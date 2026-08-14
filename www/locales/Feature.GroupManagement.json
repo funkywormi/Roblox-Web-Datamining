@@ -173,5 +173,8 @@
     "Organization.MemberManager.Label": "Add or remove group members",
     "ManageCloudAuthentication.Label": "Create community API keys",
     "Info.PrivateRole": "This role is private and only visible to those with permissions",
-    "Label.NoMembersFound": "No members found"
+    "Label.NoMembersFound": "No members found",
+    "Action.CopyRoleId": "Copy role ID",
+    "Label.RoleId": "Role ID",
+    "Message.RoleIdCopied": "Role ID copied to clipboard"
 }

@@ -32,6 +32,7 @@
     "Description.AllowCopyingDisclaimer": "By checking this box, {boldTagStart}you are granting every other user of Roblox the right to use{boldTagEnd} (in various ways) the content you are now sharing. {boldTagStart2}If you do not want to grant this right, please do not check this box{boldTagEnd2}. For more information about sharing content, please review the Roblox {linkStart}Terms of Use{linkEnd}.",
     "Label.Favorites": "Favorites",
     "Label.ExperimentalWarning": "{aTagStartWithHref}{ExperimentalGamesInfoLink}{hrefEnd}This experience may not function as intended.{aTagEnd} The developer needs to update the experience.",
+    "Action.Report": "Report",
     "Action.Continue": "Continue",
     "Label.GenreAll": "All",
     "Label.GenreBuilding": "Building",

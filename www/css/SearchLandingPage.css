@@ -882,6 +882,10 @@
     right: 0
 }
 
+.gap-\[var\(--size-150\)\] {
+    gap: var(--size-150)
+}
+
 .scroll {
     overflow: auto
 }
@@ -914,6 +918,11 @@
 .size-\[var\(--icon-size-xsmall\)\] {
     width: var(--icon-size-xsmall);
     height: var(--icon-size-xsmall)
+}
+
+.size-\[var\(--icon-size-xxlarge\)\] {
+    width: var(--icon-size-xxlarge);
+    height: var(--icon-size-xxlarge)
 }
 
 .max-width-\[calc\(var\(--radix-popover-content-available-width\)-2rem\)\] {
@@ -956,6 +965,18 @@
 
 .content-\[var\(--light-mode-content-emphasis\)\] {
     color: var(--light-mode-content-emphasis)
+}
+
+.bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
+    background-color: rgb(from var(--color-system-alert)r g b/.2)
+}
+
+.bg-\[rgb\(from_var\(--color-system-success\)_r_g_b_\/_0\.2\)\] {
+    background-color: rgb(from var(--color-system-success)r g b/.2)
+}
+
+.bg-\[rgb\(from_var\(--color-system-warning\)_r_g_b_\/_0\.2\)\] {
+    background-color: rgb(from var(--color-system-warning)r g b/.2)
 }
 
 .bg-\[var\(--light-mode-surface-100\)\] {
@@ -6008,6 +6029,14 @@
 
 .placeholder\:content-muted::placeholder {
     color: var(--color-content-muted)
+}
+
+.focus-within\:stroke-system-alert:focus-within {
+    border-color: var(--color-system-alert)
+}
+
+.focus-within\:stroke-system-emphasis:focus-within {
+    border-color: var(--color-system-emphasis)
 }
 
 .hover\:underline:hover {
