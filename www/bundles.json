@@ -16,6 +16,11 @@
             "source": "/home"
         },
         {
+            "name": "Authentication.AccountRecovery",
+            "url": "https://js.rbxcdn.com/ca8fc82018c3f464c07708a31a9f50b6224b1caf002d9ec31ac6542fe56e952b.js",
+            "source": "/login/forgot-password-or-username"
+        },
+        {
             "name": "Authentication.AccountSwitch",
             "url": "https://js.rbxcdn.com/63dacb1fad541c7c50a937cbab11cd0858b78187acc6c0af105381aa406e7147.js",
             "source": "/home"
@@ -24,6 +29,11 @@
             "name": "Authentication.Captcha",
             "url": "https://js.rbxcdn.com/44ff0f2cc820b734456e36bcd3528a30460f0576ff6ff17478b2d84824b64abd.js",
             "source": "/home"
+        },
+        {
+            "name": "Authentication.CrossDevice",
+            "url": "https://js.rbxcdn.com/98d87b17b72853c32ccad8f71f741fd7cd1c39eeaeb3365d2aabf571cc52895d.js",
+            "source": "/crossdevicelogin/ConfirmCode"
         },
         {
             "name": "Authentication.Login",
@@ -46,6 +56,16 @@
             "source": "/home"
         },
         {
+            "name": "Authentication.ResetPassword",
+            "url": "https://js.rbxcdn.com/9dbd7eb5dfec0dbde4d8354fd560294bb7e34aa6ceed1e5ec80497c0134466cd.js",
+            "source": "/login/forgot-password-or-username"
+        },
+        {
+            "name": "Authentication.SecurityNotification",
+            "url": "https://js.rbxcdn.com/e93246892d2cb02695b33f1d99c45ed6b7d1d234fba985c5d96f4dc845d97020.js",
+            "source": "/login/forgot-password-or-username"
+        },
+        {
             "name": "Authentication.SignUp",
             "url": "https://js.rbxcdn.com/286ccc74e823e8a7e867dd3fdf61521a1f66aae27a3d1cfe26e13b565e38fb57.js",
             "source": "/home"
@@ -66,6 +86,11 @@
             "source": "/home"
         },
         {
+            "name": "Common.AssetTypes",
+            "url": "https://js.rbxcdn.com/80e6e237cec35c62a31eed8f3298a79fe22a6b736d42479c971d1068ed9f03ca.js",
+            "source": "/trades"
+        },
+        {
             "name": "Common.ExternalLinks",
             "url": "https://js.rbxcdn.com/597b203c8ac8d4fc140786f4add8c7735625c5694688eff149f402bd5858d606.js",
             "source": "/upgrades/robux"
@@ -78,7 +103,7 @@
         {
             "name": "Common.PremiumFeatures",
             "url": "https://js.rbxcdn.com/ff2f882422ea649eca0070815b9e250a555f131729d7e7eaa2c1e73c621b65fc.js",
-            "source": "/upgrades/robux"
+            "source": "/gift-robux"
         },
         {
             "name": "Common.Presence",
@@ -116,6 +141,21 @@
             "source": "/home"
         },
         {
+            "name": "CreatorDashboard.Analytics",
+            "url": "https://js.rbxcdn.com/544fca4382591fbf830e37f49c62fe4a6d70b112be1a2fbb4fc4fc1f96de897a.js",
+            "source": "/communities/configure"
+        },
+        {
+            "name": "CreatorDashboard.Controls",
+            "url": "https://js.rbxcdn.com/fbd38526029767e7996698c0f06209991b7c22077646cca690f700d5fae62fe6.js",
+            "source": "/communities/1"
+        },
+        {
+            "name": "Feature.Accessibility",
+            "url": "https://js.rbxcdn.com/d95cc1fa721c3f82e09732b924936eb0be9c2c7978f68aedb0d8dbd3e06dce33.js",
+            "source": "/my/account"
+        },
+        {
             "name": "Feature.AccountSecurityPrompt",
             "url": "https://js.rbxcdn.com/0089de28097df89a1d7ffa268edbe3c15549a4454976767cee0e0c43d731701c.js",
             "source": "/home"
@@ -131,14 +171,29 @@
             "source": "/home"
         },
         {
+            "name": "Feature.AppealsPortal",
+            "url": "https://js.rbxcdn.com/dff1b43c25802f6ca22db4355afdb4bc4872b26165768975bbf2905432f1ac47.js",
+            "source": "/support"
+        },
+        {
             "name": "Feature.Avatar",
             "url": "https://js.rbxcdn.com/b473222f9d12d4b2c5bfab4c264f0f18a98e2abd0eb42fe1c6977ae7544aceb0.js",
             "source": "/my/avatar"
         },
         {
+            "name": "Feature.BillingAddress",
+            "url": "https://js.rbxcdn.com/2681f3793e0ae982d2d933dfa954fa398a56303162d5f75c4fb8447a1274e294.js",
+            "source": "/redeem"
+        },
+        {
             "name": "Feature.BiometricChallenge",
             "url": "https://js.rbxcdn.com/e92d027c197738388b36f7a8164dd7bdfc61a638ac1acaeb577a92fb77a98857.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.BlockingModal",
+            "url": "https://js.rbxcdn.com/c9a5f3fb0b5a701ada0d21a4b1084534f46ce12ae6b96e0da5a89ed175d3d721.js",
+            "source": "/users/1/profile"
         },
         {
             "name": "Feature.BuyRobux",
@@ -156,9 +211,19 @@
             "source": "/home"
         },
         {
+            "name": "Feature.CommunityLinks",
+            "url": "https://js.rbxcdn.com/5ae38cee9aed098e9680b6f2ecacc829b8a5a5fa9cd2ebbf61a3a4d397840f91.js",
+            "source": "/communities/1"
+        },
+        {
             "name": "Feature.ContactUpsell",
             "url": "https://js.rbxcdn.com/8e12294bc660b8f537fc6a3edd2090a9357f0234ccd1e458ab5803ce590c884f.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.CustomForms",
+            "url": "https://js.rbxcdn.com/dc5a5a9af11da850607ed819ebbd769950ea02c300677fc9693d2720263a201f.js",
+            "source": "/communities/1"
         },
         {
             "name": "Feature.Denied",
@@ -166,14 +231,44 @@
             "source": "/home"
         },
         {
+            "name": "Feature.DeveloperProducts",
+            "url": "https://js.rbxcdn.com/2086c2d1ac0a96e57ad3bd137d0682b95816ef38ece13cbab923c812a32d6c37.js",
+            "source": "/games/1818"
+        },
+        {
             "name": "Feature.DeviceIntegrityChallenge",
             "url": "https://js.rbxcdn.com/993eb6cb9b2ed18baadeca1088086e99ede5c9877cb7fe9700e0c6854bfeefe0.js",
             "source": "/home"
         },
         {
+            "name": "Feature.DisplayName",
+            "url": "https://js.rbxcdn.com/4656c5491801de74e63d98690e434f197dc90b36363a1cdf8b8a36f7593e6802.js",
+            "source": "/my/account"
+        },
+        {
+            "name": "Feature.DoNotDisturb",
+            "url": "https://js.rbxcdn.com/16b1982e81eea1ebbb4ce73345c7d91850e4494a96c19c0adc4ce1a6647a5145.js",
+            "source": "/my/account"
+        },
+        {
             "name": "Feature.DownloadLanding",
             "url": "https://js.rbxcdn.com/6d0691ef28f81e89001d5aaf49fcc4123261046af9aafa9b6368c04aae0bcd98.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.DSAIllegalContentReportForm",
+            "url": "https://js.rbxcdn.com/f7ca01a72e6123bb0826ba9deb8866f1f6a82ff4442a2e90c38c8f7982d894df.js",
+            "source": "/illegal-content-reporting"
+        },
+        {
+            "name": "Feature.DynamicUI",
+            "url": "https://js.rbxcdn.com/2f1d3b0b3b547e463fd62e550e6c1ead67555b054f641f44833bf432e3f93417.js",
+            "source": "/report-abuse"
+        },
+        {
+            "name": "Feature.EditUserBio",
+            "url": "https://js.rbxcdn.com/ac5fefa1a754781d3c1c02704fe6ac81c3a146a71ee09c796e35a77a2d42b1bb.js",
+            "source": "/users/1/profile"
         },
         {
             "name": "Feature.EmailVerificationChallenge",
@@ -188,7 +283,12 @@
         {
             "name": "Feature.Favorites",
             "url": "https://js.rbxcdn.com/69c3f641759f1d3f8d23f837f2011c1bd85ad258641401e27f6562ddf2e84d2e.js",
-            "source": "/catalog/3360689775"
+            "source": "/users/1/favorites"
+        },
+        {
+            "name": "Feature.FileUploadComponent",
+            "url": "https://js.rbxcdn.com/96552cc8a52c69233e8c72f10b20053a51fe79378958db23b63fb8b068b5d22d.js",
+            "source": "/communities/1"
         },
         {
             "name": "Feature.ForceAuthenticator",
@@ -201,9 +301,19 @@
             "source": "/home"
         },
         {
+            "name": "Feature.FriendRecommendations",
+            "url": "https://js.rbxcdn.com/52d84c4f622197d530e6745c34209e7fc360e58bf420746db82ddcf2c33ea5c1.js",
+            "source": "/users/friends"
+        },
+        {
             "name": "Feature.Friends",
             "url": "https://js.rbxcdn.com/351c3e8fa2e21b1c1aa5509fcbac99d35086939f83d28d521c13e572404e2d16.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.GameBadges",
+            "url": "https://js.rbxcdn.com/6e2e5db4571fc36021cb6c35e3866c9fa5bff20b334ba0729a8747ea7e6a228a.js",
+            "source": "/games/1818"
         },
         {
             "name": "Feature.GameDetails",
@@ -221,9 +331,24 @@
             "source": "/home"
         },
         {
+            "name": "Feature.GamePass",
+            "url": "https://js.rbxcdn.com/c6b039c5cb0354cf8e0c762554e932cbf42b075c855faca145e9c3d4931b9a4f.js",
+            "source": "/games/1818"
+        },
+        {
             "name": "Feature.GiftingProducts",
             "url": "https://js.rbxcdn.com/2f309407319c0afa41fa2e0cf651da97d8881a3f1f6d39a4cbf7f0dc94353ec0.js",
-            "source": "/upgrades/robux"
+            "source": "/gift-robux"
+        },
+        {
+            "name": "Feature.GroupManagement",
+            "url": "https://js.rbxcdn.com/84e1c75ccca8cfe784e9af97af5fb41361e3b673d0907b13abefed475a3fee1f.js",
+            "source": "/communities/configure"
+        },
+        {
+            "name": "Feature.Groups",
+            "url": "https://js.rbxcdn.com/c703d8791f15e5a3cb5acecb6a217fc5570cdbe08df0b605dcd19ea9a524dc91.js",
+            "source": "/transactions"
         },
         {
             "name": "Feature.Home",
@@ -239,6 +364,11 @@
             "name": "Feature.InExperienceIntervention",
             "url": "https://js.rbxcdn.com/52fa5e108a4648249b8d5969e87264f18d3f0bb94478d118424da8df66ad2a4a.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.Inventory",
+            "url": "https://js.rbxcdn.com/c43db396b536126091c604a2e16244a1ad633db9bddbc714120bba962f91296f.js",
+            "source": "/users/inventory"
         },
         {
             "name": "Feature.Item",
@@ -261,9 +391,24 @@
             "source": "/home"
         },
         {
+            "name": "Feature.Messages",
+            "url": "https://js.rbxcdn.com/7ff7658c068ff35f8af21b8cab416bd29133789bb6068fffd0891101888b76c8.js",
+            "source": "/my/messages"
+        },
+        {
+            "name": "Feature.Moderation",
+            "url": "https://js.rbxcdn.com/29b2b8f66cf17b5c78647df32043db41d1d55f71329d8821320e87d23dcd2962.js",
+            "source": "/safety-dashboard"
+        },
+        {
             "name": "Feature.NotApproved",
             "url": "https://js.rbxcdn.com/272d85a93f43b2ce1fc8c57e8e1359fee75ba4ce4a3b9abeb150d92fd2de6740.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.NotificationSettings",
+            "url": "https://js.rbxcdn.com/bb2ed5a7f643269140986e65d5f51f09700e3beaff27ad1543d189f82d486886.js",
+            "source": "/my/account"
         },
         {
             "name": "Feature.Parents",
@@ -273,7 +418,12 @@
         {
             "name": "Feature.Payment",
             "url": "https://js.rbxcdn.com/c0e3e9e1276f1362beaa45efc79bc5916100ad05f2332c59786149efca5c4216.js",
-            "source": "/upgrades/robux"
+            "source": "/redeem"
+        },
+        {
+            "name": "Feature.PaymentRedeem",
+            "url": "https://js.rbxcdn.com/9c4e36e41034b229af8a172f98bc0bec63cd6b41517ed07f63d629d58c5f0663.js",
+            "source": "/redeem"
         },
         {
             "name": "Feature.PeopleList",
@@ -318,7 +468,12 @@
         {
             "name": "Feature.PrivateSales",
             "url": "https://js.rbxcdn.com/23a4d7c1405e017062c61b8ee0b488a1912d095511cc8dfa82e87ce0f13c5c21.js",
-            "source": "/my/avatar"
+            "source": "/users/inventory"
+        },
+        {
+            "name": "Feature.PrivateServers",
+            "url": "https://js.rbxcdn.com/f1173bbba00d0f68be796d340cb4be4580b6f2ed79a1699537d77fd08d3710c3.js",
+            "source": "/games/1818"
         },
         {
             "name": "Feature.Profile",
@@ -329,6 +484,11 @@
             "name": "Feature.ProfileBadges",
             "url": "https://js.rbxcdn.com/ebc57f8a4aabceab9f38dda880bf11c04f2c92f441e535f0bcaa21b294736e65.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.PromotedChannels",
+            "url": "https://js.rbxcdn.com/24c9fc6bb717efc8a4f4f9726653660b3083ff05e0d191974c98ffe4b689e1b6.js",
+            "source": "/users/1/profile"
         },
         {
             "name": "Feature.ProofOfSpaceChallenge",
@@ -356,6 +516,16 @@
             "source": "/home"
         },
         {
+            "name": "Feature.RichTextEditor",
+            "url": "https://js.rbxcdn.com/ebdfc78e0916a1d9df95093b53e55877734b0ac058c256b58bb0f645c724546b.js",
+            "source": "/communities/1"
+        },
+        {
+            "name": "Feature.RobloxCredit",
+            "url": "https://js.rbxcdn.com/c08977d7658686f3d3dc7f4e43e543d45f3887454c8e6c389c6abb181af10775.js",
+            "source": "/my/account"
+        },
+        {
             "name": "Feature.RobloxSubscription",
             "url": "https://js.rbxcdn.com/6a8fdf34048e5fe792fac7c7d6c58a6ddd1af61978d8d92f355753047876d53c.js",
             "source": "/home"
@@ -366,14 +536,79 @@
             "source": "/home"
         },
         {
+            "name": "Feature.SafetyDashboard",
+            "url": "https://js.rbxcdn.com/40f14b0862841f8b23cbeee58b78ba6b81bebfd2447488a6908605b20a19725e.js",
+            "source": "/help-safety"
+        },
+        {
+            "name": "Feature.Screentime",
+            "url": "https://js.rbxcdn.com/46ec7856c5aa19b2bd5e4d7b745da33086769838558970c98610e983b70fe922.js",
+            "source": "/my/account"
+        },
+        {
+            "name": "Feature.SearchDropdownComponent",
+            "url": "https://js.rbxcdn.com/d6ffeed49fbdc41c1589d170c60383f5415c915849d72401bfa3f07f4b2096de.js",
+            "source": "/communities/1"
+        },
+        {
             "name": "Feature.SecurityQuestions",
             "url": "https://js.rbxcdn.com/2da1b676b979a60ce3b9471d919f53c6523c606f10e6ba75fa3c168945b8455a.js",
             "source": "/home"
         },
         {
+            "name": "Feature.ServerList",
+            "url": "https://js.rbxcdn.com/34fba2d457048406e78d818fcb1bc2ab2e694ad99f864ddc5167ed808c105c3d.js",
+            "source": "/communities/1"
+        },
+        {
+            "name": "Feature.SessionManagement",
+            "url": "https://js.rbxcdn.com/69328308e792bf2c280cc9e66e94782e9ee1ffec5efde60c9c9b2f1d858a5a9c.js",
+            "source": "/my/account"
+        },
+        {
             "name": "Feature.ShopDialog",
             "url": "https://js.rbxcdn.com/13b3b0cf97cfb5da4538eb0c59f252188b4f724f9328c264a58d24a714e41fe5.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.SocialLinks",
+            "url": "https://js.rbxcdn.com/e5065fed674364cbb787d932acc57e348bac279ce4e473036f16b1d239e13e51.js",
+            "source": "/my/account"
+        },
+        {
+            "name": "Feature.SocialShare",
+            "url": "https://js.rbxcdn.com/f82474cc57fda02938e5ed5fe9adcfa986e91e2239d22c73f1009223fe7f8899.js",
+            "source": "/games/1818"
+        },
+        {
+            "name": "Feature.SponsoredAdsList",
+            "url": "https://js.rbxcdn.com/13f0c5c4611294f1f0075cd0bd6bae45b6195bf35f0c07632710e4719d26596b.js",
+            "source": "/sponsorships/list"
+        },
+        {
+            "name": "Feature.SponsoredPages",
+            "url": "https://js.rbxcdn.com/e2be5c4b65bb1bc79da25023da473e6d3f6612829e1c535da886ea1ab61983ec.js",
+            "source": "/shopgiftcards"
+        },
+        {
+            "name": "Feature.Subscription",
+            "url": "https://js.rbxcdn.com/258a96cccbe322f6782260919fe9946dbe8414b4f6e08e7bcf6df452d2716e00.js",
+            "source": "/games/1818"
+        },
+        {
+            "name": "Feature.Support",
+            "url": "https://js.rbxcdn.com/95cc031aea41b5cfd73238bfdf927672c895c814032f1e499c331ab5872664c0.js",
+            "source": "/support"
+        },
+        {
+            "name": "Feature.SupportCenter",
+            "url": "https://js.rbxcdn.com/9ab2c39fb89d57e855bd888d3398bf31bb3ac76bf6bf0e22adfa0c139997948b.js",
+            "source": "/support-center"
+        },
+        {
+            "name": "Feature.SupportedBrowsers",
+            "url": "https://js.rbxcdn.com/340c7872da3efc0c41b58c55435c2051e9fcc71863ebabeb77aad1be971525b5.js",
+            "source": "/supported-browsers"
         },
         {
             "name": "Feature.Tracking",
@@ -383,7 +618,17 @@
         {
             "name": "Feature.Trades",
             "url": "https://js.rbxcdn.com/8da3c3a13108eb874aec96f08696084e10506c1dec461163496dbc45e412df20.js",
-            "source": "/my/avatar"
+            "source": "/trades"
+        },
+        {
+            "name": "Feature.Transactions",
+            "url": "https://js.rbxcdn.com/16e015d6e4a35efd7026f9d27b1ed76d504cbc810063a25e2b8b53adcca8baa2.js",
+            "source": "/transactions"
+        },
+        {
+            "name": "Feature.UniversalFeatureRestrictions",
+            "url": "https://js.rbxcdn.com/b86bd713876fc5fdbaf208c1a989db46689673d6247cc1c1ee9800665fb00ad2.js",
+            "source": "/safety-dashboard"
         },
         {
             "name": "Feature.VerificationUpsell",
@@ -396,6 +641,21 @@
             "source": "/upgrades/robux"
         },
         {
+            "name": "Feature.VIPServer",
+            "url": "https://js.rbxcdn.com/a979dce0dce85b7886fd9b6df5abeed6eb3afdc4c82b7de4d5fb2cfb86b2518d.js",
+            "source": "/games/1818"
+        },
+        {
+            "name": "Feature.VirtualEvents",
+            "url": "https://js.rbxcdn.com/6412c42e0a3a07943a1a1639e01d30e4f76ac13a860e9c023752eec12622df4a.js",
+            "source": "/communities/1"
+        },
+        {
+            "name": "Feature.VotingPanel",
+            "url": "https://js.rbxcdn.com/4f6098a7154e8118f90152edfd2791f983d3ed98a8c1ae1fff87790ccf729034.js",
+            "source": "/games/1818"
+        },
+        {
             "name": "IAPExperience.PurchaseError",
             "url": "https://js.rbxcdn.com/3e545d98e98d8a8a188a4ef6ce70138b165954d7b45c0c0e54a5cf23ad0cc12b.js",
             "source": "/home"
@@ -404,6 +664,16 @@
             "name": "Notifications.NotificationStream",
             "url": "https://js.rbxcdn.com/370f41e6c511fd5b12ddd14e625ea29d9b315e9b32cd36601188a050ae2d7a2e.js",
             "source": "/home"
+        },
+        {
+            "name": "Notifications.Preferences",
+            "url": "https://js.rbxcdn.com/4385b4a024d6d74c443a79d1d4b8ae10926975c90eec0640cf31cc4710a000e8.js",
+            "source": "/my/account"
+        },
+        {
+            "name": "PlayerFeedbacks.VoteForm",
+            "url": "https://js.rbxcdn.com/49e32623688fc4327d7ed64eb516d2078447d9307666ec5ea011b546705444d0.js",
+            "source": "/games/1818"
         },
         {
             "name": "Purchasing.PurchaseDialog",
@@ -416,12 +686,22 @@
             "source": "/home"
         },
         {
+            "name": "Search.GlobalSearch",
+            "url": "https://js.rbxcdn.com/f9d748b8e4d793979c69621f677175a6fe4149855eaa3553df7289d76d8d2d58.js",
+            "source": "/discover/?Keyword=roblox"
+        },
+        {
             "name": "Verification.Identity",
             "url": "https://js.rbxcdn.com/d2103009f17303199e698315acec635d3ebd96fb6072fa9804cd14c6fef0914d.js",
             "source": "/home"
         }
     ],
     "js": [
+        {
+            "name": "AbuseReportWebPlatform",
+            "url": "https://js.rbxcdn.com/5770b1ba31979178aed98ede9a79566f9ad7fab7da9bc58033013e2d89fe03da-AbuseReportWebPlatform.js",
+            "source": "/report-abuse"
+        },
         {
             "name": "AccessManagementUpsell",
             "url": "https://js.rbxcdn.com/4e3e9c2f50f98960207aef1cc243c85914cda72e2c1f78ea66f35f61096e2c8a-AccessManagementUpsell.js",
@@ -431,6 +711,11 @@
             "name": "AccessManagementUpsellV2",
             "url": "https://js.rbxcdn.com/17c30f0868b8f64a10d24db42ca77291f709fb48ab9abd71a32b8c23219a92c6-AccessManagementUpsellV2.js",
             "source": "/home"
+        },
+        {
+            "name": "AccountRecovery",
+            "url": "https://js.rbxcdn.com/cafea3d748f41103bd71625b9db9acec4b29197259d883588bb32cf8171f1926-AccountRecovery.js",
+            "source": "/login/forgot-password-or-username"
         },
         {
             "name": "AccountSecurityPrompt",
@@ -448,6 +733,11 @@
             "source": "/home"
         },
         {
+            "name": "AudioButton",
+            "url": "https://js.rbxcdn.com/dcbe6c1a9a3b44698a6b140263802ad0d31aafd6bfe07d2d34a922f0238c5f63.js",
+            "source": "/users/inventory"
+        },
+        {
             "name": "Avatar",
             "url": "https://js.rbxcdn.com/04f9637f929cf9095f72ec935a63084af79c188b428f8f7a9d3d596085bd1833-Avatar.js",
             "source": "/my/avatar"
@@ -455,7 +745,7 @@
         {
             "name": "AvatarAccoutrementRules",
             "url": "https://js.rbxcdn.com/22854f063a47132a0b95cdcbb024cf148a0e69eec0f1644dabffee8ba69aa84c-AvatarAccoutrementRules.js",
-            "source": "/my/avatar"
+            "source": "/users/inventory"
         },
         {
             "name": "AvatarShopHomepageRecommendations",
@@ -478,6 +768,11 @@
             "source": "/home"
         },
         {
+            "name": "Captcha",
+            "url": "https://js.rbxcdn.com/b604dac29d89b56aef30844f099c5640c2f1870a97a06f4e692208d24097f9ed-Captcha.js",
+            "source": "/support"
+        },
+        {
             "name": "CaptchaCore",
             "url": "https://js.rbxcdn.com/8e79851738baf4a99514ce726568faa52a0155d6298e0ed7521a210bde79c688-CaptchaCore.js",
             "source": "/home"
@@ -493,9 +788,29 @@
             "source": "/home"
         },
         {
+            "name": "ChallengeHybridView",
+            "url": "https://js.rbxcdn.com/3ff6ba8eaa51d46892f8ad1f940829139001e0872daa81d8c92af64a6baa715a-ChallengeHybridView.js",
+            "source": "/challenge/cdn/hybrid"
+        },
+        {
             "name": "Chat",
             "url": "https://js.rbxcdn.com/45673a16a1a4b37322ddb5c9f1f01aaa86777d59320bef7c0ec8989009a2adeb-Chat.js",
             "source": "/home"
+        },
+        {
+            "name": "CommunityTelemetry",
+            "url": "https://js.rbxcdn.com/e874a0270e6e11308c2456dff7fa7927fc7fd59b1a3bfe03404db9469478603f-CommunityTelemetry.js",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "ConfigureGroup",
+            "url": "https://js.rbxcdn.com/819d84b472726550ae9918ae84d0e19471fda574912bd3d2b786b4dabf3ef606-ConfigureGroup.js",
+            "source": "/communities/configure"
+        },
+        {
+            "name": "ConfigurePrivateServer",
+            "url": "https://js.rbxcdn.com/39e6f1ef72f0d7b2126fb61a9c9c5a0e16a4aadbb1b8359daded7aeacace9c49-ConfigurePrivateServer.js",
+            "source": "/private-server/configure/527154577"
         },
         {
             "name": "ConfigureWebApps",
@@ -513,9 +828,24 @@
             "source": "/home"
         },
         {
+            "name": "CoreRobloxUtilities",
+            "url": "https://js.rbxcdn.com/41bd9f2b3a9485661a0c9637526141c355311899d473b7a4ad2cca837f5e47f0.js",
+            "source": "/challenge/cdn/hybrid"
+        },
+        {
             "name": "CoreUtilities",
             "url": "https://js.rbxcdn.com/c12384c48770c4af46c489ca4c8bd8c4524d2d3ee51cde33ff15dd8014762f57-CoreUtilities.js",
             "source": "/home"
+        },
+        {
+            "name": "CreateGroup",
+            "url": "https://js.rbxcdn.com/2c478eebef391e788e7d4a728908aa79f17621c3f267d0c57186d2e776c54a27-CreateGroup.js",
+            "source": "/communities/create"
+        },
+        {
+            "name": "CrossDeviceLoginConfirmCode",
+            "url": "https://js.rbxcdn.com/aafb7243f02b476f7ce647a0b641a242b2afd90b1d7afafdd7cca07fc847101b-CrossDeviceLoginConfirmCode.js",
+            "source": "/crossdevicelogin/ConfirmCode"
         },
         {
             "name": "CrossTabCommunication",
@@ -523,9 +853,29 @@
             "source": "/home"
         },
         {
+            "name": "CurrentWearing",
+            "url": "https://js.rbxcdn.com/cb7c16253f1acd9b4a9485a0c7e4f385a8174c3afba89f5a50842ca3caf739bb.js",
+            "source": "/users/1/profile"
+        },
+        {
             "name": "CursorPagination",
             "url": "https://js.rbxcdn.com/966e7d62281fb04569c27fc1c68ae404d0d2385ecc1ed3ceb532bd1623012fb9.js",
             "source": "/catalog"
+        },
+        {
+            "name": "CustomerSupportChat",
+            "url": "https://js.rbxcdn.com/021eb070c762d1e5ffa9d917ef07442cd64c3edde7339709f34fef0a1cad44ad-CustomerSupportChat.js",
+            "source": "/support"
+        },
+        {
+            "name": "DeveloperProductDetails",
+            "url": "https://js.rbxcdn.com/325b08f1952cbb417b91e0cb67d958a9dd09ffdf85116ae94b2db3b5f30c605e-DeveloperProductDetails.js",
+            "source": "/developer-product/47545/product/45124061"
+        },
+        {
+            "name": "DSAIllegalContentReportForm",
+            "url": "https://js.rbxcdn.com/f22af0ea00f546f56eea8e86eb5045ed16d49524af1974a557b51b2a515c029d-DsaIllegalContentReportForm.js",
+            "source": "/illegal-content-reporting"
         },
         {
             "name": "EmailVerifyCodeModal",
@@ -548,9 +898,24 @@
             "source": "/home"
         },
         {
+            "name": "Favorites",
+            "url": "https://js.rbxcdn.com/ca33a9da93fdb5616a0c7ba02f6f4001b3c264b10a0333afc15683a016c6daae-Favorites.js",
+            "source": "/users/1/favorites"
+        },
+        {
             "name": "FavoritesButton",
             "url": "https://js.rbxcdn.com/25d190530aa670176044b41eea464ad5f9224a19988a7e1fdaac515eaa157279-FavoritesButton.js",
             "source": "/catalog/3360689775"
+        },
+        {
+            "name": "Fido2CredentialRegistration",
+            "url": "https://js.rbxcdn.com/38849c4ab217e75f056935e43b66034ada6afbfa2ae25e62f36d6e76c7b70d65-Fido2CredentialRegistration.js",
+            "source": "/my/account"
+        },
+        {
+            "name": "FileUpload",
+            "url": "https://js.rbxcdn.com/991b3632781e6d95c6e03257bdabc212e46ecddcb2ebca7d347f0663b655eed8.js",
+            "source": "/communities/configure"
         },
         {
             "name": "Footer",
@@ -558,9 +923,44 @@
             "source": "/home"
         },
         {
+            "name": "ForgotCredentials",
+            "url": "https://js.rbxcdn.com/9c062292dba5947650517d38699bba3f871efa1e62c5ced6483fae60b1aae3af-ForgotCredentials.js",
+            "source": "/login/forgot-password-or-username"
+        },
+        {
+            "name": "Friends",
+            "url": "https://js.rbxcdn.com/69b5932b0d6044aee051753c64875a166d84ea125dc3438704b7c7acf5d9decc-Friends.js",
+            "source": "/users/friends"
+        },
+        {
+            "name": "FriendsCarousel",
+            "url": "https://js.rbxcdn.com/53f5026286a2fd62cbd32a04bc373fdf7864fca7ccbb79c1cb393eb7e8e41abe-FriendsCarousel.js",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "GameBadges",
+            "url": "https://js.rbxcdn.com/5420af216971fec031b6913820b8f4b9a48ef6ca7f0c7f0541f79cc1ea2ad42b-GameBadges.js",
+            "source": "/games/1818"
+        },
+        {
             "name": "GameCarousel",
             "url": "https://js.rbxcdn.com/2be0a71318421d6e4b83efa528020c18fc9ab7785717aa980765f3c1b9a23246-GameCarousel.js",
             "source": "/charts"
+        },
+        {
+            "name": "GameCommunity",
+            "url": "https://js.rbxcdn.com/c1879942fa4c997ca0eba4586d9df487d6cf5ed1c78a44e85b21d3427f4f3eb8.js",
+            "source": "/games/1818"
+        },
+        {
+            "name": "GameDetails",
+            "url": "https://js.rbxcdn.com/afbad4bb8cd74e236b655e0e0d84428eb583eea701818f2c845e03f985d3fa57-GameDetails.js",
+            "source": "/games/1818"
+        },
+        {
+            "name": "GameGuidelines",
+            "url": "https://js.rbxcdn.com/6145118d67597fab71a7f10f8312a5ae18e5a162ca18f35f3063a7ed75dffdfa-GameGuidelines.js",
+            "source": "/games/1818"
         },
         {
             "name": "GameLaunch",
@@ -568,9 +968,74 @@
             "source": "/home"
         },
         {
+            "name": "GameSearch",
+            "url": "https://js.rbxcdn.com/f29478cc38259be2139939b720cb6f1291e000a6389dc8113e1c3625734bf92f-GameSearch.js",
+            "source": "/discover/?Keyword=roblox"
+        },
+        {
+            "name": "GameStore",
+            "url": "https://js.rbxcdn.com/2136fcc7af828e577e3070708c453e22bfa0e6bee4de83fa150e57327477e6cc-GameStore.js",
+            "source": "/games/1818"
+        },
+        {
+            "name": "GameSubscriptions",
+            "url": "https://js.rbxcdn.com/a86664be1e71343f2efa89a5984eb81834c822e605ad4fd44272d8aebda1d34f-GameSubscriptions.js",
+            "source": "/games/1818"
+        },
+        {
+            "name": "GiftCards",
+            "url": "https://js.rbxcdn.com/0f00ddc47d3b160df43d87f77122563aa14cc043853d5835197a5bd6bac3730e-GiftCards.js",
+            "source": "/giftcards-us"
+        },
+        {
+            "name": "GiftingProducts",
+            "url": "https://js.rbxcdn.com/8c294db746dcba2f6836cef66b0f2ec06c8d979e99f9616a33f65fa580b920b5-GiftingProducts.js",
+            "source": "/gift-robux"
+        },
+        {
             "name": "GlobalPrivacyControlChecker",
             "url": "https://js.rbxcdn.com/ef0d5bf50bd1c7c225e07156087085a29bb9b23ee09368dee2338a64fe9a7745.js",
             "source": "/home"
+        },
+        {
+            "name": "GroupContentModeration",
+            "url": "https://js.rbxcdn.com/7e611ce2ad934262bfa5abdff1a12cbf1551eaf925fde6db41302e989aeee065-GroupContentModeration.js",
+            "source": "/communities/configure"
+        },
+        {
+            "name": "GroupDetails",
+            "url": "https://js.rbxcdn.com/8d22f7fa3c4a68e4dba4d78d6a26e69cf06390d5b3ade10b15df5bf3cbda183e-GroupDetails.js",
+            "source": "/communities/1"
+        },
+        {
+            "name": "GroupEvents",
+            "url": "https://js.rbxcdn.com/bcaf0e357c8cc36e467278c4c7fafc0f1a76ed8266eb71bb9add1f045e23e2b8-GroupEvents.js",
+            "source": "/communities/1"
+        },
+        {
+            "name": "GroupForums",
+            "url": "https://js.rbxcdn.com/a47816aa7bebeafe8defa30bab892885d65e5c6d5325eb377652de57db8e2915-GroupForums.js",
+            "source": "/communities/1"
+        },
+        {
+            "name": "GroupPayouts",
+            "url": "https://js.rbxcdn.com/9ac0b8165333bb67217942570103b191209b9c94c5dedf6857d3707fc88b8e63-GroupPayouts.js",
+            "source": "/communities/1"
+        },
+        {
+            "name": "GroupSearch",
+            "url": "https://js.rbxcdn.com/73ac26263b7838bd3799bf51ce9762bedf9bee5420a53d45d03906f212725fee-GroupSearch.js",
+            "source": "/search/communities"
+        },
+        {
+            "name": "GroupShouts",
+            "url": "https://js.rbxcdn.com/52d6d484479a3d69aa27bcb61bdd087b7ffefe662218739f73943c0c41063c63-GroupShouts.js",
+            "source": "/communities/1"
+        },
+        {
+            "name": "GroupsList",
+            "url": "https://js.rbxcdn.com/faf45c651f4e84de99aea69681a8a84e817f65c1c49ab1fc2478db8382201c73-GroupsList.js",
+            "source": "/users/1/profile"
         },
         {
             "name": "HeaderScripts",
@@ -598,6 +1063,11 @@
             "source": "/home"
         },
         {
+            "name": "Inventory",
+            "url": "https://js.rbxcdn.com/ed54581f698ec3cc215a48fa8d8f016c9a1151c9ca73ef3daa2a57ba7a5d9034-Inventory.js",
+            "source": "/users/inventory"
+        },
+        {
             "name": "ItemDetails",
             "url": "https://js.rbxcdn.com/60f31de628012c32607b8f4b1488288a98bf9fc5b57251e59209e4df5fdc68ca-ItemDetails.js",
             "source": "/catalog/3360689775"
@@ -615,7 +1085,7 @@
         {
             "name": "ItemDetailsLimitedInventory",
             "url": "https://js.rbxcdn.com/74c2de7ba8a227ab30eeaa11b37066e1ab1dfb6428c4b17b76b0246915febc4a-ItemDetailsLimitedInventory.js",
-            "source": "/my/avatar"
+            "source": "/users/inventory"
         },
         {
             "name": "ItemDetailsThumbnail",
@@ -640,7 +1110,7 @@
         {
             "name": "ItemResale",
             "url": "https://js.rbxcdn.com/06634b3c3964df9c01f2a9f15d624d3cb75b04c2cd6068d57e77df3befd410b5-ItemResale.js",
-            "source": "/my/avatar"
+            "source": "/users/inventory"
         },
         {
             "name": "LatencyMeasurement",
@@ -653,9 +1123,19 @@
             "source": "/home"
         },
         {
+            "name": "NativeAdsList",
+            "url": "https://js.rbxcdn.com/e55abab02f423ff1c8cefe3d461700c8091fd1f1d760004008152e921ae012a3-NativeAdsList.js",
+            "source": "/sponsorships/list"
+        },
+        {
             "name": "Navigation",
             "url": "https://js.rbxcdn.com/ec18c4643a0a1f1f466b0bbfed2e03b610267179871f7faf85708a786397b530-Navigation.js",
             "source": "/home"
+        },
+        {
+            "name": "NotificationPreferences",
+            "url": "https://js.rbxcdn.com/aa6dbc04e7974c8cdde225ce92a213f29ea3e7bcdd8d84a9dfd558c276305068-NotificationPreferences.js",
+            "source": "/my/account"
         },
         {
             "name": "NotificationStream",
@@ -663,9 +1143,19 @@
             "source": "/home"
         },
         {
+            "name": "PaymentMethodsSetting",
+            "url": "https://js.rbxcdn.com/fcdc55acac95903cd06fd2b79831da5c4bfe127dbbc1f14c9b5aad97ebb9828e-PaymentMethodsSetting.js",
+            "source": "/my/account"
+        },
+        {
             "name": "PeopleList",
             "url": "https://js.rbxcdn.com/0782d6b419440e70332b84079e91e64da7f65e31c63b55108b75303ff13d98bc.js",
             "source": "/home"
+        },
+        {
+            "name": "PhoneValidation",
+            "url": "https://js.rbxcdn.com/f3864eb4e31b54ec164213463e8c438457336e4db0acf816c645c426f11f9718.js",
+            "source": "/login/forgot-password-or-username"
         },
         {
             "name": "PlacesList",
@@ -673,9 +1163,19 @@
             "source": "/home"
         },
         {
+            "name": "PlayerSearch",
+            "url": "https://js.rbxcdn.com/5b09ee27af043ddfe2da62fb047d5f8a533d8def80f271fc19e305c69096b9f6-PlayerSearch.js",
+            "source": "/search/users"
+        },
+        {
             "name": "Polyfill",
             "url": "https://js.rbxcdn.com/5c8a2ba3737908f693394045e81ebd71c77cde6f87550ea51f7833e8c98200ae.js",
             "source": "/home"
+        },
+        {
+            "name": "Premium",
+            "url": "https://js.rbxcdn.com/742a7595cece435d2e41a4818f6d981e18fd3c6cb0818a4bd1c877752d7c4d0b-Premium.js",
+            "source": "/trades"
         },
         {
             "name": "PresenceRegistration",
@@ -693,9 +1193,39 @@
             "source": "/home"
         },
         {
+            "name": "PrivateMessage",
+            "url": "https://js.rbxcdn.com/31122dc039d935d4f8921e3501d9bf974fcd5333e057cee78c30db513b5b5c0a-PrivateMessage.js",
+            "source": "/my/messages"
+        },
+        {
+            "name": "ProfileBadges",
+            "url": "https://js.rbxcdn.com/867fa0ac36d623c10b430b28f05e4d5faa249298cab5321d1cef1d13d5f871af.js",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "ProfileHeader",
+            "url": "https://js.rbxcdn.com/32479d6b4f5fa79633457da0ba68422ba0a90b5359f93bdd261cc000f6140cff-ProfileHeader.js",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "ProfilePlatform",
+            "url": "https://js.rbxcdn.com/215a44769b5c82fef19a5e2107134f852a1f0f24eed9063218e23cb3280bc3d8-ProfilePlatform.js",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "PromptsOrchestrator",
+            "url": "https://js.rbxcdn.com/c341478d4636f810e350cd78970139e5f053dfee7058b156d13ab0ddcad607bd-PromptsOrchestrator.js",
+            "source": "/communities/1"
+        },
+        {
             "name": "React",
             "url": "https://js.rbxcdn.com/b1eec88f581c575b721433689f5e4e1b5b47ec1df1bfbe5595660480ba2b104c-React.js",
             "source": "/home"
+        },
+        {
+            "name": "ReactCaptcha",
+            "url": "https://js.rbxcdn.com/781b5865cece935d3ff16b44e11a96829b32994289dd13cd66927dc9a04bef73-ReactCaptcha.js",
+            "source": "/redeem"
         },
         {
             "name": "ReactStyleGuide",
@@ -715,12 +1245,27 @@
         {
             "name": "Recommendations",
             "url": "https://js.rbxcdn.com/af1135f13c05984718027ea8a9eb35f03b369778bb719261bee36ae88ec3d7bc-Recommendations.js",
-            "source": "/my/avatar"
+            "source": "/users/inventory"
+        },
+        {
+            "name": "RedeemGiftCard",
+            "url": "https://js.rbxcdn.com/7faad5cb90f03cb11f8e69f677e0f5d1dc98b495c1c943517f04e4b86b10a3af-RedeemGiftCard.js",
+            "source": "/redeem"
         },
         {
             "name": "RobloxBadges",
             "url": "https://js.rbxcdn.com/0f91ae7a3efbb94ac1888931d53d6309fc65812b5a64b240c4861d9ab48011e1.js",
             "source": "/home"
+        },
+        {
+            "name": "RobloxCredit",
+            "url": "https://js.rbxcdn.com/8ce29f3627ca4d215543f48f5822f85819c150c58688b79ef8df37e95d81dd4f.js",
+            "source": "/my/account"
+        },
+        {
+            "name": "RobloxSubscription",
+            "url": "https://js.rbxcdn.com/be073e609edc9de563ea29373fd76517a419ad6cd675f8e0201daf77bf0f6f07-RobloxSubscription.js",
+            "source": "/plus"
         },
         {
             "name": "RobuxRedesign",
@@ -733,9 +1278,29 @@
             "source": "/home"
         },
         {
+            "name": "SafetyDashboard",
+            "url": "https://js.rbxcdn.com/c1b536031c5610285ec89634328889362346f0d2681418d3caa456cc7ecfd55c-SafetyDashboard.js",
+            "source": "/safety-dashboard"
+        },
+        {
+            "name": "SafetySupportPage",
+            "url": "https://js.rbxcdn.com/4b17b25a2125e86f87e25d3ff4064d9bba4dffcc422189adf96d3d21d65195c2-SafetySupportPage.js",
+            "source": "/help-safety"
+        },
+        {
+            "name": "SearchDropdown",
+            "url": "https://js.rbxcdn.com/d7b66604b6aed7454c982f0c5e055cb0a91bf6bf02ce81a9069db7578a9c7119.js",
+            "source": "/communities/1"
+        },
+        {
             "name": "SearchLandingPage",
             "url": "https://js.rbxcdn.com/49c4f94edd37da0195c6a92fe5821990bab819cc400e0d23ec5126bf697ca12d-SearchLandingPage.js",
             "source": "/home"
+        },
+        {
+            "name": "SecurityTab",
+            "url": "https://js.rbxcdn.com/d138f1a4895e7b8f9e56ce60e6285420f3c8a61f59734a772177cad8aedddcb5-SecurityTab.js",
+            "source": "/my/account"
         },
         {
             "name": "SendrNotificationStream",
@@ -748,9 +1313,34 @@
             "source": "/home"
         },
         {
+            "name": "ServerList",
+            "url": "https://js.rbxcdn.com/e518d3474b4ea1f779aecf7fcda9c7c5090a63eb56bfe85a5c5be96b0020ce4b-ServerList.js",
+            "source": "/games/1818"
+        },
+        {
+            "name": "SessionManagement",
+            "url": "https://js.rbxcdn.com/08a3a2bf2a6a2d47f4442e0dbf3217d8010960cb3fe51d92c50b0a85772467d2-SessionManagement.js",
+            "source": "/my/account"
+        },
+        {
+            "name": "ShopGiftCards",
+            "url": "https://js.rbxcdn.com/3b4e8cb079f30e5eb848caf9f664e9e12c8347fad89051644582ffe8642ebc4c-ShopGiftCards.js",
+            "source": "/shopgiftcards"
+        },
+        {
             "name": "Sitemap",
             "url": "https://js.rbxcdn.com/62aa83036d696870d18f901e03c9bee33570bc9b5bb5ea4cffe6458c3baa09c4.js",
             "source": "/sitemap"
+        },
+        {
+            "name": "SocialLinksConfiguration",
+            "url": "https://js.rbxcdn.com/c80c9c1623deb027a9a02c31e2583cc3417ab1d427fd524a131689fb67d9d324-SocialLinksConfiguration.js",
+            "source": "/communities/configure"
+        },
+        {
+            "name": "SocialLinksJumbotron",
+            "url": "https://js.rbxcdn.com/dfa910aa0465d2552b905c717aeabe5846666c51ed619ba9784ec1eb9b276012-SocialLinksJumbotron.js",
+            "source": "/users/1/profile"
         },
         {
             "name": "SponsoredCatalogItems",
@@ -763,9 +1353,24 @@
             "source": "/home"
         },
         {
+            "name": "SubscriptionManagement",
+            "url": "https://js.rbxcdn.com/74c9ecbbdaed53ef0ca8b82f4b290f86b67a0bc7ec2545fa6c6e56196e643844-SubscriptionManagement.js",
+            "source": "/my/account"
+        },
+        {
+            "name": "SupportCenter",
+            "url": "https://js.rbxcdn.com/f08cd036b643fb022e867ed96845fa714e3133a967393a4f9640caac8fb44752-SupportCenter.js",
+            "source": "/support-center"
+        },
+        {
+            "name": "SupportedBrowsers",
+            "url": "https://js.rbxcdn.com/faa458f4f0a5a65724f9fd28da2ae1b68e0b42fcb485efad35ff219de9edd015.js",
+            "source": "/supported-browsers"
+        },
+        {
             "name": "SystemFeedback",
             "url": "https://js.rbxcdn.com/aac542106f7f77697cbc3b36ab3cf0619bf9b69a1af0983e59dfeb6c36652d3b.js",
-            "source": "/my/avatar"
+            "source": "/trades"
         },
         {
             "name": "Theme",
@@ -780,7 +1385,17 @@
         {
             "name": "Thumbnails3d",
             "url": "https://js.rbxcdn.com/39a92a0ae17a331364eddd2b1e5d117609dd3720789d016779f57a131744569b-Thumbnails3d.js",
-            "source": "/my/avatar"
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "Trades",
+            "url": "https://js.rbxcdn.com/65223f06b233ac7c908e075c2d6233dd3b86160c3b875193014d8040e9deaf42-Trades.js",
+            "source": "/trades"
+        },
+        {
+            "name": "Transactions",
+            "url": "https://js.rbxcdn.com/310954a26cf5b170648bc4b306028f90c66b102bc6ef7f69c670164f791ac736-Transactions.js",
+            "source": "/transactions"
         },
         {
             "name": "TranslationResources",
@@ -793,14 +1408,29 @@
             "source": "/home"
         },
         {
+            "name": "UserDescription",
+            "url": "https://js.rbxcdn.com/91450a9877aec43f561d18dd0be86973ab72ecf5e3139743071271e9190844a8.js",
+            "source": "/users/1/profile"
+        },
+        {
             "name": "UserProfiles",
             "url": "https://js.rbxcdn.com/05355f4f42e31d8469852179b730ec7f252467eb07a3139c9f3c2551f378bb9c.js",
             "source": "/home"
         },
         {
+            "name": "UserSettings",
+            "url": "https://js.rbxcdn.com/7c57f526d5f82ddbf77f9cd045e6daabf7f6f1ea606ea0920019b86ffb4c9156-UserSettings.js",
+            "source": "/my/account"
+        },
+        {
             "name": "VerificationUpsell",
             "url": "https://js.rbxcdn.com/ea02dd03dee8d01ac1d70c79d1a67cd19f1a2cee81b5796e32ae0102917d8992-VerificationUpsell.js",
             "source": "/home"
+        },
+        {
+            "name": "VirtualEventDetails",
+            "url": "https://js.rbxcdn.com/d2c8bdbb1aad2d636399e8bb1fc459ba57f5274db95b97fdd118ac0b49712627-VirtualEventDetails.js",
+            "source": "/events/6177598281426797213"
         },
         {
             "name": "WebBlox",
@@ -815,6 +1445,11 @@
     ],
     "css": [
         {
+            "name": "AbuseReportWebPlatform",
+            "url": "https://css.rbxcdn.com/1e6b85c6d069ddc55d9e45819d445cc389dd4cf82276e6bca786f79f53384349-AbuseReportWebPlatform.css",
+            "source": "/report-abuse"
+        },
+        {
             "name": "AccessManagementUpsell",
             "url": "https://css.rbxcdn.com/d45e200658a1343116bbf4a88c367d093758085e7d001918d641c85b2143468f-AccessManagementUpsell.css",
             "source": "/home"
@@ -825,6 +1460,11 @@
             "source": "/home"
         },
         {
+            "name": "AccountRecovery",
+            "url": "https://css.rbxcdn.com/dbdf317d291b51fad6c91d1f4887a086e3b1545541ed1bf4f63e137af7a6fdbd-AccountRecovery.css",
+            "source": "/login/forgot-password-or-username"
+        },
+        {
             "name": "AccountSecurityPrompt",
             "url": "https://css.rbxcdn.com/aea0cd2ab8a0c382ece4f323f2e89df290c9a87eff4f07f3057b1eda5a10d8b1-AccountSecurityPrompt.css",
             "source": "/home"
@@ -833,6 +1473,11 @@
             "name": "AccountSwitcher",
             "url": "https://css.rbxcdn.com/0704f0124b6c271ad6dfc296f9805b5f240b99a58479b04052d6c929f4647942-AccountSwitcher.css",
             "source": "/home"
+        },
+        {
+            "name": "AudioButton",
+            "url": "https://css.rbxcdn.com/0c78732112b25b5e37a2649997142acaa78c8111502ba364152ff8f496fbd37e.css",
+            "source": "/users/inventory"
         },
         {
             "name": "Avatar",
@@ -855,6 +1500,11 @@
             "source": "/home"
         },
         {
+            "name": "Captcha",
+            "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-Captcha.css",
+            "source": "/support"
+        },
+        {
             "name": "CaptchaCore",
             "url": "https://css.rbxcdn.com/b8f8f15a57a66e73469ae72eea7d8905346afa78b9f2397627cd099f7dcc779a-CaptchaCore.css",
             "source": "/home"
@@ -870,14 +1520,59 @@
             "source": "/home"
         },
         {
+            "name": "ChallengeHybridView",
+            "url": "https://css.rbxcdn.com/34d0d3a1153c782216525fa1070ed604a7ba4b20f816d07d46c367f5825301b2-ChallengeHybridView.css",
+            "source": "/challenge/cdn/hybrid"
+        },
+        {
             "name": "Chat",
             "url": "https://css.rbxcdn.com/81879d03c5a32c5e1d9a10333caf90641e30e899b73594ff603d370c4caa1005-Chat.css",
             "source": "/home"
         },
         {
+            "name": "ConfigureGroup",
+            "url": "https://css.rbxcdn.com/d1ceba5b61e486cea06db891cfebefcbc6fdea1a1cce7166735dc435ef9a0dda-ConfigureGroup.css",
+            "source": "/communities/configure"
+        },
+        {
+            "name": "ConfigurePrivateServer",
+            "url": "https://css.rbxcdn.com/26cbc06b72c8a97b34eab8b6f72e233db5f71aff2aff3daa7e1b4fa10e280c87-ConfigurePrivateServer.css",
+            "source": "/private-server/configure/527154577"
+        },
+        {
             "name": "CookieBannerV3",
             "url": "https://css.rbxcdn.com/0f638d9cad3d450dec6771c2db09c9e8954b25b6ef84423d94f291b6c480471f-CookieBannerV3.css",
             "source": "/home"
+        },
+        {
+            "name": "CreateGroup",
+            "url": "https://css.rbxcdn.com/bcd28bdfcdaf1ee6db602bbbc816726c2caa0099a3b88c725f095542af7cd3cf-CreateGroup.css",
+            "source": "/communities/create"
+        },
+        {
+            "name": "CrossDeviceLoginConfirmCode",
+            "url": "https://css.rbxcdn.com/8529a5810e4f0f940bb1ebd4b6fec63d618f1f690dad78debd9050cc232a7afa-CrossDeviceLoginConfirmCode.css",
+            "source": "/crossdevicelogin/ConfirmCode"
+        },
+        {
+            "name": "CurrentWearing",
+            "url": "https://css.rbxcdn.com/cc693776e7662b9afb39b185b252b4f5e8cfb19436bf079b0bc6e2e970112c9d.css",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "CustomerSupportChat",
+            "url": "https://css.rbxcdn.com/1da3a3c53dd623c39fc7c2891a966136994edef7c0465ff47e04a76ad9f14ac6-CustomerSupportChat.css",
+            "source": "/support"
+        },
+        {
+            "name": "DeveloperProductDetails",
+            "url": "https://css.rbxcdn.com/ae05a65cf21755f383cffa78d4dd649fbdd39679242348328f9fc9e7116a5700-DeveloperProductDetails.css",
+            "source": "/developer-product/47545/product/45124061"
+        },
+        {
+            "name": "DSAIllegalContentReportForm",
+            "url": "https://css.rbxcdn.com/525228c6fc6fc6510a7af2f492d103be795e3096fe781f127e69db69d8518f61-DsaIllegalContentReportForm.css",
+            "source": "/illegal-content-reporting"
         },
         {
             "name": "EmailVerifyCodeModal",
@@ -890,9 +1585,24 @@
             "source": "/home"
         },
         {
+            "name": "Favorites",
+            "url": "https://css.rbxcdn.com/3290f3ebbbdcbb858ad4cdb8bcddc658a2e92dc9a1c86d8ea52a50cd4f0e9b53-Favorites.css",
+            "source": "/users/1/favorites"
+        },
+        {
             "name": "FavoritesButton",
             "url": "https://css.rbxcdn.com/0f5d6448d8b57274568db594f08ab06b2dfa3b8e0086904cb2eee20e5e06652f-FavoritesButton.css",
             "source": "/catalog/3360689775"
+        },
+        {
+            "name": "Fido2CredentialRegistration",
+            "url": "https://css.rbxcdn.com/1ed965bd66f695687b45be884d86f084e254005dea30359c0e950f25486deaa7-Fido2CredentialRegistration.css",
+            "source": "/my/account"
+        },
+        {
+            "name": "FileUpload",
+            "url": "https://css.rbxcdn.com/3e9a6d487c536a0901ff43396c9d1b57ccfb848590b3ad846be1c8f040c8129b.css",
+            "source": "/communities/configure"
         },
         {
             "name": "Footer",
@@ -900,9 +1610,29 @@
             "source": "/home"
         },
         {
+            "name": "ForgotCredentials",
+            "url": "https://css.rbxcdn.com/2d1c79c2b78e53a2840b1b9a3bc8227a6b0b8dca908068443269b5b3a36ee744-ForgotCredentials.css",
+            "source": "/login/forgot-password-or-username"
+        },
+        {
             "name": "FoundationCss",
             "url": "https://css.rbxcdn.com/c322b91ca81a7865f4c49ac675d1ab14df2cdec6479bc4a7fe8af14dc5291044-FoundationCss.css",
             "source": "/home"
+        },
+        {
+            "name": "Friends",
+            "url": "https://css.rbxcdn.com/a0f2b1446ad780763f1db2683d7d938e4b00f668a2e2df1f9e57ea87a61b8088-Friends.css",
+            "source": "/users/friends"
+        },
+        {
+            "name": "FriendsCarousel",
+            "url": "https://css.rbxcdn.com/522bd94dd9632fb8da0c55fb412cf9c7620371ab90dfafe65eda37658ef58743-FriendsCarousel.css",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "GameBadges",
+            "url": "https://css.rbxcdn.com/5b1d3527ec7241f7a7cf45ef3c4ce8f4d5b78d4e70a5ac90663a0b67594cd518-GameBadges.css",
+            "source": "/games/1818"
         },
         {
             "name": "GameCarousel",
@@ -910,9 +1640,89 @@
             "source": "/charts"
         },
         {
+            "name": "GameCommunity",
+            "url": "https://css.rbxcdn.com/8be9ea4f8b5be6a83a30167619cc5edbf9861414f17e3ab33897533505d2fbdc.css",
+            "source": "/games/1818"
+        },
+        {
+            "name": "GameDetails",
+            "url": "https://css.rbxcdn.com/1b4e6d219cf078a5561bf445d95c51b8fc16c312d4a36ca80eaba1f72a89cf63-GameDetails.css",
+            "source": "/games/1818"
+        },
+        {
+            "name": "GameGuidelines",
+            "url": "https://css.rbxcdn.com/9ac26cf3e09128693667ce57e8e50d967d80966fda3b519faf53dbc17b8128f5-GameGuidelines.css",
+            "source": "/games/1818"
+        },
+        {
             "name": "GameLaunch",
             "url": "https://css.rbxcdn.com/4806bac3d36a384ebcf7cd0da6c34786b66ca961cc084daee7995125cc08b7f1-GameLaunch.css",
             "source": "/home"
+        },
+        {
+            "name": "GameSearch",
+            "url": "https://css.rbxcdn.com/0c470b6cf50230075624ee4f3ce43771c14f69229720d74902e850603a23e1a7-GameSearch.css",
+            "source": "/discover/?Keyword=roblox"
+        },
+        {
+            "name": "GameStore",
+            "url": "https://css.rbxcdn.com/4d2396a8c3ae7447c3dc72f3b4a9689761d7f5748ab6869b8c0b54bf634cfd10-GameStore.css",
+            "source": "/games/1818"
+        },
+        {
+            "name": "GameSubscriptions",
+            "url": "https://css.rbxcdn.com/1020558a7a12de7fbe8d207eeb970adf530843b26f324b589b9d3bded92bec85-GameSubscriptions.css",
+            "source": "/games/1818"
+        },
+        {
+            "name": "GiftCards",
+            "url": "https://css.rbxcdn.com/7e34b9fc3f85faef239e7d205b49fe3e75e5cc354181cc5dc0a509b9d8a59860-GiftCards.css",
+            "source": "/giftcards-us"
+        },
+        {
+            "name": "GiftingProducts",
+            "url": "https://css.rbxcdn.com/85b371f3ae72673cab16986e8ac9f78ca80bc924649a562f78cf3b8c67ae6376-GiftingProducts.css",
+            "source": "/gift-robux"
+        },
+        {
+            "name": "GroupContentModeration",
+            "url": "https://css.rbxcdn.com/01350eb5e9024e7506533f682780e7bafc4371ec9248bfd4547867842a590ead-GroupContentModeration.css",
+            "source": "/communities/configure"
+        },
+        {
+            "name": "GroupDetails",
+            "url": "https://css.rbxcdn.com/59b5328df43576e138d5f1e5be433c49dc04782e0033abd85cde0eef84f300ab-GroupDetails.css",
+            "source": "/communities/1"
+        },
+        {
+            "name": "GroupEvents",
+            "url": "https://css.rbxcdn.com/1f03f3c18f4ab04f8881af7b8f2224c36cdf36aab233cdd4548323016aa09423-GroupEvents.css",
+            "source": "/communities/1"
+        },
+        {
+            "name": "GroupForums",
+            "url": "https://css.rbxcdn.com/e7dc181c3f6ff811581868ef8c7a5b8b68defb7f76ab6b6d39ac82a2132934b1-GroupForums.css",
+            "source": "/communities/1"
+        },
+        {
+            "name": "GroupPayouts",
+            "url": "https://css.rbxcdn.com/4f388c907ce170eedfb9f3d0c897a4d23bddaea186dfd17ce41788ca60cf96b1-GroupPayouts.css",
+            "source": "/communities/1"
+        },
+        {
+            "name": "GroupSearch",
+            "url": "https://css.rbxcdn.com/f17e03ce29c52c70defc4dac89dde2fe58373987a13c703bb4b015832fc8f505-GroupSearch.css",
+            "source": "/search/communities"
+        },
+        {
+            "name": "GroupShouts",
+            "url": "https://css.rbxcdn.com/3b6e8d78f4e6f12a10544011048dfc09418534f0387a076fef348ca66abcfd72-GroupShouts.css",
+            "source": "/communities/1"
+        },
+        {
+            "name": "GroupsList",
+            "url": "https://css.rbxcdn.com/fdaae5750b1b6a423a4135c99811a4c9be3bc3248cd93ec459bdab9840418a85-GroupsList.css",
+            "source": "/users/1/profile"
         },
         {
             "name": "HomePageUpsellCard",
@@ -923,6 +1733,11 @@
             "name": "IdVerification",
             "url": "https://css.rbxcdn.com/37b5bc69ed67ee094c95e908d68d809c55c28ab8f34ed714a7541f1f5eeacfa6-IdVerification.css",
             "source": "/home"
+        },
+        {
+            "name": "Inventory",
+            "url": "https://css.rbxcdn.com/3290f3ebbbdcbb858ad4cdb8bcddc658a2e92dc9a1c86d8ea52a50cd4f0e9b53-Inventory.css",
+            "source": "/users/inventory"
         },
         {
             "name": "ItemDetails",
@@ -937,7 +1752,7 @@
         {
             "name": "ItemDetailsLimitedInventory",
             "url": "https://css.rbxcdn.com/2019f1bca71a6a4f4748278adc8ffb230926889f8af9d503ad465d9cf29dfd48-ItemDetailsLimitedInventory.css",
-            "source": "/my/avatar"
+            "source": "/users/inventory"
         },
         {
             "name": "ItemDetailsThumbnail",
@@ -962,7 +1777,12 @@
         {
             "name": "ItemResale",
             "url": "https://css.rbxcdn.com/a809315c6b065fe8c0194bd0058a08240c8988e2e5d752d0eca37301fee3df15-ItemResale.css",
-            "source": "/my/avatar"
+            "source": "/users/inventory"
+        },
+        {
+            "name": "NativeAdsList",
+            "url": "https://css.rbxcdn.com/7d369ca08c5d0a7fb22ddb7ff181626b18c4c06cb39a7837292bba1930eba592-NativeAdsList.css",
+            "source": "/sponsorships/list"
         },
         {
             "name": "Navigation",
@@ -970,9 +1790,19 @@
             "source": "/home"
         },
         {
+            "name": "NotificationPreferences",
+            "url": "https://css.rbxcdn.com/f1b8a795ee290a5d7ac351fdac6380306e113cc8ecf61862d7a371cc237a7b90-NotificationPreferences.css",
+            "source": "/my/account"
+        },
+        {
             "name": "NotificationStream",
             "url": "https://css.rbxcdn.com/935fb7331d9761008e6d48890a8f03c8124d73dd41b4f19f93a1844577186103-NotificationStream.css",
             "source": "/home"
+        },
+        {
+            "name": "PaymentMethodsSetting",
+            "url": "https://css.rbxcdn.com/c5a439f701be1a142fb57544c893d1d1f2e207a8af085c1a768d62454e8253ea-PaymentMethodsSetting.css",
+            "source": "/my/account"
         },
         {
             "name": "PeopleList",
@@ -985,9 +1815,44 @@
             "source": "/home"
         },
         {
+            "name": "PlayerSearch",
+            "url": "https://css.rbxcdn.com/fb70f4729b9f3ecc22e085d932b984f6cdda59c0951b4183c7e30f5be151f527-PlayerSearch.css",
+            "source": "/search/users"
+        },
+        {
             "name": "PriceTag",
             "url": "https://css.rbxcdn.com/9bfc48ea40a698035ea8cbe3d3e94bd06d3aac48969bedceb6d8ba5ff17ff84d.css",
             "source": "/home"
+        },
+        {
+            "name": "PrivateMessage",
+            "url": "https://css.rbxcdn.com/61814e13cb017aa6a8a375cc9215187051f76cf4468d206fde31a5e166db97a2-PrivateMessage.css",
+            "source": "/my/messages"
+        },
+        {
+            "name": "ProfileBadges",
+            "url": "https://css.rbxcdn.com/12908c31c53f8fdfffbdea99689dfaddc1d2577a69d19c8bf86d6dda93d306f7.css",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "ProfileHeader",
+            "url": "https://css.rbxcdn.com/2e9673d3e9b0a29541b0699c7a45666373f18c62933e1494f1ae2c334c72326c-ProfileHeader.css",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "ProfilePlatform",
+            "url": "https://css.rbxcdn.com/8ddd31f412d23c67bf008f44fccedf06c9394606f07172460bbb3955fbe6be32-ProfilePlatform.css",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "PromptsOrchestrator",
+            "url": "https://css.rbxcdn.com/66d72a47202974fed123d01e3e8a6f24133e7da031efed1acb73116ef421d746-PromptsOrchestrator.css",
+            "source": "/communities/1"
+        },
+        {
+            "name": "ReactCaptcha",
+            "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-ReactCaptcha.css",
+            "source": "/redeem"
         },
         {
             "name": "ReactStyleGuide",
@@ -997,12 +1862,22 @@
         {
             "name": "Recommendations",
             "url": "https://css.rbxcdn.com/c335d5d3a7a900dea0f85286f56c0f27c8e64f8a23c5ff142cc1e4665af9f19f-Recommendations.css",
-            "source": "/my/avatar"
+            "source": "/users/inventory"
+        },
+        {
+            "name": "RedeemGiftCard",
+            "url": "https://css.rbxcdn.com/de6e2d85c7f8dd2090fc3f8cfa7872002a86124a2497e29f30774e9bc7607b4d-RedeemGiftCard.css",
+            "source": "/redeem"
         },
         {
             "name": "RobloxBadges",
             "url": "https://css.rbxcdn.com/b2cff71de0c286e8f85b1a26a8b87a8cd7f77422c592849ad5114ac5d929c575.css",
             "source": "/home"
+        },
+        {
+            "name": "RobloxSubscription",
+            "url": "https://css.rbxcdn.com/cd751791d9c3b9cd113d6ed78b92929751c91559ef632789b7e49a1eeba6b268-RobloxSubscription.css",
+            "source": "/plus"
         },
         {
             "name": "RobuxIcon",
@@ -1015,9 +1890,29 @@
             "source": "/upgrades/robux"
         },
         {
+            "name": "SafetyDashboard",
+            "url": "https://css.rbxcdn.com/32dffc144a5d30e69b9b09bc0aa8ad0d0b12736b00408a2bf95527ac330f3726-SafetyDashboard.css",
+            "source": "/safety-dashboard"
+        },
+        {
+            "name": "SafetySupportPage",
+            "url": "https://css.rbxcdn.com/7b1cddbaf57134b6f278513cbff810e3faead717002bd2edad1a09819cc2cfc8-SafetySupportPage.css",
+            "source": "/help-safety"
+        },
+        {
+            "name": "SearchDropdown",
+            "url": "https://css.rbxcdn.com/9465044f971fd06d5fb1af0ee4e1ce58cd6fe515dce4a57b3343a1ddd920a65f.css",
+            "source": "/communities/1"
+        },
+        {
             "name": "SearchLandingPage",
             "url": "https://css.rbxcdn.com/db825d8aa3dad8b15b22dd2a495ab099711d48c8a8303d0f402fc51476850c7c-SearchLandingPage.css",
             "source": "/home"
+        },
+        {
+            "name": "SecurityTab",
+            "url": "https://css.rbxcdn.com/6eec83cab5bbbd75c20a1507836604462ea74e47fc713a7fd749359f07519225-SecurityTab.css",
+            "source": "/my/account"
         },
         {
             "name": "SendrNotificationStream",
@@ -1025,9 +1920,34 @@
             "source": "/home"
         },
         {
+            "name": "ServerList",
+            "url": "https://css.rbxcdn.com/32e031ea8692e7ac0e8396c79855bad78207c13f67dcc2bbcf83997d9894acce-ServerList.css",
+            "source": "/games/1818"
+        },
+        {
+            "name": "SessionManagement",
+            "url": "https://css.rbxcdn.com/1450e05af2c7b377d04ade029b99c5d6c584c44df6fc48d22edd8bf13af8633f-SessionManagement.css",
+            "source": "/my/account"
+        },
+        {
+            "name": "ShopGiftCards",
+            "url": "https://css.rbxcdn.com/29bbf6888aa7b59692de7c55bcd79e19ae33b8b9097b5e7bc16dfa858448c3a8-ShopGiftCards.css",
+            "source": "/shopgiftcards"
+        },
+        {
             "name": "Sitemap",
             "url": "https://css.rbxcdn.com/bb7ca3e100a23736df3e1099d91ff3bf7585520b2ab33ae445ea6503c9175418.css",
             "source": "/sitemap"
+        },
+        {
+            "name": "SocialLinksConfiguration",
+            "url": "https://css.rbxcdn.com/f4ef3eee21b8520c823486383788cfffe11a0f23ea8af224f3152b9dd9e2d19a-SocialLinksConfiguration.css",
+            "source": "/communities/configure"
+        },
+        {
+            "name": "SocialLinksJumbotron",
+            "url": "https://css.rbxcdn.com/46d8b311af5c012a6bc0fa5e72ab6c611a1d5752190f4b23b15490ccb8d666ac-SocialLinksJumbotron.css",
+            "source": "/users/1/profile"
         },
         {
             "name": "SponsoredCatalogItems",
@@ -1040,9 +1960,34 @@
             "source": "/home"
         },
         {
+            "name": "SubscriptionManagement",
+            "url": "https://css.rbxcdn.com/c178fb47142732455d9b443f950ba792fff296078177b9ae9fe44a078a9098a0-SubscriptionManagement.css",
+            "source": "/my/account"
+        },
+        {
+            "name": "SupportCenter",
+            "url": "https://css.rbxcdn.com/08d5d15d40c2d61305bb34e12cfa70ab76e98da0a24528364efd53d92a850b93-SupportCenter.css",
+            "source": "/support-center"
+        },
+        {
+            "name": "SupportedBrowsers",
+            "url": "https://css.rbxcdn.com/5675f1b05c4902992323a19af52a6a1918eb3dc98e77b588719f8a940715524b.css",
+            "source": "/supported-browsers"
+        },
+        {
             "name": "Thumbnails",
             "url": "https://css.rbxcdn.com/04f1210583fa8e85a56204ea2442012e57addf09809ab10e9934fa490d56ee49-Thumbnails.css",
             "source": "/home"
+        },
+        {
+            "name": "Trades",
+            "url": "https://css.rbxcdn.com/de042e435030898e26999df79aea717fa7596db51473f347b572a1b5bafca858-Trades.css",
+            "source": "/trades"
+        },
+        {
+            "name": "Transactions",
+            "url": "https://css.rbxcdn.com/3e5e476e23b0f7c0447f4cda7a0cbc5c1252ba8d7aac356fd0bbb0afaf8ec948-Transactions.css",
+            "source": "/transactions"
         },
         {
             "name": "UserAgreementsChecker",
@@ -1050,9 +1995,24 @@
             "source": "/home"
         },
         {
+            "name": "UserDescription",
+            "url": "https://css.rbxcdn.com/fdbc0173245f68440cbb311624eb6859d2e4024b89281763b7323e318a19c4c0.css",
+            "source": "/users/1/profile"
+        },
+        {
+            "name": "UserSettings",
+            "url": "https://css.rbxcdn.com/1b693de0d90c99c7fc610844cc9cd9ae8f827f20d13a019dba961a6594c0cc87-UserSettings.css",
+            "source": "/my/account"
+        },
+        {
             "name": "VerificationUpsell",
             "url": "https://css.rbxcdn.com/f77e16b9fa5823882aaa0cdabade9706b9ba2b7e050d23d2831da138a58e5f7f-VerificationUpsell.css",
             "source": "/home"
+        },
+        {
+            "name": "VirtualEventDetails",
+            "url": "https://css.rbxcdn.com/58315fd104be0cb391dc1e84ef11865bc9137b753c6cd3c5a6b479264f105ec8-VirtualEventDetails.css",
+            "source": "/events/6177598281426797213"
         }
     ]
 }
