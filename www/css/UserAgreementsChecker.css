@@ -1,0 +1,8 @@
+.agreement-item {
+    margin-top: 12px
+}
+
+.agreement-modal-body {
+    overflow: auto;
+    max-height: 324px
+}

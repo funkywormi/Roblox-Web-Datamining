@@ -1,0 +1,16 @@
+html,
+body,
+.challenge-container {
+    width: 100%
+}
+
+.challenge-container {
+    -ms-flex-pack: center;
+    justify-content: center;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.navigate-to-feature-callback {
+    display: none
+}

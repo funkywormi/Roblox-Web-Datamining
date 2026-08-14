@@ -1,0 +1,1256 @@
+.inset-\[0\] {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0
+}
+
+.scroll {
+    overflow: auto
+}
+
+.size-\[var\(--icon-size-large\)\] {
+    width: var(--icon-size-large);
+    height: var(--icon-size-large)
+}
+
+.size-\[var\(--icon-size-medium\)\] {
+    width: var(--icon-size-medium);
+    height: var(--icon-size-medium)
+}
+
+.size-\[var\(--icon-size-small\)\] {
+    width: var(--icon-size-small);
+    height: var(--icon-size-small)
+}
+
+.size-\[var\(--icon-size-xlarge\)\] {
+    width: var(--icon-size-xlarge);
+    height: var(--icon-size-xlarge)
+}
+
+.size-\[var\(--icon-size-xsmall\)\] {
+    width: var(--icon-size-xsmall);
+    height: var(--icon-size-xsmall)
+}
+
+.icon-regular-x {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M7.29289 8.70711C6.90237 8.31658 6.90237 7.68342 7.29289 7.29289C7.68342 6.90237 8.31658 6.90237 8.70711 7.29289L16 14.5858L23.2929 7.29289C23.6834 6.90237 24.3166 6.90237 24.7071 7.29289C25.0976 7.68342 25.0976 8.31658 24.7071 8.70711L17.4142 16L24.7071 23.2929C25.0976 23.6834 25.0976 24.3166 24.7071 24.7071C24.3166 25.0976 23.6834 25.0976 23.2929 24.7071L16 17.4142L8.70711 24.7071C8.31658 25.0976 7.68342 25.0976 7.29289 24.7071C6.90237 24.3166 6.90237 23.6834 7.29289 23.2929L14.5858 16L7.29289 8.70711Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.modal-overlay {
+    z-index: 1;
+    background-color: rgba(0, 0, 0, .5);
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -ms-flexbox;
+    display: flex;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0
+}
+
+.custom-modal {
+    border-radius: 8px;
+    width: 90%;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .3)
+}
+
+.light-theme .custom-modal,
+.dark-theme .custom-modal {
+    background-color: var(--color-surface-100);
+    color: var(--color-content-emphasis)
+}
+
+@media (min-width:768px) {
+    .custom-modal {
+        width: 70%
+    }
+}
+
+@media (min-width:1024px) {
+    .custom-modal {
+        width: 35%
+    }
+}
+
+.modal-content {
+    background: 0 0;
+    border: none;
+    margin: 20px 0
+}
+
+.modal-header {
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 5px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.modal-header .modal-head-left {
+    -ms-flex: 1;
+    flex: 1
+}
+
+.modal-header .modal-head-right {
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    margin-top: 5px;
+    margin-left: 10px
+}
+
+.modal-header .modal-head-right .transparent-button {
+    color: inherit;
+    background-color: transparent;
+    border: none
+}
+
+.modal-header .modal-head-right .close-icon {
+    background-position: 0, 0;
+    background-size: auto;
+    width: 20px;
+    height: 20px;
+    display: block
+}
+
+.light-theme .modal-header .modal-head-right .close-icon {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iIzM5M2IzZCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAuMyAyMS43IDEyIDEzLjRsLTguMyA4LjMtMS40LTEuNCA4LjMtOC4zLTguMy04LjMgMS40LTEuNCA4LjMgOC4zIDguMy04LjMgMS40IDEuNC04LjMgOC4zIDguMyA4LjN6Ii8+PC9zdmc+)
+}
+
+.dark-theme .modal-header .modal-head-right .close-icon {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI2ZmZiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjAuMyAyMS43IDEyIDEzLjRsLTguMyA4LjMtMS40LTEuNCA4LjMtOC4zLTguMy04LjMgMS40LTEuNCA4LjMgOC4zIDguMy04LjMgMS40IDEuNC04LjMgOC4zIDguMyA4LjN6Ii8+PC9zdmc+)
+}
+
+.form-container {
+    width: 70%;
+    margin: auto
+}
+
+.ca-1394-report-page {
+    min-height: 100vh;
+    overflow: auto
+}
+
+.light-theme .ca-1394-report-page,
+.dark-theme .ca-1394-report-page {
+    background-color: var(--color-surface-0)
+}
+
+.flex-space-between-container {
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.other-radio-container {
+    -ms-flex-align: center;
+    align-items: center;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.section {
+    margin-top: 30px
+}
+
+.main-card {
+    border-radius: 8px;
+    margin-top: 30px;
+    padding: 20px
+}
+
+.light-theme .main-card {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .4)
+}
+
+.dark-theme .main-card {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .1)
+}
+
+.main-card .dsa-reason-limit {
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 300
+}
+
+.main-card .nonresizable {
+    resize: none
+}
+
+.light-theme .main-card,
+.dark-theme .main-card {
+    background-color: var(--color-surface-100)
+}
+
+.custom-radio-group {
+    -ms-flex-direction: column;
+    flex-direction: column;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.radio-item {
+    margin: 10px 0 0;
+    padding: 0 6px;
+    display: inline-block;
+    position: relative
+}
+
+.radio-item input[type=radio] {
+    display: none
+}
+
+.radio-item input[type=text] {
+    background-color: transparent;
+    border-radius: 4px;
+    width: 50%;
+    margin-left: 10px
+}
+
+.radio-item input[type=text]:focus {
+    outline: transparent
+}
+
+.light-theme .radio-item input[type=text]:focus {
+    border: 1px solid var(--color-action-standard-foreground)
+}
+
+.dark-theme .radio-item input[type=text]:focus {
+    border: 1px solid var(--color-action-standard-foreground)
+}
+
+.radio-item label:hover {
+    cursor: pointer
+}
+
+.radio-item label:before {
+    content: "";
+    background-color: transparent;
+    border-radius: 11px;
+    width: 20px;
+    height: 20px;
+    margin: 0 5px 0 0;
+    display: inline-block;
+    position: relative;
+    top: 5px
+}
+
+.light-theme .radio-item label:before,
+.dark-theme .radio-item label:before {
+    border: 2px solid var(--color-action-standard-foreground)
+}
+
+.radio-item input[type=radio]:checked+label:after {
+    content: "";
+    border-radius: 11px;
+    width: 12px;
+    height: 12px;
+    display: block;
+    position: absolute;
+    top: 9px;
+    left: 10px
+}
+
+.light-theme .radio-item input[type=radio]:checked+label:after {
+    background-color: var(--color-action-standard-foreground)
+}
+
+.dark-theme .radio-item input[type=radio]:checked+label:after {
+    background-color: var(--color-action-standard-foreground)
+}
+
+.other-violation-input {
+    outline: none;
+    width: 40%;
+    margin-top: 12px
+}
+
+.error-text {
+    color: #d86868
+}
+
+.light-theme .success-text,
+.dark-theme .success-text {
+    color: var(--color-system-success)
+}
+
+.verification-checkmark {
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    font-weight: 700;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.light-theme .verification-checkmark,
+.dark-theme .verification-checkmark {
+    color: var(--color-system-success)
+}
+
+.light-theme .muted-text,
+.dark-theme .muted-text {
+    color: var(--color-content-muted)
+}
+
+.no-text-transform {
+    text-transform: none
+}
+
+.styled-modal-box {
+    background-color: #fff;
+    width: 400px;
+    padding: 16px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, .1)
+}
+
+.styled-modal-box>.box {
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.margin-top-20 {
+    margin-top: 20px
+}
+
+.loading-button {
+    color: gray;
+    cursor: not-allowed;
+    background-color: #fff;
+    border: 1px solid gray
+}
+
+.white-space-button {
+    white-space: normal
+}
+
+.loading-spinner {
+    border: 2px solid gray;
+    border-top-color: transparent;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: .8s linear infinite spin;
+    display: inline-block
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg)
+    }
+}
+
+.margin-left-5 {
+    margin-left: 5px
+}
+
+.pointer-cursor {
+    cursor: pointer
+}
+
+.rbx-select-group .dropdown-menu li a {
+    white-space: normal;
+    word-break: break-word
+}
+
+.checkbox input[type=checkbox]+.checkbox-label {
+    height: auto;
+    min-height: 16px
+}
+
+@media (max-width:991px) {
+    .checkbox input[type=checkbox]+.checkbox-label {
+        min-height: 24px
+    }
+}
+
+.email-verify-code-help-text {
+    text-align: left;
+    margin-bottom: 16px;
+    font-size: 16px
+}
+
+.email-verify-code-input {
+    width: 100%;
+    margin: 16px 0
+}
+
+.email-verify-code-error-text {
+    text-align: left;
+    min-height: 36px;
+    margin-top: -9px
+}
+
+.email-verify-code-button {
+    -ms-flex-item-align: center;
+    align-self: center;
+    width: 100%;
+    margin-top: 16px
+}
+
+.icon-default-generic,
+.icon-check-selection,
+.icon-female-white,
+.icon-male-white,
+.icon-trash-bin,
+.icon-password-hide-white,
+.icon-password-hide,
+.icon-password-show-white,
+.icon-password-show,
+.icon-more-gray-vertical,
+.icon-pause-fill,
+.icon-regenerate,
+.icon-playgame,
+.icon-viewdetails,
+.icon-chat-gray,
+.icon-globe,
+.icon-logo-win,
+.icon-logo-apple,
+.icon-arrow-right-blue,
+.icon-bigstop-fill,
+.icon-bigstop,
+.icon-bigplay-fill,
+.icon-bigplay,
+.icon-unlocked,
+.icon-locked,
+.icon-copy,
+.icon-minus,
+.icon-plus,
+.icon-checkmark-blue,
+.icon-menu-black,
+.icon-first-gray,
+.icon-last-gray,
+.icon-left-gray,
+.icon-right-gray,
+.icon-notifications,
+.icon-sandglass,
+.icon-close-white,
+.icon-checkmark-white-bold,
+.icon-checkmark-white,
+.icon-first-page,
+.icon-last-page,
+.icon-pastname,
+.icon-slideshow,
+.icon-grid,
+.icon-clock,
+.icon-games-carousel-left.hover,
+.icon-games-carousel-right.hover,
+.icon-games-carousel-left,
+.icon-games-carousel-right,
+.icon-carousel-left,
+.icon-carousel-right,
+.icon-additem,
+.icon-sorting,
+.icon-more,
+.icon-close,
+.icon-checkmark-on,
+.icon-checkmark,
+.icon-back,
+.icon-next,
+.icon-down,
+.icon-up,
+.icon-left,
+.icon-right,
+.icon-menu,
+.icon-pause,
+.icon-play,
+.icon-moreinfo,
+.icon-audio,
+.icon-brokenpage,
+.icon-page,
+.icon-female,
+.icon-male,
+.icon-inactive,
+.icon-edit,
+.icon-settings,
+.icon-search,
+.icon-home {
+    vertical-align: middle;
+    background-image: url(https://images.rbxcdn.com/424995aeeb54e41f.svg);
+    background-repeat: no-repeat;
+    background-size: 200%;
+    width: 28px;
+    height: 28px;
+    display: inline-block
+}
+
+.dark-theme .icon-default-generic,
+.dark-theme .icon-check-selection,
+.dark-theme .icon-female-white,
+.dark-theme .icon-male-white,
+.dark-theme .icon-trash-bin,
+.dark-theme .icon-password-hide-white,
+.dark-theme .icon-password-hide,
+.dark-theme .icon-password-show-white,
+.dark-theme .icon-password-show,
+.dark-theme .icon-more-gray-vertical,
+.dark-theme .icon-pause-fill,
+.dark-theme .icon-regenerate,
+.dark-theme .icon-playgame,
+.dark-theme .icon-viewdetails,
+.dark-theme .icon-chat-gray,
+.dark-theme .icon-globe,
+.dark-theme .icon-logo-win,
+.dark-theme .icon-logo-apple,
+.dark-theme .icon-arrow-right-blue,
+.dark-theme .icon-bigstop-fill,
+.dark-theme .icon-bigstop,
+.dark-theme .icon-bigplay-fill,
+.dark-theme .icon-bigplay,
+.dark-theme .icon-unlocked,
+.dark-theme .icon-locked,
+.dark-theme .icon-copy,
+.dark-theme .icon-minus,
+.dark-theme .icon-plus,
+.dark-theme .icon-checkmark-blue,
+.dark-theme .icon-menu-black,
+.dark-theme .icon-first-gray,
+.dark-theme .icon-last-gray,
+.dark-theme .icon-left-gray,
+.dark-theme .icon-right-gray,
+.dark-theme .icon-notifications,
+.dark-theme .icon-sandglass,
+.dark-theme .icon-close-white,
+.dark-theme .icon-checkmark-white-bold,
+.dark-theme .icon-checkmark-white,
+.dark-theme .icon-first-page,
+.dark-theme .icon-last-page,
+.dark-theme .icon-pastname,
+.dark-theme .icon-slideshow,
+.dark-theme .icon-grid,
+.dark-theme .icon-clock,
+.dark-theme .icon-games-carousel-left,
+.dark-theme .icon-games-carousel-right,
+.dark-theme .icon-carousel-left,
+.dark-theme .icon-carousel-right,
+.dark-theme .icon-additem,
+.dark-theme .icon-sorting,
+.dark-theme .icon-more,
+.dark-theme .icon-close,
+.dark-theme .icon-checkmark-on,
+.dark-theme .icon-checkmark,
+.dark-theme .icon-back,
+.dark-theme .icon-next,
+.dark-theme .icon-down,
+.dark-theme .icon-up,
+.dark-theme .icon-left,
+.dark-theme .icon-right,
+.dark-theme .icon-menu,
+.dark-theme .icon-pause,
+.dark-theme .icon-play,
+.dark-theme .icon-moreinfo,
+.dark-theme .icon-audio,
+.dark-theme .icon-brokenpage,
+.dark-theme .icon-page,
+.dark-theme .icon-female,
+.dark-theme .icon-male,
+.dark-theme .icon-inactive,
+.dark-theme .icon-edit,
+.dark-theme .icon-settings,
+.dark-theme .icon-search,
+.dark-theme .icon-home {
+    background-image: url(https://images.rbxcdn.com/3ebc87949bc669c2.svg)
+}
+
+.light-theme .icon-default-generic,
+.light-theme .icon-check-selection,
+.light-theme .icon-female-white,
+.light-theme .icon-male-white,
+.light-theme .icon-trash-bin,
+.light-theme .icon-password-hide-white,
+.light-theme .icon-password-hide,
+.light-theme .icon-password-show-white,
+.light-theme .icon-password-show,
+.light-theme .icon-more-gray-vertical,
+.light-theme .icon-pause-fill,
+.light-theme .icon-regenerate,
+.light-theme .icon-playgame,
+.light-theme .icon-viewdetails,
+.light-theme .icon-chat-gray,
+.light-theme .icon-globe,
+.light-theme .icon-logo-win,
+.light-theme .icon-logo-apple,
+.light-theme .icon-arrow-right-blue,
+.light-theme .icon-bigstop-fill,
+.light-theme .icon-bigstop,
+.light-theme .icon-bigplay-fill,
+.light-theme .icon-bigplay,
+.light-theme .icon-unlocked,
+.light-theme .icon-locked,
+.light-theme .icon-copy,
+.light-theme .icon-minus,
+.light-theme .icon-plus,
+.light-theme .icon-checkmark-blue,
+.light-theme .icon-menu-black,
+.light-theme .icon-first-gray,
+.light-theme .icon-last-gray,
+.light-theme .icon-left-gray,
+.light-theme .icon-right-gray,
+.light-theme .icon-notifications,
+.light-theme .icon-sandglass,
+.light-theme .icon-close-white,
+.light-theme .icon-checkmark-white-bold,
+.light-theme .icon-checkmark-white,
+.light-theme .icon-first-page,
+.light-theme .icon-last-page,
+.light-theme .icon-pastname,
+.light-theme .icon-slideshow,
+.light-theme .icon-grid,
+.light-theme .icon-clock,
+.light-theme .icon-games-carousel-left,
+.light-theme .icon-games-carousel-right,
+.light-theme .icon-carousel-left,
+.light-theme .icon-carousel-right,
+.light-theme .icon-additem,
+.light-theme .icon-sorting,
+.light-theme .icon-more,
+.light-theme .icon-close,
+.light-theme .icon-checkmark-on,
+.light-theme .icon-checkmark,
+.light-theme .icon-back,
+.light-theme .icon-next,
+.light-theme .icon-down,
+.light-theme .icon-up,
+.light-theme .icon-left,
+.light-theme .icon-right,
+.light-theme .icon-menu,
+.light-theme .icon-pause,
+.light-theme .icon-play,
+.light-theme .icon-moreinfo,
+.light-theme .icon-audio,
+.light-theme .icon-brokenpage,
+.light-theme .icon-page,
+.light-theme .icon-female,
+.light-theme .icon-male,
+.light-theme .icon-inactive,
+.light-theme .icon-edit,
+.light-theme .icon-settings,
+.light-theme .icon-search,
+.light-theme .icon-home {
+    background-image: url(https://images.rbxcdn.com/f6278bdb80b2f24c.svg)
+}
+
+.icon-default-generic-16x16,
+.icon-close-gray-16x16,
+.icon-red-timer-16x16,
+.icon-close-16x16,
+.icon-checkmark-16x16,
+.icon-down-16x16,
+.icon-up-16x16,
+.icon-left-16x16,
+.icon-right-16x16,
+.icon-moreinfo-16x16,
+.icon-edit-16x16,
+.icon-settings-16x16 {
+    vertical-align: middle;
+    background-image: url(https://images.rbxcdn.com/424995aeeb54e41f.svg);
+    background-repeat: no-repeat;
+    background-size: 32px;
+    width: 16px;
+    height: 16px;
+    display: inline-block
+}
+
+.dark-theme .icon-default-generic-16x16,
+.dark-theme .icon-close-gray-16x16,
+.dark-theme .icon-red-timer-16x16,
+.dark-theme .icon-close-16x16,
+.dark-theme .icon-checkmark-16x16,
+.dark-theme .icon-down-16x16,
+.dark-theme .icon-up-16x16,
+.dark-theme .icon-left-16x16,
+.dark-theme .icon-right-16x16,
+.dark-theme .icon-moreinfo-16x16,
+.dark-theme .icon-edit-16x16,
+.dark-theme .icon-settings-16x16 {
+    background-image: url(https://images.rbxcdn.com/3ebc87949bc669c2.svg)
+}
+
+.light-theme .icon-default-generic-16x16,
+.light-theme .icon-close-gray-16x16,
+.light-theme .icon-red-timer-16x16,
+.light-theme .icon-close-16x16,
+.light-theme .icon-checkmark-16x16,
+.light-theme .icon-down-16x16,
+.light-theme .icon-up-16x16,
+.light-theme .icon-left-16x16,
+.light-theme .icon-right-16x16,
+.light-theme .icon-moreinfo-16x16,
+.light-theme .icon-edit-16x16,
+.light-theme .icon-settings-16x16 {
+    background-image: url(https://images.rbxcdn.com/f6278bdb80b2f24c.svg)
+}
+
+.icon-home {
+    background-position: 0 0
+}
+
+.icon-search {
+    background-position: 0 -28px
+}
+
+.icon-settings {
+    background-position: 0 -56px
+}
+
+.icon-edit {
+    background-position: 0 -84px
+}
+
+.icon-edit:hover,
+button:hover .icon-edit,
+a:hover .icon-edit {
+    background-position: -28px -84px
+}
+
+.icon-inactive {
+    background-position: 0 -112px
+}
+
+.icon-male {
+    background-position: 0 -140px
+}
+
+.icon-male:hover,
+button:hover .icon-male,
+a:hover .icon-male {
+    background-position: -28px -140px
+}
+
+.icon-female {
+    background-position: 0 -168px
+}
+
+.icon-female:hover,
+button:hover .icon-female,
+a:hover .icon-female {
+    background-position: -28px -168px
+}
+
+.icon-page {
+    background-position: 0 -196px
+}
+
+.icon-brokenpage {
+    background-position: 0 -224px
+}
+
+.icon-audio {
+    background-position: 0 -252px
+}
+
+.icon-moreinfo {
+    background-position: 0 -280px
+}
+
+.icon-moreinfo:hover,
+button:hover .icon-moreinfo,
+a:hover .icon-moreinfo {
+    background-position: -28px -280px
+}
+
+.icon-play {
+    background-position: 0 -308px
+}
+
+.icon-pause {
+    background-position: 0 -336px
+}
+
+.icon-menu {
+    background-position: 0 -364px
+}
+
+.icon-right {
+    background-position: 0 -392px
+}
+
+.icon-right:hover,
+button:hover .icon-right,
+a:hover .icon-right {
+    background-position: -28px -392px
+}
+
+.icon-left {
+    background-position: 0 -420px
+}
+
+.icon-left:hover,
+button:hover .icon-left,
+a:hover .icon-left {
+    background-position: -28px -420px
+}
+
+.icon-up {
+    background-position: 0 -448px
+}
+
+.icon-down {
+    background-position: 0 -476px
+}
+
+.icon-next {
+    background-position: 0 -504px
+}
+
+.icon-back {
+    background-position: 0 -532px
+}
+
+.icon-checkmark {
+    background-position: 0 -560px
+}
+
+.icon-checkmark-on {
+    background-position: -28px -560px
+}
+
+.icon-close {
+    background-position: 0 -588px
+}
+
+.icon-more {
+    background-position: 0 -616px
+}
+
+.icon-more:hover,
+button:hover .icon-more,
+a:hover .icon-more {
+    background-position: -28px -616px
+}
+
+.icon-sorting {
+    background-position: 0 -644px
+}
+
+.icon-additem {
+    background-position: 0 -672px
+}
+
+.icon-additem:hover,
+button:hover .icon-additem,
+a:hover .icon-additem {
+    background-position: -28px -672px
+}
+
+.icon-settings-16x16 {
+    background-position: 0 -32px
+}
+
+.icon-settings-16x16:hover,
+button:hover .icon-settings-16x16,
+a:hover .icon-settings-16x16 {
+    background-position: -16px -32px
+}
+
+.icon-edit-16x16 {
+    background-position: 0 -48px
+}
+
+.icon-moreinfo-16x16 {
+    background-position: 0 -160px
+}
+
+.icon-moreinfo-16x16:hover,
+button:hover .icon-moreinfo-16x16,
+a:hover .icon-moreinfo-16x16 {
+    background-position: -16px -160px
+}
+
+.icon-right-16x16 {
+    background-position: 0 -224px
+}
+
+.icon-left-16x16 {
+    background-position: 0 -240px
+}
+
+.icon-up-16x16 {
+    background-position: 0 -256px
+}
+
+.icon-down-16x16 {
+    background-position: 0 -272px
+}
+
+.icon-checkmark-16x16 {
+    background-position: 0 -320px
+}
+
+.icon-close-16x16 {
+    background-position: 0 -336px
+}
+
+.icon-carousel-right {
+    background-position: 0 -896px
+}
+
+.icon-carousel-left {
+    background-position: 0 -924px
+}
+
+.icon-games-carousel-right {
+    background-position: 0 -952px
+}
+
+.icon-games-carousel-right:hover,
+button:hover .icon-games-carousel-right,
+a:hover .icon-games-carousel-right {
+    background-position: -28px -952px
+}
+
+.icon-games-carousel-left {
+    background-position: 0 -980px
+}
+
+.icon-games-carousel-left:hover,
+button:hover .icon-games-carousel-left,
+a:hover .icon-games-carousel-left {
+    background-position: -28px -980px
+}
+
+.icon-games-carousel-right.hover {
+    background-position: -28px -952px
+}
+
+.icon-games-carousel-left.hover {
+    background-position: -28px -980px
+}
+
+.icon-clock {
+    background-position: 0 -1008px
+}
+
+.icon-clock:hover,
+button:hover .icon-clock,
+a:hover .icon-clock {
+    background-position: -28px -1008px
+}
+
+.icon-grid {
+    background-position: 0 -1036px
+}
+
+.icon-slideshow {
+    background-position: 0 -1064px
+}
+
+.icon-pastname {
+    background-position: 0 -1092px
+}
+
+.icon-last-page {
+    background-position: 0 -1120px
+}
+
+.icon-first-page {
+    background-position: 0 -1148px
+}
+
+.icon-checkmark-white {
+    background-position: 0 -1176px
+}
+
+.icon-checkmark-white-bold {
+    background-position: 0 -1204px
+}
+
+.icon-close-white {
+    background-position: 0 -1232px
+}
+
+.icon-sandglass {
+    background-position: 0 -1260px
+}
+
+.icon-notifications {
+    background-position: 0 -1288px
+}
+
+.icon-notifications:hover,
+button:hover .icon-notifications,
+a:hover .icon-notifications {
+    background-position: -28px -1288px
+}
+
+.icon-right-gray {
+    background-position: 0 -1316px
+}
+
+.icon-left-gray {
+    background-position: 0 -1344px
+}
+
+.icon-last-gray {
+    background-position: 0 -1372px
+}
+
+.icon-first-gray {
+    background-position: 0 -1400px
+}
+
+.icon-red-timer-16x16 {
+    background-position: 0 -816px
+}
+
+.icon-close-gray-16x16 {
+    background-position: 0 -832px
+}
+
+.icon-close-gray-16x16:hover,
+button:hover .icon-close-gray-16x16,
+a:hover .icon-close-gray-16x16 {
+    background-position: -16px -832px
+}
+
+.icon-menu-black {
+    background-position: 0 -1484px
+}
+
+.icon-checkmark-blue {
+    background-position: 0 -1512px
+}
+
+.icon-checkmark-blue:hover,
+button:hover .icon-checkmark-blue,
+a:hover .icon-checkmark-blue {
+    background-position: -28px -1512px
+}
+
+.icon-plus {
+    background-position: 0 -1540px
+}
+
+.icon-plus:hover,
+button:hover .icon-plus,
+a:hover .icon-plus {
+    background-position: -28px -1540px
+}
+
+.icon-minus {
+    background-position: 0 -1568px
+}
+
+.icon-minus:hover,
+button:hover .icon-minus,
+a:hover .icon-minus {
+    background-position: -28px -1568px
+}
+
+.icon-copy {
+    background-position: 0 -1596px
+}
+
+.icon-copy:hover,
+button:hover .icon-copy,
+a:hover .icon-copy {
+    background-position: -28px -1596px
+}
+
+.icon-locked {
+    background-position: 0 -1624px
+}
+
+.icon-unlocked {
+    background-position: 0 -1652px
+}
+
+.icon-bigplay {
+    background-position: 0 -1680px
+}
+
+.icon-bigplay-fill {
+    background-position: -28px -1680px
+}
+
+.icon-bigplay-fill:hover,
+button:hover .icon-bigplay-fill,
+a:hover .icon-bigplay-fill {
+    background-position: -56px -1680px
+}
+
+.icon-bigstop {
+    background-position: 0 -1708px
+}
+
+.icon-bigstop-fill {
+    background-position: -28px -1708px
+}
+
+.icon-bigstop-fill:hover,
+button:hover .icon-bigstop-fill,
+a:hover .icon-bigstop-fill {
+    background-position: -56px -1708px
+}
+
+.icon-arrow-right-blue {
+    background-position: 0 -1764px
+}
+
+.icon-logo-apple {
+    background-position: 0 -1792px
+}
+
+.icon-logo-win {
+    background-position: -28px -1792px
+}
+
+.icon-globe {
+    background-position: 0 -1820px
+}
+
+.icon-globe:hover,
+button:hover .icon-globe,
+a:hover .icon-globe {
+    background-position: -28px -1820px
+}
+
+.icon-chat-gray {
+    background-position: 0 -1848px
+}
+
+.icon-chat-gray:hover,
+button:hover .icon-chat-gray,
+a:hover .icon-chat-gray {
+    background-position: -28px -1848px
+}
+
+.icon-viewdetails {
+    background-position: 0 -1876px
+}
+
+.icon-viewdetails:hover,
+button:hover .icon-viewdetails,
+a:hover .icon-viewdetails {
+    background-position: -28px -1876px
+}
+
+.icon-playgame {
+    background-position: 0 -1904px
+}
+
+.icon-playgame:hover,
+button:hover .icon-playgame,
+a:hover .icon-playgame {
+    background-position: -28px -1904px
+}
+
+.icon-regenerate {
+    background-position: 0 -1932px
+}
+
+.icon-pause-fill {
+    background-position: 0 -1960px
+}
+
+.icon-more-gray-vertical {
+    background-position: 0 -1988px
+}
+
+.icon-password-show {
+    background-position: 0 -2016px
+}
+
+.icon-password-show-white {
+    background-position: -28px -2016px
+}
+
+.icon-password-hide {
+    background-position: 0 -2044px
+}
+
+.icon-password-hide-white {
+    background-position: -28px -2044px
+}
+
+.icon-trash-bin {
+    background-position: 0 -2072px
+}
+
+.icon-trash-bin:hover,
+button:hover .icon-trash-bin,
+a:hover .icon-trash-bin {
+    background-position: -28px -2072px
+}
+
+.icon-male-white {
+    background-position: 0 -2100px
+}
+
+.icon-male-white:hover,
+button:hover .icon-male-white,
+a:hover .icon-male-white {
+    background-position: -28px -2100px
+}
+
+.icon-female-white {
+    background-position: 0 -2128px
+}
+
+.icon-female-white:hover,
+button:hover .icon-female-white,
+a:hover .icon-female-white {
+    background-position: -28px -2128px
+}
+
+.icon-check-selection {
+    background-position: 0 -2212px
+}
+
+.dsa-description p {
+    margin-bottom: 1em;
+    font-size: 1rem;
+    font-weight: 300
+}
+
+button.back-button {
+    font-size: large
+}
+
+button.back-button .icon-back {
+    margin-right: 10px;
+    display: inline-block;
+    transform: scale(1.2)
+}
+
+.focus-visible\:outline-focus:focus-visible {
+    outline: var(--stroke-thicker)solid var(--color-selection-start);
+    outline-offset: var(--stroke-thicker)
+}
+
+.disabled\:outline-none:disabled {
+    outline: var(--stroke-none)solid var(--color-none)
+}
+
+.group\/interactable:hover .group-hover\/interactable\:bg-\[var\(--color-state-hover\)\] {
+    background-color: var(--color-state-hover)
+}
+
+.group\/interactable:active .group-active\/interactable\:bg-\[var\(--color-state-press\)\] {
+    background-color: var(--color-state-press)
+}
+
+.group\/interactable:disabled .group-disabled\/interactable\:bg-none {
+    background-color: var(--color-none)
+}

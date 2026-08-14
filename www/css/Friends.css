@@ -1,0 +1,567 @@
+.friend-recommendations-section {
+    margin: 0 auto
+}
+
+.friend-recommendations-section .container-header {
+    margin: 0 0 12px
+}
+
+.friend-recommendations-section .friend-recommendations-content {
+    overflow-x: hidden
+}
+
+.friend-recommendations-section .friend-recommendations-content .scroller.next {
+    right: 0
+}
+
+.friend-recommendations-section .friend-recommendations-content .scroller:not(.next) {
+    left: 0
+}
+
+.friend-recommendations-section .friend-recommendations-content .scroller {
+    width: 30px;
+    height: 100%;
+    padding: 0
+}
+
+.friend-recommendations-section .friend-recommendations-content .scroller .arrow {
+    height: auto;
+    left: 50%;
+    transform: translateX(-75%)
+}
+
+.friend-recommendations-section .friend-recommendations-content .animate-scroll {
+    transition: left 1s
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container {
+    display: inline;
+    white-space: nowrap;
+    position: relative
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item {
+    display: inline-block;
+    float: none;
+    white-space: normal
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item {
+    background-color: #fff
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item.light-theme {
+    background-color: var(--color-surface-300);
+    color: var(--color-content-emphasis)
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item.light-theme.remove-panel {
+    background-color: transparent
+}
+
+.light-theme .friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item {
+    background-color: var(--color-surface-300);
+    color: var(--color-content-emphasis)
+}
+
+.light-theme .friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item.remove-panel {
+    background-color: transparent
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item.dark-theme {
+    background-color: var(--color-surface-300);
+    color: var(--color-content-emphasis)
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item.dark-theme.remove-panel {
+    background-color: transparent
+}
+
+.dark-theme .friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item {
+    background-color: var(--color-surface-300);
+    color: var(--color-content-emphasis)
+}
+
+.dark-theme .friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item.remove-panel {
+    background-color: transparent
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item {
+    width: 138px;
+    height: 222px;
+    padding: 12px;
+    margin: 0 12px 0 0;
+    float: left
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item .friend-recommendation-link .avatar-headshot {
+    width: 90px;
+    height: 90px;
+    margin: 0 12px;
+    float: left
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item .friend-recommendation-link .friend-recommendation-info {
+    width: 114px;
+    height: 54px;
+    margin: 9px 0;
+    float: left;
+    text-align: center;
+    line-height: 1em
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item .friend-recommendation-link .friend-recommendation-info .friend-recommendation-name {
+    width: 100%;
+    float: left;
+    margin-bottom: 2px
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item .friend-recommendation-link .friend-recommendation-info .mutual-friends-tooltip-label {
+    width: 114px;
+    padding: 0;
+    margin: 0
+}
+
+.friend-recommendations-section .friend-recommendations-content .friend-recommendations-container .friend-recommendations-list-item .friend-recommendation-item .add-friend-button {
+    width: 114px;
+    height: 36px;
+    padding: 0
+}
+
+.friend-recommendations-section .friend-recommendations-content-with-scrollers {
+    padding: 0 30px
+}
+
+@media(max-width:991px) {
+    .friend-recommendations-section .friend-recommendations-content-with-scrollers {
+        margin-left: 15px;
+        margin-right: 15px
+    }
+}
+
+.verified-badge-icon,
+.verified-badge-text-container {
+    display: none
+}
+
+.badgeSizeCaptionheader,
+.badgeSizeFooter,
+.badgeSizeHeader,
+.badgeSizeSubheader,
+.badgeSizeTitle {
+    position: relative;
+    overflow: hidden
+}
+
+.badgeSizeTitle {
+    width: 28px;
+    height: 28px
+}
+
+.badgeSizeFooter {
+    width: 12px;
+    height: 12px
+}
+
+.badgeSizeCaptionheader,
+.badgeSizeHeader,
+.badgeSizeSubheader {
+    width: 16px;
+    height: 16px
+}
+
+.hz-centered-badge-container {
+    margin: 5px 0;
+    display: flex;
+    justify-content: center
+}
+
+.verified-badge-friends-img {
+    display: inline-block;
+    margin-left: 4px;
+    width: 16px;
+    height: 16px
+}
+
+@media(max-width:543px) {
+    .verified-badge-friends-img {
+        margin-left: 2px;
+        width: 12px;
+        height: 12px
+    }
+}
+
+.content {
+    max-width: 970px
+}
+
+.content .friends-filter {
+    margin: 0 0 0 6px;
+    display: inline-flex;
+    float: right
+}
+
+@media(max-width:767px) {
+    .content .friends-filter {
+        flex-direction: column;
+        float: none;
+        width: 100%;
+        padding-right: 12px
+    }
+}
+
+.content .friends-filter .dropdown {
+    display: inline-block;
+    width: 165px
+}
+
+@media(max-width:767px) {
+    .content .friends-filter .dropdown {
+        width: auto;
+        margin: 4px 0 0
+    }
+}
+
+.content .friends-filter .dropdown button {
+    font-weight: 300;
+    height: 36px
+}
+
+.light-theme .content .friends-filter .dropdown button {
+    border-color: rgba(0, 0, 0, .3)
+}
+
+.light-theme .content .friends-filter .dropdown button:focus-within {
+    border-color: var(--color-content-default)
+}
+
+.dark-theme .content .friends-filter .dropdown button {
+    border-color: hsla(0, 0%, 100%, .3)
+}
+
+.dark-theme .content .friends-filter .dropdown button:focus-within {
+    border-color: var(--color-content-default)
+}
+
+.content .friends-filter .dropdown .rbx-selection-label {
+    max-width: 90%;
+    max-width: calc(100% - 20px);
+    text-overflow: ellipsis;
+    overflow: hidden
+}
+
+.content .friends-filter .search-bar {
+    display: inline-block;
+    width: 220px
+}
+
+.content .friends-filter .friends-filter-searchbar-container {
+    border-radius: 8px;
+    height: 36px;
+    width: 300px;
+    display: inline-flex;
+    align-items: center;
+    margin: 0 2px 2px 0;
+    padding: 5px 6px
+}
+
+@media(max-width:767px) {
+    .content .friends-filter .friends-filter-searchbar-container {
+        width: auto;
+        margin: 0 0 2px
+    }
+}
+
+.light-theme .content .friends-filter .friends-filter-searchbar-container {
+    border-color: rgba(0, 0, 0, .3)
+}
+
+.light-theme .content .friends-filter .friends-filter-searchbar-container:focus-within {
+    border-color: var(--color-content-default)
+}
+
+.dark-theme .content .friends-filter .friends-filter-searchbar-container {
+    border-color: hsla(0, 0%, 100%, .3)
+}
+
+.dark-theme .content .friends-filter .friends-filter-searchbar-container:focus-within {
+    border-color: var(--color-content-default)
+}
+
+.content .friends-filter .friends-filter-searchbar-container .icon-search {
+    background-size: 40px auto;
+    width: 20px;
+    height: 20px;
+    background-position: 0 -20px;
+    margin: 0 2px
+}
+
+.content .friends-filter .friends-filter-searchbar-container .friends-filter-searchbar-input {
+    font-size: 16px;
+    font-weight: 300;
+    height: 22px;
+    width: 100%;
+    line-height: 22px;
+    background: transparent;
+    border: none
+}
+
+.light-theme .content .friends-filter .friends-filter-searchbar-container .friends-filter-searchbar-input::placeholder {
+    color: var(--color-content-emphasis)
+}
+
+.dark-theme .content .friends-filter .friends-filter-searchbar-container .friends-filter-searchbar-input::placeholder {
+    color: var(--color-content-emphasis)
+}
+
+.content .friends-filter .friends-filter-searchbar-container .friends-filter-searchbar-input:focus {
+    outline: none
+}
+
+.content .container-header {
+    display: flex;
+    flex-direction: column;
+    position: relative
+}
+
+.content .friends-subtitle {
+    margin: 4px 0 0 6px;
+    display: inline-block;
+    padding-bottom: 12px
+}
+
+.content .chip-filters-container {
+    margin: 4px 0 12px 6px;
+    display: inline-flex;
+    gap: 8px
+}
+
+.content .education-text-container {
+    margin: 0 0 6px 6px
+}
+
+.content .education-text-container .learn-more-link {
+    text-decoration: underline
+}
+
+.content .tooltip-container .icon-moreinfo {
+    background-position: 0 -200px;
+    background-size: 40px auto;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    padding: 0
+}
+
+.content .ignore-button {
+    position: absolute;
+    right: 0;
+    top: 4px
+}
+
+@media(max-width:543px) {
+    .content .ignore-button {
+        width: 100%;
+        margin: 0 0 6px
+    }
+}
+
+.content .find-friends-button {
+    float: right;
+    margin: 6px 0 0
+}
+
+@media(max-width:543px) {
+    .content .find-friends-button {
+        margin: 0 0 6px
+    }
+}
+
+.content .hide-template {
+    opacity: 0;
+    transition: all, .2s, ease-in-out
+}
+
+.content .horizontal-tabs {
+    margin-bottom: 12px
+}
+
+.content .nav-tabs {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    margin-bottom: 12px
+}
+
+.content .rbx-tab {
+    min-width: 25%
+}
+
+.content .rbx-tab.subtract-item {
+    min-width: 33.3333333333%
+}
+
+.content .rbx-tab.signed-out {
+    min-width: 50%
+}
+
+.content .empty-content-message {
+    color: #494d5a;
+    margin: 48px 24px 24px;
+    text-align: center
+}
+
+.content .mutual-friends-extra-padding-without-pagination {
+    padding-top: 60px
+}
+
+.content .mutual-friends-extra-padding-with-pagination {
+    padding-top: 24px
+}
+
+.friends-content .accept-friend,
+.friends-content .ignore-friend {
+    width: calc(50% - 12px);
+    margin: 0 6px
+}
+
+.friends-content .avatar-cards-empty {
+    text-align: center;
+    margin-top: 4px
+}
+
+.friends-content .avatar-card .avatar-card-footer .text-link {
+    display: inline
+}
+
+.friends-content .avatar-card-label {
+    font-feature-settings: "ss03";
+    font-variant-numeric: slashed-zero
+}
+
+.friends-content .avatar-card-container.disabled {
+    opacity: .4;
+    pointer-events: none
+}
+
+.friends-content .avatar-card-container.disabled .avatar-card-menu {
+    pointer-events: auto
+}
+
+.friends-content .mutual-friends-tooltip-label {
+    padding: 0
+}
+
+#mutual-friends-tooltip .tooltip-inner {
+    text-align: left
+}
+
+@media(max-width:767px) {
+    .modal:before {
+        height: 20%
+    }
+}
+
+.light-theme .avatar-card-btns .accept-friend {
+    border-radius: 8px;
+    background-color: var(--color-content-emphasis);
+    border-color: var(--color-content-emphasis);
+    color: var(--color-surface-0)
+}
+
+.light-theme .avatar-card-btns .accept-friend:link {
+    color: var(--color-surface-0)
+}
+
+.light-theme .avatar-card-btns .accept-friend:focus,
+.light-theme .avatar-card-btns .accept-friend:hover {
+    background-color: var(--color-content-emphasis);
+    border-color: var(--color-content-emphasis);
+    color: var(--color-surface-0)
+}
+
+.light-theme .avatar-card-btns .accept-friend.active,
+.light-theme .avatar-card-btns .accept-friend:active {
+    background-color: var(--color-content-emphasis);
+    color: var(--color-surface-0)
+}
+
+.light-theme .avatar-card-btns .accept-friend:visited {
+    color: var(--color-surface-0)
+}
+
+.light-theme .avatar-card-btns .accept-friend.disabled,
+.light-theme .avatar-card-btns .accept-friend.disabled.active,
+.light-theme .avatar-card-btns .accept-friend.disabled:active,
+.light-theme .avatar-card-btns .accept-friend.disabled:focus,
+.light-theme .avatar-card-btns .accept-friend.disabled:hover,
+.light-theme .avatar-card-btns .accept-friend[disabled],
+.light-theme .avatar-card-btns .accept-friend[disabled].active,
+.light-theme .avatar-card-btns .accept-friend[disabled]:active,
+.light-theme .avatar-card-btns .accept-friend[disabled]:focus,
+.light-theme .avatar-card-btns .accept-friend[disabled]:hover {
+    background-color: var(--color-content-emphasis);
+    border-color: var(--color-content-emphasis);
+    color: var(--color-surface-0);
+    opacity: .5
+}
+
+.dark-theme .avatar-card-btns .accept-friend {
+    border-radius: 8px;
+    background-color: var(--color-content-emphasis);
+    border-color: var(--color-content-emphasis);
+    color: var(--color-surface-0)
+}
+
+.dark-theme .avatar-card-btns .accept-friend:link {
+    color: var(--color-surface-0)
+}
+
+.dark-theme .avatar-card-btns .accept-friend:focus,
+.dark-theme .avatar-card-btns .accept-friend:hover {
+    background-color: var(--color-content-emphasis);
+    border-color: var(--color-content-emphasis);
+    color: var(--color-surface-0)
+}
+
+.dark-theme .avatar-card-btns .accept-friend.active,
+.dark-theme .avatar-card-btns .accept-friend:active {
+    background-color: var(--color-content-emphasis);
+    color: var(--color-surface-0)
+}
+
+.dark-theme .avatar-card-btns .accept-friend:visited {
+    color: var(--color-surface-0)
+}
+
+.dark-theme .avatar-card-btns .accept-friend.disabled,
+.dark-theme .avatar-card-btns .accept-friend.disabled.active,
+.dark-theme .avatar-card-btns .accept-friend.disabled:active,
+.dark-theme .avatar-card-btns .accept-friend.disabled:focus,
+.dark-theme .avatar-card-btns .accept-friend.disabled:hover,
+.dark-theme .avatar-card-btns .accept-friend[disabled],
+.dark-theme .avatar-card-btns .accept-friend[disabled].active,
+.dark-theme .avatar-card-btns .accept-friend[disabled]:active,
+.dark-theme .avatar-card-btns .accept-friend[disabled]:focus,
+.dark-theme .avatar-card-btns .accept-friend[disabled]:hover {
+    background-color: var(--color-content-emphasis);
+    border-color: var(--color-content-emphasis);
+    color: var(--color-surface-0);
+    opacity: .5
+}
+
+.dark-theme .touch .avatar-card-btns .accept-friend.active,
+.dark-theme .touch .avatar-card-btns .accept-friend:active,
+.dark-theme .touch .avatar-card-btns .accept-friend:focus,
+.dark-theme .touch .avatar-card-btns .accept-friend:hover,
+.dark-theme .touch .avatar-card-btns .accept-friend:visited,
+.light-theme .touch .avatar-card-btns .accept-friend.active,
+.light-theme .touch .avatar-card-btns .accept-friend:active,
+.light-theme .touch .avatar-card-btns .accept-friend:focus,
+.light-theme .touch .avatar-card-btns .accept-friend:hover,
+.light-theme .touch .avatar-card-btns .accept-friend:visited {
+    color: var(--color-surface-0);
+    background-color: var(--color-content-emphasis);
+    border-color: var(--color-content-emphasis)
+}

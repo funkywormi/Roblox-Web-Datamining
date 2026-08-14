@@ -1,0 +1,349 @@
+.iv-qr-frame {
+    background-color: #fff;
+    border-radius: var(--size-350)
+}
+
+.iv-qr-svg {
+    display: block;
+    width: 176px;
+    height: 176px
+}
+
+.iv-qr-logo-backdrop {
+    rx: var(--radius-small);
+    ry: var(--radius-small)
+}
+
+@media(max-width:543px) {
+    .access-management-upsell-modal {
+        padding: 0
+    }
+}
+
+.access-management-upsell-modal #access-management-modal-title {
+    width: 100%;
+    text-align: center;
+    padding: 0
+}
+
+.access-management-upsell-modal .close {
+    float: left
+}
+
+@media(max-width:767px) {
+    .access-management-upsell-modal #access-management-upsell-close-button {
+        margin-top: -2px
+    }
+}
+
+.access-management-upsell-modal .modal-dialog {
+    overflow: auto
+}
+
+@media(min-width:543px) {
+    .access-management-upsell-modal .modal-dialog {
+        min-width: 510px
+    }
+}
+
+.access-management-upsell-modal .modal-dialog .modal-content {
+    border-radius: 8px
+}
+
+.access-management-upsell-modal .modal-dialog .modal-content .modal-body {
+    white-space: pre-wrap;
+    padding-bottom: 20px;
+    margin: 0 12px 24px
+}
+
+.access-management-upsell-modal .modal-dialog .modal-content .modal-footer {
+    margin: 0 24px 24px
+}
+
+.parental-consent-modal-body {
+    text-align: center;
+    margin-bottom: 12px
+}
+
+.account-settings-redirect-modal .modal-body {
+    white-space: pre-line
+}
+
+@media(max-width:543px) {
+    .access-management-upsell-inner-modal {
+        padding: 0
+    }
+}
+
+.access-management-upsell-inner-modal .modal-dialog {
+    overflow: auto
+}
+
+@media(min-width:543px) {
+    .access-management-upsell-inner-modal .modal-dialog {
+        min-width: 510px
+    }
+}
+
+.access-management-upsell-inner-modal .modal-dialog .modal-content {
+    border-radius: 8px
+}
+
+.access-management-upsell-inner-modal .modal-dialog .modal-content .modal-header {
+    text-align: center
+}
+
+.access-management-upsell-inner-modal .modal-dialog .modal-content .modal-header .modal-title {
+    padding: 0 30px
+}
+
+.access-management-upsell-inner-modal .modal-dialog .modal-content .modal-header .close-button {
+    position: absolute;
+    top: 12px;
+    left: 12px
+}
+
+.access-management-upsell-inner-modal .modal-dialog .modal-content .modal-body {
+    margin: 0 12px
+}
+
+.access-management-upsell-inner-modal .modal-dialog .modal-content .modal-body .form-horizontal .form-group {
+    width: 100%
+}
+
+.access-management-upsell-inner-modal .modal-dialog .modal-content .modal-body .form-horizontal .form-group .modal-error-message {
+    white-space: normal
+}
+
+.access-management-upsell-inner-modal .modal-dialog .modal-content .modal-footer .modal-half-width-button {
+    margin: 6px 0;
+    width: calc(100% - 8px)
+}
+
+@media(min-width:543px) {
+    .access-management-upsell-inner-modal .modal-dialog .modal-content .modal-footer {
+        margin: 0 20px 20px;
+        display: flex
+    }
+
+    .access-management-upsell-inner-modal .modal-dialog .modal-content .modal-footer .modal-half-width-button {
+        margin: 0 6px;
+        width: calc(50% - 8px)
+    }
+}
+
+.access-management-upsell-inner-modal .modal-dialog .modal-content .modal-footer .modal-full-width-button {
+    margin: 6px 0;
+    width: calc(100% - 8px)
+}
+
+.ask-your-parent-lock,
+.parent-email-image {
+    height: 142px;
+    background-position: 50%;
+    background-size: auto 142px;
+    background-repeat: no-repeat;
+    margin: 24px 0
+}
+
+.dark-theme .parent-email-image {
+    background-image: url(https://images.rbxcdn.com/fa01f08ee09b83c8eec048b6add6c6b4-new-parent-email-dark.png)
+}
+
+.light-theme .parent-email-image {
+    background-image: url(https://images.rbxcdn.com/3d56755a7abcf8ebcedf0d5ede9dd82e-new-parent-email-light.png)
+}
+
+.dark-theme .ask-your-parent-lock {
+    background-image: url(https://images.rbxcdn.com/735baabe7e62a6cb7740fab9af5fe0aa-ask-your-parent-lock-dark.png)
+}
+
+.light-theme .ask-your-parent-lock {
+    background-image: url(https://images.rbxcdn.com/44ccff1d92f04ee1ecf2782884a4c2c8-ask-your-parent-lock-light.png)
+}
+
+.user-settings-modal .consent-form {
+    display: flex;
+    margin-top: 12px
+}
+
+.user-settings-modal .consent-form #consent-checkbox {
+    display: flex;
+    align-items: center;
+    margin-right: 12px
+}
+
+.user-settings-modal .consent-form .checkbox-label {
+    display: flex;
+    align-items: center
+}
+
+.fae-qr-code-header {
+    padding: 0 0 4px
+}
+
+.fae-qr-code-heading {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: -.2px;
+    margin: 0 0 4px;
+    padding-right: 40px
+}
+
+.dark-theme .fae-qr-code-heading,
+.light-theme .fae-qr-code-heading {
+    color: var(--color-content-emphasis)
+}
+
+.fae-qr-code-subheading {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    margin: 0
+}
+
+.dark-theme .fae-qr-code-subheading,
+.light-theme .fae-qr-code-subheading {
+    color: var(--color-content-default)
+}
+
+.fae-qr-code-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    margin-top: 20px;
+    border-radius: 16px
+}
+
+.dark-theme .fae-qr-code-card,
+.light-theme .fae-qr-code-card {
+    background-color: var(--color-surface-200)
+}
+
+.fae-qr-code-image {
+    display: block;
+    flex-shrink: 0;
+    width: 134px;
+    height: 134px;
+    border-radius: 8px
+}
+
+.fae-qr-code-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+    padding: 4px 0
+}
+
+.fae-qr-code-scan-instruction {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    margin: 0
+}
+
+.dark-theme .fae-qr-code-scan-instruction,
+.light-theme .fae-qr-code-scan-instruction {
+    color: var(--color-content-emphasis)
+}
+
+.fae-qr-code-divider {
+    height: 1px;
+    min-height: 1px;
+    width: 100%;
+    flex-shrink: 0
+}
+
+.dark-theme .fae-qr-code-divider,
+.light-theme .fae-qr-code-divider {
+    background-color: var(--color-stroke-default)
+}
+
+.fae-qr-code-fallback {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    margin: 0
+}
+
+.dark-theme .fae-qr-code-fallback,
+.light-theme .fae-qr-code-fallback {
+    color: var(--color-content-muted)
+}
+
+.fae-qr-code-fallback-bold {
+    font-weight: 600
+}
+
+.access-management-upsell-modal .modal-dialog:has(.verification-link-page-content-no-padding) {
+    max-width: 86vw;
+    margin-left: auto;
+    margin-right: auto
+}
+
+.access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding {
+    margin: 0;
+    padding: 0
+}
+
+.access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-header {
+    margin: 20px 16px;
+    padding-right: 24px;
+    position: relative
+}
+
+.access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-header .verification-close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer
+}
+
+.dark-theme .access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-header .verification-close-button .icon-close,
+.light-theme .access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-header .verification-close-button .icon-close {
+    color: var(--color-content-emphasis)
+}
+
+.access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-header .new-verification-link-upsell .new-age-verification-title {
+    font-size: 24px;
+    text-align: left;
+    padding: 0 0 5px
+}
+
+.dark-theme .access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-header .new-verification-link-upsell .new-age-verification-title,
+.light-theme .access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-header .new-verification-link-upsell .new-age-verification-title {
+    color: var(--color-content-emphasis)
+}
+
+.access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-header .new-verification-link-description {
+    font-size: 15px;
+    text-align: left
+}
+
+.dark-theme .access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-header .new-verification-link-description,
+.light-theme .access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-header .new-verification-link-description {
+    color: var(--color-content-emphasis)
+}
+
+.access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-body {
+    margin: 0 16px 16px
+}
+
+.access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-body .new-verification-link-legal {
+    font-size: 13px;
+    text-align: left;
+    margin-top: 0
+}
+
+.dark-theme .access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-body .new-verification-link-legal,
+.light-theme .access-management-upsell-modal .modal-dialog .modal-content .modal-body.verification-link-page-content-no-padding .new-verification-link-page-content-body .new-verification-link-legal {
+    color: var(--color-content-emphasis)
+}

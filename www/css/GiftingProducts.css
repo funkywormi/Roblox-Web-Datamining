@@ -1,0 +1,1174 @@
+.gift-message-dropdown {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    gap: 8px
+}
+
+.gift-message-dropdown label {
+    font-size: 14px;
+    line-height: 140%;
+    font-weight: 400
+}
+
+.gift-message-dropdown .select-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
+    padding: 0 12px 0 16px;
+    border-radius: 8px;
+    background-color: transparent
+}
+
+.dark-theme .gift-message-dropdown .select-button,
+.light-theme .gift-message-dropdown .select-button {
+    border: 1px solid var(--color-stroke-default)
+}
+
+.gift-message-dropdown .select-button p {
+    max-width: calc(100% - 28px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden
+}
+
+.dark-theme .gift-message-dropdown .select-button p,
+.light-theme .gift-message-dropdown .select-button p {
+    color: var(--color-content-emphasis)
+}
+
+.gift-message-dropdown .select-dropdown {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    overflow-y: hidden;
+    max-height: 0;
+    width: 100%;
+    top: 88px;
+    z-index: 2;
+    transition: max-height .25s ease-in-out
+}
+
+.gift-message-dropdown .select-dropdown.active {
+    overflow-y: auto;
+    max-height: 341px
+}
+
+.gift-message-dropdown .select-dropdown button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 12px
+}
+
+.dark-theme .gift-message-dropdown .select-dropdown button,
+.light-theme .gift-message-dropdown .select-dropdown button {
+    background: var(--color-surface-300);
+    border-color: var(--color-stroke-default)
+}
+
+.gift-message-dropdown .select-dropdown button:first-child {
+    border-radius: 8px 8px 0 0
+}
+
+.gift-message-dropdown .select-dropdown button:last-child {
+    border: none;
+    border-radius: 0 0 8px 8px
+}
+
+.gift-message-dropdown .select-dropdown button:not(:last-child) {
+    border-width: 0 0 1px
+}
+
+.gift-message-dropdown .select-dropdown button p {
+    font-weight: 600;
+    padding: 0 12px;
+    max-width: calc(100% - 28px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden
+}
+
+.dark-theme .gift-message-dropdown .select-dropdown button p,
+.light-theme .gift-message-dropdown .select-dropdown button p {
+    color: var(--color-content-emphasis)
+}
+
+.robux-gifting-verification-modal .modal-dialog {
+    max-width: 540px;
+    width: auto
+}
+
+.dark-theme .robux-gifting-verification-modal .input-field,
+.light-theme .robux-gifting-verification-modal .input-field {
+    background-color: var(--color-shift-200);
+    border-color: var(--color-stroke-default)
+}
+
+.dark-theme .robux-gifting-verification-modal .modal-title,
+.dark-theme .robux-gifting-verification-modal .phone-prefix-selected,
+.dark-theme .robux-gifting-verification-modal input,
+.light-theme .robux-gifting-verification-modal .modal-title,
+.light-theme .robux-gifting-verification-modal .phone-prefix-selected,
+.light-theme .robux-gifting-verification-modal input {
+    color: var(--color-content-emphasis)
+}
+
+.dark-theme .robux-gifting-verification-modal .phone-verification-legal-text,
+.dark-theme .robux-gifting-verification-modal .phone-verification-nonpublic-text,
+.dark-theme .robux-gifting-verification-modal .resend-text,
+.dark-theme .robux-gifting-verification-modal .verification-upsell-text-body,
+.light-theme .robux-gifting-verification-modal .phone-verification-legal-text,
+.light-theme .robux-gifting-verification-modal .phone-verification-nonpublic-text,
+.light-theme .robux-gifting-verification-modal .resend-text,
+.light-theme .robux-gifting-verification-modal .verification-upsell-text-body {
+    color: var(--color-content-default)
+}
+
+.light-theme .robux-gifting-verification-modal .phone-input::placeholder,
+.light-theme .robux-gifting-verification-modal .verification-code-input::placeholder {
+    color: var(--color-content-muted);
+    font-weight: 400
+}
+
+.dark-theme .robux-gifting-verification-modal .phone-input::placeholder,
+.dark-theme .robux-gifting-verification-modal .verification-code-input::placeholder {
+    color: var(--color-content-muted);
+    font-weight: 400
+}
+
+.robux-gifting-verification-modal .phone-number-change-number-button,
+.robux-gifting-verification-modal .resend-text span {
+    color: #528bff
+}
+
+.robux-gifting-verification-modal .phone-number-change-number-button:focus-visible,
+.robux-gifting-verification-modal .resend-text span:focus-visible {
+    outline: 1px auto #83d1fd
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content {
+    border-radius: 8px
+}
+
+.dark-theme .robux-gifting-verification-modal .modal-dialog .modal-content,
+.light-theme .robux-gifting-verification-modal .modal-dialog .modal-content {
+    background-color: var(--color-surface-100)
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-header .modal-title {
+    font-weight: 700;
+    padding: 0 30px;
+    text-align: center
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-header .close-button {
+    position: absolute;
+    top: 12px;
+    left: 12px
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body {
+    margin: 0 12px 12px;
+    padding: 12px
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .robux-gifting-phone-number-input-container {
+    border-width: .67px;
+    height: 48px;
+    margin: 24px 0 4px
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .robux-gifting-phone-number-input-container .phone-input-row {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: row;
+    align-content: center
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .robux-gifting-phone-number-input-container .phone-input-row .select {
+    display: none;
+    appearance: none;
+    width: 100%;
+    margin: 0
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .robux-gifting-phone-number-input-container .phone-input-row select:focus {
+    outline: none
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .robux-gifting-phone-number-input-container .phone-input-row .phone-prefix-wrapper {
+    display: inline-block;
+    height: 100%
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .robux-gifting-phone-number-input-container .phone-input-row .phone-prefix-selected {
+    transform: translateY(-50%);
+    position: relative;
+    top: 50%;
+    height: auto;
+    text-align: right;
+    pointer-events: none;
+    display: inline-block
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .robux-gifting-phone-number-input-container .phone-input-row .phone-prefix-dropdown {
+    left: 0;
+    width: 20px;
+    padding-left: 4px;
+    padding-right: 4px;
+    font-size: 16px;
+    position: absolute;
+    z-index: 1;
+    border: 0;
+    opacity: 0;
+    height: 100%
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .robux-gifting-phone-number-input-container .phone-input-row .phone-input {
+    position: relative;
+    width: auto;
+    height: 100%;
+    flex: auto;
+    overflow: scroll;
+    border: none;
+    background: none;
+    padding-left: 4px
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .robux-gifting-phone-number-input-container .phone-input-row .phone-divider {
+    width: 0;
+    height: 45%
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .verification-upsell-text-body {
+    text-align: left;
+    white-space: pre-wrap;
+    margin-bottom: 0
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .phone-verification-nonpublic-text {
+    text-align: left;
+    margin: 0
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .phone-number-change-number-button {
+    margin-left: 0;
+    margin-bottom: 24px;
+    padding-left: 0;
+    font-size: 16px
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .verification-code-input {
+    border-width: .67px;
+    height: 48px;
+    text-align: left;
+    margin-bottom: 4px
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .resend-text {
+    margin-bottom: 24px
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-body .resend-text span {
+    cursor: pointer
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-footer {
+    padding: 0 12px 12px;
+    text-align: left
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-footer .phone-verification-legal-text {
+    margin-top: 2px;
+    margin-bottom: 48px
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-footer .phone-verification-legal-text a {
+    color: inherit;
+    text-decoration: underline
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-footer .buttons-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    height: auto
+}
+
+.robux-gifting-verification-modal .modal-dialog .modal-content .modal-footer .buttons-section button {
+    font-weight: 700;
+    padding: 15px
+}
+
+.request-robux-modal .modal-content {
+    border-radius: 8px
+}
+
+.request-robux-modal .modal-content .modal-header {
+    display: flex;
+    align-items: center
+}
+
+.request-robux-modal .modal-content .modal-header .modal-title {
+    flex: 1 1 auto;
+    font-size: 20px;
+    line-height: 120%;
+    font-weight: 700;
+    padding: 0
+}
+
+.request-robux-modal .modal-content .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 24px
+}
+
+.request-robux-modal .modal-content .modal-body .description-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px
+}
+
+.request-robux-modal .modal-content .modal-body .description-container .description-line1 {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 140%
+}
+
+.request-robux-modal .modal-content .modal-body .description-container .description-line2 {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 140%
+}
+
+.request-robux-modal .modal-content .modal-body .qr-code-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 42px;
+    gap: 24px;
+    margin: 0;
+    border-radius: 8px;
+    background: #fff;
+    width: 100%;
+    height: 282px
+}
+
+.request-robux-modal .modal-content .modal-body .qr-code-container .qr-code-wrapper {
+    position: relative;
+    width: 158px;
+    height: 158px;
+    transform: rotate(22.7deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: contain;
+    background-position: 50%
+}
+
+.request-robux-modal .modal-content .modal-body .qr-code-container .qr-code-wrapper .qr-code-profile-image {
+    width: 56px;
+    height: 56px;
+    background: #fff
+}
+
+.request-robux-modal .modal-content .modal-body .qr-code-container .qr-code-wrapper .qr-code-profile-image .thumbnail-2d-container {
+    background-color: transparent
+}
+
+.request-robux-modal .modal-content .modal-body .qr-code-container .qr-code-wrapper .qr-code-profile-image .thumbnail-2d-container img {
+    transform: scale(1.25) rotate(-22.7deg)
+}
+
+.request-robux-modal .modal-content .modal-body .qr-code-container .user-info-container {
+    color: #393b3d;
+    line-height: 140%;
+    text-align: center
+}
+
+.request-robux-modal .modal-content .modal-body .qr-code-container .user-info-container .display-name {
+    font-size: 16px;
+    font-weight: 700
+}
+
+.request-robux-modal .modal-content .modal-body .qr-code-container .user-info-container .name {
+    font-size: 12px;
+    font-weight: 400
+}
+
+.request-robux-modal .modal-content .modal-body .copy-url-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px
+}
+
+.request-robux-modal .modal-content .modal-body .copy-url-container .form-group {
+    flex: 1 1 auto;
+    margin-bottom: 0
+}
+
+.request-robux-modal .modal-content .modal-body .copy-url-container .form-group .form-label {
+    font-size: 14px;
+    line-height: 140%;
+    font-weight: 400;
+    display: flex;
+    flex-direction: column;
+    gap: 4px
+}
+
+.request-robux-modal .modal-content .modal-body .copy-url-container .form-group .form-label .form-control {
+    height: 48px
+}
+
+.request-robux-modal .modal-content .modal-body .copy-url-container .copy-url-button {
+    min-width: 48px;
+    min-height: 48px
+}
+
+.request-robux-modal .modal-content .modal-footer-buttons {
+    display: flex;
+    gap: 12px;
+    margin: 24px 12px 12px
+}
+
+.request-robux-modal .modal-content .modal-footer-buttons button {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px
+}
+
+.gifting-products-banner-container {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 12px;
+    background-color: #fff;
+    margin: 0 0 24px
+}
+
+.dark-theme .gifting-products-banner-container {
+    background-color: #202227
+}
+
+@media(max-width:991px) {
+    .gifting-products-banner-container {
+        margin: 0 24px 24px
+    }
+}
+
+@media(max-width:543px) {
+    .gifting-products-banner-container {
+        margin: 0 12px 24px
+    }
+}
+
+.light-theme .gifting-products-banner-container {
+    border: 1px solid rgba(0, 0, 0, .1)
+}
+
+.dark-theme .gifting-products-banner-container {
+    border: 1px solid hsla(0, 0%, 100%, .1)
+}
+
+.gifting-products-banner-container .banner-content-container {
+    flex: 1 1 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px
+}
+
+@media(max-width:543px) {
+    .gifting-products-banner-container .banner-content-container {
+        padding: 16px
+    }
+}
+
+.gifting-products-banner-container .banner-content-container .banner-text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px
+}
+
+.gifting-products-banner-container .banner-content-container .banner-text-container .banner-new-label {
+    border-radius: 12px;
+    background-color: #202227;
+    color: #f7f7f8;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 140%;
+    padding: 4px 12px;
+    align-self: flex-start
+}
+
+.dark-theme .gifting-products-banner-container .banner-content-container .banner-text-container .banner-new-label {
+    background-color: #f7f7f8;
+    color: #202227
+}
+
+.gifting-products-banner-container .banner-content-container .banner-text-container .banner-text .banner-title {
+    font-size: 24px;
+    line-height: 120%;
+    font-weight: 700
+}
+
+@media(max-width:543px) {
+    .gifting-products-banner-container .banner-content-container .banner-text-container .banner-text .banner-title {
+        font-size: 16px;
+        line-height: 100%;
+        font-weight: 600
+    }
+}
+
+.gifting-products-banner-container .banner-content-container .banner-text-container .banner-text .banner-subtitle {
+    font-size: 16px;
+    line-height: 140%;
+    font-weight: 400
+}
+
+.dark-theme .gifting-products-banner-container .banner-content-container .banner-text-container .banner-text .banner-subtitle,
+.light-theme .gifting-products-banner-container .banner-content-container .banner-text-container .banner-text .banner-subtitle {
+    color: var(--color-content-muted)
+}
+
+@media(max-width:543px) {
+    .gifting-products-banner-container .banner-content-container .banner-text-container .banner-text .banner-subtitle {
+        font-size: 12px
+    }
+}
+
+.gifting-products-banner-container .banner-content-container .banner-footer-container .banner-action-button {
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 100%
+}
+
+.gifting-products-banner-container .banner-image-container {
+    flex: 0;
+    margin-right: 30px
+}
+
+@media(max-width:767px) {
+    .gifting-products-banner-container .banner-image-container {
+        margin-right: 20px
+    }
+}
+
+.gifting-products-banner-container .banner-image-container .banner-image {
+    width: 140px;
+    height: 140px;
+    background: url(https://images.rbxcdn.com/751a9aebc4deed08f08bf91b94e9eb84-gift_light.svg) no-repeat bottom/contain
+}
+
+.dark-theme .gifting-products-banner-container .banner-image-container .banner-image {
+    background: url(https://images.rbxcdn.com/33f462db62c3561d2279741d03e90c9a-gift_dark.svg) no-repeat bottom/contain
+}
+
+@media(max-width:767px) {
+    .gifting-products-banner-container .banner-image-container .banner-image {
+        width: 120px;
+        height: 120px;
+        background: url(https://images.rbxcdn.com/751a9aebc4deed08f08bf91b94e9eb84-gift_light.svg) no-repeat bottom/contain
+    }
+
+    .dark-theme .gifting-products-banner-container .banner-image-container .banner-image {
+        background: url(https://images.rbxcdn.com/33f462db62c3561d2279741d03e90c9a-gift_dark.svg) no-repeat bottom/contain
+    }
+}
+
+.content-full-screen {
+    padding: 0 !important;
+    max-width: unset !important
+}
+
+.dark-theme .gifting-products-container-intro {
+    background: linear-gradient(180deg, rgba(18, 18, 21, .9) 30%, #121215 65%), url(https://images.rbxcdn.com/a2e5c212565b5f17585784d9a7bbbc83-gift_robux_bg.png) no-repeat 50% fixed #121215;
+    background-size: cover
+}
+
+.gifting-products-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center
+}
+
+.gifting-products-container .gifting-products-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    gap: 48px;
+    max-width: 644px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container {
+    display: flex;
+    flex-direction: column;
+    gap: 48px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-title-container {
+    text-align: center;
+    padding: 32px 2px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-title-container h1 {
+    padding: 0;
+    font-size: 64px;
+    line-height: 120%;
+    font-weight: 700
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-title-container p {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 140%
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-error-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-error-container,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-error-container {
+    border: 1px solid var(--color-stroke-default);
+    background-color: var(--color-surface-300)
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-error-container .error-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 auto
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-error-container .error-info-container .title {
+    font-size: 16px;
+    font-weight: 350;
+    line-height: 125%
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-error-container .error-info-container .subtitle {
+    font-size: 12px;
+    font-weight: 325;
+    line-height: normal
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    padding: 24px;
+    column-gap: 32px;
+    row-gap: 16px;
+    border-radius: 8px
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container {
+    background-color: var(--color-surface-100)
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .left-container {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .left-container .user-thumbnail-wrapper {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    border-radius: 50%
+}
+
+@media(max-width:543px) {
+    .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .left-container .user-thumbnail-wrapper {
+        width: 90px;
+        height: 90px
+    }
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .sending-to {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 100%
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .sending-to,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .sending-to {
+    color: var(--color-content-muted)
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .user-info .user-info-spinner {
+    width: 80px;
+    display: block
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .user-info .user-names {
+    display: flex;
+    flex-direction: column;
+    gap: 4px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .user-info .user-names .spinner {
+    height: 60px;
+    margin: 0
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .user-info .user-names .display-name {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 120%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .user-info .user-names .name {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 140%
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .user-info .user-names .name,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .user-info .user-names .name {
+    color: var(--color-content-muted)
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .get-started-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .get-started-container .get-started-button {
+    flex: 1 1 auto;
+    max-width: 244px;
+    min-height: 48px;
+    padding: 0 16px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .right-container .get-started-container .open-search-button {
+    padding: 0 16px;
+    min-height: 48px;
+    min-width: 52px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .contact-support-container p {
+    font-size: 12px;
+    line-height: 140%;
+    font-weight: 400
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .contact-support-container p,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .contact-support-container p {
+    color: var(--color-content-muted)
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .contact-support-full-row-container {
+    grid-column: 2;
+    grid-row: 2
+}
+
+@media(max-width:543px) {
+    .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-container .contact-support-full-row-container {
+        grid-column: 1/span 2;
+        margin: 0 auto
+    }
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-not-found {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    border-radius: 8px;
+    width: 100%
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-not-found,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-not-found {
+    background-color: var(--color-surface-100)
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-not-found .icon-oof {
+    display: block;
+    margin: 8px auto 12px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .gifting-products-user-not-found p {
+    text-align: center
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    gap: 8px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-input {
+    position: relative;
+    display: flex;
+    overflow: hidden
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-input .icon-common-search-sm {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    pointer-events: none
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-input input {
+    padding: 5px 12px 5px 36px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    overflow-y: hidden;
+    max-height: 0;
+    width: 100%;
+    top: 62px;
+    z-index: 2;
+    transition: max-height .25s ease-in-out;
+    border-radius: 8px
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown {
+    background: var(--color-surface-300);
+    border: 1px solid var(--color-stroke-default)
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown.active {
+    overflow-y: auto;
+    max-height: 341px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-no-results {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    font-size: 16px;
+    line-height: 140%;
+    font-weight: 400
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-no-results,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-no-results {
+    color: var(--color-content-muted)
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item {
+    background: transparent;
+    border-color: var(--color-stroke-default)
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item.focused,
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item:hover,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item.focused,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item:hover {
+    background: var(--color-shift-200)
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item:last-child {
+    border: none
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item:not(:last-child) {
+    border-width: 0 0 1px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item .user-search-item-container {
+    display: flex;
+    align-items: center;
+    gap: 12px
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item .user-search-item-container .user-search-item-thumbnail {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item .user-search-item-container .user-search-item-info {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item .user-search-item-container .user-search-item-info .user-search-item-name {
+    font-size: 16px;
+    line-height: 140%;
+    font-weight: 700
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item .user-search-item-container .user-search-item-info .user-search-item-username {
+    font-size: 12px;
+    line-height: 140%;
+    font-weight: 400
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item .user-search-item-container .user-search-item-info .user-search-item-username,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-header-container .user-search-container .user-search-dropdown .user-search-item .user-search-item-container .user-search-item-info .user-search-item-username {
+    color: var(--color-content-muted)
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-intro-container,
+.gifting-products-container .gifting-products-wrapper .gifting-products-intro-container section {
+    display: flex;
+    gap: 12px;
+    flex-direction: column
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-intro-container section h2 {
+    font-size: 24px;
+    line-height: 120%;
+    padding: 0
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-intro-container section p {
+    font-size: 16px;
+    line-height: 140%;
+    white-space: pre-wrap
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-intro-container .robux-about-preview {
+    background: url(https://images.rbxcdn.com/c11da649105562702376ebc2bf4ce257-gift_robux.png) 50%/cover no-repeat;
+    height: 230px;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden
+}
+
+.gifting-products-container .gifting-products-wrapper .gifting-products-legal-disclosure-container {
+    font-size: 10px;
+    line-height: 140%;
+    font-weight: 600
+}
+
+.dark-theme .gifting-products-container .gifting-products-wrapper .gifting-products-legal-disclosure-container,
+.light-theme .gifting-products-container .gifting-products-wrapper .gifting-products-legal-disclosure-container {
+    color: var(--color-content-muted)
+}
+
+.gift-product-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 16px
+}
+
+.gift-product-selector .gift-product {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-radius: 8px;
+    background: transparent
+}
+
+.dark-theme .gift-product-selector .gift-product,
+.light-theme .gift-product-selector .gift-product {
+    border: 1px solid var(--color-stroke-default)
+}
+
+.dark-theme .gift-product-selector .gift-product.selected,
+.light-theme .gift-product-selector .gift-product.selected {
+    border: 1px solid
+}
+
+.gift-product-selector .gift-product .gift-product-content {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between
+}
+
+.gift-product-selector .gift-product .gift-product-content .robux-amount {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 16px;
+    line-height: 140%;
+    font-weight: 700
+}
+
+.gift-product-selector .gift-product .gift-product-content .robux-amount .robux-amount-row {
+    display: flex;
+    align-items: center;
+    gap: 8px
+}
+
+.gift-product-selector .gift-product .gift-product-content .robux-amount .robux-amount-row .robux-value {
+    display: flex;
+    align-items: center;
+    gap: 3px
+}
+
+.gift-product-selector .gift-product .gift-product-content .robux-amount .robux-amount-row .robux-value h4 {
+    padding: 0;
+    font-size: 28px;
+    line-height: 120%
+}
+
+.gift-product-selector .gift-product .gift-product-content .price-tag {
+    font-size: 24px;
+    line-height: 120%;
+    font-weight: 700
+}
+
+.gifting-products-checkout-container {
+    display: flex;
+    flex-direction: column;
+    gap: 48px
+}
+
+.gifting-products-checkout-container section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px
+}
+
+.gifting-products-checkout-container section h1 {
+    padding: 0;
+    font-size: 24px;
+    line-height: 120%;
+    font-weight: 700
+}
+
+.gifting-products-checkout-container section p {
+    font-size: 14px;
+    line-height: 140%;
+    font-weight: 400
+}
+
+.gifting-products-checkout-container section .optional-text {
+    font-size: 16px;
+    line-height: 140%;
+    font-weight: 400
+}
+
+.highlight-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f7d273;
+    padding: 4px 8px;
+    border-radius: 18px;
+    font-size: 12px;
+    line-height: normal;
+    font-weight: 700
+}
+
+.highlight-badge .fluid-highlight-text {
+    display: inline-block
+}
+
+@media(max-width:543px) {
+    .highlight-badge.small-badge .fluid-highlight-text {
+        display: none
+    }
+}
+
+#url-copied-popover {
+    transform: translateY(-12px);
+    border-radius: 8px
+}
+
+#url-copied-popover .popover-content {
+    font-size: 12px;
+    line-height: 140%;
+    font-weight: 400;
+    padding: 12px
+}
+
+.robux-gifting-error-modal .modal-content {
+    border-radius: 8px
+}
+
+.robux-gifting-error-modal .modal-content .modal-header .modal-title {
+    text-align: center;
+    padding: 0 30px;
+    font-weight: 700
+}
+
+.robux-gifting-error-modal .modal-content .modal-header button {
+    position: absolute;
+    top: 12px;
+    left: 12px
+}
+
+.robux-gifting-error-modal .modal-content .modal-body .gifting-error {
+    text-align: center;
+    padding: 12px
+}
+
+.robux-gifting-error-modal .modal-content .modal-footer .buttons-section {
+    margin: 24px 12px 12px
+}

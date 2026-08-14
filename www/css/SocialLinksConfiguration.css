@@ -1,0 +1,168 @@
+.social-links-container-v2 .count-notification {
+    padding-bottom: 9px
+}
+
+@media(max-width:767px) {
+    .social-links-container-v2 .add-button {
+        margin-left: 12px
+    }
+}
+
+.social-links-container-v2 social-link-configuration-row {
+    position: relative;
+    float: left;
+    width: 100%;
+    margin-bottom: 12px
+}
+
+.social-links-container-v2 social-link-configuration-row .form-group.form-has-feedback {
+    min-height: 56px;
+    margin-bottom: 0
+}
+
+.social-links-container-v2 social-link-configuration-row .form-group .input-field {
+    width: 100%
+}
+
+.social-links-container-v2 social-link-configuration-row .form-group .form-control-label {
+    float: right
+}
+
+.social-links-container-v2 social-link-configuration-row .social-link-btn-group {
+    text-align: right
+}
+
+.social-links-container-v2 social-link-configuration-row .social-link-btn-group button {
+    margin-left: 6px
+}
+
+.social-links-container .btn-default.disabled:focus {
+    background-color: #70a0ff;
+    border: 0
+}
+
+.social-links-container .universe-configure-status {
+    width: 518px
+}
+
+.social-links-container .count-notification {
+    font-size: 16px;
+    margin-bottom: 16px
+}
+
+.social-links-container .input-error {
+    border: 1px solid #e75750
+}
+
+.social-links-container .social-link {
+    margin-bottom: 3px
+}
+
+.social-links-container .remove-button,
+.social-links-container .save-button {
+    margin-left: 6px;
+    width: 7em;
+    float: left;
+    padding-top: 7.25px;
+    font-size: 12px
+}
+
+.social-links-container .save-button {
+    margin-bottom: 10px;
+    color: #fff;
+    background: #70a0ff;
+    border-color: #70a0ff;
+    border-radius: 3px
+}
+
+.social-links-container .input-row {
+    margin-bottom: .5em
+}
+
+.social-links-container .input-row-item {
+    font-size: 12px;
+    height: 17.5px
+}
+
+.social-links-container .input-row-button {
+    font-size: 10px;
+    height: 2.48em
+}
+
+.social-links-container .url-row {
+    margin-bottom: 0
+}
+
+.social-links-container .add-button {
+    margin-top: .25em;
+    width: 148px;
+    font-size: 12px
+}
+
+.social-links-container .social-link-type-dropdown {
+    width: 100%;
+    border-radius: 3px;
+    margin-left: 0;
+    -webkit-appearance: menulist-button
+}
+
+.social-links-container .url-text-field {
+    width: 511px
+}
+
+.social-links-container .title-text-field {
+    width: 355px;
+    margin-left: .5em
+}
+
+.social-links-container .character-counter {
+    margin-top: .4em;
+    color: #bcbec8
+}
+
+.social-links-container .character-count-at-max {
+    color: #e75750
+}
+
+.social-links-container input:-webkit-autofill {
+    background-color: #fff;
+    -webkit-box-shadow: 0 0 0 30px #fff inset;
+    -webkit-text-fill-color: #000
+}
+
+.social-links-container .social-link-buttons {
+    margin-top: 6em
+}
+
+.social-links-container .error-div {
+    color: #e75750;
+    padding-left: 1em;
+    margin-bottom: 3px;
+    font-size: 12px
+}
+
+.social-links-container .hidden-error {
+    visibility: hidden
+}
+
+.face-age-estimation-upsell {
+    margin-bottom: 10px
+}
+
+.face-age-estimation-upsell .view-details {
+    text-decoration: underline;
+    white-space: nowrap
+}
+
+.face-age-estimation-upsell .get-started {
+    background-color: hsla(0, 0%, 100%, .1)
+}
+
+.face-age-estimation-upsell .alert-title {
+    margin-bottom: 8px
+}
+
+.face-age-estimation-upsell .MuiAlert-action {
+    padding: 0;
+    align-items: center
+}

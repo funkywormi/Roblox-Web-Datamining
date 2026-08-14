@@ -1,0 +1,171 @@
+body,
+html {
+    height: 100%;
+    overflow: hidden
+}
+
+@media (max-width:767px) {
+
+    body,
+    html {
+        height: auto;
+        overflow-y: auto
+    }
+}
+
+.wrap {
+    height: 100%
+}
+
+.wrap .container-main {
+    height: 90%;
+    height: calc(100% - 174px);
+    padding-bottom: 0
+}
+
+@media (max-width:991px) {
+    .wrap .container-main {
+        height: 90%;
+        height: calc(100% - 250px)
+    }
+}
+
+.wrap .container-footer {
+    position: relative
+}
+
+.wrap .content {
+    max-width: 100%;
+    padding: 0;
+    height: 100%
+}
+
+.simple-navigation-container {
+    height: 40px;
+    width: 100%
+}
+
+.simple-navigation-container .logo-navigation {
+    margin: 6px 12px
+}
+
+#supported-browsers-web-app,
+.supported-browsers-app {
+    height: 100%
+}
+
+.supported-browsers-container {
+    height: 100%;
+    background-image: url(https://images.rbxcdn.com/821ecf3bcd268c9794b9dcdf52db2d0e-bg.jpg);
+    background-repeat: no-repeat;
+    background-size: cover
+}
+
+.supported-browsers-mask {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center
+}
+
+.supported-browser-logo {
+    width: 180px;
+    height: 182px;
+    display: inline-block
+}
+
+.browser-status-container {
+    margin: 0 auto;
+    text-align: center
+}
+
+.browser-status-container .browser-list {
+    display: inline-flex;
+    margin: 12px auto
+}
+
+@media (max-width:991px) {
+    .browser-status-container .browser-list {
+        display: block
+    }
+}
+
+.browser-status-container .browser-list .browser-item {
+    padding: 0 5px
+}
+
+@media (max-width:991px) {
+    .browser-status-container .browser-list .browser-item {
+        display: inline-block;
+        padding: 6px
+    }
+
+    .browser-status-container .browser-list .browser-item:nth-child(2n) {
+        text-align: left
+    }
+
+    .browser-status-container .browser-list .browser-item:nth-child(odd) {
+        text-align: right
+    }
+}
+
+.browser-status-container .browser-list .browser-name {
+    margin: 6px auto 0;
+    text-align: center
+}
+
+.browser-status-container .browser-item-link {
+    display: inline-block
+}
+
+.browser-status-container .browser-icon-container {
+    border-radius: 8px;
+    display: inline-block;
+    padding: 0 0 7.5px
+}
+
+.browser-status-container .browser-icon {
+    width: 144px;
+    height: 144px;
+    background-repeat: no-repeat;
+    background-size: 144px auto;
+    display: inline-block
+}
+
+.browser-status-container .chrome-icon {
+    background-image: url(https://images.rbxcdn.com/6a81064d016609a81d28b6984510fe88-chrome.png)
+}
+
+.browser-status-container .firefox-icon {
+    background-image: url(https://images.rbxcdn.com/179df7c43287e6f60ee9cb1436cb6cea-firefox.png)
+}
+
+.browser-status-container .msedge-icon {
+    background-image: url(https://images.rbxcdn.com/84584936e7dfb500d23ee31e3d759a71-ms_edge.png)
+}
+
+.browser-status-container .safari-icon {
+    background-image: url(https://images.rbxcdn.com/08cff0d01a99dead224351ec6fef36b5-safari.png)
+}
+
+.logo-gradient {
+    background-image: url(https://images.rbxcdn.com/3553f766a6f5934dc5ad0e93493eecaa-roblox_logo_gradient.png);
+    background-size: 180px auto
+}
+
+.browser-status-description,
+.browser-status-message,
+.supported-browser-action {
+    margin: 12px auto
+}
+
+.supported-browser-action {
+    width: 308px
+}
+
+@media (max-width:991px) {
+    .supported-browser-action {
+        width: 296px
+    }
+}
