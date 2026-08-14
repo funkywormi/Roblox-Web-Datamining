@@ -131,6 +131,11 @@
             "source": "/home"
         },
         {
+            "name": "Feature.Avatar",
+            "url": "https://js.rbxcdn.com/b473222f9d12d4b2c5bfab4c264f0f18a98e2abd0eb42fe1c6977ae7544aceb0.js",
+            "source": "/my/avatar"
+        },
+        {
             "name": "Feature.BiometricChallenge",
             "url": "https://js.rbxcdn.com/e92d027c197738388b36f7a8164dd7bdfc61a638ac1acaeb577a92fb77a98857.js",
             "source": "/home"
@@ -179,6 +184,11 @@
             "name": "Feature.ExperienceDetails",
             "url": "https://js.rbxcdn.com/05d12625796c6d84da8e1cc838d2da4522e003852ea7a5c86be81ee9d037e20b.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.Favorites",
+            "url": "https://js.rbxcdn.com/69c3f641759f1d3f8d23f837f2011c1bd85ad258641401e27f6562ddf2e84d2e.js",
+            "source": "/catalog/3360689775"
         },
         {
             "name": "Feature.ForceAuthenticator",
@@ -234,6 +244,11 @@
             "name": "Feature.Item",
             "url": "https://js.rbxcdn.com/0f75a173261ace474005809f5a4f985eb1f6974dd0a74683bb734a4f837f768d.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.ItemConfiguration",
+            "url": "https://js.rbxcdn.com/59aae6b0c3a599b514a5cdf5b1fb29769210fa6e26a51f2ab160dd44baf5256f.js",
+            "source": "/catalog/3360689775"
         },
         {
             "name": "Feature.ItemModel",
@@ -301,6 +316,11 @@
             "source": "/home"
         },
         {
+            "name": "Feature.PrivateSales",
+            "url": "https://js.rbxcdn.com/23a4d7c1405e017062c61b8ee0b488a1912d095511cc8dfa82e87ce0f13c5c21.js",
+            "source": "/my/avatar"
+        },
+        {
             "name": "Feature.Profile",
             "url": "https://js.rbxcdn.com/2bb2bd861bfc7e4656ac1d0cb5f35640d44a9cc2281bb1d9f2f5c8483dd95126.js",
             "source": "/home"
@@ -337,7 +357,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/ca68c294e507a2c30cec80cb627afa0a5f1afed373425add538c6c0289a6d9ad.js",
+            "url": "https://js.rbxcdn.com/6a8fdf34048e5fe792fac7c7d6c58a6ddd1af61978d8d92f355753047876d53c.js",
             "source": "/home"
         },
         {
@@ -359,6 +379,11 @@
             "name": "Feature.Tracking",
             "url": "https://js.rbxcdn.com/7043536ec0248f489b68b5e62dd3336f6962fb50d18a65b766453a206a772d4f.js",
             "source": "/home"
+        },
+        {
+            "name": "Feature.Trades",
+            "url": "https://js.rbxcdn.com/8da3c3a13108eb874aec96f08696084e10506c1dec461163496dbc45e412df20.js",
+            "source": "/my/avatar"
         },
         {
             "name": "Feature.VerificationUpsell",
@@ -409,7 +434,7 @@
         },
         {
             "name": "AccountSecurityPrompt",
-            "url": "https://js.rbxcdn.com/358c3f3d18384216d955e850cab438a0350f95f7b8be4a539b398b12281c622f-AccountSecurityPrompt.js",
+            "url": "https://js.rbxcdn.com/3785b70727707e3c121cc98a9ecbf6c2348c20b41050f8bec9b15a5997fe978d-AccountSecurityPrompt.js",
             "source": "/home"
         },
         {
@@ -423,9 +448,24 @@
             "source": "/home"
         },
         {
+            "name": "Avatar",
+            "url": "https://js.rbxcdn.com/04f9637f929cf9095f72ec935a63084af79c188b428f8f7a9d3d596085bd1833-Avatar.js",
+            "source": "/my/avatar"
+        },
+        {
+            "name": "AvatarAccoutrementRules",
+            "url": "https://js.rbxcdn.com/22854f063a47132a0b95cdcbb024cf148a0e69eec0f1644dabffee8ba69aa84c-AvatarAccoutrementRules.js",
+            "source": "/my/avatar"
+        },
+        {
             "name": "AvatarShopHomepageRecommendations",
             "url": "https://js.rbxcdn.com/6692c40d5c88e6f0839419dc7455a0ecfe9ffc15eff4f9c530690fd8ef77e012.js",
             "source": "/home"
+        },
+        {
+            "name": "AvatarUpsell",
+            "url": "https://js.rbxcdn.com/2664b0e62f04fd62d1e28b8452a5a2ae2c6ffe4b16365578f9fab8ce078ab254-AvatarUpsell.js",
+            "source": "/my/avatar"
         },
         {
             "name": "AXAnalyticsService",
@@ -449,7 +489,7 @@
         },
         {
             "name": "Challenge",
-            "url": "https://js.rbxcdn.com/f923a6d957366fa8dbc5f3162dae48f2a26ae6a3aef066bd960dc076f06cdeee-Challenge.js",
+            "url": "https://js.rbxcdn.com/f8aa0bd5fabdce9b435b66446ddb72de659cc2ac7a1cdf9ab03b55bcc38882a7-Challenge.js",
             "source": "/home"
         },
         {
@@ -508,6 +548,11 @@
             "source": "/home"
         },
         {
+            "name": "FavoritesButton",
+            "url": "https://js.rbxcdn.com/25d190530aa670176044b41eea464ad5f9224a19988a7e1fdaac515eaa157279-FavoritesButton.js",
+            "source": "/catalog/3360689775"
+        },
+        {
             "name": "Footer",
             "url": "https://js.rbxcdn.com/d867bf1ff8bfaa4f2c1404f01fcf20c2ddb11f8e8255c16b73e5173cc31a39b1-Footer.js",
             "source": "/home"
@@ -553,9 +598,34 @@
             "source": "/home"
         },
         {
+            "name": "ItemDetails",
+            "url": "https://js.rbxcdn.com/60f31de628012c32607b8f4b1488288a98bf9fc5b57251e59209e4df5fdc68ca-ItemDetails.js",
+            "source": "/catalog/3360689775"
+        },
+        {
             "name": "ItemDetailsHydrationService",
             "url": "https://js.rbxcdn.com/c8ac397606b8d4dfab9ea0d9af928273fcc51341a741b50ee831308aaed3517b-ItemDetailsHydrationService.js",
             "source": "/home"
+        },
+        {
+            "name": "ItemDetailsInfo",
+            "url": "https://js.rbxcdn.com/b282c4de9f7b4e10bf9925097720f8ac82359095bd63360cb1210f82b100b462-ItemDetailsInfo.js",
+            "source": "/catalog/3360689775"
+        },
+        {
+            "name": "ItemDetailsLimitedInventory",
+            "url": "https://js.rbxcdn.com/74c2de7ba8a227ab30eeaa11b37066e1ab1dfb6428c4b17b76b0246915febc4a-ItemDetailsLimitedInventory.js",
+            "source": "/my/avatar"
+        },
+        {
+            "name": "ItemDetailsThumbnail",
+            "url": "https://js.rbxcdn.com/a9811ab82709f14e60e1e34e95addc4fc4807b26208b1f39a6b2fee0e1eaa5e4-ItemDetailsThumbnail.js",
+            "source": "/catalog/3360689775"
+        },
+        {
+            "name": "ItemList",
+            "url": "https://js.rbxcdn.com/c8c9f798480283e350f3332805718320a794af379bc0577fea9be126f8335187-ItemList.js",
+            "source": "/catalog/3360689775"
         },
         {
             "name": "ItemPurchase",
@@ -566,6 +636,11 @@
             "name": "ItemPurchaseUpsell",
             "url": "https://js.rbxcdn.com/92e2673adda04b11e7b19ba36e6459532317515b86de84139115fcb45064cb28-ItemPurchaseUpsell.js",
             "source": "/home"
+        },
+        {
+            "name": "ItemResale",
+            "url": "https://js.rbxcdn.com/06634b3c3964df9c01f2a9f15d624d3cb75b04c2cd6068d57e77df3befd410b5-ItemResale.js",
+            "source": "/my/avatar"
         },
         {
             "name": "LatencyMeasurement",
@@ -579,7 +654,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/f2633b3b482e642d4d334eb76de69074600a66726202fc09a30c9d924506efcf-Navigation.js",
+            "url": "https://js.rbxcdn.com/ec18c4643a0a1f1f466b0bbfed2e03b610267179871f7faf85708a786397b530-Navigation.js",
             "source": "/home"
         },
         {
@@ -638,6 +713,11 @@
             "source": "/home"
         },
         {
+            "name": "Recommendations",
+            "url": "https://js.rbxcdn.com/af1135f13c05984718027ea8a9eb35f03b369778bb719261bee36ae88ec3d7bc-Recommendations.js",
+            "source": "/my/avatar"
+        },
+        {
             "name": "RobloxBadges",
             "url": "https://js.rbxcdn.com/0f91ae7a3efbb94ac1888931d53d6309fc65812b5a64b240c4861d9ab48011e1.js",
             "source": "/home"
@@ -668,6 +748,11 @@
             "source": "/home"
         },
         {
+            "name": "Sitemap",
+            "url": "https://js.rbxcdn.com/62aa83036d696870d18f901e03c9bee33570bc9b5bb5ea4cffe6458c3baa09c4.js",
+            "source": "/sitemap"
+        },
+        {
             "name": "SponsoredCatalogItems",
             "url": "https://js.rbxcdn.com/abb9c8358ac0048fa143b1dc25c53a709bb073c89bd9a18e7b772776cb3ee0f0.js",
             "source": "/catalog"
@@ -678,6 +763,11 @@
             "source": "/home"
         },
         {
+            "name": "SystemFeedback",
+            "url": "https://js.rbxcdn.com/aac542106f7f77697cbc3b36ab3cf0619bf9b69a1af0983e59dfeb6c36652d3b.js",
+            "source": "/my/avatar"
+        },
+        {
             "name": "Theme",
             "url": "https://js.rbxcdn.com/1c20c0f26166289e9aed14bcd31b854b9184f0da61c97197aa90314c599ebada-Theme.js",
             "source": "/home"
@@ -686,6 +776,11 @@
             "name": "Thumbnails",
             "url": "https://js.rbxcdn.com/e35ef65070a20060049530937f97a7134f17ff26cbf6ecb553065a1698f4f7b4-Thumbnails.js",
             "source": "/home"
+        },
+        {
+            "name": "Thumbnails3d",
+            "url": "https://js.rbxcdn.com/39a92a0ae17a331364eddd2b1e5d117609dd3720789d016779f57a131744569b-Thumbnails3d.js",
+            "source": "/my/avatar"
         },
         {
             "name": "TranslationResources",
@@ -740,9 +835,19 @@
             "source": "/home"
         },
         {
+            "name": "Avatar",
+            "url": "https://css.rbxcdn.com/17f430f73ab0a46d39a16207e15a5ebcf4f7b570f9ae485394bd5223f8d9efa1-Avatar.css",
+            "source": "/my/avatar"
+        },
+        {
             "name": "AvatarShopHomepageRecommendations",
             "url": "https://css.rbxcdn.com/3c59e1d5397458d7e71078c1a921f0bcac7f509cdad1fd677a5c518d1fca31d1.css",
             "source": "/home"
+        },
+        {
+            "name": "AvatarUpsell",
+            "url": "https://css.rbxcdn.com/ad1ffab1dd2210c35ced2ef045ce9bdcaf646751a36ba3a837e0cac254456f19-AvatarUpsell.css",
+            "source": "/my/avatar"
         },
         {
             "name": "Builder",
@@ -785,6 +890,11 @@
             "source": "/home"
         },
         {
+            "name": "FavoritesButton",
+            "url": "https://css.rbxcdn.com/0f5d6448d8b57274568db594f08ab06b2dfa3b8e0086904cb2eee20e5e06652f-FavoritesButton.css",
+            "source": "/catalog/3360689775"
+        },
+        {
             "name": "Footer",
             "url": "https://css.rbxcdn.com/d0015d0fd7893c94a935e228b4ca3f79eece7593ab080cc2cdfdbc5d278b44b4-Footer.css",
             "source": "/home"
@@ -815,6 +925,31 @@
             "source": "/home"
         },
         {
+            "name": "ItemDetails",
+            "url": "https://css.rbxcdn.com/96f4134e1841a411c7fb8285afa76bc8192325a98d97f99a1730e36838c4b22f-ItemDetails.css",
+            "source": "/catalog/3360689775"
+        },
+        {
+            "name": "ItemDetailsInfo",
+            "url": "https://css.rbxcdn.com/e1a035927d8f52bc9795e5b815a5abf4a739283d54d2e086cf0e95774d636429-ItemDetailsInfo.css",
+            "source": "/catalog/3360689775"
+        },
+        {
+            "name": "ItemDetailsLimitedInventory",
+            "url": "https://css.rbxcdn.com/2019f1bca71a6a4f4748278adc8ffb230926889f8af9d503ad465d9cf29dfd48-ItemDetailsLimitedInventory.css",
+            "source": "/my/avatar"
+        },
+        {
+            "name": "ItemDetailsThumbnail",
+            "url": "https://css.rbxcdn.com/d2f4a3d003ba5544ac7343a24a79c229a742b398c6ecb12bb7cc1b7abd6b9591-ItemDetailsThumbnail.css",
+            "source": "/catalog/3360689775"
+        },
+        {
+            "name": "ItemList",
+            "url": "https://css.rbxcdn.com/25fea97c0c805acbab1325182c924930f28d85fce67d6fa375feed8890f9bee1-ItemList.css",
+            "source": "/catalog/3360689775"
+        },
+        {
             "name": "ItemPurchase",
             "url": "https://css.rbxcdn.com/3408b46f5db5261266fe187e582c87e980ac50a5047314613bc4a7486de21e8c-ItemPurchase.css",
             "source": "/home"
@@ -823,6 +958,11 @@
             "name": "ItemPurchaseUpsell",
             "url": "https://css.rbxcdn.com/52f3e763c2d49763b2dac14293b034680b0d32284d3f46e4b0a51073ae47995b-ItemPurchaseUpsell.css",
             "source": "/home"
+        },
+        {
+            "name": "ItemResale",
+            "url": "https://css.rbxcdn.com/a809315c6b065fe8c0194bd0058a08240c8988e2e5d752d0eca37301fee3df15-ItemResale.css",
+            "source": "/my/avatar"
         },
         {
             "name": "Navigation",
@@ -855,6 +995,11 @@
             "source": "/home"
         },
         {
+            "name": "Recommendations",
+            "url": "https://css.rbxcdn.com/c335d5d3a7a900dea0f85286f56c0f27c8e64f8a23c5ff142cc1e4665af9f19f-Recommendations.css",
+            "source": "/my/avatar"
+        },
+        {
             "name": "RobloxBadges",
             "url": "https://css.rbxcdn.com/b2cff71de0c286e8f85b1a26a8b87a8cd7f77422c592849ad5114ac5d929c575.css",
             "source": "/home"
@@ -878,6 +1023,11 @@
             "name": "SendrNotificationStream",
             "url": "https://css.rbxcdn.com/04ed6c0f17a598ae609a52708d9944923b2b703c346d6119d8a7f9a406ccf9a3-SendrNotificationStream.css",
             "source": "/home"
+        },
+        {
+            "name": "Sitemap",
+            "url": "https://css.rbxcdn.com/bb7ca3e100a23736df3e1099d91ff3bf7585520b2ab33ae445ea6503c9175418.css",
+            "source": "/sitemap"
         },
         {
             "name": "SponsoredCatalogItems",

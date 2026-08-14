@@ -1,0 +1,6 @@
+{
+    "Description.ConfirmAbandon": "If you quit verification, you won't be able to complete this action.",
+    "Label.RejectAbandon": "Go back",
+    "Label.ConfirmAbandon": "Quit",
+    "Header.ConfirmAbandon": "Quit verification?"
+}

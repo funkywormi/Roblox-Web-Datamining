@@ -1,0 +1,5 @@
+{
+    "Description.VerificationSuccess": "Verification Completed.",
+    "Description.VerifyingYouAreNotBot": "Verifying you're not a bot",
+    "Description.VerificationError": "Some errors occurred. Please try again."
+}
