@@ -1,0 +1,5 @@
+{
+    "Response.ShowingNormalSearchResults": "Showing results for <b>{query}</b> (without quotes):",
+    "Response.NoExactSearchResults": "No results found for <b>{query}</b>.",
+    "Action.LoadMore": "Load more"
+}
