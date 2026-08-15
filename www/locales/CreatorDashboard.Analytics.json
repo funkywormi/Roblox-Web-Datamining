@@ -1055,7 +1055,7 @@
     "Label.Dimension.FromStage": "From stage",
     "Label.Dimension.ToStage": "To stage",
     "Label.Metric.JourneyTransitionCount": "Session count",
-    "Label.Metric.JourneyTransitionCountUser": "Unique Users",
+    "Label.Metric.JourneyTransitionCountUser": "Unique users",
     "Label.Dimension.JourneyName": "Journey Name",
     "Description.FunnelCohortCompletionRate": "The percentage of users in a cohort who completed each funnel step, based on the date they completed step 1",
     "Label.Metric.FunnelCohortCompletionRate": "Cohort completion rate",
@@ -1209,7 +1209,7 @@
     "Description.IphEarningsRobuxPartial": "Total earnings in Robux paid to the IP Holder for collaboration license agreements",
     "Label.Metric.IphTransactionCountPartial": "IPH Transaction Count - Collaboration",
     "Description.IphTransactionCountPartial": "Total transaction count contributing to IP Holder earnings for collaboration license agreements",
-    "Label.JourneyNode": "Stage",
+    "Label.JourneyNode": "Node",
     "Title.RobloxOwnedScriptErrorsRemovedBanner": "We removed all errors and warnings from Roblox-owned scripts from your dashboard, so you can focus on what's in your control.",
     "Description.RobloxOwnedScriptErrorsRemovedBanner": "You may notice a significant drop in your error and warning counts.",
     "Label.Annotation.MetricChange.ErrorReportClean20260810": "Errors and warnings from Roblox-owned scripts were removed from your reports."
