@@ -251,5 +251,6 @@
     "ClientCacheFallbackBanner.Label.ErrorRefreshingToastSubtitle": "Please try again later",
     "ClientCacheFallbackBanner.Label.RefreshPageToLoadContents": "Refresh page to load contents",
     "ClientCacheFallbackBanner.Action.Refresh": "Refresh",
-    "BecauseYouPlayedX": "Because you played {ExperienceName}"
+    "BecauseYouPlayedX": "Because you played {ExperienceName}",
+    "Label.GameItemsSubtitle": "Enhance play with these recommended items"
 }
