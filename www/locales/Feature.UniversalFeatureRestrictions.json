@@ -29,6 +29,6 @@
     "AbuseVector.PartyChat": "Party Chat",
     "AbuseVector.RightsManagement": "Rights Management",
     "Action.OK": "OK",
-    "AbuseVector.AgeVerification.DialogTitle.Suspended": "Age verification unavailable",
-    "AbuseVector.AgeVerification.DialogBody.Suspended": "You can't verify your age right now because your recent age verification attempt was invalid."
+    "AbuseVector.AgeVerification.DialogTitle.Suspended": "Age checks suspended",
+    "AbuseVector.AgeVerification.DialogBody.Suspended": "You can't check your age right now because you've repeatedly broken our Community Standards. You can try again after the restriction ends."
 }
