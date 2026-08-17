@@ -1266,10 +1266,6 @@ body[dir=rtl] .richtext-base .rich-text-unordered-list {
     color: var(--color-system-alert)
 }
 
-.group-forums-config-dropdown-menu {
-    width: 220px
-}
-
 .group-forums-upsell-container {
     display: flex;
     flex-direction: column;
