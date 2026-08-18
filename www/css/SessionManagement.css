@@ -5,12 +5,8 @@
     right: 0
 }
 
-.opacity-\[0\.5\] {
-    opacity: .5
-}
-
-.max-width-\[calc\(var\(--size-100\)\*50\)\] {
-    max-width: calc(var(--size-100)*50)
+.scroll {
+    overflow: auto
 }
 
 .size-\[var\(--icon-size-large\)\] {
@@ -38,6 +34,15 @@
     height: var(--icon-size-xsmall)
 }
 
+.size-\[var\(--icon-size-xxlarge\)\] {
+    width: var(--icon-size-xxlarge);
+    height: var(--icon-size-xxlarge)
+}
+
+.max-width-\[calc\(var\(--size-100\)\*50\)\] {
+    max-width: calc(var(--size-100)*50)
+}
+
 .padding-left-\[var\(--size-150\)\] {
     padding-left: var(--size-150)
 }
@@ -48,6 +53,14 @@
 
 .padding-right-\[var\(--size-250\)\] {
     padding-right: var(--size-250)
+}
+
+.content-\[var\(--inverse-surface-0\)\] {
+    color: var(--inverse-surface-0)
+}
+
+.opacity-\[0\.5\] {
+    opacity: .5
 }
 
 .icon-regular-chevron-large-right {
