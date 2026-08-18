@@ -1,0 +1,8 @@
+{
+    "Title.VerifyHuman": "Verify you're human",
+    "Content.HoldToConfirm": "Hold the button to confirm you're human.",
+    "Content.TryAgain": "Please try again",
+    "Action.PressAndHold": "Press and hold",
+    "Label.Cancel": "Cancel",
+    "Content.ReferenceID": "Reference ID {id}"
+}

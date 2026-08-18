@@ -1108,8 +1108,6 @@ input[type=button].btn-block {
     font-family: text-security-disc !important
 }
 
-@tailwind utilities;
-
 .iv-qr-frame {
     border-radius: var(--size-350);
     background-color: #fff

@@ -37,7 +37,7 @@
         },
         {
             "name": "Authentication.Login",
-            "url": "https://js.rbxcdn.com/8851c30e1b955f08455d15c5712db774e05d946f3dde6f959bf5ea48ae64c3af.js",
+            "url": "https://js.rbxcdn.com/18c350826e0974099f9935c844185ea5334df5200cfc87848528626fdf95d8f3.js",
             "source": "/home"
         },
         {
@@ -162,7 +162,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/51f0a0cff110b09e06a245222f38c970b98931fda981aa2b61814eee96728251.js",
+            "url": "https://js.rbxcdn.com/80e2a64e2ade5b5ab85f6190a75277515680ba0daff9addf3fa3d4e6c4c265b4.js",
             "source": "/home"
         },
         {
@@ -201,8 +201,13 @@
             "source": "/upgrades/robux"
         },
         {
+            "name": "Feature.CaptchaV2Challenge",
+            "url": "https://js.rbxcdn.com/39fc596fe35569666d5a3de2830296da4164ebf2ab50e1268b6f4617cb51ce43.js",
+            "source": "/home"
+        },
+        {
             "name": "Feature.Catalog",
-            "url": "https://js.rbxcdn.com/125b3f6b0431b04c3f822dd40ac37548134c9f3443a2e1d39c6009115ffa7d16.js",
+            "url": "https://js.rbxcdn.com/edb3bbfb2cc9d00de219bf36a52b61d9503c10ef37bb2e3fd2a3160b3b874eb4.js",
             "source": "/home"
         },
         {
@@ -352,7 +357,7 @@
         },
         {
             "name": "Feature.Home",
-            "url": "https://js.rbxcdn.com/5a72d310c4521118326a6db9e1f5c5df75d017e539f87cd24edb87488461a495.js",
+            "url": "https://js.rbxcdn.com/63a04edac0cafbd686b2eb3691e115b9b78602318d226c4d93db616dd6a0387f.js",
             "source": "/home"
         },
         {
@@ -622,7 +627,7 @@
         },
         {
             "name": "Feature.Transactions",
-            "url": "https://js.rbxcdn.com/16e015d6e4a35efd7026f9d27b1ed76d504cbc810063a25e2b8b53adcca8baa2.js",
+            "url": "https://js.rbxcdn.com/6f4a775194b4b124d2e758384e50e7ef235feef3d4db507964442a83fe2bbf23.js",
             "source": "/transactions"
         },
         {
@@ -784,7 +789,7 @@
         },
         {
             "name": "Challenge",
-            "url": "https://js.rbxcdn.com/f8aa0bd5fabdce9b435b66446ddb72de659cc2ac7a1cdf9ab03b55bcc38882a7-Challenge.js",
+            "url": "https://js.rbxcdn.com/1050cb6a59208ef0b92013f9795f79f0b0923f3064fb36e1f64a1e68eebc8065-Challenge.js",
             "source": "/home"
         },
         {
@@ -1159,7 +1164,7 @@
         },
         {
             "name": "PlacesList",
-            "url": "https://js.rbxcdn.com/7717ba930c650d8e09f63691b98eb9fb71c83a8708d982b7abc3ae1f1478962a-PlacesList.js",
+            "url": "https://js.rbxcdn.com/cbfd8fff3a9912b8499b367ecd8e7f025ed5772d202249922b8ecc955e6208ed-PlacesList.js",
             "source": "/home"
         },
         {
@@ -1215,7 +1220,7 @@
         {
             "name": "PromptsOrchestrator",
             "url": "https://js.rbxcdn.com/ac1da974bc03cb8c2dc741b551725f4b744eb8a5d64e74f2187ac686e26aa12b-PromptsOrchestrator.js",
-            "source": "/communities/1"
+            "source": "/home"
         },
         {
             "name": "React",
@@ -1516,7 +1521,7 @@
         },
         {
             "name": "Challenge",
-            "url": "https://css.rbxcdn.com/e9bab14645914eae536d29cfe9648ccac27abf9abf6e602c9480cd3ed7d127f4-Challenge.css",
+            "url": "https://css.rbxcdn.com/8e1cfd7bd32c2e18abd4d13279ce270d1f0f6a2c6bf05d29dbab0729ba0b5ef8-Challenge.css",
             "source": "/home"
         },
         {
@@ -1847,7 +1852,7 @@
         {
             "name": "PromptsOrchestrator",
             "url": "https://css.rbxcdn.com/a0ec33a9daad55b1d77cd6ef3a2841a48aadc42b145200180a5bfe958ca2e2c6-PromptsOrchestrator.css",
-            "source": "/communities/1"
+            "source": "/home"
         },
         {
             "name": "ReactCaptcha",
