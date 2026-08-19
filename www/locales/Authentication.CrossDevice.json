@@ -52,5 +52,10 @@
     "Label.EnterCodeTextBox": "Enter code",
     "Label.Confirm": "Confirm",
     "Label.QuickSignInWarning": "For your security, only enter codes you generated from your new device.",
-    "Label.OK": "OK"
+    "Label.OK": "OK",
+    "Heading.SignInWithQrCode": "Sign in with QR code",
+    "Heading.WaitingForConfirmation": "Waiting for confirmation",
+    "Description.QuickSignInInstructionsModal": "On your signed-in device, scan the QR code or go to <b>More > Quick sign in</b> and enter the code below.",
+    "Description.ConfirmOnSignedInDevice": "Confirm on your signed-in device to continue.",
+    "Description.SigningInAs": "Signing in as {identifier}"
 }

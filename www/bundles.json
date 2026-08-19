@@ -32,12 +32,12 @@
         },
         {
             "name": "Authentication.CrossDevice",
-            "url": "https://js.rbxcdn.com/98d87b17b72853c32ccad8f71f741fd7cd1c39eeaeb3365d2aabf571cc52895d.js",
+            "url": "https://js.rbxcdn.com/ce98f84e59607325a8d59044a9301a4cdbeabb09ba316542995b2cc0c17e485e.js",
             "source": "/crossdevicelogin/ConfirmCode"
         },
         {
             "name": "Authentication.Login",
-            "url": "https://js.rbxcdn.com/18c350826e0974099f9935c844185ea5334df5200cfc87848528626fdf95d8f3.js",
+            "url": "https://js.rbxcdn.com/e07c2601022f7256cc4e3522fc9b0c91142e8d53962fa0031dafa4c0968b948f.js",
             "source": "/home"
         },
         {
