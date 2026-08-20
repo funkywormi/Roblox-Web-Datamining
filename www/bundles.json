@@ -532,7 +532,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/6a8fdf34048e5fe792fac7c7d6c58a6ddd1af61978d8d92f355753047876d53c.js",
+            "url": "https://js.rbxcdn.com/fd00c2dbb378b1810a65a947ea1e8bca06d67d170a702cc512d5029ac5e94f7c.js",
             "source": "/home"
         },
         {
@@ -1264,7 +1264,7 @@
         },
         {
             "name": "RobloxSubscription",
-            "url": "https://js.rbxcdn.com/babea3c1162b209d37aa4130db25576e27e5fb461eee5b8c248664dc24969c2a-RobloxSubscription.js",
+            "url": "https://js.rbxcdn.com/10c9c00f8766c621593340c0eb392f4f98a50247018a3e56ad932d20e4cda92a-RobloxSubscription.js",
             "source": "/plus"
         },
         {
@@ -1304,7 +1304,7 @@
         },
         {
             "name": "SendrNotificationStream",
-            "url": "https://js.rbxcdn.com/943b51f992674c6e8cd9e829b4bdd1ba07cefc4e92c8bb821a50d49b1678e1bb-SendrNotificationStream.js",
+            "url": "https://js.rbxcdn.com/f9a16b7f57f685968f0697079914317b7153c6ad43614dd1954c70db4cdfea93-SendrNotificationStream.js",
             "source": "/home"
         },
         {
@@ -1359,7 +1359,7 @@
         },
         {
             "name": "SupportCenter",
-            "url": "https://js.rbxcdn.com/f08cd036b643fb022e867ed96845fa714e3133a967393a4f9640caac8fb44752-SupportCenter.js",
+            "url": "https://js.rbxcdn.com/4576bb5ba672330da55caa812b97ed68bb724d431243939abd4561028963bf52-SupportCenter.js",
             "source": "/support-center"
         },
         {
@@ -1916,7 +1916,7 @@
         },
         {
             "name": "SendrNotificationStream",
-            "url": "https://css.rbxcdn.com/04ed6c0f17a598ae609a52708d9944923b2b703c346d6119d8a7f9a406ccf9a3-SendrNotificationStream.css",
+            "url": "https://css.rbxcdn.com/28598554c639b78a1d0b4d5ef8c7a84dee98dd182bef13ba493d0019b55f95b7-SendrNotificationStream.css",
             "source": "/home"
         },
         {
@@ -1966,7 +1966,7 @@
         },
         {
             "name": "SupportCenter",
-            "url": "https://css.rbxcdn.com/08d5d15d40c2d61305bb34e12cfa70ab76e98da0a24528364efd53d92a850b93-SupportCenter.css",
+            "url": "https://css.rbxcdn.com/9a567648b93c80b1c4e82cce3f5c35241b626fcc0e1064d7c84a9018a6d5d697-SupportCenter.css",
             "source": "/support-center"
         },
         {
