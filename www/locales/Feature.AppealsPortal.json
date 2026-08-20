@@ -243,5 +243,7 @@
     "Label.YourBehavior": "Your behavior",
     "Label.ExploitDetected": "Device exploit detected",
     "Label.DisplayName": "Display name",
-    "Label.ProfileDescription": "Profile description"
+    "Label.ProfileDescription": "Profile description",
+    "Label.Type.Post": "Post",
+    "Label.TypeLower.Post": "post"
 }

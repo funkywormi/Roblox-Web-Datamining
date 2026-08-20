@@ -437,20 +437,19 @@ div.MuiDialog-root:not(:first-of-type) .MuiDialog-container {
 
 .notification-stream-base {
     border-radius: 8px;
+    width: 420px;
     overflow: hidden
 }
 
 .notification-stream-scroll {
-    padding: 8px
+    overscroll-behavior: contain;
+    padding: 8px;
+    overflow-x: hidden
 }
 
 .light-theme .notification-stream-scroll,
 .dark-theme .notification-stream-scroll {
     background-color: var(--color-surface-200)
-}
-
-.notification-stream-scroll.is-empty {
-    width: 420px
 }
 
 .notification-stream-header {
@@ -652,6 +651,36 @@ div.MuiDialog-root:not(:first-of-type) .MuiDialog-container {
 .light-theme .notification-stream-banner.banner-new .alert-link:focus,
 .light-theme .notification-stream-banner.banner-new .alert-link:active {
     color: #353741
+}
+
+.notification-stream-banner-v2 {
+    position: relative
+}
+
+.notification-stream-banner-v2__text {
+    text-align: center
+}
+
+.notification-stream-banner-v2__close {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%)
+}
+
+.notification-stream-banner-v2--error {
+    color: #fff;
+    background-color: #e75750
+}
+
+.light-theme .notification-stream-banner-v2--new {
+    color: #353741;
+    background-color: #bcbec8
+}
+
+.dark-theme .notification-stream-banner-v2--new {
+    color: #bcbec8;
+    background-color: #494d5a
 }
 
 .inset-\[0\] {
