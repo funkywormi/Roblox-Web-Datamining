@@ -197,7 +197,7 @@
         },
         {
             "name": "Feature.BuyRobux",
-            "url": "https://js.rbxcdn.com/59a90ad950fa61177c3a9169436af5d5a75f8743ab985fa0a91d44389855584f.js",
+            "url": "https://js.rbxcdn.com/8cc7512c6d219a24f45a68782f3be5410c68f4a714a1442471f17cd34b7ae03a.js",
             "source": "/upgrades/robux"
         },
         {
@@ -282,7 +282,7 @@
         },
         {
             "name": "Feature.ExperienceDetails",
-            "url": "https://js.rbxcdn.com/0e165b829066f818b30497df870c1adaa4bd953a1bdb6fe6805210d6286f8ad3.js",
+            "url": "https://js.rbxcdn.com/66701f5b0356dd24e9f018ea5668345c187f6f63cb70fc7125ed759fa5f5bedd.js",
             "source": "/home"
         },
         {
@@ -352,7 +352,7 @@
         },
         {
             "name": "Feature.Groups",
-            "url": "https://js.rbxcdn.com/8410968671aff34d407272c156add7049dafe7c7c27d3ee819072e2a5b7820ca.js",
+            "url": "https://js.rbxcdn.com/790972b915c7ce37502d6e91199bee1ac88095ef594e2282f6204dfad8ebd2ba.js",
             "source": "/transactions"
         },
         {
@@ -407,7 +407,7 @@
         },
         {
             "name": "Feature.NotApproved",
-            "url": "https://js.rbxcdn.com/f6f3c1dc59d31d09ad073a888ed97744634ef2e1c86b34962f9ff74e236f3804.js",
+            "url": "https://js.rbxcdn.com/1ebf6dab4801ce3c807f5b6312f1f738e76f6a244f962dc6b60af0cc128f33b4.js",
             "source": "/home"
         },
         {
@@ -532,7 +532,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/fd00c2dbb378b1810a65a947ea1e8bca06d67d170a702cc512d5029ac5e94f7c.js",
+            "url": "https://js.rbxcdn.com/df4700cff20c46efd57da9086ef50032f236f6cd536113f37bddbcc5b319f6eb.js",
             "source": "/home"
         },
         {
@@ -1014,7 +1014,7 @@
         },
         {
             "name": "GroupForums",
-            "url": "https://js.rbxcdn.com/73c05dfd01f8b3c645ae134086c3ececc336452ccc550e99cc24a6a9aeb4a304-GroupForums.js",
+            "url": "https://js.rbxcdn.com/c5763856d8a53c181fbc76f931748f6d287a863a597547587e5636667cee76f4-GroupForums.js",
             "source": "/communities/1"
         },
         {
@@ -1701,7 +1701,7 @@
         },
         {
             "name": "GroupForums",
-            "url": "https://css.rbxcdn.com/cfdabc3f30aad31009f4ce7ce67187c86850bc5aa8365bc0f12b210fd5929912-GroupForums.css",
+            "url": "https://css.rbxcdn.com/e80505b7f02ccc3d93e3498e942013c4e1f1ccb8bdf00566edbcba6c0ac67535-GroupForums.css",
             "source": "/communities/1"
         },
         {

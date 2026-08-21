@@ -393,5 +393,7 @@
     "Label.Sublabel.ContentMaturityOffByOneBucket": "Inaccurate Maturity & Compliance Questionnaire submission",
     "Label.Sublabel.ContentMaturityOffByMoreThanOneBucket": "Inaccurate Maturity & Compliance Questionnaire submission",
     "Label.Sublabel.ContentMaturityMissingDescriptor": "Inaccurate Maturity & Compliance Questionnaire submission",
-    "Label.Sublabel.ContentMaturityMissingModeratePlusDescriptor": "Inaccurate Maturity & Compliance Questionnaire submission"
+    "Label.Sublabel.ContentMaturityMissingModeratePlusDescriptor": "Inaccurate Maturity & Compliance Questionnaire submission",
+    "Label.Sublabel.ContentMaturityMissingSensitiveDescriptor": "Inaccurate Maturity & Compliance Questionnaire submission",
+    "Label.Sublabel.ContentMaturityMissingUnplayableDescriptor": "Inaccurate Maturity & Compliance Questionnaire submission"
 }
