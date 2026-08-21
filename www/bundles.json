@@ -93,7 +93,7 @@
         {
             "name": "Common.Captcha",
             "url": "https://js.rbxcdn.com/5f2ee2913bf919a8576bbe4120a6d41b933e814a4779a0a3fc1d9d941c5ee368.js",
-            "source": "/"
+            "source": "/login"
         },
         {
             "name": "Common.ExternalLinks",
@@ -167,7 +167,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/e71dfb51e7c350ada57596396eded970d3a570503f5f4720ff714ec2be53195a.js",
+            "url": "https://js.rbxcdn.com/1ec10ace0c3c0f890c6558647b9d13a4754029d57a23364fea2d4d45603e4399.js",
             "source": "/home"
         },
         {
@@ -398,7 +398,7 @@
         {
             "name": "Feature.Landing",
             "url": "https://js.rbxcdn.com/686bd55707be42af370b81d2f36f55b6e10c56edb105502b3f9f0a34f7412bf5.js",
-            "source": "/"
+            "source": "/login"
         },
         {
             "name": "Feature.LegallySensitiveContent",
@@ -559,6 +559,11 @@
             "name": "Feature.Screentime",
             "url": "https://js.rbxcdn.com/46ec7856c5aa19b2bd5e4d7b745da33086769838558970c98610e983b70fe922.js",
             "source": "/my/account"
+        },
+        {
+            "name": "Feature.SduiLandingPage",
+            "url": "https://js.rbxcdn.com/07709f6b2cecb7b34d4779d27348293fa0d4058d95fc98bc601c2d0b8f7070aa.js",
+            "source": "/"
         },
         {
             "name": "Feature.SearchDropdownComponent",
@@ -795,7 +800,7 @@
         {
             "name": "Captcha",
             "url": "https://js.rbxcdn.com/b604dac29d89b56aef30844f099c5640c2f1870a97a06f4e692208d24097f9ed-Captcha.js",
-            "source": "/"
+            "source": "/login"
         },
         {
             "name": "CaptchaCore",
@@ -1253,11 +1258,6 @@
             "source": "/redeem"
         },
         {
-            "name": "ReactLanding",
-            "url": "https://js.rbxcdn.com/eab0c77ddef43eef67fc50271db8c432c4293c959ecf2b491d1121a0d60846f1-ReactLanding.js",
-            "source": "/"
-        },
-        {
             "name": "ReactLogin",
             "url": "https://js.rbxcdn.com/be5e71b3a276e41175f1ce0341431b5677968cb26beb58786e15b4bdee081906-ReactLogin.js",
             "source": "/login"
@@ -1321,6 +1321,11 @@
             "name": "SafetySupportPage",
             "url": "https://js.rbxcdn.com/4b17b25a2125e86f87e25d3ff4064d9bba4dffcc422189adf96d3d21d65195c2-SafetySupportPage.js",
             "source": "/help-safety"
+        },
+        {
+            "name": "SduiLandingPage",
+            "url": "https://js.rbxcdn.com/69520c3cc19709cfd7d1b8303fb97e02e8964d39820525973e635f89473a1496-SduiLandingPage.js",
+            "source": "/"
         },
         {
             "name": "SearchDropdown",
@@ -1547,7 +1552,7 @@
         {
             "name": "Captcha",
             "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-Captcha.css",
-            "source": "/"
+            "source": "/login"
         },
         {
             "name": "CaptchaCore",
@@ -1905,11 +1910,6 @@
             "source": "/redeem"
         },
         {
-            "name": "ReactLanding",
-            "url": "https://css.rbxcdn.com/b298a7664e0742b640ae693ab40dd74a883ca2ef90b3dac6c6489bbafb052ab1-ReactLanding.css",
-            "source": "/"
-        },
-        {
             "name": "ReactLogin",
             "url": "https://css.rbxcdn.com/101698613e5f7cb3eb3417018efca2ee7004b4e3832b082e9d87895e2bd61b03-ReactLogin.css",
             "source": "/login"
@@ -1958,6 +1958,11 @@
             "name": "SafetySupportPage",
             "url": "https://css.rbxcdn.com/7b1cddbaf57134b6f278513cbff810e3faead717002bd2edad1a09819cc2cfc8-SafetySupportPage.css",
             "source": "/help-safety"
+        },
+        {
+            "name": "SduiLandingPage",
+            "url": "https://css.rbxcdn.com/4ce84b6404158e838f5285c37c333fef22d8e3c9aa394d1f6cd8e43f6929536e-SduiLandingPage.css",
+            "source": "/"
         },
         {
             "name": "SearchDropdown",
