@@ -33,7 +33,7 @@
         {
             "name": "Authentication.CrossDevice",
             "url": "https://js.rbxcdn.com/ce98f84e59607325a8d59044a9301a4cdbeabb09ba316542995b2cc0c17e485e.js",
-            "source": "/crossdevicelogin/ConfirmCode"
+            "source": "/login"
         },
         {
             "name": "Authentication.Login",
@@ -58,7 +58,7 @@
         {
             "name": "Authentication.ResetPassword",
             "url": "https://js.rbxcdn.com/9dbd7eb5dfec0dbde4d8354fd560294bb7e34aa6ceed1e5ec80497c0134466cd.js",
-            "source": "/login/forgot-password-or-username"
+            "source": "/login"
         },
         {
             "name": "Authentication.SecurityNotification",
@@ -89,6 +89,11 @@
             "name": "Common.AssetTypes",
             "url": "https://js.rbxcdn.com/80e6e237cec35c62a31eed8f3298a79fe22a6b736d42479c971d1068ed9f03ca.js",
             "source": "/trades"
+        },
+        {
+            "name": "Common.Captcha",
+            "url": "https://js.rbxcdn.com/5f2ee2913bf919a8576bbe4120a6d41b933e814a4779a0a3fc1d9d941c5ee368.js",
+            "source": "/"
         },
         {
             "name": "Common.ExternalLinks",
@@ -391,6 +396,11 @@
             "source": "/home"
         },
         {
+            "name": "Feature.Landing",
+            "url": "https://js.rbxcdn.com/686bd55707be42af370b81d2f36f55b6e10c56edb105502b3f9f0a34f7412bf5.js",
+            "source": "/"
+        },
+        {
             "name": "Feature.LegallySensitiveContent",
             "url": "https://js.rbxcdn.com/5c7d73b31182161484106be3dd2a04b74eba15dc051cc19a327dfb4cfb679cda.js",
             "source": "/home"
@@ -532,7 +542,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/df4700cff20c46efd57da9086ef50032f236f6cd536113f37bddbcc5b319f6eb.js",
+            "url": "https://js.rbxcdn.com/1c51528ff7c9d47a7f61bf3c7932e30b6fd075e3588247d9410c462c6355d82f.js",
             "source": "/home"
         },
         {
@@ -723,9 +733,19 @@
             "source": "/login/forgot-password-or-username"
         },
         {
+            "name": "AccountRecoveryModal",
+            "url": "https://js.rbxcdn.com/0056022aadda7fc97ab043ed4f014c54aa31c5b13aa2d33840a736db2bc286b4.js",
+            "source": "/login"
+        },
+        {
             "name": "AccountSecurityPrompt",
             "url": "https://js.rbxcdn.com/3785b70727707e3c121cc98a9ecbf6c2348c20b41050f8bec9b15a5997fe978d-AccountSecurityPrompt.js",
             "source": "/home"
+        },
+        {
+            "name": "AccountSelector",
+            "url": "https://js.rbxcdn.com/ef10015766354e5b084f467090ada6298a546a29545546c8a0daf503c3e6a86c-AccountSelector.js",
+            "source": "/login"
         },
         {
             "name": "AccountSwitcher",
@@ -775,7 +795,7 @@
         {
             "name": "Captcha",
             "url": "https://js.rbxcdn.com/b604dac29d89b56aef30844f099c5640c2f1870a97a06f4e692208d24097f9ed-Captcha.js",
-            "source": "/support"
+            "source": "/"
         },
         {
             "name": "CaptchaCore",
@@ -846,6 +866,11 @@
             "name": "CrossDeviceLoginConfirmCode",
             "url": "https://js.rbxcdn.com/aafb7243f02b476f7ce647a0b641a242b2afd90b1d7afafdd7cca07fc847101b-CrossDeviceLoginConfirmCode.js",
             "source": "/crossdevicelogin/ConfirmCode"
+        },
+        {
+            "name": "CrossDeviceLoginDisplayCode",
+            "url": "https://js.rbxcdn.com/a504a4fe7bb5befdf84b023efc0a9a084a2da478feb98c8889035db3225c65f5.js",
+            "source": "/login"
         },
         {
             "name": "CrossTabCommunication",
@@ -934,7 +959,7 @@
         },
         {
             "name": "FriendsCarousel",
-            "url": "https://js.rbxcdn.com/53f5026286a2fd62cbd32a04bc373fdf7864fca7ccbb79c1cb393eb7e8e41abe-FriendsCarousel.js",
+            "url": "https://js.rbxcdn.com/8ea7448d3da0791757bb80ef0c92e59e69434e54651a8600d2531aad08a351c3-FriendsCarousel.js",
             "source": "/users/1/profile"
         },
         {
@@ -1159,7 +1184,7 @@
         },
         {
             "name": "PlacesList",
-            "url": "https://js.rbxcdn.com/cbfd8fff3a9912b8499b367ecd8e7f025ed5772d202249922b8ecc955e6208ed-PlacesList.js",
+            "url": "https://js.rbxcdn.com/8cb88445ead8258117ce175f8f4c6f9dd1d6401a893da9dc5ef1a841f1ee6196-PlacesList.js",
             "source": "/home"
         },
         {
@@ -1209,7 +1234,7 @@
         },
         {
             "name": "ProfilePlatform",
-            "url": "https://js.rbxcdn.com/6c0ce975f47bbb0dfd71fa966d339495e127aa91b9f796648e5c1c4c67888df3-ProfilePlatform.js",
+            "url": "https://js.rbxcdn.com/5970ca91d4f225daaef707cad35ccc4e6bd74b5330baeb342035269b6d7f1c74-ProfilePlatform.js",
             "source": "/users/1/profile"
         },
         {
@@ -1226,6 +1251,16 @@
             "name": "ReactCaptcha",
             "url": "https://js.rbxcdn.com/781b5865cece935d3ff16b44e11a96829b32994289dd13cd66927dc9a04bef73-ReactCaptcha.js",
             "source": "/redeem"
+        },
+        {
+            "name": "ReactLanding",
+            "url": "https://js.rbxcdn.com/eab0c77ddef43eef67fc50271db8c432c4293c959ecf2b491d1121a0d60846f1-ReactLanding.js",
+            "source": "/"
+        },
+        {
+            "name": "ReactLogin",
+            "url": "https://js.rbxcdn.com/be5e71b3a276e41175f1ce0341431b5677968cb26beb58786e15b4bdee081906-ReactLogin.js",
+            "source": "/login"
         },
         {
             "name": "ReactStyleGuide",
@@ -1465,9 +1500,19 @@
             "source": "/login/forgot-password-or-username"
         },
         {
+            "name": "AccountRecoveryModal",
+            "url": "https://css.rbxcdn.com/4b5dce375cef78073d2192583d1ecd458f10c308fa99847d649d5ec801bebd61.css",
+            "source": "/login"
+        },
+        {
             "name": "AccountSecurityPrompt",
             "url": "https://css.rbxcdn.com/aea0cd2ab8a0c382ece4f323f2e89df290c9a87eff4f07f3057b1eda5a10d8b1-AccountSecurityPrompt.css",
             "source": "/home"
+        },
+        {
+            "name": "AccountSelector",
+            "url": "https://css.rbxcdn.com/65a98f51e494ef823bbcdccfd97ba50d15193236fe88f1edccb9ab3383c51b37-AccountSelector.css",
+            "source": "/login"
         },
         {
             "name": "AccountSwitcher",
@@ -1502,7 +1547,7 @@
         {
             "name": "Captcha",
             "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-Captcha.css",
-            "source": "/support"
+            "source": "/"
         },
         {
             "name": "CaptchaCore",
@@ -1553,6 +1598,11 @@
             "name": "CrossDeviceLoginConfirmCode",
             "url": "https://css.rbxcdn.com/8529a5810e4f0f940bb1ebd4b6fec63d618f1f690dad78debd9050cc232a7afa-CrossDeviceLoginConfirmCode.css",
             "source": "/crossdevicelogin/ConfirmCode"
+        },
+        {
+            "name": "CrossDeviceLoginDisplayCode",
+            "url": "https://css.rbxcdn.com/07d73a0fe62fadd30d32d50e667e7d6b62ca192cd258a1c3340cb262de401d72.css",
+            "source": "/login"
         },
         {
             "name": "CurrentWearing",
@@ -1626,7 +1676,7 @@
         },
         {
             "name": "FriendsCarousel",
-            "url": "https://css.rbxcdn.com/522bd94dd9632fb8da0c55fb412cf9c7620371ab90dfafe65eda37658ef58743-FriendsCarousel.css",
+            "url": "https://css.rbxcdn.com/08242448e77c2385074f72b0b7112a895faf9f1b7024437457f4222ab0151a46-FriendsCarousel.css",
             "source": "/users/1/profile"
         },
         {
@@ -1811,7 +1861,7 @@
         },
         {
             "name": "PlacesList",
-            "url": "https://css.rbxcdn.com/2147ace72a5caf952197032101668e8c6952e1cda5c8879498ecee1d2c256a1a-PlacesList.css",
+            "url": "https://css.rbxcdn.com/7a0a72d6c27a9b86861f4a8cbec4806a33e15dc85859c5a719da63e959774258-PlacesList.css",
             "source": "/home"
         },
         {
@@ -1853,6 +1903,16 @@
             "name": "ReactCaptcha",
             "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-ReactCaptcha.css",
             "source": "/redeem"
+        },
+        {
+            "name": "ReactLanding",
+            "url": "https://css.rbxcdn.com/b298a7664e0742b640ae693ab40dd74a883ca2ef90b3dac6c6489bbafb052ab1-ReactLanding.css",
+            "source": "/"
+        },
+        {
+            "name": "ReactLogin",
+            "url": "https://css.rbxcdn.com/101698613e5f7cb3eb3417018efca2ee7004b4e3832b082e9d87895e2bd61b03-ReactLogin.css",
+            "source": "/login"
         },
         {
             "name": "ReactStyleGuide",

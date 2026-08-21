@@ -1,0 +1,5 @@
+{
+    "Response.CaptchaErrorVerifyFailed": "Temporary error. Please try again in a few minutes",
+    "Response.CaptchaErrorFailedToLoad": "We need to verify that you are human. Please disable your browser blocker and refresh the page, or try a different browser.",
+    "Response.CaptchaErrorFailedToVerify": "Temporary error. Please try again in a few minutes."
+}
