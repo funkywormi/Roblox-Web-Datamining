@@ -5,6 +5,10 @@
     right: 0
 }
 
+.scroll {
+    overflow: auto
+}
+
 .size-\[1em\] {
     width: 1em;
     height: 1em

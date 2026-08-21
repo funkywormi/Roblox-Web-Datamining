@@ -1842,6 +1842,10 @@
     right: 0
 }
 
+.margin-top-\[1px\] {
+    margin-top: 1px
+}
+
 .gap-\[var\(--size-150\)\] {
     gap: var(--size-150)
 }
