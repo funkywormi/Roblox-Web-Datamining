@@ -1212,5 +1212,9 @@
     "Label.JourneyNode": "Node",
     "Title.RobloxOwnedScriptErrorsRemovedBanner": "We removed all errors and warnings from Roblox-owned scripts from your dashboard, so you can focus on what's in your control.",
     "Description.RobloxOwnedScriptErrorsRemovedBanner": "You may notice a significant drop in your error and warning counts.",
-    "Label.Annotation.MetricChange.ErrorReportClean20260810": "Errors and warnings from Roblox-owned scripts were removed from your reports."
+    "Label.Annotation.MetricChange.ErrorReportClean20260810": "Errors and warnings from Roblox-owned scripts were removed from your reports.",
+    "Label.Dimension.PlacementType": "Placement Type",
+    "Label.Dimension.PlacementType.PlayWithReward": "Managed Rewarded",
+    "Label.Dimension.PlacementType.OnDemandAd": "Custom Rewarded",
+    "Label.Dimension.PlacementType.Unknown": "Unknown"
 }

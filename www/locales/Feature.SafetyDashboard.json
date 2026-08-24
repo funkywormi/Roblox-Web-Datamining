@@ -36,5 +36,5 @@
     "Description.AccountStatus": "Review account status, violations, and appeals",
     "Heading.AccountStatus.Upper": "Account Status",
     "Description.NoRecentViolations": "You don’t have any recent violations to show. To appeal something you don’t see, visit {linkStart}Support.{linkEnd}",
-    "Heading.AccountStatus.V2": "Account status and violations"
+    "Heading.AccountStatus.V2": "Account status, violations, and appeals"
 }
