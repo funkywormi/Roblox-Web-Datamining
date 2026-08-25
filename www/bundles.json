@@ -17,7 +17,7 @@
         },
         {
             "name": "Authentication.AccountRecovery",
-            "url": "https://js.rbxcdn.com/ca8fc82018c3f464c07708a31a9f50b6224b1caf002d9ec31ac6542fe56e952b.js",
+            "url": "https://js.rbxcdn.com/7dc0f127e576d10fe0c25379740ed9df7a6a1963dc4f1a148524d5aa9662cc61.js",
             "source": "/login/forgot-password-or-username"
         },
         {
@@ -67,7 +67,7 @@
         },
         {
             "name": "Authentication.SignUp",
-            "url": "https://js.rbxcdn.com/286ccc74e823e8a7e867dd3fdf61521a1f66aae27a3d1cfe26e13b565e38fb57.js",
+            "url": "https://js.rbxcdn.com/6dc36b0b25f1a0b26d2674ed14aeff8b19674976250b1a10bbf61e88791ea1d9.js",
             "source": "/home"
         },
         {
@@ -167,7 +167,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/1ec10ace0c3c0f890c6558647b9d13a4754029d57a23364fea2d4d45603e4399.js",
+            "url": "https://js.rbxcdn.com/51044aeb4ff575271d2b02a815b23ee2923f777c9a260dd61945760c7901153a.js",
             "source": "/home"
         },
         {
@@ -182,7 +182,7 @@
         },
         {
             "name": "Feature.Avatar",
-            "url": "https://js.rbxcdn.com/b473222f9d12d4b2c5bfab4c264f0f18a98e2abd0eb42fe1c6977ae7544aceb0.js",
+            "url": "https://js.rbxcdn.com/54d824eb344789cea60e6ffe55af326788935377456cf9501721587d7c7d1dd7.js",
             "source": "/my/avatar"
         },
         {
@@ -352,7 +352,7 @@
         },
         {
             "name": "Feature.GroupManagement",
-            "url": "https://js.rbxcdn.com/45ddec8024070c2dba70f0ba6489b7c928b123a6d3991f4cd1cce750e9db2582.js",
+            "url": "https://js.rbxcdn.com/367f75997587ff96f11a959323d5944e95711b886488c39d1c8575ff9614e312.js",
             "source": "/communities/configure"
         },
         {
@@ -1239,12 +1239,12 @@
         },
         {
             "name": "ProfilePlatform",
-            "url": "https://js.rbxcdn.com/5970ca91d4f225daaef707cad35ccc4e6bd74b5330baeb342035269b6d7f1c74-ProfilePlatform.js",
+            "url": "https://js.rbxcdn.com/169acde42c7cbbf40b68f11c7ceb2cea309d600653527cadb087e1701c9758ef-ProfilePlatform.js",
             "source": "/users/1/profile"
         },
         {
             "name": "PromptsOrchestrator",
-            "url": "https://js.rbxcdn.com/a3178c59c183f1e1bc271892908eff1faacb03d1b15d8769513babcaa788e3bb-PromptsOrchestrator.js",
+            "url": "https://js.rbxcdn.com/e72e2bb5ee0489745f5a86d389875ae960e5981b0cd89cd7813fc1b11298f63d-PromptsOrchestrator.js",
             "source": "/home"
         },
         {
@@ -1304,7 +1304,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/0dcdd40385d7eaa5749a66886f2d8faa0e151db8b440a1faa2fe467aa3833007-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/fc0dfd4dcf236332ee936ff067a11131e10dbcecdfbca1fddd600182abaf4974-RobuxRedesign.js",
             "source": "/upgrades/robux"
         },
         {
@@ -1314,17 +1314,17 @@
         },
         {
             "name": "SafetyDashboard",
-            "url": "https://js.rbxcdn.com/c1b536031c5610285ec89634328889362346f0d2681418d3caa456cc7ecfd55c-SafetyDashboard.js",
+            "url": "https://js.rbxcdn.com/5f79fdb45fbc4e588cd089e45b48d0230dead6215a5447853b44deac8d640c3d-SafetyDashboard.js",
             "source": "/safety-dashboard"
         },
         {
             "name": "SafetySupportPage",
-            "url": "https://js.rbxcdn.com/4b17b25a2125e86f87e25d3ff4064d9bba4dffcc422189adf96d3d21d65195c2-SafetySupportPage.js",
+            "url": "https://js.rbxcdn.com/b6da6e0453977378d23b0b59e02f5412d6362555bb00d6f403a5f52e946e39a8-SafetySupportPage.js",
             "source": "/help-safety"
         },
         {
             "name": "SduiLandingPage",
-            "url": "https://js.rbxcdn.com/69520c3cc19709cfd7d1b8303fb97e02e8964d39820525973e635f89473a1496-SduiLandingPage.js",
+            "url": "https://js.rbxcdn.com/e0c3d629a500ebcc4676ffcdcbdee4da01196655df68008eb7795df26b16ccff-SduiLandingPage.js",
             "source": "/"
         },
         {
@@ -1459,7 +1459,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/30ba90b7ee06fec7e106ffd040def873fde7ef3cb465791c26618ed92bbdf50b-UserSettings.js",
+            "url": "https://js.rbxcdn.com/0da239ff08cce7141b8e00e49a76598fe31316fa25c0bf53b8e1c0c22ddc6d98-UserSettings.js",
             "source": "/my/account"
         },
         {
@@ -1946,17 +1946,17 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://css.rbxcdn.com/727d8424b26be5ef5b256b6fa26a83b1e7eaf12d5cc2ade38b5afaeb6ddb337f-RobuxRedesign.css",
+            "url": "https://css.rbxcdn.com/7a543801896b0c650269bacd0bce5c12b2de3b72b962c8c8b6b236122a267748-RobuxRedesign.css",
             "source": "/upgrades/robux"
         },
         {
             "name": "SafetyDashboard",
-            "url": "https://css.rbxcdn.com/32dffc144a5d30e69b9b09bc0aa8ad0d0b12736b00408a2bf95527ac330f3726-SafetyDashboard.css",
+            "url": "https://css.rbxcdn.com/b8e6dbd572b70b3d16f31154b132aa22389b886f4b62deb37b76399b2e16ae20-SafetyDashboard.css",
             "source": "/safety-dashboard"
         },
         {
             "name": "SafetySupportPage",
-            "url": "https://css.rbxcdn.com/7b1cddbaf57134b6f278513cbff810e3faead717002bd2edad1a09819cc2cfc8-SafetySupportPage.css",
+            "url": "https://css.rbxcdn.com/5c2809a5bd084c719b27cf61e118bbb790ca6113917707dceee1b127abec6d84-SafetySupportPage.css",
             "source": "/help-safety"
         },
         {

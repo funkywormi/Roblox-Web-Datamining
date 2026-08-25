@@ -176,5 +176,7 @@
     "Label.NoMembersFound": "No members found",
     "Action.CopyRoleId": "Copy role ID",
     "Label.RoleId": "Role ID",
-    "Message.RoleIdCopied": "Role ID copied to clipboard"
+    "Message.RoleIdCopied": "Role ID copied to clipboard",
+    "Message.RoleWithUsersAllowDeletion": "There are {numUsers} users in this role. Removing it may result in a loss of permissions for those users. Do you want to continue to delete {role}?",
+    "Message.RoleWithUserAllowDeletion": "There is 1 user in this role. Removing it may result in a loss of permissions for those users. Do you want to continue to delete {role}?"
 }

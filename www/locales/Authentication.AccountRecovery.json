@@ -159,5 +159,8 @@
     "Description.AccountSecuredConfirmation": "All changes have been removed.",
     "Action.ReviewAccountSecurity": "Review account security",
     "Heading.NoChangesMade": "No changes were made",
-    "Description.NoChangesMade": "Keep your account secure by adding an extra layer of protection."
+    "Description.NoChangesMade": "Keep your account secure by adding an extra layer of protection.",
+    "Description.AccountSecuredConfirmationWeb": "All changes have been removed. Keep your account secure by adding an extra layer of protection.",
+    "Description.NoChangesMadeWeb": "Keep your account secure by adding an extra layer of protection.",
+    "Action.AddProtection": "Add protection"
 }
