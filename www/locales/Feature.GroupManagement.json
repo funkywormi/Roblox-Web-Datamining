@@ -178,5 +178,6 @@
     "Label.RoleId": "Role ID",
     "Message.RoleIdCopied": "Role ID copied to clipboard",
     "Message.RoleWithUsersAllowDeletion": "There are {numUsers} users in this role. Removing it may result in a loss of permissions for those users. Do you want to continue to delete {role}?",
-    "Message.RoleWithUserAllowDeletion": "There is 1 user in this role. Removing it may result in a loss of permissions for those users. Do you want to continue to delete {role}?"
+    "Message.RoleWithUserAllowDeletion": "There is 1 user in this role. Removing it may result in a loss of permissions for this user. Do you want to continue to delete {role}?",
+    "Message.UnificationStarted": "Your group has begun unification"
 }

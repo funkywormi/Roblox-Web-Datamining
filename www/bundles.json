@@ -132,7 +132,7 @@
         },
         {
             "name": "CommonUI.Features",
-            "url": "https://js.rbxcdn.com/0b0a579affaba7e35d01943f279473e1f29ccf2203625397d4fa85d57b787d7f.js",
+            "url": "https://js.rbxcdn.com/2689daed263e0cf27738d119c8961311698e53a60c783e4c6dab4eaab3ddcfce.js",
             "source": "/home"
         },
         {
@@ -352,12 +352,12 @@
         },
         {
             "name": "Feature.GroupManagement",
-            "url": "https://js.rbxcdn.com/367f75997587ff96f11a959323d5944e95711b886488c39d1c8575ff9614e312.js",
+            "url": "https://js.rbxcdn.com/c874e2b5c6faa2640cb3e2d33c51df094651b1b1dc49a3ededf2848786df1b5d.js",
             "source": "/communities/configure"
         },
         {
             "name": "Feature.Groups",
-            "url": "https://js.rbxcdn.com/8410968671aff34d407272c156add7049dafe7c7c27d3ee819072e2a5b7820ca.js",
+            "url": "https://js.rbxcdn.com/418002b612b5b6d683167314c3b08f17a369801ac9291b6dad41e268f5a0e2ec.js",
             "source": "/transactions"
         },
         {
@@ -417,7 +417,7 @@
         },
         {
             "name": "Feature.NotApproved",
-            "url": "https://js.rbxcdn.com/1ebf6dab4801ce3c807f5b6312f1f738e76f6a244f962dc6b60af0cc128f33b4.js",
+            "url": "https://js.rbxcdn.com/90c5fe5c866f1f5d50bedba4f1f4118f24e508a1e60601a3681e69e08cde9cf0.js",
             "source": "/home"
         },
         {
@@ -522,7 +522,7 @@
         },
         {
             "name": "Feature.Recommendations",
-            "url": "https://js.rbxcdn.com/babce206b492515143d22e96c7508c6c11b2f1298a66f5d98b0b2c567c005962.js",
+            "url": "https://js.rbxcdn.com/7cae8592d1cd45c8d5935159d37363a6951926fa0532dcdd627b057c76ce268e.js",
             "source": "/home"
         },
         {
@@ -642,7 +642,7 @@
         },
         {
             "name": "Feature.Transactions",
-            "url": "https://js.rbxcdn.com/6f4a775194b4b124d2e758384e50e7ef235feef3d4db507964442a83fe2bbf23.js",
+            "url": "https://js.rbxcdn.com/b1c1f4b3fe4d9c5096bad887de36a198a94ed1b77013b6ac622ac706f78116df.js",
             "source": "/transactions"
         },
         {
@@ -682,12 +682,12 @@
         },
         {
             "name": "Notifications.NotificationStream",
-            "url": "https://js.rbxcdn.com/370f41e6c511fd5b12ddd14e625ea29d9b315e9b32cd36601188a050ae2d7a2e.js",
+            "url": "https://js.rbxcdn.com/3a822c55a31261e0a21c97fdce967e4aa01a226adca1747436a08a9ca91b8231.js",
             "source": "/home"
         },
         {
             "name": "Notifications.Preferences",
-            "url": "https://js.rbxcdn.com/4385b4a024d6d74c443a79d1d4b8ae10926975c90eec0640cf31cc4710a000e8.js",
+            "url": "https://js.rbxcdn.com/b7358833c4f6b316325eb0d1b1a26ebcbc91268c3ac399658ed0143bfa8dfa92.js",
             "source": "/my/account"
         },
         {
@@ -769,7 +769,7 @@
         },
         {
             "name": "Avatar",
-            "url": "https://js.rbxcdn.com/04f9637f929cf9095f72ec935a63084af79c188b428f8f7a9d3d596085bd1833-Avatar.js",
+            "url": "https://js.rbxcdn.com/e4021176c4ab6b05e28532786a485ce3800317b03ead748c22f2883a2ae50db8-Avatar.js",
             "source": "/my/avatar"
         },
         {
@@ -1531,7 +1531,7 @@
         },
         {
             "name": "Avatar",
-            "url": "https://css.rbxcdn.com/17f430f73ab0a46d39a16207e15a5ebcf4f7b570f9ae485394bd5223f8d9efa1-Avatar.css",
+            "url": "https://css.rbxcdn.com/11aad3eefa6c125da049c4d98d2e3c830893073e2525bcaebf1a7443471b9b52-Avatar.css",
             "source": "/my/avatar"
         },
         {
