@@ -1227,6 +1227,14 @@
     display: inline-block
 }
 
+.attributes-tooltip-body .holding-tooltip-body-header {
+    font-weight: 700
+}
+
+.attributes-tooltip-body .attributes-tooltip-section+.attributes-tooltip-section {
+    margin-top: 10px
+}
+
 .tooltip-title-bold {
     font-weight: bolder;
     margin-bottom: 10px;
@@ -1447,7 +1455,7 @@
 }
 
 .icon-regular-diamond-simplified {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.857c.71.71.71 1.86 0 2.57l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.57a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.856c.71.71.71 1.861 0 2.571l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.571a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.142l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-flag {
@@ -2345,7 +2353,7 @@
 }
 
 .icon-regular-diamond-simplified {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.857c.71.71.71 1.86 0 2.57l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.57a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.856c.71.71.71 1.861 0 2.571l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.571a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.142l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-flag {

@@ -1980,7 +1980,7 @@
 }
 
 .icon-filled-music-note {
-    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M26.3841 2.06695C27.7045 1.73662 29 2.67028 29 3.95232V22.195C29 24.8891 26.6719 27.0731 23.8 27.0731C20.9281 27.0731 18.6 24.8891 18.6 22.195C18.6 19.5009 20.9281 17.3168 23.8 17.3168C24.9706 17.3168 26.0509 17.6797 26.92 18.2921V9.80608L13.4 13.1883V25.1219C13.4 27.816 11.0719 30 8.2 30C5.32812 30 3 27.816 3 25.1219C3 22.4277 5.32812 20.2437 8.2 20.2437C9.37063 20.2437 10.4509 20.6066 11.32 21.219V7.3345C11.32 6.45048 11.9535 5.6769 12.8641 5.44912L26.3841 2.06695ZM13.4 11.1688L26.92 7.78664V3.95232L13.4 7.3345V11.1688Z' fill='black'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M26.499 2.02042C27.7651 1.69271 28.9996 2.64822 29 3.95597V22.2148H28.998C28.9497 24.8688 26.6459 27.0067 23.8096 27.0067C20.943 27.0067 18.6193 24.823 18.6191 22.1298C18.6194 19.4367 20.9431 17.2528 23.8096 17.2528C25.0127 17.2528 26.1198 17.6386 27 18.2841V9.78214L13.3682 13.2001C13.3675 17.1743 13.3725 21.1489 13.373 25.123C13.373 27.8163 11.0492 29.9999 8.18262 29.9999C5.31602 29.9999 2.99219 27.8163 2.99219 25.123C2.99245 22.4298 5.31618 20.246 8.18262 20.246C9.38341 20.246 10.4888 20.6301 11.3682 21.2733V7.48819C11.3684 6.57712 11.9843 5.78032 12.8662 5.55167L26.499 2.02042ZM13.3682 7.48819V11.1376L27 7.72062V3.95597L13.3682 7.48819Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-filled-plus-large {
@@ -2016,7 +2016,7 @@
 }
 
 .icon-filled-verified-check {
-    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M21.7071 13.7071C22.0976 13.3166 22.0976 12.6834 21.7071 12.2929C21.3166 11.9024 20.6834 11.9024 20.2929 12.2929L14 18.5858L11.7071 16.2929C11.3166 15.9024 10.6834 15.9024 10.2929 16.2929C9.90237 16.6834 9.90237 17.3166 10.2929 17.7071L13.2929 20.7071C13.6834 21.0976 14.3166 21.0976 14.7071 20.7071L21.7071 13.7071Z' fill='black'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M19.9393 11.9393C20.5251 11.3536 21.4746 11.3536 22.0604 11.9393C22.646 12.5251 22.6461 13.4747 22.0604 14.0604L15.0604 21.0604C14.4747 21.6461 13.5251 21.646 12.9393 21.0604L9.93934 18.0604C9.35355 17.4746 9.35355 16.5251 9.93934 15.9393C10.5251 15.3536 11.4746 15.3536 12.0604 15.9393L13.9999 17.8788L19.9393 11.9393Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-regular-x {
@@ -2100,7 +2100,50 @@
     width: 100%;
     height: auto;
     display: -ms-flexbox;
-    display: flex
+    display: flex;
+    position: relative
+}
+
+.game-card-container.grid-item-container .game-tile-overflow-button {
+    z-index: 2;
+    position: absolute;
+    top: 12px;
+    right: 12px
+}
+
+.game-card-container.grid-item-container .game-tile-hidden-placeholder {
+    border-radius: 8px;
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%;
+    position: relative
+}
+
+.light-theme .game-card-container.grid-item-container .game-tile-hidden-placeholder {
+    background-color: rgba(0, 0, 0, .1)
+}
+
+.dark-theme .game-card-container.grid-item-container .game-tile-hidden-placeholder {
+    background-color: rgba(255, 255, 255, .1)
+}
+
+.game-card-container.grid-item-container .game-tile-hidden-placeholder .game-tile-hidden-placeholder-contents {
+    text-align: center;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    display: -ms-flexbox;
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0
 }
 
 .game-card-container.grid-item-container>a {

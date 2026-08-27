@@ -1,5 +1,10 @@
 @tailwind utilities;
 
+#px-captcha {
+    border-radius: 8px;
+    overflow: hidden
+}
+
 .modal-modern {
     padding: 12px !important
 }
@@ -1122,6 +1127,10 @@ input[type=button].btn-block {
 .iv-qr-logo-backdrop {
     rx: var(--radius-small);
     ry: var(--radius-small)
+}
+
+.\!relative {
+    position: relative !important
 }
 
 .inset-\[0\] {
