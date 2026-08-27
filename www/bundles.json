@@ -734,7 +734,7 @@
         },
         {
             "name": "AccountRecovery",
-            "url": "https://js.rbxcdn.com/cafea3d748f41103bd71625b9db9acec4b29197259d883588bb32cf8171f1926-AccountRecovery.js",
+            "url": "https://js.rbxcdn.com/d2314f4f3f8906765d755524377103d3f889de82543472f7634be8db388a2d36-AccountRecovery.js",
             "source": "/login/forgot-password-or-username"
         },
         {
@@ -859,7 +859,7 @@
         },
         {
             "name": "CoreUtilities",
-            "url": "https://js.rbxcdn.com/e80ae721ebc74e69f8bf0d44292f8c8e5cb8941cee3ace155abfb26918b09cea-CoreUtilities.js",
+            "url": "https://js.rbxcdn.com/bb73702393d5138ed6ee69f045635b59f08a36f378f3f1c69d2f132458a0b9af-CoreUtilities.js",
             "source": "/home"
         },
         {
@@ -1159,7 +1159,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/3d407f854110b95695bb0fa772c2e28c36c1a918acf6650b6a73f78676d61e74-Navigation.js",
+            "url": "https://js.rbxcdn.com/96bf223062f89edc18ddf002609bb5b22c3bc0609c2b44e7c1e18de27f572953-Navigation.js",
             "source": "/home"
         },
         {
@@ -1501,7 +1501,7 @@
         },
         {
             "name": "AccountRecovery",
-            "url": "https://css.rbxcdn.com/dbdf317d291b51fad6c91d1f4887a086e3b1545541ed1bf4f63e137af7a6fdbd-AccountRecovery.css",
+            "url": "https://css.rbxcdn.com/30533c6f8c638b12ac35ee61360048baf8ab809ae7d774d6dfa3d11ad63abd0d-AccountRecovery.css",
             "source": "/login/forgot-password-or-username"
         },
         {
@@ -1841,7 +1841,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://css.rbxcdn.com/7e2fa6345e2c2b5f931bfda68f4574582a28a281905b6c18e028fa4f5d10d7b7-Navigation.css",
+            "url": "https://css.rbxcdn.com/1a5a79a4fdea43ee6575653db3bc5354b8b1187a3c74b1c6af11f944567fa6bc-Navigation.css",
             "source": "/home"
         },
         {
