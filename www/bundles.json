@@ -167,7 +167,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/51044aeb4ff575271d2b02a815b23ee2923f777c9a260dd61945760c7901153a.js",
+            "url": "https://js.rbxcdn.com/22cb5eebe288b87d9699b3459a0a9f3b3825ba9c6aca496a7c7ba622af8dd9fb.js",
             "source": "/home"
         },
         {
@@ -317,7 +317,7 @@
         },
         {
             "name": "Feature.Friends",
-            "url": "https://js.rbxcdn.com/005822caabb3739460c468537b1b7b3965faa195bb6e2cf8353f08ca0bdd769b.js",
+            "url": "https://js.rbxcdn.com/6e3fe0b433e23c1b7d76762e7a479681c215a692ef5279cb6d17efa56bea4864.js",
             "source": "/home"
         },
         {
@@ -422,12 +422,12 @@
         },
         {
             "name": "Feature.NotificationSettings",
-            "url": "https://js.rbxcdn.com/f7a8f6b686fc5f84f1a447c705eab4dc42c7b6934521ceb13fbace43b6ed3b43.js",
+            "url": "https://js.rbxcdn.com/d8a0dd623add1b6dbaf151af8096b8d905e659aa66752af6f740fdfc4a07276a.js",
             "source": "/my/account"
         },
         {
             "name": "Feature.Parents",
-            "url": "https://js.rbxcdn.com/74cb73033fd4819e79202a90687356c4680f049e8a347c195dece1c0a6969483.js",
+            "url": "https://js.rbxcdn.com/6c5401a688ab80982a85c3601b05c8ed745c92d59bfae267453833018b3210ff.js",
             "source": "/home"
         },
         {
@@ -542,7 +542,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/b1ee42d67f63914c725be17df9ecd8fb980373c8974f3a738bd7015b95aebac8.js",
+            "url": "https://js.rbxcdn.com/2796ab6c47c53ad98074f9c3b488a1df95a5fd9530fd631422c6345e157b2d4d.js",
             "source": "/home"
         },
         {
@@ -607,7 +607,7 @@
         },
         {
             "name": "Feature.SponsoredPages",
-            "url": "https://js.rbxcdn.com/e2be5c4b65bb1bc79da25023da473e6d3f6612829e1c535da886ea1ab61983ec.js",
+            "url": "https://js.rbxcdn.com/c55f0f0233123300748d490dc6d7391964cdccc246fba290cefd7df2ff9f95e0.js",
             "source": "/shopgiftcards"
         },
         {
@@ -652,7 +652,7 @@
         },
         {
             "name": "Feature.VerificationUpsell",
-            "url": "https://js.rbxcdn.com/b83b0d0795c637d354a2cd0bc4237a6a20c17cce09fe9f7bb7311e80c6456471.js",
+            "url": "https://js.rbxcdn.com/9bc27fe1d63821db7325abfb1d2906397fc7f56f00da84a7757dc5f7b306a34c.js",
             "source": "/home"
         },
         {
@@ -1159,7 +1159,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/96bf223062f89edc18ddf002609bb5b22c3bc0609c2b44e7c1e18de27f572953-Navigation.js",
+            "url": "https://js.rbxcdn.com/c9d42b5739a65afcf7dd5add71bc3cc877ffe1de9bb8226e6b988d097ecaeb7f-Navigation.js",
             "source": "/home"
         },
         {
@@ -1169,7 +1169,7 @@
         },
         {
             "name": "NotificationStream",
-            "url": "https://js.rbxcdn.com/e26e999646d3e5faddff9ecd22b8ce178d10c1ecf37a989c580351654a11a3ad-NotificationStream.js",
+            "url": "https://js.rbxcdn.com/79c0fb9ab4edd2972e8a5f2fc28ffad0d6345ea228a4737bdc786ab086d7704a-NotificationStream.js",
             "source": "/home"
         },
         {
@@ -1344,7 +1344,7 @@
         },
         {
             "name": "SendrNotificationStream",
-            "url": "https://js.rbxcdn.com/f9a16b7f57f685968f0697079914317b7153c6ad43614dd1954c70db4cdfea93-SendrNotificationStream.js",
+            "url": "https://js.rbxcdn.com/bb72c057bf3a3cce2a2fcb9e6998685215006c01e05e129b16f5efec79e3709e-SendrNotificationStream.js",
             "source": "/home"
         },
         {
@@ -1841,7 +1841,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://css.rbxcdn.com/1a5a79a4fdea43ee6575653db3bc5354b8b1187a3c74b1c6af11f944567fa6bc-Navigation.css",
+            "url": "https://css.rbxcdn.com/8fe116c50484c448fc43ebf1dda30fc04c0ca5f5096f89811ac4c3e2140b9a22-Navigation.css",
             "source": "/home"
         },
         {
@@ -1981,7 +1981,7 @@
         },
         {
             "name": "SendrNotificationStream",
-            "url": "https://css.rbxcdn.com/28598554c639b78a1d0b4d5ef8c7a84dee98dd182bef13ba493d0019b55f95b7-SendrNotificationStream.css",
+            "url": "https://css.rbxcdn.com/317a470203229db4999c548ba0defe222b3ffec318f2ffb4de3b309391050b43-SendrNotificationStream.css",
             "source": "/home"
         },
         {
