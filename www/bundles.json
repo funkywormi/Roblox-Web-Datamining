@@ -1258,6 +1258,11 @@
             "source": "/redeem"
         },
         {
+            "name": "ReactLanding",
+            "url": "https://js.rbxcdn.com/431d9189e30538a2446f790f87b46206778c0549cc33ed219603a3bb17c8c34e-ReactLanding.js",
+            "source": "/CreateAccount"
+        },
+        {
             "name": "ReactLogin",
             "url": "https://js.rbxcdn.com/be5e71b3a276e41175f1ce0341431b5677968cb26beb58786e15b4bdee081906-ReactLogin.js",
             "source": "/login"
@@ -1908,6 +1913,11 @@
             "name": "ReactCaptcha",
             "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-ReactCaptcha.css",
             "source": "/redeem"
+        },
+        {
+            "name": "ReactLanding",
+            "url": "https://css.rbxcdn.com/c82b48c34addf58bea0c462ee7734097bad49a899927ec3f8edf4433f742ebb2-ReactLanding.css",
+            "source": "/CreateAccount"
         },
         {
             "name": "ReactLogin",

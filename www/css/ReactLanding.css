@@ -1250,6 +1250,65 @@ h3 {
     overflow: visible !important
 }
 
+#signup-container.signup-v2-chrome .signup-v2-text-input:focus-within {
+    outline: none
+}
+
+#signup-container.signup-v2-chrome .signup-v2-text-input:has(input:focus-visible) {
+    outline: var(--stroke-thicker) solid var(--color-selection-start);
+    outline-offset: var(--stroke-thicker)
+}
+
+#signup-container.signup-v2-chrome .signup-v2-step-heading:focus {
+    outline: none
+}
+
+#signup-container.signup-v2-chrome .signup-v2-card {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 416px;
+    margin-left: auto;
+    margin-right: auto
+}
+
+#signup-container.signup-v2-chrome .signup-v2-card.signup-v2-card-resizing {
+    overflow: hidden;
+    transition: height var(--time-200) var(--ease-standard-out)
+}
+
+@media(prefers-reduced-motion:reduce) {
+    #signup-container.signup-v2-chrome .signup-v2-card.signup-v2-card-resizing {
+        transition: none
+    }
+}
+
+@media(max-width:991px) {
+    #signup-container.signup-v2-chrome.signup-v2-no-shell-log-in {
+        padding-top: var(--padding-xxlarge)
+    }
+}
+
+#signup-container.signup-v2-chrome #signup-header-container {
+    position: static;
+    top: auto;
+    height: auto;
+    margin-bottom: var(--padding-xxlarge)
+}
+
+#signup-container.signup-v2-chrome #signup-header-container #signup-header {
+    max-width: none
+}
+
+#signup-container.signup-v2-chrome #signup-header-container .header-icon-logo {
+    display: block;
+    width: 186px;
+    height: 35px;
+    margin: 0 auto;
+    padding: 0;
+    background-position: 50%;
+    background-size: contain
+}
+
 .font-builder-extended {
     font-family: Builder Extended, Builder Sans, sans-serif
 }
@@ -3187,8 +3246,8 @@ textarea.form-control {
     top: 0
 }
 
-.margin-left-\[-6px\] {
-    margin-left: -6px
+.margin-left-\[-12px\] {
+    margin-left: -12px
 }
 
 .gap-\[20px\] {
@@ -3238,10 +3297,6 @@ textarea.form-control {
 
 .width-\[212px\] {
     width: 212px
-}
-
-.width-\[390px\] {
-    width: 390px
 }
 
 .width-\[fit-content\] {
@@ -3326,8 +3381,8 @@ textarea.form-control {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M15.293 22.707a1 1 0 001.414 0l10-10a1 1 0 00-1.414-1.414L16 20.586l-9.293-9.293a1 1 0 00-1.414 1.414l10 10z'/%3E%3C/svg%3E")
 }
 
-.icon-filled-chevron-large-left {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M8.836 16.946a1.5 1.5 0 01.103-2.007l10-10 .115-.103a1.5 1.5 0 012.11 2.11l-.104.115L12.122 16l8.94 8.94a1.5 1.5 0 11-2.122 2.12l-10-10-.103-.114z'/%3E%3C/svg%3E")
+.icon-regular-chevron-large-left {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M9.293 16.707a1 1 0 010-1.414l10-10a1 1 0 111.414 1.414L11.414 16l9.293 9.293a1 1 0 01-1.414 1.414l-10-10z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-circle-check {
@@ -3503,4 +3558,10 @@ textarea.form-control {
 
 .rtl\:left-\[0\]:where([dir=rtl], [dir=rtl] *) {
     left: 0
+}
+
+.\[\&_a\]\:underline a {
+    text-decoration-line: underline;
+    -webkit-text-decoration-skip-ink: none;
+    text-decoration-skip-ink: none
 }
