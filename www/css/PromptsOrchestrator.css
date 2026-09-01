@@ -116,7 +116,7 @@
 }
 
 .install-instructions .col-xs-6 .section-content {
-    background: #202227;
+    background: var(--color-surface-100);
     border-radius: 20px;
     min-height: 380px;
     padding: 32px

@@ -2115,6 +2115,12 @@ ul.hlist.game-cards {
     }
 }
 
+.configure-community-tier__notice {
+    padding: 16px;
+    border: 1px solid var(--color-stroke-default);
+    border-radius: 16px
+}
+
 .configure-community-tier-grid__scroll {
     overflow-x: auto
 }

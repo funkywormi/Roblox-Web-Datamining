@@ -334,24 +334,25 @@ fieldset[disabled] .dark-theme .account-switcher-list .account-selection-list-it
     display: block
 }
 
-.account-switcher-foundation-dialog {
+div.account-switcher-modal.account-switcher-foundation-dialog {
     border-radius: 8px;
     background-color: var(--color-surface-100);
     color: var(--color-content-emphasis);
-    max-width: 400px;
+    max-width: calc(100vw - 24px);
+    min-width: 0;
     overflow: hidden;
     padding: 0;
     width: 400px
 }
 
 @media(max-width:319px) {
-    .account-switcher-foundation-dialog {
+    div.account-switcher-modal.account-switcher-foundation-dialog {
         max-width: 100%;
         width: 100%
     }
 }
 
-.account-switcher-foundation-dialog .account-switcher-foundation-header {
+div.account-switcher-modal.account-switcher-foundation-dialog .account-switcher-foundation-header {
     align-items: center;
     border-bottom: var(--stroke-standard) solid var(--color-stroke-muted);
     display: flex;
@@ -359,12 +360,12 @@ fieldset[disabled] .dark-theme .account-switcher-list .account-selection-list-it
     padding: 0 12px
 }
 
-.account-switcher-foundation-dialog .account-switcher-foundation-close,
-.account-switcher-foundation-dialog .account-switcher-foundation-header-spacer {
+div.account-switcher-modal.account-switcher-foundation-dialog .account-switcher-foundation-close,
+div.account-switcher-modal.account-switcher-foundation-dialog .account-switcher-foundation-header-spacer {
     flex: 0 0 48px
 }
 
-.account-switcher-foundation-dialog .account-switcher-foundation-title {
+div.account-switcher-modal.account-switcher-foundation-dialog .account-switcher-foundation-title {
     flex: 1 1 auto;
     font-size: 24px;
     font-weight: 400;
@@ -373,23 +374,23 @@ fieldset[disabled] .dark-theme .account-switcher-list .account-selection-list-it
     text-align: center
 }
 
-.account-switcher-foundation-dialog .account-switcher-foundation-body {
+div.account-switcher-modal.account-switcher-foundation-dialog .account-switcher-foundation-body {
     background-color: var(--color-surface-100);
     padding: 0 12px
 }
 
-.account-switcher-foundation-dialog .account-switcher-foundation-body .account-switcher-foundation-section {
+div.account-switcher-modal.account-switcher-foundation-dialog .account-switcher-foundation-body .account-switcher-foundation-section {
     background-color: var(--color-surface-100);
     padding: 0
 }
 
-.account-switcher-foundation-dialog .account-switcher-foundation-body .account-switcher-help-text {
+div.account-switcher-modal.account-switcher-foundation-dialog .account-switcher-foundation-body .account-switcher-help-text {
     font-size: 15px;
     margin: 12px;
     text-align: center
 }
 
-.account-switcher-foundation-dialog .account-switcher-foundation-body .modal-section {
+div.account-switcher-modal.account-switcher-foundation-dialog .account-switcher-foundation-body .modal-section {
     padding: 0
 }
 

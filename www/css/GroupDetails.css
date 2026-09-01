@@ -2905,6 +2905,10 @@ ul.hlist.game-cards {
     flex: 1 1 auto
 }
 
+.\!grow-1 {
+    flex-grow: 1 !important
+}
+
 .size-\[1em\] {
     width: 1em;
     height: 1em
@@ -2933,6 +2937,15 @@ ul.hlist.game-cards {
 .size-\[var\(--icon-size-xsmall\)\] {
     width: var(--icon-size-xsmall);
     height: var(--icon-size-xsmall)
+}
+
+.\!height-fit {
+    height: -moz-fit-content !important;
+    height: fit-content !important
+}
+
+.height-\[180px\] {
+    height: 180px
 }
 
 .height-\[var\(--stroke-thick\)\] {
@@ -2995,6 +3008,10 @@ ul.hlist.game-cards {
     min-height: 48px
 }
 
+.min-height-\[60vh\] {
+    min-height: 60vh
+}
+
 .min-height-\[calc\(var\(--size-2300\)\*2\)\] {
     min-height: calc(var(--size-2300)*2)
 }
@@ -3025,6 +3042,10 @@ ul.hlist.game-cards {
 
 .min-width-\[var\(--size-1200\)\] {
     min-width: var(--size-1200)
+}
+
+.width-\[115px\] {
+    width: 115px
 }
 
 .width-\[176px\] {
@@ -3242,11 +3263,11 @@ ul.hlist.game-cards {
 }
 
 .icon-regular-diamond-simplified {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.857c.71.71.71 1.86 0 2.57l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.57a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.856c.71.71.71 1.861 0 2.571l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.571a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.142l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
 }
 
 .icon-filled-diamond-simplified {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M18.57 4.571a3.636 3.636 0 00-5.142 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M18.57 4.57a3.636 3.636 0 00-5.142 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-discord {
@@ -3369,6 +3390,10 @@ ul.hlist.game-cards {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M24.26 11.695c2.621 0 4.737 1.266 4.737 4.37V24H26.79v-1.541l-.321-.092c-.736 1.15-1.933 1.863-3.543 1.863-2.392 0-3.979-1.45-3.979-3.772 0-2.277 1.61-3.817 4.577-3.817h3.266v-.576c0-1.702-1.173-2.253-2.599-2.254-1.495 0-2.53.598-3.565 1.518L19.36 13.65a6.977 6.977 0 014.9-1.955zm-.737 6.762c-1.587 0-2.369.782-2.369 1.91 0 1.034.805 1.862 2.3 1.863 1.403 0 2.576-.714 3.335-1.772v-2.001h-3.266zM17.767 24H15.12l-1.448-4.3H7.37L5.92 24H3.277L9.072 7.9h2.899L17.767 24zm-9.638-6.531h4.808l-2.254-6.67h-.3l-2.254 6.67z'/%3E%3C/svg%3E")
 }
 
+.icon-filled-three-bars-horizontal-narrowing {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M19 22.5a1.5 1.5 0 010 3h-6a1.5 1.5 0 010-3h6zm5.153-7.992a1.5 1.5 0 010 2.984L24 17.5H8a1.5 1.5 0 010-3h16l.153.008zm5-8a1.5 1.5 0 010 2.984L29 9.5H3a1.5 1.5 0 110-3h26l.153.008z'/%3E%3C/svg%3E")
+}
+
 .icon-filled-three-bars-horizontal-triangles-vertical,
 .icon-regular-three-bars-horizontal-triangles-vertical {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28 11a1 1 0 01-1 1H5a1 1 0 110-2h22a1 1 0 011 1zM28 16a1 1 0 01-1 1H5a1 1 0 110-2h22a1 1 0 011 1zM27 22a1 1 0 000-2H5a1 1 0 100 2h22zM16.4 29.466l2-2.667a.5.5 0 00-.4-.8h-4a.5.5 0 00-.4.8l2 2.667a.5.5 0 00.8 0zM18.4 5.2l-2-2.667a.5.5 0 00-.8 0l-2 2.667a.5.5 0 00.4.8h4a.5.5 0 00.4-.8z'/%3E%3C/svg%3E")
@@ -3484,6 +3509,10 @@ ul.hlist.game-cards {
     inset: 0
 }
 
+.\[left\:0\] {
+    left: 0
+}
+
 .\[list-style-position\:inside\] {
     list-style-position: inside
 }
@@ -3512,12 +3541,24 @@ ul.hlist.game-cards {
     overflow: auto
 }
 
+.\[right\:0\] {
+    right: 0
+}
+
 .\[scrollbar-width\:none\] {
     scrollbar-width: none
 }
 
 .\[text-align\:inherit\] {
     text-align: inherit
+}
+
+.\[text-transform\:none\] {
+    text-transform: none
+}
+
+.\[top\:0\] {
+    top: 0
 }
 
 .\[width\:240px\] {
@@ -3781,6 +3822,12 @@ ul.hlist.game-cards {
     }
 }
 
+@media not all and (min-width:601px) {
+    .max-medium\:width-full {
+        width: 100%
+    }
+}
+
 @media (max-width:600.95px) {
     .max-\[600\.95px\]\:margin-x-none {
         margin-left: var(--margin-none);
@@ -3824,6 +3871,34 @@ ul.hlist.game-cards {
 
     .medium\:flex-row {
         flex-direction: row
+    }
+
+    .medium\:gap-medium {
+        gap: var(--gap-medium)
+    }
+
+    .medium\:grow-1 {
+        flex-grow: 1
+    }
+
+    .medium\:grow-2 {
+        flex-grow: 2
+    }
+
+    .medium\:shrink-1 {
+        flex-shrink: 1
+    }
+
+    .medium\:basis-0 {
+        flex-basis: 0%
+    }
+
+    .medium\:max-width-\[216px\] {
+        max-width: 216px
+    }
+
+    .medium\:min-width-0 {
+        min-width: var(--size-0)
     }
 }
 
@@ -3889,6 +3964,22 @@ ul.hlist.game-cards {
 
 .\[\&\>\*\:not\(\:last-child\)\]\:\[border-bottom\:1px_solid_var\(--color-stroke-default\)\]>:not(:last-child) {
     border-bottom: 1px solid var(--color-stroke-default)
+}
+
+.\[\&\>span\:nth-child\(2\)\>span\:nth-child\(1\)\]\:width-full>span:nth-child(2)>span:first-child {
+    width: 100%
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:grow-1>span:nth-child(2) {
+    flex-grow: 1
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:max-width-full>span:nth-child(2) {
+    max-width: 100%
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:min-width-0>span:nth-child(2) {
+    min-width: var(--size-0)
 }
 
 .group-experiences-container .group-experience-tile {
@@ -4215,6 +4306,10 @@ ul.hlist.game-cards {
     flex: 1 1 auto
 }
 
+.\!grow-1 {
+    flex-grow: 1 !important
+}
+
 .size-\[1em\] {
     width: 1em;
     height: 1em
@@ -4243,6 +4338,15 @@ ul.hlist.game-cards {
 .size-\[var\(--icon-size-xsmall\)\] {
     width: var(--icon-size-xsmall);
     height: var(--icon-size-xsmall)
+}
+
+.\!height-fit {
+    height: -moz-fit-content !important;
+    height: fit-content !important
+}
+
+.height-\[180px\] {
+    height: 180px
 }
 
 .height-\[var\(--stroke-thick\)\] {
@@ -4305,6 +4409,10 @@ ul.hlist.game-cards {
     min-height: 48px
 }
 
+.min-height-\[60vh\] {
+    min-height: 60vh
+}
+
 .min-height-\[calc\(var\(--size-2300\)\*2\)\] {
     min-height: calc(var(--size-2300)*2)
 }
@@ -4335,6 +4443,10 @@ ul.hlist.game-cards {
 
 .min-width-\[var\(--size-1200\)\] {
     min-width: var(--size-1200)
+}
+
+.width-\[115px\] {
+    width: 115px
 }
 
 .width-\[176px\] {
@@ -4552,11 +4664,11 @@ ul.hlist.game-cards {
 }
 
 .icon-regular-diamond-simplified {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.857c.71.71.71 1.86 0 2.57l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.57a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.856c.71.71.71 1.861 0 2.571l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.571a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.142l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
 }
 
 .icon-filled-diamond-simplified {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M18.57 4.571a3.636 3.636 0 00-5.142 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M18.57 4.57a3.636 3.636 0 00-5.142 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-discord {
@@ -4679,6 +4791,10 @@ ul.hlist.game-cards {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M24.26 11.695c2.621 0 4.737 1.266 4.737 4.37V24H26.79v-1.541l-.321-.092c-.736 1.15-1.933 1.863-3.543 1.863-2.392 0-3.979-1.45-3.979-3.772 0-2.277 1.61-3.817 4.577-3.817h3.266v-.576c0-1.702-1.173-2.253-2.599-2.254-1.495 0-2.53.598-3.565 1.518L19.36 13.65a6.977 6.977 0 014.9-1.955zm-.737 6.762c-1.587 0-2.369.782-2.369 1.91 0 1.034.805 1.862 2.3 1.863 1.403 0 2.576-.714 3.335-1.772v-2.001h-3.266zM17.767 24H15.12l-1.448-4.3H7.37L5.92 24H3.277L9.072 7.9h2.899L17.767 24zm-9.638-6.531h4.808l-2.254-6.67h-.3l-2.254 6.67z'/%3E%3C/svg%3E")
 }
 
+.icon-filled-three-bars-horizontal-narrowing {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M19 22.5a1.5 1.5 0 010 3h-6a1.5 1.5 0 010-3h6zm5.153-7.992a1.5 1.5 0 010 2.984L24 17.5H8a1.5 1.5 0 010-3h16l.153.008zm5-8a1.5 1.5 0 010 2.984L29 9.5H3a1.5 1.5 0 110-3h26l.153.008z'/%3E%3C/svg%3E")
+}
+
 .icon-filled-three-bars-horizontal-triangles-vertical,
 .icon-regular-three-bars-horizontal-triangles-vertical {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28 11a1 1 0 01-1 1H5a1 1 0 110-2h22a1 1 0 011 1zM28 16a1 1 0 01-1 1H5a1 1 0 110-2h22a1 1 0 011 1zM27 22a1 1 0 000-2H5a1 1 0 100 2h22zM16.4 29.466l2-2.667a.5.5 0 00-.4-.8h-4a.5.5 0 00-.4.8l2 2.667a.5.5 0 00.8 0zM18.4 5.2l-2-2.667a.5.5 0 00-.8 0l-2 2.667a.5.5 0 00.4.8h4a.5.5 0 00.4-.8z'/%3E%3C/svg%3E")
@@ -4794,6 +4910,10 @@ ul.hlist.game-cards {
     inset: 0
 }
 
+.\[left\:0\] {
+    left: 0
+}
+
 .\[list-style-position\:inside\] {
     list-style-position: inside
 }
@@ -4822,12 +4942,24 @@ ul.hlist.game-cards {
     overflow: auto
 }
 
+.\[right\:0\] {
+    right: 0
+}
+
 .\[scrollbar-width\:none\] {
     scrollbar-width: none
 }
 
 .\[text-align\:inherit\] {
     text-align: inherit
+}
+
+.\[text-transform\:none\] {
+    text-transform: none
+}
+
+.\[top\:0\] {
+    top: 0
 }
 
 .\[width\:240px\] {
@@ -5091,6 +5223,12 @@ ul.hlist.game-cards {
     }
 }
 
+@media not all and (min-width:601px) {
+    .max-medium\:width-full {
+        width: 100%
+    }
+}
+
 @media (max-width:600.95px) {
     .max-\[600\.95px\]\:margin-x-none {
         margin-left: var(--margin-none);
@@ -5134,6 +5272,34 @@ ul.hlist.game-cards {
 
     .medium\:flex-row {
         flex-direction: row
+    }
+
+    .medium\:gap-medium {
+        gap: var(--gap-medium)
+    }
+
+    .medium\:grow-1 {
+        flex-grow: 1
+    }
+
+    .medium\:grow-2 {
+        flex-grow: 2
+    }
+
+    .medium\:shrink-1 {
+        flex-shrink: 1
+    }
+
+    .medium\:basis-0 {
+        flex-basis: 0%
+    }
+
+    .medium\:max-width-\[216px\] {
+        max-width: 216px
+    }
+
+    .medium\:min-width-0 {
+        min-width: var(--size-0)
     }
 }
 
@@ -5199,6 +5365,22 @@ ul.hlist.game-cards {
 
 .\[\&\>\*\:not\(\:last-child\)\]\:\[border-bottom\:1px_solid_var\(--color-stroke-default\)\]>:not(:last-child) {
     border-bottom: 1px solid var(--color-stroke-default)
+}
+
+.\[\&\>span\:nth-child\(2\)\>span\:nth-child\(1\)\]\:width-full>span:nth-child(2)>span:first-child {
+    width: 100%
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:grow-1>span:nth-child(2) {
+    flex-grow: 1
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:max-width-full>span:nth-child(2) {
+    max-width: 100%
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:min-width-0>span:nth-child(2) {
+    min-width: var(--size-0)
 }
 
 .group-profile-header {
@@ -5442,6 +5624,10 @@ ul.hlist.game-cards {
     flex: 1 1 auto
 }
 
+.\!grow-1 {
+    flex-grow: 1 !important
+}
+
 .size-\[1em\] {
     width: 1em;
     height: 1em
@@ -5470,6 +5656,15 @@ ul.hlist.game-cards {
 .size-\[var\(--icon-size-xsmall\)\] {
     width: var(--icon-size-xsmall);
     height: var(--icon-size-xsmall)
+}
+
+.\!height-fit {
+    height: -moz-fit-content !important;
+    height: fit-content !important
+}
+
+.height-\[180px\] {
+    height: 180px
 }
 
 .height-\[var\(--stroke-thick\)\] {
@@ -5532,6 +5727,10 @@ ul.hlist.game-cards {
     min-height: 48px
 }
 
+.min-height-\[60vh\] {
+    min-height: 60vh
+}
+
 .min-height-\[calc\(var\(--size-2300\)\*2\)\] {
     min-height: calc(var(--size-2300)*2)
 }
@@ -5562,6 +5761,10 @@ ul.hlist.game-cards {
 
 .min-width-\[var\(--size-1200\)\] {
     min-width: var(--size-1200)
+}
+
+.width-\[115px\] {
+    width: 115px
 }
 
 .width-\[176px\] {
@@ -5779,11 +5982,11 @@ ul.hlist.game-cards {
 }
 
 .icon-regular-diamond-simplified {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.857c.71.71.71 1.86 0 2.57l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.57a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.856c.71.71.71 1.861 0 2.571l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.571a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.142l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
 }
 
 .icon-filled-diamond-simplified {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M18.57 4.571a3.636 3.636 0 00-5.142 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M18.57 4.57a3.636 3.636 0 00-5.142 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-discord {
@@ -5906,6 +6109,10 @@ ul.hlist.game-cards {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M24.26 11.695c2.621 0 4.737 1.266 4.737 4.37V24H26.79v-1.541l-.321-.092c-.736 1.15-1.933 1.863-3.543 1.863-2.392 0-3.979-1.45-3.979-3.772 0-2.277 1.61-3.817 4.577-3.817h3.266v-.576c0-1.702-1.173-2.253-2.599-2.254-1.495 0-2.53.598-3.565 1.518L19.36 13.65a6.977 6.977 0 014.9-1.955zm-.737 6.762c-1.587 0-2.369.782-2.369 1.91 0 1.034.805 1.862 2.3 1.863 1.403 0 2.576-.714 3.335-1.772v-2.001h-3.266zM17.767 24H15.12l-1.448-4.3H7.37L5.92 24H3.277L9.072 7.9h2.899L17.767 24zm-9.638-6.531h4.808l-2.254-6.67h-.3l-2.254 6.67z'/%3E%3C/svg%3E")
 }
 
+.icon-filled-three-bars-horizontal-narrowing {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M19 22.5a1.5 1.5 0 010 3h-6a1.5 1.5 0 010-3h6zm5.153-7.992a1.5 1.5 0 010 2.984L24 17.5H8a1.5 1.5 0 010-3h16l.153.008zm5-8a1.5 1.5 0 010 2.984L29 9.5H3a1.5 1.5 0 110-3h26l.153.008z'/%3E%3C/svg%3E")
+}
+
 .icon-filled-three-bars-horizontal-triangles-vertical,
 .icon-regular-three-bars-horizontal-triangles-vertical {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28 11a1 1 0 01-1 1H5a1 1 0 110-2h22a1 1 0 011 1zM28 16a1 1 0 01-1 1H5a1 1 0 110-2h22a1 1 0 011 1zM27 22a1 1 0 000-2H5a1 1 0 100 2h22zM16.4 29.466l2-2.667a.5.5 0 00-.4-.8h-4a.5.5 0 00-.4.8l2 2.667a.5.5 0 00.8 0zM18.4 5.2l-2-2.667a.5.5 0 00-.8 0l-2 2.667a.5.5 0 00.4.8h4a.5.5 0 00.4-.8z'/%3E%3C/svg%3E")
@@ -6021,6 +6228,10 @@ ul.hlist.game-cards {
     inset: 0
 }
 
+.\[left\:0\] {
+    left: 0
+}
+
 .\[list-style-position\:inside\] {
     list-style-position: inside
 }
@@ -6049,12 +6260,24 @@ ul.hlist.game-cards {
     overflow: auto
 }
 
+.\[right\:0\] {
+    right: 0
+}
+
 .\[scrollbar-width\:none\] {
     scrollbar-width: none
 }
 
 .\[text-align\:inherit\] {
     text-align: inherit
+}
+
+.\[text-transform\:none\] {
+    text-transform: none
+}
+
+.\[top\:0\] {
+    top: 0
 }
 
 .\[width\:240px\] {
@@ -6318,6 +6541,12 @@ ul.hlist.game-cards {
     }
 }
 
+@media not all and (min-width:601px) {
+    .max-medium\:width-full {
+        width: 100%
+    }
+}
+
 @media (max-width:600.95px) {
     .max-\[600\.95px\]\:margin-x-none {
         margin-left: var(--margin-none);
@@ -6361,6 +6590,34 @@ ul.hlist.game-cards {
 
     .medium\:flex-row {
         flex-direction: row
+    }
+
+    .medium\:gap-medium {
+        gap: var(--gap-medium)
+    }
+
+    .medium\:grow-1 {
+        flex-grow: 1
+    }
+
+    .medium\:grow-2 {
+        flex-grow: 2
+    }
+
+    .medium\:shrink-1 {
+        flex-shrink: 1
+    }
+
+    .medium\:basis-0 {
+        flex-basis: 0%
+    }
+
+    .medium\:max-width-\[216px\] {
+        max-width: 216px
+    }
+
+    .medium\:min-width-0 {
+        min-width: var(--size-0)
     }
 }
 
@@ -6426,6 +6683,22 @@ ul.hlist.game-cards {
 
 .\[\&\>\*\:not\(\:last-child\)\]\:\[border-bottom\:1px_solid_var\(--color-stroke-default\)\]>:not(:last-child) {
     border-bottom: 1px solid var(--color-stroke-default)
+}
+
+.\[\&\>span\:nth-child\(2\)\>span\:nth-child\(1\)\]\:width-full>span:nth-child(2)>span:first-child {
+    width: 100%
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:grow-1>span:nth-child(2) {
+    flex-grow: 1
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:max-width-full>span:nth-child(2) {
+    max-width: 100%
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:min-width-0>span:nth-child(2) {
+    min-width: var(--size-0)
 }
 
 .group-videos-modal-close-button {
@@ -6723,6 +6996,10 @@ ul.hlist.game-cards {
     flex: 1 1 auto
 }
 
+.\!grow-1 {
+    flex-grow: 1 !important
+}
+
 .size-\[1em\] {
     width: 1em;
     height: 1em
@@ -6751,6 +7028,15 @@ ul.hlist.game-cards {
 .size-\[var\(--icon-size-xsmall\)\] {
     width: var(--icon-size-xsmall);
     height: var(--icon-size-xsmall)
+}
+
+.\!height-fit {
+    height: -moz-fit-content !important;
+    height: fit-content !important
+}
+
+.height-\[180px\] {
+    height: 180px
 }
 
 .height-\[var\(--stroke-thick\)\] {
@@ -6813,6 +7099,10 @@ ul.hlist.game-cards {
     min-height: 48px
 }
 
+.min-height-\[60vh\] {
+    min-height: 60vh
+}
+
 .min-height-\[calc\(var\(--size-2300\)\*2\)\] {
     min-height: calc(var(--size-2300)*2)
 }
@@ -6843,6 +7133,10 @@ ul.hlist.game-cards {
 
 .min-width-\[var\(--size-1200\)\] {
     min-width: var(--size-1200)
+}
+
+.width-\[115px\] {
+    width: 115px
 }
 
 .width-\[176px\] {
@@ -7060,11 +7354,11 @@ ul.hlist.game-cards {
 }
 
 .icon-regular-diamond-simplified {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.857c.71.71.71 1.86 0 2.57l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.57a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M26.284 14.856c.71.71.71 1.861 0 2.571l-9 9c-.71.71-1.86.71-2.57 0l-9-9a1.818 1.818 0 010-2.57l9-9c.71-.71 1.86-.71 2.57 0l9 9zM18.571 4.571a3.636 3.636 0 00-5.143 0l-9 9a3.636 3.636 0 000 5.142l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
 }
 
 .icon-filled-diamond-simplified {
-    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M18.57 4.571a3.636 3.636 0 00-5.142 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M18.57 4.57a3.636 3.636 0 00-5.142 0l-9 9a3.636 3.636 0 000 5.143l9 9a3.636 3.636 0 005.142 0l9-9a3.636 3.636 0 000-5.143l-9-9z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-discord {
@@ -7187,6 +7481,10 @@ ul.hlist.game-cards {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M24.26 11.695c2.621 0 4.737 1.266 4.737 4.37V24H26.79v-1.541l-.321-.092c-.736 1.15-1.933 1.863-3.543 1.863-2.392 0-3.979-1.45-3.979-3.772 0-2.277 1.61-3.817 4.577-3.817h3.266v-.576c0-1.702-1.173-2.253-2.599-2.254-1.495 0-2.53.598-3.565 1.518L19.36 13.65a6.977 6.977 0 014.9-1.955zm-.737 6.762c-1.587 0-2.369.782-2.369 1.91 0 1.034.805 1.862 2.3 1.863 1.403 0 2.576-.714 3.335-1.772v-2.001h-3.266zM17.767 24H15.12l-1.448-4.3H7.37L5.92 24H3.277L9.072 7.9h2.899L17.767 24zm-9.638-6.531h4.808l-2.254-6.67h-.3l-2.254 6.67z'/%3E%3C/svg%3E")
 }
 
+.icon-filled-three-bars-horizontal-narrowing {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M19 22.5a1.5 1.5 0 010 3h-6a1.5 1.5 0 010-3h6zm5.153-7.992a1.5 1.5 0 010 2.984L24 17.5H8a1.5 1.5 0 010-3h16l.153.008zm5-8a1.5 1.5 0 010 2.984L29 9.5H3a1.5 1.5 0 110-3h26l.153.008z'/%3E%3C/svg%3E")
+}
+
 .icon-filled-three-bars-horizontal-triangles-vertical,
 .icon-regular-three-bars-horizontal-triangles-vertical {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28 11a1 1 0 01-1 1H5a1 1 0 110-2h22a1 1 0 011 1zM28 16a1 1 0 01-1 1H5a1 1 0 110-2h22a1 1 0 011 1zM27 22a1 1 0 000-2H5a1 1 0 100 2h22zM16.4 29.466l2-2.667a.5.5 0 00-.4-.8h-4a.5.5 0 00-.4.8l2 2.667a.5.5 0 00.8 0zM18.4 5.2l-2-2.667a.5.5 0 00-.8 0l-2 2.667a.5.5 0 00.4.8h4a.5.5 0 00.4-.8z'/%3E%3C/svg%3E")
@@ -7302,6 +7600,10 @@ ul.hlist.game-cards {
     inset: 0
 }
 
+.\[left\:0\] {
+    left: 0
+}
+
 .\[list-style-position\:inside\] {
     list-style-position: inside
 }
@@ -7330,12 +7632,24 @@ ul.hlist.game-cards {
     overflow: auto
 }
 
+.\[right\:0\] {
+    right: 0
+}
+
 .\[scrollbar-width\:none\] {
     scrollbar-width: none
 }
 
 .\[text-align\:inherit\] {
     text-align: inherit
+}
+
+.\[text-transform\:none\] {
+    text-transform: none
+}
+
+.\[top\:0\] {
+    top: 0
 }
 
 .\[width\:240px\] {
@@ -7599,6 +7913,12 @@ ul.hlist.game-cards {
     }
 }
 
+@media not all and (min-width:601px) {
+    .max-medium\:width-full {
+        width: 100%
+    }
+}
+
 @media (max-width:600.95px) {
     .max-\[600\.95px\]\:margin-x-none {
         margin-left: var(--margin-none);
@@ -7642,6 +7962,34 @@ ul.hlist.game-cards {
 
     .medium\:flex-row {
         flex-direction: row
+    }
+
+    .medium\:gap-medium {
+        gap: var(--gap-medium)
+    }
+
+    .medium\:grow-1 {
+        flex-grow: 1
+    }
+
+    .medium\:grow-2 {
+        flex-grow: 2
+    }
+
+    .medium\:shrink-1 {
+        flex-shrink: 1
+    }
+
+    .medium\:basis-0 {
+        flex-basis: 0%
+    }
+
+    .medium\:max-width-\[216px\] {
+        max-width: 216px
+    }
+
+    .medium\:min-width-0 {
+        min-width: var(--size-0)
     }
 }
 
@@ -7707,6 +8055,22 @@ ul.hlist.game-cards {
 
 .\[\&\>\*\:not\(\:last-child\)\]\:\[border-bottom\:1px_solid_var\(--color-stroke-default\)\]>:not(:last-child) {
     border-bottom: 1px solid var(--color-stroke-default)
+}
+
+.\[\&\>span\:nth-child\(2\)\>span\:nth-child\(1\)\]\:width-full>span:nth-child(2)>span:first-child {
+    width: 100%
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:grow-1>span:nth-child(2) {
+    flex-grow: 1
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:max-width-full>span:nth-child(2) {
+    max-width: 100%
+}
+
+.\[\&\>span\:nth-child\(2\)\]\:min-width-0>span:nth-child(2) {
+    min-width: var(--size-0)
 }
 
 .groups-list-new {
