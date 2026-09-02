@@ -2649,7 +2649,7 @@ ul.hlist.game-cards {
     border-right: 1px solid var(--color-surface-300)
 }
 
-@media(max-width:991px) {
+@media(max-width:767px) {
     .groups-list-sidebar {
         display: none
     }
@@ -2700,13 +2700,13 @@ ul.hlist.game-cards {
     --sidebar-reserved-width: 327px
 }
 
-@media(max-width:991px) {
+@media(max-width:767px) {
     .wrap.has-groups-list-sidebar {
         --sidebar-reserved-width: 0px
     }
 }
 
-@media(min-width:991px)and (max-width:1688px) {
+@media(min-width:768px)and (max-width:1688px) {
     .wrap.has-groups-list-sidebar .rbx-left-col.nav-show {
         box-shadow: 152px 0 0 0 var(--color-over-media-100);
         border-right: 1px solid var(--color-shift-200)
@@ -2731,7 +2731,7 @@ ul.hlist.game-cards {
     margin: 0 auto
 }
 
-@media(min-width:991px) {
+@media(min-width:768px) {
     .wrap.has-groups-list-sidebar .content {
         margin-left: 327px;
         padding-left: 20px;
@@ -2743,6 +2743,14 @@ ul.hlist.game-cards {
     top: 40px;
     height: calc(100vh - 40px);
     left: var(--left-nav-reserved-width)
+}
+
+@media(max-width:991px) {
+    .wrap.has-groups-list-sidebar .container-main:not(.in-app) .groups-list-sidebar {
+        top: 82px;
+        bottom: 0;
+        height: auto
+    }
 }
 
 .wrap.has-groups-list-sidebar .container-footer {
@@ -2810,7 +2818,7 @@ ul.hlist.game-cards {
     mask-repeat: no-repeat
 }
 
-@media(min-width:991px) {
+@media(min-width:768px) {
     .wrap.has-groups-list-sidebar .group-cover-photo-fullwidth {
         width: calc(100% + 40px);
         margin-left: -20px
