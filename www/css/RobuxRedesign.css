@@ -189,7 +189,7 @@
 .modal-dialog .modal-content .modal-header .modal-title {
     text-align: left;
     font-size: 22px;
-    font-weight: 700
+    font-weight: var(--font-weight-700)
 }
 
 .modal-dialog .modal-content .modal-body {
@@ -245,12 +245,12 @@
 .light-theme .total-due-price,
 .dark-theme .total-due-price {
     color: var(--color-content-emphasis);
-    font-weight: 500
+    font-weight: var(--font-weight-500)
 }
 
 .light-theme .price-tag,
 .dark-theme .price-tag {
-    font-weight: 500
+    font-weight: var(--font-weight-500)
 }
 
 #tax-popover {
@@ -292,7 +292,7 @@
 }
 
 .delete-saved-payment-legal-text-bold {
-    font-weight: 800
+    font-weight: var(--font-weight-800)
 }
 
 .bonus-item-label {
@@ -372,8 +372,8 @@
 .light-theme .product .icon-wrapper .product-detail .product-name,
 .dark-theme .product .icon-wrapper .product-detail .product-name {
     color: var(--color-content-emphasis);
-    font-size: 24px;
-    font-weight: 700
+    font-weight: var(--font-weight-700);
+    font-size: 24px
 }
 
 .light-theme .product .icon-wrapper .product-detail .product-price,
@@ -434,6 +434,7 @@
 }
 
 .payment-method-container {
+    font-family: var(--config-text-font), "Builder Sans", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     -ms-flex-direction: row;
     flex-direction: row;
     -ms-flex: 1;
@@ -442,7 +443,6 @@
     align-items: center;
     column-gap: 12px;
     min-width: 0;
-    font-family: Builder Sans, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
     display: -ms-flexbox;
     display: flex;
     overflow: hidden
@@ -462,7 +462,7 @@
 .light-theme .payment-method-container .payment-profile-label,
 .dark-theme .payment-method-container .payment-profile-label {
     color: var(--color-content-emphasis);
-    font-weight: 500
+    font-weight: var(--font-weight-500)
 }
 
 .payment-method-container .paypal-email {
@@ -487,7 +487,7 @@
 .light-theme .payment-method-container .paypal-email,
 .dark-theme .payment-method-container .paypal-email {
     color: var(--color-content-emphasis);
-    font-weight: 500
+    font-weight: var(--font-weight-500)
 }
 
 .payment-method-container .paypal-email {
@@ -637,8 +637,8 @@
 }
 
 .light-theme .custom-select .select-dropdown .dropdown-selection-button .payment-method-container {
-    width: 100%;
-    font-family: Builder Sans, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif
+    font-family: var(--config-text-font), "Builder Sans", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    width: 100%
 }
 
 .light-theme .custom-select .select-dropdown .dropdown-selection-button :hover {
@@ -743,8 +743,8 @@
 }
 
 .dark-theme .custom-select .select-dropdown .dropdown-selection-button .payment-method-container {
-    width: 100%;
-    font-family: Builder Sans, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif
+    font-family: var(--config-text-font), "Builder Sans", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    width: 100%
 }
 
 .dark-theme .custom-select .select-dropdown .dropdown-selection-button :hover {
@@ -806,8 +806,8 @@
 .light-theme .bonus-item-card-small .description-container .description-title,
 .dark-theme .bonus-item-card-small .description-container .description-title {
     color: var(--color-content-emphasis);
-    font-size: 17px;
-    font-weight: 700
+    font-weight: var(--font-weight-700);
+    font-size: 17px
 }
 
 .light-theme .bonus-item-card-small .description-container .description-subtitle,
@@ -1394,6 +1394,10 @@ p.personalized-bonus-items__report-popover {
 
 .icon-regular-moon {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M26.4981 21.0056C25.6771 21.1651 24.8303 21.2484 23.966 21.2484C16.6679 21.2484 10.7516 15.3321 10.7516 8.03399C10.7516 7.16971 10.8349 6.32294 10.9944 5.50186C11.0133 5.40432 11.0109 5.2861 10.98 5.16524C10.0618 5.67748 9.19661 6.32457 8.41288 7.10831C3.86238 11.6588 3.86238 19.0366 8.41288 23.5871C12.9634 28.1376 20.3412 28.1376 24.8917 23.5871C25.6754 22.8034 26.3225 21.9382 26.8348 21.02C26.7139 20.9891 26.5957 20.9867 26.4981 21.0056ZM26.1168 19.0423C27.7758 18.7201 29.5861 20.0453 28.8181 21.5507C28.1838 22.7943 27.3464 23.9609 26.3059 25.0013C20.9744 30.3329 12.3302 30.3329 6.99866 25.0013C1.66711 19.6698 1.66711 11.0256 6.99866 5.69409C8.03912 4.65364 9.20573 3.81622 10.4493 3.18186C11.9547 2.41387 13.2799 4.22418 12.9577 5.88322C12.8225 6.5793 12.7516 7.29838 12.7516 8.03399C12.7516 14.2275 17.7725 19.2484 23.966 19.2484C24.7016 19.2484 25.4207 19.1775 26.1168 19.0423Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-paint-brush {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M21.6659 3.69715C23.4539 1.60984 26.6414 1.48719 28.5849 3.43054C30.5174 5.3636 30.4074 8.52954 28.3456 10.3241L15.6581 21.3641C15.9545 22.6655 15.7648 24.0755 14.999 25.328C13.5107 27.7582 10.522 28.9972 7.85931 28.996C6.96126 28.9955 5.87297 28.9955 4.8681 28.995C2.7066 28.9935 1.29258 26.7288 2.23919 24.786L2.37981 24.4999L2.3847 24.4901L2.38958 24.4794L2.39446 24.4696C2.39766 24.4635 2.40323 24.4536 2.40911 24.4423C2.42143 24.4185 2.43981 24.3831 2.46282 24.3387C2.50956 24.2487 2.57718 24.1183 2.66106 23.9579C2.82932 23.6362 3.06382 23.1907 3.32708 22.6981C3.84989 21.7199 4.50073 20.5275 4.9804 19.743C6.12065 17.8783 8.21225 16.8986 10.3075 17.0067C10.3435 16.9345 10.3885 16.8647 10.4433 16.8007L21.6659 3.69715ZM11.913 19.4843C10.0639 18.4741 7.72308 19.0933 6.68743 20.787C6.24156 21.5162 5.6143 22.6609 5.09075 23.6405C4.83099 24.1266 4.59881 24.5668 4.43255 24.8846C4.34967 25.0431 4.28313 25.1722 4.23724 25.2606C4.21446 25.3045 4.19643 25.3391 4.1845 25.3622C4.17869 25.3734 4.17382 25.3828 4.17083 25.3886L4.16692 25.3964L4.03704 25.662C3.73751 26.277 4.18536 26.9942 4.86907 26.995C5.87393 26.9955 6.96227 26.9955 7.86028 26.996C10.0155 26.9969 12.2581 25.9754 13.2939 24.2841C14.3069 22.6262 13.7318 20.4781 11.913 19.4843ZM12.457 17.5243C12.5969 17.5872 12.7356 17.6549 12.872 17.7294C13.673 18.167 14.325 18.7628 14.8085 19.453L16.9999 17.5458L14.5488 15.202C14.5295 15.1836 14.5115 15.164 14.4941 15.1444L12.457 17.5243ZM27.1699 4.84461C26.0505 3.72543 24.2154 3.79608 23.1855 4.99793L15.7831 13.6395C15.8352 13.6733 15.8851 13.7123 15.9316 13.7567L18.5146 16.2274L27.0322 8.81629C28.2201 7.78253 28.2833 5.95815 27.1699 4.84461Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-regular-person {

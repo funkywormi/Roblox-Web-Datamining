@@ -234,5 +234,6 @@
     "Label.CategoryMarketplace": "Marketplace",
     "Label.NotificationTypeTransactionRefunded": "Transaction Refunded",
     "Description.NotificationTypeTransactionRefunded": "Refunded transaction updates from my sales",
-    "Description.UnsubscribeFromTransactionRefunded": "Stop notifying me about refunded transactions from my sales"
+    "Description.UnsubscribeFromTransactionRefunded": "Stop notifying me about refunded transactions from my sales",
+    "Label.NotifciationTypeFriendPresence": "Friend Presence"
 }
