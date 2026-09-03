@@ -1,0 +1,32 @@
+const translateKeysMapping = {
+  male: 'Label.MalesTarget',
+  female: 'Label.FemalesTarget',
+  anygender: 'Label.AnyGenderTarget',
+  anyGender: 'Label.AnyGenderTarget',
+  ageunder13: 'Label.UnderThirdteenTarget',
+  age13orover: 'Label.OverThirdteenTarget',
+  age13to16: 'Label.Age13To16Target',
+  age17orover: 'Label.Over17Target',
+  computer: 'Label.ComputerTarget',
+  console: 'Label.ConsoleTarget',
+  tablet: 'Label.TabletTarget',
+  phone: 'Label.PhoneTarget',
+  Experiences_conversions: 'Label.AdPlays',
+  CatalogAssets_conversions: 'Label.AttributedPurchases',
+  Experiences_conversionstooltip: 'Description.AttributedVisitsTooltip',
+  CatalogAssets_conversionstooltip: 'Description.AttributedPurchasesTooltip',
+  Experiences_clickconversiontooltip: 'Description.ClickConversionsTooltip',
+  CatalogAssets_clickconversiontooltip: 'Description.ItemClickConversionTooltip',
+  Experiences_impressionconversiontooltip: 'Description.PostImpressionTooltip',
+  CatalogAssets_impressionconversiontooltip: 'Description.ItemImpressionConversionTooltip',
+  Experiences_conversionratetooltip: 'Description.GameConversionRateTooltip',
+  CatalogAssets_conversionratetooltip: 'Description.ItemConversionRateTooltip',
+  Experiences_cpptooltip: 'Description.CppTooltip',
+  CatalogAssets_cpptooltip: 'Description.CostPerPurchase',
+  Experiences_nothingselected: 'Description.NoGameSelected',
+  CatalogAssets_nothingselected: 'Description.NoItemSelected',
+  Experiences_selectfromdropdown: 'Description.SelectGameFromDropdown',
+  CatalogAssets_selectfromdropdown: 'Description.SelectItemFromDropdown'
+};
+
+export default translateKeysMapping;

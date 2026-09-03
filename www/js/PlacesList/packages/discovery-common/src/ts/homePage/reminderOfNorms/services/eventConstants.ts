@@ -1,0 +1,13 @@
+export const EVENT_CONTEXT = "WebApp";
+export const EVENT_NAME = "HomePageRemindersEvent";
+export const EVENT_PLATFORM = "PLATFORM_WEB";
+
+export enum EventTypes {
+  CTA_CLICKED = "REMINDER_INTERACTION_CTA_CLICKED",
+  DISMISSED = "REMINDER_INTERACTION_REMINDER_DISMISSED",
+}
+
+export enum EducationExperimentAnalyticsVariants {
+  CHANGE_OR_BLOCK = "EXPERIMENT_VARIANT_CHANGE_OR_BLOCK",
+  WARNING = "EXPERIMENT_VARIANT_WARNING",
+}

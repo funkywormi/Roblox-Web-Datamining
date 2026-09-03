@@ -1,0 +1,129 @@
+import React from "react";
+import { Toggle } from "react-style-guide";
+import { useTranslation } from "react-utilities";
+import { LegallySensitiveContentService } from "Roblox";
+import {
+  EnabledStatusValue,
+  TUpdateUserSettingValueRequest,
+  UserSetting,
+  useSnackbar,
+} from "@rbx/user-settings";
+import InlineSettingComponent from "../../../common/components/InlineSettingComponent";
+import commonTranslationConstants from "../../constants/contentConstants/commonTranslationConstants";
+import {
+  useGetUserSettingsQuery,
+  useUpdateUserSettingValueMutation,
+} from "../../../apis/userSettingsApi";
+import {
+  personalizedAdsConsentName,
+  personalizedAdsSurface,
+  sellShareDataConsentName,
+  sellShareDataSurface,
+} from "../../constants/privacy/privacyConstants";
+
+export const AdPreferences = (): JSX.Element => {
+  const { translate } = useTranslation();
+  const { snackbarService } = useSnackbar();
+
+  const { data: userSettings } = useGetUserSettingsQuery();
+  const [updateUserSettings] = useUpdateUserSettingValueMutation();
+
+  const [personalizedAdsLegallySensitiveData, personalizedAdsLegallySensitiveActions] =
+    LegallySensitiveContentService.useLegallySensitiveContentAndActions(
+      personalizedAdsConsentName,
+      personalizedAdsSurface,
+    );
+  const personalizedAdsAuditHeader =
+    personalizedAdsLegallySensitiveActions.getBase64EncodedAuditHeader();
+
+  const [sellShareDataLegallySensitiveData, sellShareDataLegallySensitiveActions] =
+    LegallySensitiveContentService.useLegallySensitiveContentAndActions(
+      sellShareDataConsentName,
+      sellShareDataSurface,
+    );
+  const sellShareDataAuditHeader =
+    sellShareDataLegallySensitiveActions.getBase64EncodedAuditHeader();
+
+  const currentAllowSellShareDataValue = userSettings?.allowSellShareData;
+  const currentAllowPersonalizedAdvertisingValue = userSettings?.allowPersonalizedAdvertising;
+
+  const toggleSellShareSettingHandler = async () => {
+    const newSellShareSetting =
+      currentAllowSellShareDataValue === EnabledStatusValue.Enabled
+        ? EnabledStatusValue.Disabled
+        : EnabledStatusValue.Enabled;
+    const updateBody: TUpdateUserSettingValueRequest = {
+      setting: UserSetting.allowSellShareData,
+      value: newSellShareSetting,
+      auditHeader: sellShareDataAuditHeader,
+    };
+    try {
+      await updateUserSettings(updateBody).unwrap();
+      snackbarService.success(translate(commonTranslationConstants.successDialogMessage));
+    } catch {
+      snackbarService.warning(translate(commonTranslationConstants.unknownError));
+    }
+  };
+
+  const togglePersonalizedAdsSettingHandler = async () => {
+    const newPersonalizedAdvertisingSetting =
+      currentAllowPersonalizedAdvertisingValue === EnabledStatusValue.Enabled
+        ? EnabledStatusValue.Disabled
+        : EnabledStatusValue.Enabled;
+    const updateBody: TUpdateUserSettingValueRequest = {
+      setting: UserSetting.allowPersonalizedAdvertising,
+      value: newPersonalizedAdvertisingSetting,
+      auditHeader: personalizedAdsAuditHeader,
+    };
+    try {
+      await updateUserSettings(updateBody).unwrap();
+      snackbarService.success(translate(commonTranslationConstants.successDialogMessage));
+    } catch {
+      snackbarService.warning(translate(commonTranslationConstants.unknownError));
+    }
+  };
+
+  return (
+    <React.Fragment>
+      <InlineSettingComponent
+        id="personalized-ads-setting"
+        label={personalizedAdsLegallySensitiveData.wordsOfConsent.title ?? ""}
+        inputId="ads-personalized-ads-toggle"
+        description={
+          <span
+            className="small text"
+            dangerouslySetInnerHTML={{
+              __html: personalizedAdsLegallySensitiveData.wordsOfConsent.consent ?? "",
+            }}
+          />
+        }
+      >
+        <Toggle
+          isOn={currentAllowPersonalizedAdvertisingValue === EnabledStatusValue.Enabled}
+          onToggle={togglePersonalizedAdsSettingHandler}
+        />
+      </InlineSettingComponent>
+
+      <InlineSettingComponent
+        id="data-sell-share-setting"
+        label={sellShareDataLegallySensitiveData.wordsOfConsent.title ?? ""}
+        inputId="ads-sell-share-toggle"
+        description={
+          <span
+            className="small text"
+            dangerouslySetInnerHTML={{
+              __html: sellShareDataLegallySensitiveData.wordsOfConsent.consent ?? "",
+            }}
+          />
+        }
+      >
+        <Toggle
+          isOn={currentAllowSellShareDataValue === EnabledStatusValue.Enabled}
+          onToggle={toggleSellShareSettingHandler}
+        />
+      </InlineSettingComponent>
+    </React.Fragment>
+  );
+};
+
+export default AdPreferences;
