@@ -29,7 +29,7 @@ const ModalSecurityKeyDelete: React.FC<ModalFragmentProps> = ({
   const deleteKey = async () => {
     const deleteSecurityKeyResult = await requestService.twoStepVerification.deleteSecurityKey(
       authenticatedUser.id!.toString(),
-      modalStateAndProps.additionalModalProps.keysToDeleteNames,
+      modalStateAndProps.additionalModalProps.keysToDeleteIDs,
     );
     if (deleteSecurityKeyResult.isError) {
       const { Generic } = AccountIntegrityChallengeService;

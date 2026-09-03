@@ -99,6 +99,13 @@ export const PasskeySetting = (): JSX.Element => {
           translate(accountInfoTranslationConstants.passkey.removedSuccessfully),
         );
       },
+      onRenameSuccess: () => {
+        // eslint-disable-next-line no-void
+        void refetch();
+        snackbarService.success(
+          translate(accountInfoTranslationConstants.passkey.renamedSuccessfully),
+        );
+      },
       onGenericError: () => {
         accountInfoEventService.passkeyCreated(passkeyCreatedStates.genericError);
         snackbarService.warning(translate(commonTranslationConstants.unknownError));

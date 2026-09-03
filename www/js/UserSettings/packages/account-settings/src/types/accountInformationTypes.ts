@@ -56,6 +56,7 @@ export type TDisplayNameMeta = {
 export type TGenderBody = { gender: Gender };
 
 export type Fido2Credential = {
+  credentialID: string;
   nickname: string;
 };
 

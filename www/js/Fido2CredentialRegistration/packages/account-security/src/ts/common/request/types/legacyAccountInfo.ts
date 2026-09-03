@@ -1,4 +1,4 @@
-import { UrlConfig } from "core-utilities";
+import { UrlConfig } from "@rbx/core-scripts/http";
 
 export const LegacyAccountInfoUrlConfig: UrlConfig = {
   url: "/my/settings/json",

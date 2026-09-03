@@ -2,7 +2,8 @@
 
 import React, { useEffect } from "react";
 import { Modal } from "react-style-guide";
-import { CrossDeviceLoginDisplayCodeService, DeviceMeta, Hybrid } from "Roblox";
+import { openModal as openCrossDeviceLoginDisplayCodeModal } from "@rbx/authentication/crossDeviceLoginDisplayCodeModal/services/crossDeviceLoginDisplayCodeService";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import { InlineChallengeFooter } from "../../../common/inlineChallengeFooter";
 import { FooterButtonConfig, FragmentModalFooter } from "../../../common/modalFooter";
@@ -25,7 +26,7 @@ const QuickSignInInput: React.FC<Props> = ({ setModalTitleText, children }: Prop
     setModalTitleText(resources.Title.UseAnotherDevice);
   }, [setModalTitleText, resources.Title.UseAnotherDevice]);
 
-  const inRobloxApp = DeviceMeta && DeviceMeta().isInApp;
+  const inRobloxApp = getDeviceMeta()?.isInApp;
 
   const getBodyText = function () {
     if (inRobloxApp) {
@@ -41,13 +42,16 @@ const QuickSignInInput: React.FC<Props> = ({ setModalTitleText, children }: Prop
 
   const handleButtonClick = () => {
     if (inRobloxApp) {
-      // In RobloxApp webview, close the hybrid overlay
-      if (Hybrid && Hybrid.Overlay) {
-        Hybrid.Overlay.close(() => undefined);
-      }
+      // In RobloxApp webview, close the hybrid overlay. window.Roblox.Hybrid is injected by
+      // the native app webview bridge (no importable module); read defensively so off-app
+      // paths no-op instead of throwing.
+      const { Hybrid } = window.Roblox as {
+        Hybrid?: { Overlay?: { close: (callback: () => void) => void } };
+      };
+      Hybrid?.Overlay?.close(() => undefined);
     } else {
-      // On web, open the cross-device login modal
-      CrossDeviceLoginDisplayCodeService.openModal();
+      // On web, open the cross-device login modal via the imported service.
+      openCrossDeviceLoginDisplayCodeModal();
     }
   };
 

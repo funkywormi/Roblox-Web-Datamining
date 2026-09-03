@@ -34,6 +34,7 @@ type Props = {
   onDeleteSuccess: () => void;
   onLastKeyDeleted: () => void;
   onGenericError: () => void;
+  onRenameSuccess: () => void;
   credentialPurpose: CredentialPurpose;
   registeredKeys: Fido2Credential[];
   fido2Supported?: boolean;
@@ -56,6 +57,7 @@ export const Fido2CredentialRegistrationContextProvider = ({
   onDeleteSuccess,
   onLastKeyDeleted,
   onGenericError,
+  onRenameSuccess,
   credentialPurpose,
   registeredKeys,
   fido2Supported,
@@ -72,6 +74,7 @@ export const Fido2CredentialRegistrationContextProvider = ({
     onDeleteSuccess,
     onLastKeyDeleted,
     onGenericError,
+    onRenameSuccess,
     credentialPurpose,
     registeredKeys,
     fido2Supported,

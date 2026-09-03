@@ -8,6 +8,7 @@ import ModalFido2CredentialName from "../modals/fido2CredentialName";
 import ModalFido2CredentialConfirmTrust from "../modals/fido2CredentialConfirmTrust";
 import ModalFido2CredentialDelete from "../modals/fido2CredentialDelete";
 import ModalFido2CredentialManage from "../modals/fido2CredentialManage";
+import ModalFido2CredentialRename from "../modals/fido2CredentialRename";
 import ModalFido2CredentialError from "../modals/fido2CredentialError";
 import { Fido2CredentialRegistrationActionType } from "../store/action";
 
@@ -37,6 +38,7 @@ const getModalSchema = (modalState: ModalState): ModalSchema | null => {
     [ModalState.FIDO_CREDENTIAL_ERROR, createModalSchema(ModalFido2CredentialError, true)],
     [ModalState.FIDO_CREDENTIAL_DELETE, createModalSchema(ModalFido2CredentialDelete, true)],
     [ModalState.FIDO_CREDENTIAL_MANAGE, createModalSchema(ModalFido2CredentialManage, true)],
+    [ModalState.FIDO_CREDENTIAL_RENAME, createModalSchema(ModalFido2CredentialRename, false)],
   ]);
   const modalSchema = modalStateToInnerFragment.get(modalState);
 

@@ -1,7 +1,10 @@
 import React from "react";
+import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/react";
 import { RequestService } from "../../../common/request";
+import { TRANSLATION_CONFIG } from "./app.config";
 import CaptchaV2 from "./containers/captchaV2";
 import {
+  CaptchaMode,
   OnChallengeCompletedCallback,
   OnChallengeDisplayedCallback,
   OnChallengeInvalidatedCallback,
@@ -15,6 +18,8 @@ type Props = {
   challengeId: string;
   // eslint-disable-next-line react/require-default-props
   appType?: string;
+  // eslint-disable-next-line react/require-default-props
+  mode?: CaptchaMode;
   renderInline: boolean;
   eventService: EventService;
   metricsService: MetricsService;
@@ -23,15 +28,17 @@ type Props = {
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
-};
+} & WithTranslationsProps;
 
-const App: React.FC<Props> = ({
+export const App: React.FC<Props> = ({
   challengeId,
   appType,
+  mode,
   renderInline,
   eventService,
   metricsService,
   requestService,
+  translate,
   onChallengeDisplayed,
   onChallengeCompleted,
   onChallengeInvalidated,
@@ -41,10 +48,12 @@ const App: React.FC<Props> = ({
     <CaptchaV2ContextProvider
       challengeId={challengeId}
       appType={appType}
+      mode={mode}
       renderInline={renderInline}
       eventService={eventService}
       metricsService={metricsService}
       requestService={requestService}
+      translate={translate}
       onChallengeDisplayed={onChallengeDisplayed}
       onChallengeCompleted={onChallengeCompleted}
       onChallengeInvalidated={onChallengeInvalidated}
@@ -55,4 +64,4 @@ const App: React.FC<Props> = ({
   );
 };
 
-export default App;
+export default withTranslations(App, TRANSLATION_CONFIG);

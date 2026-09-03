@@ -63,17 +63,28 @@ const ModalFido2CredentialManage: React.FC<ModalFragmentProps> = ({
    * Event Handlers
    */
 
-  const handleDeleteKey = (name: string) => {
+  const handleDeleteKey = (credentialID: string) => {
     // The endpoint (and therefore the delete modal) supports batch deletes, but for now we're okay with deleting only one key at a time.
     // This UI may change in the future.
-    const keysToDeleteNames = [name];
-    const deletedAllKeys = keysToDeleteNames.length === registeredKeys.length;
+    const keysToDeleteIDs = [credentialID];
+    const deletedAllKeys = keysToDeleteIDs.length === registeredKeys.length;
     dispatch({
       type: Fido2CredentialRegistrationActionType.SET_MODAL_STATE,
       modalState: ModalState.FIDO_CREDENTIAL_DELETE,
       additionalModalProps: {
-        keysToDeleteNames,
+        keysToDeleteIDs,
         deletedAllKeys,
+      },
+    });
+  };
+
+  const handleEditKey = (credentialID: string, currentNickname: string) => {
+    dispatch({
+      type: Fido2CredentialRegistrationActionType.SET_MODAL_STATE,
+      modalState: ModalState.FIDO_CREDENTIAL_RENAME,
+      additionalModalProps: {
+        credentialID,
+        currentNickname,
       },
     });
   };
@@ -122,12 +133,25 @@ const ModalFido2CredentialManage: React.FC<ModalFragmentProps> = ({
       <div className="fido-credential-checkbox-container">
         <span className={keyIconClassName} />
         <div className="fido-credential-name">{registeredKey.nickname}</div>
+        {credentialPurpose === CredentialPurpose.Login && (
+          <button
+            type="button"
+            className="fido-credential-edit-button"
+            data-testid="fido-credential-edit-button"
+            onClick={() => handleEditKey(registeredKey.credentialID, registeredKey.nickname)}
+            title={translate("Action.Rename")}
+            aria-label={translate("Action.Rename")}
+          >
+            <span className="icon-edit" />
+          </button>
+        )}
         {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
         {canDeleteKeys && (
           <button
             className="fido-credential-delete-button"
             type="button"
-            onClick={() => handleDeleteKey(registeredKey.nickname)}
+            data-testid="fido-credential-delete-button"
+            onClick={() => handleDeleteKey(registeredKey.credentialID)}
           >
             <span className="icon-trash-bin" />
           </button>
@@ -138,46 +162,38 @@ const ModalFido2CredentialManage: React.FC<ModalFragmentProps> = ({
   ));
 
   const deviceNotCompatibleWarning = (
-    <React.Fragment>
-      <div className="passkey-incompatible-warning">
-        <span className="icon-warning-orange passkey-incompatible-icon" />
-        <span>{translate("Description.DeviceNotCompatible")}</span>
-      </div>
-    </React.Fragment>
+    <div className="passkey-incompatible-warning">
+      <span className="icon-warning-orange passkey-incompatible-icon" />
+      <span>{translate("Description.DeviceNotCompatible")}</span>
+    </div>
   );
 
   const compatibilityCheckView = (
-    <React.Fragment>
-      <div className="passkey-compatibility-check">
-        <div className="passkey-compatibility-spinner">
-          <div className="spinner spinner-sm" />
-        </div>
-        <span className="passkey-compatibility-check-message">
-          {translate("Description.CheckingPasskeyCompatibility")}
-        </span>
+    <div className="passkey-compatibility-check">
+      <div className="passkey-compatibility-spinner">
+        <div className="spinner spinner-sm" />
       </div>
-    </React.Fragment>
+      <span className="passkey-compatibility-check-message">
+        {translate("Description.CheckingPasskeyCompatibility")}
+      </span>
+    </div>
   );
 
   const maxPasskeysAddedWarning = (
-    <React.Fragment>
-      <div className="passkey-manage-warning">
-        <span>
-          {translate("Description.NumPasskeysAddedStatus", {
-            registeredKeys: registeredKeys.length,
-            maxKeys: MAX_KEY_COUNT,
-          })}
-        </span>
-      </div>
-    </React.Fragment>
+    <div className="passkey-manage-warning">
+      <span>
+        {translate("Description.NumPasskeysAddedStatus", {
+          registeredKeys: registeredKeys.length,
+          maxKeys: MAX_KEY_COUNT,
+        })}
+      </span>
+    </div>
   );
 
   const cannotDeleteLastKeyWarning = (
-    <React.Fragment>
-      <div className="passkey-manage-warning">
-        <span>{translate("Description.LastPasskeyWarning")}</span>
-      </div>
-    </React.Fragment>
+    <div className="passkey-manage-warning">
+      <span>{translate("Description.LastPasskeyWarning")}</span>
+    </div>
   );
 
   return (

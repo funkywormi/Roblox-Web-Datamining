@@ -92,6 +92,7 @@ export type ModalStateAndProps =
   | {
       modalState: ModalState.SECURITY_KEY_DELETE;
       additionalModalProps: {
+        keysToDeleteIDs: string[];
         keysToDeleteNames: string[];
         deletedAllKeys: boolean;
       };

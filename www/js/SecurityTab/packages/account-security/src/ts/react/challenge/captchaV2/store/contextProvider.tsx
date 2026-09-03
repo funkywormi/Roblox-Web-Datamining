@@ -6,8 +6,11 @@ import React, {
   useReducer,
   useState,
 } from "react";
+import { WithTranslationsProps } from "@rbx/core-scripts/react";
 import { RequestService } from "../../../../common/request";
+import { getResources } from "../constants/resources";
 import {
+  CaptchaMode,
   OnChallengeCompletedCallback,
   OnChallengeDisplayedCallback,
   OnChallengeInvalidatedCallback,
@@ -30,6 +33,8 @@ type Props = {
   challengeId: string;
   // eslint-disable-next-line react/require-default-props
   appType?: string;
+  // eslint-disable-next-line react/require-default-props
+  mode?: CaptchaMode;
   renderInline: boolean;
   eventService: EventService;
   metricsService: MetricsService;
@@ -39,7 +44,7 @@ type Props = {
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
   children: ReactChild;
-};
+} & Pick<WithTranslationsProps, "translate">;
 
 /**
  * A React provider is a special component that wraps a tree of components and
@@ -49,6 +54,7 @@ type Props = {
 export const CaptchaV2ContextProvider = ({
   challengeId,
   appType,
+  mode,
   renderInline,
   eventService,
   metricsService,
@@ -57,6 +63,7 @@ export const CaptchaV2ContextProvider = ({
   onChallengeCompleted,
   onChallengeInvalidated,
   onModalChallengeAbandoned,
+  translate,
   children,
 }: Props): ReactElement => {
   // We declare these variables as lazy-initialized state variables since they
@@ -65,8 +72,10 @@ export const CaptchaV2ContextProvider = ({
     // Immutable parameters:
     challengeId,
     appType,
+    mode,
     renderInline,
     // Immutable state:
+    resources: getResources(translate),
     eventService,
     metricsService,
     requestService,
@@ -104,8 +113,11 @@ export const CaptchaV2ContextProvider = ({
 
   // Completion effect:
   useEffect(() => {
-    // Ensure that invalidation effect has not already fired.
-    if (state.onChallengeCompletedData === null || state.onChallengeInvalidatedData !== null) {
+    if (
+      state.isAbandoned ||
+      state.onChallengeCompletedData === null ||
+      state.onChallengeInvalidatedData !== null
+    ) {
       return;
     }
 
@@ -116,6 +128,7 @@ export const CaptchaV2ContextProvider = ({
   }, [
     eventService,
     metricsService,
+    state.isAbandoned,
     state.onChallengeCompletedData,
     state.onChallengeInvalidatedData,
     onChallengeCompleted,

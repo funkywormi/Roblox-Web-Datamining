@@ -9,6 +9,8 @@ import { ageRecommendationUrl, gamesEndpointUrl } from "../userSettings/constant
 import baseApi from "./common/baseApi";
 import { HttpMethod } from "./common/httpServiceBaseQueryFn";
 
+const DUMMY_UNIVERSE_ID = 13058;
+
 const generateGamesMap = (response: TGamesResponse): TGamesMap => {
   // Converts the array of games into a map of id to game objects
   return response.data.reduce<TGamesMap>((accumulator, game) => {
@@ -47,7 +49,14 @@ export const gameDetailsApi = baseApi.injectEndpoints({
   endpoints: builder => ({
     getGamesDetails: builder.query<TGamesMap, (string | number)[]>({
       queryFn: async (universeIds: (string | number)[], _queryApi, _extraOptions, baseQuery) => {
-        const chunks = chunkArray(universeIds, 50); // Split the universeIds into chunks of 50
+        // HACK (ACCMAN-4730): Games-api has validation to prevent users from viewing details for an
+        // unpublished game they should not be able to access. This is blocking parents from fetching
+        // details about unpublished games their child can access. Today, this validation on games-api
+        // only runs on single gets. As a temporary workaround, we turn our single gets into multi gets
+        // to ensure parents bypass this validation check.
+        const paddedUniverseIds =
+          universeIds.length === 1 ? [DUMMY_UNIVERSE_ID, ...universeIds] : universeIds;
+        const chunks = chunkArray(paddedUniverseIds, 50); // Split the universeIds into chunks of 50
         const queryResult = await Promise.all(
           chunks.map(
             chunk =>
@@ -68,6 +77,8 @@ export const gameDetailsApi = baseApi.injectEndpoints({
           { data: [] },
         );
 
+        // generateGamesMap keys by universeId, so the dummy padding row is an unused entry that
+        // callers never look up (ACCMAN-4730).
         return { data: generateGamesMap(combinedResponse) };
       },
     }),

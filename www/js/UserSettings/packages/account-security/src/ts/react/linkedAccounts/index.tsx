@@ -1,24 +1,32 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { UserProfileField, useUserProfiles } from "roblox-user-profiles";
 import { useTranslation } from "@rbx/core-scripts/react";
+import { Snackbar } from "@rbx/foundation-ui";
 import {
-  Thumbnail2d,
-  ThumbnailAvatarHeadshotSize,
-  ThumbnailFormat,
-  ThumbnailTypes,
-} from "@rbx/thumbnails";
-import { Button, FeedbackBanner } from "@rbx/foundation-ui";
-import { getLinkedAccounts } from "../../common/request/apis/linkedAccounts";
+  cancelAccountLink,
+  deleteAccountLink,
+  getLinkedAccounts,
+} from "../../common/request/apis/linkedAccounts";
 import {
   GetLinkedAccountsResponse,
   LinkedAccount,
   LinkedAccountsDirection,
 } from "../../common/request/types/linkedAccounts";
+import LinkedAccountsList from "./LinkedAccountsList";
+import PendingRecoveryRequests from "./PendingRecoveryRequests";
+import { useRecoveryIntents } from "./RecoveryIntents";
+import RequestLinkedAccount from "./RequestLinkedAccount";
+import ReviewLinkedAccountRequest from "./ReviewLinkedAccountRequest";
+import type { PendingOutgoingAccount } from "./RequestLinkedAccount";
 import translationConstants from "./translationConstants";
 
 const PAGE_SIZE = 10;
-const USER_PROFILE_FIELDS = [UserProfileField.Names.CombinedName, UserProfileField.Names.Username];
+const PENDING_LINK_POLL_INTERVAL = 15000;
+
+// A newly requested link is not returned by the ACTIVE-only list APIs. Keep it
+// locally until it becomes active, is canceled, or expires.
+const isPendingOutgoingAccountExpired = (account: PendingOutgoingAccount): boolean =>
+  new Date(account.intent.expiryTime).getTime() <= Date.now();
 
 export const getLinkedAccountsQueryKey = (direction: LinkedAccountsDirection) =>
   ["linked-accounts", direction] as const;
@@ -28,14 +36,11 @@ const getLinkedAccountsPage = async (
   pageToken: string,
 ): Promise<GetLinkedAccountsResponse> => {
   const result = await getLinkedAccounts({ direction, pageSize: PAGE_SIZE, pageToken });
-  if (result.isError) {
-    throw result.errorRaw;
-  }
+  if (result.isError) throw result.errorRaw;
   return result.value;
 };
 
-const useLinkedAccountsPages = (direction: LinkedAccountsDirection) => {
-  // Fetch one page based on page token.
+const useLinkedAccountsPages = (direction: LinkedAccountsDirection, shouldPoll = false) => {
   const query = useInfiniteQuery({
     queryKey: getLinkedAccountsQueryKey(direction),
     queryFn: ({ pageParam = "" }) =>
@@ -44,10 +49,10 @@ const useLinkedAccountsPages = (direction: LinkedAccountsDirection) => {
     retry: false,
     staleTime: Infinity,
     cacheTime: 0,
+    refetchInterval: shouldPoll ? PENDING_LINK_POLL_INTERVAL : false,
+    refetchIntervalInBackground: false,
   });
 
-  // Takes data from query, combines into a flat account list, and removes duplicates.
-  // This only runs when query data changes.
   const accounts = useMemo(
     () =>
       (query.data?.pages ?? [])
@@ -70,167 +75,101 @@ const useLinkedAccountsPages = (direction: LinkedAccountsDirection) => {
   };
 };
 
-// A single linked account entry.
-const LinkedAccountRow = ({
-  account,
-  combinedName,
-  userId,
-  username,
-}: {
-  account: LinkedAccount;
-  combinedName?: string | null;
-  userId: number;
-  username?: string | null;
-}): React.JSX.Element => {
-  const { translate } = useTranslation();
-
-  return (
-    <div
-      className="flex items-center gap-medium padding-y-medium border-bottom stroke-default last:stroke-none"
-      data-testid={`linked-account-row-${account.accountLinkId}`}
-    >
-      <div className="avatar avatar-headshot-sm shrink-0 clip radius-circle">
-        <Thumbnail2d
-          containerClass="block radius-circle"
-          targetId={userId}
-          format={ThumbnailFormat.webp}
-          type={ThumbnailTypes.avatarHeadshot}
-          size={ThumbnailAvatarHeadshotSize.size60}
-        />
-      </div>
-      <div className="flex flex-col">
-        <span className="flex flex-wrap items-baseline gap-small">
-          <span className="text-title-medium">
-            {combinedName ||
-              username ||
-              account.username ||
-              translate(translationConstants.unknownUser)}
-          </span>
-          {username && combinedName && username !== combinedName && (
-            <span className="text-body-medium content-muted">@{username}</span>
-          )}
-        </span>
-        <span className="text-body-small content-muted">
-          {translate(translationConstants.linkedOn, {
-            date: new Date(account.createdTime).toLocaleDateString(undefined, {
-              // undefined => browser locale
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            }),
-          })}
-        </span>
-      </div>
-    </div>
-  );
-};
-
-// A list of linked accounts, reused for both, incoming and outgoing links.
-const LinkedAccountsList = ({
-  accounts,
-  direction,
-  emptyCopy,
-  hasMore,
-  isError,
-  isLoading,
-  onLoadMore,
-  onRetry,
-}: {
-  accounts: LinkedAccount[];
-  direction: LinkedAccountsDirection;
-  emptyCopy: string;
-  hasMore: boolean;
-  isError: boolean;
-  isLoading: boolean;
-  onLoadMore: () => void;
-  onRetry: () => void;
-}): React.JSX.Element => {
-  const { translate } = useTranslation();
-
-  // User IDs that do not belong to the logged-in user, and thus are the other party in the link.
-  const relatedUserIds = useMemo(
-    () =>
-      accounts.map(account =>
-        direction === LinkedAccountsDirection.Outgoing ? account.linkedUserId : account.ownerUserId,
-      ),
-    [accounts, direction],
-  );
-  const { data: userProfiles } = useUserProfiles(relatedUserIds, USER_PROFILE_FIELDS);
-
-  if (isLoading && accounts.length === 0) {
-    return (
-      <p className="text-body-medium linked-accounts-helper">
-        {translate(translationConstants.loading)}
-      </p>
-    );
-  }
-
-  if (isError && accounts.length === 0) {
-    return (
-      <div className="flex flex-col items-start gap-medium">
-        <FeedbackBanner
-          className="linked-accounts-banner"
-          variant="Emphasis"
-          severity="Warning"
-          layout="Stacked"
-          title={translate(translationConstants.error)}
-        />
-        <Button variant="Standard" size="Small" onClick={onRetry}>
-          {translate(translationConstants.retry)}
-        </Button>
-      </div>
-    );
-  }
-
-  if (accounts.length === 0) {
-    return <p className="text-body-medium content-muted margin-none">{translate(emptyCopy)}</p>;
-  }
-
-  return (
-    <React.Fragment>
-      <div className="flex flex-col">
-        {accounts.map(account => {
-          const relatedUserId =
-            direction === LinkedAccountsDirection.Outgoing
-              ? account.linkedUserId
-              : account.ownerUserId;
-          const profile = userProfiles?.[relatedUserId];
-          return (
-            <LinkedAccountRow
-              key={account.accountLinkId}
-              account={account}
-              userId={relatedUserId}
-              combinedName={profile?.names?.combinedName}
-              username={profile?.names?.username}
-            />
-          );
-        })}
-      </div>
-      {hasMore && (
-        <Button variant="Standard" size="Small" onClick={onLoadMore} isDisabled={isLoading}>
-          {translate(translationConstants.loadMore)}
-        </Button>
-      )}
-    </React.Fragment>
-  );
-};
-
-// A dashboard of linked accounts, containing both directions of links.
 export const LinkedAccountsDashboard = (): React.JSX.Element => {
   const { translate } = useTranslation();
-  const outgoing = useLinkedAccountsPages(LinkedAccountsDirection.Outgoing);
+  // The dashboard coordinates the feature's three independent views: outgoing
+  // links, incoming links, and recovery requests awaiting a decision.
+  const [pendingOutgoingAccounts, setPendingOutgoingAccounts] = useState<PendingOutgoingAccount[]>(
+    [],
+  );
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const outgoing = useLinkedAccountsPages(
+    LinkedAccountsDirection.Outgoing,
+    pendingOutgoingAccounts.length > 0,
+  );
   const incoming = useLinkedAccountsPages(LinkedAccountsDirection.Incoming);
+  const recoveryIntents = useRecoveryIntents();
+  const refreshLinks = (): void => {
+    outgoing.retry().catch(() => undefined);
+    incoming.retry().catch(() => undefined);
+  };
+  const removeLink = async (account: LinkedAccount): Promise<void> => {
+    const result = await deleteAccountLink({ accountLinkId: account.accountLinkId });
+    if (result.isError) throw result.errorRaw;
+    refreshLinks();
+  };
+  const handleRequestSent = (account: PendingOutgoingAccount): void => {
+    setPendingOutgoingAccounts(previous => [...previous, account]);
+    setToastMessage(
+      translate(translationConstants.request.success, { username: account.username }),
+    );
+    refreshLinks();
+  };
+  const cancelPendingRequest = async (account: PendingOutgoingAccount): Promise<void> => {
+    const result = await cancelAccountLink({
+      accountLinkUpdateIntentId: account.intent.accountLinkUpdateIntentId,
+    });
+    if (result.isError) throw result.errorRaw;
+    setPendingOutgoingAccounts(previous =>
+      previous.filter(
+        pending =>
+          pending.intent.accountLinkUpdateIntentId !== account.intent.accountLinkUpdateIntentId,
+      ),
+    );
+  };
+
+  useEffect(() => {
+    setPendingOutgoingAccounts(previous => {
+      const activeAccounts = previous.filter(
+        pending =>
+          !outgoing.accounts.some(account => account.linkedUserId === pending.userId) &&
+          !isPendingOutgoingAccountExpired(pending),
+      );
+      return activeAccounts.length === previous.length ? previous : activeAccounts;
+    });
+  }, [outgoing.accounts]);
+
+  useEffect(() => {
+    if (pendingOutgoingAccounts.length === 0) return undefined;
+
+    const pruneExpiredPendingAccounts = (): void => {
+      setPendingOutgoingAccounts(previous => {
+        const activeAccounts = previous.filter(
+          pending => !isPendingOutgoingAccountExpired(pending),
+        );
+        return activeAccounts.length === previous.length ? previous : activeAccounts;
+      });
+    };
+
+    pruneExpiredPendingAccounts();
+    const interval = window.setInterval(pruneExpiredPendingAccounts, PENDING_LINK_POLL_INTERVAL);
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [pendingOutgoingAccounts.length]);
 
   return (
     <div className="flex flex-col gap-xxlarge" data-testid="linked-accounts-dashboard">
+      <PendingRecoveryRequests
+        intents={recoveryIntents.intents}
+        isLoading={recoveryIntents.isLoading}
+        isError={recoveryIntents.isError}
+        onRetry={() => {
+          recoveryIntents.retry().catch(() => undefined);
+        }}
+        onResolve={recoveryIntents.resolveIntent}
+      />
       <div className="flex flex-col gap-medium" data-testid="linked-accounts-outgoing-section">
-        <div className="flex flex-col gap-xxsmall">
-          <span className="text-title-medium">
-            {translate(translationConstants.outgoing.heading)}
-          </span>
-          <span className="text-body-small content-muted">
-            {translate(translationConstants.outgoing.description)}
-          </span>
+        <div className="flex items-start justify-between gap-medium">
+          <div className="flex flex-col gap-xxsmall">
+            <span className="text-title-medium">
+              {translate(translationConstants.outgoing.heading)}
+            </span>
+            <span className="text-body-small content-muted">
+              {translate(translationConstants.outgoing.description)}
+            </span>
+          </div>
+          <RequestLinkedAccount onRequestSent={handleRequestSent} />
         </div>
         <LinkedAccountsList
           accounts={outgoing.accounts}
@@ -245,16 +184,26 @@ export const LinkedAccountsDashboard = (): React.JSX.Element => {
           onRetry={() => {
             outgoing.retry().catch(() => undefined);
           }}
+          onDelete={removeLink}
+          pendingAccounts={pendingOutgoingAccounts}
+          onCancelPending={cancelPendingRequest}
         />
       </div>
       <div className="flex flex-col gap-medium" data-testid="linked-accounts-incoming-section">
-        <div className="flex flex-col gap-xxsmall">
-          <span className="text-title-medium">
-            {translate(translationConstants.incoming.heading)}
-          </span>
-          <span className="text-body-small content-muted">
-            {translate(translationConstants.incoming.description)}
-          </span>
+        <div className="flex items-start justify-between gap-medium">
+          <div className="flex flex-col gap-xxsmall">
+            <span className="text-title-medium">
+              {translate(translationConstants.incoming.heading)}
+            </span>
+            <span className="text-body-small content-muted">
+              {translate(translationConstants.incoming.description)}
+            </span>
+          </div>
+          <ReviewLinkedAccountRequest
+            onAccepted={() => {
+              incoming.retry().catch(() => undefined);
+            }}
+          />
         </div>
         <LinkedAccountsList
           accounts={incoming.accounts}
@@ -269,8 +218,18 @@ export const LinkedAccountsDashboard = (): React.JSX.Element => {
           onRetry={() => {
             incoming.retry().catch(() => undefined);
           }}
+          onDelete={removeLink}
         />
       </div>
+      {toastMessage && (
+        <Snackbar
+          title={toastMessage}
+          onClose={() => {
+            setToastMessage(null);
+          }}
+          shouldAutoDismiss
+        />
+      )}
     </div>
   );
 };

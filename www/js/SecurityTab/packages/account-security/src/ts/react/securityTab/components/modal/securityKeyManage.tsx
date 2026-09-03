@@ -32,11 +32,13 @@ const ModalSecurityKeyManage: React.FC<ModalFragmentProps> = ({
    * Event Handlers
    */
 
-  const checkboxClickHandler = (name: string) => {
-    setKeysCheckedState(keysCheckedState.set(name, !(keysCheckedState.get(name) || false)));
+  const checkboxClickHandler = (credentialID: string) => {
+    setKeysCheckedState(
+      keysCheckedState.set(credentialID, !(keysCheckedState.get(credentialID) || false)),
+    );
     const oneOrMoreKeysChecked = modalStateAndProps.additionalModalProps.registeredKeysList.reduce(
       (keysChecked, registeredKey) => {
-        return keysChecked || keysCheckedState.get(registeredKey.nickname) || false;
+        return keysChecked || keysCheckedState.get(registeredKey.credentialID) || false;
       },
       false,
     );
@@ -45,8 +47,9 @@ const ModalSecurityKeyManage: React.FC<ModalFragmentProps> = ({
 
   const deleteCheckedKeys = () => {
     const keysToDelete = modalStateAndProps.additionalModalProps.registeredKeysList.filter(
-      registeredKey => keysCheckedState.get(registeredKey.nickname) || false,
+      registeredKey => keysCheckedState.get(registeredKey.credentialID) || false,
     );
+    const keysToDeleteIDs = keysToDelete.map(keyToDelete => keyToDelete.credentialID);
     const keysToDeleteNames = keysToDelete.map(keyToDelete => keyToDelete.nickname);
     const deletedAllKeys =
       keysToDelete.length === modalStateAndProps.additionalModalProps.registeredKeysList.length;
@@ -54,6 +57,7 @@ const ModalSecurityKeyManage: React.FC<ModalFragmentProps> = ({
       type: SecurityTabActionType.SET_MODAL_STATE,
       modalState: ModalState.SECURITY_KEY_DELETE,
       additionalModalProps: {
+        keysToDeleteIDs,
         keysToDeleteNames,
         deletedAllKeys,
       },
@@ -66,14 +70,14 @@ const ModalSecurityKeyManage: React.FC<ModalFragmentProps> = ({
 
   const registeredKeysToDisplay = modalStateAndProps.additionalModalProps.registeredKeysList;
   const registeredKeysToDislayElements = registeredKeysToDisplay.map(registeredKey => (
-    <React.Fragment key={registeredKey.nickname}>
+    <React.Fragment key={registeredKey.credentialID}>
       <div className="security-key-checkbox-container">
         <h3 className="font-header-2">{registeredKey.nickname}</h3>
         <div className="security-key-checkbox">
           <input
             className="larger"
             type="checkbox"
-            onClick={() => checkboxClickHandler(registeredKey.nickname)}
+            onClick={() => checkboxClickHandler(registeredKey.credentialID)}
           />
         </div>
       </div>

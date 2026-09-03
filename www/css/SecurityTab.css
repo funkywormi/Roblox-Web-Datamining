@@ -565,10 +565,10 @@
 }
 
 .forgot-credentials-link {
-    margin-top: 30px;
-    margin-bottom: 30px;
     font-size: 16px;
-    font-weight: 300
+    font-weight: var(--font-weight-300);
+    margin-top: 30px;
+    margin-bottom: 30px
 }
 
 .light-theme .media-type-list .media-type-row .icon-menu-usb,
@@ -1171,6 +1171,10 @@ input[type=button].btn-block {
     ry: var(--radius-small)
 }
 
+.\!relative {
+    position: relative !important
+}
+
 .inset-\[0\] {
     top: 0;
     bottom: 0;
@@ -1332,6 +1336,11 @@ input[type=button].btn-block {
 
 .\[z-index\:1050\] {
     z-index: 1050
+}
+
+#px-captcha {
+    border-radius: 8px;
+    overflow: hidden
 }
 
 .input-field.recovery-input {

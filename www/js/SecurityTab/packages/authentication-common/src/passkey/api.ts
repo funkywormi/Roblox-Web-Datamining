@@ -7,12 +7,14 @@ import {
   FinishRegistrationReturnType,
   FinishARPreAuthRegistrationReturnType,
   DeleteCredentialBatchReturnType,
+  RenameCredentialReturnType,
   PasswordDeletionSource,
   START_REGISTRATION_CONFIG,
   START_PRE_AUTH_REGISTRATION_CONFIG,
   FINISH_REGISTRATION_CONFIG,
   FINISH_AR_PRE_AUTH_REGISTRATION_CONFIG,
   DELETE_CREDENTIAL_BATCH_CONFIG,
+  RENAME_CREDENTIAL_CONFIG,
 } from "./types";
 
 export { Result } from "./result";
@@ -22,6 +24,7 @@ export type {
   FinishRegistrationReturnType,
   FinishARPreAuthRegistrationReturnType,
   DeleteCredentialBatchReturnType,
+  RenameCredentialReturnType,
 } from "./types";
 
 export const startPasskeyRegistration = (): Promise<
@@ -94,13 +97,25 @@ export const finishARPreAuthPasskeyRegistration = (
   );
 
 export const deletePasskeyBatch = (
-  credentialNicknames: string[],
+  credentialIDs: string[],
   passkeyCount: number,
 ): Promise<Result<DeleteCredentialBatchReturnType, AuthApiError | null>> =>
   toResult(
     post(DELETE_CREDENTIAL_BATCH_CONFIG, {
-      credentialNicknames,
+      credentialIDs,
       passkeyCount,
+    }),
+    AuthApiError,
+  );
+
+export const renamePasskey = (
+  credentialID: string,
+  newNickname: string,
+): Promise<Result<RenameCredentialReturnType, AuthApiError | null>> =>
+  toResult(
+    post(RENAME_CREDENTIAL_CONFIG, {
+      credentialID,
+      newNickname,
     }),
     AuthApiError,
   );

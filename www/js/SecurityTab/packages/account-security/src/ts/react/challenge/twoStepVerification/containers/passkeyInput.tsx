@@ -1,7 +1,8 @@
-import { fido2Util, hybridResponseService } from "core-roblox-utilities";
+import * as fido2Util from "@rbx/core-scripts/auth/fido2";
+import * as hybridResponseService from "@rbx/core-scripts/auth/hybrid-response";
 import React, { useEffect, useRef, useState } from "react";
 import { Modal } from "react-style-guide";
-import { DeviceMeta } from "Roblox";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import * as TwoStepVerification from "../../../../common/request/types/twoStepVerification";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import RememberDeviceCheckBox from "../components/rememberDeviceCheckBox";
@@ -104,11 +105,8 @@ const PasskeyInput: React.FC<Props> = ({
       return;
     }
 
-    const shouldConvertToStandardBase64 = !(
-      DeviceMeta &&
-      DeviceMeta().isInApp &&
-      DeviceMeta().isAndroidApp
-    );
+    const deviceMeta = getDeviceMeta();
+    const shouldConvertToStandardBase64 = !(deviceMeta?.isInApp && deviceMeta?.isAndroidApp);
     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     const makeAssertionOptions = shouldConvertToStandardBase64
       ? fido2Util.convertPublicKeyParametersToStandardBase64(options.value.authenticationOptions)
@@ -120,7 +118,7 @@ const PasskeyInput: React.FC<Props> = ({
     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
     let code = "";
-    if (DeviceMeta && DeviceMeta().isInApp) {
+    if (deviceMeta?.isInApp) {
       /* eslint-disable @typescript-eslint/no-unsafe-member-access */
       makeAssertionOptions.keyType = "platform";
       // If we're in a web-view and Passkeys are enabled, we should call the native implementation of FIDO2.

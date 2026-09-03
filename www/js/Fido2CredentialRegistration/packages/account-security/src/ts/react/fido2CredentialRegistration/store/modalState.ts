@@ -22,6 +22,9 @@ enum ModalState {
 
   // Modal displayed to manage security keys:
   FIDO_CREDENTIAL_MANAGE = "FIDO_CREDENTIAL_MANAGE",
+
+  // Modal to rename a credential:
+  FIDO_CREDENTIAL_RENAME = "FIDO_CREDENTIAL_RENAME",
 }
 
 export default ModalState;

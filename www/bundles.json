@@ -4885,7 +4885,7 @@
         },
         {
             "name": "Fido2CredentialRegistration",
-            "url": "https://js.rbxcdn.com/38849c4ab217e75f056935e43b66034ada6afbfa2ae25e62f36d6e76c7b70d65-Fido2CredentialRegistration.js",
+            "url": "https://js.rbxcdn.com/f96b140d763b7668b4ed9e79b958ea2bc4ba3d7790eee16e2a30d70f0a7d1668-Fido2CredentialRegistration.js",
             "sources": [
                 "/my/account"
             ]
@@ -6481,7 +6481,7 @@
         },
         {
             "name": "SecurityTab",
-            "url": "https://js.rbxcdn.com/71dcae26474cf84f9b9d847c791555fa5480ba3c00928ead46392ac30c51537b-SecurityTab.js",
+            "url": "https://js.rbxcdn.com/b7e719a9523d886f2c2a953061576c5625ca9f25ce0b6f0fdcb2736ad08a617d-SecurityTab.js",
             "sources": [
                 "/my/account"
             ]
@@ -7025,7 +7025,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/55d8190bf02e15333121d82c3efffaf227dacb37bbd2e1f6091e4e6462131ce0-UserSettings.js",
+            "url": "https://js.rbxcdn.com/1995670f2a22df9e5a6996a3b9553ebfa97ff61611faf62a5e24c2cbe0f4242b-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -7860,7 +7860,7 @@
         },
         {
             "name": "Fido2CredentialRegistration",
-            "url": "https://css.rbxcdn.com/1ed965bd66f695687b45be884d86f084e254005dea30359c0e950f25486deaa7-Fido2CredentialRegistration.css",
+            "url": "https://css.rbxcdn.com/78854f38fc7cc8dabac1df81699ca0c0462b558ef9af1e3ef25a8b0c7f97c124-Fido2CredentialRegistration.css",
             "sources": [
                 "/my/account"
             ]
@@ -8896,7 +8896,7 @@
         },
         {
             "name": "SecurityTab",
-            "url": "https://css.rbxcdn.com/cf5f744ac5da40ef5c3f2df2e9645de933a02b345ae771e9474ba7e6dd11d0f7-SecurityTab.css",
+            "url": "https://css.rbxcdn.com/2cc3831c97a043937100e35dd7ae662a09089c1c58dae618b51d66b54dd0436b-SecurityTab.css",
             "sources": [
                 "/my/account"
             ]
@@ -9205,7 +9205,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://css.rbxcdn.com/c46fc4d948af9e58f965d61cfb209014f666be50405369a65febf6803b6ac9e6-UserSettings.css",
+            "url": "https://css.rbxcdn.com/5d6e97e6fe949d1ad6301e90a7997a575df5783d7dfdbc71b076e40495f6ba27-UserSettings.css",
             "sources": [
                 "/my/account"
             ]

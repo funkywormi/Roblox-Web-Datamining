@@ -47,13 +47,13 @@ const ModalFido2CredentialDelete: React.FC<ModalFragmentProps> = ({
     switch (credentialPurpose) {
       case CredentialPurpose.Login:
         return requestService.authApi.deletePasskeyBatch(
-          modalStateAndProps.additionalModalProps.keysToDeleteNames,
+          modalStateAndProps.additionalModalProps.keysToDeleteIDs,
           registeredKeys.length,
         );
       case CredentialPurpose.TwoStepVerification:
         return requestService.twoStepVerification.deleteSecurityKey(
           authenticatedUser.id!.toString(),
-          modalStateAndProps.additionalModalProps.keysToDeleteNames,
+          modalStateAndProps.additionalModalProps.keysToDeleteIDs,
         );
     }
   };

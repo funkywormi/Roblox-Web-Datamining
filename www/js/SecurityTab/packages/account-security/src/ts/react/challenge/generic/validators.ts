@@ -1,5 +1,6 @@
 import * as z from "zod";
 import * as Captcha from "../captcha/interface";
+import { CaptchaMode } from "../captchaV2/interface";
 import * as Rostile from "../rostile/interface";
 import { ActionType } from "../twoStepVerification/interface";
 import { DelayState } from "../twoStepVerification/delay/types";
@@ -129,6 +130,9 @@ const BiometricValidator = z
 const CaptchaV2Validator = z
   .object({
     challengeId: z.string(),
+    // Optional string (not `z.nativeEnum`) so an unlisted value never fails parsing.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    mode: z.string().optional() as unknown as z.ZodType<CaptchaMode | undefined>,
   })
   .and(SharedChallengeMetadataValidator);
 

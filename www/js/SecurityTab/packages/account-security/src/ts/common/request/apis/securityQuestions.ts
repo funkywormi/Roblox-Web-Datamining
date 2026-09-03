@@ -1,4 +1,4 @@
-import { httpService } from "core-utilities";
+import * as http from "@rbx/core-scripts/http";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as SecurityQuestions from "../types/securityQuestions";
@@ -10,7 +10,7 @@ export const getQuestion = (
   Result<SecurityQuestions.GetQuestionReturnType, SecurityQuestions.SecurityQuestionsError | null>
 > =>
   toResult(
-    httpService.get(SecurityQuestions.GET_QUESTION_CONFIG, { userId, sessionId }),
+    http.get(SecurityQuestions.GET_QUESTION_CONFIG, { userId, sessionId }),
     SecurityQuestions.SecurityQuestionsError,
   );
 
@@ -25,7 +25,7 @@ export const answerQuestion = (
   >
 > =>
   toResult(
-    httpService.post(SecurityQuestions.ANSWER_QUESTION_CONFIG, {
+    http.post(SecurityQuestions.ANSWER_QUESTION_CONFIG, {
       userId,
       answer: answerChoices,
       sessionId,

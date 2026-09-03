@@ -31,6 +31,7 @@ export const EVENT_CONSTANTS = {
     startStep: "startRegistration",
     finishStep: "finishRegistration",
     deletePasskey: "deletePasskey",
+    renamePasskey: "renamePasskey",
     registerCredentialsEmptyResponse: "registerCredentialsEmptyResponse",
     registerCredentialsErrorCode: "registerCredentialsErrorCode",
   },

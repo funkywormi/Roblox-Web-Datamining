@@ -33,8 +33,15 @@ export type ModalStateAndProps =
   | {
       modalState: ModalState.FIDO_CREDENTIAL_DELETE;
       additionalModalProps: {
-        keysToDeleteNames: string[];
+        keysToDeleteIDs: string[];
         deletedAllKeys: boolean;
+      };
+    }
+  | {
+      modalState: ModalState.FIDO_CREDENTIAL_RENAME;
+      additionalModalProps: {
+        credentialID: string;
+        currentNickname: string;
       };
     };
 

@@ -1,5 +1,25 @@
 import { TranslateFunction } from "react-utilities";
+import { AuthApiError } from "@rbx/authentication-common/passkey/api";
 import * as TwoStepVerificationApiTypes from "../../../common/request/types/twoStepVerification";
+
+export const mapAuthApiErrorToResource = (
+  translate: TranslateFunction,
+  error: AuthApiError | null,
+): string => {
+  switch (error) {
+    case AuthApiError.INVALID_CREDENTIAL_NICKNAME:
+      return translate("Message.Error.InvalidCredentialNickname");
+
+    case AuthApiError.EXCEEDED_REGISTERED_KEYS_LIMIT:
+      return translate("Message.Error.ExceededRegisteredKeysLimit");
+
+    case AuthApiError.FEATURE_DISABLED:
+      return translate("Response.FeatureDisabled");
+
+    default:
+      return translate("MessageUnknownError");
+  }
+};
 
 export const mapTwoStepVerificationErrorToResource = (
   translate: TranslateFunction,

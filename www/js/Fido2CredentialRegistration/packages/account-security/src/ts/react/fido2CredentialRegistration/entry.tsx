@@ -13,6 +13,7 @@ const renderFido2CredentialRegistration = ({
   onDeleteSuccess,
   onLastKeyDeleted,
   onGenericError,
+  onRenameSuccess,
   credentialPurpose,
   registeredKeys,
   fido2Supported,
@@ -30,6 +31,7 @@ const renderFido2CredentialRegistration = ({
         onDeleteSuccess={onDeleteSuccess}
         onLastKeyDeleted={onLastKeyDeleted}
         onGenericError={onGenericError}
+        onRenameSuccess={onRenameSuccess}
         credentialPurpose={credentialPurpose}
         registeredKeys={registeredKeys}
         fido2Supported={fido2Supported}

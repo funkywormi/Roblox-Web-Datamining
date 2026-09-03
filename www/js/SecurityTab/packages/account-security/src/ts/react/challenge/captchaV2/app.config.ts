@@ -1,6 +1,24 @@
+import { TranslationConfig } from "@rbx/core-scripts/react";
 import environmentUrls from "@rbx/environment-urls";
 
 export const FEATURE_NAME = "CaptchaV2" as const;
+
+/**
+ * Translations required by this web app.
+ */
+export const TRANSLATION_CONFIG: TranslationConfig = ["Feature.CaptchaV2Challenge"];
+
+/**
+ * Language resource keys for CaptchaV2 that are requested dynamically.
+ */
+export const CAPTCHA_V2_LANGUAGE_RESOURCES = [
+  "Title.VerifyHuman",
+  "Content.HoldToConfirm",
+  "Content.TryAgain",
+  "Content.ReferenceID",
+  "Action.PressAndHold",
+  "Label.Cancel",
+] as const;
 
 /**
  * Constants for event stream events.
@@ -44,6 +62,13 @@ export const SENSOR_SCRIPT_URL = environmentUrls.domain.includes("sitetest")
 
 // DOM id for sensor script (which is used to de-duplicate).
 export const SENSOR_SCRIPT_ID = "captcha-v2-sensor" as const;
+
+// DOM id of the container the block script renders the interactive
+// challenge into. This id is hard-coded by the vendor block script.
+export const PX_CAPTCHA_CONTAINER_ID = "px-captcha" as const;
+
+// DOM id for the injected ABR block script (used to de-duplicate).
+export const BLOCK_SCRIPT_ID = "captcha-v2-block-script" as const;
 
 // Sensor decision cookie.
 export const SENSOR_COOKIE_NAME = "_px3" as const;

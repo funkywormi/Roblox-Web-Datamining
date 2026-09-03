@@ -50,7 +50,7 @@ const ModalFido2CredentialName: React.FC<ModalFragmentProps> = ({
       {
         name: "Windows Hello",
         condition: () => {
-          return /Windows/.test(userAgent);
+          return userAgent.includes("Windows");
         },
       },
       {

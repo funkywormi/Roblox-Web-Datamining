@@ -9,7 +9,9 @@ const EVENT_CONSTANTS = {
     authPageLoad: "authPageload",
     authModalShown: "authModalShown",
     authClientError: "authClientError",
+    authOperationTiming: "authOperationTiming",
     usernameSuggestionShown: "usernameSuggestionShown",
+    passkeyRegistrationEvent: "passkeyRegistrationEvent",
   },
   eventName: {
     loginOtherDevice: "loginOtherDevice",
@@ -62,6 +64,16 @@ const EVENT_CONSTANTS = {
     // The OAuth consent dialog at www.roblox.com/authorize. Distinct from loginPage because the
     // account switcher there resumes an in-progress OAuth request rather than starting a session.
     authorizePage: "authorizePage",
+    lrLoginForm: "lrLoginForm",
+    lrSignupForm: "lrSignupForm",
+    silentPasskeyUpgradeWebLogin: "handleSilentPasskeyUpgradeWebLogin",
+    silentPasskeyUpgradeWebSignup: "handleSilentPasskeyUpgradeWebSignup",
+    silentPasskeyUpgradeWebLoginImmediate: "handleSilentPasskeyUpgradeWebLoginImmediate",
+    silentPasskeyUpgradeWebLoginDelayed: "handleSilentPasskeyUpgradeWebLoginDelayed",
+    silentPasskeyUpgradeWebSignupDelayed: "handleSilentPasskeyUpgradeWebSignupDelayed",
+    passkeyRegistration: "passkeyRegistration",
+    addAuthMethodPage: "addAuthMethodPage",
+    passkeyCeremony: "passkeyCeremony",
   },
   verifiedParentalConsentContext: {
     chargeback: {
@@ -75,6 +87,14 @@ const EVENT_CONSTANTS = {
     changeBirthdayContext: {
       finishParentalSignup: "finishParentalSignupAgeChange",
       homepage: "homepageAgeChange",
+    },
+    linkToChild: {
+      finishParentalSignup: "finishParentalSignupLinking",
+      homepage: "homePageLinking",
+    },
+    updateUserSetting: {
+      finishParentalSignup: "finishParentalSignupSettings",
+      homepage: "homePageSettings",
     },
   },
   aType: {
@@ -122,6 +142,11 @@ const EVENT_CONSTANTS = {
     logoutPopup: "logoutPopup",
     hasAuthIntent: "hasAuthIntent",
     tosCheckbox: "tosCheckbox",
+    exitSignupConfirmation: "exitSignupConfirmation",
+    // How the OS passkey prompt was raised; dismissal rates differ between them.
+    autoPrompt: "autoPrompt",
+    deliberateRetry: "deliberateRetry",
+    general: "general",
   },
   btn: {
     cancel: "cancel",
@@ -161,6 +186,22 @@ const EVENT_CONSTANTS = {
     addPasskeyModal: "addPasskeyModal",
     skipPasskey: "skipPasskey",
     logout: "logout",
+    xdl: "xdl",
+    forgotCredentials: "forgotCredentials",
+    createAccount: "createAccount",
+    termsOfServiceLink: "tos_link",
+    privacyPolicyLink: "pp_link",
+    signIn: "signIn",
+    lrSignInButton: "lrSignInButton",
+    signupSubmit: "signupSubmit",
+    genderMale: "genderMale",
+    genderFemale: "genderFemale",
+    showPassword: "showPassword",
+    hidePassword: "hidePassword",
+    exitSignupConfirmYes: "exitSignupConfirmYes",
+    exitSignupConfirmCancel: "exitSignupConfirmCancel",
+    passkey: "passkey",
+    password: "password",
   },
   input: {
     redacted: "[Redacted]",
@@ -169,6 +210,13 @@ const EVENT_CONSTANTS = {
     webVerifiedSignup: "WebVerifiedSignup",
     signup: "signup",
     login: "login",
+    // Signup V2 arm on the form pageload. No legacy value: that arm renders the
+    // pre-existing form, which emits no origin. Identify it via IXP exposure.
+    signUpV2Arm: {
+      passwordFirst: "passwordFirst",
+      passkeyFirst: "passkeyFirst",
+      foundationControl: "foundationControl",
+    },
   },
   text: {
     finishCreatingYourAccount: "Create Your Roblox Account",
@@ -204,6 +252,9 @@ const EVENT_CONSTANTS = {
       // it has already fired for, and the per-component fire-once-per-session
       // ref short-circuits it.
       passkeyAutoOsDialogueDeduped: "passkeyAutoOsDialogueDeduped",
+      filteredByNoPasskeySupport: "filteredByNoPasskeySupport",
+      filteredByNoSilentUpgradeSupport: "filteredByNoSilentUpgradeSupport",
+      unclearedWebSessionFlag: "unclearedWebSessionFlag",
     },
     passkeyCreation: {
       finishRegistration: "finishRegistration",
@@ -235,6 +286,48 @@ const EVENT_CONSTANTS = {
       // user abandonment.
       passwordReset2svIncomplete: "passwordReset2svIncomplete",
     },
+    accountSwitcher: {
+      switchSuccess: "success",
+      invalidSession: "invalidSession",
+      requestFailed: "requestFailed",
+    },
+    signUpV2: {
+      // Why the user reached AddAuthMethodPage.
+      addAuthMethodEntry: {
+        dismissed: "dismissed",
+        unsupported: "unsupported",
+        error: "error",
+        autoPromptSuppressed: "autoPromptSuppressed",
+      },
+      authMethodChosen: "authMethodChosen",
+      // Step reached when the page was hidden. The `abandoned:` prefix keeps
+      // these separable from real errors on the shared authClientError type.
+      abandoned: {
+        awaitingCeremony: "abandoned:awaitingCeremony",
+        awaitingChoice: "abandoned:awaitingChoice",
+        formIncomplete: "abandoned:formIncomplete",
+      },
+    },
+    // Mirrors `classifySignupError`'s outcome types verbatim so there is no
+    // second vocabulary to keep in sync.
+    signupError: {
+      captcha: "captcha",
+      field: "field",
+      identityVerification: "identityVerification",
+      general: "general",
+      ageRestriction: "ageRestriction",
+      accountSwitcher: "accountSwitcher",
+      passkeyRegistrationFailed: "passkeyRegistrationFailed",
+      abandonedChallenge: "abandonedChallenge",
+      unknown: "unknown",
+      // Rate limiting arrives as `unknown` carrying no error code, so the detail
+      // has to ride here to stay separable.
+      unknownTooManyAttempts: "unknown:tooManyAttempts",
+    },
+    focused: "focused",
+    unfocused: "unfocused",
+    selected: "selected",
+    unselected: "unselected",
   },
   // Which step of the account-recovery passkey registration ceremony failed.
   // Carried in `origin` on the passkeyRegistrationFailure authMsgShown event
@@ -272,6 +365,27 @@ const EVENT_CONSTANTS = {
     renderFailed: "renderFailed",
     // Backend 2SV error was missing a challengeId (or userId was unavailable).
     missingChallengeId: "missingChallengeId",
+  },
+  // Signup V2 submit mode. Cannot go in `state`, which Control already uses for
+  // `hasAuthIntent` on the same ctx/btn pair.
+  ctype: {
+    passkeyCeremony: "passkeyCeremony",
+    password: "password",
+    autoPromptSuppressed: "autoPromptSuppressed",
+  },
+  passkeyRegistrationSource: {
+    signup: "signup",
+  },
+  // `state` values for the schematized PasskeyRegistrationEvent emitted from the
+  // signup surface. The `signupPreauth*` values mirror the outcomes of the
+  // pre-authenticated passkey ceremony (see `usePasskeyRegistration`)
+  passkeyRegistrationState: {
+    signupPreauthCredentialCreated: "SignupPreauthCredentialCreated",
+    signupPreauthDismissed: "SignupPreauthDismissed",
+    signupPreauthUnsupported: "SignupPreauthUnsupported",
+    signupPreauthError: "SignupPreauthError",
+    signupBindSuccess: "SignupBindSuccess",
+    signupBindFailed: "SignupBindFailed",
   },
 } as const;
 

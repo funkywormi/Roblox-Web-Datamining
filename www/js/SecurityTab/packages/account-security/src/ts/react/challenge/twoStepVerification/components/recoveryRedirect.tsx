@@ -1,5 +1,6 @@
 import React from "react";
-import { DeviceMeta, EnvironmentUrls } from "Roblox";
+import EnvironmentUrls from "@rbx/environment-urls";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import useTwoStepVerificationContext from "../hooks/useTwoStepVerificationContext";
 import { ActionType } from "../interface";
 
@@ -17,12 +18,13 @@ const RecoveryRedirect: React.FC<Props> = ({ username, actionType, recoverySessi
     state: { resources },
   } = useTwoStepVerificationContext();
 
+  const deviceMeta = getDeviceMeta();
   let baseUrl = `${EnvironmentUrls.websiteUrl}/login/forgot-password-or-username`;
   let target = "_self";
-  if (DeviceMeta && (DeviceMeta().isUWPApp || DeviceMeta().isWin32App)) {
+  if (deviceMeta?.isUWPApp || deviceMeta?.isWin32App) {
     baseUrl = `${EnvironmentUrls.websiteUrl}/login/forgot-password-or-username`;
     target = "_blank";
-  } else if (DeviceMeta && DeviceMeta().isInApp) {
+  } else if (deviceMeta?.isInApp) {
     baseUrl = "roblox://navigation/account_recovery";
     target = "_blank";
   }

@@ -3,6 +3,12 @@
 // the types for the public interface separate in order to avoid compilation
 // errors arising from the strict mode mismatch.
 
+import { CaptchaMode } from "../../../common/request/types/captchaV2";
+
+// Re-exported so consumers of the challenge can reference the mode enum without
+// reaching into the request layer.
+export { CaptchaMode };
+
 /**
  * An error code for a CaptchaV2 challenge.
  */
@@ -62,6 +68,10 @@ export type ChallengeParameters = {
   containerId: string;
   challengeId: string;
   appType?: string;
+  /**
+   * The optional captcha mode resolved by GCS. May be absent.
+   */
+  mode?: CaptchaMode;
   onChallengeDisplayed: OnChallengeDisplayedCallback;
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;

@@ -15,6 +15,43 @@ const linkedAccountsTranslationConstants = {
   error: "Response.LinkedAccountsLoadFailed",
   retry: "Action.TryAgain",
   loadMore: "Action.LoadMore",
+  pendingApproval: "Label.PendingApproval",
+  cancelRequest: "Action.CancelRequest",
+  unlink: "Action.Unlink",
+  cancel: "Action.Cancel",
+  approve: "Action.Approve",
+  deny: "Action.Deny",
+  unlinkConfirmation: "Description.UnlinkLinkedAccountConfirmation",
+  actionError: "Response.LinkedAccountsActionFailed",
+  usernameNotFound: "Response.LinkedAccountUsernameNotFound",
+  pendingRequestNotFound: "Response.LinkedAccountPendingRequestNotFound",
+  limitReached: "Response.LinkedAccountLimitReached",
+  request: {
+    heading: "Heading.RequestLinkedAccount",
+    description: "Description.RequestLinkedAccount",
+    placeholder: "Placeholder.LinkedAccountUsername",
+    action: "Action.SendLinkedAccountRequest",
+    addAction: "Action.AddRecoveryAccount",
+    pending: "Description.LinkedAccountRequestPending",
+    success: "Response.LinkedAccountRequestSent",
+  },
+  review: {
+    heading: "Heading.ReviewLinkRequest",
+    description: "Description.ReviewLinkRequest",
+    usernameLabel: "Label.RequesterUsername",
+    placeholder: "Placeholder.RequesterUsername",
+    action: "Action.ReviewLinkRequest",
+    submitAction: "Action.VerifyAndAccept",
+  },
+  recoveryIntents: {
+    heading: "Heading.RecoveryIntents",
+    description: "Description.RecoveryIntents",
+    active: "Description.RecoveryIntentActive",
+    approvalConfirmation: {
+      heading: "Heading.ConfirmRecoveryIntentApproval",
+      description: "Description.ConfirmRecoveryIntentApproval",
+    },
+  },
 } as const;
 
 export default linkedAccountsTranslationConstants;

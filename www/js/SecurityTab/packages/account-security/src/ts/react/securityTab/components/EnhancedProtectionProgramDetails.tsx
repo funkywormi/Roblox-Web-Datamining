@@ -496,6 +496,10 @@ const EnhancedProtectionProgramDetails: React.FC<EnhancedProtectionProgramDetail
         await refetchCredentials();
         systemFeedbackService.success(resources.Response.PasskeyRemovedSuccessfully);
       },
+      onRenameSuccess: async () => {
+        await refetchCredentials();
+        systemFeedbackService.success(resources.Response.PasskeyRenamedSuccessfully);
+      },
       onDuplicateCreated: () => {
         systemFeedbackService.warning(resources.Response.PasskeyAlreadyCreated);
       },

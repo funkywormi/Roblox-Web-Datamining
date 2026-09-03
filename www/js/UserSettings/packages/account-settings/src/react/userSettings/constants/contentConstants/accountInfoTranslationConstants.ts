@@ -119,6 +119,7 @@ export default {
     alreadyCreated: "Response.PasskeyAlreadyCreated",
     createdSuccessfully: "Response.PasskeyCreatedSuccessfully",
     removedSuccessfully: "Response.PasskeyRemovedSuccessfully",
+    renamedSuccessfully: "Response.PasskeyRenamedSuccessfully",
     deviceNotCompatible: "Description.DeviceNotCompatible",
     checkingPasskeyCompatibility: "Description.CheckingPasskeyCompatibility",
   },

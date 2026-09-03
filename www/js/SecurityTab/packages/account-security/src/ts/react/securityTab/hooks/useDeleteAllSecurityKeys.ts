@@ -24,12 +24,12 @@ const useDeleteAllSecurityKeys = (): DeleteAllSecurityKeysReturn => {
       );
     }
 
-    const credentialNicknames = listSecurityKeyResult.value.credentials.map(cred => cred.nickname);
+    const credentialIDs = listSecurityKeyResult.value.credentials.map(cred => cred.credentialID);
 
-    if (credentialNicknames.length > 0) {
+    if (credentialIDs.length > 0) {
       const deleteResult = await requestService.twoStepVerification.deleteSecurityKey(
         userId,
-        credentialNicknames,
+        credentialIDs,
       );
 
       if (deleteResult.isError) {

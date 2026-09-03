@@ -4,6 +4,7 @@
 // errors arising from the strict mode mismatch.
 
 import * as CaptchaInterface from "../../../captcha/interface";
+import { CaptchaMode } from "../../../captchaV2/interface";
 import * as ProofOfSpaceInterface from "../../../proofOfSpace/interface";
 import * as RostileInterface from "../../../rostile/interface";
 import * as TwoStepVerificationInterface from "../../../twoStepVerification/interface";
@@ -154,6 +155,8 @@ export type BlockSession = {
  */
 export type CaptchaV2 = {
   challengeId: string;
+  // Optional JSON key `mode`; may be absent.
+  mode?: CaptchaMode;
 } & Shared;
 
 /**

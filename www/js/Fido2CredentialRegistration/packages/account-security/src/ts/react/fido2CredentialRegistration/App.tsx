@@ -19,6 +19,7 @@ type Props = {
   onDeleteSuccess?: () => void;
   onLastKeyDeleted?: () => void;
   onGenericError?: () => void;
+  onRenameSuccess?: () => void;
   registeredKeys?: Fido2Credential[];
   fido2Supported?: boolean;
   credentialPurpose: CredentialPurpose;
@@ -37,6 +38,7 @@ const App: React.FC<Props> = ({
   onDeleteSuccess = noop,
   onLastKeyDeleted = noop,
   onGenericError = noop,
+  onRenameSuccess = noop,
   registeredKeys = [],
   fido2Supported,
   credentialPurpose,
@@ -53,6 +55,7 @@ const App: React.FC<Props> = ({
       onDeleteSuccess={onDeleteSuccess}
       onLastKeyDeleted={onLastKeyDeleted}
       onGenericError={onGenericError}
+      onRenameSuccess={onRenameSuccess}
       credentialPurpose={credentialPurpose}
       registeredKeys={registeredKeys}
       fido2Supported={fido2Supported}
@@ -70,6 +73,7 @@ App.defaultProps = {
   onDeleteSuccess: noop,
   onLastKeyDeleted: noop,
   onGenericError: noop,
+  onRenameSuccess: noop,
   registeredKeys: [],
   fido2Supported: undefined,
   deleteAllPasskeysAllowed: true,

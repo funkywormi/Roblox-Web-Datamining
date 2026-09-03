@@ -9,7 +9,7 @@ import { MetricsServiceDefault } from "./services/metricsService";
 // Export some additional enums that are declared in the shared interface (they
 // are also defined in the shared interface, but we need to expose them in the
 // object hierarchy for the challenge component).
-export { ErrorCode } from "./interface";
+export { ErrorCode, CaptchaMode } from "./interface";
 
 export { preloadSensor } from "./containers/sensor";
 
@@ -24,6 +24,7 @@ export const renderChallenge: RenderChallenge = ({
   containerId,
   challengeId,
   appType,
+  mode,
   renderInline,
   onChallengeDisplayed,
   onChallengeCompleted,
@@ -45,6 +46,7 @@ export const renderChallenge: RenderChallenge = ({
       <App
         challengeId={challengeId}
         appType={appType}
+        mode={mode}
         renderInline={renderInline}
         eventService={eventService}
         metricsService={metricsService}
