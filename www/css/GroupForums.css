@@ -3259,6 +3259,8 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 }
 
 .support-ticket-sheet-content .support-ticket-add-screenshots-button-compact {
+    flex-shrink: 0;
+    min-width: max-content;
     padding-left: var(--padding-large);
     padding-right: var(--padding-large)
 }
