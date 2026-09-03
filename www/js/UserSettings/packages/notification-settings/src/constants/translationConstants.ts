@@ -120,6 +120,9 @@ const translationConstants = {
   /** Chat messages · API: ChatNewMessage */
   chatMessageLabel: "Label.ChatMessage",
 
+  /** Friend presence · API: FriendPresence */
+  friendPresenceLabel: "Label.FriendPresence",
+
   //
   // Experiences (API category.value: Experiences)
   //
@@ -144,6 +147,9 @@ const translationConstants = {
 
   /** Recommended items · API: TODO */
   recommendedItemsLabel: "Label.RecommendedItems",
+
+  /** Recommended offers · API: CampaignOfferAvailable */
+  recommendedOffersLabel: "Label.RecommendedOffers",
 
   //
   // Platform news (API category.value: RobloxPlatform)
@@ -239,6 +245,9 @@ export const notificationTypePresentationByApiValue: Record<string, { labelKey: 
   ChatNewMessage: {
     labelKey: translationConstants.chatMessageLabel,
   },
+  FriendPresence: {
+    labelKey: translationConstants.friendPresenceLabel,
+  },
   // Experiences
   VirtualEvent: {
     labelKey: translationConstants.experienceEventsLabel,
@@ -249,6 +258,9 @@ export const notificationTypePresentationByApiValue: Record<string, { labelKey: 
   // Marketplace
   SpecialItem: {
     labelKey: translationConstants.recommendedItemsLabel,
+  },
+  CampaignOfferAvailable: {
+    labelKey: translationConstants.recommendedOffersLabel,
   },
   // RobloxPlatform (platform news)
   ZCommunityEvent: {

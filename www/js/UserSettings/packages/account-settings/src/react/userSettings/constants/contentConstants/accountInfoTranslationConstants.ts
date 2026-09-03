@@ -9,6 +9,16 @@ export default {
     earlyAccessPrograms: "Heading.EarlyAccessPrograms",
   },
 
+  linkedAccounts: {
+    heading: "Heading.LinkedAccounts",
+    verification: {
+      heading: "Heading.LinkedAccountsVerify",
+      description: "Description.LinkedAccountsVerify",
+      action: "Action.VerifyItsYou",
+    },
+    error: "Response.LinkedAccountsLoadFailed",
+  },
+
   ageGroup: {
     label: "Label.AgeGroupV2",
     verifyAgeWarning: "Description.VerifyAgeWarning",

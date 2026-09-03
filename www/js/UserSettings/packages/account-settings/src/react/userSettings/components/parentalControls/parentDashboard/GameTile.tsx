@@ -172,6 +172,7 @@ const GameTile = ({
     try {
       await AccessManagementUpsellV2Service.startAccessManagementUpsell({
         featureName: AMPFeaturesConstants.CanRemoveParentManagedExperienceBlocks,
+        namespace: AMPFeaturesConstants.Namespaces.AccountManagement,
         isAsyncCall: false,
         usePrologue: true,
         ampRecourseData: {

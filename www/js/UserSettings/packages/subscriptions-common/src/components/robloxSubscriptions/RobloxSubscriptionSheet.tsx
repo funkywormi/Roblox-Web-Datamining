@@ -1,12 +1,13 @@
 import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { Icon, SheetBody, SheetContent, SheetTitle } from "@rbx/foundation-ui";
+import { Button, Icon, SheetBody, SheetContent, SheetTitle } from "@rbx/foundation-ui";
 import { usePaymentSession } from "@rbx/payments/services/paymentSession";
 import { translateHtml } from "@rbx/translation-utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import BenefitList from "./BenefitList";
 import BillingInfoDisplay from "./BillingInfoDisplay";
+import useLocalizedMoney from "../../hooks/useLocalizedMoney";
 import SubscriptionButton from "../shared/SubscriptionButton";
 
 import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v1";
@@ -42,6 +43,27 @@ export type RobloxSubscriptionSheetProps = {
    * polls for the new entitlement.
    */
   isLoading?: boolean;
+  /**
+   * Optional Back affordance. When set, a Standard "Back" button renders inline
+   * with the subscribe CTA and replaces the sheet's X close.
+   */
+  onBack?: () => void;
+  /**
+   * Optional title override. Defaults to `Title.GetBlackbird`. The roblox-plus
+   * icon is shown alongside it unless {@link showBrandIcon} is false.
+   */
+  title?: React.ReactNode;
+  /** Optional subtitle rendered under the title. Defaults to none. */
+  subtitle?: React.ReactNode;
+  /** Shows the roblox-plus brand icon next to the title. Defaults to true. */
+  showBrandIcon?: boolean;
+  /** Shows the price/billing row above the benefits. Defaults to true. */
+  showBillingInfo?: boolean;
+  /**
+   * Shows the price (e.g. "$4.99/month") as the subscribe CTA label instead of
+   * "Subscribe". Ignored during a free trial. Defaults to false.
+   */
+  showPriceInCta?: boolean;
 };
 
 const RobloxSubscriptionSheet = ({
@@ -53,6 +75,12 @@ const RobloxSubscriptionSheet = ({
   onSubscribeClick,
   onMobilePurchaseInitiated,
   isLoading,
+  onBack,
+  title,
+  subtitle,
+  showBrandIcon = true,
+  showBillingInfo = true,
+  showPriceInCta = false,
 }: RobloxSubscriptionSheetProps) => {
   const { translate } = useTranslation();
   const { id: paymentSessionId } = usePaymentSession() ?? {};
@@ -67,6 +95,8 @@ const RobloxSubscriptionSheet = ({
     [eligibleOffers],
   );
   const isFreeTrial = freeTrialOffer != null;
+
+  const displayPrice = useLocalizedMoney(localizedPrice);
 
   const plusUpsellViewMessage = useMemo(
     () =>
@@ -146,25 +176,53 @@ const RobloxSubscriptionSheet = ({
     },
   ];
 
+  const ctaLabel =
+    showPriceInCta && !isFreeTrial
+      ? translate("Description.BillingInfo", { price: displayPrice, periodType })
+      : translate(isFreeTrial ? "Action.TryItForFree" : "Action.Subscribe");
+
+  const subscribeButton = (
+    <SubscriptionButton
+      className={onBack ? "width-full" : undefined}
+      deviceMeta={deviceMeta}
+      isLoading={isLoading}
+      paymentSessionId={paymentSessionId}
+      productId={id}
+      productType={type}
+      redirectUrl={redirectUrl}
+      trackSubscriptionButtonClick={sendEventAndTrackingOnClick}
+      onMobilePurchaseInitiated={onMobilePurchaseInitiated}
+    >
+      {ctaLabel}
+    </SubscriptionButton>
+  );
+
   return (
     <SheetContent
       centerSheetSize="Medium"
+      // Hide Foundation's built-in X close when Back is present.
+      className={onBack ? "[&_.fui-sheet-close-affordance-container]:hidden" : undefined}
       closeLabel={translate("Action.Close")}
       largeScreenVariant="center"
     >
       <SheetTitle>
         <div className="gap-x-small flex items-center">
-          <Icon className="size-1000" name="icon-regular-roblox-plus" />
-          {translate("Title.GetBlackbird")}
+          {showBrandIcon && <Icon className="size-1000" name="icon-regular-roblox-plus" />}
+          {title ?? translate("Title.GetBlackbird")}
         </div>
+        {subtitle != null && (
+          <div className="margin-top-small text-body-large content-default">{subtitle}</div>
+        )}
       </SheetTitle>
       <SheetBody>
         <div className="padding-large gap-y-xlarge flex flex-col">
-          <BillingInfoDisplay
-            eligibleOffers={eligibleOffers}
-            periodType={periodType}
-            price={localizedPrice}
-          />
+          {showBillingInfo && (
+            <BillingInfoDisplay
+              eligibleOffers={eligibleOffers}
+              periodType={periodType}
+              price={localizedPrice}
+            />
+          )}
 
           {featureConfig && (
             <BenefitList
@@ -177,18 +235,16 @@ const RobloxSubscriptionSheet = ({
             />
           )}
 
-          <SubscriptionButton
-            deviceMeta={deviceMeta}
-            isLoading={isLoading}
-            paymentSessionId={paymentSessionId}
-            productId={id}
-            productType={type}
-            redirectUrl={redirectUrl}
-            trackSubscriptionButtonClick={sendEventAndTrackingOnClick}
-            onMobilePurchaseInitiated={onMobilePurchaseInitiated}
-          >
-            {isFreeTrial ? translate("Action.TryItForFree") : translate("Action.Subscribe")}
-          </SubscriptionButton>
+          {onBack ? (
+            <div className="gap-x-medium flex">
+              {subscribeButton}
+              <Button className="width-full" variant="Standard" onClick={onBack}>
+                {translate("Action.Back")}
+              </Button>
+            </div>
+          ) : (
+            subscribeButton
+          )}
 
           <span className="text-caption-medium content-muted">
             {translateHtml(

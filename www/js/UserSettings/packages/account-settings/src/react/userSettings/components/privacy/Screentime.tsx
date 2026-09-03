@@ -53,6 +53,7 @@ export const Screentime = (): JSX.Element => {
     try {
       await AccessManagementUpsellV2Service.startAccessManagementUpsell({
         featureName: AMPFeaturesConstants.settingChangeAmpFeature,
+        namespace: AMPFeaturesConstants.Namespaces.SettingsChange,
         isAsyncCall: false,
         usePrologue: false,
         ampRecourseData: {

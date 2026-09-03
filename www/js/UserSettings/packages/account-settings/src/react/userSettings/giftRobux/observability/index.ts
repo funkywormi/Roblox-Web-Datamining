@@ -5,7 +5,7 @@ import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
 
 export const observabilityRegistry = {
   featureName: "GiftRobux",
-  team: "Payments & Fraud",
+  team: "Economy > Payments & Fraud",
   features: {
     health: {
       counters: ["SheetOpened"],

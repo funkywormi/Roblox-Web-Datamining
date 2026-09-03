@@ -2,6 +2,7 @@ import React from "react";
 import { Toggle } from "react-style-guide";
 import { useTranslation } from "react-utilities";
 import { LegallySensitiveContentService } from "Roblox";
+import hybrid from "@rbx/core-scripts/hybrid";
 import {
   EnabledStatusValue,
   TUpdateUserSettingValueRequest,
@@ -14,6 +15,9 @@ import {
   useGetUserSettingsQuery,
   useUpdateUserSettingValueMutation,
 } from "../../../apis/userSettingsApi";
+import { useGetVerifiedAgeQuery } from "../../../apis/ageVerificationApi";
+import { useGetBirthdateQuery } from "../../../apis/usersApi";
+import birthdayUtils from "../../utils/birthdayUtils";
 import {
   personalizedAdsConsentName,
   personalizedAdsSurface,
@@ -27,6 +31,8 @@ export const AdPreferences = (): JSX.Element => {
 
   const { data: userSettings } = useGetUserSettingsQuery();
   const [updateUserSettings] = useUpdateUserSettingValueMutation();
+  const verifiedAgeQuery = useGetVerifiedAgeQuery();
+  const birthdateQuery = useGetBirthdateQuery();
 
   const [personalizedAdsLegallySensitiveData, personalizedAdsLegallySensitiveActions] =
     LegallySensitiveContentService.useLegallySensitiveContentAndActions(
@@ -59,6 +65,26 @@ export const AdPreferences = (): JSX.Element => {
     };
     try {
       await updateUserSettings(updateBody).unwrap();
+      // Resolve age before deciding U18 so a slow/failed load can't mislabel an adult (cached when present).
+      const verifiedAge =
+        verifiedAgeQuery.data ??
+        (await verifiedAgeQuery
+          .refetch()
+          .unwrap()
+          .catch(() => undefined));
+      const dob =
+        birthdateQuery.data ??
+        (await birthdateQuery
+          .refetch()
+          .unwrap()
+          .catch(() => undefined));
+      const effectiveAge = verifiedAge?.isVerified
+        ? verifiedAge.verifiedAge
+        : birthdayUtils.calculateAge(dob);
+      const isUnder18 = effectiveAge > 0 ? effectiveAge < 18 : true; // fail closed to U18 only when age is absent
+      // U18 always gets the sharing filter (AMP IncludeSharingFilter age < 18). Live-update the native
+      // AppsFlyer sharing filter this session; isUnder18 forces it on. No-op off-app.
+      hybrid.adConsentChanged({ allowSellShareData: newSellShareSetting, isUnder18 });
       snackbarService.success(translate(commonTranslationConstants.successDialogMessage));
     } catch {
       snackbarService.warning(translate(commonTranslationConstants.unknownError));

@@ -14,6 +14,10 @@ import { ProfileFrameItem } from "./ProfileFrameItem";
 import { ProfileFrame } from "../types/ProfileFrameTypes";
 import { NONE_FRAME_ASSET_ID, findProfileFrame } from "../frames/profileFrameConstants";
 import { PlusUpsellBanner } from "./PlusUpsellBanner";
+import {
+  trackProfileFrameFrameSelected,
+  trackProfileFrameUpsellClicked,
+} from "../frames/profileFrameTelemetry";
 
 /** Responsive preview diameter: 160px on desktop, shrinking with the smaller of the
  * viewport's width/height on small or short screens (floored so it never gets tiny). */
@@ -74,7 +78,22 @@ export const ProfileFrameDialog = ({
 
   const handleSelect = (frameId: number) => {
     hasUserSelected.current = true;
-    setSelectedFrameId(prev => (prev === frameId ? NONE_FRAME_ASSET_ID : frameId));
+    const nextFrameId = selectedFrameId === frameId ? NONE_FRAME_ASSET_ID : frameId;
+    setSelectedFrameId(nextFrameId);
+    trackProfileFrameFrameSelected({
+      userId,
+      frameId: String(nextFrameId),
+      hasPlus,
+    });
+  };
+
+  const handleUpsellOpen = () => {
+    trackProfileFrameUpsellClicked({
+      userId,
+      frameId: String(selectedFrameId ?? NONE_FRAME_ASSET_ID),
+      hasPlus,
+    });
+    onUpsellOpen();
   };
 
   const handleSave = (selectedFrameId?: number) => {
@@ -151,7 +170,7 @@ export const ProfileFrameDialog = ({
 
             {/* Plus upsell (non-Plus only): preview stays enabled, but framing is a
                 Plus perk, so we point the user at the Plus page instead of saving. */}
-            {!hasPlus && <PlusUpsellBanner onUpsellOpen={onUpsellOpen} />}
+            {!hasPlus && <PlusUpsellBanner onUpsellOpen={handleUpsellOpen} />}
           </div>
 
           {/* Selectable frame grid + scroll region. Layout (columns, gaps, responsive
@@ -187,7 +206,7 @@ export const ProfileFrameDialog = ({
               variant="Emphasis"
               size="Medium"
               className="width-[120px]"
-              onClick={onUpsellOpen}
+              onClick={handleUpsellOpen}
             >
               {translate("Action.Subscribe")}
             </Button>

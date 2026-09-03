@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { List } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { isBlackbirdUser } from "@rbx/core-scripts/meta/user";
@@ -16,11 +16,18 @@ import useAgedUpDisplayNames from "./hooks/useAgedUpDisplayNames";
 import useUserProfileData from "./hooks/useUserProfileData";
 import useProfileFrames from "./hooks/useProfileFrames";
 import {
+  checkHasFrameDialogQueryParam,
   hasSeenProfileFrameNewBadge,
   markProfileFrameNewBadgeSeen,
+  stripFrameDialogQueryParam,
 } from "./frames/profileFrameConfig";
 import ProfileFramePlusUpsell from "./components/ProfileFramePlusUpsell";
-import { NONE_FRAME } from "./frames/profileFrameConstants";
+import { NONE_FRAME, NONE_FRAME_ASSET_ID } from "./frames/profileFrameConstants";
+import {
+  trackProfileFrameDialogOpened,
+  trackProfileFrameFrameSaved,
+} from "./frames/profileFrameTelemetry";
+import { trackError } from "./observability";
 
 export const EditUserProfileContainer = () => {
   const { translate } = useTranslation();
@@ -38,7 +45,8 @@ export const EditUserProfileContainer = () => {
   // Plus instead of saving. Gate on Blackbird (Roblox Plus) membership specifically —
   // this matches every other Plus gate in the workspace.
   const hasPlus = isBlackbirdUser();
-  const { frames, equippedFrame, equippedFrameId, isSaving, saveFrame } = useProfileFrames();
+  const { frames, equippedFrame, equippedFrameId, isLoading, isSaving, saveFrame } =
+    useProfileFrames();
   const [displayNameModal, displayNameModalService] = useChangeDisplayNameModal({
     showAgedUpDisplayName: hasAgedUpDisplayNames,
     translatedTitle: translate(
@@ -75,24 +83,32 @@ export const EditUserProfileContainer = () => {
   const onFrameSaved = async (assetId: number): Promise<boolean> => {
     try {
       await saveFrame(assetId);
+      trackProfileFrameFrameSaved({
+        userId,
+        frameId: String(assetId),
+        hasPlus,
+      });
       systemFeedbackService.success(translate("Response.Dialog.DefaultSuccessMessage"));
       return true;
     } catch {
-      // The error toast is the user-facing signal; return false so the dialog stays open
-      // (skips its close-on-success) instead of dismissing as if the equip worked.
-      // TODO: report the failure to Sentry/Grafana (telemetry approach pending offline discussion).
+      trackError("Frames_SaveFailed");
       systemFeedbackService.warning(translate("Response.Dialog.DefaultErrorMessage"));
       return false;
     }
   };
 
-  const onProfileFrameClick = () => {
+  const onProfileFrameClick = useCallback(() => {
     setIsFrameDialogOpen(true);
+    trackProfileFrameDialogOpened({
+      userId,
+      frameId: String(equippedFrameId ?? NONE_FRAME_ASSET_ID),
+      hasPlus,
+    });
     if (showFrameNewBadge) {
       markProfileFrameNewBadgeSeen();
       setShowFrameNewBadge(false);
     }
-  };
+  }, [showFrameNewBadge, userId, equippedFrameId, hasPlus]);
 
   const onUpsellOpen = () => {
     setShowUpsell(true);
@@ -102,6 +118,27 @@ export const EditUserProfileContainer = () => {
   const onUpsellClose = () => {
     setShowUpsell(false);
     setIsFrameDialogOpen(true);
+  };
+
+  const isFrameDialogAutoOpenExecuted = useRef(false);
+
+  useEffect(() => {
+    if (
+      !checkHasFrameDialogQueryParam() ||
+      isFrameDialogAutoOpenExecuted.current ||
+      isLoading ||
+      frames.length === 0
+    ) {
+      return;
+    }
+    stripFrameDialogQueryParam();
+    isFrameDialogAutoOpenExecuted.current = true;
+    onProfileFrameClick();
+  }, [isLoading, frames.length, onProfileFrameClick]);
+
+  const consumeFrameDeeplink = () => {
+    stripFrameDialogQueryParam();
+    isFrameDialogAutoOpenExecuted.current = true;
   };
 
   return (
@@ -122,7 +159,7 @@ export const EditUserProfileContainer = () => {
 
         {/* Settings list(s). Per the latest Figma the profile frame lives in its own
             grouped card, separated from the identity rows. */}
-        <div className="flex flex-col gap-medium">
+        <div className="flex flex-col gap-medium" onClickCapture={consumeFrameDeeplink}>
           <List className="width-full bg-shift-100 flex flex-col radius-large clip">
             <ProfileSettingRow
               label={displayNameLabel}

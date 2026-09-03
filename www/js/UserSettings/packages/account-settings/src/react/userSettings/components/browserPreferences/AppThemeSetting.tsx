@@ -1,23 +1,19 @@
-import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
 import {
-  getTheme,
-  setTheme,
+  getTheme as getThemeGlobal,
+  setTheme as setThemeGlobal,
   setPreviewTheme,
   clearPreviewTheme,
   subscribeToThemeChange,
-  type AppTheme,
 } from "@rbx/core-scripts/theme";
 import { TUpdateUserSettingValueRequest, UserSetting } from "@rbx/user-settings";
 import SettingsSection from "../../../common/components/SettingsSection";
-import useGetSettingsAndOptions from "../../../apis/hooks/useGetSettingsAndOptions";
 import { useUpdateUserSettingValueMutation } from "../../../apis/userSettingsApi";
 import { useGetSettingsUiPolicyQuery } from "../../../apis/universalAppConfigurationApi";
 import { AppThemesAccess } from "../../../../types/policyTypes";
 import browserPreferencesTranslationConstants from "../../constants/contentConstants/browserPreferencesTranslationConstants";
 import {
-  appThemeDefByAccountTheme,
   appThemeDefByKey,
   appThemeDefs,
   defaultAppTheme,
@@ -37,28 +33,18 @@ const constants = browserPreferencesTranslationConstants;
 function AppThemePicker({
   isSubscriber,
   isEligible,
-  initialThemeDef,
 }: {
   isSubscriber: boolean;
   isEligible: boolean;
-  initialThemeDef: AppThemeDef;
 }) {
   const { translate } = useTranslation();
   const [updateSettingValue, { isLoading: isUpdating }] = useUpdateUserSettingValueMutation();
 
-  const [selectedTheme, setSelectedTheme] = useState<AppTheme>(initialThemeDef.key);
+  const [theme, setTheme] = useState(appThemeDefByKey.get(getThemeGlobal()) ?? null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<AppThemeCategoryId>(
-    initialThemeDef.category,
+    theme?.category ?? "dynamic",
   );
   const [upsellOpen, setUpsellOpen] = useState(false);
-
-  // Apply the saved theme once on mount; skip if the page already has it (e.g. settings API failed).
-  const initialKeyRef = useRef(initialThemeDef.key);
-  useEffect(() => {
-    if (isSubscriber && getTheme() !== initialKeyRef.current) {
-      setTheme(initialKeyRef.current);
-    }
-  }, [isSubscriber]);
 
   // Non-subscribers only preview; discard on unmount since it's never saved.
   useEffect(() => {
@@ -121,38 +107,50 @@ function AppThemePicker({
       if (def == null) {
         return;
       }
-      setSelectedTheme(def.key);
+      setTheme(def);
       // Reveal the new selection even if the user is browsing the other category.
       setSelectedCategoryId(def.category);
     });
   }, [isSubscriber]);
 
-  const onSelect = async ({ key, accountTheme }: AppThemeDef) => {
-    if (isPersistingRef.current || key === selectedTheme) {
+  const onSelect = async (newTheme: AppThemeDef) => {
+    if (isPersistingRef.current || newTheme.key === theme?.key) {
       return;
     }
 
     if (!isSubscriber) {
-      setPreviewTheme(key);
-      setSelectedTheme(key);
-      appThemeEventService.themeSelected(isSubscriber, accountTheme);
+      if (newTheme.key === "default") {
+        clearPreviewTheme();
+      } else {
+        setPreviewTheme(newTheme.key);
+      }
+      setTheme(newTheme);
+      appThemeEventService.themeSelected(isSubscriber, newTheme.accountTheme);
       return;
     }
 
     isPersistingRef.current = true;
-    const previousTheme = selectedTheme;
-    setTheme(key);
-    setSelectedTheme(key);
+    const previousTheme = theme;
+    const previousThemeGlobal = getThemeGlobal();
+    setTheme(newTheme);
+    setThemeGlobal(newTheme.key);
 
     const updateBody: TUpdateUserSettingValueRequest = {
       setting: UserSetting.accountTheme,
-      value: accountTheme,
+      value: newTheme.accountTheme,
     };
     try {
       await updateSettingValue(updateBody).unwrap();
     } catch {
-      setTheme(previousTheme);
-      setSelectedTheme(previousTheme);
+      if (previousTheme == null) {
+        setTheme(null);
+        if (previousThemeGlobal !== "kids") {
+          setThemeGlobal(previousThemeGlobal);
+        }
+      } else {
+        setTheme(previousTheme);
+        setThemeGlobal(previousTheme.key);
+      }
     } finally {
       isPersistingRef.current = false;
     }
@@ -188,7 +186,7 @@ function AppThemePicker({
             <AppThemeCard
               key={def.key}
               def={def}
-              selected={def.key === selectedTheme}
+              selected={def.key === theme?.key}
               disabled={isUpdating}
               onSelect={onSelect}
             />
@@ -202,7 +200,6 @@ function AppThemePicker({
 
 export default function AppThemeSetting() {
   const { data: settingsUiPolicy } = useGetSettingsUiPolicyQuery();
-  const [settingsAndOptions, settingsStatus] = useGetSettingsAndOptions();
 
   const isSubscriber = settingsUiPolicy?.appThemesAccess === AppThemesAccess.Enabled;
   const isEligible = settingsUiPolicy?.appThemesAccess === AppThemesAccess.Eligible;
@@ -211,33 +208,5 @@ export default function AppThemeSetting() {
     return null;
   }
 
-  // Ready once resolved; `data` stays set through a save's refetch, so the picker keeps state.
-  const settingsLoaded =
-    settingsAndOptions != null ||
-    settingsStatus === QueryStatus.fulfilled ||
-    settingsStatus === QueryStatus.rejected;
-
-  if (isSubscriber && !settingsLoaded) {
-    return null;
-  }
-
-  const persistedAccountTheme = settingsAndOptions?.[UserSetting.accountTheme]?.currentValue;
-  const initialThemeDef = (() => {
-    if (!isSubscriber) {
-      return defaultAppTheme;
-    }
-    if (persistedAccountTheme) {
-      return appThemeDefByAccountTheme.get(persistedAccountTheme.toLowerCase()) ?? defaultAppTheme;
-    }
-    // Settings unavailable (e.g. transient API failure): seed from the theme already on the page.
-    return appThemeDefByKey.get(getTheme()) ?? defaultAppTheme;
-  })();
-
-  return (
-    <AppThemePicker
-      isSubscriber={isSubscriber}
-      isEligible={isEligible}
-      initialThemeDef={initialThemeDef}
-    />
-  );
+  return <AppThemePicker isSubscriber={isSubscriber} isEligible={isEligible} />;
 }

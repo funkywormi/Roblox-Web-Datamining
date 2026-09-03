@@ -62,6 +62,7 @@ export const BlockedUserWithParentalConsent = ({
     try {
       await AccessManagementUpsellV2Service.startAccessManagementUpsell({
         featureName: AMPFeaturesConstants.CanRemoveParentManagedUserBlocks,
+        namespace: AMPFeaturesConstants.Namespaces.AccountManagement,
         isAsyncCall: false,
         usePrologue: true,
         ampRecourseData: {

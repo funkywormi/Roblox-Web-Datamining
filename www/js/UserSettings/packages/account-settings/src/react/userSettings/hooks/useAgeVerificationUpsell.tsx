@@ -311,6 +311,7 @@ const useAgeVerificationUpsell = (): UseAgeVerificationUpsellResult => {
   const handleVpcForFaeClick = (eventState?: string) => {
     AccessManagementUpsellV2Service.startAccessManagementUpsell({
       featureName: AMPFeaturesConstants.settingChangeAmpFeature,
+      namespace: AMPFeaturesConstants.Namespaces.SettingsChange,
       isAsyncCall: true,
       usePrologue: true,
       ampRecourseData: { [UserSetting.allowFacialAgeEstimation]: EnabledStatusValue.Enabled },

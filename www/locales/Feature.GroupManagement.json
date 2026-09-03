@@ -149,7 +149,7 @@
     "Description.BreakingChanges": "To unify roles and permissions across Creator Hub and Communities, we need to make a few changes to your group.",
     "Label.RolesImpacted": "Roles impacted",
     "Label.BreakingChanges": "Changes to be applied",
-    "Description.PermissionsRemoved": "Removed {permissions}",
+    "Description.PermissionsRemoved": "Will remove {permissions}",
     "Action.Continue": "Continue",
     "Action.AskLater": "Ask me later",
     "Action.LearnMore": "Learn more",
@@ -179,5 +179,5 @@
     "Message.RoleIdCopied": "Role ID copied to clipboard",
     "Message.RoleWithUsersAllowDeletion": "There are {numUsers} users in this role. Removing it may result in a loss of permissions for those users. Do you want to continue to delete {role}?",
     "Message.RoleWithUserAllowDeletion": "There is 1 user in this role. Removing it may result in a loss of permissions for this user. Do you want to continue to delete {role}?",
-    "Message.UnificationStarted": "Your group has begun unification"
+    "Message.UnificationStarted": "Your group is being unified, please check back in a few minutes."
 }

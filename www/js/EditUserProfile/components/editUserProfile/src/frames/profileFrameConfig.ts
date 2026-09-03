@@ -11,6 +11,33 @@
  */
 export const ROBLOX_PLUS_URL = "/plus";
 
+export const FRAME_DIALOG_QUERY_PARAM = "frames";
+
+export const stripFrameDialogQueryParam = (): void => {
+  try {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has(FRAME_DIALOG_QUERY_PARAM)) {
+      return;
+    }
+    url.searchParams.delete(FRAME_DIALOG_QUERY_PARAM);
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${url.pathname}${url.search}${url.hash}`,
+    );
+  } catch {
+    // Ignore invalid URLs and unavailable browser APIs.
+  }
+};
+
+export const checkHasFrameDialogQueryParam = (): boolean => {
+  try {
+    return new URL(window.location.href).searchParams.has(FRAME_DIALOG_QUERY_PARAM);
+  } catch {
+    return false;
+  }
+};
+
 /**
  * "New" badge on the Profile frame row. Client-only, red-dot style: show the badge
  * until the user opens the frame dialog once, then persist "seen" in localStorage so

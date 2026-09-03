@@ -72,6 +72,7 @@ const requestParentalConsent = (
 ): Promise<boolean> => {
   return AccessManagementUpsellV2Service.startAccessManagementUpsell({
     featureName: AMPFeaturesConstants.settingChangeAmpFeature,
+    namespace: AMPFeaturesConstants.Namespaces.SettingsChange,
     isAsyncCall: true,
     usePrologue,
     ampRecourseData: { [setting]: value },

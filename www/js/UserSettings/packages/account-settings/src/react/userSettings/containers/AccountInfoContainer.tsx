@@ -1,18 +1,22 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-utilities";
 import { useSnackbar } from "@rbx/user-settings";
+import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
 import { ApiRequestStatus } from "../../../types/accountInformationTypes";
 import SocialNetworksSettings from "../components/accountInfo/SocialNetworkSettings";
 import commonTranslationConstants from "../constants/contentConstants/commonTranslationConstants";
 import navigationTranslationConstants from "../constants/contentConstants/navigationTranslationConstants";
 import { PersonalSettings } from "../components/accountInfo/PersonalSettings";
 import AccountInfo from "../components/accountInfo/AccountInfo";
+import LinkedAccountsGate from "../components/accountInfo/LinkedAccountsGate";
 import { useGetAccountInfoQuery } from "../../apis/legacyAccountSettingsApi";
 import { useGetAuthMetadataQuery } from "../../apis/authApi";
 import LoginMethods from "../components/accountInfo/LoginMethods";
 import { useGetSettingsUiPolicyQuery } from "../../apis/universalAppConfigurationApi";
 import BetaProgramsSettings from "../components/accountInfo/BetaProgramsSettings";
 import { useGetBetaProgramsQuery } from "../../apis/testPilotApi";
+
+const LINKED_ACCOUNTS_EXPERIMENT_LAYER = "AccountSecurity.LinkedAccounts";
 
 export const AccountInfoContainer = (): JSX.Element => {
   const { data: accountInfo, status: accountInfoStatus } = useGetAccountInfoQuery();
@@ -21,6 +25,8 @@ export const AccountInfoContainer = (): JSX.Element => {
   const { translate } = useTranslation();
   const { data: authMetadata } = useGetAuthMetadataQuery();
   const { data: betaPrograms, isLoading: programsLoading } = useGetBetaProgramsQuery();
+  const experiments = useExperiments(LINKED_ACCOUNTS_EXPERIMENT_LAYER);
+  const isLinkedAccountsDashboardEnabled = experiments.isLinkedAccountsDashboardEnabled === true;
 
   useEffect(() => {
     if (ApiRequestStatus.error in [accountInfoStatus, policyStatus]) {
@@ -36,6 +42,7 @@ export const AccountInfoContainer = (): JSX.Element => {
       </div>
       <AccountInfo />
       {authMetadata?.IsPasskeyFeatureEnabled && <LoginMethods />}
+      {isLinkedAccountsDashboardEnabled && <LinkedAccountsGate />}
       <PersonalSettings />
       {!accountInfo?.UseSuperSafePrivacyMode &&
         uiPolicy?.displaySocialMedia &&

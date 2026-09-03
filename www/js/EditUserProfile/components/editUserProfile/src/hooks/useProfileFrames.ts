@@ -15,6 +15,7 @@ type UseProfileFramesResult = {
   frames: ProfileFrame[];
   equippedFrameId?: number;
   equippedFrame?: ProfileFrame;
+  isLoading: boolean;
   isSaving: boolean;
   saveFrame: (frameId: number) => Promise<void>;
 };
@@ -45,13 +46,13 @@ const useProfileFrames = (): UseProfileFramesResult => {
   // The grid lists only equippable frames — there's no "None" tile anymore.
   // "No frame" is represented as an empty selection (NONE_FRAME_ID) and, when
   // equipped, resolves to the NONE_FRAME fallback via findProfileFrame below.
-  const { data: frames = [] } = useQuery<ProfileFrame[]>({
+  const { data: frames = [], isLoading: isFramesLoading } = useQuery<ProfileFrame[]>({
     queryKey: FRAMES_QUERY_KEY,
     queryFn: () => fetchAvailableProfileFrames(),
     staleTime: Infinity,
   });
 
-  const { data: equippedFrameId } = useQuery<number>({
+  const { data: equippedFrameId, isLoading: isEquippedLoading } = useQuery<number>({
     queryKey: EQUIPPED_FRAME_QUERY_KEY,
     queryFn: async () => toFrameId(await fetchEquippedProfileFrameId()),
     staleTime: Infinity,
@@ -82,6 +83,7 @@ const useProfileFrames = (): UseProfileFramesResult => {
     frames,
     equippedFrameId,
     equippedFrame: equippedFrameId ? resolveEquippedFrame(frames, equippedFrameId) : undefined,
+    isLoading: isFramesLoading || isEquippedLoading,
     isSaving,
     saveFrame,
   };
