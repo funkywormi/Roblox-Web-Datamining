@@ -166,7 +166,7 @@
         },
         {
             "name": "Authentication.AccountSwitch",
-            "url": "https://js.rbxcdn.com/a8daa41405bc274d49bf6dca90ad0434e32a2927ae9c6bb25c610dc32460ba20.js",
+            "url": "https://js.rbxcdn.com/9f65c239243f3e20a33b4474b7df08f03015b22f3138d4106e490fd8c3da56b5.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -1035,7 +1035,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/5a19cc663270ba2dc3ef758989599b906d6b87a07928ea1147d34a1db8531d9f.js",
+            "url": "https://js.rbxcdn.com/298ae7b38f90cf944b7e80c161cf677aa16bddcd952ab2f84580c9d891f94892.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -3048,7 +3048,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/049d14149161b68c986c2d126a6b936d859e4aaec104c3675353b549483c5df1.js",
+            "url": "https://js.rbxcdn.com/bf326782a22f026c9136b1c995128dbb7b5663af2e360f76c54511864625702a.js",
             "sources": [
                 "/home",
                 "/charts",
