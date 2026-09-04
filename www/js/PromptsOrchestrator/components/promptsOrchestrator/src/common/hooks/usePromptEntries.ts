@@ -74,15 +74,13 @@ export const usePromptEntries = <const S extends PromptStyle>({
         allowNoConfigsBuilt: true,
         responseFormat: "protobuf",
         protoSchema: GetEligiblePromptsResponseSchema,
-        // TODO: Remove pageContext from ApiRequestConfig; page context should come from service creation.
-        pageContext: { pageName: appPage, appPage },
       };
 
       await apiStore.fetchIfNeeded(request);
     };
 
     void doFetch();
-  }, [surfaceKey, configKey, promptsUrl, apiStore, appPage]);
+  }, [surfaceKey, configKey, promptsUrl, apiStore]);
 
   const cacheEntry = useSduiCacheSubscription(apiStore, configKey);
 

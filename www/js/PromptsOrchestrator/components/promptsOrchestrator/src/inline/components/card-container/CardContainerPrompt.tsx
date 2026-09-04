@@ -2,6 +2,7 @@ import { SduiFeatureEntryPoint } from "@rbx/sdui-core/client";
 import { usePromptImpressionEmitter } from "../../../common/hooks/usePromptImpressionEmitter";
 import type { InlinePromptEntryPoint } from "../../../common/constants/promptEntryPointConstants";
 import type { ClientAttributes } from "../../../common/types/promptTypes";
+import { getSduiServices } from "../../../common/services/sduiServices";
 import { useCardContainerPrompt } from "./useCardContainerPrompt";
 
 export type CardContainerPromptProps = {
@@ -33,7 +34,7 @@ export const CardContainerPrompt = ({ entryPoint, clientAttributes }: CardContai
     <SduiFeatureEntryPoint
       configKey={configKey}
       identifier={promptEntry.identifier}
-      appPage={appPage}
+      services={getSduiServices(appPage)}
       shouldDisplayLoading={false}
       shouldDisplayError={false}
     />

@@ -53,6 +53,7 @@ export interface SduiApiStoreDeps {
   errorReporter: SduiErrorReporter;
   analyticsReporter: SduiAnalyticsReporter;
   loadTimerRegistry: SduiLoadTimerRegistry;
+  pageContext: SduiPageContext;
 }
 
 const EMPTY_CACHE_ENTRY: CacheEntry = {
@@ -147,11 +148,12 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
   const executeSduiRequest = createSduiRequestExecutor({
     analyticsReporter,
     errorReporter: deps.errorReporter,
+    pageContext: deps.pageContext,
   });
 
   function resetLoadTimer(requestConfig: ApiRequestConfig): SduiLoadTimer {
     return loadTimerRegistry.reset(getConfigKey(requestConfig), {
-      pageContext: requestConfig.pageContext,
+      pageContext: deps.pageContext,
     });
   }
 
@@ -213,7 +215,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
         builder: deps.builder,
         configKey,
         scope: requestConfig.surfaceKey,
-        pageContext: requestConfig.pageContext,
+        pageContext: deps.pageContext,
         errorReporter: deps.errorReporter,
         paginateResponse,
         mergeStrategy: requestConfig.mergeStrategy,
@@ -234,7 +236,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
         reportError(
           SduiErrorName.NoComponentConfigsBuilt,
           `No configs built when handling response for ${configKey}`,
-          requestConfig.pageContext,
+          deps.pageContext,
           { name: configKey },
           deps.errorReporter,
         );
@@ -290,7 +292,6 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
 
   function reportTargetedRefreshDiagnostics(
     configKey: string,
-    requestConfig: ApiRequestConfig,
     {
       invalidTargets = [],
       missingTargets = [],
@@ -305,7 +306,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
       reportError(
         name,
         message,
-        requestConfig.pageContext,
+        deps.pageContext,
         { name: configKey, bindingPath },
         deps.errorReporter,
       );
@@ -334,12 +335,11 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
     configKey: string,
     reason: keyof typeof TARGETED_REFRESH_DEFECT_REASONS,
     targets: readonly SduiTargetedRefreshInput[],
-    pageContext?: SduiPageContext,
   ): SduiTargetedRefreshResult {
     reportError(
       SduiErrorName.TargetedRefreshUnavailable,
       `Targeted refresh unavailable: ${TARGETED_REFRESH_DEFECT_REASONS[reason]}`,
-      pageContext,
+      deps.pageContext,
       {
         name: configKey,
         bindingPath: targets.map(({ identifierPath }) => identifierPath.join(" > ")).join(", "),
@@ -368,7 +368,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
       identifier => getOrCreateInputDataSignal(configKey, identifier).peek(),
       validatedTargets,
     );
-    reportTargetedRefreshDiagnostics(configKey, requestConfig, {
+    reportTargetedRefreshDiagnostics(configKey, {
       invalidTargets: currentTargetResolution.invalidTargets,
     });
     const invalidTargets = [...initialInvalidTargets, ...currentTargetResolution.invalidTargets];
@@ -382,7 +382,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
       currentTargetResolution.pageEntries,
       validTargets,
     );
-    reportTargetedRefreshDiagnostics(configKey, requestConfig, result);
+    reportTargetedRefreshDiagnostics(configKey, result);
 
     const mergedResponse = mergeTargetedResponse(
       currentCachedResponse,
@@ -422,7 +422,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
             builder: deps.builder,
             configKey,
             scope: requestConfig.surfaceKey,
-            pageContext: requestConfig.pageContext,
+            pageContext: deps.pageContext,
             errorReporter: deps.errorReporter,
             paginateResponse: false,
             getInputDataSignal: identifier => getOrCreateInputDataSignal(configKey, identifier),
@@ -693,7 +693,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
               targets,
               identifier => getOrCreateInputDataSignal(configKey, identifier).peek(),
             );
-            reportTargetedRefreshDiagnostics(configKey, baseConfig, {
+            reportTargetedRefreshDiagnostics(configKey, {
               invalidTargets: initialTargetResolution.invalidTargets,
             });
             if (initialTargetResolution.validTargets.length === 0) {
@@ -711,7 +711,6 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
                 configKey,
                 "targetedRefreshUrlMissing",
                 targets,
-                baseConfig.pageContext,
               );
               return;
             }

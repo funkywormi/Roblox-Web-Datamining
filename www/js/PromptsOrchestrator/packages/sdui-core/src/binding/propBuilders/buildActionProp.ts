@@ -224,7 +224,6 @@ function buildActionData(
     actionType,
     actionParams,
     analyticsContext: buildContext?.analyticsContext,
-    pageContext: buildContext?.pageContext,
     ...(telemetryHandler !== undefined ? { telemetryHandler } : {}),
     ...(actionEventName !== undefined ? { actionEventName } : {}),
   };

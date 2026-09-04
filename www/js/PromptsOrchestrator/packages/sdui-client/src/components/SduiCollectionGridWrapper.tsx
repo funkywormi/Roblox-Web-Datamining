@@ -2,16 +2,24 @@
 import React from "react";
 import { useTokens } from "@rbx/core-scripts/react";
 import { CollectionGrid, CollectionItemSize } from "@rbx/discovery-sdui-components";
-import { type SduiManagedChildList, type SduiRendererInjectedProps } from "@rbx/sdui-core";
+import {
+  expandManagedList,
+  Loading,
+  LoadMoreSentinel,
+  type SduiManagedChildList,
+  type SduiRendererInjectedProps,
+  type SduiResolvedAction,
+} from "@rbx/sdui-core";
+import { useSduiLoadMorePagination } from "@rbx/sdui-core/client";
 import { toV1CollectionItemSize } from "../utils/v1Adapters";
 import { useSduiCollectionItems } from "./useSduiCollectionItems";
 
 const COLLECTION_COMPONENT_TYPE = "COLLECTION_GRID";
 
 export interface SduiCollectionGridProps extends SduiRendererInjectedProps {
-  // TODO(ltao): support remaining CollectionGrid schema features (Charts See-All follow-up: ltao/charts-sdui-v2-see-all)
+  onReachedThresholdFromEnd?: SduiResolvedAction;
   collectionItemSize?: string;
-  headerComponent?: React.ReactNode;
+  headerComponent?: React.ReactNode | SduiManagedChildList;
   items?: SduiManagedChildList;
   numColumnsOverride?: number;
   /**
@@ -26,6 +34,7 @@ export interface SduiCollectionGridProps extends SduiRendererInjectedProps {
 /** CSR-only vertical grid (e.g. the Charts "See All" page) wrapping the V1 `CollectionGrid` primitive. */
 export function SduiCollectionGrid({
   analyticsContext,
+  onReachedThresholdFromEnd,
   collectionItemSize,
   headerComponent,
   items,
@@ -34,6 +43,8 @@ export function SduiCollectionGrid({
   skipItemImpressionsLog,
 }: SduiCollectionGridProps) {
   const tokens = useTokens();
+  const { triggerLoadMore, hasNextPage, dataUpdatedTimestamp, isLoadingMore } =
+    useSduiLoadMorePagination({ onLoadMore: onReachedThresholdFromEnd });
   const { itemsContainerRef, itemConfigs, setItemsPerRow, renderItem } = useSduiCollectionItems({
     analyticsContext,
     items,
@@ -42,7 +53,7 @@ export function SduiCollectionGrid({
     skipItemImpressionsLog,
   });
 
-  const resolvedHeader = headerComponent ?? null;
+  const resolvedHeader = headerComponent ? expandManagedList(headerComponent) : null;
   const resolvedLayoutOverrides =
     numColumnsOverride != null ? { numColumns: numColumnsOverride } : undefined;
 
@@ -58,6 +69,13 @@ export function SduiCollectionGrid({
         layoutOverrides={resolvedLayoutOverrides}
         gapBetweenHeaderAndItems={tokens.Gap.Large}
       />
+      {isLoadingMore ? <Loading ariaLabel="Loading more content" /> : null}
+      {hasNextPage ? (
+        <LoadMoreSentinel
+          onLoadMore={triggerLoadMore}
+          dataUpdatedTimestamp={dataUpdatedTimestamp}
+        />
+      ) : null}
     </div>
   );
 }

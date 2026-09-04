@@ -5,7 +5,7 @@ import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
 
 export const observabilityRegistry = {
   featureName: "SilentPasskeyUpgrade",
-  team: "Account Auth",
+  team: "Safety > Accounts > Authentication",
   defaultTimeCompare: { mode: "offset", offset: "7d" },
   features: {
     health: {

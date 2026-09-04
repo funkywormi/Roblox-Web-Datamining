@@ -183,6 +183,10 @@ export const observabilityRegistry = {
           name: "LoginRedirectUnsupportedIos",
           dimensions: ["iosMajorVersion", "appType"],
         },
+        {
+          name: "RedirectClickTime",
+          dimensions: ["bucket"],
+        },
       ],
       errors: [
         "MobileRedirectUrlGenerationFailed",

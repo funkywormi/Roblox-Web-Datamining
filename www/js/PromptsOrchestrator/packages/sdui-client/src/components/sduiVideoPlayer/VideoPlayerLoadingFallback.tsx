@@ -29,7 +29,8 @@ function VideoPlayerLoadingFallbackInner({
 }: VideoPlayerLoadingFallbackProps) {
   const parsedImage = loadingImage ? parseImageString(loadingImage) : null;
   const assetId = parsedImage?.kind === "asset" ? parsedImage.assetId : undefined;
-  const { src, status } = useResolvedImageUrl(assetId);
+  // TODO: The single asset API is a short-term fix; API selection should eventually be template-driven.
+  const { src, status } = useResolvedImageUrl(assetId, true);
   const [decodeFailed, setDecodeFailed] = useState(false);
 
   const objectFit = scaleType != null ? buildObjectFitCss(scaleType) : undefined;

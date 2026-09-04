@@ -74,6 +74,23 @@ export const sendLogoutUpsellClientError = (state: LogoutUpsellClientErrorState)
   send(schematizedEventTypes.authClientError, { state });
 };
 
+const PASSKEY_ELIGIBILITY_FIELD = "passkeyEligibility";
+
+export const PasskeyEligibilityDecision = {
+  Capable: "capable",
+  ExcludedNoPlatformAuthenticator: "excludedNoPlatformAuthenticator",
+} as const;
+
+export type PasskeyEligibilityDecisionName =
+  (typeof PasskeyEligibilityDecision)[keyof typeof PasskeyEligibilityDecision];
+
+export const sendPasskeyEligibilityDecision = (state: PasskeyEligibilityDecisionName): void => {
+  send(schematizedEventTypes.authFormInteraction, {
+    field: PASSKEY_ELIGIBILITY_FIELD,
+    state,
+  });
+};
+
 // --- Passkey upsell screen ---------------------------------------------------
 
 export const sendPasskeyUpsellShown = (): void => {

@@ -1,6 +1,5 @@
-/* The list of themes user can switch to. */
-export const appThemes = [
-  "default",
+/* Themes that only plus users can switch to. */
+export const plusThemes = [
   "emerald",
   "peridot",
   "ruby",
@@ -20,19 +19,26 @@ export const appThemes = [
   "hyper-plum",
   "pixel-pop",
   "quantum-pulse",
+  "classic",
 ] as const;
 
-/* The list of themes user can switch to. */
+/* Themes that only plus users can switch to. */
+export type PlusTheme = (typeof plusThemes)[number];
+
+/* Themes that non-plus and plus users can switch to. */
+export const freeThemes = ["default"] as const;
+
+/* Themes that non-plus and plus users can switch to. */
+export type FreeTheme = (typeof freeThemes)[number];
+
+/* Themes that users can manually select. */
+export const appThemes = [...freeThemes, ...plusThemes] as const;
+
+/* Themes that users can manually select. */
 export type AppTheme = (typeof appThemes)[number];
 
-/* The list of themes related to age and verification. */
-export const ageThemes = ["kids"] as const;
+/* All possible themes. */
+export const themes = [...appThemes, "kids"] as const;
 
-/* The list of themes related to age and verification. */
-export type AgeTheme = (typeof ageThemes)[number];
-
-/* The list of all possible themes (including those forced upon the user like `kids`). */
-export const themes = [...appThemes, ...ageThemes] as const;
-
-/* The list of all possible themes (including those forced upon the user like `kids`). */
+/* All possible themes. */
 export type Theme = (typeof themes)[number];

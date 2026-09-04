@@ -1,4 +1,3 @@
-import { noOpAnalyticsReporter } from "../analytics/SduiAnalyticsReporter";
 import {
   createSduiLoadTimerRegistry,
   type SduiLoadTimerRegistry,
@@ -6,15 +5,10 @@ import {
 import { createSduiBuilder } from "../binding/SduiBuilder";
 import { createSduiDataBinder } from "../binding/SduiDataBinder";
 import { createHydrationStores } from "../binding/stores";
-import { noOpErrorReporter } from "../errors/SduiErrorReporter";
 import type { SduiActionHandlerRegistry } from "../registry/SduiActionHandlerRegistry";
-import { createSduiActionHandlerRegistry } from "../registry/SduiActionHandlerRegistry";
 import type { SduiComponentRegistry } from "../registry/SduiComponentRegistry";
-import { createSduiComponentRegistry } from "../registry/SduiComponentRegistry";
 import type { SduiImpressionHandlerRegistry } from "../registry/SduiImpressionHandlerRegistry";
-import { createSduiImpressionHandlerRegistry } from "../registry/SduiImpressionHandlerRegistry";
 import type { SduiTelemetryHandlerNameRegistry } from "../registry/SduiTelemetryHandlerNameRegistry";
-import { createSduiTelemetryHandlerNameRegistry } from "../registry/SduiTelemetryHandlerNameRegistry";
 import { createSduiApiStore } from "../store/SduiApiStore";
 import { createSduiTemplateStore } from "../store/SduiTemplateStore";
 import type {
@@ -29,7 +23,6 @@ import type {
   SduiTemplateStore,
   TranslateFunction,
 } from "../types";
-import { FALLBACK_PAGE_CONTEXT } from "../types/analytics";
 
 // ─── Public Types ───
 
@@ -45,20 +38,22 @@ export interface SduiServices {
   analyticsReporter: SduiAnalyticsReporter;
   errorReporter: SduiErrorReporter;
   loadTimerRegistry: SduiLoadTimerRegistry;
+  pageContext: SduiPageContext;
   translate?: TranslateFunction;
 }
 
 export interface CreateSduiServicesOptions {
-  componentRegistry?: SduiComponentRegistry;
-  actionHandlerRegistry?: SduiActionHandlerRegistry;
-  telemetryHandlerNameRegistry?: SduiTelemetryHandlerNameRegistry;
-  impressionHandlerRegistry?: SduiImpressionHandlerRegistry;
-  analyticsReporter?: SduiAnalyticsReporter;
-  errorReporter?: SduiErrorReporter;
+  componentRegistry: SduiComponentRegistry;
+  actionHandlerRegistry: SduiActionHandlerRegistry;
+  telemetryHandlerNameRegistry: SduiTelemetryHandlerNameRegistry;
+  impressionHandlerRegistry: SduiImpressionHandlerRegistry;
+  analyticsReporter: SduiAnalyticsReporter;
+  errorReporter: SduiErrorReporter;
+  /** Identifies the page/surface for telemetry. */
+  pageContext: SduiPageContext;
   /** Seed entity hydration data at creation time. */
   initialHydrationData?: HydrationContent;
-  /** Identifies the page/surface for telemetry. */
-  pageContext?: SduiPageContext;
+
   /** Locale-aware translate function. */
   translate?: TranslateFunction;
 }
@@ -73,26 +68,27 @@ export interface CreateSduiServicesOptions {
  */
 export function createSduiServicesWithStores(
   stores: Record<string, HydrationStore>,
-  options?: CreateSduiServicesOptions,
+  options: CreateSduiServicesOptions,
 ): SduiServices {
-  const componentRegistry = options?.componentRegistry ?? createSduiComponentRegistry();
-  const actionHandlerRegistry = options?.actionHandlerRegistry ?? createSduiActionHandlerRegistry();
-  const telemetryHandlerNameRegistry =
-    options?.telemetryHandlerNameRegistry ?? createSduiTelemetryHandlerNameRegistry();
-  const impressionHandlerRegistry =
-    options?.impressionHandlerRegistry ?? createSduiImpressionHandlerRegistry();
-  const analyticsReporter = options?.analyticsReporter ?? noOpAnalyticsReporter;
-  const errorReporter = options?.errorReporter ?? noOpErrorReporter;
+  const {
+    componentRegistry,
+    actionHandlerRegistry,
+    telemetryHandlerNameRegistry,
+    impressionHandlerRegistry,
+    analyticsReporter,
+    errorReporter,
+    pageContext,
+  } = options;
   const loadTimerRegistry = createSduiLoadTimerRegistry(errorReporter);
 
   const templateStore = createSduiTemplateStore();
   const dataBinder = createSduiDataBinder({
     errorReporter,
-    pageContext: options?.pageContext,
+    pageContext,
     initialStores: stores,
   });
 
-  if (options?.initialHydrationData) {
+  if (options.initialHydrationData) {
     dataBinder.updateDataStores(options.initialHydrationData);
   }
 
@@ -109,6 +105,7 @@ export function createSduiServicesWithStores(
     errorReporter,
     analyticsReporter,
     loadTimerRegistry,
+    pageContext,
   });
 
   return {
@@ -123,7 +120,8 @@ export function createSduiServicesWithStores(
     analyticsReporter,
     errorReporter,
     loadTimerRegistry,
-    translate: options?.translate,
+    pageContext,
+    translate: options.translate,
   };
 }
 
@@ -144,16 +142,28 @@ export function createSduiServicesWithStores(
  * arrive via `initialHydrationData` (or a later `applyUpdate`) and is
  * serialized for client transfer via `dataBinder.getStores()`.
  */
-export function createSduiServices(options?: CreateSduiServicesOptions): SduiServices {
-  return createSduiServicesWithStores(createHydrationStores(options?.translate), {
-    ...options,
-    pageContext: options?.pageContext ?? FALLBACK_PAGE_CONTEXT,
-  });
+export function createSduiServices(options: CreateSduiServicesOptions): SduiServices {
+  return createSduiServicesWithStores(createHydrationStores(options.translate), options);
 }
 
 // ─── Page-scoped Service Registry (CSR only) ───
 
 const pageServicesByKey = new Map<string, SduiServices>();
+
+/**
+ * Return the existing page-scoped services instance.
+ *
+ * Use for lookup-only call sites that must not create a partially configured
+ * service graph.
+ */
+export function getPageServices(pageKey: string): SduiServices {
+  const services = pageServicesByKey.get(pageKey);
+  if (!services) {
+    throw new Error(`SDUI services have not been created for page "${pageKey}".`);
+  }
+
+  return services;
+}
 
 /**
  * Get or lazily create a shared `SduiServices` instance for a page. The
@@ -166,7 +176,7 @@ const pageServicesByKey = new Map<string, SduiServices>();
  */
 export function getOrCreatePageServices(
   pageKey: string,
-  options?: CreateSduiServicesOptions,
+  options: CreateSduiServicesOptions,
 ): SduiServices {
   const existing = pageServicesByKey.get(pageKey);
   if (existing) return existing;

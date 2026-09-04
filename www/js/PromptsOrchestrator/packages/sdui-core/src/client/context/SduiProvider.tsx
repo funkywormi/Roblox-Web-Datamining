@@ -1,9 +1,7 @@
 import React, { createContext, useContext, useMemo } from "react";
 import type { SduiServices } from "../../services/SduiServices";
-import type { SduiPageContext } from "../../types";
 
 export interface SduiContextValue extends SduiServices {
-  pageContext?: SduiPageContext;
   configKey?: string;
 }
 
@@ -22,20 +20,24 @@ export function useSduiServices(): SduiContextValue {
   return contextValue;
 }
 
+/** Read the cache/request key scoped to the nearest SDUI render subtree. */
+export function useSduiConfigKey(): string | undefined {
+  return useSduiServices().configKey;
+}
+
 export interface SduiProviderProps {
   children: React.ReactNode;
   services: SduiServices;
-  pageContext?: SduiPageContext;
   configKey?: string;
 }
 
 /**
- * Provides `SduiServices` plus per-page metadata (`pageContext`, `configKey`) to descendants.
+ * Provides `SduiServices` plus the current `configKey` to descendants.
  */
-export function SduiProvider({ children, services, pageContext, configKey }: SduiProviderProps) {
+export function SduiProvider({ children, services, configKey }: SduiProviderProps) {
   const contextValue = useMemo<SduiContextValue>(
-    () => ({ ...services, pageContext, configKey }),
-    [services, pageContext, configKey],
+    () => ({ ...services, configKey }),
+    [services, configKey],
   );
 
   return <SduiContext.Provider value={contextValue}>{children}</SduiContext.Provider>;

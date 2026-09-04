@@ -109,7 +109,7 @@ const NavItem = ({
   const anchor = (
     <a
       href={href}
-      className={classNames(navItemClasses, interactable, isCurrentPath && "bg-surface-300")}
+      className={classNames(navItemClasses, interactable, isCurrentPath && "bg-shift-200")}
       onClick={onActivate}
     >
       <StateLayer />

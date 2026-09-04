@@ -12,6 +12,7 @@ export const initializeTheme = () => {
   if (document.body.classList.contains("forced-theme")) {
     return; // This page should remain on the initial theme
   }
+
   const client = realtime.GetClient();
   client.Subscribe("UserSettingsChanged", details => {
     if (details == null || typeof details !== "object") {

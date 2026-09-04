@@ -38,6 +38,59 @@
     }
 }
 
+.install-instructions {
+    max-width: 1140px
+}
+
+.install-instructions h3 {
+    padding: 15px
+}
+
+.install-instructions .col-xs-6 {
+    padding: 30px
+}
+
+.install-instructions .col-xs-6 .section-content {
+    background: var(--color-surface-100);
+    border-radius: 20px;
+    min-height: 380px;
+    padding: 32px
+}
+
+.install-instructions ol {
+    text-align: left
+}
+
+.install-instructions ol>li {
+    padding-bottom: 30px;
+    list-style: decimal
+}
+
+.install-instructions .qr-tagline {
+    margin-left: 15%;
+    margin-right: 15%
+}
+
+.install-instructions .qr-container {
+    background-color: #fff;
+    border-radius: 20px;
+    width: 180px;
+    height: 180px;
+    margin: 30px;
+    display: inline-block
+}
+
+.install-instructions .qr-container .qr-code {
+    width: 90%;
+    width: calc(100% - 24px);
+    height: 90%;
+    background-image: url(https://images.rbxcdn.com/6674b8e189bf79c6.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: calc(100% - 24px);
+    margin: 12px
+}
+
 .sdui-tile-image-container:before {
     content: "";
     pointer-events: none;
@@ -101,59 +154,6 @@
 
 .thumbnail-2d-container.sdui-thumbnail-image-container img.loading {
     opacity: 0
-}
-
-.install-instructions {
-    max-width: 1140px
-}
-
-.install-instructions h3 {
-    padding: 15px
-}
-
-.install-instructions .col-xs-6 {
-    padding: 30px
-}
-
-.install-instructions .col-xs-6 .section-content {
-    background: var(--color-surface-100);
-    border-radius: 20px;
-    min-height: 380px;
-    padding: 32px
-}
-
-.install-instructions ol {
-    text-align: left
-}
-
-.install-instructions ol>li {
-    padding-bottom: 30px;
-    list-style: decimal
-}
-
-.install-instructions .qr-tagline {
-    margin-left: 15%;
-    margin-right: 15%
-}
-
-.install-instructions .qr-container {
-    background-color: #fff;
-    border-radius: 20px;
-    width: 180px;
-    height: 180px;
-    margin: 30px;
-    display: inline-block
-}
-
-.install-instructions .qr-container .qr-code {
-    width: 90%;
-    width: calc(100% - 24px);
-    height: 90%;
-    background-image: url(https://images.rbxcdn.com/6674b8e189bf79c6.png);
-    background-repeat: no-repeat;
-    background-size: cover;
-    height: calc(100% - 24px);
-    margin: 12px
 }
 
 .inset-\[0\] {
@@ -361,6 +361,10 @@
 
 .icon-regular-premium {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M23 4C25.7614 4 28 6.23858 28 9V23C28 25.7614 25.7614 28 23 28H15C14.4477 28 14 27.5523 14 27C14 26.4477 14.4477 26 15 26H23C24.6569 26 26 24.6569 26 23V9C26 7.34315 24.6569 6 23 6H9C7.34315 6 6 7.34315 6 9V27C6 27.5523 5.55228 28 5 28C4.44772 28 4 27.5523 4 27V9C4 6.23858 6.23858 4 9 4H23Z' fill='black'/%3E %3Cpath d='M20 10C21.1046 10 22 10.8954 22 12V20C22 21.1046 21.1046 22 20 22H15C14.4477 22 14 21.5523 14 21C14 20.4477 14.4477 20 15 20H20V12H12V27C12 27.5523 11.5523 28 11 28C10.4477 28 10 27.5523 10 27V12C10 10.8954 10.8954 10 12 10H20Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-roblox-plus {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M13.8555 2.5606C15.1824 1.81313 16.8176 1.81313 18.1445 2.5606L26.8555 7.46782C28.1824 8.21534 28.9999 9.59781 29 11.0928V20.9073C29 22.4024 28.1824 23.7847 26.8555 24.5323L18.1445 29.4395L17.8926 29.5704C16.6996 30.143 15.3004 30.143 14.1074 29.5704L13.8555 29.4395L11.0176 27.8409C10.3887 27.4864 10 26.8196 10 26.0977V12.001C10.0002 10.8967 10.8957 10.0012 12 10.001L20 10.0001C21.1044 10 21.9998 10.8957 22 12.0001V19.0001C22 20.1046 21.1046 21.0001 20 21.0001H16C15.4477 21.0001 15 20.5523 15 20.0001C15.0002 19.4479 15.4478 19.0001 16 19.0001H20V12.0001L12 12.001V26.0987L14.8369 27.6973C15.5545 28.1016 16.4455 28.1016 17.1631 27.6973L25.874 22.7891C26.5863 22.3877 27 21.6636 27 20.9073V11.0928C26.9999 10.3366 26.5863 9.61234 25.874 9.21099L17.1631 4.30278C16.4456 3.89864 15.5544 3.89864 14.8369 4.30278L6.12598 9.21099C5.41372 9.61234 5.00013 10.3366 5 11.0928V20.9073C5 21.6636 5.4137 22.3877 6.12598 22.7891L6.49023 22.9942C6.80495 23.1714 7 23.5051 7 23.8663C6.99984 24.6314 6.17549 25.1128 5.50879 24.7374L5.14453 24.5323C3.81763 23.7847 3 22.4024 3 20.9073V11.0928C3.00012 9.69126 3.71827 8.38846 4.90137 7.61528L5.14453 7.46782L13.8555 2.5606Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-regular-speech-bubble-align-center {

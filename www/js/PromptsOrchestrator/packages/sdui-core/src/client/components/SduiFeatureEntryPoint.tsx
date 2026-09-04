@@ -6,15 +6,8 @@ import {
   type TProgressCircleProps,
 } from "@rbx/foundation-ui";
 
-import type { SduiActionHandlerRegistry } from "../../registry/SduiActionHandlerRegistry";
-import type { SduiComponentRegistry } from "../../registry/SduiComponentRegistry";
-import { getOrCreatePageServices } from "../../services/SduiServices";
-import type {
-  AnalyticsFieldMap,
-  SduiAnalyticsReporter,
-  SduiErrorReporter,
-  SduiPageContext,
-} from "../../types";
+import type { SduiServices } from "../../services/SduiServices";
+import type { AnalyticsFieldMap } from "../../types";
 import { DEFAULT_SDUI_ENTRY_POINT_MESSAGES } from "../const/clientConstants";
 import { SduiProvider } from "../context/SduiProvider";
 import { SduiQueryClientProvider } from "../context/SduiQueryClientProvider";
@@ -126,8 +119,6 @@ function SduiFeatureEntryPointContent({
 export interface SduiFeatureEntryPointProps {
   /** Cache key for the SDUI response in `SduiApiStore`. */
   configKey: string;
-  /** Page identifier — services are keyed by this and it surfaces in telemetry. */
-  appPage: string;
   /** Selects a specific root config when the response holds more than one. Defaults to the first. */
   identifier?: string;
   /**
@@ -144,40 +135,22 @@ export interface SduiFeatureEntryPointProps {
   shouldDisplayError?: boolean;
   onRetry?: () => void;
   errorBoundaryFallback?: React.ComponentType<SduiErrorBoundaryFallbackProps>;
-  componentRegistry?: SduiComponentRegistry;
-  actionHandlerRegistry?: SduiActionHandlerRegistry;
-  analyticsReporter?: SduiAnalyticsReporter;
-  errorReporter?: SduiErrorReporter;
-  pageContext?: SduiPageContext;
+  services: SduiServices;
 }
 
 export function SduiFeatureEntryPoint({
-  appPage,
-  componentRegistry,
-  actionHandlerRegistry,
-  analyticsReporter,
-  errorReporter,
-  pageContext,
+  services,
   errorBoundaryFallback,
   configKey,
   identifier,
   ...contentProps
 }: SduiFeatureEntryPointProps) {
-  const services = getOrCreatePageServices(appPage, {
-    componentRegistry,
-    actionHandlerRegistry,
-    analyticsReporter,
-    errorReporter,
-  });
-
-  const resolvedPageContext = useMemo<SduiPageContext>(
-    () => pageContext ?? { pageName: appPage, appPage },
-    [pageContext, appPage],
-  );
+  const { pageContext } = services;
+  const { appPage } = pageContext;
 
   const handleError = createSduiRenderErrorHandler({
     errorReporter: services.errorReporter,
-    pageContext: resolvedPageContext,
+    pageContext,
     errorDimensions: {
       name: configKey,
       componentType: appPage,
@@ -187,7 +160,7 @@ export function SduiFeatureEntryPoint({
 
   return (
     <SduiQueryClientProvider>
-      <SduiProvider services={services} pageContext={resolvedPageContext} configKey={configKey}>
+      <SduiProvider services={services} configKey={configKey}>
         <SduiErrorBoundary fallback={errorBoundaryFallback} onError={handleError}>
           <SduiFeatureEntryPointContent
             configKey={configKey}

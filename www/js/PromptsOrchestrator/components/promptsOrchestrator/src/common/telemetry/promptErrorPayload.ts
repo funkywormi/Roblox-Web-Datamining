@@ -1,16 +1,23 @@
 import type { SduiErrorReporter, ReportSduiErrorAdditionalOptions } from "@rbx/sdui-core";
-import type { AppPage } from "../constants/pageConstants";
+import type { AppPage, AppPageOrOverlay } from "../constants/pageConstants";
 import { getSduiPageContext } from "../utils/sduiUtils";
 
-export type PromptErrorPayload = {
+type BaseErrorPayload = {
   errorName: string;
   errorMessage: string;
-  appPage: AppPage;
   options?: ReportSduiErrorAdditionalOptions;
 };
 
+export type PromptErrorPayload = BaseErrorPayload & {
+  appPage: AppPage;
+};
+
+export type OverlayErrorPayload = BaseErrorPayload & {
+  appPage: AppPageOrOverlay;
+};
+
 export const bindPromptErrorReporter =
-  (reporter: SduiErrorReporter) => (payload: PromptErrorPayload) => {
+  (reporter: SduiErrorReporter) => (payload: PromptErrorPayload | OverlayErrorPayload) => {
     reporter.reportSduiError(
       payload.errorName,
       payload.errorMessage,

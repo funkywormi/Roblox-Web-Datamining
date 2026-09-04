@@ -2,10 +2,8 @@ import { executeAction } from "./executeAction";
 import { SduiErrorName } from "../errors/SduiErrors";
 import { reportError } from "../errors/SduiLogger";
 import type { SduiServices } from "../services/SduiServices";
-import { FALLBACK_PAGE_CONTEXT } from "../types/analytics";
 import type {
   SduiActionContext,
-  SduiActionData,
   SduiActionResolver,
   SduiResolvedAction,
   SduiActionSnapshot,
@@ -22,29 +20,32 @@ import { DataStatus } from "../types";
  * Signals produce a new snapshot and rerender when action data changes.
  * Both href resolution and activation use the same rendered snapshot.
  *
- * `configKey` identifies the page payload the actions were rendered from, so
+ * @param configKey - identifies the page payload the actions were rendered from, so
  * handlers that refresh page data act on the entry that produced them.
+ * @param pageEntryIdentifier - the page entry identifier of the page payload the action was rendered from
  */
 export function createActionResolver(
   services: SduiServices,
   configKey?: string,
+  pageEntryIdentifier?: string,
 ): SduiActionResolver {
   const { actionHandlerRegistry, telemetryHandlerNameRegistry, translate } = services;
 
-  const createActionContext = (actionData?: SduiActionData): SduiActionContext => ({
+  const createActionContext = (): SduiActionContext => ({
     apiStore: services.apiStore,
     configKey,
+    pageEntryIdentifier,
     dataBinder: services.dataBinder,
     analyticsReporter: services.analyticsReporter,
     errorReporter: services.errorReporter,
-    pageContext: actionData?.pageContext ?? FALLBACK_PAGE_CONTEXT,
+    pageContext: services.pageContext,
     translate,
   });
 
   return (snapshot: SduiActionSnapshot): SduiResolvedAction => {
     const currentActionData =
       snapshot.status === DataStatus.Ready ? snapshot.actionData : undefined;
-    const currentActionContext = createActionContext(currentActionData);
+    const currentActionContext = createActionContext();
     const handlerConfig =
       currentActionData === undefined
         ? undefined
@@ -76,7 +77,7 @@ export function createActionResolver(
         snapshot.actionData,
         actionHandlerRegistry,
         telemetryHandlerNameRegistry,
-        createActionContext(snapshot.actionData),
+        createActionContext(),
         paramOverrides,
       );
     };

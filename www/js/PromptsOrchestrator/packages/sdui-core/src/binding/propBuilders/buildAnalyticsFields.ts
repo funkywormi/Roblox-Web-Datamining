@@ -1,22 +1,22 @@
-import { computed, type ReadonlySignal } from "@preact/signals-core";
+import type { ReadonlySignal } from "@preact/signals-core";
 
 import { reportBindingError, SduiErrorName } from "../../errors";
 import type {
   AnalyticsFieldMap,
   BindingContext,
   DataBindingSources,
+  PropBuildRequest,
   SduiDataBinder,
 } from "../../types";
 import { isRecord } from "../../utils/typeGuards";
 import { unwrapOneOf } from "../../utils/oneOfHelper";
-import { isBindingPathKind, PROP_KIND } from "../../types/propKinds";
-import { resolveBindingPath } from "../SduiDataBinder";
+import { buildDefaultProp } from "./buildDefaultProp";
 
 /**
  * Output of `resolveAnalyticsFields`. `literals` carries `AnalyticsDataField.literal`
- * fields; `signals` carries non-subscribing reads for `AnalyticsDataField.binding_path`
- * fields. `buildAnalyticsContext` overlays signals on literals at snapshot time, with
- * collection-set locals winning last.
+ * fields; `signals` carries non-subscribing reads for dynamic binding-path and
+ * conditional fields. `buildAnalyticsContext` overlays signals on literals at
+ * snapshot time, with collection-set locals winning last.
  */
 export interface ResolvedAnalyticsFields {
   literals: AnalyticsFieldMap;
@@ -42,8 +42,10 @@ function makeFieldContext(rootCtx: BindingContext, fieldName: string): BindingCo
 
 /**
  * Splits each `AnalyticsDataField` in `template.shared.analyticsData` into a
- * literal scalar or a non-subscribing binding-path read. Per-field failures
- * are isolated and reported so one bad entry can't sink the rest of the map.
+ * literal scalar or a non-subscribing dynamic read. Fields reuse the default
+ * prop builder so binding paths and conditionals follow the same resolution
+ * mechanics as regular props. Per-field failures are isolated and reported
+ * so one bad entry can't sink the rest of the map.
  */
 export function resolveAnalyticsFields(
   rawAnalyticsData: Record<string, unknown> | undefined,
@@ -80,14 +82,30 @@ export function resolveAnalyticsFields(
       continue;
     }
 
-    const { propType, propValue } = kindWrapper;
+    const request: PropBuildRequest = {
+      dataSources,
+      dataBinder,
+      ctx: fieldCtx,
+      // AnalyticsDataField conditional branches only contain literal or
+      // binding-path values, so the default builder never recursively dispatches
+      // a nested prop definition through this callback.
+      buildProp: () => ({
+        value: undefined,
+        category: "failed",
+        error: "AnalyticsDataField does not support nested prop definitions",
+      }),
+    };
+    const result = buildDefaultProp(kindWrapper.propType, kindWrapper.propValue, request, {
+      kind: "default",
+      parser: coerceAnalyticsScalar,
+    });
 
-    if (propType === PROP_KIND.LITERAL) {
-      const scalar = coerceAnalyticsScalar(propValue);
+    if (result.category === "literal") {
+      const scalar = coerceAnalyticsScalar(result.value);
       if (scalar === undefined) {
         reportFieldError(
           SduiErrorName.FailedToParseProp,
-          `analytics field "${fieldName}" literal was not a scalar (got ${typeof propValue})`,
+          `analytics field "${fieldName}" literal was not a scalar (got ${typeof kindWrapper.propValue})`,
         );
         continue;
       }
@@ -95,29 +113,9 @@ export function resolveAnalyticsFields(
       continue;
     }
 
-    if (isBindingPathKind(propType)) {
-      if (typeof propValue !== "string" || propValue.length === 0) {
-        reportFieldError(
-          SduiErrorName.InvalidBindingPath,
-          `analytics field "${fieldName}" bindingPath must be a non-empty string; got ${typeof propValue}`,
-          { bindingPath: String(propValue) },
-        );
-        continue;
-      }
-      // Wrap in a `computed` to reuse `resolveBindingPath`'s input-vs-hydration
-      // dispatch and default-path fallback. Snapshot consumers read via `peek()` so
-      // analytics never accidentally subscribes the renderer.
-      const bindingPath = propValue;
-      signals[fieldName] = computed(
-        () => resolveBindingPath(bindingPath, dataSources, dataBinder, fieldCtx).value,
-      );
-      continue;
+    if (result.category === "propSignal") {
+      signals[fieldName] = result.signal;
     }
-
-    reportFieldError(
-      SduiErrorName.FailedToParseProp,
-      `analytics field "${fieldName}" has unknown kind="${propType}" (expected "literal" or "bindingPath")`,
-    );
   }
 
   return { literals, signals };

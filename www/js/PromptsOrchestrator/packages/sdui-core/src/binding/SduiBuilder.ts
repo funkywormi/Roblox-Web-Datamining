@@ -169,7 +169,6 @@ function buildComponentConfig(
   // Inject `analyticsContext` so child `ActionProp`s see
   // the same data we'll use for impressions/clicks on this component.
   const actionCtx: ActionBuildContext = {
-    pageContext: rootCtx.pageContext,
     analyticsContext,
   };
 

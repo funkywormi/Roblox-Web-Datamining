@@ -313,6 +313,8 @@ export interface SduiActionContext {
   apiStore: SduiApiStore;
   /** Cache key of the page payload the action was rendered from. */
   configKey?: string;
+  /** The page entry identifier of the page payload the action was rendered from. */
+  pageEntryIdentifier?: string;
   dataBinder: SduiDataBinder;
   analyticsReporter: SduiAnalyticsReporter;
   errorReporter: SduiErrorReporter;
@@ -379,7 +381,6 @@ export interface SduiActionData {
   actionType: ActionType;
   actionParams: Record<string, unknown>;
   analyticsContext?: AnalyticsContext;
-  pageContext?: SduiPageContext;
   telemetryHandler?: string;
   actionEventName?: string;
 }

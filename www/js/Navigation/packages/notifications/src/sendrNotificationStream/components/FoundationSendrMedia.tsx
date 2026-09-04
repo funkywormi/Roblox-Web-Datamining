@@ -28,6 +28,10 @@ export const FoundationSendrMedia = ({
   const isRound = thumbnailItem.idType === ThumbnailType.User;
   return (
     <span
+      // radius-circle lets the shared thumbnails `:has(img[src*="-ProfileFrame"])` rule
+      // override this inline circular clip for framed derivatives (its !important beats the
+      // inline style), so a subscriber's frame renders uncropped while plain headshots stay round.
+      className={isRound ? "radius-circle" : undefined}
       style={{
         display: "block",
         width: MEDIA_SIZE,
@@ -43,6 +47,7 @@ export const FoundationSendrMedia = ({
         format={ThumbnailFormat.webp}
         targetId={parseFloat(thumbnailItem.id)}
         containerClass="notification-icon"
+        includeProfileFrame={isRound}
       />
     </span>
   );

@@ -82,12 +82,16 @@ export const NotificationThumbnail = ({
   return thumbnailItem.idType === ThumbnailType.User ? (
     <div className="avatar avatar-headshot-sm avatar-sndr-overides">
       <div className="avatar-card-image">
+        {/* includeProfileFrame: render a subscriber's frame around their headshot in
+          notifications (user avatars only). Shared thumbnails CSS handles the framed
+          derivative; other idTypes (game/group/asset) never get a frame. */}
         <Thumbnail2d
           type={thumbnailSettings.type}
           size={DefaultThumbnailSize}
           format={ThumbnailFormat.webp}
           targetId={parseFloat(thumbnailItem.id)}
           containerClass={thumbnailSettings.class}
+          includeProfileFrame
         />
       </div>
     </div>

@@ -1,4 +1,5 @@
-import "./global";
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference -- .d.ts reference, not a runtime import, so the Next bundler doesn't try to resolve it as a module
+/// <reference path="./global.d.ts" />
 
 /**
  * Similar to the `keyof` keyword, this type returns a union of the values of a type

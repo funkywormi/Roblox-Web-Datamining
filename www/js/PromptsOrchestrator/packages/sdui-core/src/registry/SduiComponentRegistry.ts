@@ -1,7 +1,7 @@
 // TODO: parity with lua — `getLazyComponent` (dynamic import) support.
 import type { ComponentType } from "react";
 import type { SduiComponentDefinition, UiComponentType } from "../types";
-import { DEFAULT_COMPONENTS } from "./defaultComponents";
+import { createBaseRegistry } from "./createBaseRegistry";
 
 export interface SduiComponentRegistry {
   registerComponentDefinition(
@@ -16,54 +16,47 @@ export interface SduiComponentRegistry {
   doesComponentManageChildren(componentType: UiComponentType): boolean;
   hasComponent(componentType: UiComponentType): boolean;
   getRegisteredTypes(): UiComponentType[];
-}
-
-/** Seeds the registry from `DEFAULT_COMPONENTS`. Missing types stay unregistered. */
-function buildDefaultComponentDefinitions(): Map<UiComponentType, SduiComponentDefinition> {
-  const definitions = new Map<UiComponentType, SduiComponentDefinition>();
-  for (const [typeKey, definition] of Object.entries(DEFAULT_COMPONENTS)) {
-    definitions.set(Number(typeKey) as UiComponentType, definition);
-  }
-  return definitions;
+  lock(): void;
+  isLocked(): boolean;
 }
 
 /**
- * Component registry seeded with the SSR-safe default leaf components.
- * Client/server packages override entries with their environment-specific
- * implementations; unregistered types render `null`.
+ * Creates an empty component registry. Composition roots register definitions
+ * from their selected modules; unregistered types render `null`.
  */
 export function createSduiComponentRegistry(): SduiComponentRegistry {
-  const definitions = buildDefaultComponentDefinitions();
+  const registry = createBaseRegistry<UiComponentType, SduiComponentDefinition>({
+    lockedMessage: "SDUI component registry is locked",
+    parseKey: rawKey => Number(rawKey) as UiComponentType,
+  });
 
   return {
     registerComponentDefinition(componentType, definition) {
-      definitions.set(componentType, definition);
+      registry.register(componentType, definition);
     },
-
-    registerComponentDefinitions(overrides) {
-      for (const [typeKey, definition] of Object.entries(overrides)) {
-        definitions.set(Number(typeKey) as UiComponentType, definition);
-      }
+    registerComponentDefinitions(definitions) {
+      registry.registerAll(definitions);
     },
-
     getComponentDefinition(componentType) {
-      return definitions.get(componentType);
+      return registry.get(componentType);
     },
-
-    doesComponentManageChildren(componentType) {
-      return definitions.get(componentType)?.doesManageChildren ?? false;
-    },
-
-    getComponent(componentType) {
-      return definitions.get(componentType)?.component;
-    },
-
     hasComponent(componentType) {
-      return definitions.has(componentType);
+      return registry.has(componentType);
     },
-
     getRegisteredTypes() {
-      return [...definitions.keys()];
+      return registry.keys();
+    },
+    lock() {
+      registry.lock();
+    },
+    isLocked() {
+      return registry.isLocked();
+    },
+    getComponent(componentType) {
+      return registry.get(componentType)?.component;
+    },
+    doesComponentManageChildren(componentType) {
+      return registry.get(componentType)?.doesManageChildren ?? false;
     },
   };
 }

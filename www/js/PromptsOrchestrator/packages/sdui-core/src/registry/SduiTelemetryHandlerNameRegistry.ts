@@ -1,5 +1,7 @@
 import type { SduiActionTelemetryHandler } from "../types";
+import { createBaseRegistry } from "./createBaseRegistry";
 
+export type TelemetryHandlersInput = Record<string, SduiActionTelemetryHandler>;
 /**
  * Registry of telemetry handlers keyed by `Action.telemetry_handler`. A hit
  * in `logActionTelemetry` overrides `SduiActionHandlerConfig.telemetryHandler`
@@ -7,32 +9,38 @@ import type { SduiActionTelemetryHandler } from "../types";
  */
 export interface SduiTelemetryHandlerNameRegistry {
   registerTelemetryHandler(name: string, handler: SduiActionTelemetryHandler): void;
-  registerTelemetryHandlers(handlers: Record<string, SduiActionTelemetryHandler>): void;
+  registerTelemetryHandlers(handlers: TelemetryHandlersInput): void;
   getTelemetryHandler(name: string): SduiActionTelemetryHandler | undefined;
   hasTelemetryHandler(name: string): boolean;
+  lock(): void;
+  isLocked(): boolean;
 }
 
 /** Returns a fresh registry per call so each `SduiServices` owns its own map. */
 export function createSduiTelemetryHandlerNameRegistry(): SduiTelemetryHandlerNameRegistry {
-  const handlers = new Map<string, SduiActionTelemetryHandler>();
+  const registry = createBaseRegistry<string, SduiActionTelemetryHandler>({
+    lockedMessage: "SDUI telemetry handler registry is locked",
+    parseKey: rawKey => rawKey,
+  });
 
   return {
     registerTelemetryHandler(name, handler) {
-      handlers.set(name, handler);
+      registry.register(name, handler);
     },
-
-    registerTelemetryHandlers(configs) {
-      for (const [name, handler] of Object.entries(configs)) {
-        handlers.set(name, handler);
-      }
+    registerTelemetryHandlers(handlers) {
+      registry.registerAll(handlers);
     },
-
     getTelemetryHandler(name) {
-      return handlers.get(name);
+      return registry.get(name);
     },
-
     hasTelemetryHandler(name) {
-      return handlers.has(name);
+      return registry.has(name);
+    },
+    lock() {
+      registry.lock();
+    },
+    isLocked() {
+      return registry.isLocked();
     },
   };
 }

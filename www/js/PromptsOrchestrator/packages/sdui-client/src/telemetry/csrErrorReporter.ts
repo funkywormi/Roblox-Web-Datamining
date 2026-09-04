@@ -23,7 +23,9 @@ const SDUI_COMPONENT_TYPE_TAG_KEY = "sduiComponentType";
  * SduiErrorReporter for SDUI services, your team will be responsible for
  * monitoring or forwarding SDUI errors
  * ```
- * const services = getOrCreateSduiClientPageServices("page", {
+ * const services = getOrCreatePageServices("page", {
+ *   ...registries,
+ *   analyticsReporter,
  *   errorReporter: createCsrErrorReporter({
  *     applicationName: "webPrompts",
  *     errorNameTagKey: "promptErrorName",

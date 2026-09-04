@@ -1,5 +1,6 @@
 // TODO: parity with lua — lazyHandler support (see getSduiImpressionHandlerRegistry.lua).
 import type { SduiImpressionEventName, SduiImpressionHandlerConfig } from "../types";
+import { createBaseRegistry } from "./createBaseRegistry";
 
 type ImpressionEventNameInput = SduiImpressionEventName | (string & {});
 
@@ -18,36 +19,40 @@ export interface SduiImpressionHandlerRegistry {
   registerImpressionHandlers(configs: ImpressionHandlerConfigsInput): void;
   getImpressionHandler(name: ImpressionEventNameInput): SduiImpressionHandlerConfig | undefined;
   hasImpressionHandler(name: ImpressionEventNameInput): boolean;
+  lock(): void;
+  isLocked(): boolean;
 }
 
-type ImpressionHandlerConfigsInput = Partial<
+export type ImpressionHandlerConfigsInput = Partial<
   Record<SduiImpressionEventName, SduiImpressionHandlerConfig>
 > &
   Record<string, SduiImpressionHandlerConfig | undefined>;
 
 /** Returns a fresh registry per call so each `SduiServices` owns its own map. */
 export function createSduiImpressionHandlerRegistry(): SduiImpressionHandlerRegistry {
-  const handlers = new Map<string, SduiImpressionHandlerConfig>();
+  const registry = createBaseRegistry<string, SduiImpressionHandlerConfig>({
+    lockedMessage: "SDUI impression handler registry is locked",
+    parseKey: rawKey => rawKey,
+  });
 
   return {
     registerImpressionHandler(name, config) {
-      handlers.set(name, config);
+      registry.register(name, config);
     },
-
     registerImpressionHandlers(configs) {
-      for (const [name, config] of Object.entries(configs)) {
-        if (config) {
-          handlers.set(name, config);
-        }
-      }
+      registry.registerAll(configs);
     },
-
     getImpressionHandler(name) {
-      return handlers.get(name);
+      return registry.get(name);
     },
-
     hasImpressionHandler(name) {
-      return handlers.has(name);
+      return registry.has(name);
+    },
+    lock() {
+      registry.lock();
+    },
+    isLocked() {
+      return registry.isLocked();
     },
   };
 }

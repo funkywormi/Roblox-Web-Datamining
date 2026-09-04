@@ -14,7 +14,7 @@ import {
   type TDialogSize,
 } from "@rbx/foundation-ui";
 import { coerceToAllowedValue } from "../utils/foundationEnums";
-import type { SduiRendererInjectedProps, SduiResolvedAction } from "../types";
+import type { SduiRendererInjectedProps, SduiResolvedAction, SduiTokenOrLiteral } from "../types";
 import {
   isSduiFoundationIconClass,
   type SduiFoundationIconClass,
@@ -28,11 +28,13 @@ export type SduiDialogImageProps = {
   image: string;
   aspectRatio: number;
   alt: string;
+  imageStyle?: SduiTokenOrLiteral | null;
 };
 
 export type SduiDialogProps = SduiRendererInjectedProps & {
   size?: string;
   image?: string;
+  imageStyle?: SduiTokenOrLiteral | null;
   /**
    * Aspect ratio of the image
    * @default 16 / 9
@@ -114,6 +116,7 @@ const asAnchorOrButton = (href: string | undefined) =>
 export function SduiDialog({
   size,
   image,
+  imageStyle,
   imageAspectRatio,
   imageAltText = "",
   imageComponent: ImageComponent,
@@ -197,6 +200,7 @@ export function SduiDialog({
               image={image}
               aspectRatio={imageAspectRatio ?? DEFAULT_IMAGE_ASPECT_RATIO}
               alt={imageAltText}
+              imageStyle={imageStyle}
             />
           </DialogHeroMedia>
         )}

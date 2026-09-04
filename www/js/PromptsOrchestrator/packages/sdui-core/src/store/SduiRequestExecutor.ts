@@ -18,6 +18,7 @@ import type {
   SduiAnalyticsReporter,
   SduiApiResponse,
   SduiErrorReporter,
+  SduiPageContext,
 } from "../types";
 import type { SduiLoadTimer } from "../types/performance";
 import { getConfigKey } from "../utils/apiStoreHelper";
@@ -26,6 +27,7 @@ import { toError } from "../utils/error";
 interface SduiRequestExecutorDeps {
   analyticsReporter: SduiAnalyticsReporter;
   errorReporter: SduiErrorReporter;
+  pageContext: SduiPageContext;
 }
 
 interface ExecuteSduiRequestOptions {
@@ -37,12 +39,13 @@ interface ExecuteSduiRequestOptions {
 
 function emitPageStatusEvent(
   analyticsReporter: SduiAnalyticsReporter,
+  pageContext: SduiPageContext,
   requestConfig: ApiRequestConfig,
   statusCode: SduiPageStatusCode,
   httpError?: string,
 ): void {
   analyticsReporter.logEvent(
-    buildSduiPageEventDescriptor(SDUI_PAGE_STATUS_EVENT_NAME, requestConfig.pageContext),
+    buildSduiPageEventDescriptor(SDUI_PAGE_STATUS_EVENT_NAME, pageContext),
     {
       pageKey: requestConfig.surfaceKey,
       statusCode,
@@ -53,6 +56,7 @@ function emitPageStatusEvent(
 
 function emitPagePayloadSizeEvent(
   analyticsReporter: SduiAnalyticsReporter,
+  pageContext: SduiPageContext,
   requestConfig: ApiRequestConfig,
   response: Response,
 ): void {
@@ -60,7 +64,7 @@ function emitPagePayloadSizeEvent(
   const payloadSize = headerValue == null ? NaN : Number(headerValue);
   if (!Number.isFinite(payloadSize)) return;
   analyticsReporter.logEvent(
-    buildSduiPageEventDescriptor(SDUI_PAGE_PAYLOAD_SIZE_EVENT_NAME, requestConfig.pageContext),
+    buildSduiPageEventDescriptor(SDUI_PAGE_PAYLOAD_SIZE_EVENT_NAME, pageContext),
     { pageKey: requestConfig.surfaceKey, payloadSize },
   );
 }
@@ -78,7 +82,7 @@ export function createSduiRequestExecutor(deps: SduiRequestExecutorDeps) {
       ...requestConfig.headers,
     };
     const configKey = getConfigKey(requestConfig);
-    const { pageContext } = requestConfig;
+    const { pageContext } = deps;
 
     // TODO(lua-parity): postConfig — POST body + Content-Type. Requires
     // sduiFetch to accept method/body. See lua `SduiApiStorePostConfig`.
@@ -106,7 +110,13 @@ export function createSduiRequestExecutor(deps: SduiRequestExecutorDeps) {
         if (isRequestCurrent()) {
           loadTimer.updateRequestStatus("FailedToLoad");
           if (reportPageAnalytics) {
-            emitPageStatusEvent(deps.analyticsReporter, requestConfig, statusCode, error.name);
+            emitPageStatusEvent(
+              deps.analyticsReporter,
+              pageContext,
+              requestConfig,
+              statusCode,
+              error.name,
+            );
           }
           reportError(errorName, message, pageContext, { name: configKey }, deps.errorReporter);
         }
@@ -117,9 +127,19 @@ export function createSduiRequestExecutor(deps: SduiRequestExecutorDeps) {
       if (isRequestCurrent()) {
         loadTimer.updateRequestStatus("LoadedFromNetwork");
         if (reportPageAnalytics) {
-          emitPageStatusEvent(deps.analyticsReporter, requestConfig, httpResponse.status);
+          emitPageStatusEvent(
+            deps.analyticsReporter,
+            pageContext,
+            requestConfig,
+            httpResponse.status,
+          );
           if (httpResponse.ok) {
-            emitPagePayloadSizeEvent(deps.analyticsReporter, requestConfig, httpResponse);
+            emitPagePayloadSizeEvent(
+              deps.analyticsReporter,
+              pageContext,
+              requestConfig,
+              httpResponse,
+            );
           }
         }
       }
@@ -152,6 +172,7 @@ export function createSduiRequestExecutor(deps: SduiRequestExecutorDeps) {
             if (reportPageAnalytics) {
               emitPageStatusEvent(
                 deps.analyticsReporter,
+                pageContext,
                 requestConfig,
                 statusCode,
                 abortError.name,

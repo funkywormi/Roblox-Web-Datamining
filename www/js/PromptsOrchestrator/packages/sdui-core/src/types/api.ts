@@ -1,7 +1,6 @@
 import type { ReadonlySignal } from "@preact/signals-core";
 import type { DescMessage } from "@bufbuild/protobuf";
 import type { Url } from "@rbx/core-lib/url";
-import { SduiPageContext } from "./analytics";
 import { SduiComponentConfig } from "./binding";
 import { HydrationContent } from "./hydration";
 import { TemplateEntry } from "./store";
@@ -145,7 +144,6 @@ export interface ApiRequestConfig {
    */
   allowNoConfigsBuilt?: boolean;
   headers?: Record<string, string>;
-  pageContext: SduiPageContext;
   /**
    * Per-request timeout in milliseconds.
    *

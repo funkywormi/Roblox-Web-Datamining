@@ -2,7 +2,6 @@ import { memo, useMemo } from "react";
 import { createActionResolver } from "../../actions/createActionResolver";
 import { SduiRenderer } from "../../renderer/SduiRenderer";
 import type { SduiComponentConfig } from "../../types";
-import { FALLBACK_PAGE_CONTEXT } from "../../types/analytics";
 import { useSduiServices } from "../context/SduiProvider";
 import { SduiDataBindingWrapper } from "./SduiDataBindingWrapper";
 
@@ -22,17 +21,16 @@ export interface SduiClientRendererProps {
 export const SduiClientRenderer = memo(({ config }: SduiClientRendererProps) => {
   const services = useSduiServices();
   const actionResolver = useMemo(
-    () => createActionResolver(services, services.configKey),
-    [services],
+    () => createActionResolver(services, services.configKey, config.identifier),
+    [services, config.identifier],
   );
-  const pageContext = services.pageContext ?? FALLBACK_PAGE_CONTEXT;
 
   return (
     <SduiRenderer
       config={config}
       registry={services.componentRegistry}
       errorReporter={services.errorReporter}
-      pageContext={pageContext}
+      pageContext={services.pageContext}
       interactiveWrapper={SduiDataBindingWrapper}
       actionResolver={actionResolver}
     />

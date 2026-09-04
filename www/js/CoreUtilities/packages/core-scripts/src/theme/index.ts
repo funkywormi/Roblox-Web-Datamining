@@ -1,12 +1,41 @@
 // Do not import anything here without checking if you need to update the rspack config for the coreUtilities component.
 
-import { arrayIncludes } from "@rbx/core-lib";
-import { AppTheme, AgeTheme, appThemes, ageThemes, Theme } from "./constants";
+import * as localStorage from "@rbx/core-lib/local-storage";
+import "@rbx/www-common/global";
+import { AppTheme, appThemes, Theme, PlusTheme } from "./constants";
+import { authenticatedUser, isBlackbirdUser } from "../meta/user";
 
 const appThemeClass = (theme: Exclude<AppTheme, "default">) => `${theme}-theme`;
-const ageThemeClass = (theme: AgeTheme) => `age-${theme}-theme`;
 const themeClass = (theme: Exclude<Theme, "default">) =>
-  arrayIncludes(ageThemes, theme) ? ageThemeClass(theme) : appThemeClass(theme);
+  theme === "kids" ? "age-kids-theme" : appThemeClass(theme);
+
+// TODO: remove this logic once classic theme is plus only
+const classicThemeEnabledForNonPlus = () => {
+  // Classic theme is an account level theme for plus users and can be handled normally
+  if (isBlackbirdUser()) {
+    return false;
+  }
+
+  // Search param passed into webview from Lua
+  if (new URLSearchParams(window.location.search).get("deviceThemeOverride") === "Classic") {
+    return true;
+  }
+
+  const metaTag = document.querySelector<HTMLMetaElement>(`meta[name="classic-theme-data"]`);
+  if (metaTag?.dataset.enabled !== "True") {
+    return false;
+  }
+
+  const userId = authenticatedUser()?.id;
+  if (userId == null) {
+    return false;
+  }
+  const themeData = localStorage.getItem("classic-theme");
+  if (themeData?.version !== 0) {
+    return false; // No data present, or new version released and we need a page reload
+  }
+  return themeData.data.includes(userId.toString());
+};
 
 const initialTheme = () => {
   // For CS site which loads CoreUtilities before document body
@@ -14,20 +43,34 @@ const initialTheme = () => {
   if (document.body == null) {
     return "default";
   }
+
   const { classList } = document.body;
-  if (classList.contains("age-kids-variant1-theme")) {
-    // TODO: remove after IXP is done
+
+  const classic = classicThemeEnabledForNonPlus();
+  if (classic) {
+    classList.add(appThemeClass("classic"));
+    // Classic theme can be applied alongside kids theme.
+    // We delay the early return until later.
+  }
+
+  if (classList.contains("age-kids-variant1-theme") || classList.contains("age-kids-theme")) {
     return "kids";
   }
-  return (
-    ageThemes.find(theme => classList.contains(ageThemeClass(theme))) ??
-    appThemes.find(theme => theme !== "default" && classList.contains(appThemeClass(theme))) ??
-    "default"
+
+  if (classic) {
+    return "classic";
+  }
+
+  const appTheme = appThemes.find(
+    (theme): theme is Exclude<AppTheme, "default"> =>
+      theme !== "default" && classList.contains(appThemeClass(theme)),
   );
+
+  return appTheme ?? "default";
 };
 
 let accountTheme: Theme = initialTheme();
-let previewTheme: AppTheme | null = null;
+let previewTheme: PlusTheme | null = null;
 
 const themeListeners = new Set<(theme: AppTheme) => void>();
 
@@ -71,10 +114,10 @@ export const subscribeToThemeChange = (listener: (theme: AppTheme) => void): (()
 };
 
 /** Returns the current app theme being previewed, if any. */
-export const getPreviewTheme = (): AppTheme | null => previewTheme;
+export const getPreviewTheme = (): PlusTheme | null => previewTheme;
 
 /** Sets the app theme to preview on the page. */
-export const setPreviewTheme = (theme: AppTheme) => {
+export const setPreviewTheme = (theme: PlusTheme) => {
   clearTheme();
   addAppThemeClass(theme);
   previewTheme = theme;
@@ -89,4 +132,4 @@ export const clearPreviewTheme = () => {
   previewTheme = null;
 };
 
-export type { Theme, AppTheme, AgeTheme };
+export type { Theme, AppTheme, PlusTheme };

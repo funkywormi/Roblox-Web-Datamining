@@ -8,4 +8,7 @@ export const PromptErrorName = {
   FailedToFetchVoicePolicy: `${PROMPTS_APPLICATION_NAME}:FailedToFetchVoicePolicy`,
   AccessManagementUpsellV2ServiceDoesNotExist: `${PROMPTS_APPLICATION_NAME}:AccessManagementUpsellV2ServiceDoesNotExist`,
   FacialAgeEstimationUpsellError: `${PROMPTS_APPLICATION_NAME}:FacialAgeEstimationUpsellError`,
+  UnsupportedOverlayRenderer: `${PROMPTS_APPLICATION_NAME}:UnsupportedOverlayRenderer`,
+  InvalidOverlayPrompt: `${PROMPTS_APPLICATION_NAME}:InvalidOverlayPrompt`,
+  OverlayTerminalCallbackError: `${PROMPTS_APPLICATION_NAME}:OverlayTerminalCallbackError`,
 } as const;

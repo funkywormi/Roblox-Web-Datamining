@@ -44,6 +44,8 @@ export enum SduiErrorName {
   NoComponentConfigsBuilt = "NoComponentConfigsBuilt",
   NoComponentRegistered = "NoComponentRegistered",
   OptimisticMutationFailed = "OptimisticMutationFailed",
+  RegistryCompositionError = "RegistryCompositionError",
+  RegistryCompositionWarning = "RegistryCompositionWarning",
   RepeatedBindingNotArray = "RepeatedBindingNotArray",
   RepeatedConditionalMiss = "RepeatedConditionalMiss",
   ReportItemActionMissingCollectionData = "ReportItemActionMissingCollectionData",

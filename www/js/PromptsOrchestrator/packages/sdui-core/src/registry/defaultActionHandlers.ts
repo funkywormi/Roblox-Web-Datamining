@@ -39,9 +39,8 @@ export function clientOnly(handler: ActionHandler): ActionHandler {
  * click time (e.g. for programmatic navigation after analytics).
  *
  * Browser-dependent handlers are wrapped with `clientOnly()`, so this
- * module is safe to import in SSR. Page-specific handlers are layered on
- * top by the consumer via the `sdui` services instance, e.g.
- * `sdui.actionHandlerRegistry.registerActionHandlers({ ... })`.
+ * module is safe to import in SSR. Consumers add page-specific handlers
+ * through named registry modules before constructing the service graph.
  */
 export const DEFAULT_ACTION_HANDLERS: Partial<Record<ActionType, SduiActionHandlerConfig>> = {
   [ActionTypeEnum.LINK]: {

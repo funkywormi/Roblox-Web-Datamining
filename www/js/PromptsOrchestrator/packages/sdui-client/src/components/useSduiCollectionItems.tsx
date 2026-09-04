@@ -89,10 +89,7 @@ export function useSduiCollectionItems({
 
   const itemAnalyticsDatasRef = useRef<(ItemAnalyticsData | null)[]>([]);
 
-  const impressionCtx = useMemo(
-    () => createImpressionContext(services, pageContext),
-    [services, pageContext],
-  );
+  const impressionCtx = useMemo(() => createImpressionContext(services), [services]);
 
   const onItemsImpressed = useCallback(
     (indexesToSend: number[]) => {

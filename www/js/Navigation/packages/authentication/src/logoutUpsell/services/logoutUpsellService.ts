@@ -1,9 +1,12 @@
+import { hybridResponseService } from "core-roblox-utilities";
 // @ts-expect-error - Legacy Roblox module types
 import { EmailVerificationService } from "@rbx/core-scripts/legacy/Roblox";
-import { DeviceMeta } from "Roblox";
-import { hybridResponseService } from "core-roblox-utilities";
 import ExperimentationService from "@rbx/experimentation";
-import { isPasskeyCompatible } from "@rbx/authentication-common/passkey/compatibility";
+import {
+  defaultNotInApp,
+  isPasskeyCompatible,
+} from "@rbx/authentication-common/passkey/compatibility";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { AddEmailTranslations } from "../components/AddEmailContent";
 import { VerifyEmailTranslations } from "../components/VerifyEmailContent";
 import { PasskeyUpsellTranslations } from "../components/PasskeyUpsellContent";
@@ -13,7 +16,13 @@ import {
   LogoutPrompt,
   recordLogoutPromptImpression,
 } from "./logoutPromptApi";
-import { LogoutUpsellClientError, sendLogoutUpsellClientError } from "./logoutUpsellEvents";
+import {
+  LogoutUpsellClientError,
+  PasskeyEligibilityDecision,
+  sendLogoutUpsellClientError,
+  sendPasskeyEligibilityDecision,
+} from "./logoutUpsellEvents";
+import { isPlatformAuthenticatorAvailable } from "./platformAuthenticatorAvailability";
 import { showPasskeyUpsellModal } from "./showPasskeyUpsellModal";
 
 /**
@@ -56,13 +65,22 @@ export type HandleLogoutUpsellOptions = {
 
 const browserSupportsPasskey = (): Promise<boolean> =>
   isPasskeyCompatible({
-    producer: DeviceMeta ?? undefined,
+    producer: () => getDeviceMeta() ?? defaultNotInApp(),
     hybridCallback: () =>
       hybridResponseService.getNativeResponse(
         hybridResponseService.FeatureTarget.CREDENTIALS_PROTOCOL_AVAILABLE,
         {},
         2000,
       ),
+    platformAuthenticatorCheck: async () => {
+      const available = await isPlatformAuthenticatorAvailable();
+      sendPasskeyEligibilityDecision(
+        available
+          ? PasskeyEligibilityDecision.Capable
+          : PasskeyEligibilityDecision.ExcludedNoPlatformAuthenticator,
+      );
+      return available;
+    },
   });
 
 // Capabilities advertised to the prompts service so its eligibility resolvers

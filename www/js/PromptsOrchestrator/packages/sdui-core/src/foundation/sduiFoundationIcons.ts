@@ -36,6 +36,7 @@ export const SDUI_FOUNDATION_ICON_CLASSES = [
   "icon-regular-lock-closed",
   "icon-regular-speech-bubble-align-center",
   "icon-regular-premium",
+  "icon-regular-roblox-plus",
   "icon-regular-x",
   "icon-regular-x-small",
 ] as const satisfies readonly TTailwindIconClass[];

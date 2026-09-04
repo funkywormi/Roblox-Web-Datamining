@@ -31,7 +31,7 @@ type BenefitConfig = {
 const BASE_BENEFITS: readonly BenefitConfig[] = [
   {
     iconName: "icon-regular-tag",
-    translationKey: "Description.Benefit.DiscountBase",
+    translationKey: "Description.Benefit.DiscountBuyRobux",
     getParams: ({ discountPercent }) => ({ discountPercent }),
   },
   {
@@ -41,6 +41,14 @@ const BASE_BENEFITS: readonly BenefitConfig[] = [
   {
     iconName: "icon-regular-robux",
     translationKey: "Description.Benefit.RobuxTransfers",
+  },
+  {
+    // Shown unconditionally for launch — the base Plus tier always includes
+    // profile frames + app themes. TODO(SUBS-5759 follow-up): gate on
+    // product.featureConfig.isProfileFrameEnabled && isAppThemesEnabled once the
+    // buyRobux payload hydrates those flags (see PR #18457).
+    iconName: "icon-regular-paint-brush",
+    translationKey: "Description.Benefit.ProfileFrameAppTheme",
   },
 ];
 
@@ -114,9 +122,12 @@ export const SubscriptionTileBenefits: FC<SubscriptionTileBenefitsProps> = ({
 }) => {
   const { translate, intl } = useTranslation();
 
-  const rawDiscountPercent =
-    product.benefits?.find(b => b.plusDiscountSubscriptionBenefits)
-      ?.plusDiscountSubscriptionBenefits?.discountPercentage ?? 0;
+  // "Up to {discountPercent} off" advertises the ceiling, so take the highest
+  // configured tier (e.g. the 20% step-up tier) rather than the base tier.
+  const rawDiscountPercent = (product.benefits ?? []).reduce(
+    (max, b) => Math.max(max, b.plusDiscountSubscriptionBenefits?.discountPercentage ?? 0),
+    0,
+  );
   const discountPercent = intl.n(rawDiscountPercent / 100, {
     style: "percent",
     maximumFractionDigits: 0,

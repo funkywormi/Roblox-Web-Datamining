@@ -18,6 +18,7 @@ import { ModalContext } from "../../contexts/ModalContext";
 import { BuyRobuxPageSectionType, PurchaseContextProps } from "../../contexts/PurchaseContext";
 import { SamsungPaymentMethods } from "../samsungPaymentMethods/useSamsungPaymentMethods";
 import { loginRedirectService } from "../../services/loginRedirectService";
+import { trackRedirectClickTime } from "../../utils/trackRedirectClickTime";
 
 export function usePurchase(
   {
@@ -165,6 +166,7 @@ export function usePurchase(
 
   const purchaseRedirectProduct: PurchaseContextProps["purchaseProduct"] = useCallback(
     ({ product, event, isSubscription }) => {
+      trackRedirectClickTime();
       if (!redirect) {
         event.preventDefault();
         trackCounter("UnexpectedPurchaseRedirectCall");

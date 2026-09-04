@@ -12,13 +12,14 @@ import { SduiText } from "../components/SduiText";
 import { SduiDownloadButton } from "../components/SduiDownloadButton";
 import { SduiDialog } from "../components/SduiDialog";
 import { SduiVideoPlayer } from "../components/sduiVideoPlayer/SduiVideoPlayer";
+import { SduiVerticalFeed } from "../components/SduiVerticalFeedWrapper";
 
 /**
- * Default client component definitions.
+ * Client component contributions.
  *
  * Each entry maps a `UiComponentType` to its client-only React component.
- * These definitions are registered on top of the isomorphic base registry
- * from `sdui-core`.
+ * The application composition root decides which other modules to combine
+ * with these definitions.
  */
 export const DEFAULT_CLIENT_COMPONENTS: Partial<Record<UiComponentType, SduiComponentDefinition>> =
   {
@@ -27,6 +28,9 @@ export const DEFAULT_CLIENT_COMPONENTS: Partial<Record<UiComponentType, SduiComp
     },
     [UiComponentType.DIALOG]: {
       component: SduiDialog,
+      propParsers: {
+        imageStyle: makeTokenOrLiteralPropParser(),
+      },
     },
     [UiComponentType.TEXT]: {
       component: SduiText,
@@ -38,6 +42,19 @@ export const DEFAULT_CLIENT_COMPONENTS: Partial<Record<UiComponentType, SduiComp
     [UiComponentType.COLLECTION_GRID]: {
       component: SduiCollectionGrid,
       doesManageChildren: true,
+    },
+    [UiComponentType.VERTICAL_FEED]: {
+      component: SduiVerticalFeed,
+      doesManageChildren: true,
+      propParsers: {
+        horizontalPadding: makeTokenOrLiteralPropParser(),
+        gapBetweenFeedItems: makeTokenOrLiteralPropParser(),
+        gapAfterStickyItems: makeTokenOrLiteralPropParser(),
+        gapBetweenStickyItems: makeTokenOrLiteralPropParser(),
+        stickyPaddingTop: makeTokenOrLiteralPropParser(),
+        stickyPaddingBottom: makeTokenOrLiteralPropParser(),
+        maxWidth: makeTokenOrLiteralPropParser(),
+      },
     },
     [UiComponentType.IMAGE]: {
       component: SduiImage,

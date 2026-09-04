@@ -1,5 +1,4 @@
 import type { ComponentType } from "react";
-
 import { UiComponentType, type SduiComponentDefinition } from "../types";
 import { makeTokenOrLiteralPropParser } from "../parsers/propParsers";
 import { SDUI_SECTION_HEADER_DEFAULTS } from "../consts/defaults";

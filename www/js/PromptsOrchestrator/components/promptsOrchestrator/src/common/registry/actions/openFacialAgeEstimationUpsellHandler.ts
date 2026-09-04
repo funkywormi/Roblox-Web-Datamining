@@ -8,10 +8,10 @@ import {
   readSduiResolvedActionParam,
   readBooleanActionParam,
 } from "@rbx/sdui-core";
-import { PromptErrorName } from "../../telemetry/constants";
-import { extractErrorMessageFromUnknownError } from "../../utils/errorMessageUtils";
 import { AppPage } from "../../constants/pageConstants";
 import { AMP_CONSTANTS, FaeUpsellEntrySurfaceType } from "../../constants/upsellConstants";
+import { submitPrompt } from "../../../overlay-orchestrator/scheduler/submitPrompt";
+import { OverlayClosedReason } from "../../../overlay-orchestrator/types";
 
 const getFaeEntrySurface = (source?: string): string => {
   if (source === AppPage.Home) {
@@ -24,23 +24,9 @@ const getFaeEntrySurface = (source?: string): string => {
 };
 
 export const openFacialAgeEstimationUpsellHandler = {
-  handler: async (actionConfig, _analyticsContext, sduiContext) => {
+  handler: (actionConfig, _analyticsContext, sduiContext) => {
     const { actionParams } = actionConfig;
     const { errorReporter, pageContext } = sduiContext;
-
-    const accessManagementUpsellV2Service = window.Roblox.AccessManagementUpsellV2Service;
-
-    if (!accessManagementUpsellV2Service) {
-      errorReporter.reportSduiError(
-        PromptErrorName.AccessManagementUpsellV2ServiceDoesNotExist,
-        "Could not proceed with facial age estimation upsell because AccessManagementUpsellV2Service does not exist",
-        pageContext,
-        {
-          actionType: actionTypeName(ActionType.OPEN_FACIAL_AGE_ESTIMATION),
-        },
-      );
-      return;
-    }
 
     const source = readStringActionParam(actionParams, "source", undefined);
 
@@ -64,51 +50,48 @@ export const openFacialAgeEstimationUpsellHandler = {
     const onFailure = readSduiResolvedActionParam(actionParams, "onFailure", undefined);
     const shouldIncludeVpc = readBooleanActionParam(actionParams, "shouldIncludeVpc", true);
 
-    try {
-      const params = {
-        featureName: shouldIncludeVpc
-          ? AMP_CONSTANTS.faeWithVpc.featureName
-          : AMP_CONSTANTS.faeWithoutVpc.featureName,
-        isAsyncCall: false,
-        usePrologue: false,
-        namespace: shouldIncludeVpc
-          ? AMP_CONSTANTS.faeWithVpc.namespace
-          : AMP_CONSTANTS.faeWithoutVpc.namespace,
-        featureSpecificData: {
-          // We use this instead of setting the `surface` parameter to match the
-          // format on app
-          context,
-        },
-      };
+    const params = {
+      featureName: shouldIncludeVpc
+        ? AMP_CONSTANTS.faeWithVpc.featureName
+        : AMP_CONSTANTS.faeWithoutVpc.featureName,
+      isAsyncCall: false,
+      usePrologue: false,
+      namespace: shouldIncludeVpc
+        ? AMP_CONSTANTS.faeWithVpc.namespace
+        : AMP_CONSTANTS.faeWithoutVpc.namespace,
+      featureSpecificData: {
+        // We use this instead of setting the `surface` parameter to match the
+        // format on app
+        context,
+      },
+    };
 
-      /**
-       * TODO: Once the modal queue is implemented, this should use it.
-       * One difficulty for the queue is that the FAE upsell modal does not
-       * render if the user already is verified. There is no way to know if
-       * this happens, and can make it hard for the queue to know when the modal
-       * is closed
-       */
-      const result = await accessManagementUpsellV2Service.startAccessManagementUpsell(params);
+    const id = `facial-age-estimation-upsell-${context}`;
 
-      if (result) {
-        onSuccess?.onActivated();
-      } else {
-        onFailure?.onActivated();
-      }
-    } catch (error) {
-      const errorMessage = extractErrorMessageFromUnknownError(
-        error,
-        "Facial age estimation upsell failed",
-      );
-      errorReporter.reportSduiError(
-        PromptErrorName.FacialAgeEstimationUpsellError,
-        errorMessage,
-        pageContext,
-        {
-          actionType: actionTypeName(ActionType.OPEN_FACIAL_AGE_ESTIMATION),
-        },
-      );
-      onFailure?.onActivated();
-    }
+    submitPrompt({
+      id,
+      dedupeKey: id,
+      dedupePolicy: "in-flight",
+      renderer: "fae-upsell",
+      triggerType: "action",
+      payload: {
+        params,
+        // A value of type AppPage is provided when we init SDUI services, but
+        // when we read it, it's lost that context. This is a safe suppression
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        appPage: pageContext.appPage as AppPage,
+      },
+      onTerminal: outcome => {
+        if (outcome.status === "closed") {
+          if (outcome.reason === OverlayClosedReason.Success) {
+            onSuccess?.onActivated();
+          } else if (outcome.reason === OverlayClosedReason.Failed) {
+            onFailure?.onActivated();
+          } else if (outcome.reason === OverlayClosedReason.Error) {
+            onFailure?.onActivated();
+          }
+        }
+      },
+    });
   },
 } satisfies SduiActionHandlerConfig;
