@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { composeQueryString, parseQueryString } from "@rbx/core-scripts/util/url";
+import { UrlSearchParams } from "@rbx/core-lib/url";
 import { MESSAGE_TABS } from "../constants";
 import type { MessageRoute, MessageTab } from "../types";
 
@@ -26,27 +26,31 @@ const parseNumberParam = (value: unknown): number | null => {
   return Number.isNaN(parsed) ? null : parsed;
 };
 
-export const parseMessageRoute = (hash = window.location.hash): MessageRoute => {
+export const parseMessageRoute = (
+  // Guard for SSR: "use client" entries still pre-render on the server where window is undefined.
+  // The Next mount also uses dynamic(ssr:false), but guard here so the component is safe on its own.
+  hash = typeof window === "undefined" ? "" : window.location.hash,
+): MessageRoute => {
   const normalizedHash = hash.startsWith("#!") ? hash.slice(2) : hash.replace(/^#/, "");
   const [rawPath = "/inbox", rawQuery = ""] = normalizedHash.split("?");
   const tabName = rawPath.replace(/^\//, "");
-  const query = parseQueryString(rawQuery);
-  const page = parseNumberParam(query.page) ?? 1;
+  const query = UrlSearchParams.parse(rawQuery);
+  const page = parseNumberParam(query.get("page")) ?? 1;
 
   return {
     tab: isMessageTab(tabName) ? tabName : MESSAGE_TABS.inbox,
     page: page > 0 ? page : 1,
-    messageIdx: parseNumberParam(query.messageIdx),
-    conversationId: parseNumberParam(query.conversationId),
+    messageIdx: parseNumberParam(query.get("messageIdx")),
+    conversationId: parseNumberParam(query.get("conversationId")),
   };
 };
 
 export const buildMessageHash = (route: MessageRoute): string => {
-  const query = composeQueryString({
-    ...(route.page > 1 ? { page: route.page } : {}),
-    ...(route.messageIdx != null ? { messageIdx: route.messageIdx } : {}),
-    ...(route.conversationId != null ? { conversationId: route.conversationId } : {}),
-  });
+  const query = UrlSearchParams.new({
+    ...(route.page > 1 ? { page: String(route.page) } : {}),
+    ...(route.messageIdx != null ? { messageIdx: String(route.messageIdx) } : {}),
+    ...(route.conversationId != null ? { conversationId: String(route.conversationId) } : {}),
+  }).toString();
 
   return `#!/${route.tab}${query ? `?${query}` : ""}`;
 };

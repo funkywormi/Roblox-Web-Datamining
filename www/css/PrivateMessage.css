@@ -867,6 +867,10 @@
     color: var(--inverse-content-emphasis)
 }
 
+.content-\[white\] {
+    color: #fff
+}
+
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-alert)r g b/.2)
 }
@@ -903,6 +907,14 @@
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M6.93934 4.93945C7.52514 4.35382 8.4747 4.35372 9.06043 4.93945L19.0604 14.9395C19.6093 15.4884 19.6439 16.3572 19.1639 16.9463L19.0604 17.0605L9.06043 27.0605C8.4747 27.6463 7.52514 27.6462 6.93934 27.0605C6.35355 26.4748 6.35355 25.5252 6.93934 24.9395L15.8788 16L6.93934 7.06055C6.35355 6.47476 6.35355 5.52524 6.93934 4.93945Z' fill='black'/%3E %3Cpath d='M23.9999 4.5C24.8282 4.50016 25.4999 5.17167 25.4999 6V26C25.4999 26.8283 24.8282 27.4998 23.9999 27.5C23.1715 27.5 22.4999 26.8284 22.4999 26V6C22.4999 5.17157 23.1715 4.5 23.9999 4.5Z' fill='black'/%3E%3C/svg%3E")
 }
 
+.icon-filled-verified-backplate {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M7.71897 4.48022C8.00434 3.41518 9.09906 2.78315 10.1641 3.06852L27.5198 7.71897C28.5848 8.00434 29.2169 9.09906 28.9315 10.1641L24.281 27.5198C23.9957 28.5848 22.9009 29.2169 21.8359 28.9315L4.48022 24.281C3.41518 23.9957 2.78315 22.9009 3.06852 21.8359L7.71897 4.48022Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-filled-verified-check {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M19.9393 11.9393C20.5251 11.3536 21.4746 11.3536 22.0604 11.9393C22.646 12.5251 22.6461 13.4747 22.0604 14.0604L15.0604 21.0604C14.4747 21.6461 13.5251 21.646 12.9393 21.0604L9.93934 18.0604C9.35355 17.4746 9.35355 16.5251 9.93934 15.9393C10.5251 15.3536 11.4746 15.3536 12.0604 15.9393L13.9999 17.8788L19.9393 11.9393Z' fill='black'/%3E%3C/svg%3E")
+}
+
 .icon-regular-x {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M7.29289 8.70711C6.90237 8.31658 6.90237 7.68342 7.29289 7.29289C7.68342 6.90237 8.31658 6.90237 8.70711 7.29289L16 14.5858L23.2929 7.29289C23.6834 6.90237 24.3166 6.90237 24.7071 7.29289C25.0976 7.68342 25.0976 8.31658 24.7071 8.70711L17.4142 16L24.7071 23.2929C25.0976 23.6834 25.0976 24.3166 24.7071 24.7071C24.3166 25.0976 23.6834 25.0976 23.2929 24.7071L16 17.4142L8.70711 24.7071C8.31658 25.0976 7.68342 25.0976 7.29289 24.7071C6.90237 24.3166 6.90237 23.6834 7.29289 23.2929L14.5858 16L7.29289 8.70711Z' fill='black'/%3E%3C/svg%3E")
 }
@@ -912,7 +924,19 @@
 }
 
 .private-message-page {
+    width: 100%;
     max-width: 970px
+}
+
+.private-message-body {
+    overflow-wrap: anywhere;
+    word-break: break-word
+}
+
+.private-message-body img,
+.private-message-body table {
+    max-width: 100%;
+    height: auto
 }
 
 .private-message-body * {
@@ -950,71 +974,6 @@
     .private-message-row-avatar {
         display: none
     }
-}
-
-.placeholder\:text-body-large::-webkit-input-placeholder {
-    font: var(--typography-body-large-font);
-    letter-spacing: var(--typography-body-large-letter-spacing)
-}
-
-.placeholder\:text-body-large::-ms-input-placeholder {
-    font: var(--typography-body-large-font);
-    letter-spacing: var(--typography-body-large-letter-spacing)
-}
-
-.placeholder\:text-body-large::placeholder {
-    font: var(--typography-body-large-font);
-    letter-spacing: var(--typography-body-large-letter-spacing)
-}
-
-.placeholder\:text-body-medium::-webkit-input-placeholder {
-    font: var(--typography-body-medium-font);
-    letter-spacing: var(--typography-body-medium-letter-spacing)
-}
-
-.placeholder\:text-body-medium::-ms-input-placeholder {
-    font: var(--typography-body-medium-font);
-    letter-spacing: var(--typography-body-medium-letter-spacing)
-}
-
-.placeholder\:text-body-medium::placeholder {
-    font: var(--typography-body-medium-font);
-    letter-spacing: var(--typography-body-medium-letter-spacing)
-}
-
-.placeholder\:text-body-small::-webkit-input-placeholder {
-    font: var(--typography-body-small-font);
-    letter-spacing: var(--typography-body-small-letter-spacing)
-}
-
-.placeholder\:text-body-small::-ms-input-placeholder {
-    font: var(--typography-body-small-font);
-    letter-spacing: var(--typography-body-small-letter-spacing)
-}
-
-.placeholder\:text-body-small::placeholder {
-    font: var(--typography-body-small-font);
-    letter-spacing: var(--typography-body-small-letter-spacing)
-}
-
-.placeholder\:content-muted::-webkit-input-placeholder {
-    color: var(--color-content-muted)
-}
-
-.placeholder\:content-muted::-ms-input-placeholder {
-    color: var(--color-content-muted)
-}
-
-.placeholder\:content-muted::placeholder {
-    color: var(--color-content-muted)
-}
-
-.focus-within\:stroke-system-alert:focus-within {
-    border-color: var(--color-system-alert)
-}
-
-.focus-within\:stroke-system-emphasis:focus-within {
-    border-color: var(--color-system-emphasis)
 }
 
 .hover\:bg-surface-300:hover {

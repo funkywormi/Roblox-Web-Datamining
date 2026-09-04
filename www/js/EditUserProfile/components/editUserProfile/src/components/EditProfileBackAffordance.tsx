@@ -27,7 +27,7 @@ const isProfilePageUrl = (url: string): boolean => {
   }
 };
 
-const EditProfileBackAffordance = () => {
+export const EditProfileBackAffordance = () => {
   const { translate } = useTranslation();
   const backHref = useMemo(getBackHref, []);
 
@@ -51,5 +51,3 @@ const EditProfileBackAffordance = () => {
     </div>
   );
 };
-
-export default EditProfileBackAffordance;

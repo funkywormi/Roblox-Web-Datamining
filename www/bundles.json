@@ -1035,7 +1035,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/298ae7b38f90cf944b7e80c161cf677aa16bddcd952ab2f84580c9d891f94892.js",
+            "url": "https://js.rbxcdn.com/13529004a9aa7ed54071113b1537051e1676383b8209259823566eb43d7fc6fd.js",
             "sources": [
                 "ALL"
             ]
@@ -1107,6 +1107,7 @@
             "name": "Feature.Avatar",
             "url": "https://js.rbxcdn.com/54d824eb344789cea60e6ffe55af326788935377456cf9501721587d7c7d1dd7.js",
             "sources": [
+                "/users/profile/edit",
                 "/my/avatar"
             ]
         },
@@ -1238,7 +1239,7 @@
         },
         {
             "name": "Feature.Catalog",
-            "url": "https://js.rbxcdn.com/a5898e181744e7c17522fab7a6ca97dd5c023527868c607dae0f794cf256c0de.js",
+            "url": "https://js.rbxcdn.com/58d9459a7aaf7e278ed9369f496f17a383135e713dcb5d116aaf20834032a765.js",
             "sources": [
                 "/home",
                 "/catalog",
@@ -3352,7 +3353,7 @@
         },
         {
             "name": "Feature.Trades",
-            "url": "https://js.rbxcdn.com/d49e7e94a6a04f610e304a69e2ce7911eb14e81129bbea138d8d203e4d6c0225.js",
+            "url": "https://js.rbxcdn.com/023b0b0ec9d49fe1316c9a53f81467a49d05f38552de75bd6683772b9fd83127.js",
             "sources": [
                 "/trades",
                 "/users/inventory",
@@ -4550,7 +4551,7 @@
         },
         {
             "name": "EditUserProfile",
-            "url": "https://js.rbxcdn.com/48816bc17bc713c506cf5798bb9dda551795ddf915cd544294478f0b6e25c16b-EditUserProfile.js",
+            "url": "https://js.rbxcdn.com/79da588a13b2e2ca820ca7eb79698682ef2d4d1233de963de364ee66c2a82c35-EditUserProfile.js",
             "sources": [
                 "/users/profile/edit"
             ]
@@ -5711,7 +5712,7 @@
         },
         {
             "name": "PrivateMessage",
-            "url": "https://js.rbxcdn.com/6148224eb413d4bb2a28f0292f5283405f14c075a382d0686c178029792861ea-PrivateMessage.js",
+            "url": "https://js.rbxcdn.com/1e59832e7eeffd470ddcc1100dc6bcea04dbe273eea6d89b49d2282900b1a5c9-PrivateMessage.js",
             "sources": [
                 "/my/messages"
             ]
@@ -7154,7 +7155,7 @@
         },
         {
             "name": "EditUserProfile",
-            "url": "https://css.rbxcdn.com/e3b3ac836225c744e53ea3cc76dde5e9b650b16c0c20829d45c37eaf9424f426-EditUserProfile.css",
+            "url": "https://css.rbxcdn.com/787d9e0d79980f88706a23755fbbd8885c8e9a68784496874314e2296d2b5777-EditUserProfile.css",
             "sources": [
                 "/users/profile/edit"
             ]
@@ -7923,7 +7924,7 @@
         },
         {
             "name": "PrivateMessage",
-            "url": "https://css.rbxcdn.com/d728564bcca4381dc744035e45ed8cd196ef699c7fe124acd43490b3f8cc4785-PrivateMessage.css",
+            "url": "https://css.rbxcdn.com/96635f47125c12db069302f0ed05da125b11ba2054c8f934d41b852ed2bafee1-PrivateMessage.css",
             "sources": [
                 "/my/messages"
             ]

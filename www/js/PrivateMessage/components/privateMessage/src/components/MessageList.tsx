@@ -1,6 +1,12 @@
-import { useTranslation } from "@rbx/core-scripts/react";
 import { MESSAGE_TABS } from "../constants";
-import type { MessageItem, MessagePage, MessageTab } from "../types";
+import type {
+  FormatDate,
+  MessageItem,
+  MessagePage,
+  MessageTab,
+  RenderThumbnail,
+  Translate,
+} from "../types";
 import MessageRow from "./MessageRow";
 
 const emptyMessageKeyByTab: Record<MessageTab, string> = {
@@ -11,19 +17,24 @@ const emptyMessageKeyByTab: Record<MessageTab, string> = {
 };
 
 const MessageList = ({
+  translate,
+  renderThumbnail,
+  formatListDate,
   page,
   activeTab,
   selectedMessageIds,
   onToggleSelection,
   onOpenMessage,
 }: {
+  translate: Translate;
+  renderThumbnail: RenderThumbnail;
+  formatListDate: FormatDate;
   page: MessagePage | null;
   activeTab: MessageTab;
   selectedMessageIds: Set<number>;
   onToggleSelection: (messageId: number) => void;
   onOpenMessage: (message: MessageItem, index: number) => void;
 }): React.ReactElement => {
-  const { translate } = useTranslation();
   const messages = page?.collection ?? [];
 
   if (messages.length === 0) {
@@ -39,6 +50,9 @@ const MessageList = ({
       {messages.map((message, index) => (
         <MessageRow
           key={message.id}
+          translate={translate}
+          renderThumbnail={renderThumbnail}
+          formatListDate={formatListDate}
           message={message}
           index={index}
           activeTab={activeTab}

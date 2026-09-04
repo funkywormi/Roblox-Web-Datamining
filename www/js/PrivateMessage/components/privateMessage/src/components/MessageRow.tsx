@@ -1,21 +1,31 @@
 import classNames from "classnames";
 import { Checkbox } from "@rbx/foundation-ui";
-import { BadgeSizes, VerifiedBadgeIconContainer } from "@rbx/roblox-badges";
-import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
+import VerifiedBadgeIcon from "@rbx/www-common/components/verified-badge";
 import { MESSAGE_TABS, PREVIEW_SEPARATOR, ROBLOX_USER, USER_HANDLE_PREFIX } from "../constants";
-import { formatListDate, htmlToPlainText } from "../utils/messageUtils";
-import type { MessageItem, MessageTab } from "../types";
+import { htmlToPlainText } from "../utils/messageUtils";
+import type { FormatDate, MessageItem, MessageTab, RenderThumbnail, Translate } from "../types";
 import ClickBoundary from "./ClickBoundary";
 import SystemRobloxLogo from "./SystemRobloxLogo";
 
-const UserName = ({ message, activeTab }: { message: MessageItem; activeTab: MessageTab }) => {
+const UserName = ({
+  translate,
+  message,
+  activeTab,
+}: {
+  translate: Translate;
+  message: MessageItem;
+  activeTab: MessageTab;
+}) => {
   const user = activeTab === MESSAGE_TABS.sent ? message.recipient : message.sender;
 
   return (
     <span className="flex items-center gap-xsmall min-width-0">
       <span className="text-truncate-end">{user.displayName}</span>
       {user.hasVerifiedBadge ? (
-        <VerifiedBadgeIconContainer size={BadgeSizes.CAPTIONHEADER} />
+        <VerifiedBadgeIcon
+          size="Medium"
+          titleText={translate("Creator.VerifiedBadgeIconAccessibilityText")}
+        />
       ) : null}
       <span className="text-body-medium content-muted text-truncate-end">
         {USER_HANDLE_PREFIX}
@@ -28,10 +38,12 @@ const UserName = ({ message, activeTab }: { message: MessageItem; activeTab: Mes
 const MessageAvatar = ({
   message,
   activeTab,
+  renderThumbnail,
   onOpen,
 }: {
   message: MessageItem;
   activeTab: MessageTab;
+  renderThumbnail: RenderThumbnail;
   onOpen: () => void;
 }) => {
   const user = activeTab === MESSAGE_TABS.sent ? message.recipient : message.sender;
@@ -48,12 +60,8 @@ const MessageAvatar = ({
       {isRobloxSystemUser ? (
         <SystemRobloxLogo className="size-700" />
       ) : (
-        <span className="radius-small clip size-700">
-          <Thumbnail2d
-            targetId={user.id}
-            type={ThumbnailTypes.avatarHeadshot}
-            altName={user.displayName}
-          />
+        <span className="radius-circle clip size-700">
+          {renderThumbnail({ userId: user.id, altName: user.displayName })}
         </span>
       )}
     </button>
@@ -61,6 +69,9 @@ const MessageAvatar = ({
 };
 
 const MessageRow = ({
+  translate,
+  renderThumbnail,
+  formatListDate,
   message,
   index,
   activeTab,
@@ -69,6 +80,9 @@ const MessageRow = ({
   onToggleSelection,
   onOpen,
 }: {
+  translate: Translate;
+  renderThumbnail: RenderThumbnail;
+  formatListDate: FormatDate;
   message: MessageItem;
   index: number;
   activeTab: MessageTab;
@@ -81,13 +95,13 @@ const MessageRow = ({
     onOpen(message, index);
   };
 
+  const isUnread = !message.isRead && activeTab !== MESSAGE_TABS.sent;
+
   return (
     <div
       className={classNames(
         "private-message-row grid items-center gap-medium padding-large stroke-bottom stroke-muted transition-colors",
-        !message.isRead && activeTab !== MESSAGE_TABS.sent
-          ? "bg-surface-200 hover:bg-surface-300"
-          : "bg-surface-100 hover:bg-surface-300",
+        isUnread ? "bg-surface-200 hover:bg-surface-300" : "bg-surface-100 hover:bg-surface-300",
       )}
     >
       <ClickBoundary className={classNames(!isSelectable && "invisible")}>
@@ -101,7 +115,12 @@ const MessageRow = ({
           }}
         />
       </ClickBoundary>
-      <MessageAvatar message={message} activeTab={activeTab} onOpen={handleOpen} />
+      <MessageAvatar
+        message={message}
+        activeTab={activeTab}
+        renderThumbnail={renderThumbnail}
+        onOpen={handleOpen}
+      />
       <button
         type="button"
         className="bg-none stroke-none padding-none text-left min-width-0 flex flex-col gap-y-small"
@@ -109,15 +128,20 @@ const MessageRow = ({
         aria-label={message.subject}
       >
         <div className="flex items-center justify-between gap-small min-width-0">
-          <span className="text-title-large content-emphasis min-width-0">
-            <UserName message={message} activeTab={activeTab} />
+          <span
+            className={classNames(
+              "text-title-large min-width-0",
+              isUnread ? "content-emphasis" : "content-muted",
+            )}
+          >
+            <UserName translate={translate} message={message} activeTab={activeTab} />
           </span>
           <span className="text-caption-medium content-muted text-no-wrap">
             {formatListDate(message.created)}
           </span>
         </div>
         <div className="private-message-row-preview text-body-large content-muted">
-          <span className="content-emphasis">{message.subject}</span>
+          <span className={isUnread ? "content-emphasis" : "content-muted"}>{message.subject}</span>
           <span>
             {PREVIEW_SEPARATOR}
             {htmlToPlainText(message.body)}

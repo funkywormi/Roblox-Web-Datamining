@@ -1,14 +1,21 @@
 import { useState } from "react";
 import classNames from "classnames";
-import { useTranslation } from "@rbx/core-scripts/react";
-import { BadgeSizes, VerifiedBadgeIconContainer } from "@rbx/roblox-badges";
-import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
+import VerifiedBadgeIcon from "@rbx/www-common/components/verified-badge";
 import { ROBLOX_USER, USER_HANDLE_PREFIX } from "../constants";
-import { formatListDate } from "../utils/messageUtils";
-import type { MessageItem, MessagePage } from "../types";
+import type { FormatDate, MessageItem, MessagePage, RenderThumbnail, Translate } from "../types";
 import SystemRobloxLogo from "./SystemRobloxLogo";
 
-const NewsRow = ({ notification }: { notification: MessageItem }): React.ReactElement => {
+const NewsRow = ({
+  translate,
+  renderThumbnail,
+  formatListDate,
+  notification,
+}: {
+  translate: Translate;
+  renderThumbnail: RenderThumbnail;
+  formatListDate: FormatDate;
+  notification: MessageItem;
+}): React.ReactElement => {
   const [isOpen, setIsOpen] = useState(false);
   const isRobloxSystemUser = notification.sender.id === ROBLOX_USER.id;
 
@@ -30,12 +37,11 @@ const NewsRow = ({ notification }: { notification: MessageItem }): React.ReactEl
           {isRobloxSystemUser ? (
             <SystemRobloxLogo className="size-700" />
           ) : (
-            <span className="radius-small clip size-700">
-              <Thumbnail2d
-                targetId={notification.sender.id}
-                type={ThumbnailTypes.avatarHeadshot}
-                altName={notification.sender.displayName}
-              />
+            <span className="radius-circle clip size-700">
+              {renderThumbnail({
+                userId: notification.sender.id,
+                altName: notification.sender.displayName,
+              })}
             </span>
           )}
         </span>
@@ -44,7 +50,10 @@ const NewsRow = ({ notification }: { notification: MessageItem }): React.ReactEl
             <span className="text-title-medium content-emphasis flex items-center gap-xsmall min-width-0">
               <span className="text-truncate-end">{notification.sender.displayName}</span>
               {notification.sender.hasVerifiedBadge ? (
-                <VerifiedBadgeIconContainer size={BadgeSizes.CAPTIONHEADER} />
+                <VerifiedBadgeIcon
+                  size="Medium"
+                  titleText={translate("Creator.VerifiedBadgeIconAccessibilityText")}
+                />
               ) : null}
               <span className="text-body-medium content-muted">
                 {USER_HANDLE_PREFIX}
@@ -72,8 +81,17 @@ const NewsRow = ({ notification }: { notification: MessageItem }): React.ReactEl
   );
 };
 
-const NewsList = ({ page }: { page: MessagePage | null }): React.ReactElement => {
-  const { translate } = useTranslation();
+const NewsList = ({
+  translate,
+  renderThumbnail,
+  formatListDate,
+  page,
+}: {
+  translate: Translate;
+  renderThumbnail: RenderThumbnail;
+  formatListDate: FormatDate;
+  page: MessagePage | null;
+}): React.ReactElement => {
   const notifications = page?.collection ?? [];
 
   if (notifications.length === 0) {
@@ -87,7 +105,13 @@ const NewsList = ({ page }: { page: MessagePage | null }): React.ReactElement =>
   return (
     <div className="overflow-hidden radius-medium stroke-standard stroke-muted">
       {notifications.map(notification => (
-        <NewsRow key={notification.id} notification={notification} />
+        <NewsRow
+          key={notification.id}
+          translate={translate}
+          renderThumbnail={renderThumbnail}
+          formatListDate={formatListDate}
+          notification={notification}
+        />
       ))}
     </div>
   );

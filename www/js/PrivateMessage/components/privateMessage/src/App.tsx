@@ -1,7 +1,7 @@
 import { ProgressCircle } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { MESSAGE_MODULE_STATE, MESSAGE_TABS } from "./constants";
+import type { FormatDate, RenderThumbnail, Translate } from "./types";
 import { usePrivateMessages } from "./hooks/usePrivateMessages";
 import FeedbackSnackbar from "./components/FeedbackSnackbar";
 import MessageActions from "./components/MessageActions";
@@ -10,8 +10,20 @@ import MessageList from "./components/MessageList";
 import NewsList from "./components/NewsList";
 import TabsHeader from "./components/TabsHeader";
 
-const App = (): React.ReactElement => {
-  const { translate } = useTranslation();
+export type AppProps = {
+  // Injected by the entry and passed as props (not React context) so the dual-React mount can't mismatch.
+  translate: Translate;
+  renderThumbnail: RenderThumbnail;
+  formatListDate: FormatDate;
+  formatDetailDate: FormatDate;
+};
+
+const App = ({
+  translate,
+  renderThumbnail,
+  formatListDate,
+  formatDetailDate,
+}: AppProps): React.ReactElement => {
   const messages = usePrivateMessages({ translate });
   const isInApp = getDeviceMeta()?.isInApp === true;
   const currentPage = messages.page ? messages.page.pageNumber + 1 : messages.route.page;
@@ -31,6 +43,7 @@ const App = (): React.ReactElement => {
         onSelectTab={messages.openTab}
       />
       <MessageActions
+        translate={translate}
         activeTab={messages.route.tab}
         moduleState={messages.moduleState}
         selectedCount={messages.selectedMessageIds.size}
@@ -67,9 +80,17 @@ const App = (): React.ReactElement => {
       !messages.error &&
       messages.moduleState === MESSAGE_MODULE_STATE.list ? (
         messages.route.tab === MESSAGE_TABS.notifications ? (
-          <NewsList page={messages.page} />
+          <NewsList
+            translate={translate}
+            renderThumbnail={renderThumbnail}
+            formatListDate={formatListDate}
+            page={messages.page}
+          />
         ) : (
           <MessageList
+            translate={translate}
+            renderThumbnail={renderThumbnail}
+            formatListDate={formatListDate}
             page={messages.page}
             activeTab={messages.route.tab}
             selectedMessageIds={messages.selectedMessageIds}
@@ -85,15 +106,11 @@ const App = (): React.ReactElement => {
       !messages.error &&
       messages.moduleState === MESSAGE_MODULE_STATE.detail ? (
         <MessageDetail
+          translate={translate}
+          renderThumbnail={renderThumbnail}
+          formatDetailDate={formatDetailDate}
           message={messages.selectedMessage}
           activeTab={messages.route.tab}
-          sendReplyState={messages.sendReplyState}
-          onReplyContentChange={messages.updateReplyContent}
-          onIncludePreviousMessageChange={messages.updateIncludePreviousMessage}
-          onSendReply={() => {
-            // eslint-disable-next-line no-void
-            void messages.sendReply();
-          }}
         />
       ) : null}
       <FeedbackSnackbar feedback={messages.feedback} onClose={messages.dismissFeedback} />

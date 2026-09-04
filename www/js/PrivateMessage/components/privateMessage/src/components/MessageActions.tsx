@@ -1,11 +1,11 @@
 import { Button, Checkbox } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { MESSAGE_MODULE_STATE, MESSAGE_TABS } from "../constants";
-import type { MessageModuleState, MessageTab } from "../types";
+import type { MessageModuleState, MessageTab, Translate } from "../types";
 import ClickBoundary from "./ClickBoundary";
 import PaginationControls from "./PaginationControls";
 
 const MessageActions = ({
+  translate,
   activeTab,
   moduleState,
   selectedCount,
@@ -18,6 +18,7 @@ const MessageActions = ({
   onBack,
   onChangePage,
 }: {
+  translate: Translate;
   activeTab: MessageTab;
   moduleState: MessageModuleState;
   selectedCount: number;
@@ -30,7 +31,6 @@ const MessageActions = ({
   onBack: () => void;
   onChangePage: (page: number) => void;
 }): React.ReactElement | null => {
-  const { translate } = useTranslation();
   const isInbox = activeTab === MESSAGE_TABS.inbox;
   const isArchive = activeTab === MESSAGE_TABS.archive;
 
@@ -38,6 +38,7 @@ const MessageActions = ({
     return moduleState === MESSAGE_MODULE_STATE.list ? (
       <div className="flex justify-end margin-y-medium">
         <PaginationControls
+          translate={translate}
           currentPage={currentPage}
           totalPages={totalPages}
           onChangePage={onChangePage}
@@ -140,6 +141,7 @@ const MessageActions = ({
         </div>
       </div>
       <PaginationControls
+        translate={translate}
         currentPage={currentPage}
         totalPages={totalPages}
         onChangePage={onChangePage}

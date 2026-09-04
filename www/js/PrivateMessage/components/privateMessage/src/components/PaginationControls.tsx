@@ -1,18 +1,18 @@
 import { IconButton } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { PAGE_SEPARATOR } from "../constants";
+import type { Translate } from "../types";
 
 const PaginationControls = ({
+  translate,
   currentPage,
   totalPages,
   onChangePage,
 }: {
+  translate: Translate;
   currentPage: number;
   totalPages: number;
   onChangePage: (page: number) => void;
 }): React.ReactElement | null => {
-  const { translate } = useTranslation();
-
   if (totalPages <= 1) {
     return null;
   }
