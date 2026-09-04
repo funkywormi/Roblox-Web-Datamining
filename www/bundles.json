@@ -516,7 +516,6 @@
             "url": "https://js.rbxcdn.com/6dc36b0b25f1a0b26d2674ed14aeff8b19674976250b1a10bbf61e88791ea1d9.js",
             "sources": [
                 "/home",
-                "/",
                 "/CreateAccount"
             ]
         },
@@ -650,7 +649,6 @@
             "name": "Common.Captcha",
             "url": "https://js.rbxcdn.com/5f2ee2913bf919a8576bbe4120a6d41b933e814a4779a0a3fc1d9d941c5ee368.js",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -2264,7 +2262,6 @@
             "name": "Feature.Landing",
             "url": "https://js.rbxcdn.com/686bd55707be42af370b81d2f36f55b6e10c56edb105502b3f9f0a34f7412bf5.js",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -2553,6 +2550,7 @@
             "url": "https://js.rbxcdn.com/7774e92ccee60b92717e18209b9060b35988362a9493cadb5234c96550e27d90.js",
             "sources": [
                 "/home",
+                "/",
                 "/charts",
                 "/discover/?Keyword=roblox",
                 "/users/1/profile"
@@ -3274,6 +3272,13 @@
             "url": "https://js.rbxcdn.com/46ec7856c5aa19b2bd5e4d7b745da33086769838558970c98610e983b70fe922.js",
             "sources": [
                 "/my/account"
+            ]
+        },
+        {
+            "name": "Feature.SduiLandingPage",
+            "url": "https://js.rbxcdn.com/07709f6b2cecb7b34d4779d27348293fa0d4058d95fc98bc601c2d0b8f7070aa.js",
+            "sources": [
+                "/"
             ]
         },
         {
@@ -4290,7 +4295,6 @@
             "name": "Captcha",
             "url": "https://js.rbxcdn.com/b604dac29d89b56aef30844f099c5640c2f1870a97a06f4e692208d24097f9ed-Captcha.js",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/support",
@@ -5855,7 +5859,6 @@
             "url": "https://js.rbxcdn.com/215fe9b0fe92491f665645f65f57db6668d716af72e02465db259b715f061118.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/catalog",
@@ -6044,7 +6047,6 @@
             "name": "ReactLanding",
             "url": "https://js.rbxcdn.com/2336f31eb1a5e853cc4ccc06b95da11e9b14438899a09b6b61c4d3b9b063c1aa-ReactLanding.js",
             "sources": [
-                "/",
                 "/CreateAccount"
             ]
         },
@@ -6239,6 +6241,13 @@
             "url": "https://js.rbxcdn.com/b6da6e0453977378d23b0b59e02f5412d6362555bb00d6f403a5f52e946e39a8-SafetySupportPage.js",
             "sources": [
                 "/help-safety"
+            ]
+        },
+        {
+            "name": "SduiLandingPage",
+            "url": "https://js.rbxcdn.com/8fb9246e5a0a44b7ee49af75ccffb42167a2e2554338964b46872afb5529d917-SduiLandingPage.js",
+            "sources": [
+                "/"
             ]
         },
         {
@@ -7224,7 +7233,6 @@
             "name": "Captcha",
             "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-Captcha.css",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/support",
@@ -8363,7 +8371,6 @@
             "name": "ReactLanding",
             "url": "https://css.rbxcdn.com/5d8906e5d5a4d80da1fcd1ba4ec95fa05113e57911457add259a88b1ba156861-ReactLanding.css",
             "sources": [
-                "/",
                 "/CreateAccount"
             ]
         },
@@ -8579,6 +8586,13 @@
             "url": "https://css.rbxcdn.com/5c2809a5bd084c719b27cf61e118bbb790ca6113917707dceee1b127abec6d84-SafetySupportPage.css",
             "sources": [
                 "/help-safety"
+            ]
+        },
+        {
+            "name": "SduiLandingPage",
+            "url": "https://css.rbxcdn.com/2b1755bad0b1fecc7cc797f785464a52f1c43220811d2765c6f343710ec9aa8a-SduiLandingPage.css",
+            "sources": [
+                "/"
             ]
         },
         {
