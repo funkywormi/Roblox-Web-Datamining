@@ -72,7 +72,11 @@ const shouldInitializeJQueryInterceptor = (): boolean => {
 
 // After much trawling of jQuery documentation, there is no simple way to have an asynchronous
 // operation always run before all jQuery requests globally. This is our best-effort as of 2024.
-const initializeBoundAuthTokensForJQuery = (): void => {
+export const initializeBoundAuthTokensForJQuery = (): void => {
+  if (!shouldInitializeJQueryInterceptor()) {
+    return;
+  }
+
   $.ajaxPrefilter((options: JQueryAjaxSettings) => {
     // 1. Kick off the Promise to generate BAT headers if necessary.
     // Here, we map jQuery HTTP config to the more standard format used by React and Angular.
@@ -136,7 +140,3 @@ const initializeBoundAuthTokensForJQuery = (): void => {
     };
   });
 };
-
-if (shouldInitializeJQueryInterceptor()) {
-  initializeBoundAuthTokensForJQuery();
-}

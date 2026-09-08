@@ -13,6 +13,7 @@ import ExperienceAffiliateDeepLinkFallbackType from "./enums/ExperienceAffiliate
 
 enum ShareLinksType {
   AVATAR_ITEM_DETAILS = "AvatarItemDetails",
+  AVATAR_ITEM_AFFILIATE = "AvatarItemAffiliate",
   CONTENT_POST = "ContentPost",
   EXPERIENCE_INVITE = "ExperienceInvite",
   EXPERIENCE_AFFILIATE = "ExperienceAffiliate",

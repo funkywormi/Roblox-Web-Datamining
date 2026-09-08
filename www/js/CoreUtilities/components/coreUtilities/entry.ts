@@ -1,4 +1,7 @@
 import { addExternal, addLegacyExternal } from "@rbx/externals";
+import * as coreLib from "@rbx/core-lib";
+import * as coreUrl from "@rbx/core-lib/url";
+import * as coreHttp from "@rbx/core-lib/http";
 import * as endpoints from "@rbx/core-scripts/endpoints";
 import * as fmtNumber from "@rbx/core-scripts/format/number";
 import * as fmtString from "@rbx/core-scripts/format/string";
@@ -38,55 +41,85 @@ import * as CoreUtilities from "@rbx/core-scripts/legacy/core-utilities";
 import * as CoreRobloxUtilities from "@rbx/core-scripts/legacy/core-roblox-utilities";
 import * as webTelemetry from "@rbx/web-telemetry/fire";
 
+import Intl from "@rbx/core-scripts/intl";
+import { authenticatedUser } from "@rbx/core-scripts/meta/user";
+import { setClientInterceptors } from "@rbx/www-common/http";
+import { defaultLocale, locales } from "@rbx/www-common/locale";
+import { userIdFromNumber } from "@rbx/www-common/user";
+
 import { initializeTheme } from "@rbx/core-scripts/theme/internal";
-import * as directionalNavigation from "./src/directional-navigation";
+import { initializeBoundAuthTokensForJQuery } from "./src/boundAuthTokenHeaderInjector";
+import { initializeGamepadNavigation } from "./src/directional-navigation";
 import heartbeatInit from "./src/pageHeartbeat";
 
-// Side-effect only import (singleton interceptor that applies bound auth tokens to all jQuery
-// requests). The React (and general purpose) version of this interceptor is attached to the
-// exported `httpService` and the Angular version of this interceptor lives with the
-// `angularJsUtilities` bundle.
-import "./src/boundAuthTokenHeaderInjector";
+addExternal(["Roblox", "core-lib", "index"], coreLib);
+addExternal(["Roblox", "core-lib", "url", "index"], coreUrl);
+addExternal(["Roblox", "core-lib", "http", "index"], coreHttp);
 
-$.ajaxPrefilter(endpoints.ajaxPrefilter);
-
-const addLocalePrefixToAnchorTag = (a: HTMLAnchorElement): void => {
-  // Only match same site links
-  if (a.hostname === window.location.hostname) {
-    const oldHref = a.href;
-    const newHref = endpoints.attachUrlLocale(oldHref);
-    if (newHref !== oldHref) {
-      // eslint-disable-next-line no-param-reassign
-      a.href = newHref;
-    }
-  }
-};
-
-const localizeAllLinks = () => {
-  const allLinks = document.links;
-  for (const a of allLinks) {
-    if (a instanceof HTMLAnchorElement) {
-      addLocalePrefixToAnchorTag(a);
-    }
-  }
-};
-
-const rewriteDynamicLinksOnClick = () => {
-  // Don't turn into arrow function, it changes the behavior of 'this'
-  // TODO: old, migrated code
-  // eslint-disable-next-line prefer-arrow-callback
-  $("body").on("click", "a", function onClick() {
-    // @ts-expect-error `this` is assumed to be an `HTMLAnchorElement`
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    addLocalePrefixToAnchorTag(this);
+try {
+  setClientInterceptors({
+    getUserId: () => {
+      const id = authenticatedUser()?.id;
+      return id == null ? null : userIdFromNumber(id);
+    },
+    getLocale: () => {
+      const locale = new Intl().getLocale();
+      return coreLib.arrayIncludes(locales, locale) ? locale : defaultLocale;
+    },
+    challengeContainerId: "generic-challenge-container",
   });
-};
+} catch {
+  // do nothing for now
+}
 
-if (endpoints.supportLocalizedUrls) {
-  $(document).ready(() => {
-    localizeAllLinks();
-    rewriteDynamicLinksOnClick();
-  });
+try {
+  initializeBoundAuthTokensForJQuery();
+  $.ajaxPrefilter(endpoints.ajaxPrefilter);
+} catch {
+  // do nothing for now
+}
+
+try {
+  const addLocalePrefixToAnchorTag = (a: HTMLAnchorElement): void => {
+    // Only match same site links
+    if (a.hostname === window.location.hostname) {
+      const oldHref = a.href;
+      const newHref = endpoints.attachUrlLocale(oldHref);
+      if (newHref !== oldHref) {
+        // eslint-disable-next-line no-param-reassign
+        a.href = newHref;
+      }
+    }
+  };
+
+  const localizeAllLinks = () => {
+    const allLinks = document.links;
+    for (const a of allLinks) {
+      if (a instanceof HTMLAnchorElement) {
+        addLocalePrefixToAnchorTag(a);
+      }
+    }
+  };
+
+  const rewriteDynamicLinksOnClick = () => {
+    // Don't turn into arrow function, it changes the behavior of 'this'
+    // TODO: old, migrated code
+    // eslint-disable-next-line prefer-arrow-callback
+    $("body").on("click", "a", function onClick() {
+      // @ts-expect-error `this` is assumed to be an `HTMLAnchorElement`
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      addLocalePrefixToAnchorTag(this);
+    });
+  };
+
+  if (endpoints.supportLocalizedUrls) {
+    $(document).ready(() => {
+      localizeAllLinks();
+      rewriteDynamicLinksOnClick();
+    });
+  }
+} catch {
+  // do nothing
 }
 
 addExternal(["Roblox", "core-scripts", "endpoints"], endpoints);
@@ -155,7 +188,7 @@ try {
 }
 
 try {
-  directionalNavigation.initializeGamepadNavigation();
+  initializeGamepadNavigation();
 } catch {
   // do nothing for now
 }

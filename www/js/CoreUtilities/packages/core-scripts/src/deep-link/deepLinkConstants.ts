@@ -150,6 +150,7 @@ export const CounterEvents = {
   PrivateServerLinkResolutionFailed: "DeeplinkParserPrivateServerLinkResolutionFailed",
   ExperienceDetailsResolutionFailed: "DeeplinkParserExperienceDetailsResolutionFailed",
   AvatarItemDetailsResolutionFailed: "DeeplinkParserAvatarItemDetailsResolutionFailed",
+  AvatarItemAffiliateResolutionFailed: "DeeplinkParserAvatarItemAffiliateResolutionFailed",
   ExperienceAffiliateResolutionFailed: "DeeplinkParserExperienceAffiliateResolutionFailed",
   ContentPostResolutionFailed: "DeeplinkParserContentPostResolutionFailed",
   ExperienceEventResolutionFailed: "DeeplinkParserExperienceEventResolutionFailed",

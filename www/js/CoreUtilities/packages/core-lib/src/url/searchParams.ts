@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import { downcast } from "../commonTypes";
+import { downcast } from "../types";
 import { Unique } from "./types";
 
 const newURLSearchParams = (

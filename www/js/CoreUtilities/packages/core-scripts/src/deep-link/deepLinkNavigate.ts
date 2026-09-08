@@ -723,14 +723,19 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
             return false;
           });
       }
-      case ShareLinksType.AVATAR_ITEM_DETAILS: {
+      case ShareLinksType.AVATAR_ITEM_DETAILS:
+      case ShareLinksType.AVATAR_ITEM_AFFILIATE: {
         if (!params.code) {
           break;
         }
 
         const { code } = params;
+        const linkType =
+          params.type === ShareLinksType.AVATAR_ITEM_AFFILIATE
+            ? ShareLinksType.AVATAR_ITEM_AFFILIATE
+            : ShareLinksType.AVATAR_ITEM_DETAILS;
 
-        return resolveShareLinks(params.code, ShareLinksType.AVATAR_ITEM_DETAILS)
+        return resolveShareLinks(params.code, linkType)
           .then(response => {
             //
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -749,11 +754,7 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
             // TODO: old, migrated code
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
             const itemType = data.itemType as "Asset" | "Bundle" | "Look";
-            const resolveLinkEvent = buildResolveLinkEvent(
-              data.status,
-              code,
-              ShareLinksType.AVATAR_ITEM_DETAILS,
-            );
+            const resolveLinkEvent = buildResolveLinkEvent(data.status, code, linkType);
             sendEventWithTarget(
               resolveLinkEvent.type,
               resolveLinkEvent.context,
@@ -764,7 +765,11 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
             return true;
           })
           .catch(() => {
-            fireEvent?.(CounterEvents.AvatarItemDetailsResolutionFailed);
+            fireEvent?.(
+              linkType === ShareLinksType.AVATAR_ITEM_AFFILIATE
+                ? CounterEvents.AvatarItemAffiliateResolutionFailed
+                : CounterEvents.AvatarItemDetailsResolutionFailed,
+            );
             return false;
           });
       }
