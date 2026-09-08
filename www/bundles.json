@@ -1580,7 +1580,7 @@
         },
         {
             "name": "Feature.DSAIllegalContentReportForm",
-            "url": "https://js.rbxcdn.com/f7ca01a72e6123bb0826ba9deb8866f1f6a82ff4442a2e90c38c8f7982d894df.js",
+            "url": "https://js.rbxcdn.com/4013b073e6614db9337804140db58bdce4e10bc9a7e29f29c2b59b297e5583a3.js",
             "sources": [
                 "/illegal-content-reporting"
             ]
@@ -4483,7 +4483,7 @@
         },
         {
             "name": "ConfigureGroup",
-            "url": "https://js.rbxcdn.com/4915d2e247fa0b2fbf288570e68801b80eee392fcfaf5176ddfb8af6426afa8f-ConfigureGroup.js",
+            "url": "https://js.rbxcdn.com/a9b9fe6a8dc66a8f457f52db84b00865171ac9d7d395d2c3654dbef7cf94c722-ConfigureGroup.js",
             "sources": [
                 "/communities/configure"
             ]
@@ -5694,7 +5694,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/00af17f8e9d9a2ee6b89f843c044ada7ea6196c6ad44d9a7987bfd598310de76-Navigation.js",
+            "url": "https://js.rbxcdn.com/bfdae6a3641edbda2c4f7f2f162f9fda2e72c7e80c1dcb3c8d2bd6d2fe0896b2-Navigation.js",
             "sources": [
                 "/home",
                 "/",
@@ -5823,7 +5823,7 @@
         },
         {
             "name": "PlacesList",
-            "url": "https://js.rbxcdn.com/ee6a739b4410161a109222bfeb49ee7d864b4f3f74473c508b20282fe3c5c29c-PlacesList.js",
+            "url": "https://js.rbxcdn.com/8d5c051ccf28bf942ba22dbb16db3041f247d18fdbd0bc360c0cb1894de647e8-PlacesList.js",
             "sources": [
                 "/home"
             ]
@@ -6212,7 +6212,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/70ca2df84d9f67f565d641f63c1b6b442af7c58055fbdd96c18009a120a44ff2-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/3088e935d5fb30aaf0b1cc8b9aa2e1ff5020c26db139e44e852c1bb76bfb8a5e-RobuxRedesign.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -8127,7 +8127,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://css.rbxcdn.com/c434f316d9f12534811cd34579e72de8ca782f639eadd4d97e5a99bcca64ebc4-Navigation.css",
+            "url": "https://css.rbxcdn.com/27324f2fa09a8185b796880208f5b326a290359c9b283f888b842d8c19fe4bb3-Navigation.css",
             "sources": [
                 "/home",
                 "/",

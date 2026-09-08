@@ -22,7 +22,6 @@ export const PERMISSION_TAB_GROUP_IDS: Record<PermissionTab, ReadonlySet<string>
     'Group.DataStoresGroup',
     'Group.NotificationsGroup',
     'Group.CommunicationGroup',
-    'Group.TalentHubGroup',
     'Group.LegacyGroup',
   ]),
 };

@@ -59,7 +59,7 @@ export function ProductList({ isPrimary, sectionBase }: ProductListProps) {
 
   return (
     <Section {...getSectionTrackingProps(sectionBase)}>
-      <div className="flex flex-col self-stretch">
+      <div className="flex flex-col gap-xsmall self-stretch">
         <div className="flex flex-row justify-between items-center self-stretch">
           <SectionHeader>{translate(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
           {daysLeft.success && <ExpirationBadge daysLeft={daysLeft.value} />}

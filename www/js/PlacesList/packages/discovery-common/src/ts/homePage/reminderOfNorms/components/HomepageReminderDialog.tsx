@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { getTheme } from "@rbx/core-scripts/theme";
 import useReminderOfNormsQuery from "../hooks/useReminderOfNormsQuery";
 import { EventTypes } from "../services/eventConstants";
 import sendReminderOfNormsEvent from "../services/sendReminderOfNormsEvent";
@@ -22,7 +21,7 @@ const HomepageReminderDialog = (): React.JSX.Element | null => {
 
   const [isDialogSeen, setIsDialogSeen] = useState<boolean>(false);
 
-  const isKids = getTheme() === "kids";
+  const isKids = document.body.classList.contains("age-kids-theme");
   const currentUser = authenticatedUser();
   const userId = currentUser?.id ?? undefined;
 

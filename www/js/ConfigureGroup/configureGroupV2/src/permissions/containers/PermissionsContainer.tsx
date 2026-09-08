@@ -13,6 +13,7 @@ import {
   usePermissionsTranslation,
 } from '../providers/TranslationProvider';
 import { PermissionsUIConfigProvider, usePermissionsUiConfig } from '../providers/UIConfigProvider';
+import { PermissionTab } from '../utils/tabConfig';
 import type { CreatorDetails, EntityDetails, PermissionsUIConfig } from '../utils/types';
 import { CreatorTypes } from '../utils/types';
 
@@ -73,6 +74,9 @@ const PermissionsContainerInternal: FunctionComponent<PermissionsContainerIntern
   const { translate } = usePermissionsTranslation();
   const { showMobileView, singleCreatorExperience } = usePermissionsUiConfig();
   const [mobileStep, setMobileStep] = useState<number>(1);
+  const [selectedPermissionTab, setSelectedPermissionTab] = useState<PermissionTab>(
+    PermissionTab.GENERAL,
+  );
 
   const onCreatorSelect = useCallback(
     (creator: CreatorDetails | null) => {
@@ -125,6 +129,8 @@ const PermissionsContainerInternal: FunctionComponent<PermissionsContainerIntern
           <PermissionGroupList
             entity={entity}
             creator={selectedCreator}
+            selectedTab={selectedPermissionTab}
+            onSelectedTabChange={setSelectedPermissionTab}
             key={selectedCreator?.id}
           />
         </Grid>

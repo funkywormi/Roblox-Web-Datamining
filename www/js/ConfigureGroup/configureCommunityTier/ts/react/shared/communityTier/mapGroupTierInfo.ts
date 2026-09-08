@@ -25,6 +25,7 @@ export type CommunityTierApiResponse = {
   tierUpdatedTime: string | null;
   lastEvaluatedTime: string | null;
   requirements?: ApiTierRequirement[] | null;
+  capabilities?: { isEligibleForUnrestrictedMessages?: boolean } | null;
 };
 
 // The full group settings response; we only care about the communityTier property.

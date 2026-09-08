@@ -35,6 +35,10 @@ const useCurrentGroupUtils = ({
   });
 
   const [allInvitedUsersAndMembers, setAllInvitedUsersAndMembers] = useState<User[] | undefined>();
+  // Whether we've settled the prefetch decision: either the full list loaded, or we
+  // determined it won't be prefetched (org too large / missing data / not requested).
+  const [hasResolvedAllInvitedUsersAndMembers, setHasResolvedAllInvitedUsersAndMembers] =
+    useState(false);
 
   const groupMembersCache = useRef<Map<string, boolean>>(new Map());
   const groupRoleCache = useRef<Map<string, boolean>>(new Map());
@@ -91,8 +95,13 @@ const useCurrentGroupUtils = ({
       setAllInvitedUsersAndMembers(allUsers.data);
     } catch {
       setAllInvitedUsersAndMembers(undefined);
+    } finally {
+      setHasResolvedAllInvitedUsersAndMembers(true);
     }
   }, []);
+
+  const shouldFetchAllInvitedUsersAndMembers =
+    overrideFetchAllInvitedUsersAndMembers === true ? true : !!roleId;
 
   const isUserInGroup = useCallback(
     async (userId: number): Promise<boolean> => {
@@ -274,17 +283,16 @@ const useCurrentGroupUtils = ({
         .map((friend) => [friend.id.toString(), true]) ?? [],
     );
 
-    const shouldFetch =
-      (overrideFetchAllInvitedUsersAndMembers ?? false)
-        ? overrideFetchAllInvitedUsersAndMembers
-        : !!roleId;
-
     if (
       cacheState.current.membership &&
       (cacheState.current.invitations || isInvitationsError) &&
-      shouldFetch
+      shouldFetchAllInvitedUsersAndMembers
     ) {
       void fetchAllInvitedUsersAndMembers();
+    } else {
+      // no prefetch will run (org too large, missing data, or not requested) — the
+      // full-list load is settled, so consumers should stop showing a loading state.
+      setHasResolvedAllInvitedUsersAndMembers(true);
     }
   }, [
     isFetching,
@@ -296,9 +304,15 @@ const useCurrentGroupUtils = ({
     invitationsByRole,
     isInvitationsError,
     roleId,
-    overrideFetchAllInvitedUsersAndMembers,
+    shouldFetchAllInvitedUsersAndMembers,
     canInviteMembers,
   ]);
+
+  // True while the prefetched full member/invitee list is still being determined or loaded.
+  // Lets consumers show a loading state (instead of an empty "no results") on an empty
+  // dropdown until the members arrive, fixing the all-vs-nothing timing race.
+  const isLoadingAllInvitedUsersAndMembers =
+    shouldFetchAllInvitedUsersAndMembers && !hasResolvedAllInvitedUsersAndMembers;
 
   const returnValue = useMemo(
     () => ({
@@ -307,6 +321,7 @@ const useCurrentGroupUtils = ({
       isUserFriend,
       isUserInRole,
       allInvitedUsersAndMembers,
+      isLoadingAllInvitedUsersAndMembers,
       isFetching,
     }),
     [
@@ -315,6 +330,7 @@ const useCurrentGroupUtils = ({
       isUserFriend,
       isUserInRole,
       allInvitedUsersAndMembers,
+      isLoadingAllInvitedUsersAndMembers,
       isFetching,
     ],
   );

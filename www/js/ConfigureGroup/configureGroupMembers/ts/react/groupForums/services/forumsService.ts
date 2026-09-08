@@ -15,7 +15,8 @@ import {
   ToggleReactionMetadata,
   ResolvedForumCategoryPermissionsResponse,
   ResolvedGroupRolePermissionsPageResponse,
-  ForumCategoryRolePermissionResponse
+  ForumCategoryRolePermissionResponse,
+  ChannelModerationType
 } from '../types';
 import { MessageContent } from '../../shared/types';
 import { createMessageContentFragment } from '../../shared/utils/messageContentUtils';
@@ -76,18 +77,26 @@ export default {
   createGroupForumCategory: async (
     groupId: number,
     name: string,
-    isRestricted?: boolean
+    isRestricted?: boolean,
+    moderationType?: ChannelModerationType
   ): Promise<ForumCategory> => {
     const urlConfig = {
       url: groupForumsConstants.urls.getForumCategoriesEndpoint(groupId, false),
       withCredentials: true
     };
 
-    const data: { name: string; isRestricted?: boolean } = {
+    const data: {
+      name: string;
+      isRestricted?: boolean;
+      moderationType?: ChannelModerationType;
+    } = {
       name
     };
     if (isRestricted !== undefined) {
       data.isRestricted = isRestricted;
+    }
+    if (moderationType !== undefined) {
+      data.moderationType = moderationType;
     }
 
     const response = await httpService.post<ForumCategory>(urlConfig, data);

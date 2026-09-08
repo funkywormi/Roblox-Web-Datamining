@@ -409,6 +409,7 @@ interface CommunityProductFeatures {
   ForumsAgeCheck: boolean;
   ForumsRestrictedCategories: boolean;
   ForumsSearch: boolean;
+  ForumsUnrestrictedMessages: boolean;
   RealtimeMessaging: boolean;
   AnnouncementPolls: boolean;
   AnnouncementAnalytics: boolean;

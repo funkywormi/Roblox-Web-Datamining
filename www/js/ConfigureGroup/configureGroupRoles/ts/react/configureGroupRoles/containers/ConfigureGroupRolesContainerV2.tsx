@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
 import { createSystemFeedback } from 'react-style-guide';
-import { QueryClient } from '@tanstack/react-query';
 import {
   GroupManagementRootProviders,
   GroupManagementSurface,
   GroupRoles
 } from '@rbx/group-management';
 import { NativeName, Locale } from '@rbx/intl';
-import { useTheme } from 'react-utilities';
+import { queryClient, useTheme } from 'react-utilities';
 import RobloxIntlTranslationProvider from '../providers/RobloxIntlTranslationProvider';
 import { CommunityProductFeaturesContextProvider } from '../../shared/contexts/CommunityProductFeaturesContext';
 
@@ -31,15 +30,6 @@ const defaultLocaleInfo = {
   nativeName: NativeName.English
 };
 const translationResourceProvider = new RobloxIntlTranslationProvider(defaultLocaleInfo);
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      refetchOnWindowFocus: false
-    }
-  }
-});
 
 const [SystemFeedback, systemFeedbackService] = createSystemFeedback();
 

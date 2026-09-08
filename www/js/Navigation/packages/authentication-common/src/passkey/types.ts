@@ -53,6 +53,14 @@ export const DELETE_CREDENTIAL_BATCH_CONFIG: UrlConfig = {
   timeout: AUTH_API_TIMEOUT,
 };
 
+export type RenameCredentialReturnType = undefined;
+
+export const RENAME_CREDENTIAL_CONFIG: UrlConfig = {
+  withCredentials: true,
+  url: `${authApiUrl}/v1/passkey/RenameCredential`,
+  timeout: AUTH_API_TIMEOUT,
+};
+
 /**
  * Wire values recognized by authentication-api for the optional `source`
  * field on FinishARPreAuthPasskeyRegistration. Unrecognized values are

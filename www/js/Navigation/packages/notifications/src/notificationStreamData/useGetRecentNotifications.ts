@@ -7,6 +7,9 @@ import { sendBundleCreated, sendNotificationRetrieved } from "./notificationStre
 
 export const GET_RECENT_QUERY_KEY = ["notification-stream-get-recent"];
 
+// NEEDS CLEANUP due Angular parity.
+const REPLAY_PAGES = 3;
+
 const byEventDateDesc = (a: StreamNotification, b: StreamNotification): number =>
   new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime();
 
@@ -97,25 +100,29 @@ export const useGetRecentNotifications = (): ReturnType<
     }
   }, [pageCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // DELIBERATE DUPLICATE FETCH. Do not "optimise" this away.
+  // NEEDS CLEANUP due Angular parity.
   //
-  // The Angular stream runs its entire get-recent sequence TWICE for a single bell open, so
-  // every notification is fetched twice and logged to nsNotificationRetrieved twice. Measured
-  // on production control 2026-08-27 with a 25-notification payload: startIndex 0,20,0,20 and
-  // 50 nsNotificationRetrieved events for 25 rows. This is a bug in the Angular stream, and
-  // the owning team's call is that the React port matches its behaviour rather than fixes it,
-  // because the notification guardrail metrics are defined against these doubled counts; the
-  // numbers are being addressed separately. Removing this replay makes React report roughly
-  // half of Angular's "stream notifications received" and reads as a regression.
+  // DELIBERATE DUPLICATE FETCH, bounded to the first REPLAY_PAGES pages. Do not "optimise"
+  // this away, and do not widen it back to every page.
   //
-  // refetch() re-requests every page already loaded, and fetchPage logs on each response, so
-  // one call reproduces the second pass. Ref-guarded so it happens once, and the shell
-  // unmounts when the popover closes, which resets it to once per open.
+  // Angular replays only the OPENING pages of its get-recent sequence, not the whole list.
+  // Measured 2026-09-04 at N = 20/60/150/250/510/1000 against an identical stubbed payload:
+  //
+  //   Angular   nsNotificationRetrieved = N + min(60, N)
+  //
+  // Replaying every page instead logs 2N, which over-reports received on long lists and grows
+  // without bound in N: at N = 1000 that is 2000 events against Angular's 1060. Bounding the
+  // replay to 3 pages reproduces Angular's count exactly at every size measured. It is
+  // metric-inert either way, since unique_received is COUNT(DISTINCT notification_id).
+  //
+  // refetchPage re-requests only the pages whose index passes the predicate, and fetchPage logs
+  // on each response. Ref-guarded so it happens once, and the shell unmounts when the popover
+  // closes, which resets it to once per open.
   const replayedRef = useRef(false);
   useEffect(() => {
     if (pageCount > 0 && !hasNextPage && !isFetching && !replayedRef.current) {
       replayedRef.current = true;
-      refetch().catch(() => undefined);
+      refetch({ refetchPage: (_page, index) => index < REPLAY_PAGES }).catch(() => undefined);
     }
   }, [pageCount, hasNextPage, isFetching, refetch]);
 

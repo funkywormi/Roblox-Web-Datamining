@@ -18,7 +18,7 @@
     "Action.Modal.Ok": "OK",
     "Action.Submit": "Submit",
     "Question.WhyIllegal": "Why are you reporting this content as illegal?*",
-    "Question.Url": "URL of the content you are reporting*",
+    "Question.Url": "Content URLs you are reporting (up to 5)*",
     "Question.Title": "Why do you believe that the identified content is illegal?*",
     "Question.Country": "What country's law do you think this content violates?*",
     "Message.UrlSample": "Sample Roblox Url",

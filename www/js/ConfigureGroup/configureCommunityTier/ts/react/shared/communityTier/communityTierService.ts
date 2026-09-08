@@ -72,6 +72,22 @@ async function evaluateGroupTier(groupId: number): Promise<GroupTierInfo | null>
   return mapGroupSettingsToTierInfo({ communityTier });
 }
 
+/**
+ * Reads the server-computed Unrestricted Messages eligibility off the group detail response.
+ * Kept out of the tier mapping: that mapping discards the Enterprise tier (the only tier this
+ * capability is granted at), so `GroupTierInfo` is null for exactly the communities that have it.
+ * This reads the flag directly and is viewer-safe (group detail is public).
+ */
+async function fetchUnrestrictedMessagesEligibility(groupId: number): Promise<boolean> {
+  const urlConfig = {
+    url: communityTierConstants.urls.getGroupDetail(groupId),
+    withCredentials: true
+  };
+
+  const response = await httpService.get<GroupSettingsCommunityTierResponse>(urlConfig);
+  return response.data.communityTier?.capabilities?.isEligibleForUnrestrictedMessages ?? false;
+}
+
 const communityTierService = {
   getGroupTierInfo: async (groupId: number): Promise<GroupTierInfo | null> => {
     if (groupId <= 0) {
@@ -95,6 +111,14 @@ const communityTierService = {
     }
 
     return evaluateGroupTier(groupId);
+  },
+
+  getUnrestrictedMessagesEligibility: async (groupId: number): Promise<boolean> => {
+    if (groupId <= 0) {
+      return false;
+    }
+
+    return fetchUnrestrictedMessagesEligibility(groupId);
   }
 };
 

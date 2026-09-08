@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import { usePrevious } from "@rbx/core-scripts/react";
-import { isEqual } from "lodash";
+import { isEqual } from "es-toolkit";
 import {
   TComponentType,
   TOmniRecommendationGame,

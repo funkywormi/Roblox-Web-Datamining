@@ -6,7 +6,7 @@ import type { GroupRoleMetadata, GroupRolePermissions } from '../../clients/grou
 import groupsClient from '../../clients/groups';
 import type { Organization } from '../../clients/organizationApi';
 import { DefaultMemberRoleIdNumber, GuestRoleRank } from '../../utils/constants';
-import { canEditRolePermissions } from '../../utils/groupPermissions';
+import { canViewRolePermissions } from '../../utils/groupPermissions';
 import type {
   CreatorDetails,
   CreatorFilter,
@@ -41,7 +41,7 @@ function buildOrganizationRolesGroup(
       name: role.name ?? '',
       color: role.color,
       isPrivate: role.isPrivate,
-      disabled: !isOwner && !canEditRolePermissions(rolePermissions?.[role.id?.toString() ?? '']),
+      disabled: !isOwner && !canViewRolePermissions(rolePermissions?.[role.id?.toString() ?? '']),
       type: CreatorTypes.ROLE,
     }));
 

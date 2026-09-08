@@ -2,11 +2,11 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Dropdown, Menu, MenuItem, MenuSection } from '@rbx/foundation-ui';
 import { Loading } from 'react-style-guide';
 import { useTranslation } from 'react-utilities';
-import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { CurrentUser } from 'Roblox';
+import { MIGRATION_STATUS, useGetMigrationStatus } from '@rbx/group-management';
 import { AssignedRole, Group, UserAndRoles } from '../../shared/types';
 import groupMembersService from '../services/groupMembersService';
-import groupsService from '../../shared/services/groupsService';
 import useMemberModerationActions from '../hooks/useMemberModerationActions';
 import useMembersQuery, {
   useMembersQueryUpdates,
@@ -20,8 +20,6 @@ import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProd
 import { isCommunityOwner } from '../../shared/utils/communityOwnership';
 import { computeManageableRoles } from '../utils/manageableRoles';
 import { canModerateMemberByRank } from '../utils/memberModeration';
-
-const MIGRATED_STATUS = 'Migrated';
 
 type MembersTabProps = {
   group: Group;
@@ -62,12 +60,12 @@ const MembersTab: React.FC<MembersTabProps> = ({ group }) => {
 
   // The lexorank affordance is unified-groups only (flag on AND migrated); legacy groups stay rank-based.
   const isUnifiedUIEnabled = features.IsUnifiedUIEnabled === true;
-  const { data: migrationStatus, isLoading: isMigrationStatusLoading } = useQuery({
-    queryKey: ['groupMigrationStatus', groupId],
-    queryFn: () => groupsService.getGroupMigrationStatus(groupId),
-    enabled: isUnifiedUIEnabled
-  });
-  const isUnifiedGroup = isUnifiedUIEnabled && migrationStatus === MIGRATED_STATUS;
+  const {
+    data: migrationStatus,
+    isLoading: isMigrationStatusLoading
+  } = useGetMigrationStatus(groupId, { enabled: isUnifiedUIEnabled });
+  const isUnifiedGroup =
+    isUnifiedUIEnabled && migrationStatus?.status === MIGRATION_STATUS.MIGRATED;
 
   // Role management and moderation both compare role position, so fetch the acting user's held
   // roles (members query filtered to self) whenever they can manage ranks or moderate members.

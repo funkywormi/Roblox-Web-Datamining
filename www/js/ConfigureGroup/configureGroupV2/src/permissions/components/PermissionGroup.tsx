@@ -12,6 +12,7 @@ export type PermissionGroupProps = {
   metadata: PermissionGroupMetadata;
   initialSelections: Record<string, PermissionResponse>;
   currentSelections: Record<string, PermissionRequest>;
+  isReadOnly?: boolean;
   onPermissionChange: (permissionId: string, isGranted: boolean) => void;
 };
 
@@ -19,6 +20,7 @@ const PermissionGroup: FunctionComponent<PermissionGroupProps> = ({
   metadata,
   initialSelections,
   currentSelections,
+  isReadOnly = false,
   onPermissionChange,
 }) => {
   const { translate } = usePermissionsTranslation();
@@ -48,7 +50,7 @@ const PermissionGroup: FunctionComponent<PermissionGroupProps> = ({
               localInheritance={permission.inheritsFrom?.find(
                 (p) => currentSelections[p]?.isGranted,
               )}
-              canEdit={initialSelections[permission.permissionId].canEdit}
+              canEdit={!isReadOnly && initialSelections[permission.permissionId].canEdit}
               onChange={onPermissionChange}
             />
           </li>

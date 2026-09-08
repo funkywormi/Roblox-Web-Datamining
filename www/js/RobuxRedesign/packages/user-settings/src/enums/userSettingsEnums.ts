@@ -91,6 +91,14 @@ export enum PartySettingsValue {
   NoOne = "NoOne",
 }
 
+export enum AcbAgeRating {
+  G = "ACB_AGE_G",
+  PG = "ACB_AGE_PG",
+  M = "ACB_AGE_M",
+  MA15 = "ACB_AGE_MA15",
+  R18 = "ACB_AGE_R18",
+}
+
 export enum UserSetting {
   contentAgeRestriction = "contentAgeRestriction",
   phoneNumberDiscoverability = "phoneNumberDiscoverability",
@@ -138,6 +146,7 @@ export enum UserSetting {
   // Note: This is a V2 setting and not supported in the V1 Contracts.
   aggregatedDesktopNotifications = "aggregatedDesktopNotifications",
   allowPresetChat = "allowPresetChat",
+  iarcAgeRating = "iarcAgeRating",
 }
 
 // The type of a given option for a setting

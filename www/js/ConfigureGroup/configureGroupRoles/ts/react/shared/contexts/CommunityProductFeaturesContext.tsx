@@ -13,6 +13,7 @@ export const defaultCommunityProductFeatures: CommunityProductFeatures = {
   ForumsAgeCheck: false,
   ForumsRestrictedCategories: false,
   ForumsSearch: false,
+  ForumsUnrestrictedMessages: false,
   RealtimeMessaging: false,
   AnnouncementPolls: false,
   AnnouncementsRichTextRead: false,
