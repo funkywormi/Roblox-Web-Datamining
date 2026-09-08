@@ -3525,6 +3525,7 @@
                 "/users/inventory",
                 "/users/1/favorites",
                 "/my/avatar",
+                "/my/account",
                 "/badges/176685910",
                 "/catalog/3360689775",
                 "/bundles/591"
@@ -6816,7 +6817,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/2a723b8c1de8fa1d2823b2d99a8c6491f11ae05b774914b5d4be24c890d7230c-UserSettings.js",
+            "url": "https://js.rbxcdn.com/3ac8cea8a8e2d8962708ae4664947dbaa7350737d3b6bab03f88c294e057a9df-UserSettings.js",
             "sources": [
                 "/my/account"
             ]

@@ -140,6 +140,7 @@ export default {
   parentSideTradingDescription: "Description.ParentSide.TradeSetting",
   inventoryVisibilityLabel: "Label.InventoryVisibility",
   inventoryVisibilityCascadingUpdatesSuccessMessage: "Description.InventoryVisibilityUpdated",
+  tradeQualityDescription: "Message.TradeQualityMessage",
 
   // Communication privacy
   communicationPrivacyHeading: "Heading.Communication",

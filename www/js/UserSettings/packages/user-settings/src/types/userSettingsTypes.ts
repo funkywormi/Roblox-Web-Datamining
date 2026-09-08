@@ -8,6 +8,7 @@ import {
   UserPrivacyLevel,
   CommunicationPrivacyLevel,
   SpendNotificationSetting,
+  TradeQualityFilterValue,
   Theme,
   AccountTheme,
   ContentControls,
@@ -42,6 +43,7 @@ export type TUserSettingsBody = {
   [UserSetting.whoCanJoinMeInExperiences]?: CommunicationPrivacyLevel;
   [UserSetting.whoCanSeeMyInventory]?: UserPrivacyLevel;
   [UserSetting.whoCanTradeWithMe]?: CommunicationPrivacyLevel;
+  [UserSetting.tradeQualityFilter]?: TradeQualityFilterValue;
   [UserSetting.themeType]?: Theme;
   [UserSetting.accountTheme]?: AccountTheme;
   [UserSetting.canUploadContacts]?: boolean;
@@ -91,6 +93,7 @@ export type TOptionValue =
   | AccountTheme
   | CommunicationPrivacyLevel
   | UserPrivacyLevel
+  | TradeQualityFilterValue
   | UpdateFriendsAboutMyActivitySettingValue
   | EnabledStatusValue
   | AllowedStatusValue
@@ -131,6 +134,7 @@ export type TUserSettingsAndOptionsBody = {
   [UserSetting.dailyScreenTimeLimit]?: TUserSettingAndOptions<number>;
   [UserSetting.enablePurchases]?: TUserSettingAndOptions<EnabledStatusValue>;
   [UserSetting.whoCanTradeWithMe]?: TUserSettingAndOptions<UserPrivacyLevel>;
+  [UserSetting.tradeQualityFilter]?: TUserSettingAndOptions<TradeQualityFilterValue>;
   [UserSetting.whoCanSeeMyInventory]?: TUserSettingAndOptions<UserPrivacyLevel>;
   [UserSetting.whoCanSeeMySocialNetworks]?: TUserSettingAndOptions<UserPrivacyLevel>;
   [UserSetting.allowThirdPartyAppPermissions]?: TUserSettingAndOptions<EnabledStatusValue>;

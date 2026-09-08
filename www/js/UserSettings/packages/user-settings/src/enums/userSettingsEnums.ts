@@ -92,6 +92,13 @@ export enum PartySettingsValue {
   NoOne = "NoOne",
 }
 
+export enum TradeQualityFilterValue {
+  None = "None",
+  Low = "Low",
+  Medium = "Medium",
+  High = "High",
+}
+
 export enum AcbAgeRating {
   G = "ACB_AGE_G",
   PG = "ACB_AGE_PG",
@@ -107,6 +114,7 @@ export enum UserSetting {
   whoCanJoinMeInExperiences = "whoCanJoinMeInExperiences",
   whoCanSeeMyInventory = "whoCanSeeMyInventory",
   whoCanTradeWithMe = "whoCanTradeWithMe",
+  tradeQualityFilter = "tradeQualityFilter",
   themeType = "themeType",
   accountTheme = "accountTheme",
   canUploadContacts = "canUploadContacts",

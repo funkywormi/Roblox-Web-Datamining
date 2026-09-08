@@ -4,6 +4,7 @@ import {
   UserPrivacyLevel,
   CommunicationPrivacyLevel,
   PartySettingsValue,
+  TradeQualityFilterValue,
 } from "@rbx/user-settings";
 import { TSettingsPage } from "../../../../types/commonTypes";
 import SettingCategoryPageName from "../../../../enums/SettingCategoryPageName";
@@ -87,6 +88,10 @@ export const privacyOptionLabels = {
   allConnections: "Label.AllFriends",
   trustedConnectionsOnly: "Label.OnlyTrustedFriends",
   trustedFriends: "Label.TrustedFriends",
+  none: "Label.None",
+  low: "Label.Low",
+  medium: "Label.Medium",
+  high: "Label.High",
 };
 
 export const blockedUsersPageSize = 50;
@@ -274,6 +279,34 @@ export const getTradePrivacyOptions = (): TRadioButtonOptionV2[] => {
     id: "trade-privacy-noOne",
   };
   return [everyone, followers, following, friends, noOne];
+};
+
+export const getTradeQualityFilterOptions = (): TRadioButtonOptionV2[] => {
+  const none: TRadioButtonOptionV2 = {
+    label: privacyOptionLabels.none,
+    value: TradeQualityFilterValue.None,
+    name: "trade-quality-filter-none",
+    id: "trade-quality-filter-none",
+  };
+  const low: TRadioButtonOptionV2 = {
+    label: privacyOptionLabels.low,
+    value: TradeQualityFilterValue.Low,
+    name: "trade-quality-filter-low",
+    id: "trade-quality-filter-low",
+  };
+  const medium: TRadioButtonOptionV2 = {
+    label: privacyOptionLabels.medium,
+    value: TradeQualityFilterValue.Medium,
+    name: "trade-quality-filter-medium",
+    id: "trade-quality-filter-medium",
+  };
+  const high: TRadioButtonOptionV2 = {
+    label: privacyOptionLabels.high,
+    value: TradeQualityFilterValue.High,
+    name: "trade-quality-filter-high",
+    id: "trade-quality-filter-high",
+  };
+  return [none, low, medium, high];
 };
 
 export const getInventoryVisibilityOptions = (): TRadioButtonOptionV2[] => {

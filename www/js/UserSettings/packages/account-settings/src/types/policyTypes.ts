@@ -14,6 +14,8 @@ export type TSettingsUIPolicyBody = {
   accountCountryPickerEnabled: boolean;
   displayParentalSpendControl: boolean;
   displayAccountRestrictions: boolean;
+  displayTradeQualityFilter: boolean;
+  isTradeQualityFilterInSettingsRolledOut: boolean;
   displaySocialMedia: boolean;
   displayAccountDeletion: boolean;
   display17PlusDescription: boolean;
