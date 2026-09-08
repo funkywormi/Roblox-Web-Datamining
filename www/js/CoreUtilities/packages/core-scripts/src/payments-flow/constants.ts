@@ -43,6 +43,7 @@ export enum TRIGGERING_CONTEXT {
   WEB_DEVELOPER_PRODUCT_PLUS_UPSELL = "WebDeveloperProductPlusUpsell",
   WEB_PRIVATE_SERVER_PLUS_UPSELL = "WebPrivateServerPlusUpsell",
   WEB_APP_THEME_PLUS_UPSELL = "WebAppThemePlusUpsell",
+  WEB_PROFILE_FRAME_PLUS_UPSELL = "WebProfileFramePlusUpsell",
 }
 
 export enum VIEW_NAME {

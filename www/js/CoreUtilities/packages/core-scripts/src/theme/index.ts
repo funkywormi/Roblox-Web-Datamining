@@ -2,17 +2,25 @@
 
 import * as localStorage from "@rbx/core-lib/local-storage";
 import "@rbx/www-common/global";
-import { AppTheme, appThemes, Theme, PlusTheme } from "./constants";
+import { AppTheme, appThemes, PlusTheme, FreeTheme } from "./constants";
 import { authenticatedUser, isBlackbirdUser } from "../meta/user";
 
 const appThemeClass = (theme: Exclude<AppTheme, "default">) => `${theme}-theme`;
-const themeClass = (theme: Exclude<Theme, "default">) =>
-  theme === "kids" ? "age-kids-theme" : appThemeClass(theme);
+
+const kids = (() => {
+  // For CS site which loads CoreUtilities before document body
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (document.body == null) {
+    return false;
+  }
+  const { classList } = document.body;
+  return classList.contains("age-kids-variant1-theme") || classList.contains("age-kids-theme");
+})();
 
 // TODO: remove this logic once classic theme is plus only
-const classicThemeEnabledForNonPlus = () => {
-  // Classic theme is an account level theme for plus users and can be handled normally
-  if (isBlackbirdUser()) {
+const classicThemeEnabledForNonPlusOrKids = () => {
+  // Classic theme is an account level theme for non-kid, plus users and can be handled normally
+  if (isBlackbirdUser() && !kids) {
     return false;
   }
 
@@ -46,18 +54,8 @@ const initialTheme = () => {
 
   const { classList } = document.body;
 
-  const classic = classicThemeEnabledForNonPlus();
-  if (classic) {
+  if (classicThemeEnabledForNonPlusOrKids()) {
     classList.add(appThemeClass("classic"));
-    // Classic theme can be applied alongside kids theme.
-    // We delay the early return until later.
-  }
-
-  if (classList.contains("age-kids-variant1-theme") || classList.contains("age-kids-theme")) {
-    return "kids";
-  }
-
-  if (classic) {
     return "classic";
   }
 
@@ -69,8 +67,9 @@ const initialTheme = () => {
   return appTheme ?? "default";
 };
 
-let accountTheme: Theme = initialTheme();
+let accountTheme: AppTheme = initialTheme();
 let previewTheme: PlusTheme | null = null;
+let listeningToThemeChanges = false;
 
 const themeListeners = new Set<(theme: AppTheme) => void>();
 
@@ -83,12 +82,12 @@ const addAppThemeClass = (theme: AppTheme) => {
 const clearTheme = () => {
   const theme = previewTheme ?? accountTheme;
   if (theme !== "default") {
-    document.body.classList.remove(themeClass(theme));
+    document.body.classList.remove(appThemeClass(theme));
   }
 };
 
 /** Returns the currently stored account level theme in memory. */
-export const getTheme = (): Theme => accountTheme;
+export const getTheme = (): AppTheme => accountTheme;
 
 /** Sets the currently stored account level theme in memory (does not persist). */
 export const setTheme = (theme: AppTheme) => {
@@ -113,6 +112,12 @@ export const subscribeToThemeChange = (listener: (theme: AppTheme) => void): (()
   };
 };
 
+export const getListeningToThemeChanges = () => listeningToThemeChanges;
+
+export const setListeningToThemeChanges = (listen: boolean) => {
+  listeningToThemeChanges = listen;
+};
+
 /** Returns the current app theme being previewed, if any. */
 export const getPreviewTheme = (): PlusTheme | null => previewTheme;
 
@@ -125,11 +130,12 @@ export const setPreviewTheme = (theme: PlusTheme) => {
 
 /** Clears the theme being previewed and restores the page to the account level theme. */
 export const clearPreviewTheme = () => {
-  clearTheme();
-  if (accountTheme !== "default") {
-    document.body.classList.add(themeClass(accountTheme));
+  if (previewTheme == null) {
+    return;
   }
+  clearTheme();
+  addAppThemeClass(accountTheme);
   previewTheme = null;
 };
 
-export type { Theme, AppTheme, PlusTheme };
+export type { AppTheme, PlusTheme, FreeTheme };

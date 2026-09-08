@@ -36,9 +36,3 @@ export const appThemes = [...freeThemes, ...plusThemes] as const;
 
 /* Themes that users can manually select. */
 export type AppTheme = (typeof appThemes)[number];
-
-/* All possible themes. */
-export const themes = [...appThemes, "kids"] as const;
-
-/* All possible themes. */
-export type Theme = (typeof themes)[number];

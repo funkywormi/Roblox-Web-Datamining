@@ -103,6 +103,7 @@ export const DeepLinkNavigationMap: Record<string, string> = {
 };
 
 export const UrlPart = {
+  Home: "/home",
   Games: "/games",
   Users: "/users",
   Groups: "/groups",
