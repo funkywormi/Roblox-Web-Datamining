@@ -16,12 +16,15 @@ import {
   RequirementType,
   CrossAgeGroupCollaborationValue,
   PartySettingsValue,
+  AcbAgeRating,
 } from "../enums/userSettingsEnums";
 
 export type TDoNotDisturbTimeWindow = {
   startTimeMinutes: number;
   endTimeMinutes: number;
 };
+
+export type IarcAgeRating = string;
 
 export type TChannelSettingUpdate = {
   channelName: string;
@@ -77,10 +80,12 @@ export type TUserSettingsBody = {
   [UserSetting.spendNotifications]?: SpendNotificationSetting;
   [UserSetting.AllowPromotionalOffersNotifications]?: TChannelSettings;
   [UserSetting.allowPresetChat]?: EnabledStatusValue;
+  [UserSetting.iarcAgeRating]?: IarcAgeRating;
 };
 
 export type TOptionValue =
   | ContentControls
+  | AcbAgeRating
   | PhoneNumberDiscoverability
   | Theme
   | AccountTheme
@@ -193,6 +198,7 @@ export type TUserSettingsAndOptionsV2Body = {
   [UserSetting.whoCanUsePartyChatWithMe]?: TUserSettingsAndOptionsV2<PartySettingsValue>;
   [UserSetting.whoCanUsePartyVoiceWithMe]?: TUserSettingsAndOptionsV2<PartySettingsValue>;
   [UserSetting.allowPresetChat]?: TUserSettingsAndOptionsV2<EnabledStatusValue>;
+  [UserSetting.iarcAgeRating]?: TUserSettingsAndOptionsV2<IarcAgeRating>;
 };
 
 type TCascadingSettingUpdatesResponse = {

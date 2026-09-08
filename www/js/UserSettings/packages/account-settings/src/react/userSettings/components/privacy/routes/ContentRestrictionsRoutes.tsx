@@ -5,11 +5,13 @@ import { UserSetting } from "@rbx/user-settings";
 import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
 import PrivacySettingName from "../../../../../enums/privacy/PrivacySettingName";
 import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOptions";
+import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAndOptionsV2";
 import { useGetSettingsUiPolicyQuery } from "../../../../apis/universalAppConfigurationApi";
+import { getAgeRatingEntry } from "../../../constants/privacy/iarcAgeRatingRegistry";
 import { TSettingsPage } from "../../../../../types/commonTypes";
 import SettingsList from "../../../../common/components/routing/SettingsList";
 import { getTranslatedOptionValue } from "../../../constants/contentConstants/consentTranslationConstants";
-import ContentMaturitySlider from "../ContentMaturitySlider";
+import ContentMaturity from "../ContentMaturity";
 import BlockedExperiences from "../BlockedExperiences";
 import ApprovedExperiences from "../ApprovedExperiences";
 import {
@@ -21,10 +23,13 @@ import SensitiveIssues from "../SensitiveIssues";
 export const ContentRestrictionsRoutes = (): JSX.Element => {
   const { translate } = useTranslation();
   const [settingsAndOptions] = useGetSettingsAndOptions();
+  const [settingsAndOptionsV2] = useGetSettingsAndOptionsV2();
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
 
   const displayAllowedExperiences = uiPolicy?.isAllowedExperiencesEnabled;
   const displaySensitiveIssues = settingsAndOptions?.[UserSetting.allowSensitiveIssues];
+  const displayIarcAgeRating = uiPolicy?.isIarcAgeRatingEnabled;
+  const iarcCurrentValue = settingsAndOptionsV2?.[UserSetting.iarcAgeRating]?.currentValue;
 
   // Fetch labels for current setting values
   const pagesWithCurrentValues: Record<string, TSettingsPage> = useMemo(() => {
@@ -35,10 +40,12 @@ export const ContentRestrictionsRoutes = (): JSX.Element => {
         let currValueLabel: string | undefined;
         switch (key) {
           case PrivacySettingName.ContentMaturity:
-            currValueLabel = getTranslatedOptionValue(
-              settingsAndOptions?.[UserSetting.contentAgeRestriction]?.currentValue,
-              translate,
-            );
+            currValueLabel = displayIarcAgeRating
+              ? getAgeRatingEntry(iarcCurrentValue)?.label
+              : getTranslatedOptionValue(
+                  settingsAndOptions?.[UserSetting.contentAgeRestriction]?.currentValue,
+                  translate,
+                );
             break;
           case PrivacySettingName.SensitiveIssues:
             currValueLabel = getTranslatedOptionValue(
@@ -64,7 +71,14 @@ export const ContentRestrictionsRoutes = (): JSX.Element => {
     }
 
     return result;
-  }, [settingsAndOptions, displayAllowedExperiences, displaySensitiveIssues]);
+  }, [
+    settingsAndOptions,
+    displayAllowedExperiences,
+    displaySensitiveIssues,
+    displayIarcAgeRating,
+    iarcCurrentValue,
+    translate,
+  ]);
 
   return (
     <React.Fragment>
@@ -73,7 +87,7 @@ export const ContentRestrictionsRoutes = (): JSX.Element => {
         routingPath={privacySettingCategoryPages[SettingCategoryPageName.ContentRestrictions].path}
       />
       <Route path={contentRestrictionsPages[PrivacySettingName.ContentMaturity].path}>
-        <ContentMaturitySlider />
+        <ContentMaturity />
       </Route>
       <Route path={contentRestrictionsPages[PrivacySettingName.BlockedExperiences].path}>
         <BlockedExperiences />

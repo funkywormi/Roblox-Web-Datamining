@@ -83,6 +83,7 @@ export type TSettingsUIPolicyBody = {
   shouldShowGenericShareActivityUpdatesCopy: boolean;
   isTrustedFriendsInVisibilitySettingsRolledOut: boolean;
   shouldShowContentMaturityLocalAgeRatingBanner: boolean;
+  isIarcAgeRatingEnabled: boolean;
   canSeeChatTerminology: boolean;
   appThemesAccess: AppThemesAccess;
 };

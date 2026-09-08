@@ -27,7 +27,7 @@ import { sendPrivacyPageloadEvent } from "../services/eventServices/privacyEvent
 import { selectSettingConsentRequirements } from "../../apis/slices/parentalConsentSlice";
 import { useAppSelector } from "../../redux/hooks";
 import useGetSettingsAndOptions from "../../apis/hooks/useGetSettingsAndOptions";
-import ContentMaturitySlider from "../components/privacy/ContentMaturitySlider";
+import ContentMaturity from "../components/privacy/ContentMaturity";
 import InventoryTradePrivacy from "../components/privacy/InventoryTradePrivacy";
 import AdPreferences from "../components/privacy/AdPreferences";
 import FriendsAndContacts from "../components/privacy/FriendsAndContacts";
@@ -183,7 +183,7 @@ export const PrivacySettingsContainer = (): JSX.Element => {
         <ContentRestrictionsRoutes />
       ) : (
         <Route path={privacySettingCategoryPages[PrivacySettingName.ContentMaturity].path}>
-          <ContentMaturitySlider />
+          <ContentMaturity />
         </Route>
       )}
 

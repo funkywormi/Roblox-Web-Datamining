@@ -1,8 +1,4 @@
-export default {
-  appThemeLabel: "Heading.DeviceAppTheme",
-  appThemeDescription: "Description.DeviceAppTheme",
-  appThemeUpsellDescription: "Description.DeviceAppThemeUpsell",
-  newBadgeLabel: "Label.AppThemeBadgeNew",
-  appThemeUpsellText: "Label.AppThemeUnlockBanner",
-  appThemeSubscribeText: "Action.Subscribe",
-};
+export const appThemeLabel = "Heading.DeviceAppTheme";
+export const newBadgeLabel = "Label.AppThemeBadgeNew";
+export const appThemeUpsellText = "Label.AppThemeUnlockBanner";
+export const appThemeSubscribeText = "Action.Subscribe";

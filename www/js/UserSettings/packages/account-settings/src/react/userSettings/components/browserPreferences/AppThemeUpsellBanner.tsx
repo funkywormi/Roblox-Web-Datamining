@@ -1,26 +1,40 @@
+import { useEffect, useRef } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { Button, Icon } from "@rbx/foundation-ui";
-import browserPreferencesTranslationConstants from "../../constants/contentConstants/browserPreferencesTranslationConstants";
+import { Link } from "@rbx/foundation-ui";
+import {
+  appThemeUpsellText,
+  appThemeSubscribeText,
+} from "../../constants/contentConstants/browserPreferencesTranslationConstants";
 
-const constants = browserPreferencesTranslationConstants;
-
-export default function AppThemeUpsellBanner({ onSubscribe }: { onSubscribe: () => void }) {
+export default function AppThemeUpsellBanner({
+  onFirstMount,
+  onSubscribe,
+}: {
+  onFirstMount: () => void;
+  onSubscribe: () => void;
+}) {
   const { translate } = useTranslation();
+
+  const firstMount = useRef(true);
+  useEffect(() => {
+    if (!firstMount.current) {
+      return;
+    }
+    firstMount.current = false;
+    onFirstMount();
+  }, [onFirstMount]);
 
   return (
     <div
       data-testid="app-theme-upsell"
-      className="flex items-center justify-between gap-small padding-y-small padding-x-medium radius-medium stroke-standard stroke-default max-width-[410px]"
+      className="flex items-center gap-large padding-medium bg-shift-200 radius-medium"
     >
-      <div className="flex items-center gap-small min-width-0">
-        <Icon name="icon-regular-roblox-plus" size="Medium" />
-        <span className="text-body-medium content-muted">
-          {translate(constants.appThemeUpsellText)}
-        </span>
-      </div>
-      <Button size="Small" variant="Link" onClick={onSubscribe}>
-        {translate(constants.appThemeSubscribeText)}
-      </Button>
+      <span className="fill text-body-medium content-emphasis">
+        {translate(appThemeUpsellText)}
+      </span>
+      <Link as="button" size="Small" underline="always" onClick={onSubscribe}>
+        {translate(appThemeSubscribeText)}
+      </Link>
     </div>
   );
 }

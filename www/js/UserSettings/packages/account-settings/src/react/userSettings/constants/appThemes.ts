@@ -1,7 +1,7 @@
 import type { AppTheme } from "@rbx/core-scripts/theme";
 import { AccountTheme } from "@rbx/user-settings";
 
-export type AppThemeCategoryId = "calm" | "dynamic";
+export type AppThemeCategoryId = "calm" | "dynamic" | "special";
 
 export type AppThemeSwatch = {
   light: string;
@@ -9,11 +9,10 @@ export type AppThemeSwatch = {
 };
 
 export type AppThemeDef = {
-  // core-scripts theme key; drives the `{key}-theme` body class.
   key: AppTheme;
   accountTheme: AccountTheme;
   labelKey: string;
-  category: AppThemeCategoryId;
+  category: AppThemeCategoryId | null;
   swatch: AppThemeSwatch;
 };
 
@@ -22,18 +21,30 @@ export const appThemeCategories: { id: AppThemeCategoryId; labelKey: string }[] 
   { id: "calm", labelKey: "AppTheme.CategoryCalm" },
 ];
 
-export const defaultAppTheme: AppThemeDef = {
+export const defaultTheme: AppThemeDef = {
   key: "default",
   accountTheme: AccountTheme.Default,
   labelKey: "AppTheme.Default",
-  category: "dynamic",
+  category: null,
   swatch: {
     light: "#ffffff",
     dark: "#121215",
   },
 };
 
+export const classicTheme: AppThemeDef = {
+  key: "classic",
+  accountTheme: AccountTheme.Classic,
+  labelKey: "AppTheme.Classic",
+  category: null,
+  swatch: {
+    light: "#e42727",
+    dark: "#e42727",
+  },
+};
+
 export const appThemeDefs: AppThemeDef[] = [
+  defaultTheme,
   {
     key: "cosmic-dust",
     accountTheme: AccountTheme.CosmicDust,
@@ -132,16 +143,7 @@ export const appThemeDefs: AppThemeDef[] = [
     category: "calm",
     swatch: { light: "#fbc8f8", dark: "#5d0e5d" },
   },
+  classicTheme,
 ];
 
-const allThemeDefs = [defaultAppTheme, ...appThemeDefs];
-
-export const appThemeDefByKey = new Map<string, AppThemeDef>(
-  allThemeDefs.map(def => [def.key, def]),
-);
-
-// Keyed by lowercased `AccountTheme` value: the settings API returns the enum value
-// (e.g. "CosmicDust"), which must be mapped to the kebab `key` that drives the CSS class.
-export const appThemeDefByAccountTheme = new Map<string, AppThemeDef>(
-  allThemeDefs.map(def => [def.accountTheme.toLowerCase(), def]),
-);
+export const appThemesByKey = new Map<string, AppThemeDef>(appThemeDefs.map(def => [def.key, def]));

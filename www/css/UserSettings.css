@@ -5165,6 +5165,11 @@ input[type=button].btn-block {
     flex: 1 0 auto
 }
 
+.size-\[1em\] {
+    width: 1em;
+    height: 1em
+}
+
 .size-\[50px\] {
     width: 50px;
     height: 50px
@@ -5202,10 +5207,6 @@ input[type=button].btn-block {
 
 .max-width-\[380px\] {
     max-width: 380px
-}
-
-.max-width-\[410px\] {
-    max-width: 410px
 }
 
 .max-width-\[480px\] {
@@ -5391,12 +5392,28 @@ input[type=button].btn-block {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M7.29289 8.70711C6.90237 8.31658 6.90237 7.68342 7.29289 7.29289C7.68342 6.90237 8.31658 6.90237 8.70711 7.29289L16 14.5858L23.2929 7.29289C23.6834 6.90237 24.3166 6.90237 24.7071 7.29289C25.0976 7.68342 25.0976 8.31658 24.7071 8.70711L17.4142 16L24.7071 23.2929C25.0976 23.6834 25.0976 24.3166 24.7071 24.7071C24.3166 25.0976 23.6834 25.0976 23.2929 24.7071L16 17.4142L8.70711 24.7071C8.31658 25.0976 7.68342 25.0976 7.29289 24.7071C6.90237 24.3166 6.90237 23.6834 7.29289 23.2929L14.5858 16L7.29289 8.70711Z' fill='black'/%3E%3C/svg%3E")
 }
 
+.\[-webkit-box-orient\:vertical\] {
+    -webkit-box-orient: vertical
+}
+
+.\[-webkit-line-clamp\:3\] {
+    -webkit-line-clamp: 3
+}
+
+.\[display\:-webkit-box\] {
+    display: -webkit-box
+}
+
 .\[font-size\:var\(--font-size-350\)\] {
     font-size: var(--font-size-350)
 }
 
 .\[grid-template-columns\:repeat\(2\,minmax\(0\,1fr\)\)\] {
     grid-template-columns: repeat(2, minmax(0, 1fr))
+}
+
+.\[text-align\:inherit\] {
+    text-align: inherit
 }
 
 .placeholder\:text-body-large::-webkit-input-placeholder {
@@ -5470,9 +5487,41 @@ input[type=button].btn-block {
     border-color: var(--color-system-emphasis)
 }
 
+.hover\:underline:hover {
+    -webkit-text-decoration-skip-ink: none;
+    text-decoration-skip-ink: none;
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline
+}
+
+.hover\:cursor-pointer:hover {
+    cursor: pointer
+}
+
+.hover\:\[opacity\:0\.8\]:hover {
+    opacity: .8
+}
+
+.focus\:outline-focus:focus {
+    outline: var(--stroke-thicker)solid var(--color-selection-start);
+    outline-offset: var(--stroke-thicker)
+}
+
 .focus-visible\:outline-focus:focus-visible {
     outline: var(--stroke-thicker)solid var(--color-selection-start);
     outline-offset: var(--stroke-thicker)
+}
+
+.focus-visible\:\[outline-color\:var\(--color-system-emphasis\)\]:focus-visible {
+    outline-color: var(--color-system-emphasis)
+}
+
+.focus-visible\:\[outline-style\:solid\]:focus-visible {
+    outline-style: solid
+}
+
+.focus-visible\:\[outline-width\:var\(--stroke-standard\)\]:focus-visible {
+    outline-width: var(--stroke-standard)
 }
 
 .focus-visible\:hover\:outline-none:hover:focus-visible {
@@ -5540,6 +5589,12 @@ input[type=button].btn-block {
 }
 
 @media (prefers-reduced-motion:no-preference) {
+    .motion-safe\:transition-opacity {
+        transition-property: opacity;
+        transition-timing-function: var(--ease-linear);
+        transition-duration: var(--time-100)
+    }
+
     .motion-safe\:transition-\[flex-grow\] {
         transition-property: -ms-flex-grow, flex-grow
     }

@@ -1,6 +1,5 @@
 import { useTranslation, useTheme } from "@rbx/core-scripts/react";
-import { Icon } from "@rbx/foundation-ui";
-import { defaultAppTheme, type AppThemeDef } from "../../constants/appThemes";
+import type { AppThemeDef } from "../../constants/appThemes";
 
 export default function AppThemeCard({
   def,
@@ -31,15 +30,13 @@ export default function AppThemeCard({
     >
       <span
         aria-hidden
-        className="shrink-0 size-800 radius-circle stroke-standard stroke-muted"
-        style={{ backgroundColor: def.swatch[colorMode] }}
-      />
+        className="grow-0 shrink-0 basis-auto size-800 radius-circle clip stroke-standard stroke-[var(--color-content-muted)]"
+      >
+        <span className="block size-full" style={{ backgroundColor: def.swatch[colorMode] }} />
+      </span>
       <span className="fill basis-0 min-width-0 text-no-wrap text-truncate-end text-body-medium content-default">
         {translate(def.labelKey)}
       </span>
-      {def.key !== defaultAppTheme.key && (
-        <Icon className="content-muted" name="icon-regular-roblox-plus" />
-      )}
     </button>
   );
 }
