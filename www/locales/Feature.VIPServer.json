@@ -141,5 +141,9 @@
     "Label.ChangeFriendsAllowedError.FriendsRename": "Unable to change friends allowed.",
     "Label.ChangeFriendsAllowedSuccess.FriendsRename": "Successfully changed friends allowed.",
     "Label.FriendsAllowed.FriendsRename": "Friends Allowed",
-    "Label.EditServerName": "Edit server name"
+    "Label.EditServerName": "Edit server name",
+    "Label.Active": "Active",
+    "Label.Inactive": "Inactive",
+    "Label.Expiring": "Expiring",
+    "Label.Unavailable": "Unavailable"
 }
