@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import ExperimentationService from "@rbx/experimentation";
+import ExperimentationService, { type ExperimentationInputs } from "@rbx/experimentation";
 import configConstants from "../constants/configConstants";
+
+type UseExperimentValuesOptions = {
+  inputs?: ExperimentationInputs;
+  enabled?: boolean;
+};
 
 /**
  * General hook that fetches all IXP values for a given layer
@@ -11,17 +16,22 @@ import configConstants from "../constants/configConstants";
 const useExperimentValues = <T extends Record<string, unknown>>(
   layerName: string,
   defaultValues: T,
+  options?: UseExperimentValuesOptions,
 ): { ixpData: T; isLoading: boolean } => {
+  const { inputs, enabled = true } = options ?? {};
   const { data, isLoading } = useQuery({
-    queryKey: [`ixp/${layerName}`],
+    queryKey: inputs ? [`ixp/${layerName}`, inputs] : [`ixp/${layerName}`],
     queryFn: async () => {
       try {
-        return await ExperimentationService.getAllValuesForLayer(layerName);
+        return inputs
+          ? await ExperimentationService.getAllValuesForLayer(layerName, undefined, inputs)
+          : await ExperimentationService.getAllValuesForLayer(layerName);
       } catch {
         window.EventTracker?.fireEvent(configConstants.common.FetchExperimentationLayerValuesError);
         return {};
       }
     },
+    enabled,
     staleTime: Infinity, // IXP data doesn't change frequently
   });
 
@@ -29,9 +39,9 @@ const useExperimentValues = <T extends Record<string, unknown>>(
     () => ({
       // fallback to default values for any missing values
       ixpData: { ...defaultValues, ...data } as T,
-      isLoading,
+      isLoading: enabled && isLoading,
     }),
-    [data, defaultValues, isLoading],
+    [data, defaultValues, enabled, isLoading],
   );
 };
 

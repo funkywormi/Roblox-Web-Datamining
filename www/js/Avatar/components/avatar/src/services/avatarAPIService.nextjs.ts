@@ -1,12 +1,6 @@
 /**
  * Next.js implementation of the avatar service using @rbx/core-lib/http.
  *
- * Why no manual CSRF/auth wiring here:
- *   @rbx/www-nextjs instrumentation-client.ts calls setClientInterceptors() from
- *   @rbx/www-common/http before any component code runs. That interceptor handles
- *   CSRF tokens, locale headers, and Sentry tracing automatically for every
- *   http.get / http.post call below. Nothing extra needed in the service itself.
- *
  * Error handling:
  *   getOrThrow() on AsyncResult converts to Promise<T>, rejecting on HttpError.
  *   Callers that inspect error.response.status still work (HttpError has .response.status).
@@ -16,7 +10,6 @@
 
 import * as http from "@rbx/core-lib/http";
 import { Url } from "@rbx/core-lib/url";
-import type { JsonSerializable } from "@rbx/core-lib/json";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import environmentUrls from "@rbx/environment-urls";
 import { getCurrentUserId } from "../utils/currentUser";

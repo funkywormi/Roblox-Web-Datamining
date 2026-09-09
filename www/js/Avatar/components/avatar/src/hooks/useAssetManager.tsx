@@ -3,7 +3,7 @@ import type { AccoutrementAsset } from "@rbx/avatar-common";
 import { ThumbnailTypes } from "@rbx/thumbnails";
 import { ClassicHeadSlot, HatSlot, CategorySlot } from "../types";
 import avatarConstants from "../constants/avatarConstants";
-import AvatarAPIService from "../services/avatarAPIService";
+import AvatarAPIService, { getInvalidAssetIds } from "../services/avatarAPIService";
 import { getCurrentUserId } from "../utils/currentUser";
 import getItemThumbnailAndLink from "../utils/assetManager.helpers";
 import useLayeredClothingSlots from "./useLayeredClothingSlots";
@@ -188,15 +188,47 @@ const useAssetManager = () => {
   );
 
   const setWearingAssets = useCallback(
-    (assets: AccoutrementAsset[]) => {
+    (
+      assets: AccoutrementAsset[],
+      // Callers that already report a partial outcome themselves pass `false`. The outfit flow
+      // counts refused assets off this result and shows `Message.MissingItemsFromOutfit`
+      // (useOutfitHelpers), so reporting here too would double-toast and would file a
+      // SetWearingAssetsError counter that flow deliberately avoids.
+      { reportRefusedAssets = true }: { reportRefusedAssets?: boolean } = {},
+    ) => {
       const previouslyWornAssets: AccoutrementAsset[] = [...currentlyWornAssetsList];
 
       setCurrentlyWornAssets(assets);
 
       const request = setWearingAssetsFromIdsV2(assets);
       request.then(
-        () => {
-          // x
+        response => {
+          // A 2xx does not mean every asset was worn: the ones the server refused come back
+          // under `invalidAssets` (PATCH /v4/avatar) or `invalidAssetIds` (legacy v2). Without
+          // reconciling them the optimistic update above keeps them marked as equipped on an
+          // avatar that is not wearing them.
+          const invalidAssetIds = getInvalidAssetIds(response);
+          if (invalidAssetIds.length === 0) {
+            return;
+          }
+
+          // Dropping the refused ids is the whole fix: the tile reverting to unselected is the
+          // feedback, in the same spirit as ConfirmUpdateAdvancedAccessoriesDialog marking a
+          // slot invalid in place. No toast — a generic "error updating items" on a single
+          // refused item is noise, and the outfit flow reports its own aggregate message.
+          setCurrentlyWornAssets(assets.filter(asset => !invalidAssetIds.includes(asset.id)));
+
+          if (!reportRefusedAssets) {
+            return;
+          }
+
+          // Silent to the user, not to us: without this counter a refusal is invisible in
+          // telemetry, which is why this went unnoticed long enough to be filed as a bug.
+          reportAXError({
+            itemName: "SetWearingAssetsError",
+            counterName: "AvatarEditorError",
+            log: JSON.stringify({ message: "HasInvalidAssets", invalidAssetIds }),
+          });
         },
         e => {
           reportAXError({

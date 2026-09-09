@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import classNames from "classnames";
 import { useTranslation } from "@rbx/core-scripts/react";
+import { isBlackbirdUser } from "@rbx/core-scripts/meta/user";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import { mapItemRestrictionIcons } from "@rbx/www-common/components/itemCard";
 import { reportAXError } from "../../../utils/axAnalyticsService";
@@ -32,6 +33,7 @@ import {
   Asset,
 } from "../../../avatar.types";
 import getItemThumbnailAndLink from "../../../utils/assetManager.helpers";
+import filterAvatarInventoryItems from "../../../utils/filterAvatarInventoryItems";
 import parseError from "../../../utils/parseErrorUtil";
 
 /**
@@ -155,6 +157,7 @@ function AvatarItemsContent({
   const { enableContinuousLoad, pageLoaded } = useAvatarPageContext();
   const systemFeedback = useSystemFeedback();
   const { currentlyWornAssetsLookup } = useCurrentlyWearingAssetsStoreContext();
+  const hasPlus = isBlackbirdUser();
 
   // Avatar inventory state
   const [loading, setLoading] = useState(false);
@@ -347,10 +350,14 @@ function AvatarItemsContent({
           const newAssets: CatalogItem[] = [];
           const assetIds: { assetId: number }[] = [];
           const assetPositions: Record<number, number> = {};
+          const visibleInventoryItems = filterAvatarInventoryItems(
+            result.avatarInventoryItems,
+            hasPlus,
+          );
 
           // Process each inventory item
-          for (let i = 0; i < result.avatarInventoryItems.length; i++) {
-            const returnedItem = result.avatarInventoryItems[i]!;
+          for (let i = 0; i < visibleInventoryItems.length; i++) {
+            const returnedItem = visibleInventoryItems[i]!;
             const itemIndex = isLoadMore ? items.length + i : i;
 
             if (returnedItem.itemCategory.itemType === 1) {
@@ -682,6 +689,7 @@ function AvatarItemsContent({
       pageToken,
       items,
       categories,
+      hasPlus,
       isItemSelected,
       systemFeedback,
       translate,

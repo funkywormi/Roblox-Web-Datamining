@@ -33,7 +33,12 @@ interface AssetManagerContextType {
     assets: AccoutrementAsset[],
     newLayeredClothingOrder?: LayeredClothingSlot[],
   ) => AccoutrementAsset[];
-  setWearingAssets: (assets: AccoutrementAsset[]) => Promise<SetWearingAssetsResponse>;
+  setWearingAssets: (
+    assets: AccoutrementAsset[],
+    // Callers that surface a partial outcome themselves pass `reportRefusedAssets: false`;
+    // state is still reconciled, only the toast and AX counter are suppressed.
+    options?: { reportRefusedAssets?: boolean },
+  ) => Promise<SetWearingAssetsResponse>;
   avatarCallLimiterItemCardsDisabled: boolean;
   setAvatarCallLimiterItemCardsDisabled: (disabled: boolean) => void;
   setWearingAssetsFromIdsV2: (

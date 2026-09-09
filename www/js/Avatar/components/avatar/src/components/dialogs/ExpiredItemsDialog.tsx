@@ -28,7 +28,7 @@ import { TDetailEntry } from "@rbx/catalog/itemDetailsHydrationService/constants
 import { getCurrentUserId } from "../../utils/currentUser";
 import { sendAXTracking, AXAnalyticsConstants } from "../../utils/axAnalyticsService";
 import { getExpiredItemDetails } from "../../services/expiredItemDetails";
-import BatchBuyPriceContainer from "@rbx/purchase-common/src/js/react/itemPurchase/components/BatchBuyPriceContainer";
+import BatchBuyPriceContainer from "@rbx/purchase-common/js/react/itemPurchase/components/BatchBuyPriceContainer";
 import { Asset } from "../../avatar.types";
 import AvatarAPIService from "../../services/avatarAPIService";
 import { getCatalogItemUrl } from "../../utils/assetManager.helpers";

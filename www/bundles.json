@@ -4185,7 +4185,7 @@
         },
         {
             "name": "Avatar",
-            "url": "https://js.rbxcdn.com/955b350bd66a4a931228fde7cff2b12bf233c1a7e26fac5e94575818505941be-Avatar.js",
+            "url": "https://js.rbxcdn.com/342c8e9183036750d4e367930335eb839b59d6f3ebc5ab60d3d23b86250e8d8d-Avatar.js",
             "sources": [
                 "/my/avatar"
             ]
@@ -5044,7 +5044,7 @@
         },
         {
             "name": "GameDetails",
-            "url": "https://js.rbxcdn.com/0ddcee2e5f5f27361d5d4c4096673a22d992f310405dea8fd64aace8fe92cf7d-GameDetails.js",
+            "url": "https://js.rbxcdn.com/1330b4f74b95bd3d755a5a0df194b204c13d11e55a9b776c5c45807fb8c616bb-GameDetails.js",
             "sources": [
                 "/games/1818"
             ]
@@ -5694,7 +5694,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/bfdae6a3641edbda2c4f7f2f162f9fda2e72c7e80c1dcb3c8d2bd6d2fe0896b2-Navigation.js",
+            "url": "https://js.rbxcdn.com/d95908e58a5fe8b8ba2d3f919ba4a7185935dfa829ee5900f307f6e808ca57af-Navigation.js",
             "sources": [
                 "/home",
                 "/",
@@ -7726,7 +7726,7 @@
         },
         {
             "name": "GameDetails",
-            "url": "https://css.rbxcdn.com/493f7b47b7863169eda429df05d2906aace8711dc4d8f8cac687a9e8e73d2a69-GameDetails.css",
+            "url": "https://css.rbxcdn.com/323e8104a8a3264f8dcb4cc64dea6bec4436726961e53533bfddf97c9b5a37dd-GameDetails.css",
             "sources": [
                 "/games/1818"
             ]
@@ -8127,7 +8127,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://css.rbxcdn.com/27324f2fa09a8185b796880208f5b326a290359c9b283f888b842d8c19fe4bb3-Navigation.css",
+            "url": "https://css.rbxcdn.com/a83701683a0ef847e7147d1febd3b74447ac8eae11e9410b91c5039fff1b4e85-Navigation.css",
             "sources": [
                 "/home",
                 "/",

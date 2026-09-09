@@ -154,6 +154,7 @@ export type AvatarInventoryItem = {
   isEditable?: boolean;
   headShape?: string;
   availabilityStatus?: AvatarItemAvailabilityStatus;
+  isPlusExclusive?: boolean;
   outfitDetail?: {
     // 64-bit long on the wire; rewritten to string by preserveJsonNumberPrecision.
     linkedEntityId?: string;
@@ -1218,11 +1219,6 @@ export class AvatarAPIService {
   }
 }
 
-// Factory: NEXT_PUBLIC_IS_NEXTJS is inlined at build time by Next.js (set to "true"
-// in apps/www .env). In the Rspack SCS build for .NET it is undefined, so the
-// legacy Axios path is used. In Next.js, @rbx/www-nextjs instrumentation-client.ts
-// has already called setClientInterceptors() from @rbx/www-common/http before any
-// component code runs, so core-lib/http calls get CSRF, locale, and Sentry for free.
 const isNextJs = process.env.NEXT_PUBLIC_IS_NEXTJS === "true";
 
 export default isNextJs ? AvatarAPIServiceNextJs : AvatarAPIService;

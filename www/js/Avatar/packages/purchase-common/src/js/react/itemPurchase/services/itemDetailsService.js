@@ -68,6 +68,18 @@ export default {
     const result = await httpService.post(urlConfig, requestBody);
     return result.data?.[0] || null;
   },
+  async getCollectibleItemsDetails(collectibleItemIds) {
+    const urlConfig = {
+      url: getCollectibleItemDetailsUrl(),
+      retryable: true,
+      withCredentials: true
+    };
+    const requestBody = {
+      itemIds: collectibleItemIds
+    };
+    const result = await httpService.post(urlConfig, requestBody);
+    return result.data ?? [];
+  },
   getCurrentUserBalance: userId => {
     const urlConfig = {
       url: getCurrentUserBalance(userId),

@@ -307,7 +307,9 @@ const useOutfitHelpers = (
 
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const assetWearingResult = await setWearingAssets(assetList);
+      // This flow reports its own partial outcome below (`Message.MissingItemsFromOutfit`),
+      // so suppress the per-asset reporting and keep only the state reconciliation.
+      const assetWearingResult = await setWearingAssets(assetList, { reportRefusedAssets: false });
       resultArray.push(assetWearingResult);
 
       if (shouldBackgroundBeUpdatedForOutfit(data)) {
@@ -415,12 +417,15 @@ const useOutfitHelpers = (
                 setAvatarType(data.playerAvatarType as AvatarType);
               }
               sendOutfitWearEvent(outfit.id, resultSuccess);
-              if (resultSuccess) {
-                systemFeedback.success(OUTFIT_COSTUME_MESSAGES.successfulWear);
-              } else if (invalidAssetCount > 0) {
+              // Refused assets are checked before `resultSuccess` because the server can answer
+              // `success: true` while still listing assets it would not wear. Ordering success
+              // first reported a successful wear for an outfit that came up short.
+              if (invalidAssetCount > 0) {
                 const count = invalidAssetCount.toString();
                 const message = translate("Message.MissingItemsFromOutfit", { number: count });
                 systemFeedback.error(message);
+              } else if (resultSuccess) {
+                systemFeedback.success(OUTFIT_COSTUME_MESSAGES.successfulWear);
               } else {
                 reportAXError({
                   itemName: "WearOutfitError",

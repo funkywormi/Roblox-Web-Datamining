@@ -4,16 +4,14 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { renderToString } from 'react-dom/server';
 import { withTranslations } from '@rbx/core-scripts/react';
-import { createModal } from '@rbx/core-ui/legacy/react-style-guide';
 import {
   Thumbnail2d,
   ThumbnailTypes,
   ThumbnailFormat,
   DefaultThumbnailSize
 } from '@rbx/thumbnails';
-import { CurrentUser } from '@rbx/legacy-webapp-types/Roblox';
-import { isPremiumUser } from '@rbx/core-scripts/meta/user';
-import { uuidService } from '@rbx/core-scripts/legacy/core-utilities';
+import { isPremiumUser, userId } from '@rbx/core-scripts/meta/user';
+import { generateRandomUuid } from '@rbx/core-lib/uuid';
 import { Badge } from '@rbx/foundation-ui';
 import translationConfig from '../translation.config';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
@@ -23,6 +21,7 @@ import itemPurchaseService from '../services/itemPurchaseService';
 import ItemType from '../../../../ts/react/enums/ItemType';
 import BatchBuyPurchaseResults from '../../../../ts/react/enums/BatchBuyPurchaseResults';
 import TwoStepVerificationModal from '../components/TwoStepVerificationModal';
+import FoundationPurchaseModal from '../components/FoundationPurchaseModal';
 
 const { violationLabels } = itemPurchaseConstants;
 
@@ -258,9 +257,9 @@ export function handleResultFromPurchases(translate, result, startTwoStepVerific
 }
 
 export default function createMultiItemPurchaseModal() {
-  const [Modal, modalService] = createModal();
   function MultiItemPurchaseModal({
     translate,
+    open,
     title,
     expectedTotalPrice,
     items,
@@ -349,9 +348,9 @@ export default function createMultiItemPurchaseModal() {
         collectibleItemId: item.collectibleItemId,
         expectedCurrency: 1,
         expectedPrice: price,
-        expectedPurchaserId: CurrentUser.userId,
+        expectedPurchaserId: userId(),
         expectedPurchaserType: 'User',
-        idempotencyKey: uuidService.generateRandomUuid()
+        idempotencyKey: generateRandomUuid()
       };
       if (!purchaseFromCreator && collectibleItemDetails.lowestAvailableResaleItemInstanceId) {
         params.collectibleItemInstanceId =
@@ -479,13 +478,13 @@ export default function createMultiItemPurchaseModal() {
       const lookId = purchaseMetadata.has(purchaseMetadataKeys.LookId)
         ? purchaseMetadata.get(purchaseMetadataKeys.LookId)
         : '';
-      const guid = uuidService.generateRandomUuid();
+      const guid = generateRandomUuid();
       const idempotencyKey =
         lookId !== undefined && lookId !== '' ? `web_looks_purchase-${lookId}-${guid}` : guid;
       let result;
       try {
         result = await itemPurchaseService.bulkPurchaseItem(
-          CurrentUser.userId,
+          userId(),
           productSurface,
           fulfillmentGroups,
           idempotencyKey
@@ -560,7 +559,7 @@ export default function createMultiItemPurchaseModal() {
               );
               return (
                 <ItemThumbnail
-                  key={item.itemId}
+                  key={`${item.itemType}-${item.id}`}
                   itemsCount={itemDetails.length}
                   item={item}
                   index={i}
@@ -581,7 +580,8 @@ export default function createMultiItemPurchaseModal() {
           stopTwoStepVerification={onTwoStepVerificationChallengeComplete}
           systemFeedbackService={systemFeedbackService}
         />
-        <Modal
+        <FoundationPurchaseModal
+          open={open}
           title={title || defaultTitle}
           body={body}
           neutralButtonText={translate(resources.cancelAction)}
@@ -595,19 +595,21 @@ export default function createMultiItemPurchaseModal() {
             />
           }
           loading={loading}
-          actionButtonShow={itemDetails}
+          actionButtonShow={!!itemDetails}
         />
       </React.Fragment>
     );
   }
 
   MultiItemPurchaseModal.defaultProps = {
+    open: false,
     title: '',
     loading: false
   };
 
   MultiItemPurchaseModal.propTypes = {
     translate: PropTypes.func.isRequired,
+    open: PropTypes.bool,
     title: PropTypes.string,
     expectedTotalPrice: PropTypes.number.isRequired,
     items: PropTypes.arrayOf(
@@ -657,8 +659,5 @@ export default function createMultiItemPurchaseModal() {
     productSurface: PropTypes.string.isRequired,
     systemFeedbackService: PropTypes.func.isRequired
   };
-  return [
-    withTranslations(MultiItemPurchaseModal, translationConfig.purchasingResources),
-    modalService
-  ];
+  return withTranslations(MultiItemPurchaseModal, translationConfig.purchasingResources);
 }

@@ -21,6 +21,7 @@ const layerNames = {
   gridUi: "PlayerApp.GridUI",
   serverTab: "GameDetails.ServersTab",
   gameDetails: "Website.GameDetails",
+  gameDetailsBtid: "Website.GameDetails.Btid",
   gameDetailsExposure: "Website.GameDetails.Exposure",
   searchPage: "Website.SearchResultsPage",
   discoverPage: "Website.GamesPage",
@@ -40,6 +41,9 @@ const defaultValues = {
     HasUpdatedRecommendedSortTitle: true,
     IsGamePreviewVideoEnabled: false,
     HasTopSongsEnabled: false,
+  },
+  gameDetailsBtid: {
+    isDownloadButtonOverrideEnabled: false,
   },
   gameDetailsExposure: {},
   searchPage: {},

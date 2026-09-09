@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { cloneDeep, isEqual } from "lodash";
+import { cloneDeep, isEqual } from "es-toolkit";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { getDeviceMeta, DeviceTypes } from "@rbx/core-scripts/meta/device";
 import bedev1Services from "../../common/services/bedev1Services";

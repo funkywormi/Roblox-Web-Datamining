@@ -1,16 +1,3 @@
-/** Similar to the `keyof` keyword, this type returns a union of the values of a type (instead of the keys). */
-export type ValueOf<T> = T[keyof T];
-
-/** Opposite of {@link Readonly}, removes the `readonly` modifier from all properties in `T`. */
-export type Mutable<T> = {
-  -readonly [P in keyof T]: T[P];
-};
-
-/** Forces a type expression to be resolved/flattened into a regular object type for better documentation. */
-export type Prettify<T> = {
-  [K in keyof T]: T[K];
-} & {};
-
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 declare class NominalTypeGuard<Name extends string, T> {
   private readonly _name: Name;
@@ -109,3 +96,13 @@ export const castToNewType = <Name extends string, T>(x: T): NewType<Name, T> =>
  */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 export const castFromNewType = <Name extends string, T>(x: NewType<Name, T>): T => x as T;
+
+/**
+ * A {@link NewType} wrapper around a string for sensitive data.
+ *
+ * Use {@link readSecret} to get the string data.
+ */
+export type Secret = NewType<"Secret", string>;
+
+/** Explicitly read a {@link Secret} to get the underlying string data. */
+export const readSecret = (secret: Secret): string => castFromNewType(secret);

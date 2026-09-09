@@ -5,7 +5,7 @@ import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import type { TPlayButtonPageContext } from "../types/playButtonTypes";
 
-const { counterEvents, unlockPlayIntentConstants } = playButtonConstants;
+const { counterEvents, unlockPlayIntentConstants, ampNamespaces } = playButtonConstants;
 
 type TExperienceApprovalActionNeededButtonProps = {
   universeId: string;
@@ -40,6 +40,7 @@ const ExperienceApprovalActionNeededButton = ({
 
       window.Roblox.AccessManagementUpsellV2Service.startAccessManagementUpsell({
         featureName: "CanApproveExperience",
+        namespace: ampNamespaces.accountManagement,
         isAsyncCall: false,
         usePrologue: true,
         ampRecourseData: {

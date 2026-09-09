@@ -78,18 +78,32 @@ const _: AllEntriesAreJsonSerializable = true;
  * Note that this is quicker/more efficient than `get(key) != null`, since {@link getItem} must
  * perform JSON deserialization.
  */
-export const hasItem = (key: keyof LocalStorageRegistry): boolean =>
-  localStorage.getItem(key) != null;
+export const hasItem = (key: keyof LocalStorageRegistry): boolean => {
+  try {
+    return localStorage.getItem(key) != null;
+  } catch {
+    return false;
+  }
+};
 
 /** Remove a value from local storage. */
 export const removeItem = (key: keyof LocalStorageRegistry): void => {
-  localStorage.removeItem(key);
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // do nothing
+  }
 };
 
 const getItemIgnoreExpiry = <T extends keyof LocalStorageRegistry>(
   key: T,
 ): LocalStorageRegistry[T] | null => {
-  const str = localStorage.getItem(key);
+  let str: string | null = null;
+  try {
+    str = localStorage.getItem(key);
+  } catch {
+    // do nothing
+  }
   // Since we control the serialization, we assume that deserialization cannot fail. If it somehow
   // does, then we return `null` and assume the data is corrupted/invalid and needs to be rewritten.
   //
@@ -106,13 +120,13 @@ const getItemIgnoreExpiry = <T extends keyof LocalStorageRegistry>(
  *
  * Possible error cases are:
  * - `JsonSerialization`: an error occurred when serializing the value to JSON (i.e., a circular reference).
- * - `QuotaExceeded`: the storage quota was likely exceeded (an unknown error occurred).
  * - `PageRefreshNeeded`: a new schema for the expiry list was encountered, and a page refresh is
  *   needed to correctly store the `maxAge` of entries in the new schema.
+ * - `Unknown`: an unknown error occurred (the storage quota might be exceeded).
  */
 export type LocalStorageWriteErrorCause =
   | { readonly code: "JsonSerialization"; readonly error: Error }
-  | { readonly code: "QuotaExceeded"; readonly error: unknown }
+  | { readonly code: "Unknown"; readonly error: unknown }
   | { readonly code: "PageRefreshNeeded" };
 
 /**
@@ -120,9 +134,9 @@ export type LocalStorageWriteErrorCause =
  *
  * Possible error cases are:
  * - `JsonSerialization`: an error occurred when serializing the value to JSON (i.e., a circular reference).
- * - `QuotaExceeded`: the storage quota was likely exceeded (an unknown error occurred).
  * - `PageRefreshNeeded`: a new schema for the expiry list was encountered, and a page refresh is
  *   needed to correctly store the `maxAge` of entries in the new schema.
+ * - `Unknown`: an unknown error occurred (the storage quota might be exceeded).
  */
 export class LocalStorageWriteError extends Error {
   constructor(readonly cause: LocalStorageWriteErrorCause) {
@@ -144,7 +158,7 @@ const setItemIgnoreExpiry = <T extends keyof LocalStorageRegistry>(
   } catch (error: unknown) {
     return err(
       new LocalStorageWriteError({
-        code: "QuotaExceeded",
+        code: "Unknown",
         error,
       }),
     );

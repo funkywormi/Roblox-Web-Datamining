@@ -31,6 +31,7 @@ import usePlaceIdOverride from "../../common/hooks/usePlaceIdOverride";
 import { PageContext } from "../../common/types/pageContext";
 import getExperienceAffiliateReferralUrlParams from "../../common/utils/getExperienceAffiliateReferralUrlParams";
 import { ExperienceNoticeType } from "../constants/experienceNoticeConstants";
+import usePlayButtonDownloadCtaExperiment from "../hooks/usePlayButtonDownloadCtaExperiment";
 
 type TPlayButtonProps = {
   attributionId: string;
@@ -55,9 +56,13 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
   const { linkCode, linkType } = getExperienceAffiliateReferralUrlParams(
     window.location.toString(),
   );
-  const [shouldDefaultToDownloadButton] = React.useState(
-    () => parseQueryString(window.location.search).downloadButtonDefault === "true",
-  );
+  const [{ shouldDefaultToDownloadButton, isMarketingCampaignReferred }] = React.useState(() => {
+    const queryParams = parseQueryString(window.location.search);
+    return {
+      shouldDefaultToDownloadButton: queryParams.downloadButtonDefault === "true",
+      isMarketingCampaignReferred: queryParams.gsrbx === "1",
+    };
+  });
   const { referralParams, appsFlyerReferralParams, serverProvidedQueryParams } =
     usePageReferralTracker(
       eventStreamConstants.gameDetailReferral,
@@ -88,7 +93,15 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
         SessionInfoType.SpotlightPageSessionInfo,
         SessionInfoType.PreAuthLandingPageSessionInfo,
       ],
-      ["privateServerLinkCode", "placeId", "launchData", "gameInstanceId", "referralUrl"],
+      [
+        "privateServerLinkCode",
+        "placeId",
+        "launchData",
+        "gameInstanceId",
+        "referralUrl",
+        "downloadButtonDefault",
+        "gsrbx",
+      ],
       {
         [EventStreamMetadata.PlaceId]: rootPlaceId,
         [EventStreamMetadata.UniverseId]: universeId,
@@ -106,6 +119,15 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
       }),
     [translate],
   );
+  const isDownloadButtonExperimentEligible =
+    playabilityStatus === PlayabilityStatus.GuestProhibited &&
+    resolvedDownload?.isDirectDownload === true &&
+    !shouldDefaultToDownloadButton;
+  const { isDownloadButtonOverrideEnabled, isLoading: isDownloadButtonExperimentLoading } =
+    usePlayButtonDownloadCtaExperiment({
+      isEligible: isDownloadButtonExperimentEligible,
+      isMarketingCampaignReferred,
+    });
 
   // Use placeIdOverride from URL only if it belongs to this EDP's universe
   const { validatedPlaceIdOverride, isResolvingPlaceId } = usePlaceIdOverride(
@@ -120,7 +142,7 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
       ? String(referralParams[EventStreamMetadata.LaunchData])
       : undefined;
 
-  if (isFetchingPolicy || isResolvingPlaceId) {
+  if (isFetchingPolicy || isResolvingPlaceId || isDownloadButtonExperimentLoading) {
     return <Loading />;
   }
 
@@ -151,7 +173,8 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
   );
   const playabilityStatusCtaOverrides = {
     [PlayabilityStatus.GuestProhibited]:
-      shouldDefaultToDownloadButton && resolvedDownload?.isDirectDownload ? (
+      (shouldDefaultToDownloadButton || isDownloadButtonOverrideEnabled) &&
+      resolvedDownload?.isDirectDownload ? (
         <TokenizedDownloadButton
           variant="Emphasis"
           size="Large"
