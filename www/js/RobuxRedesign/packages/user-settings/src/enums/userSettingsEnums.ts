@@ -37,6 +37,7 @@ export enum AccountTheme {
   InfernoBlast = "InfernoBlast",
   HyperPlum = "HyperPlum",
   QuantumPulse = "QuantumPulse",
+  Classic = "Classic",
 }
 
 export enum CommunicationPrivacyLevel {
@@ -91,6 +92,13 @@ export enum PartySettingsValue {
   NoOne = "NoOne",
 }
 
+export enum TradeQualityFilterValue {
+  None = "None",
+  Low = "Low",
+  Medium = "Medium",
+  High = "High",
+}
+
 export enum AcbAgeRating {
   G = "ACB_AGE_G",
   PG = "ACB_AGE_PG",
@@ -106,6 +114,7 @@ export enum UserSetting {
   whoCanJoinMeInExperiences = "whoCanJoinMeInExperiences",
   whoCanSeeMyInventory = "whoCanSeeMyInventory",
   whoCanTradeWithMe = "whoCanTradeWithMe",
+  tradeQualityFilter = "tradeQualityFilter",
   themeType = "themeType",
   accountTheme = "accountTheme",
   canUploadContacts = "canUploadContacts",
@@ -146,6 +155,8 @@ export enum UserSetting {
   // Note: This is a V2 setting and not supported in the V1 Contracts.
   aggregatedDesktopNotifications = "aggregatedDesktopNotifications",
   allowPresetChat = "allowPresetChat",
+  allowIdentityVerification = "allowIdentityVerification",
+  robuxTransferLimits = "robuxTransferLimits",
   iarcAgeRating = "iarcAgeRating",
 }
 

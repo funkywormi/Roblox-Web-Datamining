@@ -6212,7 +6212,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/3088e935d5fb30aaf0b1cc8b9aa2e1ff5020c26db139e44e852c1bb76bfb8a5e-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/8a30db711db16f0098bff65d5eca651459067bf58e5e651ef04433aa44e32f16-RobuxRedesign.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -6528,7 +6528,7 @@
         },
         {
             "name": "SupportCenter",
-            "url": "https://js.rbxcdn.com/58cf2a15441542294a67160b98590947dd8e6339d40f46e59a44ac1a89ceff79-SupportCenter.js",
+            "url": "https://js.rbxcdn.com/d41589f1cec28eacad3d83ff5c21f5706f787f446224f3ea41d731001f3641e4-SupportCenter.js",
             "sources": [
                 "/support-center"
             ]
@@ -8563,7 +8563,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://css.rbxcdn.com/70410c15381b7c1cdec93286700f952526084115182e9e5eb8068bc0fcef781f-RobuxRedesign.css",
+            "url": "https://css.rbxcdn.com/2b4bcae9c0c565a60f077a2077c8b3adb84bd36cab51b8fa2ea745cc38ee7529-RobuxRedesign.css",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -8766,7 +8766,7 @@
         },
         {
             "name": "SupportCenter",
-            "url": "https://css.rbxcdn.com/9a567648b93c80b1c4e82cce3f5c35241b626fcc0e1064d7c84a9018a6d5d697-SupportCenter.css",
+            "url": "https://css.rbxcdn.com/9f2ebde908f8909a38d9f0fad21cb691866d4e594048422b41d3d3b361185b5f-SupportCenter.css",
             "sources": [
                 "/support-center"
             ]

@@ -98,9 +98,8 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           </h3>
         )}
         <IconButton
-          className="width-[32px] shrink-0"
+          className="lightbox-icon shrink-0"
           icon="icon-filled-x"
-          iconColor="Inverse"
           variant="Utility"
           size="Large"
           onClick={onClose}
@@ -128,18 +127,16 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
       {assetIds.length > 1 && (
         <React.Fragment>
           <IconButton
-            className="lightbox-arrow left"
+            className="lightbox-icon lightbox-arrow left"
             icon="icon-filled-chevron-large-left"
-            iconColor="Inverse"
             ariaLabel={translate("Action.Previous")}
             variant="Utility"
             isDisabled={!hasPrev}
             onClick={goToPrev}
           />
           <IconButton
-            className="lightbox-arrow right"
+            className="lightbox-icon lightbox-arrow right"
             icon="icon-filled-chevron-large-right"
-            iconColor="Inverse"
             ariaLabel={translate("Action.Next")}
             variant="Utility"
             isDisabled={!hasNext}

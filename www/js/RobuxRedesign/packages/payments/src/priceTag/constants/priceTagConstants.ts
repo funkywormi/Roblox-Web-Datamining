@@ -12,10 +12,3 @@ export const NOTATION_CURRENCY_CODE_EXCLUDE_LIST = ["JPY"];
 
 export const NAVBAR_COMPACT_CLASS = "navbar-compact";
 export const NAVBAR_COMPACT_MAX_SIG_FIG = 4;
-
-const COUNTER_PREFIX = "PriceTag";
-export const COUNTERS = {
-  PRICE_DATA_NOT_VALID: `${COUNTER_PREFIX}DataNotValid`,
-  NUMBER_FORMAT_LOCALE_EXCEPTION: `${COUNTER_PREFIX}NumberFormatLocaleException`,
-  ARABIC_LOCALE_TRIGGERED: `${COUNTER_PREFIX}ArabicLocale`,
-};

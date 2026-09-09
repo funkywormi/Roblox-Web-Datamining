@@ -301,13 +301,14 @@
     max-height: 70vh
 }
 
-.lightbox-arrow {
-    position: absolute
-}
-
-.lightbox-arrow .icon {
+.lightbox-icon .icon {
+    color: #fff;
     width: 32px;
     height: 32px
+}
+
+.lightbox-arrow {
+    position: absolute
 }
 
 .lightbox-arrow.left {

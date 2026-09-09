@@ -49,7 +49,7 @@ function SectionBody({ banner, children, isPrimary, ...props }: SectionBodyProps
     return (
       <div
         className={classNames(
-          "radius-large flex flex-col items-start self-stretch gap-xlarge padding-xlarge",
+          "radius-large flex flex-col items-start self-stretch gap-xlarge robux-section",
           {
             "bg-surface-100": isPrimary,
             "stroke-standard": !isPrimary,
@@ -71,7 +71,7 @@ function SectionBody({ banner, children, isPrimary, ...props }: SectionBodyProps
       })}
     >
       {banner}
-      <div className="flex flex-col items-start self-stretch gap-xlarge padding-xlarge" {...props}>
+      <div className="flex flex-col items-start self-stretch gap-xlarge robux-section" {...props}>
         {children}
       </div>
     </div>

@@ -1787,6 +1787,16 @@ p.personalized-bonus-items__report-popover {
     overflow: hidden
 }
 
+.robux-section {
+    padding: var(--padding-xlarge)
+}
+
+@media (min-width:361px) and (max-width:372px) {
+    .robux-section {
+        padding: var(--padding-medium)
+    }
+}
+
 .light-theme .buy-robux-section-header {
     color: #272930
 }
