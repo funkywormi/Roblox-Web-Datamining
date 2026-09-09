@@ -956,7 +956,8 @@
 }
 
 .private-message-row {
-    grid-template-columns: auto 56px minmax(0, 1fr)
+    grid-template-columns: auto 56px minmax(0, 1fr);
+    overflow: hidden
 }
 
 .private-message-row-preview {

@@ -3519,7 +3519,7 @@
         },
         {
             "name": "Feature.Trades",
-            "url": "https://js.rbxcdn.com/67f716afdc82ffec9351a5c659649fce067bbbfe9567a711acc3c017bad65b9d.js",
+            "url": "https://js.rbxcdn.com/547029bf88101713aeb79a6d88db5e8b96a64bd52fce3ef623acf17a82761c74.js",
             "sources": [
                 "/trades",
                 "/users/inventory",
@@ -5983,7 +5983,7 @@
         },
         {
             "name": "PrivateMessage",
-            "url": "https://js.rbxcdn.com/1e59832e7eeffd470ddcc1100dc6bcea04dbe273eea6d89b49d2282900b1a5c9-PrivateMessage.js",
+            "url": "https://js.rbxcdn.com/42a1c2c68adb145bdc0665035a9c43985b6575e871bc4350f0fa7145b277bf66-PrivateMessage.js",
             "sources": [
                 "/my/messages"
             ]
@@ -8309,7 +8309,7 @@
         },
         {
             "name": "PrivateMessage",
-            "url": "https://css.rbxcdn.com/96635f47125c12db069302f0ed05da125b11ba2054c8f934d41b852ed2bafee1-PrivateMessage.css",
+            "url": "https://css.rbxcdn.com/e0bc1782f76fd21f9613d7ae0a23b58c127b282a8cbfa03daa8d89f81ef6c061-PrivateMessage.css",
             "sources": [
                 "/my/messages"
             ]

@@ -20,14 +20,14 @@ const UserName = ({
 
   return (
     <span className="flex items-center gap-xsmall min-width-0">
-      <span className="text-truncate-end">{user.displayName}</span>
+      <span className="text-truncate-end text-no-wrap min-width-0">{user.displayName}</span>
       {user.hasVerifiedBadge ? (
         <VerifiedBadgeIcon
           size="Medium"
           titleText={translate("Creator.VerifiedBadgeIconAccessibilityText")}
         />
       ) : null}
-      <span className="text-body-medium content-muted text-truncate-end">
+      <span className="text-body-medium content-muted text-truncate-end text-no-wrap min-width-0">
         {USER_HANDLE_PREFIX}
         {user.name}
       </span>
@@ -123,7 +123,7 @@ const MessageRow = ({
       />
       <button
         type="button"
-        className="bg-none stroke-none padding-none text-left min-width-0 flex flex-col gap-y-small"
+        className="bg-none stroke-none padding-none text-left min-width-0 clip flex flex-col gap-y-small"
         onClick={handleOpen}
         aria-label={message.subject}
       >
