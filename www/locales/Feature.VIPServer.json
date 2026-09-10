@@ -145,5 +145,6 @@
     "Label.Active": "Active",
     "Label.Inactive": "Inactive",
     "Label.Expiring": "Expiring",
-    "Label.Unavailable": "Unavailable"
+    "Label.Unavailable": "Unavailable",
+    "Label.IncludedWithPlus": "Included with Plus"
 }

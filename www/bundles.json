@@ -1096,7 +1096,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/ad559d4a024f70705208554df3b99c1d8153be0fd70a06856184040e675105cf.js",
+            "url": "https://js.rbxcdn.com/cdb3cb00d0b16de0e54bb1bcdc23098beeedfbb7a7b37ce93f34f21ea8c0161c.js",
             "sources": [
                 "ALL"
             ]
@@ -2785,7 +2785,7 @@
         },
         {
             "name": "Feature.PrivateServers",
-            "url": "https://js.rbxcdn.com/f1173bbba00d0f68be796d340cb4be4580b6f2ed79a1699537d77fd08d3710c3.js",
+            "url": "https://js.rbxcdn.com/f435588c3dc30a13da568049335c8bef0ce476d32f79fe622a4079bf93910166.js",
             "sources": [
                 "/games/1818"
             ]
@@ -3562,7 +3562,7 @@
         },
         {
             "name": "Feature.VIPServer",
-            "url": "https://js.rbxcdn.com/808f1291d2a0731a4bd5f97de199b872b8de3d55e35743da6d598c6c09e8e980.js",
+            "url": "https://js.rbxcdn.com/148e47ff735c1e71d6c806a421e1d5dae493124e2e659410d9c471ac0d6a8ed8.js",
             "sources": [
                 "/games/1818",
                 "/private-server/configure/527154577"
