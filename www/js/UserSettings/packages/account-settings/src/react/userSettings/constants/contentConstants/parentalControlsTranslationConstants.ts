@@ -1,6 +1,7 @@
 import { Intl } from "Roblox";
 import { urlService } from "core-utilities";
 import SpendSettingName from "../../../../enums/SpendSettingName";
+import RobuxSettingName from "../../../../enums/RobuxSettingName";
 import SettingCategoryPageName from "../../../../enums/SettingCategoryPageName";
 import ContentMaturityLevel from "../../../../enums/parentalControls/ContentMaturityLevel";
 import ParentalControlsPageName from "../../../../enums/parentalControls/ParentalControlsPageName";
@@ -26,6 +27,10 @@ export default {
     [SpendSettingName.MonthlySpendingLimit]: "Heading.MonthlySpendingLimit",
     [SpendSettingName.SpendNotifications]: "Heading.SpendNotifications",
     [SpendSettingName.AllowPurchases]: "Heading.AllowPurchases",
+
+    // Robux
+    [SettingCategoryPageName.Robux]: "Heading.Robux",
+    [RobuxSettingName.TransferLimits]: "Heading.TransferLimits",
   },
 
   heading: "Heading.ParentalControls",
@@ -92,6 +97,20 @@ export default {
     noTransactionsLabel: "Label.DropDown.None",
     allowPurchasesHeading: "Heading.AllowPurchases",
     allowPurchasesDescription: "Description.AllowPurchases",
+  },
+  robuxTransferLimits: {
+    parentSideDescription: "Description.ParentSide.RobuxTransferLimits",
+    dailyLimitLabel: "Label.DailyLimit",
+    monthlyLimitLabel: "Label.MonthlyLimit",
+    // Both carry {maxTransferLimit} and spell out the units, so the caller passes
+    // the formatted ceiling and concatenates nothing.
+    maximumDailyLimit: "Label.MaximumDailyRobuxTransferLimit",
+    maximumMonthlyLimit: "Label.MaximumMonthlyRobuxTransferLimit",
+    exceedRangeError: "Message.RobuxTransferLimitExceedRangeError",
+    orderingError: "Message.RobuxTransferLimitOrderingError",
+    // {limit} only — the row places an icon between the two, so they cannot be one string.
+    dailyLimitValue: "Label.DailyRobuxTransferLimitValue",
+    monthlyLimitValue: "Label.MonthlyRobuxTransferLimitValue",
   },
   friendManagement: {
     viewProfile: "Action.ViewProfile",

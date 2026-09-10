@@ -1,11 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
-import { fireEvent } from "roblox-event-tracker";
 import { TPriceTagProps } from "../constants/typeDefinitions";
 import {
   ARABIC_LOCALE,
-  COUNTERS,
   DEFAULT_LOCALE,
   MINUS_SIGN,
   NOTATION_COMPACT_APPLY_THRESHOLD,
@@ -13,13 +11,14 @@ import {
   NAVBAR_COMPACT_CLASS,
   NAVBAR_COMPACT_MAX_SIG_FIG,
 } from "../constants/priceTagConstants";
+import { trackCounter, trackCriticalError } from "../../observability";
 
 function getLocale() {
   const systemLocale = Intl.NumberFormat().resolvedOptions().locale;
   if (systemLocale.startsWith(ARABIC_LOCALE)) {
     // we are not supporting Arabic very well on the other parts of the website,
     // it would be weird only the price is the one using Arabic, also it is not left aligned
-    fireEvent(COUNTERS.ARABIC_LOCALE_TRIGGERED);
+    trackCounter("PriceTag_ArabicLocaleTriggered");
     return systemLocale.replace(ARABIC_LOCALE, DEFAULT_LOCALE);
   }
   return systemLocale;
@@ -71,7 +70,7 @@ export function getFormattedAmount({
       amountAbs,
     );
   } catch (e) {
-    fireEvent(COUNTERS.NUMBER_FORMAT_LOCALE_EXCEPTION);
+    trackCriticalError("PriceTag_NumberFormatLocaleException", undefined, e);
   }
   return {
     formattedAmount,

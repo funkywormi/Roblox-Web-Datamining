@@ -12,6 +12,9 @@ export const ageGroupUrl = `${accountInsightsUrl}/age-group`;
 // billing-api (parental spend controls)
 export const getParentalSpendControlsUrl = `${EnvironmentUrls.billingApi}/v1/parental-controls/get-settings`;
 
+// transfer-api (parent load of a linked child's Robux transfer limits)
+export const getChildTransferLimitUrl = `${EnvironmentUrls.apiGatewayUrl}/transfer/v1/robux-transfer/child-transfer-limit`;
+
 // parental-controls-api
 export const childrenInfoUrl = `${EnvironmentUrls.apiGatewayUrl}/parental-controls-api/v1/parental-controls/children-info`;
 export const childSettingsUrl = `${EnvironmentUrls.apiGatewayUrl}/parental-controls-api/v1/parental-controls/child-settings`;

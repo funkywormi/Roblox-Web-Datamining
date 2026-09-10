@@ -18,6 +18,7 @@ export const accountSettingstranslationConfig: TConfig = {
     "Feature.Accessibility",
     "Feature.RobloxSubscription",
     "Authentication.LinkedAccounts",
+    "Authentication.Login",
     "Feature.Trades",
   ],
   feature: "Feature.AccountSettings",

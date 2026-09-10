@@ -1,3 +1,34 @@
+.profile-frame-thumb {
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    display: block
+}
+
+.profile-frame-thumb img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%
+}
+
+.profile-frame-dialog-body {
+    max-height: calc(100vh - 160px)
+}
+
+.profile-frame-grid {
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 16px 13px;
+    min-height: 0;
+    margin-left: -3px;
+    padding: 3px 4px 3px 3px;
+    display: grid;
+    overflow-y: auto
+}
+
+.profile-frame-item-thumb {
+    background-color: transparent !important
+}
+
 .inset-\[0\] {
     top: 0;
     bottom: 0;
@@ -168,37 +199,6 @@
     min-width: 0;
     padding-left: 6px;
     overflow: hidden
-}
-
-.profile-frame-thumb {
-    background-color: transparent;
-    width: 100%;
-    height: 100%;
-    display: block
-}
-
-.profile-frame-thumb img {
-    object-fit: contain;
-    width: 100%;
-    height: 100%
-}
-
-.profile-frame-dialog-body {
-    max-height: calc(100vh - 160px)
-}
-
-.profile-frame-grid {
-    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-    gap: 16px 13px;
-    min-height: 0;
-    margin-left: -3px;
-    padding: 3px 4px 3px 3px;
-    display: grid;
-    overflow-y: auto
-}
-
-.profile-frame-item-thumb {
-    background-color: transparent !important
 }
 
 .placeholder\:text-body-large::-webkit-input-placeholder {

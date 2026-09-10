@@ -25,6 +25,7 @@ enum ApiCacheTag {
   // Cache tag types - not to be used directly as cache tags, but instead associated with an id
   ChildFriendsType = "ChildFriendsType",
   ChildSettingsType = "ChildSettingsType",
+  ChildTransferLimitsType = "ChildTransferLimitsType",
   ParentalConsentsType = "ParentalConsentsType",
   ParentLinkSettings = "ParentLinkSettings",
   SpendControls = "SpendControls",

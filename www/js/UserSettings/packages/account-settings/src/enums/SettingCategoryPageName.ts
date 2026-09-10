@@ -29,6 +29,9 @@ enum SettingCategoryPageName {
   // Spending settings
   Spending = "Spending",
 
+  // Robux settings
+  Robux = "Robux",
+
   // Notifications
   Notifications = "Notifications",
 

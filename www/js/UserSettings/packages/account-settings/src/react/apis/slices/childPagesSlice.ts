@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import SpendSettingName from "../../../enums/SpendSettingName";
+import RobuxSettingName from "../../../enums/RobuxSettingName";
 import SettingCategoryPageName from "../../../enums/SettingCategoryPageName";
 import PrivacySettingName from "../../../enums/privacy/PrivacySettingName";
 import ParentalControlsPageName from "../../../enums/parentalControls/ParentalControlsPageName";
@@ -29,6 +30,7 @@ export type TChildPages = {
   childSettingCategoryPages: Record<string, TSettingsPage>;
   communicationPages: Record<string, TSettingsPage>;
   spendingPages: Record<string, TSettingsPage>;
+  robuxPages: Record<string, TSettingsPage>;
   screenTimeManagementPage: TSettingsPage;
   topGamesPage: TSettingsPage;
   topGameDetailsPage: TSettingsPage;
@@ -73,6 +75,11 @@ const getChildPages = (childUserId: number): TChildPages => {
       name: SettingCategoryPageName.Spending,
       path: `${linkedChildDetailsPath}/${SettingCategoryPageName.Spending}`,
       titleTranslationKey: pageTitles[SettingCategoryPageName.Spending],
+    },
+    [SettingCategoryPageName.Robux]: {
+      name: SettingCategoryPageName.Robux,
+      path: `${linkedChildDetailsPath}/${SettingCategoryPageName.Robux}`,
+      titleTranslationKey: pageTitles[SettingCategoryPageName.Robux],
     },
     [SettingCategoryPageName.VisibilityAndPrivateServers]: {
       name: SettingCategoryPageName.VisibilityAndPrivateServers,
@@ -238,6 +245,16 @@ const getChildPages = (childUserId: number): TChildPages => {
     },
   };
 
+  const robuxPages: Record<string, TSettingsPage> = {
+    [RobuxSettingName.TransferLimits]: {
+      name: RobuxSettingName.TransferLimits,
+      path: `${childSettingCategoryPages[SettingCategoryPageName.Robux].path}/${
+        RobuxSettingName.TransferLimits
+      }`,
+      titleTranslationKey: pageTitles[RobuxSettingName.TransferLimits],
+    },
+  };
+
   const visibilityAndPrivateServersPages: Record<string, TSettingsPage> = {
     [SettingCategoryPageName.Visibility]: {
       name: SettingCategoryPageName.Visibility,
@@ -300,6 +317,7 @@ const getChildPages = (childUserId: number): TChildPages => {
     contentRestrictionPages,
     communicationPages,
     spendingPages,
+    robuxPages,
     visibilityAndPrivateServersPages,
     consentCenterPage,
     friendManagementPage,

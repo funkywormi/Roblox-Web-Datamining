@@ -20,18 +20,44 @@ import "../../userSettings-css/utilities/tailwind.css";
 import Providers from "../common/providers";
 import { setupResizeObserverPolyfill } from "../common/utils/resizeObserverPolyfill";
 import { renderWithErrorBoundary } from "react-utilities";
+import MagicLinkEntryAction from "../../enums/MagicLinkEntryAction";
+import MagicLinkSwitchAccountModal from "./components/magicLink/MagicLinkSwitchAccountModal";
+import { getMagicLinkToken, resolveMagicLinkEntryAction } from "./utils/magicLinkUtils";
 
 // Setup ResizeObserver polyfill for UWP compatibility before any components are rendered
 setupResizeObserverPolyfill();
 
+const renderSettings = (content: JSX.Element): void => {
+  renderWithErrorBoundary(<Providers>{content}</Providers>, userSettingsPageContainer());
+};
+
 export const renderApp = (): void => {
-  const entryPoint = userSettingsPageContainer();
-  renderWithErrorBoundary(
-    <Providers>
-      <App />
-    </Providers>,
-    entryPoint,
-  );
+  // Parent emails link here with a `magicLinkToken` query param, e.g.
+  // /my/account?magicLinkToken=...#!/parental-controls/LinkedChildDetails-123.
+  if (!getMagicLinkToken()) {
+    renderSettings(<App />);
+    return;
+  }
+
+  resolveMagicLinkEntryAction()
+    .then(action => {
+      if (action === MagicLinkEntryAction.RedirectedToLogin) {
+        return;
+      }
+
+      if (action === MagicLinkEntryAction.ShowSwitchAccountModal) {
+        renderSettings(<MagicLinkSwitchAccountModal variant="valid" />);
+        return;
+      }
+      if (action === MagicLinkEntryAction.ShowExpiredSwitchAccountModal) {
+        renderSettings(<MagicLinkSwitchAccountModal variant="expired" />);
+        return;
+      }
+      renderSettings(<App />);
+    })
+    .catch(() => {
+      renderSettings(<App />);
+    });
 };
 
 export const renderSecurityTab = (): void => {

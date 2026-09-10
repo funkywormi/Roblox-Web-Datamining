@@ -26,6 +26,7 @@ import InventoryTradePrivacy from "../../privacy/InventoryTradePrivacy";
 import ChildNotificationSettings from "../parentDashboard/ChildNotificationSetings";
 import ChildCommunicationRoutes from "./ChildCommunicationRoutes";
 import ChildSpendingRestrictionRoutes from "./ChildSpendingRestrictionRoutes";
+import ChildRobuxRoutes from "./ChildRobuxRoutes";
 import ChildVisibilityAndPrivateServersRoutes from "./ChildVisibilityAndPrivateServersRoutes";
 import ChildContentRestrictionsRoutes from "./ChildContentRestrictionsRoutes";
 import ChildSpendingNotifications from "../parentDashboard/ChildSpendingNotifications";
@@ -72,6 +73,8 @@ export const ChildRoutes = ({
     );
   }, [child, childSettings]);
 
+  const showRobuxSettings = child.canParentManageChildRobuxTransferLimits;
+
   const showAgeCheckPage = useMemo(() => {
     const childHasFaeSetting = childSettings?.[UserSetting.allowFacialAgeEstimation];
     return (
@@ -102,6 +105,10 @@ export const ChildRoutes = ({
 
     if (!child.canParentViewChildSpendRestrictions) {
       delete subpages[SettingCategoryPageName.Spending];
+    }
+
+    if (!showRobuxSettings) {
+      delete subpages[SettingCategoryPageName.Robux];
     }
 
     if (!child.shouldParentSeeSpendingInsights) {
@@ -146,6 +153,7 @@ export const ChildRoutes = ({
     childSettings,
     showChildContentRestrictions,
     showAgeCheckPage,
+    showRobuxSettings,
     uiPolicy?.enableParentLinkActivityUpdates,
   ]);
 
@@ -235,6 +243,8 @@ export const ChildRoutes = ({
       {child.canParentViewChildSpendRestrictions && (
         <ChildSpendingRestrictionRoutes child={child} />
       )}
+
+      {showRobuxSettings && <ChildRobuxRoutes child={child} />}
 
       {child.shouldParentSeeSpendingInsights && (
         <Route path={filteredChildCategoryPages[SpendSettingName.SpendNotifications]?.path}>

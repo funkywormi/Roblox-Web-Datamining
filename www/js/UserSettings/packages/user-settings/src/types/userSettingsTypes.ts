@@ -1,5 +1,6 @@
 import CurrencyCode from "../enums/CurrencyCode";
 import { UpdateInventoryTradePrivacyErrorCode } from "../enums/errorCodes";
+import { TRobuxTransferLimitsInput } from "./robuxTransferLimitsTypes";
 import {
   OptionType,
   EnabledStatusValue,
@@ -82,6 +83,16 @@ export type TUserSettingsBody = {
   [UserSetting.spendNotifications]?: SpendNotificationSetting;
   [UserSetting.AllowPromotionalOffersNotifications]?: TChannelSettings;
   [UserSetting.allowPresetChat]?: EnabledStatusValue;
+  /**
+   * Protobuf JSON of `TRobuxTransferLimitsValue`, built by
+   * `buildRobuxTransferLimitsConsentValue`. A string rather than the object
+   * because this setting is parent-only, so it only ever travels on
+   * grant-consent, and the parent APIs take the value serialized.
+   *
+   * Both windows travel together, so a save is validated as the state it will
+   * produce rather than as a patch of it.
+   */
+  [UserSetting.robuxTransferLimits]?: string;
   [UserSetting.iarcAgeRating]?: IarcAgeRating;
 };
 
@@ -102,7 +113,9 @@ export type TOptionValue =
   | number
   | TDoNotDisturbTimeWindow
   | TChannelSettings
-  | string; // for do not disturb time window in parental-controls-api/v1/parental-controls/grant-consent
+  // for structured settings sent to parental-controls-api/v1/parental-controls/grant-consent as JSON:
+  // do not disturb time window, robux transfer limits
+  | string;
 
 export type TOption = {
   optionValue?: TOptionValue;
@@ -202,6 +215,12 @@ export type TUserSettingsAndOptionsV2Body = {
   [UserSetting.whoCanUsePartyChatWithMe]?: TUserSettingsAndOptionsV2<PartySettingsValue>;
   [UserSetting.whoCanUsePartyVoiceWithMe]?: TUserSettingsAndOptionsV2<PartySettingsValue>;
   [UserSetting.allowPresetChat]?: TUserSettingsAndOptionsV2<EnabledStatusValue>;
+  /**
+   * Read shape, which is not the write shape: user-settings reports each window
+   * as a nullable cap, while a save encodes it as `TRobuxTransferLimitsValue`.
+   * The setting carries no value at all until a cap has been saved.
+   */
+  [UserSetting.robuxTransferLimits]?: TUserSettingsAndOptionsV2<TRobuxTransferLimitsInput>;
   [UserSetting.iarcAgeRating]?: TUserSettingsAndOptionsV2<IarcAgeRating>;
 };
 

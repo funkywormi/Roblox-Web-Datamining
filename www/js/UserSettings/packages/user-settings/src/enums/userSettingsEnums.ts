@@ -155,6 +155,7 @@ export enum UserSetting {
   // Note: This is a V2 setting and not supported in the V1 Contracts.
   aggregatedDesktopNotifications = "aggregatedDesktopNotifications",
   allowPresetChat = "allowPresetChat",
+  robuxTransferLimits = "robuxTransferLimits",
   iarcAgeRating = "iarcAgeRating",
 }
 

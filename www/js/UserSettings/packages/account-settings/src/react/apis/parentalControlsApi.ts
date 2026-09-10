@@ -68,6 +68,7 @@ import {
   getBlockedExperiencesCacheTag,
 } from "./experienceBlockingApi";
 import { getChildSpendControlsSettingsCacheTag } from "./billingApi";
+import { getChildTransferLimitCacheTag } from "./transferLimitsApi";
 
 export const getChildSettingsCacheTag = (childUserId: number): FullTagDescription<ApiCacheTag> => {
   return { type: ApiCacheTag.ChildSettingsType, id: childUserId };
@@ -611,6 +612,9 @@ export const parentalControlsApi = baseApi.injectEndpoints({
           body.details.monthlySpendLimitNotificationType !== undefined
         ) {
           tags.push(getChildSpendControlsSettingsCacheTag(body.childUserId));
+        }
+        if (body.details.robuxTransferLimits !== undefined) {
+          tags.push(getChildTransferLimitCacheTag(body.childUserId));
         }
         return tags;
       },

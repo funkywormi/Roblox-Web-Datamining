@@ -45,6 +45,9 @@ export const logoutEndpoint = `${EnvironmentUrls.authApi}/v2/logout`;
 export const changePasswordUrl = `${EnvironmentUrls.authApi}/v2/user/passwords/change`;
 export const listCredentialsUrl = `${EnvironmentUrls.authApi}/v1/passkey/ListCredentials`;
 export const authMetadataUrl = `${EnvironmentUrls.authApi}/v1/metadata`;
+export const loginPath = "/login";
+export const validateMagicLinkUrl = `${EnvironmentUrls.apiGatewayUrl}/auth-token-service/v1/validateMagicLink`;
+export const logoutAllLoggedInUsersUrl = `${EnvironmentUrls.apiGatewayUrl}/account-switcher/v1/logoutAllLoggedInUsers`;
 
 // Parental Controls help articles
 export const spendRestrictionsHelpUrl = "https://help.roblox.com/hc/articles/4409125091348";
