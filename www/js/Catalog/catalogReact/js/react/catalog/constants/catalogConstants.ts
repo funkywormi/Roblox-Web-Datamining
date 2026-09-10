@@ -42,6 +42,11 @@ const catalogConstants = {
       retryable: true,
       withCredentials: true
     },
+    getMarketplaceWidgets: {
+      url: `${EnvironmentUrls.apiGatewayUrl}/marketplace-widgets/v1/widgets/web`,
+      retryable: true,
+      withCredentials: true
+    },
     getCatalogItemDetails: {
       url: `${EnvironmentUrls.catalogApi}/v1/catalog/items/details`,
       retryable: false,
@@ -123,6 +128,7 @@ const catalogConstants = {
     categoryName: 'CatalogPageAjaxErrors',
     endpointNames: {
       getSearchItems: 'SearchItems',
+      getMarketplaceWidgets: 'MarketplaceWidgets',
       getCatalogItemDetails: 'CatalogItemDetails'
     }
   },
@@ -165,6 +171,10 @@ const catalogConstants = {
   },
   keywordSearch: {
     censoredKey: '###'
+  },
+  // Users whose userId % 100 matches this value (ids ending in 00). 1% of users.
+  marketplaceWidgetsLandingPageRollout: {
+    lastTwoDigits: 0
   }
 };
 

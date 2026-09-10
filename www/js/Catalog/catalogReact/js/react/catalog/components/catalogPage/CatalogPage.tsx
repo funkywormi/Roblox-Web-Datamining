@@ -233,6 +233,7 @@ function CatalogPage({
     layout,
     isPaginationEnabled,
     keyword,
+    numberOfAppliedFilters,
     setCurrentUrl,
     setIsKeywordCensored,
     setIsSearchItemsLoaded,

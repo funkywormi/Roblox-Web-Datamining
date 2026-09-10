@@ -69,6 +69,7 @@ function ItemResults(props: ItemResultsProps & WithTranslationsProps): JSX.Eleme
   const renderItemCard = useCallback(
     (item: ItemWithDetails) => {
       let { price, lowestPrice } = item;
+      const itemKey = `${item.itemType}_${item.id}`;
       const shoppingCartProps: ShoppingCartProps = {
         isItemInCart: isItemInCart(item.id),
         addItemToCart: (itemInfo, displaySystemFeedback) => {
@@ -100,7 +101,7 @@ function ItemResults(props: ItemResultsProps & WithTranslationsProps): JSX.Eleme
       return (
         // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
         <div
-          key={item.id}
+          key={itemKey}
           style={{ display: 'contents' }}
           onClick={() =>
             trackItemCardClick(TItemCardSource.Catalog, {
@@ -109,7 +110,7 @@ function ItemResults(props: ItemResultsProps & WithTranslationsProps): JSX.Eleme
             })
           }>
           <ItemCard
-            key={item.id}
+            key={itemKey}
             id={item.id}
             name={item.name}
             type={item.itemType}

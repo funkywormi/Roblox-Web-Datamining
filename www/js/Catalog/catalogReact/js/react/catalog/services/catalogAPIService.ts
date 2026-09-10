@@ -68,6 +68,58 @@ export type ItemDetailsInput = TItem & {
   thumbnailType: ThumbnailTypes;
 };
 
+export type MarketplaceWidgetContentItem = {
+  // "Asset" | "Bundle" - already matches catalogConstants.itemTypes
+  type: string;
+  id: number;
+};
+
+export type MarketplaceWidget = {
+  id: string;
+  type: string;
+  content: MarketplaceWidgetContentItem[];
+  template?: unknown;
+};
+
+export type MarketplaceWidgetsResponse = {
+  widgets: Record<string, MarketplaceWidget>;
+};
+
+export const flattenMarketplaceWidgetItems = (
+  widgetsMap: Record<string, MarketplaceWidget>,
+  maxItems = catalogConstants.numberOfSearchItemsExpanded
+): TItem[] => {
+  const items: TItem[] = [];
+  const seenItems = new Set<string>();
+  const { asset, bundle } = catalogConstants.itemTypes;
+
+  Object.keys(widgetsMap).forEach(widgetKey => {
+    widgetsMap[widgetKey]?.content?.forEach(entry => {
+      if (items.length >= maxItems || !entry || !Number.isFinite(entry.id) || !entry.type) {
+        return;
+      }
+
+      let normalizedType: string | undefined;
+      if (entry.type.toLowerCase() === asset.toLowerCase()) {
+        normalizedType = asset;
+      } else if (entry.type.toLowerCase() === bundle.toLowerCase()) {
+        normalizedType = bundle;
+      }
+      if (!normalizedType) {
+        return;
+      }
+
+      const itemKey = `${normalizedType}:${entry.id}`;
+      if (!seenItems.has(itemKey)) {
+        seenItems.add(itemKey);
+        items.push({ id: entry.id, itemType: normalizedType });
+      }
+    });
+  });
+
+  return items;
+};
+
 export type NavigationMenuItemsResponse = {
   defaultGearSubcategory: number;
   defaultCategory: number;
@@ -151,7 +203,7 @@ class CatalogAPIService {
     Object.entries(params).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         // Handle arrays by adding multiple parameters with the same key
-        value.forEach(item => urlParams.append(key, String(item)));
+        value.forEach((item: unknown) => urlParams.append(key, String(item)));
       } else if (value !== undefined && value !== null) {
         urlParams.set(key, String(value));
       }
@@ -164,8 +216,25 @@ class CatalogAPIService {
     );
   }
 
+  // Fetches the catalog landing page feed (no filters/sorts/keyword) from the
+  // marketplace-widgets service. Flattens and de-duplicates each widget's content
+  // into a bounded list of { itemType, id } that can be hydrated safely.
+  static getMarketplaceWidgetItems(): Promise<TItem[]> {
+    const requestId = Math.random().toString(16).slice(2, 10);
+    return httpService
+      .get<MarketplaceWidgetsResponse>(catalogConstants.endpoints.getMarketplaceWidgets, {
+        requestId
+      })
+      .then(response => {
+        const widgetsMap = response.data?.widgets ?? {};
+        return flattenMarketplaceWidgetItems(widgetsMap);
+      });
+  }
+
+  // Keyed by content key (`${itemType}_${id}`) rather than id alone, since an asset
+  // and a bundle can share the same numeric id.
   static getCatalogItemDetails(
-    itemsMapKey: Record<number, ItemDetailsInput>,
+    itemsMapKey: Record<string, ItemDetailsInput>,
     translate: TranslateFunction
   ): Promise<ItemWithDetails[]> {
     const { endpoints, priceStatus } = catalogConstants;
@@ -176,13 +245,18 @@ class CatalogAPIService {
       .then(response => {
         const result = response.data;
 
-        const returnResult =
+        const returnResult: ItemWithDetails[] =
           result && result.data
-            ? result.data.map(item => {
-                const { id } = item;
+            ? result.data.reduce<ItemWithDetails[]>((hydratedItems, item) => {
+                const itemKey = UtilityService.getCatalogContentKey(item);
+                const requestedItem = itemsMapKey[itemKey];
+                if (!requestedItem) {
+                  return hydratedItems;
+                }
+
                 const newItem: TGenericItemDetails = {
                   ...item,
-                  key: itemsMapKey[id].key,
+                  key: requestedItem.key,
                   ...(item.priceStatus === priceStatus.free && { isFree: true })
                 };
 
@@ -201,8 +275,9 @@ class CatalogAPIService {
                   creatorLink: UtilityService.buildUserLink(itemWithRestrictions)
                 };
 
-                return itemWithProperties;
-              })
+                hydratedItems.push(itemWithProperties);
+                return hydratedItems;
+              }, [])
             : [];
 
         return returnResult;

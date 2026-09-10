@@ -10,6 +10,12 @@ export type MetricsService = {
   sendErrorsToGoogleAnalytics(result: any, endpointName: any): void;
 };
 
+type ErrorCountMeasurement = {
+  featureName: string;
+  measureName: string;
+  value: number;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 declare global {
   interface Window {
@@ -21,7 +27,7 @@ declare global {
 const GoogleAnalyticsEvents = window.GoogleAnalyticsEvents || null;
 
 function useMetricsService(): MetricsService {
-  function sendErrorCount(data) {
+  function sendErrorCount(data: ErrorCountMeasurement[]) {
     const { endpoints } = catalogConstants;
     const url = endpoints.performanceMeasurements;
     return httpService.post(url, data);
@@ -36,9 +42,12 @@ function useMetricsService(): MetricsService {
 
   return {
     sendErrorsToLogCount(result: ErrorData, endpointName: string) {
-      const { errors } = result;
+      const errors = result?.errors;
+      if (!Array.isArray(errors)) {
+        return;
+      }
       const { categoryName } = catalogConstants.errorMessages;
-      const postData: any[] = [];
+      const postData: ErrorCountMeasurement[] = [];
       errors.forEach((error: AxiosError) => {
         const { code } = error;
         const measureName = `${endpointName}${code as string}`;
@@ -55,9 +64,12 @@ function useMetricsService(): MetricsService {
     },
 
     sendErrorsToGoogleAnalytics(result: ErrorData, endpointName: string) {
+      const errors = result?.errors;
+      if (!Array.isArray(errors)) {
+        return;
+      }
       const hasGAConsent = (isGoogleAnalyticsCookieConsentOptIn as () => boolean)();
       if (!hasGAConsent) return;
-      const { errors } = result;
       const { categoryName } = catalogConstants.errorMessages;
       const userAgent = getUserAgent();
       const errorMessages = UtilityService.buildErrorMessages(errors, userAgent);

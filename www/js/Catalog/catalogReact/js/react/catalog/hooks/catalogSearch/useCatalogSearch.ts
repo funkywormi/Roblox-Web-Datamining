@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { CurrentUser } from 'Roblox';
 import { TranslateFunction } from 'react-utilities';
 import { ThumbnailTypes } from 'roblox-thumbnails';
 import isEqual from 'lodash/isEqual';
@@ -27,6 +28,7 @@ import useMetricsService from '../../services/metricsService';
 import usePagination from './usePagination';
 import { CatalogQuery } from '../catalogQuery/catalogQuery.types';
 import { SearchOptionsData } from '../searchOptions/searchOptions.types';
+import isUserInMarketplaceWidgetsLandingPageRollout from '../../utils/isUserInMarketplaceWidgetsLandingPageRollout';
 
 export type CatalagSearchParams = {
   catalogQuery: CatalogQuery;
@@ -36,6 +38,7 @@ export type CatalagSearchParams = {
   layout: Layout;
   isPaginationEnabled: boolean | undefined;
   keyword: string | null | undefined;
+  numberOfAppliedFilters: number;
   setCurrentUrl: (v: string) => void;
   setIsKeywordCensored: (v: boolean) => void;
   setIsSearchItemsLoaded: (v: boolean) => void;
@@ -57,6 +60,7 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
     layout,
     isPaginationEnabled,
     keyword,
+    numberOfAppliedFilters,
     setCurrentUrl,
     setIsKeywordCensored,
     setIsSearchItemsLoaded,
@@ -70,8 +74,24 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
   } = params;
 
   const metricsService = useMetricsService();
+  const latestRequestSequence = useRef(0);
+  const isRequestInFlight = useRef(false);
 
   const showElasticDebugInfo = sessionStorage.getItem('AXShowElasticDebugInfo');
+
+  // The catalog landing page is the pristine, first page of results: no keyword,
+  // no selected topics, no applied filters/sorts and no pagination cursor. In this
+  // state, enrolled users source items from the marketplace-widgets feed instead of
+  // catalog search. Enrollment is userIds ending in 00 (see catalogConstants).
+  const isLandingDefaultState =
+    numberOfAppliedFilters === 0 &&
+    !catalogQuery.keyword &&
+    catalogQuery.topics.length === 0 &&
+    !catalogQuery.cursor;
+  const shouldUseMarketplaceWidgetsLandingPage =
+    isLandingDefaultState &&
+    CurrentUser.isAuthenticated &&
+    isUserInMarketplaceWidgetsLandingPageRollout(CurrentUser.userId);
 
   const {
     startPaging,
@@ -212,8 +232,14 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
     (
       searchData: TItem[] | null,
       clearResults: boolean,
+      isRequestCurrent: () => boolean,
+      onHydrationError?: () => void,
       elasticsearchDebugInfo?: SearchItemsResponseElasticSearchDebugInfo
     ) => {
+      if (!isRequestCurrent()) {
+        return;
+      }
+
       if (clearResults && (!searchData || searchData.length === 0)) {
         setSearchItemsError('no_results');
         setIsSearchItemsLoaded(true);
@@ -222,7 +248,7 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
       }
 
       const { itemTypes } = catalogConstants;
-      const itemParamsMapKey: Record<number, ItemDetailsInput> = {};
+      const itemParamsMapKey: Record<string, ItemDetailsInput> = {};
 
       const newSearchResultsDict = {
         ...searchResultDict
@@ -258,9 +284,7 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
           newResultsList.push(key);
         }
 
-        const itemId = item.id;
-
-        itemParamsMapKey[itemId] = {
+        itemParamsMapKey[key] = {
           ...item,
           thumbnailType:
             item && item.itemType === itemTypes.bundle
@@ -276,14 +300,39 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
         return [...prevSearchResultList, ...newResultsList];
       });
 
+      let fallbackStarted = false;
       CatalogAPIService.getCatalogItemDetails(itemParamsMapKey, translate)
         .then(
           function success(details) {
+            if (!isRequestCurrent()) {
+              return;
+            }
+            if (!details.length && onHydrationError) {
+              fallbackStarted = true;
+              onHydrationError();
+              return;
+            }
+
+            const hydratedKeys = new Set(details.map(item => item.key));
+            const missingKeys = new Set(
+              newResultsList.filter(itemKey => !hydratedKeys.has(itemKey))
+            );
             UtilityService.updateSearchItemDetails(details, newSearchResultsDict);
+            missingKeys.forEach(itemKey => {
+              delete newSearchResultsDict[itemKey];
+            });
+            setSearchResultList(prevSearchResultList => {
+              if (!prevSearchResultList) {
+                return prevSearchResultList;
+              }
+              return prevSearchResultList.filter(itemKey => !missingKeys.has(itemKey));
+            });
             setSearchResultDict(prevDict => ({ ...prevDict, ...newSearchResultsDict }));
           },
           function error(response) {
-            setSearchItemsError('error');
+            if (!isRequestCurrent()) {
+              return;
+            }
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             const errorResultData = response?.data as ErrorData;
             if (errorResultData) {
@@ -297,9 +346,19 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
                 endpointNames.getCatalogItemDetails
               );
             }
+            if (onHydrationError) {
+              fallbackStarted = true;
+              onHydrationError();
+              return;
+            }
+            setSearchItemsError('error');
           }
         )
         .finally(() => {
+          if (!isRequestCurrent() || fallbackStarted) {
+            return;
+          }
+          isRequestInFlight.current = false;
           setIsSearchItemsLoaded(true);
           setLoading(false);
         });
@@ -448,11 +507,18 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
       );
 
       if (isEqual(modifiedQuery, query)) {
-        setLoading(false);
-        setIsSearchItemsLoaded(true);
+        if (!isRequestInFlight.current) {
+          setLoading(false);
+          setIsSearchItemsLoaded(true);
+        }
         // Query is unchanged so we don't need to fetch new data
         return true;
       }
+
+      latestRequestSequence.current += 1;
+      isRequestInFlight.current = true;
+      const requestSequence = latestRequestSequence.current;
+      const isRequestCurrent = () => latestRequestSequence.current === requestSequence;
 
       if (clearResults) {
         setIsSearchItemsLoaded(false);
@@ -465,62 +531,143 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
       }
 
       setModifiedQuery(query);
-      CatalogAPIService.getSearchItemsV2({ ...query }, !!library.isFullScreen, showExpandedResults)
-        .then(
-          function success(response) {
-            const { topics: selectedTopics, topicBasedBrowsingEnabledForCategory } = catalogQuery;
-            resetPageContentAndLoading(clearResults);
-            const searchResult = response.data;
-            if (searchResult) {
-              const {
-                data: searchResultData,
-                keyword: searchResultKeyword,
-                elasticsearchDebugInfo
-              } = searchResult;
-              if (selectedTopics.length <= 0) {
-                if (UtilityService.isKeywordResultCensored(searchResultKeyword)) {
-                  setIsKeywordCensored(true);
-                } else {
-                  setIsKeywordCensored(false);
-                }
-              }
-              if (topicBasedBrowsingEnabledForCategory && clearResults) {
-                if (selectedTopics.length) {
-                  postGetTopics([], selectedTopics);
-                } else if (searchResultData?.length) {
-                  postGetTopics(searchResultData, []);
-                }
-              }
 
-              setNextPageCursor(searchResult.nextPageCursor);
-              buildSearchResultDataNoHydration(
-                searchResultData,
-                clearResults,
-                elasticsearchDebugInfo
-              );
+      const fetchCatalogSearchItems = () => {
+        CatalogAPIService.getSearchItemsV2(
+          { ...query },
+          !!library.isFullScreen,
+          showExpandedResults
+        )
+          .then(
+            function success(response) {
+              if (!isRequestCurrent()) {
+                return;
+              }
+              const { topics: selectedTopics, topicBasedBrowsingEnabledForCategory } = catalogQuery;
+              resetPageContentAndLoading(clearResults);
+              const searchResult = response.data;
+              if (searchResult) {
+                const {
+                  data: searchResultData,
+                  keyword: searchResultKeyword,
+                  elasticsearchDebugInfo
+                } = searchResult;
+                if (selectedTopics.length <= 0) {
+                  if (UtilityService.isKeywordResultCensored(searchResultKeyword)) {
+                    setIsKeywordCensored(true);
+                  } else {
+                    setIsKeywordCensored(false);
+                  }
+                }
+                if (topicBasedBrowsingEnabledForCategory && clearResults) {
+                  if (selectedTopics.length) {
+                    postGetTopics([], selectedTopics);
+                  } else if (searchResultData?.length) {
+                    postGetTopics(searchResultData, []);
+                  }
+                }
+
+                setNextPageCursor(searchResult.nextPageCursor);
+                buildSearchResultDataNoHydration(
+                  searchResultData,
+                  clearResults,
+                  elasticsearchDebugInfo
+                );
+              }
+            },
+            function error(response) {
+              if (!isRequestCurrent()) {
+                return;
+              }
+              setLoading(false);
+              resetPageContentAndLoading(clearResults);
+              setSearchItemsError('error');
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              const errorResultData = response?.data as ErrorData;
+              if (errorResultData) {
+                const { endpointNames } = catalogConstants.errorMessages;
+                metricsService.sendErrorsToGoogleAnalytics(
+                  errorResultData,
+                  endpointNames.getSearchItems
+                );
+                metricsService.sendErrorsToLogCount(errorResultData, endpointNames.getSearchItems);
+              }
             }
+          )
+          .finally(() => {
+            if (!isRequestCurrent()) {
+              return;
+            }
+            isRequestInFlight.current = false;
+            setLayoutInitialized(true);
+
+            setStartPaging(false);
+          });
+      };
+
+      const fallbackToCatalogSearchItems = () => {
+        if (!isRequestCurrent()) {
+          return;
+        }
+        clearSearchResults();
+        fetchCatalogSearchItems();
+      };
+
+      if (shouldUseMarketplaceWidgetsLandingPage) {
+        // Landing feed comes from marketplace-widgets, which returns a flat list of
+        // { itemType, id }. There is no cursor-based pagination for this feed, so we
+        // hydrate the returned items directly via getCatalogItemDetails. An empty or
+        // failed widgets response falls back to the standard catalog search feed.
+        setNextPageCursor(null);
+        CatalogAPIService.getMarketplaceWidgetItems().then(
+          function success(items) {
+            if (!isRequestCurrent()) {
+              return;
+            }
+            if (!items.length) {
+              fallbackToCatalogSearchItems();
+              return;
+            }
+
+            resetPageContentAndLoading(clearResults);
+            setIsKeywordCensored(false);
+            if (catalogQuery.topicBasedBrowsingEnabledForCategory && clearResults) {
+              postGetTopics(items, []);
+            }
+            buildSearchResultData(
+              items,
+              clearResults,
+              isRequestCurrent,
+              fallbackToCatalogSearchItems
+            );
+            setLayoutInitialized(true);
+            setStartPaging(false);
           },
           function error(response) {
-            setLoading(false);
-            resetPageContentAndLoading(clearResults);
-            setSearchItemsError('error');
+            if (!isRequestCurrent()) {
+              return;
+            }
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             const errorResultData = response?.data as ErrorData;
             if (errorResultData) {
               const { endpointNames } = catalogConstants.errorMessages;
               metricsService.sendErrorsToGoogleAnalytics(
                 errorResultData,
-                endpointNames.getSearchItems
+                endpointNames.getMarketplaceWidgets
               );
-              metricsService.sendErrorsToLogCount(errorResultData, endpointNames.getSearchItems);
+              metricsService.sendErrorsToLogCount(
+                errorResultData,
+                endpointNames.getMarketplaceWidgets
+              );
             }
-          }
-        )
-        .finally(() => {
-          setLayoutInitialized(true);
 
-          setStartPaging(false);
-        });
+            fallbackToCatalogSearchItems();
+          }
+        );
+        return false;
+      }
+
+      fetchCatalogSearchItems();
 
       return false;
     },
@@ -541,7 +688,8 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
       setSearchItemsError,
       metricsService,
       setLayoutInitialized,
-      setStartPaging
+      setStartPaging,
+      shouldUseMarketplaceWidgetsLandingPage
     ]
   );
 
