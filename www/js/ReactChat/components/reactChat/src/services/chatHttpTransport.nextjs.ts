@@ -4,15 +4,6 @@ import type { JsonSerializable } from "@rbx/core-lib/json";
 import { Url } from "@rbx/core-lib/url";
 import type { TChatHttpTransport, TChatUrlConfig } from "./chatHttpTransport";
 
-/**
- * Next.js transport for reactChat, using @rbx/core-lib/http.
- *
- * No manual CSRF/locale/auth wiring — @rbx/www-nextjs's instrumentation-client calls
- * setClientInterceptors() from @rbx/www-common/http before any component code runs, so every
- * request here inherits CSRF, locale, and Sentry automatically. See avatar's
- * recommendationsRequests.nextjs.ts for the same pattern.
- */
-
 const buildUrl = (config: TChatUrlConfig, params?: object): Url => {
   const url = Url.parse(config.url).getOrThrow();
   if (!params) {

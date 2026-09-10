@@ -9,6 +9,7 @@ import type { DialogInterventionAnalytics } from "./useDialogRestrictionModel";
 
 interface Props {
   onDismiss: () => void;
+  onAcknowledgmentSuccess?: () => void;
   analytics: DialogInterventionAnalytics;
   dsaMessage?: string;
   mountTimeMs: number;
@@ -19,7 +20,13 @@ interface Props {
  * The dialog will always display the OK button.
  * If a DSA message is provided, it will be displayed below the buttons.
  */
-const DialogInterventionActions = ({ onDismiss, analytics, dsaMessage, mountTimeMs }: Props) => {
+const DialogInterventionActions = ({
+  onDismiss,
+  onAcknowledgmentSuccess,
+  analytics,
+  dsaMessage,
+  mountTimeMs,
+}: Props) => {
   const { translate } = useUniversalFeatureRestrictionsConfig();
   const sendAnalyticsEvent = useSendAnalyticsEvent();
 
@@ -30,7 +37,10 @@ const DialogInterventionActions = ({ onDismiss, analytics, dsaMessage, mountTime
     acknowledgeable,
   };
 
-  const { acknowledgeIntervention, isPending } = useAcknowledgeIntervention(analytics);
+  const { acknowledgeIntervention, isPending } = useAcknowledgeIntervention(
+    analytics,
+    onAcknowledgmentSuccess,
+  );
 
   const handleCtaClick = () => {
     sendAnalyticsEvent(EventType.CtaClicked, {

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { chatQueryKeys } from "../constants/queryKeys";
-import { fetchFriendsPage, fetchUserDetails } from "../services/chatFriendsService";
+import { fetchFriendsPage, fetchUserNames } from "../services/chatFriendsService";
 import { getUserPresences } from "../services/presenceService";
 import type { TChatParticipant, TPresenceType } from "../types/chat";
 import { getCurrentUserId } from "../utils/currentUser";
@@ -40,22 +40,23 @@ export const useFriendsDirectory = (): {
         return [];
       }
 
-      const [userDetails, presenceResponse] = await Promise.all([
-        fetchUserDetails(friendIds),
+      // Names from user-profile-api, presence from presence-api.
+      const [names, presenceResponse] = await Promise.all([
+        fetchUserNames(friendIds),
         getUserPresences(friendIds),
       ]);
 
-      const userMap = Object.fromEntries(userDetails.map(u => [u.id, u]));
       const presenceMap = Object.fromEntries(
         presenceResponse.userPresences.map(p => [p.userId, p.userPresenceType]),
       );
 
       return friendIds.map(friendId => {
-        const user = userMap[friendId];
+        const profileNames = names[friendId];
         const fallbackName = String(friendId);
         const displayName =
-          firstNonEmptyString(user?.displayName?.trim(), user?.name?.trim()) ?? fallbackName;
-        const username = firstNonEmptyString(user?.name?.trim()) ?? fallbackName;
+          firstNonEmptyString(profileNames?.combinedName?.trim(), profileNames?.username?.trim()) ??
+          fallbackName;
+        const username = firstNonEmptyString(profileNames?.username?.trim()) ?? fallbackName;
 
         return {
           id: friendId,

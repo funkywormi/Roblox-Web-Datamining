@@ -12,6 +12,7 @@ interface Props {
   onDismiss: () => void;
   overrides?: Overrides;
   onAppeal?: () => void;
+  onAcknowledgmentSuccess?: () => void;
   providedModerationDetail?: ModerationDetail;
   analyticsEventId?: string;
   showAppealSnackbar: () => void;
@@ -30,6 +31,7 @@ const DialogContentView = ({
   onDismiss,
   overrides,
   onAppeal,
+  onAcknowledgmentSuccess,
   providedModerationDetail,
   analyticsEventId,
   showAppealSnackbar,
@@ -80,6 +82,7 @@ const DialogContentView = ({
         <div className="shrink-0">
           <DialogInterventionActions
             onDismiss={onDismiss}
+            onAcknowledgmentSuccess={onAcknowledgmentSuccess}
             analytics={view.analytics}
             dsaMessage={view.dsaMessage}
             mountTimeMs={mountTimeMs}

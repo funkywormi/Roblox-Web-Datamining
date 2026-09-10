@@ -1,11 +1,14 @@
 import environmentUrls from "@rbx/environment-urls";
 import chatHttpTransport from "./chatHttpTransport";
 
+// Only the id is used; names come from fetchUserNames.
 export type TFriendsApiFriendRow = {
   id: number;
-  name?: string;
-  displayName?: string;
-  hasVerifiedBadge?: boolean;
+};
+
+export type TUserProfileNames = {
+  combinedName?: string;
+  username?: string;
 };
 
 type TFriendsApiPage = {
@@ -27,6 +30,33 @@ export const fetchFriendsPage = async (userId: number, limit = 200): Promise<TFr
   return { data: body.data ?? [], nextPageCursor: body.nextPageCursor };
 };
 
+// Friend display names via user-profile-api get-profiles (combinedName), matching AngularJS.
+export const fetchUserNames = async (
+  userIds: number[],
+): Promise<Record<number, TUserProfileNames>> => {
+  const deduped = [...new Set(userIds)];
+  if (deduped.length === 0) {
+    return {};
+  }
+
+  const body = await chatHttpTransport.post<{
+    profileDetails?: { userId: number; names?: TUserProfileNames }[];
+  }>(
+    {
+      url: `${environmentUrls.apiGatewayUrl}/user-profile-api/v1/user/profiles/get-profiles`,
+      retryable: true,
+      withCredentials: true,
+    },
+    { userIds: deduped, fields: ["names.combinedName", "names.username"] },
+  );
+
+  const namesByUserId: Record<number, TUserProfileNames> = {};
+  for (const row of body.profileDetails ?? []) {
+    namesByUserId[row.userId] = row.names ?? {};
+  }
+  return namesByUserId;
+};
+
 /** Sever the trusted-connection relationship with a friend (contact-card "Remove" action). */
 export const removeTrustedConnection = async (friendId: number): Promise<void> => {
   await chatHttpTransport.post<unknown>({
@@ -34,32 +64,4 @@ export const removeTrustedConnection = async (friendId: number): Promise<void> =
     retryable: true,
     withCredentials: true,
   });
-};
-
-const USERS_BATCH_SIZE = 100;
-
-export const fetchUserDetails = async (userIds: number[]): Promise<TFriendsApiFriendRow[]> => {
-  if (userIds.length === 0) {
-    return [];
-  }
-
-  const batches: number[][] = [];
-  for (let i = 0; i < userIds.length; i += USERS_BATCH_SIZE) {
-    batches.push(userIds.slice(i, i + USERS_BATCH_SIZE));
-  }
-
-  const results = await Promise.all(
-    batches.map(async batch => {
-      const body = await chatHttpTransport.post<{ data?: TFriendsApiFriendRow[] }>(
-        {
-          url: `${environmentUrls.usersApi}/v1/users`,
-          withCredentials: true,
-        },
-        { userIds: batch },
-      );
-      return body.data ?? [];
-    }),
-  );
-
-  return results.flat();
 };

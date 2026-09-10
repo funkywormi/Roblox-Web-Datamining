@@ -37,7 +37,14 @@ const UniversalFeatureRestrictionDialog = ({
   const [queryClient] = useState(createQueryClient);
   const [isAppealFeedbackVisible, setIsAppealFeedbackVisible] = useState(false);
 
-  const { abuseVector, overrides, onAppeal, moderationDetail, analyticsEventId } = request;
+  const {
+    abuseVector,
+    overrides,
+    onAppeal,
+    onAcknowledgmentSuccess,
+    moderationDetail,
+    analyticsEventId,
+  } = request;
   const readOnly = overrides?.readOnly;
 
   return (
@@ -67,6 +74,7 @@ const UniversalFeatureRestrictionDialog = ({
                 onDismiss={onDismiss}
                 overrides={overrides}
                 onAppeal={onAppeal}
+                onAcknowledgmentSuccess={onAcknowledgmentSuccess}
                 providedModerationDetail={moderationDetail}
                 analyticsEventId={analyticsEventId}
                 showAppealSnackbar={() => {

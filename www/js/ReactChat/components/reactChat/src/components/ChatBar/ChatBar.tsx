@@ -96,7 +96,7 @@ const ChatBar = ({
         </div>
         <IconButton
           ariaLabel={translate("Label.SpanTitle.CreateGroupNeeds2More")}
-          icon="icon-regular-person-plus"
+          icon="icon-regular-pencil-square"
           size="Small"
           variant="Utility"
           isCircular
