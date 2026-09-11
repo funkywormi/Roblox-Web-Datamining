@@ -33,6 +33,7 @@ export enum PathPart {
   VisibilitySubsettings = "visibility_subsettings",
   ParentalControls = "parental_controls",
   SpendingSettings = "spending_settings",
+  RobuxSettings = "robux_settings",
   Group = "group",
   ExternalWebUrl = "external_web_link",
   SecurityAlert = "security_alert",
@@ -83,6 +84,7 @@ export const DeepLinkNavigationMap: Record<string, string> = {
   [PathPart.PrivacySettings]: "/my/account#!/privacy",
   [PathPart.ParentalControls]: "/my/account#!/parental-controls",
   [PathPart.SpendingSettings]: "/my/account#!/billing",
+  [PathPart.RobuxSettings]: "/my/account#!/robux",
   [PathPart.AppPermissionsSettings]: "/my/account#!/app-permissions",
   [PathPart.ScreentimeSubsettings]: "/my/account#!/privacy/Screentime",
   [PathPart.BlockedExperiencesSubsettings]:

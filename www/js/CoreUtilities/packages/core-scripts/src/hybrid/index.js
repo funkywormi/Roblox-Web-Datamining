@@ -1,4 +1,4 @@
-const { Chat, Navigation, Overlay, Game, Localization, AdConsent } = window.Roblox?.Hybrid ?? {};
+const { Chat, Navigation, Overlay, Game, Localization } = window.Roblox?.Hybrid ?? {};
 
 const getCallback = callback => {
   if (typeof callback === "undefined") {
@@ -55,6 +55,9 @@ export default {
   },
 
   adConsentChanged: (params, callback) => {
+    // Native WebView injects Hybrid.AdConsent after CoreUtilities evaluates.
+    // Resolve at call time so a load-time capture does not stay undefined forever.
+    const AdConsent = window.Roblox?.Hybrid?.AdConsent;
     if (AdConsent && AdConsent.adConsentChanged) {
       AdConsent.adConsentChanged(params, getCallback(callback));
     }

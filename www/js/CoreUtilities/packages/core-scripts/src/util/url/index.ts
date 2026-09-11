@@ -170,8 +170,13 @@ export const isValidStripeCheckoutUrl = (urlString: string): urlString is ValidS
 export const urlSafetyValidation = (urlString: string): URL | undefined => {
   let normalizedUrl: string;
   try {
-    // Only allow https protocol by default
-    normalizedUrl = normalizeUrl(urlString, { defaultProtocol: "https", stripWWW: false });
+    // Only allow https protocol by default. Sorting decodes the whole query string, which breaks
+    // encoded urls that contain query params by promoting its params to the top level.
+    normalizedUrl = normalizeUrl(urlString, {
+      defaultProtocol: "https",
+      stripWWW: false,
+      sortQueryParameters: false,
+    });
   } catch {
     // If normalization fails, return undefined
     return undefined;
