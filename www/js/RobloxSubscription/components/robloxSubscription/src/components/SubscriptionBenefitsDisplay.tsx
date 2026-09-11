@@ -1,7 +1,7 @@
 import { useTranslation } from "@rbx/core-scripts/react";
 import { ListItem, Icon } from "@rbx/foundation-ui";
 
-import type { RobloxSubscriptionProductFeatureConfig } from "@rbx/client-roblox-subscriptions-api/v1";
+import type { RobloxSubscriptionProductFeatureConfig } from "@rbx/client-subscriptions-api/v1";
 import type { FC } from "react";
 
 export type SubscriptionBenefitsDisplayProps = {

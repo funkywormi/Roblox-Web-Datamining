@@ -1,7 +1,11 @@
 import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { SheetActions, SheetBody, SheetContent, SheetRoot, SheetTitle } from "@rbx/foundation-ui";
-import { SubscriptionButton, translateHtml } from "@rbx/subscriptions-common";
+import {
+  SUBSCRIPTION_TERMS_URL,
+  SubscriptionButton,
+  translateHtml,
+} from "@rbx/subscriptions-common";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import BundlePickerSheetRow from "./BundlePickerSheetRow";
@@ -12,8 +16,6 @@ import { findFreeTrialOffer, isFreeTrialEligible } from "../utils/subscriptionPr
 import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v1";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
 import type { FC, ReactNode } from "react";
-
-const SUBSCRIPTION_TERMS_URL = "https://www.roblox.com/info/terms";
 
 export type BundlePickerSheetProps = {
   isOpen: boolean;

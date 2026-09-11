@@ -4,9 +4,11 @@ import { Button } from "@rbx/foundation-ui";
 import { usePaymentSession } from "@rbx/payments/services/paymentSession";
 import {
   BillingInfoDisplay,
+  PlusReferralLandingContainer,
   RobloxPlusHeading,
   ProductFeaturesList,
   RobloxPlusGiftItemUpsellBanner,
+  SUBSCRIPTION_TERMS_URL,
   SubscriptionButton,
   translateHtml,
 } from "@rbx/subscriptions-common";
@@ -24,8 +26,6 @@ import { getFeatureConfig } from "../utils/subscriptionProductInfo";
 import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v1";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
 import type { FC, ReactNode } from "react";
-
-const SUBSCRIPTION_TERMS_URL = "https://www.roblox.com/info/terms";
 // Keep the promotion implementation available for a future rerun without rendering it currently.
 const PURCHASE_GIFT_BANNER_CONFIG = {
   enabled: false,
@@ -179,6 +179,12 @@ const PurchaseView: FC<PurchaseViewProps> = ({
     paymentSessionId,
     trackSubscriptionButtonClick: trackSubscribeClick,
     onSubscribeClick: isMobileInApp ? onMobilePurchaseInitiated : undefined,
+  };
+
+  // The referral popup is its own surface, so a subscribe from it is not a landing-CTA click.
+  const referralSubscribeButtonProps = {
+    ...subscribeButtonProps,
+    trackSubscriptionButtonClick: undefined,
   };
 
   const openSheet = () => {
@@ -348,6 +354,13 @@ const PurchaseView: FC<PurchaseViewProps> = ({
           onOpenChange={setIsSheetOpen}
         />
       )}
+      <PlusReferralLandingContainer
+        subscribeButtonProps={referralSubscribeButtonProps}
+        subscribeEligibleOffers={baselineProduct.eligibleOffers}
+        subscribeFeatureConfig={getFeatureConfig(baselineProduct)}
+        subscribePeriodType={baselineProduct.periodType}
+        subscribePrice={baselineProduct.localizedPrice}
+      />
     </Fragment>
   );
 };

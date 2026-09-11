@@ -1,6 +1,9 @@
+import { isReferralEnabled } from "@rbx/core-scripts/meta/subscription";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Icon, List } from "@rbx/foundation-ui";
 import { Fragment, useMemo } from "react";
+
+import { REFERRAL_REWARD_ROBUX } from "../../subscriptionConstants";
 
 import type {
   PeriodType,
@@ -67,13 +70,21 @@ export type ProductFeaturesListProps = {
   periodType: PeriodType;
   overrideIconName?: TTailwindIconClass;
   onTileClick?: (primary: string, secondary: string) => void;
+  /**
+   * Adds referring as a benefit tile. Opt-in because it is not part of the product's feature
+   * config: only surfaces shown to an existing subscriber can act on it.
+   */
+  includeReferralBenefit?: boolean;
 };
+
+// The introductory discount is a fixed 60-day offer regardless of the product's billing period.
+const INTRODUCTORY_DISCOUNT_DAYS = 60;
 
 const ProductFeaturesList: FC<ProductFeaturesListProps> = ({
   featureConfig,
-  periodType,
   overrideIconName,
   onTileClick,
+  includeReferralBenefit = false,
 }) => {
   const { translate, intl } = useTranslation();
 
@@ -112,29 +123,61 @@ const ProductFeaturesList: FC<ProductFeaturesListProps> = ({
           expandedPrimary={translate("Description.Benefit.DiscountBaseExpandedTitle")}
           expandedSecondary={translate("Description.Benefit.DiscountBaseExpandedBody")}
           iconName={overrideIconName ?? "icon-regular-tag"}
-          primary={translate("Description.Benefit.DiscountBase", {
-            discountPercent: intl.n(featureConfigBaseDiscount.discountPercent * 0.01, {
-              style: "percent",
-            }),
-          })}
-          secondary={translate("Description.Benefit.DiscountBaseSubtitle")}
+          primary={
+            featureConfigNextDiscount
+              ? translate("Description.Benefit.DiscountBaseV2")
+              : translate("Description.Benefit.DiscountBase", {
+                  discountPercent: intl.n(featureConfigBaseDiscount.discountPercent * 0.01, {
+                    style: "percent",
+                  }),
+                })
+          }
+          // With a step-up tier, show the combined "X% now, Y% later" copy.
+          // Without one (e.g. free-trial products that only have the base tier),
+          // fall back to the previous single-tier subtitle.
+          secondary={
+            featureConfigNextDiscount
+              ? translate("Description.Benefit.DiscountBaseSubtitleV2", {
+                  discountPercentTier1: intl.n(featureConfigBaseDiscount.discountPercent * 0.01, {
+                    style: "percent",
+                  }),
+                  discountTier1Days: intl.n(INTRODUCTORY_DISCOUNT_DAYS),
+                  discountPercentTier2: intl.n(featureConfigNextDiscount.discountPercent * 0.01, {
+                    style: "percent",
+                  }),
+                })
+              : translate("Description.Benefit.DiscountBaseSubtitle")
+          }
           onTileClick={onTileClick}
         />
       )}
-      {featureConfigNextDiscount && (
+      {featureConfig.isAiBackgroundEnabled && (
         <ProductFeaturesDisplayRow
-          expandedPrimary={translate("Description.Benefit.DiscountNextExpandedTitle")}
-          expandedSecondary={translate("Description.Benefit.DiscountNextExpandedBody")}
-          iconName={overrideIconName ?? "icon-regular-tag-arrow-up"}
-          primary={translate("Description.Benefit.DiscountNext", {
-            productName: translate("Label.Blackbird"),
-            discountPercent: intl.n(featureConfigNextDiscount.discountPercent * 0.01, {
-              style: "percent",
-            }),
-            discountPeriodCount: intl.n(featureConfigNextDiscount.periodIndex),
-            discountPeriodUnit: periodType,
-          })}
-          secondary={translate("Description.Benefit.DiscountNextSubtitle")}
+          expandedPrimary={translate("Description.Benefit.AvatarBackground")}
+          expandedSecondary={translate("Description.Benefit.AvatarBackgroundSubtitle")}
+          iconName={overrideIconName ?? "icon-regular-image"}
+          primary={translate("Description.Benefit.AvatarBackground")}
+          secondary={translate("Description.Benefit.AvatarBackgroundSubtitle")}
+          onTileClick={onTileClick}
+        />
+      )}
+      {featureConfig.isAppThemesEnabled && (
+        <ProductFeaturesDisplayRow
+          expandedPrimary={translate("Description.Benefit.AppThemes")}
+          expandedSecondary={translate("Description.Benefit.AppThemesSubtitle")}
+          iconName={overrideIconName ?? "icon-regular-paint-brush"}
+          primary={translate("Description.Benefit.AppThemes")}
+          secondary={translate("Description.Benefit.AppThemesSubtitle")}
+          onTileClick={onTileClick}
+        />
+      )}
+      {featureConfig.isProfileFrameEnabled && (
+        <ProductFeaturesDisplayRow
+          expandedPrimary={translate("Description.Benefit.ProfileFrames")}
+          expandedSecondary={translate("Description.Benefit.ProfileFramesSubtitle")}
+          iconName={overrideIconName ?? "icon-regular-frame-expanded"}
+          primary={translate("Description.Benefit.ProfileFrames")}
+          secondary={translate("Description.Benefit.ProfileFramesSubtitle")}
           onTileClick={onTileClick}
         />
       )}
@@ -179,6 +222,21 @@ const ProductFeaturesList: FC<ProductFeaturesListProps> = ({
           iconName={overrideIconName ?? "icon-regular-arrow-up-from-landscape-rectangle"}
           primary={translate("Description.Benefit.PublishItems")}
           secondary={translate("Description.Benefit.PublishItemsSubtitle")}
+          onTileClick={onTileClick}
+        />
+      )}
+      {includeReferralBenefit && isReferralEnabled() && (
+        <ProductFeaturesDisplayRow
+          // Referring has no expanded copy of its own, so the tile repeats itself when opened.
+          expandedPrimary={translate("Description.Benefit.Referral")}
+          expandedSecondary={translate("Description.Benefit.ReferralSubtitle", {
+            amount: intl.n(REFERRAL_REWARD_ROBUX),
+          })}
+          iconName={overrideIconName ?? "icon-regular-person-plus"}
+          primary={translate("Description.Benefit.Referral")}
+          secondary={translate("Description.Benefit.ReferralSubtitle", {
+            amount: intl.n(REFERRAL_REWARD_ROBUX),
+          })}
           onTileClick={onTileClick}
         />
       )}

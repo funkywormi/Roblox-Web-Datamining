@@ -1,3 +1,4 @@
+import { isReferralEnabled as isPlusReferralRolloutEnabled } from "@rbx/core-scripts/meta/subscription";
 import { useTranslation } from "@rbx/core-scripts/react";
 import {
   RobloxPlusHeading,
@@ -8,7 +9,9 @@ import { useMemo } from "react";
 
 import ActionPanel from "./ActionPanel";
 import DiscountTierProgressCard from "./DiscountTierProgressCard";
+import InteractWithPlusSection from "./InteractWithPlusSection";
 import ManageButton from "./ManageButton";
+import PlusReferralShareCard from "./PlusReferralShareCard";
 import SavingsDashboard from "./SavingsDashboard";
 import SubscriberStatusSummary from "./SubscriberStatusSummary";
 import SubscriptionBenefitsDisplay from "./SubscriptionBenefitsDisplay";
@@ -26,11 +29,17 @@ import type { GetRobloxPlusUserBenefitsResponse } from "@rbx/client-roblox-subsc
 import type { SubscriptionProductInfo, Subscription } from "@rbx/client-subscriptions-api/v1";
 import type { FC } from "react";
 
+// Keep the promotion implementation available for a future rerun without rendering it currently.
+const SUBSCRIBER_GIFT_BANNER_CONFIG = {
+  enabled: false,
+};
+
 export type SubscriberViewProps = {
   robloxSubscriptionProduct: SubscriptionProductInfo;
   robloxSubscriptionMembership: Subscription;
   robloxPlusUserBenefits: GetRobloxPlusUserBenefitsResponse | undefined;
   isFaeFreeTrial: boolean;
+  onOpenReferrals: () => void;
 };
 
 const SubscriberView: FC<SubscriberViewProps> = ({
@@ -38,6 +47,7 @@ const SubscriberView: FC<SubscriberViewProps> = ({
   robloxSubscriptionMembership,
   robloxPlusUserBenefits,
   isFaeFreeTrial,
+  onOpenReferrals,
 }) => {
   const { translate } = useTranslation();
   const savedRobux = robloxPlusUserBenefits?.robuxSavedWithPlus;
@@ -81,12 +91,12 @@ const SubscriberView: FC<SubscriberViewProps> = ({
     ],
   );
   const currentDiscountPercent = discountTier.current?.discountPercent ?? 0;
-  const { data: ownsGiftItem } = useOwnsGiftItem();
+  const { data: ownsGiftItem } = useOwnsGiftItem(SUBSCRIBER_GIFT_BANNER_CONFIG.enabled);
 
   return (
     <div className="flex flex-col items-center">
       <div className="margin-top-[48px] padding-x-xlarge content-emphasis gap-y-xxlarge width-full large:max-width-[730px] flex flex-col">
-        {ownsGiftItem === true && (
+        {SUBSCRIBER_GIFT_BANNER_CONFIG.enabled && ownsGiftItem === true && (
           <RobloxPlusGiftItemUpsellBanner
             body={translate("Description.BannerBodyUnboxed")}
             equipText={translate("Action.BannerEquip")}
@@ -130,6 +140,13 @@ const SubscriberView: FC<SubscriberViewProps> = ({
           />
         </div>
         <div className="flex flex-col gap-y-[32px]">
+          {/* The invite card is the rail's only item today, so the whole section goes away with
+              it rather than leaving a heading above an empty carousel. */}
+          {isPlusReferralRolloutEnabled() ? (
+            <InteractWithPlusSection>
+              <PlusReferralShareCard onOpenDashboard={onOpenReferrals} />
+            </InteractWithPlusSection>
+          ) : null}
           <SavingsDashboard
             currentDiscountPercent={currentDiscountPercent}
             itemsBoughtWithDiscountCount={itemsBoughtWithDiscountCount}

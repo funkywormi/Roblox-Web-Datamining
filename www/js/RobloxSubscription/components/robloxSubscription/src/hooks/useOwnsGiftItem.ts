@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getIsItemOwned } from "../clients/inventory";
 import { GIFT_ITEM } from "../utils/giftItemNavigation";
 
-export const useOwnsGiftItem = () => {
+export const useOwnsGiftItem = (enabled = true) => {
   const currentUserId = userId();
 
   return useQuery({
@@ -16,6 +16,6 @@ export const useOwnsGiftItem = () => {
 
       return getIsItemOwned(currentUserId, GIFT_ITEM);
     },
-    enabled: currentUserId != null,
+    enabled: enabled && currentUserId != null,
   });
 };

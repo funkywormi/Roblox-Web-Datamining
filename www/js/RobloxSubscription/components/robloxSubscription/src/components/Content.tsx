@@ -1,13 +1,19 @@
 import { GrantType, PeriodType, ProductType } from "@rbx/client-subscriptions-api/v1";
+import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { callBehaviour } from "@rbx/core-scripts/guac";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
-import { consumeSubscriptionRedirectUrl } from "@rbx/subscriptions-common";
+import { isReferralEnabled } from "@rbx/core-scripts/meta/subscription";
+import {
+  consumeSubscriptionRedirectUrl,
+  PLUS_REFERRALS_QUERY_PARAM,
+} from "@rbx/subscriptions-common";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import ErrorView from "./ErrorView";
 import FreeTrialConfirmationView from "./FreeTrialConfirmationView";
 import LoadingView from "./LoadingView";
+import PlusReferralDashboard from "./PlusReferralDashboard";
 import PurchaseView from "./PurchaseView";
 import SubscriberView from "./SubscriberView";
 import WelcomeView from "./WelcomeView";
@@ -37,6 +43,20 @@ const Content = () => {
   const [isFreeTrialConfirmation, setIsFreeTrialConfirmation] = useState(() =>
     new URLSearchParams(window.location.search).has("faeFreeTrialConfirmation"),
   );
+
+  const [isReferralsDashboard, setIsReferralsDashboard] = useState(
+    () =>
+      // Gated as well as read: the invite card that sets this param is already behind the
+      // rollout, but the url outlives it in bookmarks and shared links. Without the gate those
+      // still open the dashboard and spend a create-link call to reach the dead-link sheet.
+      isReferralEnabled() &&
+      new URLSearchParams(window.location.search).has(PLUS_REFERRALS_QUERY_PARAM),
+  );
+
+  // Only the invite card on this page opens the dashboard in place, so it is the only entry point
+  // with a landing to come back to. Nav, home, and notifications arrive on `/plus?referrals`
+  // directly, where the landing was never shown and closing should leave for home.
+  const openedFromLandingRef = useRef(false);
 
   const [isPollingForMembership, setIsPollingForMembership] = useState(
     isWelcome || isFreeTrialConfirmation,
@@ -187,6 +207,26 @@ const Content = () => {
     setIsFreeTrialConfirmation(false);
   }, []);
 
+  const enableReferralsDashboard = useCallback(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set(PLUS_REFERRALS_QUERY_PARAM, "");
+    window.history.replaceState(null, "", url.toString());
+    openedFromLandingRef.current = true;
+    setIsReferralsDashboard(true);
+  }, []);
+
+  const dismissReferralsDashboard = useCallback(() => {
+    if (!openedFromLandingRef.current) {
+      window.location.href = getAbsoluteUrl("/home");
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete(PLUS_REFERRALS_QUERY_PARAM);
+    window.history.replaceState(null, "", url.toString());
+    setIsReferralsDashboard(false);
+  }, []);
+
   useEffect(() => {
     if (!isPollingForMembership) {
       return;
@@ -280,6 +320,24 @@ const Content = () => {
     }
   }
 
+  // `/plus?referrals`: create-link gate (invalid popup if ineligible).
+  if (isReferralsDashboard) {
+    return (
+      <PlusReferralDashboard
+        robloxPlusUserBenefits={robloxPlusUserBenefitsQuery.data}
+        subscribeButtonProps={{
+          productId: robloxSubscriptionProduct.productKey.id,
+          productType: robloxSubscriptionProduct.productKey.type,
+          deviceMeta,
+          // Same policy `PurchaseView` honours: without this the invalid sheet offers a live
+          // Join CTA on surfaces where Blackbird entrypoints are turned off.
+          isDisabled: isEntrypointDisabled,
+        }}
+        onClose={dismissReferralsDashboard}
+      />
+    );
+  }
+
   if (isSubscribed) {
     return (
       <SubscriberView
@@ -287,6 +345,7 @@ const Content = () => {
         robloxPlusUserBenefits={robloxPlusUserBenefitsQuery.data}
         robloxSubscriptionMembership={robloxSubscriptionMembership}
         robloxSubscriptionProduct={robloxSubscriptionProduct}
+        onOpenReferrals={enableReferralsDashboard}
       />
     );
   }

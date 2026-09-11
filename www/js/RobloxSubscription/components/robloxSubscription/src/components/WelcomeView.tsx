@@ -96,6 +96,7 @@ const WelcomeView: FC<WelcomeViewProps> = ({
             <span className="text-heading-small">{translate("Title.BenefitsUnlocked")}</span>
             <ProductFeaturesList
               featureConfig={getFeatureConfig(robloxSubscriptionProduct)}
+              includeReferralBenefit
               overrideIconName="icon-filled-check"
               periodType={robloxSubscriptionProduct.periodType}
               onTileClick={(primary, secondary) => {

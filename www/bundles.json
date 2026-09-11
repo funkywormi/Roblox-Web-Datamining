@@ -1096,7 +1096,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/16c20f04208b06ba4e856a51d6eb08aa710ab2029c50862cf388371a6f62665e.js",
+            "url": "https://js.rbxcdn.com/a1c537b88b59fc1d6434c3afc55b395ad4718bb29bd7d1e69ffdab2a16d3545e.js",
             "sources": [
                 "ALL"
             ]
@@ -6235,7 +6235,7 @@
         },
         {
             "name": "RobloxSubscription",
-            "url": "https://js.rbxcdn.com/c867e390567680771468755aaf7245280976c10b7d0a17b7501102bbce1a018b-RobloxSubscription.js",
+            "url": "https://js.rbxcdn.com/fa0841813d6b32c335907bf4640e4dcf821c6dee8e0ed985d44bc62bca71f92b-RobloxSubscription.js",
             "sources": [
                 "/plus"
             ]
@@ -8532,7 +8532,7 @@
         },
         {
             "name": "RobloxSubscription",
-            "url": "https://css.rbxcdn.com/9cf11663f7e9bdb3cf0b8f245b95cd030f71852ab33b1dc1ed4abbf50e6053a5-RobloxSubscription.css",
+            "url": "https://css.rbxcdn.com/e69cb9bd4e3c1c14dffd91a809fe8aaa397cc3b94f94170cae4aab1ec71b44fb-RobloxSubscription.css",
             "sources": [
                 "/plus"
             ]
