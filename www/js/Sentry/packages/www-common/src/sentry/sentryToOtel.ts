@@ -1,6 +1,6 @@
 import type { BrowserOptions, Event } from "@sentry/browser";
 import * as json from "@rbx/core-lib/json";
-import type { DeviceInfo } from "../device";
+import type { TracingResources } from "./tracingResources";
 
 type BeforeSendTransactionCallback = NonNullable<BrowserOptions["beforeSendTransaction"]>;
 
@@ -145,12 +145,15 @@ export function buildAttributes(
 const nonEmpty = (value?: string | null): string | undefined =>
   value == null || value === "" ? undefined : value;
 
-// Device info as OTEL resource attributes, following semantic conventions.
-export function buildDeviceResourceAttributes(deviceInfo?: DeviceInfo): OtelKeyValue[] {
+// Tracing context as OTEL resource attributes, following semantic conventions.
+export function buildTracingResourceAttributes(
+  tracingResources?: TracingResources,
+): OtelKeyValue[] {
   return buildAttributes([
     {
-      "device.type": nonEmpty(deviceInfo?.deviceType),
-      "browser.name": nonEmpty(deviceInfo?.browser),
+      "device.type": nonEmpty(tracingResources?.deviceInfo?.deviceType),
+      "browser.name": nonEmpty(tracingResources?.deviceInfo?.browser),
+      "geo.country.iso_code": nonEmpty(tracingResources?.requestCountryCode),
     },
   ]);
 }
@@ -310,7 +313,7 @@ export function extractMeasurements(measurements?: SentryMeasurements): OtelKeyV
 // https://develop.sentry.dev/sdk/performance/opentelemetry/
 export function convertSentryToOtel(
   event: SentryTransactionEvent,
-  deviceInfo?: DeviceInfo,
+  tracingResources?: TracingResources,
 ): OtelTracesExport | null {
   const eventAny = event as SentryTransactionEventInternal;
   const trace = eventAny.contexts?.trace ?? {};
@@ -336,7 +339,7 @@ export function convertSentryToOtel(
           { "telemetry.sdk.name": "@sentry/browser" },
           eventAny.release ? { "telemetry.sdk.version": eventAny.release } : undefined,
         ])),
-    ...buildDeviceResourceAttributes(deviceInfo),
+    ...buildTracingResourceAttributes(tracingResources),
   ];
 
   const spans: OtelSpan[] = [];
@@ -460,10 +463,10 @@ export function postOtel(endpoint: string, payload: OtelTracesExport): void {
 export function sendToOtel(
   endpoint: string,
   event: SentryTransactionEvent,
-  deviceInfo?: DeviceInfo,
+  tracingResources?: TracingResources,
 ): void {
   try {
-    const otel = convertSentryToOtel(event, deviceInfo);
+    const otel = convertSentryToOtel(event, tracingResources);
     if (otel == null) {
       return;
     }

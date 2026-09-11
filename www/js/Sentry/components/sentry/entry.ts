@@ -12,8 +12,12 @@ import {
 } from "@sentry/browser";
 import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import { requestCountryCode as getRequestCountryCode } from "@rbx/core-scripts/meta/requestContext";
+import { isTestSite } from "@rbx/core-scripts/meta/environment";
 import { sendToOtel } from "@rbx/www-common/sentry/sentryToOtel";
 import { browserFromUserAgent, type DeviceInfo } from "@rbx/www-common/device";
+import { parseCountryCode } from "@rbx/www-common/country";
+import type { TracingResources } from "@rbx/www-common/sentry/tracingResources";
 import { getOtelCollectorTracesEndpoint } from "@rbx/www-common/sentry/otelEndpoint";
 import environmentUrls from "@rbx/environment-urls";
 import { reportWebVitals } from "@rbx/www-common/webVitals";
@@ -59,7 +63,11 @@ const parsedTracesSampleRate = tracesSampleRate == null ? 0 : parseFloat(tracesS
 const isTransactionOff = parsedTracesSampleRate === 0;
 // 0.8% is the targeted trace sample rate for WWW telemetry
 // Ramping up can be done by changing SentryTracesSampleRate on the admin site
-const perfBase = Math.min(parsedTracesSampleRate, 0.008);
+// Sitetests are meant to be traced end to end, so they take the full rate and
+// skip the noise cuts. beforeSendTransaction still holds Sentry Cloud near
+// SENTRY_BASE, so this only widens what reaches our own collector.
+const fullSample = !isTransactionOff && isTestSite();
+const perfBase = fullSample ? 1 : Math.min(parsedTracesSampleRate, 0.008);
 const SENTRY_BASE = 0.0005;
 
 // Derived once and reused by beforeSendTransaction and the DOMContentLoaded handler.
@@ -70,6 +78,10 @@ const deviceMeta = getDeviceMeta();
 const deviceInfo: DeviceInfo = {
   deviceType: deviceMeta?.deviceType,
   browser: browserFromUserAgent(navigator.userAgent),
+};
+const tracingResources: TracingResources = {
+  deviceInfo,
+  requestCountryCode: parseCountryCode(getRequestCountryCode()),
 };
 
 initSentry({
@@ -84,12 +96,12 @@ initSentry({
   /// Keep a base perf rate visible (docs/telemetry). If tracesSampler is present,
   tracesSampleRate: perfBase,
   // Spans are created at source; Sentry ingest is filtered in beforeSendTransaction.
-  tracesSampler: isTransactionOff ? undefined : buildTracesSampler(perfBase),
+  tracesSampler: isTransactionOff ? undefined : buildTracesSampler(perfBase, fullSample),
   sampleRate: buildSampleRate(parsedSampleRate),
   replaysOnErrorSampleRate: parsedSampleRate,
   beforeSendTransaction: event => {
     // Full transaction to OTEL; filtered copy to Sentry for quota reduction.
-    sendToOtel(otelEndpoint, event, deviceInfo);
+    sendToOtel(otelEndpoint, event, tracingResources);
     // The trace was oversampled to the OTEL rate; deterministically downsample
     // to the Sentry target rate. Mirror the tracesSampler input (transaction
     // name first) so the decision uses the same rule that sampled this trace.

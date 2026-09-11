@@ -58,12 +58,16 @@ export function shouldSendTraceToSentry(
 }
 
 // TODO: adjust rates as needed more details here: https://roblox.atlassian.net/wiki/spaces/UB/pages/3909976268/Sentry+Spans+Noise+Reduction
-export function buildTracesSampler(perfBase: number) {
+export function buildTracesSampler(perfBase: number, skipNoiseCuts = false) {
   const base = clamp01(perfBase);
 
   return function tracesSampler(ctx: TracesCtx): number {
     // Respect incoming distributed tracing decision
     if (ctx.parentSampled !== undefined) return ctx.parentSampled ? 1 : 0;
+
+    // The cuts below only exist to protect production quota, which sitetests
+    // do not need; they take the base rate on every path instead.
+    if (skipNoiseCuts) return base;
 
     // Noise-only cuts; everything else stays at base
     const raw = ctx.name || (typeof window !== "undefined" ? window.location.pathname : "") || "";

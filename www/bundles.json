@@ -1096,7 +1096,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/d7a8e86fe11f0654c7d24f2159506fee20e9e54818d89b2c03bbee3886e43965.js",
+            "url": "https://js.rbxcdn.com/16c20f04208b06ba4e856a51d6eb08aa710ab2029c50862cf388371a6f62665e.js",
             "sources": [
                 "ALL"
             ]
@@ -6389,7 +6389,7 @@
         },
         {
             "name": "Sentry",
-            "url": "https://js.rbxcdn.com/3abde38c7f9ab1b7eded447d893918bfcf6661952a379a7a690ac65ac42387e2-Sentry.js",
+            "url": "https://js.rbxcdn.com/bb31afa2bfed335b2d0a921880ab8085637d2daea62d9b312b07836c3300d511-Sentry.js",
             "sources": [
                 "/home",
                 "/",
