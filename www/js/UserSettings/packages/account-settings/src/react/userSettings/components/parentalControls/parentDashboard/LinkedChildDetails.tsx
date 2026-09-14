@@ -42,6 +42,8 @@ export const LinkedChildDetails = ({
     child.canParentManageChildsCommunicationSettings ||
     child.canParentManageChildsInExperienceDirectChatSetting ||
     child.canParentManageChildsPresetChatSetting ||
+    child.canParentManageChildsPrivatePlaytestSetting ||
+    child.canParentManageChildsAllowIdentityVerificationSetting ||
     uiPolicy?.enableParentLinkActivityUpdates;
 
   const handleRobuxBalanceSectionError = React.useCallback(() => {
@@ -56,12 +58,10 @@ export const LinkedChildDetails = ({
           <div className="rbx-divider" />
           <PendingRequestList childUserId={child.userId} />
 
-          {child.canParentGiftChildRobux && child.robuxBalance !== undefined && (
-            <GiftRobuxErrorBoundary fallback={null} onError={handleRobuxBalanceSectionError}>
-              <div className="rbx-divider" />
-              <RobuxBalanceSection child={child} />
-            </GiftRobuxErrorBoundary>
-          )}
+          <GiftRobuxErrorBoundary fallback={null} onError={handleRobuxBalanceSectionError}>
+            <div className="rbx-divider" />
+            <RobuxBalanceSection child={child} />
+          </GiftRobuxErrorBoundary>
 
           {shouldDisplayScreenTimeLimit && (
             <React.Fragment>

@@ -18,6 +18,7 @@ import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOp
 import { selectChildPagesForChildUserId } from "../../../../apis/slices/childPagesSlice";
 import { useAppSelector } from "../../../../redux/hooks";
 import SpendSettingName from "../../../../../enums/SpendSettingName";
+import RobuxSettingName from "../../../../../enums/RobuxSettingName";
 import { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import { RobuxTransfer } from "../../../../../types/robuxTransferTypes";
 import { useAnswerConsentRequestMutation } from "../../../../apis/parentalControlsApi";
@@ -243,6 +244,7 @@ const ConsentCenterCard = ({
     switch (settingName) {
       case UserSetting.monthlySpendLimit:
       case UserSetting.dailyScreenTimeLimit:
+      case UserSetting.robuxTransferLimits:
         // Update your child's {settingName}
         return [
           parentConsentsLegallySensitiveContent.consentCenterUpdateSettingNoValueConsentName,
@@ -407,6 +409,9 @@ const ConsentCenterCard = ({
           break;
         case UserSetting.dailyScreenTimeLimit:
           path = childPages?.screenTimeManagementPage.path;
+          break;
+        case UserSetting.robuxTransferLimits:
+          path = childPages?.robuxPages[RobuxSettingName.TransferLimits]?.path;
           break;
         default:
           break;

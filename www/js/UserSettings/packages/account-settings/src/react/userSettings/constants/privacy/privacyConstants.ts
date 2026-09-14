@@ -1,5 +1,6 @@
 import {
   CrossAgeGroupCollaborationValue,
+  PrivatePlaytestValue,
   EnabledStatusValue,
   UserPrivacyLevel,
   CommunicationPrivacyLevel,
@@ -525,6 +526,30 @@ export const getStudioCollaborationOptions = (): TRadioButtonOptionV2[] => {
   return [olderAgeGroupsAllowed, similarAgeGroupsOrTrustedConnections, similarAgeGroupsOnly, noOne];
 };
 
+// Only NoOne and SimilarAgeGroupsAndTrustedFriends launch, shown as Off/On.
+export const privatePlaytestOptionLabels = {
+  [PrivatePlaytestValue.AllAgeGroups]: undefined,
+  [PrivatePlaytestValue.SimilarAgeGroupsAndTrustedFriends]: privacyOptionLabels.on,
+  [PrivatePlaytestValue.TrustedFriends]: undefined,
+  [PrivatePlaytestValue.NoOne]: privacyOptionLabels.off,
+} satisfies Record<PrivatePlaytestValue, string | undefined>;
+
+export const getPrivatePlaytestOptions = (): TRadioButtonOptionV2[] => {
+  const on: TRadioButtonOptionV2 = {
+    label: privatePlaytestOptionLabels[PrivatePlaytestValue.SimilarAgeGroupsAndTrustedFriends],
+    value: PrivatePlaytestValue.SimilarAgeGroupsAndTrustedFriends,
+    id: "private-playtest-on",
+    name: "private-playtest-on",
+  };
+  const off: TRadioButtonOptionV2 = {
+    label: privatePlaytestOptionLabels[PrivatePlaytestValue.NoOne],
+    value: PrivatePlaytestValue.NoOne,
+    id: "private-playtest-off",
+    name: "private-playtest-off",
+  };
+  return [on, off];
+};
+
 export const getPresetChatOptions = (): TRadioButtonOptionV2[] => {
   const enabled: TRadioButtonOptionV2 = {
     label: privacyOptionLabels.on,
@@ -630,6 +655,13 @@ export const contentRestrictionsPages = {
       PrivacySettingName.SensitiveIssues
     }`,
     titleTranslationKey: pageTitles[PrivacySettingName.SensitiveIssues],
+  },
+  [PrivacySettingName.PrivatePlaytest]: {
+    name: PrivacySettingName.PrivatePlaytest,
+    path: `${privacySettingCategoryPages[SettingCategoryPageName.ContentRestrictions].path}/${
+      PrivacySettingName.PrivatePlaytest
+    }`,
+    titleTranslationKey: pageTitles[PrivacySettingName.PrivatePlaytest],
   },
 } satisfies Record<string, TSettingsPage>;
 

@@ -19,7 +19,7 @@ export type TSettingsTabAgeState = {
 
 // Age segmentation for settings tab page loads
 const useSettingsTabAgeState = (): TSettingsTabAgeState => {
-  const isUnder13 = CurrentUser.isUnder13;
+  const { isUnder13 } = CurrentUser;
 
   const { data: ageOfMajorityResult, status } = useGetFeatureAccessQuery(
     { featureName: AMPFeaturesConstants.ageOfMajorityAmpFeature },

@@ -167,6 +167,13 @@ const getChildPages = (childUserId: number): TChildPages => {
       }`,
       titleTranslationKey: privacyPageTitles[PrivacySettingName.SensitiveIssues],
     },
+    [PrivacySettingName.PrivatePlaytest]: {
+      name: PrivacySettingName.PrivatePlaytest,
+      path: `${childSettingCategoryPages[SettingCategoryPageName.ContentRestrictions].path}/${
+        PrivacySettingName.PrivatePlaytest
+      }`,
+      titleTranslationKey: privacyPageTitles[PrivacySettingName.PrivatePlaytest],
+    },
   };
 
   const communicationPages: Record<string, TSettingsPage> = {

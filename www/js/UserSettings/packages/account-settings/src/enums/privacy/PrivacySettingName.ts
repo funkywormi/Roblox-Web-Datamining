@@ -5,6 +5,7 @@ export enum PrivacySettingName {
   BlockedExperiencesSearch = "BlockedExperiencesSearch",
   ApprovedExperiences = "ApprovedExperiences",
   SensitiveIssues = "SensitiveIssues",
+  PrivatePlaytest = "PrivatePlaytest",
 
   // Visibility & Private Servers
   PrivateServerPrivacy = "PrivateServerPrivacy",

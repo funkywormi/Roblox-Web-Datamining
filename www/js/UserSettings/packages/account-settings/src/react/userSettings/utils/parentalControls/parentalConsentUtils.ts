@@ -112,6 +112,7 @@ export const booleanToOption = (value: boolean, settingName: UserSetting): TOpti
       return value ? EnabledStatusValue.Enabled : EnabledStatusValue.Disabled;
     case UserSetting.allowSensitiveIssues:
     case UserSetting.allowFacialAgeEstimation:
+    case UserSetting.allowIdentityVerification:
       return value ? EnabledStatusValue.Enabled : EnabledStatusValue.Disabled;
     case UserSetting.aggregatedDesktopNotifications:
       return value ? EnabledStatusValue.Enabled : EnabledStatusValue.Disabled;

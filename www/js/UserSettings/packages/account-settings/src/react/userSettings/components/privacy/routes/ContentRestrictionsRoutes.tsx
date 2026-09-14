@@ -16,9 +16,11 @@ import BlockedExperiences from "../BlockedExperiences";
 import ApprovedExperiences from "../ApprovedExperiences";
 import {
   contentRestrictionsPages,
+  privatePlaytestOptionLabels,
   privacySettingCategoryPages,
 } from "../../../constants/privacy/privacyConstants";
 import SensitiveIssues from "../SensitiveIssues";
+import PrivatePlaytestPrivacy from "../PrivatePlaytestPrivacy";
 
 export const ContentRestrictionsRoutes = (): JSX.Element => {
   const { translate } = useTranslation();
@@ -28,6 +30,7 @@ export const ContentRestrictionsRoutes = (): JSX.Element => {
 
   const displayAllowedExperiences = uiPolicy?.isAllowedExperiencesEnabled;
   const displaySensitiveIssues = settingsAndOptions?.[UserSetting.allowSensitiveIssues];
+  const displayPrivatePlaytest = settingsAndOptionsV2?.[UserSetting.privatePlaytest];
   const displayIarcAgeRating = uiPolicy?.isIarcAgeRatingEnabled;
   const iarcCurrentValue = settingsAndOptionsV2?.[UserSetting.iarcAgeRating]?.currentValue;
 
@@ -53,6 +56,17 @@ export const ContentRestrictionsRoutes = (): JSX.Element => {
               translate,
             );
             break;
+          case PrivacySettingName.PrivatePlaytest: {
+            const privatePlaytestValue =
+              settingsAndOptionsV2?.[UserSetting.privatePlaytest]?.currentValue;
+            const labelKey = privatePlaytestValue
+              ? privatePlaytestOptionLabels[privatePlaytestValue]
+              : undefined;
+            if (labelKey) {
+              currValueLabel = translate(labelKey);
+            }
+            break;
+          }
           default:
         }
         result[key] = {
@@ -70,11 +84,17 @@ export const ContentRestrictionsRoutes = (): JSX.Element => {
       delete result[PrivacySettingName.SensitiveIssues];
     }
 
+    if (!displayPrivatePlaytest) {
+      delete result[PrivacySettingName.PrivatePlaytest];
+    }
+
     return result;
   }, [
     settingsAndOptions,
+    settingsAndOptionsV2,
     displayAllowedExperiences,
     displaySensitiveIssues,
+    displayPrivatePlaytest,
     displayIarcAgeRating,
     iarcCurrentValue,
     translate,
@@ -100,6 +120,11 @@ export const ContentRestrictionsRoutes = (): JSX.Element => {
       {displaySensitiveIssues && (
         <Route path={contentRestrictionsPages[PrivacySettingName.SensitiveIssues].path}>
           <SensitiveIssues />
+        </Route>
+      )}
+      {displayPrivatePlaytest && (
+        <Route path={contentRestrictionsPages[PrivacySettingName.PrivatePlaytest].path}>
+          <PrivatePlaytestPrivacy />
         </Route>
       )}
     </React.Fragment>

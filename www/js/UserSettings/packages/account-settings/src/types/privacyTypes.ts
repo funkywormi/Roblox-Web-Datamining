@@ -1,4 +1,4 @@
-import { SeamlessVoiceStatus } from "../index";
+import SeamlessVoiceStatus from "../enums/SeamlessVoiceStatus";
 
 export type TVoiceSettingsBody = {
   isVerifiedForVoice: boolean;

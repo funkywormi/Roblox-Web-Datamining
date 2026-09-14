@@ -7,6 +7,7 @@ import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageNam
 import ParentalControlsPageName from "../../../../../enums/parentalControls/ParentalControlsPageName";
 import { TSettingsPage } from "../../../../../types/commonTypes";
 import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOptions";
+import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAndOptionsV2";
 import { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import { TChildPages } from "../../../../apis/slices/childPagesSlice";
 import {
@@ -49,6 +50,7 @@ export const ChildRoutes = ({
   const handleUnlinkChild = useHandleUnlinkChild();
 
   const [childSettings] = useGetSettingsAndOptions(child.userId);
+  const [settingsAndOptionsV2] = useGetSettingsAndOptionsV2(child.userId);
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
 
   const shouldDisplayScreenTime = useMemo(() => {
@@ -69,20 +71,34 @@ export const ChildRoutes = ({
 
   const showChildContentRestrictions = useMemo(() => {
     return (
-      child.canParentManageChildsExperiences || childSettings?.[UserSetting.allowSensitiveIssues]
+      child.canParentManageChildsExperiences ||
+      childSettings?.[UserSetting.allowSensitiveIssues] ||
+      child.canParentManageChildsPrivatePlaytestSetting
     );
   }, [child, childSettings]);
 
   const showRobuxSettings = child.canParentManageChildRobuxTransferLimits;
 
-  const showAgeCheckPage = useMemo(() => {
+  const showFae = useMemo(() => {
     const childHasFaeSetting = childSettings?.[UserSetting.allowFacialAgeEstimation];
-    return (
+    return Boolean(
       (childHasFaeSetting && uiPolicy?.enableAgeCheckSetting) ||
-      (child.canParentViewChildCreatorCollaborationSettings &&
-        uiPolicy?.vpcForFaeCreatorCollabSettingEnabled)
+        (child.canParentViewChildCreatorCollaborationSettings &&
+          uiPolicy?.vpcForFaeCreatorCollabSettingEnabled),
     );
   }, [childSettings, uiPolicy, child]);
+
+  const showIdv = useMemo(
+    () =>
+      !!child.canParentManageChildsAllowIdentityVerificationSetting &&
+      !!settingsAndOptionsV2?.[UserSetting.allowIdentityVerification],
+    [child, settingsAndOptionsV2],
+  );
+
+  // The "Facial and ID verification" page (SettingCategoryPageName.AgeCheck) hosts both the
+  // facial-verification (FAE) toggle and the identity-verification (IDV) toggle. Show it only when
+  // either the FAE or the IDV setting applies to the child.
+  const showAgeCheckPage = useMemo(() => showFae || showIdv, [showFae, showIdv]);
 
   const filteredChildCategoryPages: Record<string, TSettingsPage> = useMemo(() => {
     const subpages = { ...childPages?.childSettingCategoryPages };
@@ -107,9 +123,11 @@ export const ChildRoutes = ({
       delete subpages[SettingCategoryPageName.Spending];
     }
 
-    if (!showRobuxSettings) {
-      delete subpages[SettingCategoryPageName.Robux];
-    }
+    // The Robux card on the dashboard is the only entry point to this page, so
+    // listing it here as well would be a second route to the same place. The
+    // route itself stays mounted below, gated on the same permission the card's
+    // link is gated on.
+    delete subpages[SettingCategoryPageName.Robux];
 
     if (!child.shouldParentSeeSpendingInsights) {
       delete subpages[SpendSettingName.SpendNotifications];
@@ -153,7 +171,6 @@ export const ChildRoutes = ({
     childSettings,
     showChildContentRestrictions,
     showAgeCheckPage,
-    showRobuxSettings,
     uiPolicy?.enableParentLinkActivityUpdates,
   ]);
 
@@ -285,7 +302,7 @@ export const ChildRoutes = ({
       )}
       {showAgeCheckPage && (
         <Route path={filteredChildCategoryPages[SettingCategoryPageName.AgeCheck]?.path}>
-          <AgeCheck child={child} />
+          <AgeCheck child={child} showFae={showFae} showIdv={showIdv} />
         </Route>
       )}
     </React.Fragment>

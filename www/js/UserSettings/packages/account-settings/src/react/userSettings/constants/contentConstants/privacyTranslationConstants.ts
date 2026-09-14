@@ -13,6 +13,7 @@ export default {
     [PrivacySettingName.BlockedExperiences]: "Heading.BlockedExperiences",
     [PrivacySettingName.ApprovedExperiences]: "Heading.ApprovedExperiences",
     [PrivacySettingName.SensitiveIssues]: "Label.SensitiveIssues",
+    [PrivacySettingName.PrivatePlaytest]: "Heading.EligibleGamesForPlaytest",
 
     [PrivacySettingName.Screentime]: "Heading.ScreenTime",
 
@@ -47,7 +48,7 @@ export default {
 
     [SettingCategoryPageName.Notifications]: "Heading.Notifications",
 
-    [SettingCategoryPageName.AgeCheck]: "Heading.AgeCheck",
+    [SettingCategoryPageName.AgeCheck]: "Heading.FacialAndIDVerification",
   },
 
   // Account Deletion and Deactivation
@@ -226,6 +227,11 @@ export default {
   removedCommsPartyChildSide: "Description.PartySetting.AddToParty",
   removedCommsPartyParentSide: "Description.PartySettingConsent.AddToParty",
 
+  // Private playtest
+  privatePlaytestLabel: "Label.PrivatePlaytestSetting",
+  privatePlaytestDescription: "Description.PrivatePlaytest",
+  parentSidePrivatePlaytestDescription: "Description.ParentSide.PrivatePlaytest",
+
   // Studio collaboration
   studioCollaborationLabel: "Heading.StudioCollaboration",
   studioCollaborationDescription: "Description.StudioCollaboration",
@@ -324,6 +330,13 @@ export default {
   presetChatSubtitle: "Description.PresetChat.Subtitle",
   restrictivePresetChatSubtitle: "Description.PresetChat.RestrictiveSubtitle",
   presetChatLabel: "Label.PresetChat",
+
+  // Facial and ID verification page (parent-managed)
+  facialAndIdVerificationBody: "Body.FacialAndIDVerification",
+  allowFacialAgeEstimationLabel: "Label.AllowFacialAgeEstimation",
+  parentSideAllowFacialAgeEstimationDescription: "Description.ParentSide.AllowFacialAgeEstimation",
+  allowIdVerificationLabel: "Label.AllowIdVerification",
+  parentSideAllowIdVerificationDescription: "Description.ParentSide.AllowIdVerification",
 
   // Ads Privacy Settings
   adsPrivacySettingsTitle: "Heading.AdsPreferences",

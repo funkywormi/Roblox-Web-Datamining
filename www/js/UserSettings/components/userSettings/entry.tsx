@@ -1,4 +1,4 @@
-import { renderApp } from "@rbx/account-settings/react/userSettings/userSettingsEntry";
+import { renderApp } from "@rbx/account-settings";
 import "./src/main.css";
 import ready from "@rbx/core-scripts/util/ready";
 

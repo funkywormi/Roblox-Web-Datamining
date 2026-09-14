@@ -17,6 +17,7 @@ import {
   UpdateFriendsAboutMyActivitySettingValue,
   RequirementType,
   CrossAgeGroupCollaborationValue,
+  PrivatePlaytestValue,
   PartySettingsValue,
   AcbAgeRating,
 } from "../enums/userSettingsEnums";
@@ -75,6 +76,7 @@ export type TUserSettingsBody = {
   [UserSetting.allowSensitiveIssues]?: EnabledStatusValue;
   [UserSetting.allowMarketingEmailNotifications]?: EnabledStatusValue;
   [UserSetting.allowCrossAgeGroupStudioCollaboration]?: CrossAgeGroupCollaborationValue;
+  [UserSetting.privatePlaytest]?: PrivatePlaytestValue;
   [UserSetting.allowFacialAgeEstimation]?: EnabledStatusValue;
   [UserSetting.aggregatedDesktopNotifications]?: EnabledStatusValue;
   [UserSetting.whoCanPartyWithMe]?: PartySettingsValue;
@@ -83,6 +85,7 @@ export type TUserSettingsBody = {
   [UserSetting.spendNotifications]?: SpendNotificationSetting;
   [UserSetting.AllowPromotionalOffersNotifications]?: TChannelSettings;
   [UserSetting.allowPresetChat]?: EnabledStatusValue;
+  [UserSetting.allowIdentityVerification]?: EnabledStatusValue;
   /**
    * Protobuf JSON of `TRobuxTransferLimitsValue`, built by
    * `buildRobuxTransferLimitsConsentValue`. A string rather than the object
@@ -210,11 +213,13 @@ export type TUserSettingsAndOptionsV2Body = {
   [UserSetting.whoCanChatWithMeInExperiences]?: TUserSettingsAndOptionsV2<UserPrivacyLevel>;
   [UserSetting.whoCanSeeMySocialNetworks]?: TUserSettingsAndOptionsV2<UserPrivacyLevel>;
   [UserSetting.allowCrossAgeGroupStudioCollaboration]?: TUserSettingsAndOptionsV2<CrossAgeGroupCollaborationValue>;
+  [UserSetting.privatePlaytest]?: TUserSettingsAndOptionsV2<PrivatePlaytestValue>;
   [UserSetting.aggregatedDesktopNotifications]?: TUserSettingsAndOptionsV2<EnabledStatusValue>;
   [UserSetting.whoCanPartyWithMe]?: TUserSettingsAndOptionsV2<PartySettingsValue>;
   [UserSetting.whoCanUsePartyChatWithMe]?: TUserSettingsAndOptionsV2<PartySettingsValue>;
   [UserSetting.whoCanUsePartyVoiceWithMe]?: TUserSettingsAndOptionsV2<PartySettingsValue>;
   [UserSetting.allowPresetChat]?: TUserSettingsAndOptionsV2<EnabledStatusValue>;
+  [UserSetting.allowIdentityVerification]?: TUserSettingsAndOptionsV2<EnabledStatusValue>;
   /**
    * Read shape, which is not the write shape: user-settings reports each window
    * as a nullable cap, while a save encodes it as `TRobuxTransferLimitsValue`.

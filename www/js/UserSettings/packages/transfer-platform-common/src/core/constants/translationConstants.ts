@@ -10,6 +10,12 @@ const translationConstants = {
   higherLimitsIneligibleModeration: "Description.HigherLimitsIneligible.Moderation",
   higherLimitsIneligibleRefundOrChargeback: "Description.HigherLimitsIneligible.RefundOrChargeback",
   higherLimitsIneligiblePurchaseHistory: "Description.HigherLimitsIneligible.PurchaseHistory",
+  askParentForHigherLimitsLabel: "Action.Label.AskParentForHigherTransferLimits",
+  askParentForHigherLimitsDescription: "Description.AskParentForHigherTransferLimits",
+  waitingForParentLabel: "Label.WaitingForParentToChangeTransferLimits",
+  waitingForParentDescription: "Description.WaitingForParentToChangeTransferLimits",
+  pendingBadge: "Label.Pending",
+  cancelRequest: "Header.CancelRequest",
   transactionHistory: "Label.TransactionHistory",
   loadingError: "Message.Error.Default",
 };

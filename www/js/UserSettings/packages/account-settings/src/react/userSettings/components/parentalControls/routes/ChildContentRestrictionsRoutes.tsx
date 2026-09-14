@@ -5,6 +5,7 @@ import { UserSetting } from "@rbx/user-settings";
 import PrivacySettingName from "../../../../../enums/privacy/PrivacySettingName";
 import { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOptions";
+import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAndOptionsV2";
 import { useGetSettingsUiPolicyQuery } from "../../../../apis/universalAppConfigurationApi";
 import { TSettingsPage } from "../../../../../types/commonTypes";
 import SettingsList from "../../../../common/components/routing/SettingsList";
@@ -14,6 +15,8 @@ import BlockedExperiences from "../../privacy/BlockedExperiences";
 import BlockedExperiencesSearch from "../../privacy/BlockedExperiencesSearch";
 import ApprovedExperiences from "../../privacy/ApprovedExperiences";
 import SensitiveIssues from "../../privacy/SensitiveIssues";
+import PrivatePlaytestPrivacy from "../../privacy/PrivatePlaytestPrivacy";
+import { privatePlaytestOptionLabels } from "../../../constants/privacy/privacyConstants";
 
 export const ChildContentRestrictionsRoutes = ({
   child,
@@ -27,10 +30,14 @@ export const ChildContentRestrictionsRoutes = ({
   const displayContentMaturity = child.canParentAccessChildBasicPrivacySettings;
   const { translate } = useTranslation();
   const [childSettings] = useGetSettingsAndOptions(child.userId);
+  const [childSettingsV2] = useGetSettingsAndOptionsV2(child.userId);
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
 
   const displayAllowedExperiences = uiPolicy?.isAllowedExperiencesEnabled;
   const displaySensitiveIssues = childSettings?.[UserSetting.allowSensitiveIssues];
+  const displayPrivatePlaytest =
+    child.canParentManageChildsPrivatePlaytestSetting &&
+    childSettingsV2?.[UserSetting.privatePlaytest];
 
   // Fetch labels for current setting values
   const pagesWithCurrentValues: Record<string, TSettingsPage> = useMemo(() => {
@@ -51,6 +58,16 @@ export const ChildContentRestrictionsRoutes = ({
             translate,
           );
           break;
+        case PrivacySettingName.PrivatePlaytest: {
+          const privatePlaytestValue = childSettingsV2?.[UserSetting.privatePlaytest]?.currentValue;
+          const labelKey = privatePlaytestValue
+            ? privatePlaytestOptionLabels[privatePlaytestValue]
+            : undefined;
+          if (labelKey) {
+            currValueLabel = translate(labelKey);
+          }
+          break;
+        }
         default:
       }
       result[key] = {
@@ -73,13 +90,19 @@ export const ChildContentRestrictionsRoutes = ({
       delete result[PrivacySettingName.ContentMaturity];
     }
 
+    if (!displayPrivatePlaytest) {
+      delete result[PrivacySettingName.PrivatePlaytest];
+    }
+
     return result;
   }, [
     childSettings,
+    childSettingsV2,
     subpages,
     displayAllowedExperiences,
     displaySensitiveIssues,
     displayContentMaturity,
+    displayPrivatePlaytest,
   ]);
 
   return (
@@ -107,6 +130,11 @@ export const ChildContentRestrictionsRoutes = ({
       {displaySensitiveIssues && (
         <Route path={subpages[PrivacySettingName.SensitiveIssues]?.path}>
           <SensitiveIssues child={child} />
+        </Route>
+      )}
+      {displayPrivatePlaytest && (
+        <Route path={subpages[PrivacySettingName.PrivatePlaytest]?.path}>
+          <PrivatePlaytestPrivacy child={child} />
         </Route>
       )}
     </React.Fragment>

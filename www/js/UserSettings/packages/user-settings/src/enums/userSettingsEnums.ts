@@ -86,6 +86,13 @@ export enum CrossAgeGroupCollaborationValue {
   NoOne = "NoOne",
 }
 
+export enum PrivatePlaytestValue {
+  AllAgeGroups = "AllAgeGroups",
+  SimilarAgeGroupsAndTrustedFriends = "SimilarAgeGroupsAndTrustedFriends",
+  TrustedFriends = "TrustedFriends",
+  NoOne = "NoOne",
+}
+
 export enum PartySettingsValue {
   AllConnections = "AllConnections",
   TrustedConnectionsOnly = "TrustedConnectionsOnly",
@@ -155,6 +162,8 @@ export enum UserSetting {
   // Note: This is a V2 setting and not supported in the V1 Contracts.
   aggregatedDesktopNotifications = "aggregatedDesktopNotifications",
   allowPresetChat = "allowPresetChat",
+  privatePlaytest = "privatePlaytest",
+  allowIdentityVerification = "allowIdentityVerification",
   robuxTransferLimits = "robuxTransferLimits",
   iarcAgeRating = "iarcAgeRating",
 }
