@@ -74,7 +74,6 @@ const vpcV2Handoff: TVpcV2Handoff = {
 
   launch: ({
     recourseAction,
-    parentConsentTypes,
     translate,
     requestType,
     requestDetails,
@@ -93,10 +92,7 @@ const vpcV2Handoff: TVpcV2Handoff = {
         remoteParentRequest: {
           translate,
           useLegallySensitiveContent:
-            LegallySensitiveContentService.useLegallySensitiveContentAndActions as UseLegallySensitiveContent,
-          launchAction: recourseAction,
-          launchConsents: parentConsentTypes,
-          launchRecourseData: requestDetails
+            LegallySensitiveContentService.useLegallySensitiveContentAndActions as UseLegallySensitiveContent
         }
       }
     }).then((result: unknown) => {

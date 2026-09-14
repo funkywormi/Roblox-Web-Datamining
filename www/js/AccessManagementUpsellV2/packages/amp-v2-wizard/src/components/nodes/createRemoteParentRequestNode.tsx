@@ -40,9 +40,6 @@ export type UseLegallySensitiveContent = (
 export type RemoteParentRequestConfig = {
   translate: TranslateFunction;
   useLegallySensitiveContent: UseLegallySensitiveContent;
-  launchAction?: string;
-  launchConsents?: string[];
-  launchRecourseData?: RequestDetails | null;
   api?: RemoteParentRequestApi;
 };
 
@@ -62,27 +59,11 @@ const fallbackConfig: RemoteParentRequestConfig = {
   useLegallySensitiveContent: () => [{}, { getBase64EncodedAuditHeader: () => "" }],
 };
 
-function asAction(value: unknown, fallback: string | undefined): string {
-  if (value === PARENT_CONSENT || value === PARENT_LINK) {
-    return value;
-  }
-  return fallback === PARENT_CONSENT ? PARENT_CONSENT : PARENT_LINK;
-}
-
-function asConsents(value: unknown): string[] | undefined {
-  if (!Array.isArray(value)) {
-    return undefined;
-  }
-  const consents = value.filter((item): item is string => typeof item === "string");
-  return consents.length > 0 ? consents : undefined;
-}
-
 function asRequestDetails(value: unknown): RequestDetails | undefined {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return undefined;
   }
-  const entries = Object.entries(value);
-  return entries.length > 0 ? Object.fromEntries(entries) : undefined;
+  return Object.fromEntries(Object.entries(value));
 }
 
 function errorCode(error: unknown): string | undefined {
@@ -126,19 +107,13 @@ export const RemoteParentRequestNode: NodeComponent = ({
   const configValue = ctx.config.remoteParentRequest;
   const configured = isRemoteParentRequestConfig(configValue);
   const config = configured ? configValue : fallbackConfig;
-  const {
-    translate,
-    useLegallySensitiveContent,
-    launchAction,
-    launchConsents,
-    launchRecourseData,
-    api = remoteParentRequestApi,
-  } = config;
-  const action = asAction(props.action, launchAction);
-  const consents = asConsents(props.consents) ?? asConsents(launchConsents);
-  const requestType = consents?.[0];
-  const requestDetails =
-    asRequestDetails(props.recourseData) ?? asRequestDetails(launchRecourseData);
+  const { translate, useLegallySensitiveContent, api = remoteParentRequestApi } = config;
+  const action = props.action === PARENT_CONSENT ? PARENT_CONSENT : PARENT_LINK;
+  const requestType =
+    typeof props.requestType === "string" && props.requestType.length > 0
+      ? props.requestType
+      : undefined;
+  const requestDetails = asRequestDetails(props.requestDetails);
   const [step, setStep] = useState<Step>("loading");
   const [email, setEmail] = useState("");
   const [parentEmails, setParentEmails] = useState<string[]>([]);

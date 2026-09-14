@@ -185,13 +185,13 @@ export const CodeInput = ({
       </div>
 
       {errorContent === undefined ? null : (
-        <p
+        <div
           id={messageId}
           role="alert"
           className="text-body-small padding-top-small margin-none content-system-alert"
         >
           {errorContent}
-        </p>
+        </div>
       )}
     </div>
   );
