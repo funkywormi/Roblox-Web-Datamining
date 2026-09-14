@@ -10,6 +10,7 @@ export {
   finishPasskeyRegistration,
   finishARPreAuthPasskeyRegistration,
   deletePasskeyBatch,
+  renamePasskey,
   PasswordDeletionSource,
 } from "@rbx/authentication-common/passkey/api";
 

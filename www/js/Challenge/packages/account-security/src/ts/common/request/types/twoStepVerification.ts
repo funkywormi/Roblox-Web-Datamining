@@ -44,6 +44,7 @@ export type Code = {
 };
 
 export type Fido2Credential = {
+  credentialID: string;
   nickname: string;
 };
 
@@ -359,6 +360,17 @@ export type DeleteSecurityKeyReturnType = void;
 export const DELETE_SECURITY_KEY_CONFIG: (userId: string) => UrlConfig = userId => ({
   withCredentials: true,
   url: `${twoStepVerificationApiUrl}/v1/users/${userId}/configuration/security-key/disable`,
+  timeout: TwoStepVerificationTimeout,
+});
+
+export type RenameSecurityKeyReturnType = void;
+
+/**
+ * Request Type: `POST`.
+ */
+export const RENAME_SECURITY_KEY_CONFIG: (userId: string) => UrlConfig = userId => ({
+  withCredentials: true,
+  url: `${twoStepVerificationApiUrl}/v1/users/${userId}/configuration/security-key/rename`,
   timeout: TwoStepVerificationTimeout,
 });
 

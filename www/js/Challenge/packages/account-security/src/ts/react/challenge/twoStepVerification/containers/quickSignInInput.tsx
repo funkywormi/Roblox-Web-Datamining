@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { Modal } from "react-style-guide";
+import { openModal as openCrossDeviceLoginDisplayCodeModal } from "@rbx/authentication/crossDeviceLoginDisplayCodeModal/services/crossDeviceLoginDisplayCodeService";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import { InlineChallengeFooter } from "../../../common/inlineChallengeFooter";
@@ -40,18 +41,17 @@ const QuickSignInInput: React.FC<Props> = ({ setModalTitleText, children }: Prop
   const bodyText = getBodyText();
 
   const handleButtonClick = () => {
-    // Legacy window.Roblox globals with no canonical module; read defensively so the
-    // web path degrades gracefully off the .NET page.
-    const roblox = window.Roblox as {
-      Hybrid?: { Overlay?: { close: (callback: () => void) => void } };
-      CrossDeviceLoginDisplayCodeService?: { openModal: () => void };
-    };
     if (inRobloxApp) {
-      // In RobloxApp webview, close the hybrid overlay
-      roblox.Hybrid?.Overlay?.close(() => undefined);
+      // In RobloxApp webview, close the hybrid overlay. window.Roblox.Hybrid is injected by
+      // the native app webview bridge (no importable module); read defensively so off-app
+      // paths no-op instead of throwing.
+      const { Hybrid } = window.Roblox as {
+        Hybrid?: { Overlay?: { close: (callback: () => void) => void } };
+      };
+      Hybrid?.Overlay?.close(() => undefined);
     } else {
-      // On web, open the cross-device login modal
-      roblox.CrossDeviceLoginDisplayCodeService?.openModal();
+      // On web, open the cross-device login modal via the imported service.
+      openCrossDeviceLoginDisplayCodeModal();
     }
   };
 

@@ -32,6 +32,12 @@ export const EVENT_CONSTANTS = {
     challengeCompleted: "challengeCompleted",
     challengeInvalidated: "challengeInvalidated",
     challengeAbandoned: "challengeAbandoned",
+    // Advanced Blocking Response (press-and-hold widget) lifecycle.
+    abrLoaded: "abrLoaded",
+    abrFailed: "abrFailed",
+    abrSucceeded: "abrSucceeded",
+    abrAccepted: "abrAccepted",
+    abrRejected: "abrRejected",
   },
 } as const;
 

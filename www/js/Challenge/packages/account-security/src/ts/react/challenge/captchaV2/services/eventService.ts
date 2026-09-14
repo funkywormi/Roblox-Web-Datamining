@@ -11,12 +11,13 @@ export class EventServiceDefault {
     this.challengeId = challengeId;
   }
 
-  private sendEvent(context: string): void {
+  private sendEvent(context: string, additionalParams: Record<string, string> = {}): void {
     Roblox.EventStream.SendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       context,
       {
         challengeId: this.challengeId,
+        ...additionalParams,
       },
       Roblox.EventStream.TargetTypes.WWW,
     );
@@ -44,6 +45,28 @@ export class EventServiceDefault {
 
   sendChallengeAbandonedEvent(): void {
     this.sendEvent(EVENT_CONSTANTS.context.challengeAbandoned);
+  }
+
+  // ABR (press-and-hold widget) lifecycle events. `uuid` is the ABR ReferenceID
+  // (the server-side px_uuid), included so these correlate to the HUMAN block.
+  sendAbrLoadedEvent(uuid: string): void {
+    this.sendEvent(EVENT_CONSTANTS.context.abrLoaded, { uuid });
+  }
+
+  sendAbrFailedEvent(uuid: string): void {
+    this.sendEvent(EVENT_CONSTANTS.context.abrFailed, { uuid });
+  }
+
+  sendAbrSucceededEvent(uuid: string): void {
+    this.sendEvent(EVENT_CONSTANTS.context.abrSucceeded, { uuid });
+  }
+
+  sendAbrAcceptedEvent(uuid: string): void {
+    this.sendEvent(EVENT_CONSTANTS.context.abrAccepted, { uuid });
+  }
+
+  sendAbrRejectedEvent(uuid: string): void {
+    this.sendEvent(EVENT_CONSTANTS.context.abrRejected, { uuid });
   }
 }
 

@@ -123,9 +123,41 @@ export type GetRecoveryIntentStatusReturnType = {
   status: RecoveryIntentStatus;
 };
 
+export type RecoveryIntent = {
+  recoveryIntentId: string;
+  mainAccountUserId: number;
+  createdTime: string;
+};
+
+export type GetRecoveryIntentsResponse = {
+  pendingRecoveryIntents: RecoveryIntent[];
+};
+
+export type RecoveryIntentRequest = {
+  recoveryIntentId: string;
+};
+
 export const GET_RECOVERY_INTENT_STATUS_CONFIG: UrlConfig = {
   withCredentials: true,
   url: `${accountRecoveryServiceUrl}/v1/get-recovery-intent-status`,
+  timeout: 10000,
+};
+
+export const GET_RECOVERY_INTENTS_CONFIG: UrlConfig = {
+  withCredentials: true,
+  url: `${accountRecoveryServiceUrl}/v1/get-recovery-intents`,
+  timeout: 10000,
+};
+
+export const APPROVE_RECOVERY_INTENT_CONFIG: UrlConfig = {
+  withCredentials: true,
+  url: `${accountRecoveryServiceUrl}/v1/approve-recovery-intent`,
+  timeout: 10000,
+};
+
+export const DENY_RECOVERY_INTENT_CONFIG: UrlConfig = {
+  withCredentials: true,
+  url: `${accountRecoveryServiceUrl}/v1/deny-recovery-intent`,
   timeout: 10000,
 };
 
