@@ -1,9 +1,9 @@
-import './src/main.css';
-import React from 'react';
-import { render, unmountComponentAtNode } from 'react-dom';
-import Roblox from 'Roblox';
-import * as Interface from '@rbx/subscriptions/ts/react/subscriptionManagement/interface';
-import App from '@rbx/subscriptions/ts/react/subscriptionManagement/App';
+import "./src/main.css";
+import React from "react";
+import { render, unmountComponentAtNode } from "react-dom";
+import Roblox from "Roblox";
+import * as Interface from "@rbx/subscriptions/ts/react/subscriptionManagement/interface";
+import App from "@rbx/subscriptions/ts/react/subscriptionManagement/App";
 
 /**
  * Renders the Subscriptions Tab UI for a given set of parameters.
@@ -26,9 +26,9 @@ export const renderComponent: Interface.RenderComponent = (containerId: string) 
 // the shared interface types for this component get reflected in its compiled
 // definition.
 const SubscriptionManagement: typeof Interface = {
-  renderComponent
+  renderComponent,
 };
 
 Object.assign(Roblox, {
-  SubscriptionManagement
+  SubscriptionManagement,
 });

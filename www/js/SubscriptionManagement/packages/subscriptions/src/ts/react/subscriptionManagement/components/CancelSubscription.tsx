@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { fireEvent } from 'roblox-event-tracker';
-import { useTranslation } from 'react-utilities';
-import { Modal } from 'react-style-guide';
-import { authenticatedUser, deviceMeta } from 'header-scripts';
-import { ProductType } from '@rbx/client-subscriptions-api/v1';
-import { PremiumPurchasePlatform } from '../../../core/types/premiumEnums';
-import '../../../../css/subscriptionManagement/cancelSubscription.scss';
-import { ANDROID_CANCEL_RENEWAL_URL } from '../../../core/constants/websiteConstants';
+import React, { useEffect, useState } from "react";
+import { fireEvent } from "roblox-event-tracker";
+import { useTranslation } from "react-utilities";
+import { Modal } from "react-style-guide";
+import { authenticatedUser, deviceMeta } from "header-scripts";
+import { ProductType } from "@rbx/client-subscriptions-api/v1";
+import { PremiumPurchasePlatform } from "../../../core/types/premiumEnums";
+import "../../../../css/subscriptionManagement/cancelSubscription.scss";
+import { ANDROID_CANCEL_RENEWAL_URL } from "../../../core/constants/websiteConstants";
 import {
   cancelPremiumSubscription,
-  cancelUserSubscription
-} from '../../../core/services/subscriptionServices';
-import useSystemFeedbackContext from '../../shared/hooks/useSystemFeedback';
-import { COUNTER_METRICS } from '../constants/metricConstants';
-import { PremiumSubscription } from '../../../core/types/premiumSubscription';
-import { UserSubscription } from '../../../core/types/userSubscription';
-import trackerClient, { ManageEventType } from '../utils/logging';
-import { isExpiring } from '../utils/subscriptionUtils';
+  cancelUserSubscription,
+} from "../../../core/services/subscriptionServices";
+import useSystemFeedbackContext from "../../shared/hooks/useSystemFeedback";
+import { COUNTER_METRICS } from "../constants/metricConstants";
+import { PremiumSubscription } from "../../../core/types/premiumSubscription";
+import { UserSubscription } from "../../../core/types/userSubscription";
+import trackerClient, { ManageEventType } from "../utils/logging";
+import { isExpiring } from "../utils/subscriptionUtils";
 
 type CancelSubscriptionProps = {
   className?: string;
@@ -29,7 +29,7 @@ const CancelSubscription: React.FC<CancelSubscriptionProps> = ({
   className,
   subscription,
   onCancel,
-  isPremium = false
+  isPremium = false,
 }) => {
   const { translate } = useTranslation();
 
@@ -97,7 +97,7 @@ const CancelSubscription: React.FC<CancelSubscriptionProps> = ({
     setIsCancelModalVisible(false);
     cancelCall
       .then(() => {
-        systemFeedbackService.success(translate('Response.Subscriptions.CancelSuccess'));
+        systemFeedbackService.success(translate("Response.Subscriptions.CancelSuccess"));
         // This call isn't completely required since calling onCancel should trigger
         // the components up the tree updating the expiration time
         setIsCanceled(true);
@@ -119,22 +119,22 @@ const CancelSubscription: React.FC<CancelSubscriptionProps> = ({
   };
 
   const accessDateString = subscription.renewal.toLocaleDateString(undefined, {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
   });
 
   return (
     <React.Fragment>
       {showCancelButton() && (
-        <button type='button' className={className} onClick={cancelButtonClick}>
-          {translate('Action.CancelRenewal')}
+        <button type="button" className={className} onClick={cancelButtonClick}>
+          {translate("Action.CancelRenewal")}
         </button>
       )}
       <Modal show={isCancelModalVisible} onHide={() => setIsCancelModalVisible(false)}>
         <Modal.Header
-          className='cancel-modal-header'
-          title={translate('Action.CancelSubscription')}
+          className="cancel-modal-header"
+          title={translate("Action.CancelSubscription")}
           showCloseButton
           onClose={() => setIsCancelModalVisible(false)}
         />
@@ -142,47 +142,49 @@ const CancelSubscription: React.FC<CancelSubscriptionProps> = ({
           {(subscription as UserSubscription).productType === ProductType.Blackbird ? (
             <React.Fragment>
               <p>
-                {translate('Message.Subscriptions.PlusCancelBody', {
-                  subscriptionExpirationDate: accessDateString
+                {translate("Message.Subscriptions.PlusCancelBody", {
+                  subscriptionExpirationDate: accessDateString,
                 })}
               </p>
-              <p>{translate('Message.Subscriptions.PlusCancelBody2')}</p>
+              <p>{translate("Message.Subscriptions.PlusCancelBody2")}</p>
             </React.Fragment>
           ) : (
-            translate('Message.Subscriptions.AccessUntil', {
-              subscriptionExpirationDate: accessDateString
+            translate("Message.Subscriptions.AccessUntil", {
+              subscriptionExpirationDate: accessDateString,
             })
           )}
         </Modal.Body>
-        <Modal.Footer className='cancel-modal-footer'>
+        <Modal.Footer className="cancel-modal-footer">
           <button
-            type='button'
-            className='btn-secondary-md btn-full-width'
-            onClick={() => setIsCancelModalVisible(false)}>
-            {translate('Action.Subscriptions.StopCancel')}
+            type="button"
+            className="btn-secondary-md btn-full-width"
+            onClick={() => setIsCancelModalVisible(false)}
+          >
+            {translate("Action.Subscriptions.StopCancel")}
           </button>
-          <button type='button' className='btn-cta-md btn-full-width' onClick={cancelSubscription}>
-            {translate('Action.Subscriptions.CancelSubscription')}
+          <button type="button" className="btn-cta-md btn-full-width" onClick={cancelSubscription}>
+            {translate("Action.Subscriptions.CancelSubscription")}
           </button>
         </Modal.Footer>
       </Modal>
       <Modal show={isCancelErrorVisible} onHide={() => setIsCancelErrorVisible(false)}>
         <Modal.Header
-          className='cancel-modal-header'
-          title={translate('Heading.Dialog.DefaultError')}
+          className="cancel-modal-header"
+          title={translate("Heading.Dialog.DefaultError")}
           showCloseButton
           onClose={() => setIsCancelErrorVisible(false)}
         />
-        <Modal.Body className='cancel-error-body'>
-          {translate('Response.Subscriptions.CancelUnknownError')}
-          <span className='icon-status-alert-xl' />
+        <Modal.Body className="cancel-error-body">
+          {translate("Response.Subscriptions.CancelUnknownError")}
+          <span className="icon-status-alert-xl" />
         </Modal.Body>
-        <Modal.Footer className='cancel-modal-footer'>
+        <Modal.Footer className="cancel-modal-footer">
           <button
-            type='button'
-            className='btn-cta-md btn-full-width'
-            onClick={() => setIsCancelErrorVisible(false)}>
-            {translate('Action.Dialog.Success')}
+            type="button"
+            className="btn-cta-md btn-full-width"
+            onClick={() => setIsCancelErrorVisible(false)}
+          >
+            {translate("Action.Dialog.Success")}
           </button>
         </Modal.Footer>
       </Modal>

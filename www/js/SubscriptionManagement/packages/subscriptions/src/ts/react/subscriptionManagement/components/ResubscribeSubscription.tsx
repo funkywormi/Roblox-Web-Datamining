@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-utilities';
-import { Modal } from 'react-style-guide';
-import '../../../../css/subscriptionManagement/resubscribeSubscription.scss';
-import classNames from 'classnames';
-import { Price } from '../../../core/types/price';
-import { PeriodType } from '../../../core/types/subscriptionEnums';
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-utilities";
+import { Modal } from "react-style-guide";
+import "../../../../css/subscriptionManagement/resubscribeSubscription.scss";
+import classNames from "classnames";
+import { Price } from "../../../core/types/price";
+import { PeriodType } from "../../../core/types/subscriptionEnums";
 import {
   getSubscriptionResubscribeEligibility,
-  resubscribeSubscription
-} from '../../../core/services/subscriptionServices';
-import useSystemFeedbackContext from '../../shared/hooks/useSystemFeedback';
-import { PremiumSubscription } from '../../../core/types/premiumSubscription';
-import { UserSubscription } from '../../../core/types/userSubscription';
-import trackerClient, { ManageEventType } from '../utils/logging';
-import PriceDisplay from './PriceDisplay';
-import PriceDisplayInRobux from './PriceDisplayInRobux';
-import { premiumPeriod } from '../utils/premiumUtils';
-import { getPaymentIconClass } from '../utils/subscriptionUtils';
+  resubscribeSubscription,
+} from "../../../core/services/subscriptionServices";
+import useSystemFeedbackContext from "../../shared/hooks/useSystemFeedback";
+import { PremiumSubscription } from "../../../core/types/premiumSubscription";
+import { UserSubscription } from "../../../core/types/userSubscription";
+import trackerClient, { ManageEventType } from "../utils/logging";
+import PriceDisplay from "./PriceDisplay";
+import PriceDisplayInRobux from "./PriceDisplayInRobux";
+import { premiumPeriod } from "../utils/premiumUtils";
+import { getPaymentIconClass } from "../utils/subscriptionUtils";
 
 type ResubscribeSubscriptionProps = {
   className?: string;
@@ -32,7 +32,7 @@ const ResubscribeSubscription: React.FC<ResubscribeSubscriptionProps> = ({
   subscription,
   onResubscribe,
   isPremium = false,
-  assumeEligible = false
+  assumeEligible = false,
 }) => {
   const { translate } = useTranslation();
 
@@ -51,7 +51,7 @@ const ResubscribeSubscription: React.FC<ResubscribeSubscriptionProps> = ({
   useEffect(() => {
     if (assumeEligible) return;
     getSubscriptionResubscribeEligibility({
-      subscriptionProductTargetKey: subscription.subscriptionTargetKey
+      subscriptionProductTargetKey: subscription.subscriptionTargetKey,
     })
       .then(response => {
         if (response) {
@@ -68,17 +68,17 @@ const ResubscribeSubscription: React.FC<ResubscribeSubscriptionProps> = ({
     setIsResubscribeModalVisible(false);
     resubscribeSubscription({ subscriptionProductTargetKey: subscription.subscriptionTargetKey })
       .then(() => {
-        systemFeedbackService.success(translate('Response.Subscriptions.ResubscribeSuccess'));
+        systemFeedbackService.success(translate("Response.Subscriptions.ResubscribeSuccess"));
 
         setCanResubscribe(false);
         if (onResubscribe) {
           const targetKey =
-            'subscriptionTargetKey' in subscription
+            "subscriptionTargetKey" in subscription
               ? subscription.subscriptionTargetKey
               : undefined;
           onResubscribe(isPremium, targetKey);
         }
-        if (!isPremium && 'subscriptionTargetKey' in subscription) {
+        if (!isPremium && "subscriptionTargetKey" in subscription) {
           trackerClient.sendEvent(ManageEventType.RESUBSCRIBE_SUCCESS, subscription);
         }
       })
@@ -88,7 +88,7 @@ const ResubscribeSubscription: React.FC<ResubscribeSubscriptionProps> = ({
   // Show modal on button click
   const resubscribeButtonClick = () => {
     if (!isPremium) {
-      if ('subscriptionTargetKey' in subscription) {
+      if ("subscriptionTargetKey" in subscription) {
         trackerClient.sendEvent(ManageEventType.CLICK_RESUBSCRIBE, subscription);
       }
     }
@@ -97,9 +97,9 @@ const ResubscribeSubscription: React.FC<ResubscribeSubscriptionProps> = ({
 
   // Convery expiration date to string
   const accessDateString = subscription.expiration.toLocaleDateString(undefined, {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
   });
 
   const subscriptionPeriod = isPremium
@@ -110,7 +110,7 @@ const ResubscribeSubscription: React.FC<ResubscribeSubscriptionProps> = ({
     : (subscription as UserSubscription).periodCount;
 
   const robuxPrice =
-    !isPremium && 'priceInRobux' in subscription ? subscription.priceInRobux : null;
+    !isPremium && "priceInRobux" in subscription ? subscription.priceInRobux : null;
   const isRobux = robuxPrice != null && robuxPrice > 0;
 
   // Modal body content
@@ -118,14 +118,14 @@ const ResubscribeSubscription: React.FC<ResubscribeSubscriptionProps> = ({
     if (isRobux) {
       return (
         <div>
-          <div className='description-top'>
+          <div className="description-top">
             <span>
-              {translate('Message.Subscriptions.ResubscribeConfirmationP1', {
+              {translate("Message.Subscriptions.ResubscribeConfirmationP1", {
                 subscriptionName: subscription.name,
-                subscriptionRenewalDate: accessDateString
+                subscriptionRenewalDate: accessDateString,
               })}
-            </span>{' '}
-            <span>{translate('Message.Subscriptions.ResubscribeConfirmationP2')} </span>
+            </span>{" "}
+            <span>{translate("Message.Subscriptions.ResubscribeConfirmationP2")} </span>
             <PriceDisplayInRobux priceInRobux={robuxPrice} />
           </div>
         </div>
@@ -135,36 +135,36 @@ const ResubscribeSubscription: React.FC<ResubscribeSubscriptionProps> = ({
       const lastFourString = `****${subscription.cardInfo.last4Digits}`;
       return (
         <div>
-          <div className='description-top'>
+          <div className="description-top">
             <span>
-              {translate('Message.Subscriptions.ResubscribeConfirmationP1', {
+              {translate("Message.Subscriptions.ResubscribeConfirmationP1", {
                 subscriptionName: subscription.name,
-                subscriptionRenewalDate: accessDateString
+                subscriptionRenewalDate: accessDateString,
               })}
             </span>
-            <div className='resubscribe-payment-container'>
+            <div className="resubscribe-payment-container">
               <span
                 className={classNames(
-                  'resubscribe-card-icon',
+                  "resubscribe-card-icon",
                   getPaymentIconClass(
                     subscription.purchasePlatform,
                     subscription.paymentProvider,
-                    subscription.cardInfo
-                  )
+                    subscription.cardInfo,
+                  ),
                 )}
               />
-              <span className='card-four-digits'>{lastFourString}</span>
+              <span className="card-four-digits">{lastFourString}</span>
             </div>
-            <span>{translate('Message.Subscriptions.ResubscribeConfirmationP2')} </span>
+            <span>{translate("Message.Subscriptions.ResubscribeConfirmationP2")} </span>
             <PriceDisplay
               price={subscription.price as Price}
               period={subscriptionPeriod}
               periodCount={subscriptionPeriodCount}
-              className='resubscribe'
+              className="resubscribe"
             />
           </div>
-          <div className='description-bottom'>
-            {translate('Message.Subscriptions.ResubscribeConfirmationP3')}
+          <div className="description-bottom">
+            {translate("Message.Subscriptions.ResubscribeConfirmationP3")}
           </div>
         </div>
       );
@@ -175,50 +175,53 @@ const ResubscribeSubscription: React.FC<ResubscribeSubscriptionProps> = ({
     <React.Fragment>
       {canResubscribe && (
         <button
-          type='button'
+          type="button"
           className={className}
           onClick={resubscribeButtonClick}
-          data-testid='resubscribe'>
-          {translate('Action.Resubscribe')}
+          data-testid="resubscribe"
+        >
+          {translate("Action.Resubscribe")}
         </button>
       )}
       <Modal show={isResubscribeModalVisible} onHide={() => setIsResubscribeModalVisible(false)}>
         <Modal.Header
-          className='resubscribe-modal-header'
-          title={translate('Action.Resubscribe')}
+          className="resubscribe-modal-header"
+          title={translate("Action.Resubscribe")}
           showCloseButton
           onClose={() => setIsResubscribeModalVisible(false)}
         />
-        <Modal.Body className='resubscribe-modal-body'>{resubscribeModalBody()}</Modal.Body>
-        <Modal.Footer className='resubscribe-modal-footer'>
+        <Modal.Body className="resubscribe-modal-body">{resubscribeModalBody()}</Modal.Body>
+        <Modal.Footer className="resubscribe-modal-footer">
           <button
-            type='button'
-            className='btn-secondary-md btn-full-width'
-            onClick={() => setIsResubscribeModalVisible(false)}>
-            {translate('Action.Cancel')}
+            type="button"
+            className="btn-secondary-md btn-full-width"
+            onClick={() => setIsResubscribeModalVisible(false)}
+          >
+            {translate("Action.Cancel")}
           </button>
-          <button type='button' className='btn-cta-md btn-full-width' onClick={resubscribe}>
-            {translate('Action.Resubscribe')}
+          <button type="button" className="btn-cta-md btn-full-width" onClick={resubscribe}>
+            {translate("Action.Resubscribe")}
           </button>
         </Modal.Footer>
       </Modal>
       <Modal show={isResubscribeErrorVisible} onHide={() => setIsResubscribeErrorVisible(false)}>
         <Modal.Header
-          className='resubscribe-modal-header'
-          title={translate('Heading.Dialog.DefaultError')}
+          className="resubscribe-modal-header"
+          title={translate("Heading.Dialog.DefaultError")}
           showCloseButton
           onClose={() => setIsResubscribeErrorVisible(false)}
         />
-        <Modal.Body className='resubscribe-error-body'>
-          {translate('Error.GenericError')}
-          <span className='icon-status-alert-xl' />
+        <Modal.Body className="resubscribe-error-body">
+          {translate("Error.GenericError")}
+          <span className="icon-status-alert-xl" />
         </Modal.Body>
-        <Modal.Footer className='resubscribe-modal-footer'>
+        <Modal.Footer className="resubscribe-modal-footer">
           <button
-            type='button'
-            className='btn-cta-md btn-full-width'
-            onClick={() => setIsResubscribeErrorVisible(false)}>
-            {translate('Action.Dialog.Success')}
+            type="button"
+            className="btn-cta-md btn-full-width"
+            onClick={() => setIsResubscribeErrorVisible(false)}
+          >
+            {translate("Action.Dialog.Success")}
           </button>
         </Modal.Footer>
       </Modal>

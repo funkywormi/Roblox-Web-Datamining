@@ -1,14 +1,14 @@
-import { EnvironmentUrls } from 'Roblox';
-import { httpService, UrlConfig } from 'core-utilities';
+import { EnvironmentUrls } from "Roblox";
+import { httpService, UrlConfig } from "core-utilities";
 import {
   Configuration,
   SubscriptionsV2Api,
   Subscription,
   ProductType,
   PeriodType,
-  GrantType
-} from '@rbx/client-subscriptions-api/v1';
-import serviceConstants from '../constants/serviceConstants';
+  GrantType,
+} from "@rbx/client-subscriptions-api/v1";
+import serviceConstants from "../constants/serviceConstants";
 import {
   GetSubscriptionStatusesRequest,
   GetSubscriptionStatusesResponse,
@@ -27,37 +27,37 @@ import {
   CreditBalance,
   ResubscribeSubscriptionRequest,
   PurchaseWithRobuxRequest,
-  PurchaseWithRobuxResponse
-} from '../types/serviceTypes';
-import { UserSubscription } from '../types/userSubscription';
-import { PremiumSubscription } from '../types/premiumSubscription';
-import { normalizeSubscriptionPaymentProvider } from '../utils/normalizeSubscriptionPaymentProvider';
+  PurchaseWithRobuxResponse,
+} from "../types/serviceTypes";
+import { UserSubscription } from "../types/userSubscription";
+import { PremiumSubscription } from "../types/premiumSubscription";
+import { normalizeSubscriptionPaymentProvider } from "../utils/normalizeSubscriptionPaymentProvider";
 
 export const getSubscriptions = async (
-  params: GetSubscriptionsRequest
+  params: GetSubscriptionsRequest,
 ): Promise<GetSubscriptionsResponse> => {
   try {
     const { data } = await httpService.get<GetSubscriptionsResponse>(
       serviceConstants.url.getSubscriptions,
       {
-        ...params
-      }
+        ...params,
+      },
     );
 
     return data;
   } catch (error) {
     return {
-      subscriptionProductsInfo: []
+      subscriptionProductsInfo: [],
     };
   }
 };
 
 export const getSubscriptionsStatuses = async (
-  params: GetSubscriptionStatusesRequest
+  params: GetSubscriptionStatusesRequest,
 ): Promise<GetSubscriptionStatusesResponse> => {
   try {
     const { data } = await httpService.get<GetSubscriptionStatusesResponse>(
-      serviceConstants.url.getSubscriptionStatuses(params.subscriptionProductTargetKeys)
+      serviceConstants.url.getSubscriptionStatuses(params.subscriptionProductTargetKeys),
     );
     return data;
   } catch (error) {
@@ -66,42 +66,40 @@ export const getSubscriptionsStatuses = async (
 };
 
 export const purchaseSubscription = async (
-  params: SubscriptionPurchaseRequest
+  params: SubscriptionPurchaseRequest,
 ): Promise<SubscriptionPurchaseResponse> => {
   const { data } = await httpService.post<SubscriptionPurchaseResponse>(
     serviceConstants.url.purchaseSubscription(params.targetKey),
     {
-      ...params
-    }
+      ...params,
+    },
   );
   return data;
 };
 
 export const purchaseWithRobux = async (
-  params: PurchaseWithRobuxRequest
+  params: PurchaseWithRobuxRequest,
 ): Promise<PurchaseWithRobuxResponse> => {
   const { subscriptionProductTargetKey, priceInRobux } = params;
-  const urlConfig: UrlConfig = serviceConstants.url.purchaseWithRobux(
-    subscriptionProductTargetKey
-  );
+  const urlConfig: UrlConfig = serviceConstants.url.purchaseWithRobux(subscriptionProductTargetKey);
   const { data } = await httpService.post<PurchaseWithRobuxResponse>(urlConfig, {
-    priceInRobux
+    priceInRobux,
   });
   return data;
 };
 
 export const getSubscriptionMetadata = async (): Promise<SubscriptionMetadata> => {
   const { data } = await httpService.get<SubscriptionMetadata>(
-    serviceConstants.url.getSubscriptionMetadata
+    serviceConstants.url.getSubscriptionMetadata,
   );
   return data;
 };
 
 export const getPaymentMethodsForPurchase = async (
-  targetKey: string
+  targetKey: string,
 ): Promise<GetSubscriptionPaymentMethodsResponse> => {
   const { data } = await httpService.get<GetSubscriptionPaymentMethodsResponse>(
-    serviceConstants.url.getSubscriptionPaymentMethods(targetKey)
+    serviceConstants.url.getSubscriptionPaymentMethods(targetKey),
   );
   return data;
 };
@@ -111,7 +109,7 @@ export const getPaymentMethodsForPurchase = async (
  * @param userId User to get premium details for
  */
 export const getUserPremiumSubscription = async (
-  userId: number
+  userId: number,
 ): Promise<PremiumSubscription | null> => {
   const urlConfig = serviceConstants.url.getUserPremiumSubscription(userId);
   try {
@@ -120,7 +118,7 @@ export const getUserPremiumSubscription = async (
     const subscriptionPrice = result.data.price
       ? {
           amount: result.data.price.amount,
-          currencyCode: result.data.price.currency.currencyCode
+          currencyCode: result.data.price.currency.currencyCode,
         }
       : null;
 
@@ -134,11 +132,11 @@ export const getUserPremiumSubscription = async (
       purchasePlatform: product.purchasePlatform,
       name: product.subscriptionName,
       price: subscriptionPrice,
-      subscriptionProviderName: 'Roblox',
+      subscriptionProviderName: "Roblox",
       subscriptionTargetKey: `PRM-${product.premiumFeatureId}`,
       // paymentProvider filled from getUserSubscriptions (PRM row) when the API returns one
       showLowBalanceNotification: false,
-      paymentProfileId: ''
+      paymentProfileId: "",
     };
   } catch (e) {
     const error = e as HttpServiceError;
@@ -158,7 +156,7 @@ export const getUserPremiumSubscription = async (
  */
 export const getUserSubscriptions = async (
   expirationTimestampStart?: Date,
-  expirationTimestampEnd?: Date
+  expirationTimestampEnd?: Date,
 ): Promise<UserSubscription[]> => {
   const urlConfig = serviceConstants.url.getUserSubscriptions;
   let subscriptions: UserSubscription[] = [];
@@ -172,7 +170,7 @@ export const getUserSubscriptions = async (
       resultsPerPage: 20,
       cursor,
       expirationTimestampMsStart: expirationTimestampStart ? expirationTimestampStart.getTime() : 0,
-      expirationTimestampMsEnd: expirationTimestampEnd ? expirationTimestampEnd.getTime() : 0
+      expirationTimestampMsEnd: expirationTimestampEnd ? expirationTimestampEnd.getTime() : 0,
     };
     // No way to run in parallel since we need to get the cursor to do the next request
     // eslint-disable-next-line no-await-in-loop
@@ -194,7 +192,7 @@ export const getUserSubscriptions = async (
       providerId: subscription.providerId,
       paymentProvider: normalizeSubscriptionPaymentProvider(subscription.paymentProvider),
       showLowBalanceNotification: subscription.showLowBalanceNotification,
-      paymentProfileId: subscription.paymentProfileId
+      paymentProfileId: subscription.paymentProfileId,
     }));
     subscriptions = [...subscriptions, ...convertedSubscriptions];
     hasMore = result.data?.hasMore ?? false;
@@ -216,7 +214,7 @@ export const cancelUserSubscription = async (subscriptionTargetKey: string): Pro
  * Dismisses the notification for a user's subscription. Throws exception on failure.
  */
 export const dismissSubscriptionNotification = async (
-  subscriptionTargetKey: string
+  subscriptionTargetKey: string,
 ): Promise<void> => {
   const urlConfig = serviceConstants.url.dismissSubscriptionNotification(subscriptionTargetKey);
   await httpService.post(urlConfig);
@@ -239,22 +237,22 @@ export const getUserCreditBalance = async (): Promise<CreditBalance> => {
 
 export const updateSubscriptionPaymentProfile = async (
   subscriptionProductTargetKey: string,
-  paymentProfileId: string
+  paymentProfileId: string,
 ): Promise<void> => {
   const urlConfig = serviceConstants.url.updateSubscriptionPaymentProfile(
-    subscriptionProductTargetKey
+    subscriptionProductTargetKey,
   );
   await httpService.post(urlConfig, { paymentProfileId });
 };
 
 export const getSubscriptionResubscribeEligibility = async (
-  params: GetSubscriptionResubscribeEligibilityRequest
+  params: GetSubscriptionResubscribeEligibilityRequest,
 ): Promise<GetSubscriptionResubscribeEligibilityResponse> => {
   try {
     const { data } = await httpService.get<GetSubscriptionResubscribeEligibilityResponse>(
       serviceConstants.url.getSubscriptionResubscribeEligibility(
-        params.subscriptionProductTargetKey
-      )
+        params.subscriptionProductTargetKey,
+      ),
     );
     return data;
   } catch (error) {
@@ -263,10 +261,10 @@ export const getSubscriptionResubscribeEligibility = async (
 };
 
 export const resubscribeSubscription = async (
-  params: ResubscribeSubscriptionRequest
+  params: ResubscribeSubscriptionRequest,
 ): Promise<void> => {
   const urlConfig = serviceConstants.url.resubscribeSubscription(
-    params.subscriptionProductTargetKey
+    params.subscriptionProductTargetKey,
   );
   await httpService.post(urlConfig);
 };
@@ -274,8 +272,8 @@ export const resubscribeSubscription = async (
 const subscriptionsV2Api = new SubscriptionsV2Api(
   new Configuration({
     basePath: `${EnvironmentUrls.apiGatewayUrl}/subscriptions`,
-    credentials: 'include'
-  })
+    credentials: "include",
+  }),
 );
 
 /**
@@ -291,11 +289,9 @@ export const getFaeTrialProductId = async (): Promise<string | null> => {
     const response = await subscriptionsV2Api.subscriptionsV2ListAvailableSubscriptionProducts({
       productType: ProductType.Blackbird,
       includePurchased: true,
-      grantType: GrantType.FaeFreeTrial
+      grantType: GrantType.FaeFreeTrial,
     });
-    return (
-      response.products.find(p => p.periodType === PeriodType.Week)?.productKey.id ?? null
-    );
+    return response.products.find(p => p.periodType === PeriodType.Week)?.productKey.id ?? null;
   } catch {
     return null;
   }
@@ -306,7 +302,7 @@ export const listSubscriptionsV2 = async (productType: ProductType): Promise<Sub
     const response = await subscriptionsV2Api.subscriptionsV2ListSubscriptions({
       productType,
       expirationTimestampMsStart: Date.now(),
-      resultsPerPage: 100
+      resultsPerPage: 100,
     });
     return response.subscriptions ?? [];
   } catch (error) {
@@ -325,5 +321,5 @@ export default {
   getSubscriptionResubscribeEligibility,
   resubscribeSubscription,
   listSubscriptionsV2,
-  purchaseWithRobux
+  purchaseWithRobux,
 };

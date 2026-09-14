@@ -1,20 +1,20 @@
-import { CardNetwork } from '../types/cardInfo';
+import { CardNetwork } from "../types/cardInfo";
 
 export const GetStripeCardIcon = (cardNetwork: string): string => {
   switch (cardNetwork) {
     case CardNetwork.AMEX:
     case CardNetwork.AMERICANEXPRESS:
-      return 'icon-amex';
+      return "icon-amex";
     case CardNetwork.DISCOVER:
-      return 'icon-discover';
+      return "icon-discover";
     case CardNetwork.MASTERCARD:
-      return 'icon-mastercard';
+      return "icon-mastercard";
     case CardNetwork.VISA:
-      return 'icon-visa';
+      return "icon-visa";
     case CardNetwork.DEBIT:
-      return 'icon-debit';
+      return "icon-debit";
     default:
-      return 'icon-generic-card';
+      return "icon-generic-card";
   }
 };
 

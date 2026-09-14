@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
-import { useTranslation } from 'react-utilities';
-import { Price } from '../../../core/types/price';
-import { PeriodType } from '../../../core/types/subscriptionEnums';
-import '../../../../css/subscriptionManagement/priceDisplay.scss';
+import React, { useEffect } from "react";
+import { useTranslation } from "react-utilities";
+import { Price } from "../../../core/types/price";
+import { PeriodType } from "../../../core/types/subscriptionEnums";
+import "../../../../css/subscriptionManagement/priceDisplay.scss";
 
 type PriceDisplayProps = {
   price: Price;
@@ -20,25 +20,25 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({ price, period, periodCount,
   // itself is rendered by the adjacent price tag, so we use the duration-only key rather than
   // Action.PricePerSubscriptionDuration (which also embeds the price). periodCount is normalized
   // to >= 1 by the backend.
-  const duration = translate('Label.SubscriptionDuration', {
+  const duration = translate("Label.SubscriptionDuration", {
     periodType: period,
-    periodCount: periodCount ?? 1
+    periodCount: periodCount ?? 1,
   });
-  const periodString = ` / ${duration}${className === 'resubscribe' ? '.' : ''}`;
+  const periodString = ` / ${duration}${className === "resubscribe" ? "." : ""}`;
 
   useEffect(() => {
     window.dispatchEvent(
-      new CustomEvent('price-tag:render', {
+      new CustomEvent("price-tag:render", {
         detail: {
           tagClassName: `${className}-price text-description`,
-          targetSelector: `.${className}-price-tag`
-        }
-      })
+          targetSelector: `.${className}-price-tag`,
+        },
+      }),
     );
   }, [price, className]);
 
   return (
-    <span className='price-period'>
+    <span className="price-period">
       <span
         className={`${className}-price-tag`}
         data-amount={price.amount}

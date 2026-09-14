@@ -1,29 +1,29 @@
 // Indicates whether an item is a subscription or a private server
 export enum SubscriptionListItemType {
-  SUBSCRIPTION = 'Subscription',
-  PRIVATE_SERVER = 'PrivateServer'
+  SUBSCRIPTION = "Subscription",
+  PRIVATE_SERVER = "PrivateServer",
 }
 
 // Subscription period in between renewals.
 export enum PeriodType {
-  INVALID = 'Invalid',
-  MONTH = 'Month',
-  YEAR = 'Year'
+  INVALID = "Invalid",
+  MONTH = "Month",
+  YEAR = "Year",
 }
 
 // Device platforms for purchasing subscriptions.
 export enum PurchasePlatform {
-  INVALID = 'Invalid',
-  DESKTOP = 'Desktop',
-  APPLE = 'Apple',
-  GOOGLE = 'Google',
-  INTERNAL = 'Internal'
+  INVALID = "Invalid",
+  DESKTOP = "Desktop",
+  APPLE = "Apple",
+  GOOGLE = "Google",
+  INTERNAL = "Internal",
 }
 
 // Subscription product type but used by api calls.
 export enum SubscriptionProductType {
   INVALID = 0,
-  DEVELOPER_SUBSCRIPTION_PRODUCT = 1
+  DEVELOPER_SUBSCRIPTION_PRODUCT = 1,
 }
 
 // To decipher the error codes sent back by the subscriptions api
@@ -43,19 +43,19 @@ export enum SubscriptionErrorCodes {
   RESTRICTED_USER = 12,
   UNSUPPORTED_LOCALE = 13,
   UNAUTHORIZED = 14,
-  EXCEED_PARENTAL_SPEND_LIMIT = 15
+  EXCEED_PARENTAL_SPEND_LIMIT = 15,
 }
 
 export enum PaymentProvider {
-  INVALID = 'Invalid',
-  STRIPE = 'Stripe',
-  APPLEAPPSTORE = 'AppleAppStore',
-  GOOGLEPLAYSTORE = 'GooglePlayStore',
-  CREDITBALANCE = 'CreditBalance',
-  BRAINTREE = 'Braintree'
+  INVALID = "Invalid",
+  STRIPE = "Stripe",
+  APPLEAPPSTORE = "AppleAppStore",
+  GOOGLEPLAYSTORE = "GooglePlayStore",
+  CREDITBALANCE = "CreditBalance",
+  BRAINTREE = "Braintree",
 }
 
 export enum PollingStatus {
-  CANCEL = 'cancel',
-  RESUBSCRIBE = 'resubscribe'
+  CANCEL = "cancel",
+  RESUBSCRIBE = "resubscribe",
 }

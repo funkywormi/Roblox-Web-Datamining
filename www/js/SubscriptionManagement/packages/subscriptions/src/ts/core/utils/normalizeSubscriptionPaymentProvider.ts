@@ -1,4 +1,4 @@
-import { PaymentProvider } from '../types/subscriptionEnums';
+import { PaymentProvider } from "../types/subscriptionEnums";
 
 const REAL_PROVIDERS: PaymentProvider[] = (
   Object.values(PaymentProvider) as PaymentProvider[]
@@ -6,7 +6,7 @@ const REAL_PROVIDERS: PaymentProvider[] = (
 
 /** Lowercase → canonical enum for real payment providers only. */
 const PAYMENT_PROVIDER_BY_LOWER = new Map<string, PaymentProvider>(
-  REAL_PROVIDERS.map(value => [value.toLowerCase(), value])
+  REAL_PROVIDERS.map(value => [value.toLowerCase(), value]),
 );
 
 /**
@@ -16,7 +16,7 @@ const PAYMENT_PROVIDER_BY_LOWER = new Map<string, PaymentProvider>(
  * `undefined` (meaning no external payment provider).
  */
 export function normalizeSubscriptionPaymentProvider(
-  raw: PaymentProvider | string | null | undefined
+  raw: PaymentProvider | string | null | undefined,
 ): PaymentProvider | undefined {
-  return PAYMENT_PROVIDER_BY_LOWER.get(raw?.toLowerCase() ?? '');
+  return PAYMENT_PROVIDER_BY_LOWER.get(raw?.toLowerCase() ?? "");
 }

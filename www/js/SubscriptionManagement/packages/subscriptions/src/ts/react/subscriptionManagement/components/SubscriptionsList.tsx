@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react';
-import classNames from 'classnames';
-import { useTranslation } from 'react-utilities';
-import { ProductType } from '@rbx/client-subscriptions-api/v1';
-import { Pagination as PaginationBase } from '@rbx/core-ui';
-import { ONE_ROBUX_IN_MICROS } from '@rbx/subscriptions-common';
-import { PremiumSubscription } from '../../../core/types/premiumSubscription';
-import { SubscriptionListItem, UserSubscription } from '../../../core/types/userSubscription';
-import SubscriptionCard from './SubscriptionCard';
-import { premiumName, premiumPeriod } from '../utils/premiumUtils';
-import '../../../../css/subscriptionManagement/subscriptionsList.scss';
-import { SubscriptionListItemType } from '../../../core/types/subscriptionEnums';
-import PrivateServerCard from './PrivateServerCard';
-import { MyPrivateServerType } from '../../../core/types/privateServerTypes';
+import React, { useMemo } from "react";
+import classNames from "classnames";
+import { useTranslation } from "react-utilities";
+import { ProductType } from "@rbx/client-subscriptions-api/v1";
+import { Pagination as PaginationBase } from "@rbx/core-ui";
+import { ONE_ROBUX_IN_MICROS } from "@rbx/subscriptions-common";
+import { PremiumSubscription } from "../../../core/types/premiumSubscription";
+import { SubscriptionListItem, UserSubscription } from "../../../core/types/userSubscription";
+import SubscriptionCard from "./SubscriptionCard";
+import { premiumName, premiumPeriod } from "../utils/premiumUtils";
+import "../../../../css/subscriptionManagement/subscriptionsList.scss";
+import { SubscriptionListItemType } from "../../../core/types/subscriptionEnums";
+import PrivateServerCard from "./PrivateServerCard";
+import { PrivateServerWithBenefitCap } from "../../../core/types/privateServerTypes";
 
 type SubscriptionsListProps = {
   premiumSubscription: PremiumSubscription | null;
@@ -22,9 +22,9 @@ type SubscriptionsListProps = {
   onChangePage: (newPage: number) => void;
   onSelectSubscription?: (
     subscription: UserSubscription | PremiumSubscription,
-    isPremium: boolean
+    isPremium: boolean,
   ) => void;
-  onSelectPrivateServer?: (privateServer: MyPrivateServerType) => void;
+  onSelectPrivateServer?: (privateServer: PrivateServerWithBenefitCap) => void;
   isPriceLoading?: boolean;
 };
 
@@ -37,7 +37,7 @@ const SubscriptionsList: React.FC<SubscriptionsListProps> = ({
   onChangePage,
   onSelectSubscription,
   onSelectPrivateServer,
-  isPriceLoading = false
+  isPriceLoading = false,
 }) => {
   const { translate } = useTranslation();
 
@@ -51,16 +51,16 @@ const SubscriptionsList: React.FC<SubscriptionsListProps> = ({
           ) {
             return `Plus ${sub.currencySubscriptionBenefit.entitledAmountMicrosPerGrantingPeriod / ONE_ROBUX_IN_MICROS}`;
           }
-          return translate('Label.Blackbird');
+          return translate("Label.Blackbird");
         case ProductType.CurrencySubscription:
-          return translate('Label.CurrencySubscription');
+          return translate("Label.CurrencySubscription");
         default:
           return sub.name;
       }
     };
 
     const renderSubscriptionListItem = (
-      subscriptionListItem: SubscriptionListItem
+      subscriptionListItem: SubscriptionListItem,
     ): React.ReactElement | null => {
       if (subscriptionListItem.type === SubscriptionListItemType.PRIVATE_SERVER) {
         const { privateServer } = subscriptionListItem;
@@ -70,9 +70,7 @@ const SubscriptionsList: React.FC<SubscriptionsListProps> = ({
             key={privateServer.privateServerId}
             privateServer={privateServer}
             isPriceLoading={isPriceLoading}
-            onClick={
-              onSelectPrivateServer ? () => onSelectPrivateServer(privateServer) : undefined
-            }
+            onClick={onSelectPrivateServer ? () => onSelectPrivateServer(privateServer) : undefined}
           />
         );
       }
@@ -116,7 +114,7 @@ const SubscriptionsList: React.FC<SubscriptionsListProps> = ({
 
     const premiumCard: React.ReactElement | null = premiumSubscription ? (
       <SubscriptionCard
-        key='premium'
+        key="premium"
         subscriptionName={premiumName(premiumSubscription)}
         subscriptionProviderName={premiumSubscription.subscriptionProviderName}
         price={premiumSubscription.price}
@@ -132,7 +130,7 @@ const SubscriptionsList: React.FC<SubscriptionsListProps> = ({
     ) : null;
 
     return [...blackbirdCards, premiumCard, ...otherCards].filter(
-      (el): el is React.ReactElement => el !== null
+      (el): el is React.ReactElement => el !== null,
     );
   }, [
     premiumSubscription,
@@ -140,31 +138,31 @@ const SubscriptionsList: React.FC<SubscriptionsListProps> = ({
     onSelectSubscription,
     onSelectPrivateServer,
     isPriceLoading,
-    translate
+    translate,
   ]);
 
   const pageSubscriptionCards = subscriptionCards.slice(
     (currentPage - 1) * resultsPerPage,
-    Math.min(currentPage * resultsPerPage, subscriptionCards.length)
+    Math.min(currentPage * resultsPerPage, subscriptionCards.length),
   );
 
   const numPages = Math.ceil(subscriptionCards.length / resultsPerPage);
   const pagination =
     subscriptionCards.length > resultsPerPage ? (
-      <div className='overview-pagination-container'>
+      <div className="overview-pagination-container">
         <PaginationBase current={currentPage} total={numPages} onChange={onChangePage} hasNext />
       </div>
     ) : null;
 
   return (
-    <div className={classNames({ 'no-active': subscriptionCards.length === 0 })}>
+    <div className={classNames({ "no-active": subscriptionCards.length === 0 })}>
       {subscriptionCards.length > 0 ? (
         <React.Fragment>
           {pageSubscriptionCards}
           {pagination}
         </React.Fragment>
       ) : (
-        <span className='text-description'>{emptyText}</span>
+        <span className="text-description">{emptyText}</span>
       )}
     </div>
   );

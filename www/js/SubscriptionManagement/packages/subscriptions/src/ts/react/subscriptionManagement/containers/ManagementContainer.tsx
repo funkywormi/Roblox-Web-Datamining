@@ -1,60 +1,79 @@
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-utilities';
-import { fireEvent } from 'roblox-event-tracker';
-import { authenticatedUser } from 'header-scripts';
-import { httpResponseCodes } from 'core-utilities';
-import { useHistory } from 'react-router-dom';
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-utilities";
+import { fireEvent } from "roblox-event-tracker";
+import { authenticatedUser } from "header-scripts";
+import { httpResponseCodes } from "core-utilities";
+import { useHistory } from "react-router-dom";
 import {
   PeriodType as ApiPeriodType,
   ProductType,
-  RobloxSubscriptionProductFeatureConfig
-} from '@rbx/client-subscriptions-api/v1';
-import { PremiumPurchasePlatform } from '../../../core/types/premiumEnums';
+  RobloxSubscriptionProductFeatureConfig,
+} from "@rbx/client-subscriptions-api/v1";
+import { PremiumPurchasePlatform } from "../../../core/types/premiumEnums";
 import {
   CreditBalance,
   ErrorResponse,
-  SubscriptionMetadata
-} from '../../../core/types/serviceTypes';
+  SubscriptionMetadata,
+} from "../../../core/types/serviceTypes";
 import {
   getSubscriptionMetadata,
   getUserCreditBalance,
   getUserPremiumSubscription,
   getUserSubscriptions,
   listSubscriptionsV2,
-  getFaeTrialProductId
-} from '../../../core/services/subscriptionServices';
-import { mapV2ToUserSubscription, toTargetKey } from '../utils/mappers';
+  getFaeTrialProductId,
+} from "../../../core/services/subscriptionServices";
+import { mapV2ToUserSubscription, toTargetKey } from "../utils/mappers";
 import {
   PaymentProvider,
   PollingStatus,
-  SubscriptionListItemType
-} from '../../../core/types/subscriptionEnums';
-import { SubscriptionListItem, UserSubscription } from '../../../core/types/userSubscription';
-import { PremiumSubscription } from '../../../core/types/premiumSubscription';
-import SubscriptionsList from '../components/SubscriptionsList';
-import SubscriptionDetails from '../components/SubscriptionDetails';
-import { RESULTS_PER_PAGE, SUBSCRIPTIONS_HELP_LINK } from '../constants/constants';
-import useSystemFeedbackContext from '../../shared/hooks/useSystemFeedback';
-import { COUNTER_METRICS } from '../constants/metricConstants';
-import trackerClient, { ManageEventType } from '../utils/logging';
+  SubscriptionListItemType,
+} from "../../../core/types/subscriptionEnums";
+import { SubscriptionListItem, UserSubscription } from "../../../core/types/userSubscription";
+import { PremiumSubscription } from "../../../core/types/premiumSubscription";
+import SubscriptionsList from "../components/SubscriptionsList";
+import SubscriptionDetails from "../components/SubscriptionDetails";
+import {
+  LOW_BALANCE_WARNING_DAYS,
+  RESULTS_PER_PAGE,
+  SUBSCRIPTIONS_HELP_LINK,
+} from "../constants/constants";
+import useSystemFeedbackContext from "../../shared/hooks/useSystemFeedback";
+import { COUNTER_METRICS } from "../constants/metricConstants";
+import trackerClient, { ManageEventType } from "../utils/logging";
 import {
   getSavedPaymentProfiles,
-  isStripeEnabledForUser
-} from '../../../core/services/paymentServices';
-import { SavedPaymentProfile } from '../../../core/types/savedPaymentProfile';
-import StripeElementsContainer from '../../shared/components/StripeElementsContainer';
-import UpdatePaymentProfileModal from '../components/UpdatePaymentProfileModal';
-import { getUserBirthdate } from '../../../core/services/usersServices';
-import { isUnder18 } from '../../../core/utils/userUtils';
-import { getPaymentProfile, isExpiring } from '../utils/subscriptionUtils';
-import { MyPrivateServerType } from '../../../core/types/privateServerTypes';
-import PrivateServerDetails from '../components/PrivateServerDetails';
-import { getAllPrivateServers } from '../../../core/services/privateServerServices';
+  isStripeEnabledForUser,
+} from "../../../core/services/paymentServices";
+import { SavedPaymentProfile } from "../../../core/types/savedPaymentProfile";
+import StripeElementsContainer from "../../shared/components/StripeElementsContainer";
+import UpdatePaymentProfileModal from "../components/UpdatePaymentProfileModal";
+import { getUserBirthdate } from "../../../core/services/usersServices";
+import { isUnder18 } from "../../../core/utils/userUtils";
+import { getPaymentProfile, isExpiring } from "../utils/subscriptionUtils";
+import {
+  MyPrivateServerResponse,
+  PrivateServerWithBenefitCap,
+} from "../../../core/types/privateServerTypes";
+import PrivateServerDetails from "../components/PrivateServerDetails";
+import { useGetAllPrivateServers } from "../../../core/queries/useGetAllPrivateServers";
+import { useGetPrivateServersSystemSettings } from "../../../core/queries/useGetPrivateServersSystemSettings";
+import {
+  annotateBenefitCapOutcome,
+  FALLBACK_SYSTEM_SETTINGS,
+  shouldRenderPrivateServer,
+  shouldRenderWithPlusFree,
+} from "../../../core/utils/privateServerUtils";
+import { privateServerKeys } from "../../../core/queries/constants";
+
+// Stable empty arrays so the combined-list effect doesn't re-run on every render while loading.
+const EMPTY_RAW_PRIVATE_SERVERS: MyPrivateServerResponse[] = [];
+const EMPTY_PRIVATE_SERVERS: PrivateServerWithBenefitCap[] = [];
 
 const ManagementContainer: React.FC = () => {
   const [premiumSubscription, setPremiumSubscription] = useState<PremiumSubscription | null>(null);
   const [subscriptions, setSubscriptions] = useState<UserSubscription[]>([]);
-  const [privateServers, setPrivateServers] = useState<MyPrivateServerType[]>([]);
   const [combinedList, setCombinedList] = useState<SubscriptionListItem[]>([]);
   // Roblox Plus (Blackbird) product info, used to render the dynamic benefit list
   // on the details page. Fetched once we know the user has a Blackbird subscription.
@@ -65,12 +84,12 @@ const ManagementContainer: React.FC = () => {
   const [isFaeFreeTrial, setIsFaeFreeTrial] = useState(false);
   const [creditBalance, setCreditBalance] = useState<CreditBalance>({
     creditBalance: 0,
-    currencyCode: ''
+    currencyCode: "",
   });
   const [activeSubsPage, setActiveSubsPage] = useState(1);
   const [subscriptionMetadata, setSubscriptionMetadata] = useState<SubscriptionMetadata>({
     isWebPurchasingEnabled: false,
-    isSubscriptionPaymentProfileUpdatingEnabled: false
+    isSubscriptionPaymentProfileUpdatingEnabled: false,
   });
 
   const { translate } = useTranslation();
@@ -83,14 +102,11 @@ const ManagementContainer: React.FC = () => {
   // deep-link URL (e.g. ?id=...&type=Blackbird). Used so the back button can
   // pop the prior browser entry instead of falling back to the list view.
   const [wasDeepLinked, setWasDeepLinked] = useState(false);
-  const [
-    currentPrivateServerView,
-    setCurrentPrivateServerView
-  ] = useState<MyPrivateServerType | null>(null);
+  const [currentPrivateServerView, setCurrentPrivateServerView] =
+    useState<PrivateServerWithBenefitCap | null>(null);
   const [currSubscriptionIsPremium, setCurrSubscriptionIsPremium] = useState(false);
-  const [showLowBalanceNotificationForPremium, setShowLowBalanceNotificationForPremium] = useState(
-    false
-  );
+  const [showLowBalanceNotificationForPremium, setShowLowBalanceNotificationForPremium] =
+    useState(false);
   const [premiumPaymentProvider, setPremiumPaymentProvider] = useState<
     PaymentProvider | undefined
   >();
@@ -118,6 +134,37 @@ const ManagementContainer: React.FC = () => {
   // System feedback banner to display
   const { SystemFeedback, systemFeedbackService } = useSystemFeedbackContext();
 
+  const queryClient = useQueryClient();
+  const { data: privateServersSettings, isError: isPrivateServersSettingsError } =
+    useGetPrivateServersSystemSettings();
+  const { data: rawPrivateServers = EMPTY_RAW_PRIVATE_SERVERS } = useGetAllPrivateServers({
+    onError: () => systemFeedbackService.warning(translate("MessageUnknownError")),
+  });
+
+  // Filter to displayable servers and annotate which will auto-expire from being over the Plus free benefit cap.
+  const privateServers = useMemo<PrivateServerWithBenefitCap[]>(() => {
+    const effectiveSettings =
+      privateServersSettings ??
+      (isPrivateServersSettingsError ? FALLBACK_SYSTEM_SETTINGS : undefined);
+    if (effectiveSettings === undefined) {
+      return EMPTY_PRIVATE_SERVERS;
+    }
+    const displayed = rawPrivateServers.filter(
+      effectiveSettings.displayPlusFreePrivateServers
+        ? shouldRenderWithPlusFree
+        : shouldRenderPrivateServer,
+    );
+    return effectiveSettings.displayPlusFreePrivateServers
+      ? annotateBenefitCapOutcome(displayed, effectiveSettings)
+      : displayed.map(server => ({
+          ...server,
+          benefitCapOutcome: "none" as const,
+
+          // Unused
+          firstRenewalOnOrAfterEnforcement: new Date(0),
+        }));
+  }, [rawPrivateServers, privateServersSettings, isPrivateServersSettingsError]);
+
   const fetchSavedPaymentProfiles = async (): Promise<SavedPaymentProfile[]> => {
     try {
       fireEvent(COUNTER_METRICS.API.GET_SAVED_PAYMENT_PROFILES_CALLED);
@@ -139,7 +186,7 @@ const ManagementContainer: React.FC = () => {
       setPremiumSubscription(subscription);
       setCurrentSubscriptionView(subscription);
     },
-    [setPremiumSubscription, setCurrentSubscriptionView]
+    [setPremiumSubscription, setCurrentSubscriptionView],
   );
 
   // Send event on first page load
@@ -158,8 +205,8 @@ const ManagementContainer: React.FC = () => {
 
     // New format: ?id=<productId>&type=<productType>
     const searchParams = new URLSearchParams(window.location.search);
-    const id = searchParams.get('id');
-    const type = searchParams.get('type');
+    const id = searchParams.get("id");
+    const type = searchParams.get("type");
     if (id && type) {
       const targetKey = toTargetKey(type, id);
       if (targetKey) {
@@ -175,11 +222,11 @@ const ManagementContainer: React.FC = () => {
 
     // Legacy format: #!/subscriptions?subscription=<subscriptionTargetKey>.
     const { hash } = window.location;
-    if (hash.startsWith('#!/subscriptions?subscription=')) {
-      const sub = hash.substring('#!/subscriptions?subscription='.length);
+    if (hash.startsWith("#!/subscriptions?subscription=")) {
+      const sub = hash.substring("#!/subscriptions?subscription=".length);
 
-      if (sub !== null && sub !== '') {
-        if (sub.startsWith('PRM')) {
+      if (sub !== null && sub !== "") {
+        if (sub.startsWith("PRM")) {
           setCurrSubscriptionIsPremium(true);
           setCurrentSubscriptionView(premiumSubscription);
           trackerClient.sendEvent(ManageEventType.EMAIL_REFERER_PAGE_LOAD);
@@ -206,17 +253,17 @@ const ManagementContainer: React.FC = () => {
       });
 
     fetchSavedPaymentProfiles().catch(() =>
-      systemFeedbackService.warning('Failed to load payment profiles')
+      systemFeedbackService.warning("Failed to load payment profiles"),
     );
 
     getUserBirthdate()
       .then(response => {
         setIsUserUnder18(
-          isUnder18(response.data.birthDay, response.data.birthMonth, response.data.birthYear)
+          isUnder18(response.data.birthDay, response.data.birthMonth, response.data.birthYear),
         );
       })
       .catch(() => {
-        systemFeedbackService.warning('Something went wrong.');
+        systemFeedbackService.warning("Something went wrong.");
       });
 
     getSubscriptionMetadata()
@@ -224,8 +271,8 @@ const ManagementContainer: React.FC = () => {
       .catch(() =>
         setSubscriptionMetadata({
           isWebPurchasingEnabled: false,
-          isSubscriptionPaymentProfileUpdatingEnabled: false
-        })
+          isSubscriptionPaymentProfileUpdatingEnabled: false,
+        }),
       );
   }, [systemFeedbackService]);
 
@@ -249,7 +296,7 @@ const ManagementContainer: React.FC = () => {
       })
       .catch(() => {
         fireEvent(COUNTER_METRICS.API.GET_USER_PREMIUM_SUBSCRIPTION_FAILED);
-        systemFeedbackService.warning(translate('MessageUnknownError'));
+        systemFeedbackService.warning(translate("MessageUnknownError"));
       });
   };
 
@@ -260,12 +307,12 @@ const ManagementContainer: React.FC = () => {
         premiumSubscription.paymentProvider = premiumPaymentProvider;
       }
       premiumSubscription.cardInfo = {
-        cardNetwork: premiumPaymentProfile?.providerPayload.CardNetwork ?? '',
-        last4Digits: premiumPaymentProfile?.providerPayload.Last4Digits ?? '',
+        cardNetwork: premiumPaymentProfile?.providerPayload.CardNetwork ?? "",
+        last4Digits: premiumPaymentProfile?.providerPayload.Last4Digits ?? "",
         expMonth: premiumPaymentProfile?.providerPayload.ExpMonth ?? 0,
-        expYear: premiumPaymentProfile?.providerPayload.ExpYear ?? 0
+        expYear: premiumPaymentProfile?.providerPayload.ExpYear ?? 0,
       };
-      premiumSubscription.paymentProfileId = premiumPaymentProfile?.id ?? '';
+      premiumSubscription.paymentProfileId = premiumPaymentProfile?.id ?? "";
       if (
         premiumPaymentProfile?.providerPayload.CardNetwork &&
         premiumPaymentProfile?.providerPayload.Last4Digits &&
@@ -285,7 +332,7 @@ const ManagementContainer: React.FC = () => {
     premiumPaymentProfile?.providerPayload.Last4Digits,
     premiumPaymentProfile?.providerPayload.ExpMonth,
     premiumPaymentProfile?.providerPayload.ExpYear,
-    premiumPaymentProfile?.id
+    premiumPaymentProfile?.id,
   ]);
 
   useEffect(loadPremium, [currSubscriptionIsPremium, systemFeedbackService, translate]);
@@ -296,13 +343,14 @@ const ManagementContainer: React.FC = () => {
     const fetchV1Subscriptions = getUserSubscriptions(new Date()).then(results => {
       // Dev subs (EXP) always come from V1. RBP/CUR may also appear on V1; V2 is preferred when it returns
       // the same target key, but some products (e.g. internal billing) are only present on V1 — keep those.
-      const devSubs = results.filter(sub => sub.subscriptionTargetKey.startsWith('EXP'));
+      const devSubs = results.filter(sub => sub.subscriptionTargetKey.startsWith("EXP"));
       const v1RobloxOwnedSubs = results.filter(
         sub =>
-          sub.subscriptionTargetKey.startsWith('RBP') || sub.subscriptionTargetKey.startsWith('CUR')
+          sub.subscriptionTargetKey.startsWith("RBP") ||
+          sub.subscriptionTargetKey.startsWith("CUR"),
       );
 
-      const premiumSubInfo = results.find(sub => sub.subscriptionTargetKey.startsWith('PRM'));
+      const premiumSubInfo = results.find(sub => sub.subscriptionTargetKey.startsWith("PRM"));
 
       if (premiumSubInfo) {
         setShowLowBalanceNotificationForPremium(premiumSubInfo.showLowBalanceNotification ?? false);
@@ -310,11 +358,11 @@ const ManagementContainer: React.FC = () => {
         setPremiumPaymentProfile({
           id: premiumSubInfo.paymentProfileId,
           providerPayload: {
-            CardNetwork: premiumSubInfo.cardInfo?.cardNetwork ?? '',
-            Last4Digits: premiumSubInfo.cardInfo?.last4Digits ?? '',
+            CardNetwork: premiumSubInfo.cardInfo?.cardNetwork ?? "",
+            Last4Digits: premiumSubInfo.cardInfo?.last4Digits ?? "",
             ExpMonth: premiumSubInfo.cardInfo?.expMonth ?? 0,
-            ExpYear: premiumSubInfo.cardInfo?.expYear ?? 0
-          }
+            ExpYear: premiumSubInfo.cardInfo?.expYear ?? 0,
+          },
         });
       }
 
@@ -324,7 +372,7 @@ const ManagementContainer: React.FC = () => {
     // V2 for Blackbird and Currency Subscription (two parallel calls since API accepts single productType)
     const fetchV2Subscriptions = Promise.all([
       listSubscriptionsV2(ProductType.Blackbird),
-      listSubscriptionsV2(ProductType.CurrencySubscription)
+      listSubscriptionsV2(ProductType.CurrencySubscription),
     ]).then(([blackbirdSubs, currencySubs]) => {
       const blackbirdInfo = blackbirdSubs[0]?.productInfo;
       const featureConfig =
@@ -342,7 +390,7 @@ const ManagementContainer: React.FC = () => {
 
       return [
         ...blackbirdSubs.map(mapV2ToUserSubscription),
-        ...currencySubs.map(mapV2ToUserSubscription)
+        ...currencySubs.map(mapV2ToUserSubscription),
       ];
     });
 
@@ -351,17 +399,13 @@ const ManagementContainer: React.FC = () => {
       .then(([{ devSubs, v1RobloxOwnedSubs }, robloxSubs]) => {
         const v2Keys = new Set(robloxSubs.map(s => s.subscriptionTargetKey));
         const v1RobloxFallback = v1RobloxOwnedSubs.filter(
-          sub => !v2Keys.has(sub.subscriptionTargetKey)
+          sub => !v2Keys.has(sub.subscriptionTargetKey),
         );
         setSubscriptions([...devSubs, ...robloxSubs, ...v1RobloxFallback]);
       })
       .catch(() => {
-        systemFeedbackService.warning(translate('MessageUnknownError'));
+        systemFeedbackService.warning(translate("MessageUnknownError"));
       });
-
-    getAllPrivateServers()
-      .then(privateServerResults => setPrivateServers(privateServerResults))
-      .catch(() => systemFeedbackService.warning(translate('MessageUnknownError')));
   }, [systemFeedbackService, translate]);
 
   // combine and sort the subs and private servers
@@ -387,28 +431,24 @@ const ManagementContainer: React.FC = () => {
       }
       return subA.name.localeCompare(subB.name);
     };
-    const subscriptionItems = subscriptions.map(
-      (subscription): SubscriptionListItem => {
-        return {
-          type: SubscriptionListItemType.SUBSCRIPTION,
-          subscription,
-          privateServer: null,
-          name: subscription.name,
-          providerName: subscription.subscriptionProviderName
-        };
-      }
-    );
-    const privateServerItems = privateServers.map(
-      (privateServer): SubscriptionListItem => {
-        return {
-          type: SubscriptionListItemType.PRIVATE_SERVER,
-          subscription: null,
-          privateServer,
-          name: privateServer.name,
-          providerName: privateServer.universeName
-        };
-      }
-    );
+    const subscriptionItems = subscriptions.map((subscription): SubscriptionListItem => {
+      return {
+        type: SubscriptionListItemType.SUBSCRIPTION,
+        subscription,
+        privateServer: null,
+        name: subscription.name,
+        providerName: subscription.subscriptionProviderName,
+      };
+    });
+    const privateServerItems = privateServers.map((privateServer): SubscriptionListItem => {
+      return {
+        type: SubscriptionListItemType.PRIVATE_SERVER,
+        subscription: null,
+        privateServer,
+        name: privateServer.name,
+        providerName: privateServer.universeName,
+      };
+    });
     setCombinedList([...subscriptionItems, ...privateServerItems].sort(sortCompareFn));
   }, [subscriptions, privateServers]);
 
@@ -422,10 +462,65 @@ const ManagementContainer: React.FC = () => {
       .catch(e => {
         const errorResponse = e as ErrorResponse;
         if (errorResponse.status !== httpResponseCodes.notFound) {
-          systemFeedbackService.warning(translate('MessageUnknownError'));
+          systemFeedbackService.warning(translate("MessageUnknownError"));
         }
       });
   }, [systemFeedbackService, translate]);
+
+  // Derive the low-balance banner flag for credit-funded subs (e.g. Roblox Plus).
+  // ListSubscriptions does not compute this for Blackbird, so we mirror the backend
+  // check here from data the page already has: show the banner when the sub is paid
+  // from the credit balance, that balance is below the next renewal amount, and we are
+  // within the warning window before renewal. Keyed on both subscriptions and
+  // creditBalance since the balance is fetched in a separate effect and resolves later.
+  // Session-only: low-balance banners the user dismissed this session, keyed by subscription
+  // target key. The derivation below respects this so a dismiss isn't immediately undone when
+  // the subscriptions list re-renders (there is no server-side dismiss for Plus yet).
+  const [dismissedLowBalanceKeys, setDismissedLowBalanceKeys] = useState<Set<string>>(
+    () => new Set<string>(),
+  );
+
+  useEffect(() => {
+    const now = Date.now();
+    let changed = false;
+    const updated = subscriptions.map(sub => {
+      // Only credit-funded Roblox Plus (Blackbird) subs with an upcoming renewal qualify;
+      // anything else keeps its existing (backend) flag. We scope to Blackbird because
+      // devsub and premium have their own backend low-balance modals with server-side
+      // dismiss persistence, so overriding their flag here would re-show a banner the
+      // user already dismissed. Plus has no server-side low-balance modal yet, hence the
+      // client-side derivation. A renewal at the epoch means the sub is not renewing
+      // (e.g. canceled), so there is nothing to warn about.
+      if (
+        sub.productType !== ProductType.Blackbird ||
+        sub.paymentProvider !== PaymentProvider.CREDITBALANCE ||
+        !sub.price ||
+        sub.price.amount <= 0 ||
+        sub.renewal.getTime() <= 0
+      ) {
+        return sub;
+      }
+      // Same-currency comparison only: CreditBalance is a bare amount, so it is only
+      // meaningful to compare against a price quoted in the same currency.
+      const withinWindow =
+        now >= sub.renewal.getTime() - LOW_BALANCE_WARNING_DAYS * 24 * 60 * 60 * 1000;
+      const shouldShow =
+        withinWindow &&
+        creditBalance.currencyCode === sub.price.currencyCode &&
+        creditBalance.creditBalance < sub.price.amount &&
+        !dismissedLowBalanceKeys.has(sub.subscriptionTargetKey);
+
+      if ((sub.showLowBalanceNotification ?? false) === shouldShow) {
+        return sub;
+      }
+      changed = true;
+      return { ...sub, showLowBalanceNotification: shouldShow };
+    });
+
+    if (changed) {
+      setSubscriptions(updated);
+    }
+  }, [subscriptions, creditBalance, dismissedLowBalanceKeys]);
 
   // After a Roblox Plus status change (cancel or resubscribe), poll the backend
   // until the change is confirmed so that private server pricing updates
@@ -439,20 +534,21 @@ const ManagementContainer: React.FC = () => {
     let inFlight = false;
 
     const refreshAll = async () => {
-      const [freshV1, [freshPlus, freshCurrency], freshPrivateServers] = await Promise.all([
+      const [freshV1, [freshPlus, freshCurrency]] = await Promise.all([
         getUserSubscriptions(new Date()).then(r =>
-          r.filter(s => s.subscriptionTargetKey.startsWith('EXP'))
+          r.filter(s => s.subscriptionTargetKey.startsWith("EXP")),
         ),
         Promise.all([
           listSubscriptionsV2(ProductType.Blackbird),
-          listSubscriptionsV2(ProductType.CurrencySubscription)
+          listSubscriptionsV2(ProductType.CurrencySubscription),
         ]),
-        getAllPrivateServers()
       ]);
-      setSubscriptions(
-        [...[...freshV1, ...freshPlus.map(mapV2ToUserSubscription)], ...freshCurrency.map(mapV2ToUserSubscription)]
-      );
-      setPrivateServers(freshPrivateServers);
+      setSubscriptions([
+        ...[...freshV1, ...freshPlus.map(mapV2ToUserSubscription)],
+        ...freshCurrency.map(mapV2ToUserSubscription),
+      ]);
+      // Private server pricing depends on Plus status; invalidate so React Query refetches it.
+      await queryClient.invalidateQueries({ queryKey: privateServerKeys.all() });
     };
 
     const stopPolling = async () => {
@@ -500,7 +596,7 @@ const ManagementContainer: React.FC = () => {
     }, POLL_INTERVAL_MS);
 
     return () => clearInterval(intervalId);
-  }, [pollingStatus, pollingTargetKey]);
+  }, [pollingStatus, pollingTargetKey, queryClient]);
 
   // onSelectSubscription ultimately is a dependency in a useMemo in SubscriptionsList
   // so needs to be memoized
@@ -515,9 +611,9 @@ const ManagementContainer: React.FC = () => {
         trackerClient.sendEvent(ManageEventType.VIEW_ACTIVE, subscription as UserSubscription);
       }
     },
-    []
+    [],
   );
-  const onSelectPrivateServer = useCallback((privateServer: MyPrivateServerType) => {
+  const onSelectPrivateServer = useCallback((privateServer: PrivateServerWithBenefitCap) => {
     setCurrentPrivateServerView(privateServer);
   }, []);
 
@@ -533,7 +629,7 @@ const ManagementContainer: React.FC = () => {
     setCurrentSubscriptionView(null);
     setCurrentPrivateServerView(null);
     setCurrSubscriptionIsPremium(false);
-    history.push('#!/subscriptions');
+    history.push("#!/subscriptions");
   };
 
   // Sending an async call to resubscribe/cancel a subscription takes time
@@ -547,7 +643,7 @@ const ManagementContainer: React.FC = () => {
       const premSubscription = {
         ...premiumSubscription,
         expiration: premiumSubscription.renewal,
-        renewal: new Date(0)
+        renewal: new Date(0),
       };
       setPremiumSubscription(premSubscription);
 
@@ -567,7 +663,7 @@ const ManagementContainer: React.FC = () => {
       // as renewal time will be displayed if it is the same as expiration time
       const premSubscription = {
         ...premiumSubscription,
-        renewal: premiumSubscription.expiration
+        renewal: premiumSubscription.expiration,
       };
       setPremiumSubscription(premSubscription);
 
@@ -582,7 +678,7 @@ const ManagementContainer: React.FC = () => {
 
     const updatedSubscriptions = [...subscriptions];
     const subToUpdate = updatedSubscriptions.find(
-      sub => sub.subscriptionTargetKey === subscriptionTargetKey
+      sub => sub.subscriptionTargetKey === subscriptionTargetKey,
     ) as UserSubscription;
 
     // Case where a subscription is canceled
@@ -597,7 +693,7 @@ const ManagementContainer: React.FC = () => {
         // Redirect to main page and poll until the backend confirms cancellation
         // so that private server pricing updates without a hard reload.
         setCurrentSubscriptionView(null);
-        history.push('#!/subscriptions');
+        history.push("#!/subscriptions");
         setPollingTargetKey(subscriptionTargetKey);
         setPollingStatus(PollingStatus.CANCEL);
       } else if (currentSubscriptionView && !currSubscriptionIsPremium) {
@@ -635,9 +731,12 @@ const ManagementContainer: React.FC = () => {
   };
 
   const onNotificationDismiss = (subscriptionTargetKey?: string) => {
+    if (subscriptionTargetKey) {
+      setDismissedLowBalanceKeys(prev => new Set(prev).add(subscriptionTargetKey));
+    }
     const updatedSubscriptions = [...subscriptions];
     const subToUpdate = updatedSubscriptions.find(
-      sub => sub.subscriptionTargetKey === subscriptionTargetKey
+      sub => sub.subscriptionTargetKey === subscriptionTargetKey,
     );
 
     if (subToUpdate) {
@@ -650,7 +749,7 @@ const ManagementContainer: React.FC = () => {
       if (currUserSub.subscriptionTargetKey === subscriptionTargetKey) {
         setCurrentSubscriptionView({
           ...currUserSub,
-          showLowBalanceNotification: false
+          showLowBalanceNotification: false,
         });
       }
     }
@@ -658,25 +757,25 @@ const ManagementContainer: React.FC = () => {
 
   const onPaymentProfileUpdate = (
     subscriptionTargetKey: string,
-    paymentProfile: SavedPaymentProfile
+    paymentProfile: SavedPaymentProfile,
   ) => {
-    if (subscriptionTargetKey.startsWith('PRM') && premiumSubscription) {
+    if (subscriptionTargetKey.startsWith("PRM") && premiumSubscription) {
       updatePremiumSubscriptionView({
         ...premiumSubscription,
         cardInfo: {
           cardNetwork: paymentProfile.providerPayload.CardNetwork,
           last4Digits: paymentProfile.providerPayload.Last4Digits,
           expMonth: paymentProfile.providerPayload.ExpMonth,
-          expYear: paymentProfile.providerPayload.ExpYear
+          expYear: paymentProfile.providerPayload.ExpYear,
         },
-        paymentProfileId: paymentProfile.id
+        paymentProfileId: paymentProfile.id,
       });
       return;
     }
 
     const updatedSubscriptions = [...subscriptions];
     const subToUpdate = updatedSubscriptions.find(
-      sub => sub.subscriptionTargetKey === subscriptionTargetKey
+      sub => sub.subscriptionTargetKey === subscriptionTargetKey,
     );
 
     if (subToUpdate) {
@@ -684,7 +783,7 @@ const ManagementContainer: React.FC = () => {
         cardNetwork: paymentProfile.providerPayload.CardNetwork,
         last4Digits: paymentProfile.providerPayload.Last4Digits,
         expMonth: paymentProfile.providerPayload.ExpMonth,
-        expYear: paymentProfile.providerPayload.ExpYear
+        expYear: paymentProfile.providerPayload.ExpYear,
       };
       subToUpdate.paymentProfileId = paymentProfile.id;
     }
@@ -694,7 +793,7 @@ const ManagementContainer: React.FC = () => {
       if (currUserSub.subscriptionTargetKey === subscriptionTargetKey) {
         setCurrentSubscriptionView({
           ...currUserSub,
-          cardInfo: subToUpdate.cardInfo
+          cardInfo: subToUpdate.cardInfo,
         });
       }
     }
@@ -704,28 +803,28 @@ const ManagementContainer: React.FC = () => {
     subscriptionTargetKey: string,
     paymentProfile: SavedPaymentProfile,
     newMonth: number,
-    newYear: number
+    newYear: number,
   ) => {
     const updatedPaymentProfile = {
       ...paymentProfile,
-      providerPayload: { ...paymentProfile.providerPayload, ExpMonth: newMonth, ExpYear: newYear }
+      providerPayload: { ...paymentProfile.providerPayload, ExpMonth: newMonth, ExpYear: newYear },
     };
 
     setPaymentProfiles([
       ...paymentProfiles.filter(pp => pp.id !== paymentProfile.id),
-      updatedPaymentProfile
+      updatedPaymentProfile,
     ]);
 
-    if (subscriptionTargetKey.startsWith('PRM') && premiumSubscription) {
+    if (subscriptionTargetKey.startsWith("PRM") && premiumSubscription) {
       updatePremiumSubscriptionView({
         ...premiumSubscription,
         cardInfo: {
           cardNetwork: updatedPaymentProfile.providerPayload.CardNetwork,
           last4Digits: updatedPaymentProfile.providerPayload.Last4Digits,
           expMonth: updatedPaymentProfile.providerPayload.ExpMonth,
-          expYear: updatedPaymentProfile.providerPayload.ExpYear
+          expYear: updatedPaymentProfile.providerPayload.ExpYear,
         },
-        paymentProfileId: paymentProfile.id
+        paymentProfileId: paymentProfile.id,
       });
       return;
     }
@@ -739,8 +838,8 @@ const ManagementContainer: React.FC = () => {
             cardNetwork: updatedPaymentProfile.providerPayload.CardNetwork,
             last4Digits: updatedPaymentProfile.providerPayload.Last4Digits,
             expMonth: updatedPaymentProfile.providerPayload.ExpMonth,
-            expYear: updatedPaymentProfile.providerPayload.ExpYear
-          }
+            expYear: updatedPaymentProfile.providerPayload.ExpYear,
+          },
         });
       }
     }
@@ -752,15 +851,15 @@ const ManagementContainer: React.FC = () => {
 
   const subscriptionsOverview = (
     <React.Fragment>
-      <h3 className='subscription-count font-header-2'>
-        {translate('Heading.Subscriptions.Active', {
-          activeNumber: combinedList.length + (premiumSubscription ? 1 : 0)
+      <h3 className="subscription-count font-header-2">
+        {translate("Heading.Subscriptions.Active", {
+          activeNumber: combinedList.length + (premiumSubscription ? 1 : 0),
         })}
       </h3>
       <SubscriptionsList
         premiumSubscription={premiumExpired ? null : premiumSubscription}
         subscriptionList={combinedList}
-        emptyText={translate('Description.Subscriptions.NoActive')}
+        emptyText={translate("Description.Subscriptions.NoActive")}
         onSelectSubscription={onSelectSubscription}
         onSelectPrivateServer={onSelectPrivateServer}
         resultsPerPage={RESULTS_PER_PAGE}
@@ -796,7 +895,7 @@ const ManagementContainer: React.FC = () => {
                 getPaymentProfile(
                   paymentProfiles,
                   subscriptionView.paymentProfileId,
-                  subscriptionView.cardInfo
+                  subscriptionView.cardInfo,
                 ) !== undefined
               ) {
                 openUpdateModal(subscriptionView);
@@ -804,11 +903,11 @@ const ManagementContainer: React.FC = () => {
             }}
           />
           {subscriptionView.paymentProvider === PaymentProvider.STRIPE &&
-            subscriptionView.paymentProfileId !== '' &&
+            subscriptionView.paymentProfileId !== "" &&
             getPaymentProfile(
               paymentProfiles,
               subscriptionView.paymentProfileId,
-              subscriptionView.cardInfo
+              subscriptionView.cardInfo,
             ) !== undefined &&
             canUserUseStripe && (
               <StripeElementsContainer>
@@ -827,7 +926,7 @@ const ManagementContainer: React.FC = () => {
                       subscriptionView.subscriptionTargetKey,
                       paymentProfile,
                       newMonth,
-                      newYear
+                      newYear,
                     )
                   }
                   fetchSavedPaymentProfiles={fetchSavedPaymentProfiles}
@@ -835,15 +934,15 @@ const ManagementContainer: React.FC = () => {
                     getPaymentProfile(
                       paymentProfiles,
                       subscriptionView.paymentProfileId,
-                      subscriptionView.cardInfo
+                      subscriptionView.cardInfo,
                     ) ?? {
                       providerPayload: {
-                        CardNetwork: '',
-                        Last4Digits: '',
+                        CardNetwork: "",
+                        Last4Digits: "",
                         ExpMonth: 0,
-                        ExpYear: 0
+                        ExpYear: 0,
                       },
-                      id: ''
+                      id: "",
                     }
                   }
                 />
@@ -856,22 +955,22 @@ const ManagementContainer: React.FC = () => {
   };
 
   return (
-    <div className='subscription-management-container'>
-      <h2 className='subscription-title'>{translate('Heading.Tab.Subscriptions')}</h2>
+    <div className="subscription-management-container">
+      <h2 className="subscription-title">{translate("Heading.Tab.Subscriptions")}</h2>
       {subscriptionDetailsView() || subscriptionsOverview}
       <p
-        className='subscription-help-text small text'
+        className="subscription-help-text small text"
         // Would rather not use dangerouslySetInnerHTML, but it appears to be how all the
         // link translation strings are rendered.
         // In this case, the provided string is constant and not user provided, so its less dangerous.
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
-          __html: translate('Label.SubscriptionsHelpWithLink', {
-            aTagStartWithHref: '<a href=',
+          __html: translate("Label.SubscriptionsHelpWithLink", {
+            aTagStartWithHref: "<a href=",
             subscriptionsHelpPagesLink: `"${SUBSCRIPTIONS_HELP_LINK}"`,
             hrefEnd: ' class="text-link" target="_blank">',
-            aTagEnd: '</a>'
-          })
+            aTagEnd: "</a>",
+          }),
         }}
       />
       <SystemFeedback />

@@ -1,36 +1,36 @@
 /* eslint-disable react/jsx-no-literals */
-import { Button, Modal } from 'react-style-guide';
-import { useTranslation } from 'react-utilities';
-import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import classNames from 'classnames';
-import { useElements, useStripe } from '@stripe/react-stripe-js';
-import { fireEvent } from 'roblox-event-tracker';
-import { UserSubscription } from '../../../core/types/userSubscription';
+import { Button, Modal } from "react-style-guide";
+import { useTranslation } from "react-utilities";
+import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import classNames from "classnames";
+import { useElements, useStripe } from "@stripe/react-stripe-js";
+import { fireEvent } from "roblox-event-tracker";
+import { UserSubscription } from "../../../core/types/userSubscription";
 import {
   STRIPE_ERROR_CODES,
-  TIME_BETWEEN_POLLS_IN_MS
-} from '../../../core/constants/paymentConstants';
-import { SavedPaymentProfile } from '../../../core/types/savedPaymentProfile';
+  TIME_BETWEEN_POLLS_IN_MS,
+} from "../../../core/constants/paymentConstants";
+import { SavedPaymentProfile } from "../../../core/types/savedPaymentProfile";
 
-import '../../../../css/subscriptionManagement/updatePaymentProfileModal.scss';
-import { updateSubscriptionPaymentProfile } from '../../../core/services/subscriptionServices';
-import useSystemFeedbackContext from '../../shared/hooks/useSystemFeedback';
-import StripeForm from '../../shared/components/StripeForm';
-import { GetStripeCardIcon } from '../../../core/utils/paymentUtils';
-import { StripeAllowRedisplayOptions } from '../../../core/types/stripeTypes';
+import "../../../../css/subscriptionManagement/updatePaymentProfileModal.scss";
+import { updateSubscriptionPaymentProfile } from "../../../core/services/subscriptionServices";
+import useSystemFeedbackContext from "../../shared/hooks/useSystemFeedback";
+import StripeForm from "../../shared/components/StripeForm";
+import { GetStripeCardIcon } from "../../../core/utils/paymentUtils";
+import { StripeAllowRedisplayOptions } from "../../../core/types/stripeTypes";
 import {
   deletePaymentProfile,
   updatePaymentProfileDetails,
-  verifyPaymentProfileCreation
-} from '../../../core/services/paymentServices';
+  verifyPaymentProfileCreation,
+} from "../../../core/services/paymentServices";
 import {
   GetDateFromFormattedExpiration,
   GetFormattedExpiration,
-  GetMonthAndYearFromFormattedExpiration
-} from '../../../core/utils/dateUtils';
-import { COUNTER_METRICS } from '../constants/metricConstants';
-import { PremiumSubscription } from '../../../core/types/premiumSubscription';
-import trackerClient, { ManageEventType } from '../utils/logging';
+  GetMonthAndYearFromFormattedExpiration,
+} from "../../../core/utils/dateUtils";
+import { COUNTER_METRICS } from "../constants/metricConstants";
+import { PremiumSubscription } from "../../../core/types/premiumSubscription";
+import trackerClient, { ManageEventType } from "../utils/logging";
 
 type UpdatePaymentProfileModalProps = {
   subscriptionId: string;
@@ -44,7 +44,7 @@ type UpdatePaymentProfileModalProps = {
   onPaymentProfileExpirationUpdate: (
     paymentProfile: SavedPaymentProfile,
     expirationMonth: number,
-    expirationYear: number
+    expirationYear: number,
   ) => void;
   fetchSavedPaymentProfiles: () => Promise<SavedPaymentProfile[]>;
 };
@@ -59,21 +59,20 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
   onClose,
   onSave,
   onPaymentProfileExpirationUpdate,
-  fetchSavedPaymentProfiles
+  fetchSavedPaymentProfiles,
 }) => {
   const { translate } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [canSubmit, setCanSubmit] = useState(false);
   const [stripeErrorCode, setStripeErrorCode] = useState<string | null>(null);
-  const [selectedPaymentProfile, setSelectedPaymentProfile] = useState<SavedPaymentProfile>(
-    defaultPaymentProfile
-  );
+  const [selectedPaymentProfile, setSelectedPaymentProfile] =
+    useState<SavedPaymentProfile>(defaultPaymentProfile);
   const [showSelectionDropdown, setShowSelectionDropdown] = useState<boolean>(false);
   const [expiration, setExpiration] = useState<string>(
     GetFormattedExpiration(
       defaultPaymentProfile.providerPayload.ExpMonth,
-      defaultPaymentProfile.providerPayload.ExpYear
-    )
+      defaultPaymentProfile.providerPayload.ExpYear,
+    ),
   );
   const { systemFeedbackService } = useSystemFeedbackContext();
   const [showStripeAddCardForm, setShowStripeAddCardForm] = useState(false);
@@ -83,7 +82,7 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
 
   const stripe = useStripe();
   const elements = useElements();
-  const providerPaymentProfileId = useRef<string>('');
+  const providerPaymentProfileId = useRef<string>("");
 
   useEffect(() => {
     if (showStripeAddCardForm) {
@@ -92,14 +91,14 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
 
     const initialDate = new Date(
       selectedPaymentProfile.providerPayload.ExpYear,
-      selectedPaymentProfile.providerPayload.ExpMonth - 1
+      selectedPaymentProfile.providerPayload.ExpMonth - 1,
     );
     const proposedDate = GetDateFromFormattedExpiration(expiration);
     const startOfTheMonth = new Date(new Date().getFullYear(), new Date().getMonth());
 
     setCanSubmit(
       (proposedDate !== initialDate && proposedDate >= startOfTheMonth) ||
-        selectedPaymentProfile.id !== defaultPaymentProfile.id
+        selectedPaymentProfile.id !== defaultPaymentProfile.id,
     );
     setExpirationError(proposedDate < startOfTheMonth || proposedDate < initialDate);
   }, [defaultPaymentProfile.id, expiration, selectedPaymentProfile, showStripeAddCardForm]);
@@ -131,7 +130,7 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
         const expDate = GetDateFromFormattedExpiration(exp);
         const currentCardExpirationDate = new Date(
           selectedPaymentProfile.providerPayload.ExpYear,
-          selectedPaymentProfile.providerPayload.ExpMonth - 1
+          selectedPaymentProfile.providerPayload.ExpMonth - 1,
         );
 
         if (expDate > currentCardExpirationDate) {
@@ -139,10 +138,10 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
           try {
             fireEvent(COUNTER_METRICS.API.UPDATE_SAVED_PAYMENT_PROFILE_CALLED);
             await updatePaymentProfileDetails(paymentProfileId, month, year);
-            successMessage = 'Description.PaymentExpirationUpdateSuccess';
+            successMessage = "Description.PaymentExpirationUpdateSuccess";
             trackerClient.sendEvent(
               ManageEventType.UPDATE_PAYMENT_METHOD_EXPIRATION_SUCCESS,
-              subscription
+              subscription,
             );
             fireEvent(COUNTER_METRICS.API.UPDATE_SAVED_PAYMENT_PROFILE_SUCCEEDED);
             onPaymentProfileExpirationUpdate(selectedPaymentProfile, month, year);
@@ -150,22 +149,22 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
             fireEvent(COUNTER_METRICS.API.UPDATE_SAVED_PAYMENT_PROFILE_FAILED);
             trackerClient.sendEvent(
               ManageEventType.UPDATE_PAYMENT_METHOD_EXPIRATION_FAILURE,
-              subscription
+              subscription,
             );
-            systemFeedbackService.warning(translate('Error.PaymentMethodUpdateFailed'));
-            successMessage = '';
+            systemFeedbackService.warning(translate("Error.PaymentMethodUpdateFailed"));
+            successMessage = "";
           }
         }
       }
 
       // Only update if the expiration date was updated successfully or was not updated at all.
-      if (successMessage !== '' && paymentProfileId !== defaultPaymentProfile.id) {
+      if (successMessage !== "" && paymentProfileId !== defaultPaymentProfile.id) {
         try {
           fireEvent(COUNTER_METRICS.API.UPDATE_SAVED_PAYMENT_PROFILE_CALLED);
           await updateSubscriptionPaymentProfile(subscriptionId, paymentProfileId);
           fireEvent(COUNTER_METRICS.API.UPDATE_SAVED_PAYMENT_PROFILE_SUCCEEDED);
           trackerClient.sendEvent(ManageEventType.UPDATE_PAYMENT_METHOD_SUCCESS, subscription);
-          successMessage = 'Message.PaymentUpdateSuccess';
+          successMessage = "Message.PaymentUpdateSuccess";
           if (isUserUnder18) {
             try {
               // If the user is under 18, we want to delete the old (likely allow_redisplay: limited) payment profile
@@ -180,7 +179,7 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
         } catch (e) {
           fireEvent(COUNTER_METRICS.API.UPDATE_SAVED_PAYMENT_PROFILE_FAILED);
           trackerClient.sendEvent(ManageEventType.UPDATE_PAYMENT_METHOD_FAILURE, subscription);
-          systemFeedbackService.warning(translate('Error.PaymentMethodUpdateFailed'));
+          systemFeedbackService.warning(translate("Error.PaymentMethodUpdateFailed"));
           closeDropdown();
           setLoading(false);
           closeModal();
@@ -190,15 +189,15 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
       closeDropdown();
       setLoading(false);
 
-      if (successMessage !== undefined && successMessage !== '') {
+      if (successMessage !== undefined && successMessage !== "") {
         systemFeedbackService.success(translate(successMessage));
-        if (successMessage === 'Message.PaymentUpdateSuccess') {
+        if (successMessage === "Message.PaymentUpdateSuccess") {
           let paymentProfile = paymentProfiles.find(profile => profile.id === paymentProfileId);
           if (paymentProfile === undefined) {
             // new card is created so we need to fetch the details again
             const updatedPaymentProfiles = await fetchSavedPaymentProfiles();
             paymentProfile = updatedPaymentProfiles.find(
-              profile => profile.id === paymentProfileId
+              profile => profile.id === paymentProfileId,
             );
           }
           onSave(paymentProfile as SavedPaymentProfile);
@@ -220,8 +219,8 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
       subscription,
       subscriptionId,
       systemFeedbackService,
-      translate
-    ]
+      translate,
+    ],
   );
 
   const verifyPaymentProfileCreationPoll = useCallback(async () => {
@@ -233,18 +232,18 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
     } catch (e) {
       // We can ignore this as we can expect verification to fail (hence the polling)
     }
-    return '';
+    return "";
   }, []);
 
   const poll = useCallback(
     async (fn: () => Promise<string>, interval: number, times: number) => {
       try {
         const result = await fn();
-        if (result !== undefined && result !== '') {
-          await updatePaymentProfile(result, '');
+        if (result !== undefined && result !== "") {
+          await updatePaymentProfile(result, "");
           trackerClient.sendEvent(
             ManageEventType.UPDATE_PAYMENT_METHOD_ADD_CARD_SUCCESS,
-            subscription
+            subscription,
           );
           setLoading(false);
           return;
@@ -258,11 +257,11 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
         }, interval);
       } catch (e) {
         systemFeedbackService.warning(
-          translate('Description.SavedCreditCard.SavePaymentMethodSomethingWentWrong')
+          translate("Description.SavedCreditCard.SavePaymentMethodSomethingWentWrong"),
         );
       }
     },
-    [subscription, systemFeedbackService, translate, updatePaymentProfile]
+    [subscription, systemFeedbackService, translate, updatePaymentProfile],
   );
 
   const addAndUpdatePaymentProfile = useCallback(async () => {
@@ -272,34 +271,34 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
 
     setLoading(true);
 
-    const allowRedisplayValue: StripeAllowRedisplayOptions = isUserUnder18 ? 'limited' : 'always';
+    const allowRedisplayValue: StripeAllowRedisplayOptions = isUserUnder18 ? "limited" : "always";
 
     const confirmParams = {
       payment_method_data: {
         billing_details: {},
-        allow_redisplay: allowRedisplayValue
-      }
+        allow_redisplay: allowRedisplayValue,
+      },
     };
 
     try {
       const response = await stripe.confirmSetup({
         elements,
         confirmParams,
-        redirect: 'if_required'
+        redirect: "if_required",
       });
 
-      if (response?.setupIntent?.status === 'succeeded') {
-        providerPaymentProfileId.current = response?.setupIntent?.payment_method?.toString() ?? '';
+      if (response?.setupIntent?.status === "succeeded") {
+        providerPaymentProfileId.current = response?.setupIntent?.payment_method?.toString() ?? "";
         if (providerPaymentProfileId.current) {
           await poll(verifyPaymentProfileCreationPoll, TIME_BETWEEN_POLLS_IN_MS, 3);
         }
-        if (allowRedisplayValue === 'limited') {
+        if (allowRedisplayValue === "limited") {
           fireEvent(COUNTER_METRICS.SUBSCRIPTIONS.UPDATE_PAYMENT_METHOD_ADD_LIMITED_CARD_SUCCESS);
         }
       } else if (response?.error?.code) {
         trackerClient.sendEvent(
           ManageEventType.UPDATE_PAYMENT_METHOD_ADD_CARD_FAILURE,
-          subscription
+          subscription,
         );
         switch (response.error.code) {
           case STRIPE_ERROR_CODES.INCORRECT_CVC:
@@ -308,12 +307,12 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
             break;
           case STRIPE_ERROR_CODES.CARD_DECLINED:
             systemFeedbackService.warning(
-              translate('Description.SavedCreditCard.CardDeclinedErrorMessage')
+              translate("Description.SavedCreditCard.CardDeclinedErrorMessage"),
             );
             closeModal();
             break;
           default:
-            systemFeedbackService.warning(translate('MessageUnknownError'));
+            systemFeedbackService.warning(translate("MessageUnknownError"));
         }
         setLoading(false);
       }
@@ -329,19 +328,19 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
     subscription,
     systemFeedbackService,
     translate,
-    closeModal
+    closeModal,
   ]);
 
   const renderPaymentMethod = useCallback((paymentProfile: SavedPaymentProfile) => {
     return (
-      <div className='payment-method-container'>
+      <div className="payment-method-container">
         <span
           className={classNames(
-            'card-icon',
-            GetStripeCardIcon(paymentProfile.providerPayload.CardNetwork)
+            "card-icon",
+            GetStripeCardIcon(paymentProfile.providerPayload.CardNetwork),
           )}
         />
-        <span className='card-four-digits text-emphasis'>
+        <span className="card-four-digits text-emphasis">
           ****{paymentProfile.providerPayload.Last4Digits}
         </span>
       </div>
@@ -349,26 +348,26 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
   }, []);
 
   const updateDisclosure = {
-    __html: translate('Description.SavedCreditCard.StripeUpdatePaymentMethodDisclosure', {
+    __html: translate("Description.SavedCreditCard.StripeUpdatePaymentMethodDisclosure", {
       RobloxTermsLinkStart:
         '<a href="https://help.roblox.com/hc/articles/115004647846-Roblox-Terms-of-Use" class="text-link" target="_blank">',
-      RobloxTermsLinkEnd: '</a>',
+      RobloxTermsLinkEnd: "</a>",
       RobloxPrivacyPolicyLinkStart: `<a href='https://help.roblox.com/hc/articles/115004630823-Roblox-Privacy-and-Cookie-Policy' class="text-link" target="_blank">`,
-      RobloxPrivacyPolicyLinkEnd: '</a>',
+      RobloxPrivacyPolicyLinkEnd: "</a>",
       StripeTermsOfUseLinkStart:
         '<a href="https://stripe.com/legal/end-users" class="text-link" target="_blank">',
-      StripeTermsOfUseLinkEnd: '</a>',
+      StripeTermsOfUseLinkEnd: "</a>",
       StripePrivacyPolicyLinkStart: `<a href='https://stripe.com/privacy' class="text-link" target="_blank">`,
-      StripePrivacyPolicyLinkEnd: '</a>'
-    })
+      StripePrivacyPolicyLinkEnd: "</a>",
+    }),
   };
 
   const renderDropdownSelectionButton = useCallback(
     (paymentProfile: SavedPaymentProfile) => {
       return (
         <button
-          type='button'
-          className='dropdown-selection-button'
+          type="button"
+          className="dropdown-selection-button"
           key={paymentProfile.id}
           onClick={() => {
             setSelectedPaymentProfile(paymentProfile);
@@ -376,18 +375,19 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
             setExpiration(
               GetFormattedExpiration(
                 paymentProfile.providerPayload.ExpMonth,
-                paymentProfile.providerPayload.ExpYear
-              )
+                paymentProfile.providerPayload.ExpYear,
+              ),
             );
             closeDropdown();
             setShowStripeAddCardForm(false);
             setCanSubmit(true);
-          }}>
+          }}
+        >
           {renderPaymentMethod(paymentProfile)}
         </button>
       );
     },
-    [closeDropdown, defaultPaymentProfile.id, renderPaymentMethod]
+    [closeDropdown, defaultPaymentProfile.id, renderPaymentMethod],
   );
 
   if (defaultPaymentProfile === undefined) {
@@ -398,78 +398,82 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
     <Modal
       show={isOpen}
       onHide={closeModal}
-      size='md'
-      className='subscription-update-payment-method'>
+      size="md"
+      className="subscription-update-payment-method"
+    >
       <Modal.Header
-        title={translate('Heading.SavedCreditCard.UpdatePaymentMethod')}
+        title={translate("Heading.SavedCreditCard.UpdatePaymentMethod")}
         onClose={closeModal}
       />
       <Modal.Body>
-        <div className='modal-description font-header-2 text-emphasis'>
-          {translate('Heading.SavedCreditCard.CreditOrDebitCard')}
+        <div className="modal-description font-header-2 text-emphasis">
+          {translate("Heading.SavedCreditCard.CreditOrDebitCard")}
         </div>
-        <div className='custom-select'>
+        <div className="custom-select">
           <button
-            id='select-payment-profile-button'
-            type='button'
-            role='combobox'
-            className={classNames('select-button', { active: showSelectionDropdown })}
-            aria-labelledby='select-payment-profile-button'
-            aria-haspopup='listbox'
-            aria-expanded='false'
-            aria-controls='select-payment-profile-dropdown'
+            id="select-payment-profile-button"
+            type="button"
+            role="combobox"
+            className={classNames("select-button", { active: showSelectionDropdown })}
+            aria-labelledby="select-payment-profile-button"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="select-payment-profile-dropdown"
             onClick={() => {
               if (showSelectionDropdown) {
                 closeDropdown();
               } else {
                 setShowSelectionDropdown(true);
               }
-            }}>
+            }}
+          >
             {!showStripeAddCardForm && renderPaymentMethod(selectedPaymentProfile)}
             {showStripeAddCardForm && (
-              <span className='text-emphasis'>{translate('Heading.NewCreditOrDebitCard')}</span>
+              <span className="text-emphasis">{translate("Heading.NewCreditOrDebitCard")}</span>
             )}
-            <span className={showSelectionDropdown ? 'icon-up' : 'icon-down'} />
+            <span className={showSelectionDropdown ? "icon-up" : "icon-down"} />
           </button>
           <div
-            id='select-payment-profile-dropdown'
-            role='listbox'
+            id="select-payment-profile-dropdown"
+            role="listbox"
             ref={selectDropdownList}
-            className={classNames('select-dropdown', { active: showSelectionDropdown })}>
+            className={classNames("select-dropdown", { active: showSelectionDropdown })}
+          >
             {!isUserUnder18 &&
               paymentProfiles
                 .filter(
                   paymentProfile =>
-                    paymentProfile.providerPayload !== selectedPaymentProfile.providerPayload
+                    paymentProfile.providerPayload !== selectedPaymentProfile.providerPayload,
                 )
                 .map(paymentProfile => renderDropdownSelectionButton(paymentProfile))}
             <button
-              type='button'
-              className='dropdown-selection-button'
+              type="button"
+              className="dropdown-selection-button"
               onClick={() => {
                 closeDropdown();
                 trackerClient.sendEvent(
                   ManageEventType.UPDATE_PAYMENT_METHOD_ADD_CARD_CLICKED,
-                  subscription
+                  subscription,
                 );
                 setShowStripeAddCardForm(true);
-              }}>
-              <div className='text-emphasis payment-method-container '>
-                {translate('Heading.NewCreditOrDebitCard')}
+              }}
+            >
+              <div className="text-emphasis payment-method-container ">
+                {translate("Heading.NewCreditOrDebitCard")}
               </div>
             </button>
           </div>
         </div>
         {!showStripeAddCardForm && (
           <Fragment>
-            <div className='font-caption-header text-emphasis'>{translate('Label.Expiration')}</div>
+            <div className="font-caption-header text-emphasis">{translate("Label.Expiration")}</div>
             <input
-              type='string'
-              name='expiration'
-              placeholder='MM/YY'
-              className={`expiry-input ${expirationError ? 'error-input' : ''}`}
+              type="string"
+              name="expiration"
+              placeholder="MM/YY"
+              className={`expiry-input ${expirationError ? "error-input" : ""}`}
               value={expiration}
-              inputMode='numeric'
+              inputMode="numeric"
               onChange={e => {
                 let input = e.target.value;
 
@@ -479,18 +483,18 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
                   return;
                 }
 
-                if (expiration.length >= 2 && input.startsWith('1/')) {
+                if (expiration.length >= 2 && input.startsWith("1/")) {
                   input = `0${input}`;
                 }
 
                 // // Remove any non-numeric characters
-                input = input.replace(/\D/g, '');
+                input = input.replace(/\D/g, "");
 
                 if (input.length > 4) {
                   input = input.slice(0, 4);
                 }
 
-                if (input.length === 1 && input !== '0' && input !== '1') {
+                if (input.length === 1 && input !== "0" && input !== "1") {
                   // months 2-9 are prefixed with 0
                   input = `0${input}/`;
                 } else if (input.length === 2 && Number(input) > 12) {
@@ -503,8 +507,8 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
               }}
             />
             {expirationError && (
-              <div className='font-caption-body input-error-text'>
-                {translate('Error.InvalidExpirationDate')}
+              <div className="font-caption-body input-error-text">
+                {translate("Error.InvalidExpirationDate")}
               </div>
             )}
           </Fragment>
@@ -517,26 +521,27 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
           />
         )}
       </Modal.Body>
-      <div className='footer-divider' />
+      <div className="footer-divider" />
       <Modal.Footer>
         <span
-          className='font-caption-body'
+          className="font-caption-body"
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={updateDisclosure}
         />
-        <div className='modal-buttons'>
+        <div className="modal-buttons">
           <Button
             variant={Button.variants.secondary}
             width={Button.widths.full}
             size={Button.sizes.large}
-            className='action-button'
-            onClick={closeModal}>
-            {translate('Action.Cancel')}
+            className="action-button"
+            onClick={closeModal}
+          >
+            {translate("Action.Cancel")}
           </Button>
           <Button
             width={Button.widths.full}
             size={Button.sizes.large}
-            className='action-button'
+            className="action-button"
             isLoading={loading}
             isDisabled={!canSubmit}
             onClick={async () => {
@@ -547,9 +552,10 @@ const UpdatePaymentProfileModal: React.FC<UpdatePaymentProfileModalProps> = ({
               if (showStripeAddCardForm) {
                 await addAndUpdatePaymentProfile();
               }
-            }}>
-            {!loading && translate('Action.Save')}
-            {loading && <span className='spinner spinner-sm' />}
+            }}
+          >
+            {!loading && translate("Action.Save")}
+            {loading && <span className="spinner spinner-sm" />}
           </Button>
         </div>
       </Modal.Footer>

@@ -1,15 +1,15 @@
-import { httpService } from 'core-utilities';
-import type { AxiosResponse } from '@rbx/core-scripts/http';
-import serviceConstants from '../constants/serviceConstants';
-import { SavedPaymentProfile } from '../types/savedPaymentProfile';
+import { httpService } from "core-utilities";
+import type { AxiosResponse } from "@rbx/core-scripts/http";
+import serviceConstants from "../constants/serviceConstants";
+import { SavedPaymentProfile } from "../types/savedPaymentProfile";
 import {
   IsStripeEnabledForUserResponse,
   PaymentProfileResponse,
-  PaymentProfileSetupResponse
-} from '../types/serviceTypes';
+  PaymentProfileSetupResponse,
+} from "../types/serviceTypes";
 
 export enum PAYMENT_PROVIDER {
-  Stripe = 'Stripe'
+  Stripe = "Stripe",
 }
 
 export const verifyPaymentProfileCreationPoll = async (): Promise<boolean> => {
@@ -17,10 +17,10 @@ export const verifyPaymentProfileCreationPoll = async (): Promise<boolean> => {
 };
 
 export const verifyPaymentProfileCreation = async (
-  providerPaymentProfileId: string
+  providerPaymentProfileId: string,
 ): Promise<string> => {
   const response = await httpService.get<PaymentProfileResponse>(
-    serviceConstants.url.verifyPaymentProfileCreation(providerPaymentProfileId)
+    serviceConstants.url.verifyPaymentProfileCreation(providerPaymentProfileId),
   );
 
   return response?.data?.id;
@@ -36,11 +36,11 @@ export const getStripeClientSecret = async (): Promise<string> => {
   const response = await httpService.post<PaymentProfileSetupResponse>(
     serviceConstants.url.getPaymentProfileSetupUrlConfig(),
     {
-      paymentProvider: PAYMENT_PROVIDER.Stripe
-    }
+      paymentProvider: PAYMENT_PROVIDER.Stripe,
+    },
   );
 
-  return response?.data?.providerPayload?.clientSecret ?? '';
+  return response?.data?.providerPayload?.clientSecret ?? "";
 };
 
 export const isStripeEnabledForUser = async (): Promise<
@@ -52,11 +52,11 @@ export const isStripeEnabledForUser = async (): Promise<
 export const updatePaymentProfileDetails = async (
   paymentProfileId: string,
   expirationMonth: number,
-  expirationYear: number
+  expirationYear: number,
 ): Promise<boolean> => {
   const res = await httpService.post(serviceConstants.url.updatePaymentProfile(paymentProfileId), {
     expirationMonth,
-    expirationYear
+    expirationYear,
   });
 
   return res.status === 200;
@@ -73,5 +73,5 @@ export default {
   verifyPaymentProfileCreation,
   getSavedPaymentProfiles,
   getStripeClientSecret,
-  isStripeEnabledForUser
+  isStripeEnabledForUser,
 };

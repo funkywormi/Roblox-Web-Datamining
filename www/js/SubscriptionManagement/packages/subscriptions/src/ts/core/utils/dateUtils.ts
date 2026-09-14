@@ -1,22 +1,22 @@
-import { format, parse } from 'date-fns';
+import { format, parse } from "date-fns";
 
 export const GetFullExpYear = (expYear: number): number =>
-  Number.parseInt(format(parse(expYear.toString(), 'yy', new Date()), 'yyyy'), 10);
+  Number.parseInt(format(parse(expYear.toString(), "yy", new Date()), "yyyy"), 10);
 
 export const GetShortenedYearInputFormat = (year: string): string =>
-  format(parse(year, 'yyyy', new Date()), 'yy');
+  format(parse(year, "yyyy", new Date()), "yy");
 
-export const GetShortenedMonthFormat = (month: number): string => month.toString().padStart(2, '0');
+export const GetShortenedMonthFormat = (month: number): string => month.toString().padStart(2, "0");
 
 export const GetFormattedExpiration = (month: number, year: number): string =>
   `${GetShortenedMonthFormat(month)}/${GetShortenedYearInputFormat(year.toString())}`;
 
 export const GetMonthAndYearFromFormattedExpiration = (expiration: string): [number, number] => {
-  if (!expiration.includes('/')) {
+  if (!expiration.includes("/")) {
     return [0, 0];
   }
 
-  const [month, year] = expiration.split('/');
+  const [month, year] = expiration.split("/");
 
   if (
     !month ||

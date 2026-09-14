@@ -1,5 +1,5 @@
-import { createContext } from 'react';
-import { TSystemFeedbackComponent, TSystemFeedbackService } from 'react-style-guide';
+import { createContext } from "react";
+import { TSystemFeedbackComponent, TSystemFeedbackService } from "react-style-guide";
 
 export type SystemFeedbackContextValue = {
   SystemFeedback: TSystemFeedbackComponent;

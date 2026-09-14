@@ -1,48 +1,55 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import classNames from 'classnames';
-import { useTranslation } from 'react-utilities';
-import { Thumbnail2d, ThumbnailTypes } from 'roblox-thumbnails';
+import React, { useCallback, useEffect, useState } from "react";
+import classNames from "classnames";
+import { useTranslation } from "react-utilities";
+import { Thumbnail2d, ThumbnailTypes } from "roblox-thumbnails";
 import {
   PeriodType as ApiPeriodType,
   ProductType,
-  RobloxSubscriptionProductFeatureConfig
-} from '@rbx/client-subscriptions-api/v1';
-import { Chip, Icon } from '@rbx/foundation-ui';
-import { Link } from '@rbx/ui';
-import { TranslationProvider } from '@rbx/core-scripts/react';
+  RobloxSubscriptionProductFeatureConfig,
+} from "@rbx/client-subscriptions-api/v1";
+import { Chip, Icon } from "@rbx/foundation-ui";
+import { Link } from "@rbx/ui";
+import { TranslationProvider } from "@rbx/core-scripts/react";
 import {
   BenefitList,
   ONE_ROBUX_IN_MICROS,
   RobloxPlusGiftItemUpsellBanner,
-  RobloxPlusFreeTrialBanner
-} from '@rbx/subscriptions-common';
-import { CreditBalance, SubscriptionMetadata } from '../../../core/types/serviceTypes';
-import { APP_STORE_CANCEL_HELP_URL } from '../../../core/constants/websiteConstants';
-import { PremiumPurchasePlatform } from '../../../core/types/premiumEnums';
-import { PremiumSubscription } from '../../../core/types/premiumSubscription';
-import { UserSubscription } from '../../../core/types/userSubscription';
-import { PaymentProvider, PeriodType, PurchasePlatform } from '../../../core/types/subscriptionEnums';
-import { premiumPeriod, premiumName } from '../utils/premiumUtils';
-import PriceDisplay from './PriceDisplay';
-import PriceDisplayInRobux from './PriceDisplayInRobux';
-import CycleEndDate from './CycleEndDate';
-import CancelSubscription from './CancelSubscription';
-import ResubscribeSubscription from './ResubscribeSubscription';
-import PaymentMethod from './PaymentMethod';
-import '../../../../css/subscriptionManagement/subscriptionDetails.scss';
+  RobloxPlusFreeTrialBanner,
+} from "@rbx/subscriptions-common";
+import { CreditBalance, SubscriptionMetadata } from "../../../core/types/serviceTypes";
+import { APP_STORE_CANCEL_HELP_URL } from "../../../core/constants/websiteConstants";
+import { PremiumPurchasePlatform } from "../../../core/types/premiumEnums";
+import { PremiumSubscription } from "../../../core/types/premiumSubscription";
+import { UserSubscription } from "../../../core/types/userSubscription";
+import {
+  PaymentProvider,
+  PeriodType,
+  PurchasePlatform,
+} from "../../../core/types/subscriptionEnums";
+import { premiumPeriod, premiumName } from "../utils/premiumUtils";
+import PriceDisplay from "./PriceDisplay";
+import PriceDisplayInRobux from "./PriceDisplayInRobux";
+import CycleEndDate from "./CycleEndDate";
+import CancelSubscription from "./CancelSubscription";
+import ResubscribeSubscription from "./ResubscribeSubscription";
+import PaymentMethod from "./PaymentMethod";
+import "../../../../css/subscriptionManagement/subscriptionDetails.scss";
 import {
   GetLowBalanceNotificationType,
-  SubscriptionNotification
-} from '../../../core/types/notifications';
-import NotificationBanner from './NotificationBanner';
-import Banner, { BannerType } from '../../shared/components/Banner';
-import { isExpiring, hasFreeTrialOffer } from '../utils/subscriptionUtils';
-import { getExperiencePlaceId } from '../../../core/services/gameServices';
+  SubscriptionNotification,
+} from "../../../core/types/notifications";
+import NotificationBanner from "./NotificationBanner";
+import Banner, { BannerType } from "../../shared/components/Banner";
+import { isExpiring, hasFreeTrialOffer } from "../utils/subscriptionUtils";
+import { getExperiencePlaceId } from "../../../core/services/gameServices";
 
 // Only Premium 1000 and Premium 2200 unlock access to marketplace sell/earn
 const minPremiumMarketplacSell = 1000;
 
-const PLUS_UPSELL_BANNER_ASSET_ID = 85595358191154;
+// Keep the promotion implementation available for a future rerun without rendering it currently.
+const SUBSCRIBER_GIFT_BANNER_CONFIG = {
+  enabled: false,
+};
 
 type SubscriptionDetailsProps = {
   subscription: UserSubscription | PremiumSubscription;
@@ -66,7 +73,7 @@ type SubscriptionDetailsProps = {
 // Used only for TS type checking purposes
 const subIsPremium = (
   sub: UserSubscription | PremiumSubscription,
-  isPremium: boolean
+  isPremium: boolean,
 ): sub is PremiumSubscription => isPremium;
 
 const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
@@ -79,7 +86,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
   onBack,
   onEditPaymentMethodClick,
   blackbirdProductInfo,
-  isFaeFreeTrial = false
+  isFaeFreeTrial = false,
 }) => {
   const { translate } = useTranslation();
   const [notificationType, setNotificationType] = useState<SubscriptionNotification | null>(null);
@@ -87,8 +94,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
   const [justCancelled, setJustCancelled] = useState(false);
 
   const isBlackbird =
-    !subIsPremium(subscription, isPremium) &&
-    subscription.productType === ProductType.Blackbird;
+    !subIsPremium(subscription, isPremium) && subscription.productType === ProductType.Blackbird;
 
   const navigateToExperience = useCallback(
     (e: React.MouseEvent) => {
@@ -102,7 +108,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
         })
         .catch(() => undefined);
     },
-    [subscription, isPremium]
+    [subscription, isPremium],
   );
 
   useEffect(() => {
@@ -110,8 +116,8 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
       GetLowBalanceNotificationType(
         subscription.showLowBalanceNotification ?? false,
         subscription.renewal,
-        subscription.expiration
-      )
+        subscription.expiration,
+      ),
     );
   }, [subscription]);
 
@@ -121,7 +127,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
     }
     const expirationDate = new Date(
       subscription.cardInfo.expYear,
-      subscription.cardInfo.expMonth - 1
+      subscription.cardInfo.expMonth - 1,
     );
     const today = new Date();
     const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1);
@@ -130,20 +136,20 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
 
   const renderIcon = () => {
     if (subIsPremium(subscription, isPremium)) {
-      return <span className='premium-icon' />;
+      return <span className="premium-icon" />;
     }
     if (subscription.productType === ProductType.Blackbird) {
-      return <Icon className='!size-900' name='icon-regular-roblox-plus' />;
+      return <Icon className="!size-900" name="icon-regular-roblox-plus" />;
     }
     if (subscription.productType === ProductType.CurrencySubscription) {
-      return <span className='premium-icon' />;
+      return <span className="premium-icon" />;
     }
     return (
       <Thumbnail2d
         targetId={subscription.iconImageAssetId ?? 0}
         type={ThumbnailTypes.assetThumbnail}
-        imgClassName='detail-icon'
-        containerClass='thumbnail-detail-container'
+        imgClassName="detail-icon"
+        containerClass="thumbnail-detail-container"
         altName={subscription.name}
       />
     );
@@ -152,31 +158,30 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
   const renderDescription = () => {
     if (subIsPremium(subscription, isPremium)) {
       return (
-        <div className='detail-description'>
-          <p>{translate('Description.Subscriptions.Premium')}</p>
-          <span className='premium-benefit-container'>
-            <span className='icon-menu-games-on' />
-            <p>{translate('Description.Subscriptions.PremiumBenefits')}</p>
+        <div className="detail-description">
+          <p>{translate("Description.Subscriptions.Premium")}</p>
+          <span className="premium-benefit-container">
+            <span className="icon-menu-games-on" />
+            <p>{translate("Description.Subscriptions.PremiumBenefits")}</p>
           </span>
-          <span className='premium-benefit-container'>
-            <span className='icon-robux-28x28' />
-            <p>{translate('Description.Subscriptions.MoreRobux')}</p>
+          <span className="premium-benefit-container">
+            <span className="icon-robux-28x28" />
+            <p>{translate("Description.Subscriptions.MoreRobux")}</p>
           </span>
-          <span className='premium-benefit-container'>
-            <span className='icon-menu-trade' />
-            <p>{translate('Description.Subscriptions.Trade')}</p>
+          <span className="premium-benefit-container">
+            <span className="icon-menu-trade" />
+            <p>{translate("Description.Subscriptions.Trade")}</p>
           </span>
 
           {subscription.robuxStipendAmount >= minPremiumMarketplacSell && (
-            <span className='premium-benefit-container'>
-              <span className='icon-menu-creations' />
-              <p>{translate('Description.Subscriptions.MarketplaceSell')}</p>
+            <span className="premium-benefit-container">
+              <span className="icon-menu-creations" />
+              <p>{translate("Description.Subscriptions.MarketplaceSell")}</p>
             </span>
           )}
         </div>
       );
     }
-    
 
     switch (subscription.productType) {
       case ProductType.Blackbird:
@@ -186,8 +191,8 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
         // context, which is separate from the outer react-utilities provider.
         if (blackbirdProductInfo) {
           return (
-            <div className='detail-description content-default'>
-              <TranslationProvider config={['Feature.RobloxSubscription']}>
+            <div className="detail-description content-default">
+              <TranslationProvider config={["Feature.RobloxSubscription"]}>
                 <BenefitList
                   featureConfig={blackbirdProductInfo.featureConfig}
                   periodType={blackbirdProductInfo.periodType}
@@ -198,18 +203,16 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
           );
         }
         return (
-          <p className='detail-description'>{translate('Description.Subscriptions.Blackbird')}</p>
+          <p className="detail-description">{translate("Description.Subscriptions.Blackbird")}</p>
         );
       case ProductType.CurrencySubscription:
         return (
-          <p className='detail-description'>
-              {translate('Description.Subscriptions.CurrencySubscription')}
-            </p>
+          <p className="detail-description">
+            {translate("Description.Subscriptions.CurrencySubscription")}
+          </p>
         );
       default:
-        return (
-          <p className='detail-description'>{subscription.description}</p>
-        );
+        return <p className="detail-description">{subscription.description}</p>;
     }
   };
 
@@ -227,9 +230,9 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
         ) {
           return `Plus ${subscription.currencySubscriptionBenefit.entitledAmountMicrosPerGrantingPeriod / ONE_ROBUX_IN_MICROS}`;
         }
-        return translate('Label.Blackbird');
+        return translate("Label.Blackbird");
       case ProductType.CurrencySubscription:
-        return translate('Label.CurrencySubscription');
+        return translate("Label.CurrencySubscription");
       default:
         return subscription.name;
     }
@@ -244,80 +247,88 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
 
   return (
     <div>
-      {notificationType && subscription.showLowBalanceNotification && (
-        <NotificationBanner
-          type={notificationType}
-          onNotificationDismiss={() =>
-            onNotificationDismiss(
-              subIsPremium(subscription, isPremium)
-                ? `PRM-${subscription.premiumFeatureId}`
-                : subscription.subscriptionTargetKey
-            )
-          }
-        />
-      )}
-      {!subscription.showLowBalanceNotification &&
-        subscription.cardInfo &&
-        subscription.paymentProvider === PaymentProvider.STRIPE &&
-        isCardAboutToExpire && (
-          <Banner
-            title={translate('Heading.PaymentMethodAboutToExpire')}
-            body={
-              <span className='font-caption-header banner-body'>
-                  {translate('Description.UpdatePaymentMethodToAvoidCancellation')}
-                </span>
-            }
-            bannerType={BannerType.WARNING}
-            showDismiss={false}
-            onDismiss={() => setIsCardAboutToExpire(false)}
-          />
-        )}
-      <div className='subscription-details-container'>
-        <button type='button' onClick={onBack} className='details-back-button btn-generic-back-sm'>
-          <span className='icon-back' />
-          {translate('Action.Back')}
+      <div className="subscription-details-container">
+        <button type="button" onClick={onBack} className="details-back-button btn-generic-back-sm">
+          <span className="icon-back" />
+          {translate("Action.Back")}
         </button>
-        {isBlackbird && (
-          <div className={isFaeFreeTrial ? 'margin-bottom-medium' : 'margin-bottom-large'} style={{ gridColumn: '1 / -1' }}>
+        {notificationType && subscription.showLowBalanceNotification && (
+          <div className="margin-bottom-medium" style={{ gridColumn: "1 / 2" }}>
+            <NotificationBanner
+              type={notificationType}
+              onNotificationDismiss={() =>
+                onNotificationDismiss(
+                  subIsPremium(subscription, isPremium)
+                    ? `PRM-${subscription.premiumFeatureId}`
+                    : subscription.subscriptionTargetKey,
+                )
+              }
+            />
+          </div>
+        )}
+        {!subscription.showLowBalanceNotification &&
+          subscription.cardInfo &&
+          subscription.paymentProvider === PaymentProvider.STRIPE &&
+          isCardAboutToExpire && (
+            <div className="margin-bottom-medium" style={{ gridColumn: "1 / 2" }}>
+              <Banner
+                title={translate("Heading.PaymentMethodAboutToExpire")}
+                body={
+                  <span className="font-caption-header banner-body">
+                    {translate("Description.UpdatePaymentMethodToAvoidCancellation")}
+                  </span>
+                }
+                bannerType={BannerType.WARNING}
+                showDismiss={false}
+                onDismiss={() => setIsCardAboutToExpire(false)}
+              />
+            </div>
+          )}
+        {isBlackbird && SUBSCRIBER_GIFT_BANNER_CONFIG.enabled && (
+          <div
+            className={isFaeFreeTrial ? "margin-bottom-medium" : "margin-bottom-large"}
+            style={{ gridColumn: "1 / 2" }}
+          >
             <RobloxPlusGiftItemUpsellBanner
-              body={translate('Description.Subscriptions.BannerBody')}
-              imageAssetId={PLUS_UPSELL_BANNER_ASSET_ID}
-              title={translate('Description.Subscriptions.BannerTitle')}
+              body={translate("Description.Subscriptions.BannerBody")}
+              title={translate("Description.Subscriptions.BannerTitle")}
             />
           </div>
         )}
         {isBlackbird && isFaeFreeTrial && (
-          <div className='margin-bottom-large' style={{ gridColumn: '1 / -1' }}>
+          <div className="margin-bottom-large" style={{ gridColumn: "1 / 2" }}>
             <RobloxPlusFreeTrialBanner
-              title={translate('Header.FreeTrialBannerTitle')}
-              body={translate('Subtext.FreeTrialBanner', {
-                date: (subscription as UserSubscription).expiration.toLocaleDateString(undefined, {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric'
-                })
+              title={translate("Header.FreeTrialBannerTitle")}
+              body={translate("Subtext.FreeTrialBanner", {
+                date: subscription.expiration.toLocaleDateString(undefined, {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                }),
               })}
             />
           </div>
         )}
-        <div className='details-info'>
+        <div className="details-info">
           <div
-            className={classNames('detail-card-icon-container', {
-              'detail-card-icon-container--blackbird': isBlackbird
-            })}>
+            className={classNames("detail-card-icon-container", {
+              "detail-card-icon-container--blackbird": isBlackbird,
+            })}
+          >
             {renderIcon()}
           </div>
-          <h2 className='detail-subscription-name'>{subscriptionName}</h2>
+          <h2 className="detail-subscription-name">{subscriptionName}</h2>
           {!subIsPremium(subscription, isPremium) && subscription.providerId ? (
             <Link
               href={`/games/${subscription.providerId}`}
               onClick={navigateToExperience}
-              underline='hover'
-              className='text-description'>
+              underline="hover"
+              className="text-description"
+            >
               {subscription.subscriptionProviderName}
             </Link>
           ) : (
-            <span className='detail-subscription-proider text-description'>
+            <span className="detail-subscription-proider text-description">
               {subscription.subscriptionProviderName}
             </span>
           )}
@@ -326,12 +337,15 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
           subscription.priceInRobux > 0 ? (
             <PriceDisplayInRobux priceInRobux={subscription.priceInRobux} />
           ) : (
-            subscription.price && subscription.purchasePlatform !== PurchasePlatform.INTERNAL && (
+            subscription.price &&
+            subscription.purchasePlatform !== PurchasePlatform.INTERNAL && (
               <PriceDisplay
                 price={subscription.price}
                 period={subscriptionPeriod}
-                periodCount={subIsPremium(subscription, isPremium) ? undefined : subscription.periodCount}
-                className='subscription'
+                periodCount={
+                  subIsPremium(subscription, isPremium) ? undefined : subscription.periodCount
+                }
+                className="subscription"
               />
             )
           )}
@@ -339,14 +353,14 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
             <CycleEndDate expiration={subscription.expiration} renewal={subscription.renewal} />
             {hasFreeTrialOffer((subscription as UserSubscription).subscriptionOffers) && (
               <Chip
-                as='button'
+                as="button"
                 isChecked={false}
-                size='Small'
-                text={translate('Label.FreeTrial')}
-                variant='Standard'
+                size="Small"
+                text={translate("Label.FreeTrial")}
+                variant="Standard"
               />
             )}
-          </div>          
+          </div>
           {!subIsPremium(subscription, isPremium) &&
             !(subscription.priceInRobux != null && subscription.priceInRobux > 0) &&
             subscription.purchasePlatform !== PurchasePlatform.INTERNAL && (
@@ -378,12 +392,12 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
               // The data in setInnerHtml has no user input; uses a constant URL.
               // eslint-disable-next-line react/no-danger
               dangerouslySetInnerHTML={{
-                __html: translate('Message.Subscriptions.PremiumAppStoreCancel', {
-                  aTagStartWithHref: '<a href=',
+                __html: translate("Message.Subscriptions.PremiumAppStoreCancel", {
+                  aTagStartWithHref: "<a href=",
                   cancelHelpPagesLink: `"${APP_STORE_CANCEL_HELP_URL}"`,
                   hrefEnd: ' class="text-link" target="_blank">',
-                  aTagEnd: '</a>'
-                })
+                  aTagEnd: "</a>",
+                }),
               }}
             />
           )}
@@ -398,7 +412,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
             }
             isPremium={isPremium}
             assumeEligible={justCancelled}
-            className='resubscribe btn-cta-md'
+            className="resubscribe btn-cta-md"
           />
         ) : (
           <CancelSubscription
@@ -410,15 +424,15 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
               }
             }}
             isPremium={isPremium}
-            className='cancel-renewal btn-control-md'
+            className="cancel-renewal btn-control-md"
           />
         )}
-        <div className='description-container'>
-          <h3 className='detail-description-header'>
+        <div className="description-container">
+          <h3 className="detail-description-header">
             {translate(
               isBlackbird
-                ? 'Label.Subscriptions.SubscriptionBenefits'
-                : 'Label.Subscriptions.SubscriptionDescription'
+                ? "Label.Subscriptions.SubscriptionBenefits"
+                : "Label.Subscriptions.SubscriptionDescription",
             )}
           </h3>
           {renderDescription()}
