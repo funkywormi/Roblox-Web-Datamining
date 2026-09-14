@@ -1096,7 +1096,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/12126e6f1faaaf8509b3b71b4b0aa8e17477f97a18ac0eceb220c164cb41781e.js",
+            "url": "https://js.rbxcdn.com/09cea4af28c169c4d2a151d9ca8c4468f3ea7f35c2cdb4fb79631da2de823be1.js",
             "sources": [
                 "ALL"
             ]
@@ -2442,7 +2442,7 @@
         },
         {
             "name": "Feature.Parents",
-            "url": "https://js.rbxcdn.com/632d9d2dd598dee5118dd7615ff4447fa6a9b263163dcce9f28dd30d6758385c.js",
+            "url": "https://js.rbxcdn.com/874621da7c2fc79326933b851a173b967215ab5af7344950341caac62983997f.js",
             "sources": [
                 "/home",
                 "/",
