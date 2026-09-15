@@ -2,15 +2,22 @@ import classNames from "classnames";
 import { useContext } from "react";
 import { Button } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
+import { usePendingPlusReferrals } from "@rbx/subscriptions-common";
 import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
 import { Section } from "../types/buyRobuxPageData";
-import { InlinePendingTransfers } from "./InlinePendingTransfers";
+import { InlinePendingRequests } from "./InlinePendingRequests";
 import { RobuxBalance } from "./RobuxBalance";
 import { SendRobuxButton } from "./SendRobuxButton";
 import { TrackingContext } from "../contexts/TrackingContext";
 import { ModalContext } from "../contexts/ModalContext";
 import { isInApp } from "../utils/platform";
 import { getSectionTrackingProps } from "../hooks/useScrollTracking";
+
+const HEADER_SHELL_CLASS =
+  "flex flex-col self-stretch medium:self-end medium:margin-top-[16px] medium:margin-right-[16px]";
+
+const HEADER_CARD_CLASS =
+  "flex flex-col gap-large bg-surface-100 padding-y-medium padding-x-large small:padding-x-xlarge self-stretch";
 
 export function Header({
   transfersSection,
@@ -26,23 +33,54 @@ export function Header({
   const { trackRobuxGiftClick } = useContext(TrackingContext);
 
   const { translate } = useTranslation();
+  const { pendingReferrals } = usePendingPlusReferrals();
 
   const transfers = transfersSection?.transfers;
   const robuxGift = robuxGiftSection?.robuxGift;
-  const hasPendingTransfers = Boolean(transfers?.pendingTransfers?.length);
+  const hasTransfers = Boolean(transfers?.pendingTransfers?.length);
+  const hasPendingRequests = hasTransfers || pendingReferrals.length > 0;
   const isSmallView = !breakpoint.isAboveInclusive("medium");
 
+  const pendingRequestsRow = hasPendingRequests ? (
+    <div className="flex padding-y-medium padding-x-medium medium:padding-x-large self-stretch radius-medium justify-center bg-shift-100 stroke-standard stroke-default">
+      <InlinePendingRequests transfers={transfers} pendingReferrals={pendingReferrals} />
+    </div>
+  ) : null;
+
   // A temporary check; while Transfers is not enabled, then ensure we render
-  // the old sticky RobuxBalance in Banner.tsx.
-  if (!transfers) return null;
+  // the old sticky RobuxBalance in Banner.tsx. Referrals don't depend on Transfers, so the
+  // prompt still gets a home above the page content.
+  if (!transfers) {
+    return pendingRequestsRow ? (
+      // `.buy-robux-background` is an absolutely positioned 1080px overlay, so without a z-index
+      // it paints over this row and swallows the Review click.
+      <div
+        className={HEADER_SHELL_CLASS}
+        style={
+          isSmallView
+            ? {
+                position: "sticky",
+                top: "env(safe-area-inset-top)",
+                marginTop: "env(safe-area-inset-top)",
+                zIndex: 10,
+              }
+            : { zIndex: 10 }
+        }
+      >
+        <div className={classNames(HEADER_CARD_CLASS, "medium:radius-medium")}>
+          {pendingRequestsRow}
+        </div>
+      </div>
+    ) : null;
+  }
 
   return (
     <div
       // Tagging the entire transfers header region: any time SendRobuxButton
-      // or InlinePendingTransfers becomes visible, the Transfers section is
+      // or InlinePendingRequests becomes visible, the Transfers section is
       // considered impressed.
       {...getSectionTrackingProps(transfersSection)}
-      className="flex flex-col self-stretch medium:self-end medium:margin-top-[16px] medium:margin-right-[16px]"
+      className={HEADER_SHELL_CLASS}
       style={
         isSmallView
           ? {
@@ -56,13 +94,10 @@ export function Header({
       }
     >
       <div
-        className={classNames(
-          "flex flex-col gap-large bg-surface-100 padding-y-medium padding-x-large small:padding-x-xlarge self-stretch",
-          {
-            "medium:radius-medium": hasPendingTransfers,
-            "medium:radius-circle": !hasPendingTransfers,
-          },
-        )}
+        className={classNames(HEADER_CARD_CLASS, {
+          "medium:radius-medium": hasPendingRequests,
+          "medium:radius-circle": !hasPendingRequests,
+        })}
       >
         <div
           className={classNames(
@@ -99,11 +134,7 @@ export function Header({
             )}
           </div>
         </div>
-        {hasPendingTransfers && (
-          <div className="flex padding-y-medium padding-x-medium medium:padding-x-large self-stretch radius-medium justify-center bg-shift-100 stroke-standard stroke-default">
-            <InlinePendingTransfers transfers={transfers} />
-          </div>
-        )}
+        {pendingRequestsRow}
       </div>
     </div>
   );

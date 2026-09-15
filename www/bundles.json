@@ -1096,7 +1096,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/f77a02fce559fc8851e203c3d8e827c2c10a47cd6e0e68cfdf5a464134a215d8.js",
+            "url": "https://js.rbxcdn.com/180ae70e1e664512188ad4e1b0398d6dd9b14a2b7a271530e5368c522c4e484a.js",
             "sources": [
                 "ALL"
             ]
@@ -6242,7 +6242,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/8a30db711db16f0098bff65d5eca651459067bf58e5e651ef04433aa44e32f16-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/c6de396137c3104d77c33195a3b3342068af8ddde7a9c3a50d2aa6beac3990c1-RobuxRedesign.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -6847,7 +6847,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/b311d59923f8b4e6a24f142f8cc5240809a440de9b013320f704174c0a34c1fd-UserSettings.js",
+            "url": "https://js.rbxcdn.com/b7d2d01ee6d4dc322c7ddf7f06e06397b85deedf78549181f158d6176c1aeeb8-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -8593,7 +8593,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://css.rbxcdn.com/2b4bcae9c0c565a60f077a2077c8b3adb84bd36cab51b8fa2ea745cc38ee7529-RobuxRedesign.css",
+            "url": "https://css.rbxcdn.com/ef29b048e62a0da926813f67f522fa2dbe8daa8da5ecce7f83aea69116733e19-RobuxRedesign.css",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -8940,7 +8940,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://css.rbxcdn.com/31e9540bd4e5e2ea7400b4d8f396723e84e66f8388f5052db929af5572b007c2-UserSettings.css",
+            "url": "https://css.rbxcdn.com/a541f3466c81e3024db5f4eb86978617c9eb9d250d30cb1eff590cc4443a9350-UserSettings.css",
             "sources": [
                 "/my/account"
             ]

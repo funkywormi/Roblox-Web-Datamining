@@ -126,6 +126,8 @@ export default {
   parentSideShareActivityUpdatesDescription: "Description.ParentSide.ShareActivityUpdatesV2",
   shareActivityUpdatesDescriptionV2: "Description.ShareActivityUpdatesV3",
   parentSideShareActivityUpdatesDescriptionV2: "Description.ParentSide.ShareActivityUpdatesV3",
+  thirdPartyFriendAccessLabel: "Label.ThirdPartyFriendAccess",
+  thirdPartyFriendAccessDescription: "Description.ThirdPartyFriendAccess",
 
   // Inventory & trade privacy
   inventoryPrivacyLabel: "Label.WhoCanSeeInventory",

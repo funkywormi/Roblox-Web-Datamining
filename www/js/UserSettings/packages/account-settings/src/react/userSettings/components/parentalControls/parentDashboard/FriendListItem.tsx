@@ -1,7 +1,10 @@
 import React, { useMemo } from "react";
 import { Button, IconButton, Popover } from "react-style-guide";
 import { CurrentUser } from "Roblox";
-import { BadgeSizes, VerifiedBadgeIconContainer } from "roblox-badges";
+import VerifiedBadgeIcon, {
+  VERIFIED_BADGE_ARIA_LABEL,
+  VERIFIED_BADGE_ARIA_LABEL_KEY,
+} from "@rbx/www-common/components/verified-badge";
 import {
   Thumbnail2d,
   ThumbnailTypes,
@@ -125,9 +128,14 @@ export const FriendListItem = ({
       <div className="friend-name-container">
         <div className="display-name text-name">{displayName}</div>
         {friend.hasVerifiedBadge && (
-          <VerifiedBadgeIconContainer
-            size={BadgeSizes.SUBHEADER}
-            additionalContainerClass="verified-badge"
+          <VerifiedBadgeIcon
+            size="Medium"
+            className="verified-badge"
+            titleText={translate(
+              VERIFIED_BADGE_ARIA_LABEL_KEY,
+              undefined,
+              VERIFIED_BADGE_ARIA_LABEL,
+            )}
           />
         )}
       </div>

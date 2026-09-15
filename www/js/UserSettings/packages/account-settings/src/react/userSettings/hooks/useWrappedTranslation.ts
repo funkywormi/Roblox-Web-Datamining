@@ -95,7 +95,11 @@ type TransformationRule = {
  * based on feature flags or other logic before resolving the final string.
  */
 export const useWrappedTranslation = (): {
-  translate: (resourceId: string, params?: Record<string, unknown>) => string;
+  translate: (
+    resourceId: string,
+    params?: Record<string, unknown>,
+    fallbackString?: string,
+  ) => string;
 } & Omit<ReturnType<typeof useTranslation>, "translate"> => {
   const { translate: baseTranslate, ...rest } = useTranslation();
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
@@ -130,9 +134,9 @@ export const useWrappedTranslation = (): {
   };
 
   const translate = useCallback(
-    (resourceId: string, params?: Record<string, unknown>): string => {
+    (resourceId: string, params?: Record<string, unknown>, fallbackString?: string): string => {
       const finalResourceId = applyTransformationRules(resourceId);
-      return baseTranslate(finalResourceId, params);
+      return baseTranslate(finalResourceId, params, fallbackString);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [baseTranslate, uiPolicy, vpcLaunchStatus],

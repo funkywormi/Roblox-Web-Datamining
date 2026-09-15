@@ -12,6 +12,7 @@ import SettingsSection from "../../../common/components/SettingsSection";
 import ToggleWithParentalConsent from "../../../common/components/ToggleWithParentalConsent";
 import RadioButtonOptionsWithParentalConsent from "../../../common/components/RadioButtonOptionsWithParentalConsent";
 import useGetSettingsAndOptions from "../../../apis/hooks/useGetSettingsAndOptions";
+import useGetSettingsAndOptionsV2 from "../../../apis/hooks/useGetSettingsAndOptionsV2";
 import { filterRadioButtonOptions } from "../../../../core/utils/settingOptionsUtils";
 import { useUpdateUserSettingValueMutation } from "../../../apis/userSettingsApi";
 import privacyTranslationConstants from "../../constants/contentConstants/privacyTranslationConstants";
@@ -26,6 +27,7 @@ import {
 } from "../../utils/successMessageUtils";
 import { TChildInfo } from "../../../../types/childrenInfoTypes";
 import { shareActivityUpdatesHelpPageUrl } from "../../constants/urlConstants";
+import { ThirdPartyFriendAccess } from "./ThirdPartyFriendAccess";
 
 export const VisibilitySettings = ({ child }: { child?: TChildInfo }): JSX.Element => {
   const childUserId = child?.userId;
@@ -41,6 +43,7 @@ export const VisibilitySettings = ({ child }: { child?: TChildInfo }): JSX.Eleme
   const [updateSettingValue] = useUpdateUserSettingValueMutation();
 
   const [settingsAndOptions] = useGetSettingsAndOptions(childUserId);
+  const [settingsAndOptionsV2] = useGetSettingsAndOptionsV2(childUserId);
 
   const updateJoinExperiencePrivacy = async (newPrivacyLevel: CommunicationPrivacyLevel) => {
     const updateBody: TUpdateUserSettingValueRequest = {
@@ -179,6 +182,10 @@ export const VisibilitySettings = ({ child }: { child?: TChildInfo }): JSX.Eleme
         {/* For child-side view, it lives in account info tab */}
         {childUserId && settingsAndOptions?.[UserSetting.whoCanSeeMySocialNetworks] && (
           <SocialNetworkVisibility child={child} />
+        )}
+
+        {settingsAndOptionsV2?.[UserSetting.allowThirdPartyFriendAccess] && (
+          <ThirdPartyFriendAccess childUserId={childUserId} />
         )}
       </React.Fragment>
     </SettingsSection>

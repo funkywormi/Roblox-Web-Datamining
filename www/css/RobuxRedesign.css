@@ -1141,6 +1141,10 @@ p.personalized-bonus-items__report-popover {
     right: 0
 }
 
+.margin-bottom-\[-8px\] {
+    margin-bottom: -8px
+}
+
 .margin-left-\[6px\] {
     margin-left: 6px
 }
@@ -1159,6 +1163,16 @@ p.personalized-bonus-items__report-popover {
 
 .scroll {
     overflow: auto
+}
+
+.\!size-1800 {
+    width: var(--size-1800) !important;
+    height: var(--size-1800) !important
+}
+
+.size-\[11px\] {
+    width: 11px;
+    height: 11px
 }
 
 .size-\[20px\] {
@@ -1213,12 +1227,20 @@ p.personalized-bonus-items__report-popover {
     height: 24px
 }
 
+.height-\[40px\] {
+    height: 40px
+}
+
 .height-\[60px\] {
     height: 60px
 }
 
 .height-\[75px\] {
     height: 75px
+}
+
+.max-width-\[320px\] {
+    max-width: 320px
 }
 
 .max-width-\[calc\(var\(--size-100\)\*50\)\] {
@@ -1312,6 +1334,10 @@ p.personalized-bonus-items__report-popover {
     background-color: rgba(0, 0, 0, .4)
 }
 
+.bg-\[var\(--color-extended-gray-100\)\] {
+    background-color: var(--color-extended-gray-100)
+}
+
 .opacity-\[0\.5\] {
     opacity: .5
 }
@@ -1362,6 +1388,10 @@ p.personalized-bonus-items__report-popover {
 
 .icon-regular-circle-i {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M17 21H19.5V23H12.5V21H15V14H13V12H17V21Z' fill='black'/%3E %3Cpath d='M17 10H15V8H17V10Z' fill='black'/%3E %3Cpath d='M16 2C23.732 2 30 8.26801 30 16C30 23.732 23.732 30 16 30C8.26801 30 2 23.732 2 16C2 8.26801 8.26801 2 16 2ZM16 4C9.37258 4 4 9.37258 4 16C4 22.6274 9.37258 28 16 28C22.6274 28 28 22.6274 28 16C28 9.37258 22.6274 4 16 4Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-filled-circle-i {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M16 2C23.732 2 30 8.26801 30 16C30 23.732 23.732 30 16 30C8.26801 30 2 23.732 2 16C2 8.26801 8.26801 2 16 2ZM13 14H15V21H12.5V23H19.5V21H17V12H13V14ZM15 10H17V8H15V10Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-regular-circle-star {
@@ -1447,6 +1477,10 @@ p.personalized-bonus-items__report-popover {
 
 .icon-filled-tilt {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M7.91703 2L2 24.083L24.083 30L30 7.91703L7.91703 2ZM18.2592 19.9135L12.0885 18.2592L13.7427 12.0885L19.916 13.7427L18.2592 19.9135Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-triangle-exclamation {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M17.5007 21.5C17.5007 22.3284 16.8292 23 16.0007 23C15.1723 23 14.5007 22.3284 14.5007 21.5C14.5007 20.6716 15.1723 20 16.0007 20C16.8292 20 17.5007 20.6716 17.5007 21.5Z' fill='black'/%3E %3Cpath d='M17.0007 12C17.0007 11.4477 16.553 11 16.0007 11C15.4485 11 15.0007 11.4477 15.0007 12V17C15.0007 17.5523 15.4485 18 16.0007 18C16.553 18 17.0007 17.5523 17.0007 17V12Z' fill='black'/%3E %3Cpath d='M14.1547 4.03623C14.9821 2.65459 17.0194 2.65459 17.8468 4.03623L29.7041 23.8362C30.5755 25.2913 29.4481 27 27.8581 27H4.14342C2.55342 27 1.42599 25.2913 2.29738 23.8362L14.1547 4.03623ZM16.0007 5C15.9291 5 15.8904 5.03069 15.8706 5.06377L4.01323 24.8638C4.00049 24.8851 4.00068 24.8954 4.00075 24.8989C4.00087 24.9057 4.00306 24.9192 4.01323 24.9362C4.02343 24.9532 4.03879 24.9689 4.05802 24.98C4.07498 24.9899 4.10123 25 4.14342 25H27.8581C27.9003 25 27.9265 24.9899 27.9435 24.98C27.9627 24.9689 27.9781 24.9532 27.9883 24.9362C27.9984 24.9192 28.0006 24.9059 28.0007 24.899C28.0008 24.8956 28.0012 24.8853 27.9883 24.8638L16.1309 5.06377C16.1111 5.03069 16.0724 5 16.0007 5Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-filled-verified-backplate {
@@ -2096,6 +2130,11 @@ h5 {
         column-gap: var(--gap-xlarge)
     }
 
+    .medium\:\!size-2200 {
+        width: var(--size-2200) !important;
+        height: var(--size-2200) !important
+    }
+
     .medium\:max-height-3000 {
         max-height: var(--size-3000)
     }
@@ -2150,12 +2189,33 @@ h5 {
         padding-right: var(--padding-xlarge)
     }
 
+    .medium\:padding-bottom-large {
+        padding-bottom: var(--padding-large)
+    }
+
+    .medium\:padding-bottom-medium {
+        padding-bottom: var(--padding-medium)
+    }
+
     .medium\:padding-bottom-none {
         padding-bottom: var(--padding-none)
     }
 
     .medium\:padding-left-none {
         padding-left: var(--padding-none)
+    }
+
+    .medium\:padding-top-medium {
+        padding-top: var(--padding-medium)
+    }
+
+    .medium\:padding-top-xlarge {
+        padding-top: var(--padding-xlarge)
+    }
+
+    .medium\:text-body-medium {
+        font: var(--typography-body-medium-font);
+        letter-spacing: var(--typography-body-medium-letter-spacing)
     }
 
     .medium\:text-heading-large {
@@ -2223,6 +2283,40 @@ h5 {
     }
 }
 
+@media (prefers-color-scheme:dark) {
+    .dark\:block:where(:not(:-webkit-any(.light-theme, .light-theme *))) {
+        display: block
+    }
+
+    .dark\:block:where(:not(:-moz-any(.light-theme, .light-theme *))) {
+        display: block
+    }
+
+    .dark\:block:where(:not(:is(.light-theme, .light-theme *))) {
+        display: block
+    }
+
+    .dark\:hidden:where(:not(:-webkit-any(.light-theme, .light-theme *))) {
+        display: none
+    }
+
+    .dark\:hidden:where(:not(:-moz-any(.light-theme, .light-theme *))) {
+        display: none
+    }
+
+    .dark\:hidden:where(:not(:is(.light-theme, .light-theme *))) {
+        display: none
+    }
+}
+
+.dark\:block:where(.dark-theme, .dark-theme *) {
+    display: block
+}
+
+.dark\:hidden:where(.dark-theme, .dark-theme *) {
+    display: none
+}
+
 .\[\&\:\:-webkit-search-cancel-button\]\:hidden::-webkit-search-cancel-button {
     display: none
 }
@@ -2237,4 +2331,13 @@ h5 {
 
 .\[\&\:\:-webkit-search-results-decoration\]\:hidden::-webkit-search-results-decoration {
     display: none
+}
+
+.\[\&\>\[role\=separator\]\]\:\[display\:none\]>[role=separator] {
+    display: none
+}
+
+.\[\&\>div\]\:padding-y-small>div {
+    padding-top: var(--padding-small);
+    padding-bottom: var(--padding-small)
 }

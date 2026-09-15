@@ -99,6 +99,7 @@ export const booleanToOption = (value: boolean, settingName: UserSetting): TOpti
         ? UpdateFriendsAboutMyActivitySettingValue.Yes
         : UpdateFriendsAboutMyActivitySettingValue.No;
     case UserSetting.allowThirdPartyAppPermissions:
+    case UserSetting.allowThirdPartyFriendAccess:
     case UserSetting.enablePurchases:
       return value ? EnabledStatusValue.Enabled : EnabledStatusValue.Disabled;
     case UserSetting.allowVoiceDataUsage:

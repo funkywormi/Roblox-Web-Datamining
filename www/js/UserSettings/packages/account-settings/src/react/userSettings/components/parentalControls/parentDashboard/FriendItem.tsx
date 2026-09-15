@@ -1,5 +1,9 @@
 import React from "react";
-import { BadgeSizes, VerifiedBadgeIconContainer } from "roblox-badges";
+import { useTranslation } from "react-utilities";
+import VerifiedBadgeIcon, {
+  VERIFIED_BADGE_ARIA_LABEL,
+  VERIFIED_BADGE_ARIA_LABEL_KEY,
+} from "@rbx/www-common/components/verified-badge";
 import {
   Thumbnail2d,
   ThumbnailTypes,
@@ -16,6 +20,8 @@ export const FriendItem = ({
   friend: TFriendResponse;
   userName: string;
 }): JSX.Element => {
+  const { translate } = useTranslation();
+
   const getThumbnail = (): JSX.Element => {
     const thumbnail = (
       <Thumbnail2d
@@ -38,9 +44,14 @@ export const FriendItem = ({
         <div className="friend-name-container">
           <span className="friend-name">{userName}</span>
           {friend.hasVerifiedBadge && (
-            <VerifiedBadgeIconContainer
-              size={BadgeSizes.SUBHEADER}
-              additionalContainerClass="verified-badge"
+            <VerifiedBadgeIcon
+              size="Medium"
+              className="verified-badge"
+              titleText={translate(
+                VERIFIED_BADGE_ARIA_LABEL_KEY,
+                undefined,
+                VERIFIED_BADGE_ARIA_LABEL,
+              )}
             />
           )}
         </div>

@@ -97,6 +97,7 @@ export type TUserSettingsBody = {
    */
   [UserSetting.robuxTransferLimits]?: string;
   [UserSetting.iarcAgeRating]?: IarcAgeRating;
+  [UserSetting.allowThirdPartyFriendAccess]?: EnabledStatusValue;
 };
 
 export type TOptionValue =
@@ -227,6 +228,7 @@ export type TUserSettingsAndOptionsV2Body = {
    */
   [UserSetting.robuxTransferLimits]?: TUserSettingsAndOptionsV2<TRobuxTransferLimitsInput>;
   [UserSetting.iarcAgeRating]?: TUserSettingsAndOptionsV2<IarcAgeRating>;
+  [UserSetting.allowThirdPartyFriendAccess]?: TUserSettingsAndOptionsV2<EnabledStatusValue>;
 };
 
 type TCascadingSettingUpdatesResponse = {

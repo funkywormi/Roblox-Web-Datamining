@@ -7,7 +7,10 @@ import {
   ThumbnailFormat,
   ThumbnailGameIconSize,
 } from "roblox-thumbnails";
-import { BadgeSizes, VerifiedBadgeIconContainer } from "roblox-badges";
+import VerifiedBadgeIcon, {
+  VERIFIED_BADGE_ARIA_LABEL,
+  VERIFIED_BADGE_ARIA_LABEL_KEY,
+} from "@rbx/www-common/components/verified-badge";
 import { Badge, Button, ProgressCircle } from "@rbx/foundation-ui";
 import {
   useSettingsInfoModal,
@@ -183,7 +186,16 @@ const TopGameDetails = ({ child }: { child: TChildInfo }): JSX.Element | null =>
         {creatorName && (
           <span className="text-body-medium content-default flex items-center gap-xsmall">
             {creatorName}
-            {creatorHasVerifiedBadge && <VerifiedBadgeIconContainer size={BadgeSizes.SUBHEADER} />}
+            {creatorHasVerifiedBadge && (
+              <VerifiedBadgeIcon
+                size="Medium"
+                titleText={translate(
+                  VERIFIED_BADGE_ARIA_LABEL_KEY,
+                  undefined,
+                  VERIFIED_BADGE_ARIA_LABEL,
+                )}
+              />
+            )}
           </span>
         )}
       </div>
