@@ -1,14 +1,16 @@
-import React, { useEffect, useRef } from 'react';
-import * as EmailValidator from 'email-validator';
-import { useTranslations } from '../../util/translation';
-import { Limit } from '../constants';
-import OTPModal from './OTPModal';
-import { useEmailVerification } from '../hooks/useEmailVerification';
-import VerificationCodeModal from './VerificationCodeModal';
+import React, { useEffect, useRef } from "react";
+import * as EmailValidator from "email-validator";
+import { useTranslations } from "../../util/translation";
+import { Limit } from "../constants";
+import OTPModal from "./OTPModal";
+import { useEmailVerification } from "../hooks/useEmailVerification";
+import VerificationCodeModal from "./VerificationCodeModal";
 
 const CHECKMARK_UNICODE = 0x2713; // ✓ symbol
 
 interface FieldTitleProps {
+  /** Unique identifier used to label the associated input */
+  id: string;
   /** The field label text */
   label: string;
   /** Whether the field is optional (shows "(Optional)" subtitle instead of asterisk) */
@@ -20,19 +22,19 @@ interface FieldTitleProps {
  * For optional fields: Shows label with an inline "(Optional)" indicator
  * For required fields: Shows label with asterisk
  */
-const FieldTitle: React.FC<FieldTitleProps> = ({ label, optional = false }) => {
+const FieldTitle: React.FC<FieldTitleProps> = ({ id, label, optional = false }) => {
   const { translate } = useTranslations();
 
   if (optional) {
     return (
-      <h5>
-        {label} <span className='dsa-reason-limit'>{translate('Label.Optional')}</span>
+      <h5 id={id}>
+        {label} <span className="dsa-reason-limit">{translate("Label.Optional")}</span>
       </h5>
     );
   }
 
   const title = `${label}*`;
-  return <h5>{title}</h5>;
+  return <h5 id={id}>{title}</h5>;
 };
 
 /**
@@ -49,6 +51,8 @@ export interface ContactFieldsProps {
   onNameChange: (value: string) => void;
   /** Callback when email changes */
   onEmailChange: (value: string) => void;
+  /** Override for the name field label (defaults to translated Label.Name) */
+  nameLabel?: string;
   /** Whether fields are optional (removes asterisk, adds "(Optional)" label) */
   optional?: boolean;
   /** When true open the OTP modal */
@@ -71,11 +75,12 @@ const ContactFields: React.FC<ContactFieldsProps> = ({
   email,
   onNameChange,
   onEmailChange,
+  nameLabel,
   optional = false,
   openOtpModal = false,
   onOtpVerified,
   onVerificationStatusChange,
-  onOtpModalClosedWithoutVerify
+  onOtpModalClosedWithoutVerify,
 }) => {
   const { translate } = useTranslations();
 
@@ -95,7 +100,7 @@ const ContactFields: React.FC<ContactFieldsProps> = ({
     closeModal,
     resetVerification,
     clearEmailError,
-    clearCodeError
+    clearCodeError,
   } = useEmailVerification(onOtpVerified, onVerificationStatusChange);
 
   /**
@@ -103,7 +108,7 @@ const ContactFields: React.FC<ContactFieldsProps> = ({
    * This ensures a clean state when the user starts a new report.
    */
   useEffect(() => {
-    if (email === '' && isCodeVerified) {
+    if (email === "" && isCodeVerified) {
       resetVerification();
       if (onVerificationStatusChange) {
         onVerificationStatusChange(false);
@@ -159,44 +164,54 @@ const ContactFields: React.FC<ContactFieldsProps> = ({
 
   return (
     <React.Fragment>
-      <div id='information-header' className='section'>
-        <h2>{translate('Title.Contact')}</h2>
+      <div id="information-header" className="section">
+        <h2>{translate("Title.Contact")}</h2>
       </div>
-      <div id='reporter-info-name' className='section'>
-        <FieldTitle label={translate('Label.Name')} optional={optional} />
+      <div id="reporter-info-name" className="section">
+        <FieldTitle
+          id="reporter-info-name-label"
+          label={nameLabel ?? translate("Label.Name")}
+          optional={optional}
+        />
         <input
+          id="reporter-info-name-input"
+          aria-labelledby="reporter-info-name-label"
           value={name}
-          type='text'
-          className='form-control input-field'
+          type="text"
+          className="form-control input-field"
           maxLength={Limit.MAX_NAME_LENGTH}
           onChange={e => onNameChange(e.target.value)}
         />
       </div>
 
-      <div id='reporter-info-email' className='section'>
-        <FieldTitle label={translate('Label.Email')} optional={optional} />
-        {optional && (
-          <p className='dsa-reason-limit'>({translate('Message.OptionalEmailNote')})</p>
-        )}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+      <div id="reporter-info-email" className="section">
+        <FieldTitle
+          id="reporter-info-email-label"
+          label={translate("Label.Email")}
+          optional={optional}
+        />
+        {optional && <p className="dsa-reason-limit">({translate("Message.OptionalEmailNote")})</p>}
+        <div style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
           <input
+            id="reporter-info-email-input"
+            aria-labelledby="reporter-info-email-label"
             value={email}
-            type='text'
-            className={`form-control input-field ${emailError ? 'input-field-error' : ''}`}
+            type="text"
+            className={`form-control input-field ${emailError ? "input-field-error" : ""}`}
             maxLength={Limit.MAX_EMAIL_LENGTH}
             onChange={e => handleEmailChange(e.target.value)}
             style={{ flex: 1 }}
             disabled={isCodeVerified}
           />
           {isCodeVerified && (
-            <div className='verification-checkmark' title={translate('Message.EmailVerified')}>
+            <div className="verification-checkmark" title={translate("Message.EmailVerified")}>
               {String.fromCharCode(CHECKMARK_UNICODE)}
             </div>
           )}
         </div>
-        {emailError && <span className='text-error field-validation-error'>{emailError}</span>}
+        {emailError && <span className="text-error field-validation-error">{emailError}</span>}
         {!emailError && codeError && !showModal && (
-          <span className='text-error field-validation-error'>{codeError}</span>
+          <span className="text-error field-validation-error">{codeError}</span>
         )}
       </div>
 
@@ -208,23 +223,25 @@ const ContactFields: React.FC<ContactFieldsProps> = ({
         }}
         title={
           isCodeVerified
-            ? translate('Title.Modal.CodeVerified')
-            : translate('Title.Modal.EnterCode')
-        }>
+            ? translate("Title.Modal.CodeVerified")
+            : translate("Title.Modal.EnterCode")
+        }
+      >
         {isCodeVerified ? (
-          <div className='otp-modal-content' style={{ padding: '16px' }}>
+          <div className="otp-modal-content" style={{ padding: "16px" }}>
             <p
-              className='success-text'
+              className="success-text"
               style={{
-                marginBottom: '16px',
-                textAlign: 'center',
-                fontSize: '16px'
-              }}>
-              {String.fromCharCode(CHECKMARK_UNICODE)} {translate('Message.Modal.CodeVerified')}
+                marginBottom: "16px",
+                textAlign: "center",
+                fontSize: "16px",
+              }}
+            >
+              {String.fromCharCode(CHECKMARK_UNICODE)} {translate("Message.Modal.CodeVerified")}
             </p>
           </div>
         ) : (
-          <div className='otp-modal-content'>
+          <div className="otp-modal-content">
             <VerificationCodeModal
               code={code}
               codeError={codeError}

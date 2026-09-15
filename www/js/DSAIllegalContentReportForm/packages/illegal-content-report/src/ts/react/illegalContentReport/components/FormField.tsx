@@ -1,6 +1,6 @@
-import React from 'react';
-import { useTranslations } from '../../util/translation';
-import { Limit } from '../constants';
+import React from "react";
+import { useTranslations } from "../../util/translation";
+import { Limit } from "../constants";
 
 /**
  * FormField component for multi-line text inputs with character limits.
@@ -44,15 +44,17 @@ const FormField: React.FC<FormFieldProps> = ({
   showRequiredStar = false,
   rows = 4,
   error,
-  className = 'section'
+  className = "section",
 }) => {
   const { translate } = useTranslations();
-  const subtitle = `(${translate('Message.DescriptionLimit', { number: maxLength.toString() })})`;
-  const asterisk = '*';
+  const subtitle = `(${translate("Message.DescriptionLimit", { number: maxLength.toString() })})`;
+  const asterisk = "*";
+  const labelId = `${id}-label`;
+  const inputId = `${id}-input`;
 
   let displayLabel;
   if (showRequiredStar) {
-    if (typeof label === 'string') {
+    if (typeof label === "string") {
       displayLabel = `${label}*`;
     } else {
       displayLabel = (
@@ -68,16 +70,18 @@ const FormField: React.FC<FormFieldProps> = ({
 
   return (
     <div id={id} className={className}>
-      <h5>{displayLabel}</h5>
-      <p className='dsa-reason-limit'>{subtitle}</p>
+      <h5 id={labelId}>{displayLabel}</h5>
+      <p className="dsa-reason-limit">{subtitle}</p>
       <textarea
-        className='ticket-message form-control input-field nonresizable'
+        id={inputId}
+        aria-labelledby={labelId}
+        className="ticket-message form-control input-field nonresizable"
         value={value}
         rows={rows}
         maxLength={maxLength}
         onChange={e => onUpdate(e.target.value)}
       />
-      {error && <span className='text-error field-validation-error'>{error}</span>}
+      {error && <span className="text-error field-validation-error">{error}</span>}
     </div>
   );
 };

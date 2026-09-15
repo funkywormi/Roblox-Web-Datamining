@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface SubmitRequestBody {
   IllegalType?: string;
@@ -42,12 +42,12 @@ interface SendReportResponse {
 
 // OSA Complaint Types
 enum OSAComplaintType {
-  ILLEGAL_CONTENT_TAKEDOWN = 'IllegalContentTakedown',
-  TERMS_OF_SERVICE = 'TermsOfService',
-  CHCR_SUBCATEGORY = 'CHCRSubcategory',
-  CONTENT_REPORTING = 'ContentReporting',
-  FREEDOM_OF_EXPRESSION_AND_PRIVACY = 'FreedomOfExpressionAndPrivacy',
-  PROACTIVE_TECHNOLOGY = 'ProactiveTechnology'
+  ILLEGAL_CONTENT_TAKEDOWN = "IllegalContentTakedown",
+  TERMS_OF_SERVICE = "TermsOfService",
+  CHCR_SUBCATEGORY = "CHCRSubcategory",
+  CONTENT_REPORTING = "ContentReporting",
+  FREEDOM_OF_EXPRESSION_AND_PRIVACY = "FreedomOfExpressionAndPrivacy",
+  PROACTIVE_TECHNOLOGY = "ProactiveTechnology",
 }
 
 // Base interface for all OSA complaint forms
@@ -64,7 +64,7 @@ interface TakedownDutiesComplaintData extends BaseOSAComplaintData {
 }
 
 interface TermsOfServiceComplaintData extends BaseOSAComplaintData {
-  typeOfConcern: 'Content' | 'Clarity' | 'Application';
+  typeOfConcern: "Content" | "Clarity" | "Application";
   quotedToSProvisions: string;
   explanationOfIssue: string;
 }
@@ -81,7 +81,7 @@ interface ContentReportingDutiesComplaintData extends BaseOSAComplaintData {
 }
 
 interface FreedomExpressionPrivacyComplaintData extends BaseOSAComplaintData {
-  concernType: 'FreedomOfExpression' | 'Privacy' | 'Both';
+  concernType: "FreedomOfExpression" | "Privacy" | "Both";
   impactedPolicyOrFeature: string;
   lackOfRegardExplanation: string;
 }
@@ -114,6 +114,6 @@ export type {
   ContentReportingDutiesComplaintData,
   FreedomExpressionPrivacyComplaintData,
   ProactiveTechnologyComplaintData,
-  OSAComplaintData
+  OSAComplaintData,
 };
 export { OSAComplaintType };

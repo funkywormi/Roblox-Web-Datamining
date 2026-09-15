@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { validateCode } from '../services/otpService';
+import { useEffect, useRef } from "react";
+import { validateCode } from "../services/otpService";
 
 interface UseAutoVerifyCodeOptions {
   code: string;
@@ -7,7 +7,7 @@ interface UseAutoVerifyCodeOptions {
   otpSessionToken: string;
   isValidatingCode: boolean;
   origin: string;
-  contactType: 'Email';
+  contactType: "Email";
   onValidationStart: () => void;
   onValidationSuccess: () => void;
   onValidationError: (error: unknown) => void;
@@ -28,9 +28,9 @@ const useAutoVerifyCode = ({
   onValidationStart,
   onValidationSuccess,
   onValidationError,
-  onValidationEnd
+  onValidationEnd,
 }: UseAutoVerifyCodeOptions): void => {
-  const lastValidatedCodeRef = useRef('');
+  const lastValidatedCodeRef = useRef("");
 
   useEffect(() => {
     const verifyCodeAutomatically = async () => {
@@ -46,12 +46,12 @@ const useAutoVerifyCode = ({
             passCode: code,
             otpSessionToken,
             contactType,
-            origin
+            origin,
           });
           onValidationSuccess();
         } catch (error) {
           // eslint-disable-next-line no-console
-          console.error('Error validating OTP code:', error);
+          console.error("Error validating OTP code:", error);
           onValidationError(error);
         } finally {
           onValidationEnd();
@@ -70,7 +70,7 @@ const useAutoVerifyCode = ({
     onValidationStart,
     onValidationSuccess,
     onValidationError,
-    onValidationEnd
+    onValidationEnd,
   ]);
 };
 

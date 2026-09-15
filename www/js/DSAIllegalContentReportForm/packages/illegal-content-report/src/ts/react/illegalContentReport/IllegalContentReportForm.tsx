@@ -1,26 +1,29 @@
 // Illegal Content Report Form Component
-import React, { useState, useEffect, ReactElement, ChangeEvent, useRef, useCallback } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import * as EmailValidator from 'email-validator';
-import { useTranslations } from '../util/translation';
-import CustomModal from '../components/CustomModal';
-import ContactFields from './components/ContactFields';
-import FormField from './components/FormField';
-import PrivacyNotice from './components/PrivacyNotice';
-import Checkbox from './components/Checkbox';
-import UrlInput from './components/UrlInput';
-import { sendReport } from './services';
-import useGetMetadata from './useGetMetadata';
-import { getStoredVerificationToken, setStoredVerificationToken } from './util/verificationTokenStorage';
+import React, { useState, useEffect, ReactElement, ChangeEvent, useRef, useCallback } from "react";
+import { useMutation } from "@tanstack/react-query";
+import * as EmailValidator from "email-validator";
+import { useTranslations } from "../util/translation";
+import CustomModal from "../components/CustomModal";
+import ContactFields from "./components/ContactFields";
+import FormField from "./components/FormField";
+import PrivacyNotice from "./components/PrivacyNotice";
+import Checkbox from "./components/Checkbox";
+import UrlInput from "./components/UrlInput";
+import { sendReport } from "./services";
+import useGetMetadata from "./useGetMetadata";
+import {
+  getStoredVerificationToken,
+  setStoredVerificationToken,
+} from "./util/verificationTokenStorage";
 import {
   isValidRobloxUrl,
   tooManyUrls,
   MAX_NUMBER_OF_CONTENTS,
   ReportType,
   reportTypeToString,
-  isUrlValidForSubmission
-} from './helpers';
-import { SubmitRequestBody, SubmitModal } from './types';
+  isUrlValidForSubmission,
+} from "./helpers";
+import { SubmitRequestBody, SubmitModal } from "./types";
 
 import {
   Urls,
@@ -29,11 +32,11 @@ import {
   IllegalContentSubCategoryKey,
   UKCHCROtherSubCategoryKey,
   ChildSexualExploitationSubCategoryKey,
-  IPInfringementSubCategoryKey
-} from './constants';
-import { useTranslationKeyMap } from '../util/translation/translationKeyMap';
-import { getIllegalTypeFilter } from '../util/filter';
-import BackButton from './components/BackButton';
+  IPInfringementSubCategoryKey,
+} from "./constants";
+import { useTranslationKeyMap } from "../util/translation/translationKeyMap";
+import { getIllegalTypeFilter } from "../util/filter";
+import BackButton from "./components/BackButton";
 
 export interface Props {
   defaultContentURL?: string | null;
@@ -44,37 +47,37 @@ export interface Props {
 const IllegalContentReportForm = ({
   defaultContentURL,
   reportType,
-  onBack
+  onBack,
 }: Props): ReactElement => {
   const { data, error } = useGetMetadata();
   const { translate, translateHtml } = useTranslations();
   const { getTranslationKey } = useTranslationKeyMap(reportType);
   const otherIssueInputRef = useRef<HTMLInputElement | null>(null);
-  const [issueType, setIssueType] = useState<string>('');
-  const [otherIssue, setOtherIssue] = useState<string>('');
-  const [urlStr, setUrlStr] = useState<string>(defaultContentURL || '');
-  const [description, setDescription] = useState<string>('');
+  const [issueType, setIssueType] = useState<string>("");
+  const [otherIssue, setOtherIssue] = useState<string>("");
+  const [urlStr, setUrlStr] = useState<string>(defaultContentURL || "");
+  const [description, setDescription] = useState<string>("");
   // Country is only used for DSA forms (user selects from dropdown)
   // For non-DSA forms, backend sets the country based on report type
-  const [selectedCountry, setSelectedCountry] = useState<string>('');
-  const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
   const [submittedModalInfo, setSubmittedModalInfo] = useState<SubmitModal | null>(null);
   const [needsVerificationFromBackend, setNeedsVerificationFromBackend] = useState<boolean>(false);
 
   useEffect(() => {
-    setName(data?.name ?? '');
+    setName(data?.name ?? "");
   }, [data?.name]);
 
   useEffect(() => {
     if (error) {
       const errorMessage =
-        (error as { message: string })?.message || translate('Message.Modal.Error');
+        (error as { message: string })?.message || translate("Message.Modal.Error");
       const errorModal: SubmitModal = {
-        title: translate('Title.Modal.MetadataError'),
+        title: translate("Title.Modal.MetadataError"),
         content: errorMessage,
-        buttonText: translate('Action.Modal.Ok')
+        buttonText: translate("Action.Modal.Ok"),
       };
       setSubmittedModalInfo(errorModal);
     }
@@ -82,20 +85,24 @@ const IllegalContentReportForm = ({
 
   const mutation = useMutation(sendReport);
   const clearAllInputs = useCallback(() => {
-    setIssueType('');
-    setOtherIssue('');
-    setUrlStr('');
-    setDescription('');
-    setSelectedCountry('');
-    setName(data?.name ?? '');
-    setEmail('');
+    setIssueType("");
+    setOtherIssue("");
+    setUrlStr("");
+    setDescription("");
+    setSelectedCountry("");
+    setName(data?.name ?? "");
+    setEmail("");
     setIsConfirmed(false);
   }, [data?.name]);
 
   useEffect(() => {
     if (mutation.isSuccess) {
-      const data = mutation.data as { success?: boolean; message?: string; verificationToken?: string };
-      if (data?.success === false && data?.message?.includes('Email Verification Required')) {
+      const data = mutation.data as {
+        success?: boolean;
+        message?: string;
+        verificationToken?: string;
+      };
+      if (data?.success === false && data?.message?.includes("Email Verification Required")) {
         setNeedsVerificationFromBackend(true);
         return;
       }
@@ -104,25 +111,25 @@ const IllegalContentReportForm = ({
       }
       const submitModal: SubmitModal = data?.success
         ? {
-            title: translate(getTranslationKey('Title.Modal.ReportSuccess')),
-            content: translate(getTranslationKey('Message.Modal.ReportSuccess')),
-            buttonText: translate(getTranslationKey('Action.Modal.SubmitAnother'))
+            title: translate(getTranslationKey("Title.Modal.ReportSuccess")),
+            content: translate(getTranslationKey("Message.Modal.ReportSuccess")),
+            buttonText: translate(getTranslationKey("Action.Modal.SubmitAnother")),
           }
         : {
-            title: translate('Title.Modal.ReportFailure'),
-            content: data?.message || 'Error',
-            buttonText: translate('Action.Modal.Ok')
+            title: translate("Title.Modal.ReportFailure"),
+            content: data?.message || "Error",
+            buttonText: translate("Action.Modal.Ok"),
           };
 
       setSubmittedModalInfo(submitModal);
       clearAllInputs();
     } else if (mutation.isError) {
       const errorMessage =
-        (mutation.error as { message: string })?.message || translate('Message.Modal.Error');
+        (mutation.error as { message: string })?.message || translate("Message.Modal.Error");
       const submitModal: SubmitModal = {
-        title: translate('Title.Modal.ReportFailure'),
+        title: translate("Title.Modal.ReportFailure"),
         content: errorMessage,
-        buttonText: translate('Action.Modal.Ok')
+        buttonText: translate("Action.Modal.Ok"),
       };
       setSubmittedModalInfo(submitModal);
     }
@@ -133,42 +140,44 @@ const IllegalContentReportForm = ({
     translate,
     mutation.data,
     clearAllInputs,
-    getTranslationKey
+    getTranslationKey,
   ]);
 
-  const ipInfringementTranslationHtml = translateHtml('Message.IpInfringement', [
+  const ipInfringementTranslationHtml = translateHtml("Message.IpInfringement", [
     [
-      'emailLink',
-      'emailLinkEnd',
+      "emailLink",
+      "emailLinkEnd",
       text => (
         <a
           href={`${Urls.IP_INFRINGEMENT_AGENT_EMAIL}?subject=${encodeURIComponent(
-            Urls.IP_INFRINGEMENT_AGENT_EMAIL_SUBJECT
+            Urls.IP_INFRINGEMENT_AGENT_EMAIL_SUBJECT,
           )}`}
-          className='text-link'
-          target='_blank'
-          rel='noreferrer'>
+          className="text-link"
+          target="_blank"
+          rel="noreferrer"
+        >
           {text}
         </a>
-      )
+      ),
     ],
     [
-      'docLink',
-      'docLinkEnd',
+      "docLink",
+      "docLinkEnd",
       text => (
         <a
           href={Urls.IP_INFRINGEMENT_ROBLOX_USER_TERMS_OF_USE}
-          className='text-link'
-          target='_blank'
-          rel='noreferrer'>
+          className="text-link"
+          target="_blank"
+          rel="noreferrer"
+        >
           {text}
         </a>
-      )
-    ]
+      ),
+    ],
   ]);
 
   const handleIpModalClose = () => {
-    setIssueType('');
+    setIssueType("");
   };
   const handleSubmittedModalClose = () => {
     setSubmittedModalInfo(null);
@@ -178,7 +187,10 @@ const IllegalContentReportForm = ({
   };
 
   const buildRequestBody = useCallback(
-    (opts?: { otpSessionToken?: string; includeVerificationToken?: boolean }): SubmitRequestBody => {
+    (opts?: {
+      otpSessionToken?: string;
+      includeVerificationToken?: boolean;
+    }): SubmitRequestBody => {
       const body: SubmitRequestBody = {
         IllegalType: issueType,
         OtherViolation: otherIssue,
@@ -189,7 +201,7 @@ const IllegalContentReportForm = ({
         Email: email,
         IsAppeal: false,
         ReportType: reportTypeToString(reportType),
-        OptOutCommunication: false
+        OptOutCommunication: false,
       };
       // optional fields for OTP and verification token
       if (opts?.otpSessionToken) {
@@ -201,16 +213,7 @@ const IllegalContentReportForm = ({
       }
       return body;
     },
-    [
-      issueType,
-      otherIssue,
-      urlStr,
-      description,
-      selectedCountry,
-      name,
-      email,
-      reportType
-    ]
+    [issueType, otherIssue, urlStr, description, selectedCountry, name, email, reportType],
   );
 
   const submitReport = () => {
@@ -223,23 +226,23 @@ const IllegalContentReportForm = ({
       mutation.mutate(
         buildRequestBody({
           otpSessionToken,
-          includeVerificationToken: false
-        })
+          includeVerificationToken: false,
+        }),
       );
     },
-    [buildRequestBody, mutation]
+    [buildRequestBody, mutation],
   );
   const onRadioClick = (event: React.FormEvent<HTMLInputElement>): void => {
     const { target } = event;
     if (target) {
-      const selectedIssue = (target as HTMLButtonElement).getAttribute('data-value')!;
+      const selectedIssue = (target as HTMLButtonElement).getAttribute("data-value")!;
       if (
         selectedIssue === IllegalContentSubCategoryKey ||
         selectedIssue === UKCHCROtherSubCategoryKey
       ) {
         otherIssueInputRef?.current?.focus();
       } else {
-        setOtherIssue('');
+        setOtherIssue("");
       }
       setIssueType(selectedIssue);
     }
@@ -254,14 +257,13 @@ const IllegalContentReportForm = ({
   const getUrlError = useCallback((): string | undefined => {
     if (!urlStr) return undefined;
     if (!isValidRobloxUrl(urlStr)) {
-      return translate('Message.UrlError');
+      return translate("Message.UrlError");
     }
     if (tooManyUrls(urlStr)) {
-      return translate('Message.TooManyUrlError', { number: MAX_NUMBER_OF_CONTENTS.toString() });
+      return translate("Message.TooManyUrlError", { number: MAX_NUMBER_OF_CONTENTS.toString() });
     }
     return undefined;
   }, [urlStr, translate]);
-
 
   // AU OSA allows submission without a URL; other report types still require one.
   const isUrlRequired = reportType !== ReportType.AU_OSA;
@@ -283,12 +285,12 @@ const IllegalContentReportForm = ({
 
   const getTypeList = (): string[] => {
     if (reportType === ReportType.CHCR) {
-      return (data?.chcrIllegalTypeList!) || [];
+      return data?.chcrIllegalTypeList! || [];
     }
     if (reportType === ReportType.AU_OSA) {
-      return (data?.auOSAIllegalTypeList!) || [];
+      return data?.auOSAIllegalTypeList! || [];
     }
-    return (data?.illegalTypeList!) || [];
+    return data?.illegalTypeList! || [];
   };
 
   const sortIllegalTypeList = (rawIllegalTypeList: string[]): void => {
@@ -318,38 +320,38 @@ const IllegalContentReportForm = ({
     reportType === ReportType.AU_OSA;
 
   return (
-    <div className='form-container'>
+    <div className="form-container">
       {onBack && shouldShowBackButton && (
         <BackButton
           onClick={onBack}
-          label={translate('Action.Back')}
-          title={translate('Action.Back')}
+          label={translate("Action.Back")}
+          title={translate("Action.Back")}
         />
       )}
 
-      <div id='title' className='section'>
-        <h1>{translate(getTranslationKey('Title'))}</h1>
+      <div id="title" className="section">
+        <h1>{translate(getTranslationKey("Title"))}</h1>
       </div>
-      <div className='main-card'>
-        <h2>{translate(getTranslationKey('Title.Content'))}</h2>
-        <div id='dsa-description' className='section dsa-description'>
-          <p>{translate(getTranslationKey('Message.DsaDescription1'))}</p>
-          <p>{translate(getTranslationKey('Message.DsaDescription2'))}</p>
-          <p>{translate(getTranslationKey('Message.DsaDescription3'))}</p>
-          <p>{translate(getTranslationKey('Message.DsaDescription4'))}</p>
+      <div className="main-card">
+        <h2>{translate(getTranslationKey("Title.Content"))}</h2>
+        <div id="dsa-description" className="section dsa-description">
+          <p>{translate(getTranslationKey("Message.DsaDescription1"))}</p>
+          <p>{translate(getTranslationKey("Message.DsaDescription2"))}</p>
+          <p>{translate(getTranslationKey("Message.DsaDescription3"))}</p>
+          <p>{translate(getTranslationKey("Message.DsaDescription4"))}</p>
         </div>
-        <div id='issue-type-selection' className='section'>
-          <h5>{translate(getTranslationKey('Question.WhyIllegal'))}</h5>
-          <div className='custom-radio-group'>
+        <div id="issue-type-selection" className="section">
+          <h5>{translate(getTranslationKey("Question.WhyIllegal"))}</h5>
+          <div className="custom-radio-group">
             {typeList?.filter(getIllegalTypeFilter(reportType)).map(illegalType => {
               const id = `${illegalType}-radio`;
               const mapKey = illegalType as keyof typeof IllegalTypeTranslationMap;
               const radioElement = (
-                <div key={id} className='radio-item'>
+                <div key={id} className="radio-item">
                   <input
                     id={id}
-                    type='radio'
-                    name='issue_type'
+                    type="radio"
+                    name="issue_type"
                     onChange={onRadioClick}
                     data-value={illegalType}
                     checked={issueType === illegalType}
@@ -366,14 +368,14 @@ const IllegalContentReportForm = ({
                 illegalType === UKCHCROtherSubCategoryKey
               ) {
                 return (
-                  <div key='other-radio' className='other-radio-container'>
+                  <div key="other-radio" className="other-radio-container">
                     {radioElement}
                     <input
                       ref={otherIssueInputRef}
-                      type='text'
+                      type="text"
                       value={otherIssue}
                       maxLength={Limit.MAX_DESCRIPTION_LENGTH}
-                      className='input-field other-violation-input'
+                      className="input-field other-violation-input"
                       onChange={e => setOtherIssue(e.target.value)}
                     />
                   </div>
@@ -387,37 +389,36 @@ const IllegalContentReportForm = ({
           value={urlStr}
           onChange={setUrlStr}
           error={getUrlError()}
-          labelKey={getTranslationKey('Question.Url')}
-          className='section'
+          labelKey={getTranslationKey("Question.Url")}
+          className="section"
         />
         <FormField
-          id='illegal-description-input'
-          label={translate(getTranslationKey('Question.Title'))}
+          id="illegal-description-input"
+          label={translate(getTranslationKey("Question.Title"))}
           value={description}
           onUpdate={setDescription}
           maxLength={Limit.MAX_DESCRIPTION_LENGTH}
           rows={6}
         />
-        {
-          reportType === ReportType.DSA && (
-              <div id='country-selection' className='section form-group visible-container'>
-                <h5>{translate('Question.Country')}</h5>
-                <div className='rbx-select-group'>
-                  <select
-                    value={selectedCountry}
-                    className='input-field rbx-select'
-                    onChange={handleCountryChange}>
-                    <option value=''>{translate('Label.Country.DEFAULT')}</option>
-                    {data?.countryList?.map(country => (
-                      <option key={country} value={country}>
-                        {translate(`Label.Country.${country}`)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )
-        }
+        {reportType === ReportType.DSA && (
+          <div id="country-selection" className="section form-group visible-container">
+            <h5>{translate("Question.Country")}</h5>
+            <div className="rbx-select-group">
+              <select
+                value={selectedCountry}
+                className="input-field rbx-select"
+                onChange={handleCountryChange}
+              >
+                <option value="">{translate("Label.Country.DEFAULT")}</option>
+                {data?.countryList?.map(country => (
+                  <option key={country} value={country}>
+                    {translate(`Label.Country.${country}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
         <ContactFields
           name={name}
           email={email}
@@ -431,25 +432,26 @@ const IllegalContentReportForm = ({
         {/* Hide confirmation checkbox for AU_OSA */}
         {reportType !== ReportType.AU_OSA && (
           <Checkbox
-            id='confirmCheckbox'
+            id="confirmCheckbox"
             checked={isConfirmed}
             onChange={setIsConfirmed}
-            label={translate(getTranslationKey('Message.Confirm'))}
-            className='section'
+            label={translate(getTranslationKey("Message.Confirm"))}
+            className="section"
           />
         )}
-        <div id='submit-button' className='section' style={{ marginTop: '40px' }}>
+        <div id="submit-button" className="section" style={{ marginTop: "40px" }}>
           {mutation.isLoading ? (
-            <button type='button' className='btn-primary-md btn-full-width loading-button' disabled>
-              <span className='loading-spinner' />
+            <button type="button" className="btn-primary-md btn-full-width loading-button" disabled>
+              <span className="loading-spinner" />
             </button>
           ) : (
             <button
-              type='button'
-              className='btn-primary-md btn-full-width'
+              type="button"
+              className="btn-primary-md btn-full-width"
               disabled={!canSubmit || needsVerificationFromBackend}
-              onClick={submitReport}>
-              <span>{translate('Action.Submit')}</span>
+              onClick={submitReport}
+            >
+              <span>{translate("Action.Submit")}</span>
             </button>
           )}
         </div>
@@ -458,18 +460,20 @@ const IllegalContentReportForm = ({
       <CustomModal
         open={issueType === IPInfringementSubCategoryKey}
         onClose={handleIpModalClose}
-        title={translate('Title.Modal.Ip')}
+        title={translate("Title.Modal.Ip")}
         content={ipInfringementTranslationHtml}
       />
       <CustomModal
         open={!!submittedModalInfo}
         onClose={handleSubmittedModalClose}
         title={submittedModalInfo?.title}
-        content={submittedModalInfo?.content}>
+        content={submittedModalInfo?.content}
+      >
         <button
-          type='button'
-          className='btn-control-md btn-full-width white-space-button'
-          onClick={handleSubmittedModalClose}>
+          type="button"
+          className="btn-control-md btn-full-width white-space-button"
+          onClick={handleSubmittedModalClose}
+        >
           {submittedModalInfo?.buttonText}
         </button>
       </CustomModal>

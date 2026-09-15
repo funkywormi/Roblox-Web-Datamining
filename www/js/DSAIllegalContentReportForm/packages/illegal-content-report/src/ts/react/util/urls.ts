@@ -3,7 +3,7 @@ import { EnvironmentUrls } from "@rbx/legacy-webapp-types/Roblox";
 /**
  * The character used to separate URLs in a input string
  */
-const URL_SEPARATOR = ',';
+const URL_SEPARATOR = ",";
 
 /**
  * Splits up URLs by the separator character into array.
@@ -46,7 +46,7 @@ export const isValidRobloxUrl = (url: string): boolean => {
       parsedUrl.hostname === EnvironmentUrls.domain ||
       parsedUrl.hostname.endsWith(`.${EnvironmentUrls.domain}`);
 
-    const isValidProtocol = parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:';
+    const isValidProtocol = parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:";
 
     return isValidDomain && isValidProtocol;
   } catch (error) {

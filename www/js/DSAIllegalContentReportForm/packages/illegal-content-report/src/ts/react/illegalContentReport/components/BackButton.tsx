@@ -1,5 +1,5 @@
-import React from 'react';
-import { useTranslations } from '../../util/translation';
+import React from "react";
+import { useTranslations } from "../../util/translation";
 
 /**
  * BackButton component for navigation in form flows.
@@ -21,19 +21,20 @@ export interface BackButtonProps {
  * Reusable back button component with consistent styling and behavior.
  * Features an icon and translated label, with support for custom styling.
  */
-const BackButton: React.FC<BackButtonProps> = ({ onClick, label, className = '', title }) => {
+const BackButton: React.FC<BackButtonProps> = ({ onClick, label, className = "", title }) => {
   const { translate } = useTranslations();
 
-  const buttonLabel = label || translate('Action.Back');
+  const buttonLabel = label || translate("Action.Back");
   const buttonTitle = title || buttonLabel;
 
   return (
     <button
-      type='button'
+      type="button"
       className={`btn-generic-back-sm back-button ${className}`}
       onClick={onClick}
-      title={buttonTitle}>
-      <span className='icon-back' />
+      title={buttonTitle}
+    >
+      <span className="icon-back" />
       {buttonLabel}
     </button>
   );

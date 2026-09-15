@@ -1,7 +1,7 @@
-import React from 'react';
-import { useTranslations } from '../../util/translation';
-import { getSampleRobloxUrl } from '../../util/urls';
-import { Limit } from '../constants';
+import React from "react";
+import { useTranslations } from "../../util/translation";
+import { getSampleRobloxUrl } from "../../util/urls";
+import { Limit } from "../constants";
 
 /**
  * UrlInput component for collecting Roblox content URLs.
@@ -35,25 +35,25 @@ const UrlInput: React.FC<UrlInputProps> = ({
   onChange,
   labelKey,
   addStar = false,
-  className = '',
-  testId = 'url-textbox',
-  error
+  className = "",
+  testId = "url-textbox",
+  error,
 }) => {
   const { translate } = useTranslations();
 
   return (
-    <div id='url-input' className={className}>
+    <div id="url-input" className={className}>
       <h5>{addStar ? `${translate(labelKey)}*` : translate(labelKey)}</h5>
       <input
-        type='text'
+        type="text"
         data-testid={testId}
-        className='form-control input-field'
+        className="form-control input-field"
         value={value}
-        placeholder={`${translate('Message.UrlSample')}: ${getSampleRobloxUrl()}`}
+        placeholder={`${translate("Message.UrlSample")}: ${getSampleRobloxUrl()}`}
         maxLength={Limit.MAX_URL_LENGTH}
         onChange={e => onChange(e.target.value)}
       />
-      {error && <span className='error-text'>{error}</span>}
+      {error && <span className="error-text">{error}</span>}
     </div>
   );
 };

@@ -320,5 +320,11 @@
     "Label.BrazilAds.ReporterType.IndividualUser": "Individual user",
     "Label.BrazilAds.ReporterType.NationalConsumerDefenseSystem": "National Consumer Defense System",
     "Label.BrazilAds.ReporterType.FederalAttorneyGeneralsOffice": "Federal Attorney General's Office",
-    "Label.BrazilAds.ReporterType.Other": "Other"
+    "Label.BrazilAds.ReporterType.Other": "Other",
+    "Label.IllegalType.UK_OSA_INTIMATE_IMAGE": "Intimate image",
+    "Label.UKOSAIntimateImage.Declaration": "I believe the content is an intimate image.",
+    "Question.UKOSAIntimateImage.ReporterStanding": "Who are you reporting this on behalf of?",
+    "Label.UKOSAIntimateImage.ReporterStanding.DepictedPerson": "I'm the person shown in the content.",
+    "Label.UKOSAIntimateImage.ReporterStanding.AuthorizedRep": "I'm acting on behalf of the person shown in the content.",
+    "Question.UKOSAIntimateImage.RelationshipToDepictedPerson": "Please describe your relationship to the person shown in the content."
 }

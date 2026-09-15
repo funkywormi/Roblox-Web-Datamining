@@ -1,20 +1,20 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import * as EmailValidator from 'email-validator';
-import { useTranslations } from '../util/translation';
-import { sendReport } from './services';
-import { ReportType, reportTypeToString, isUrlValidForSubmission } from './helpers';
-import { SubmitRequestBody, SendReportResponse, SubmitModal } from './types';
-import useGetMetadata from './useGetMetadata';
-import { NCIIContentSubCategoryKey, USNCIILimits } from './constants';
+import React, { useState, useCallback, useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
+import * as EmailValidator from "email-validator";
+import { useTranslations } from "../util/translation";
+import { sendReport } from "./services";
+import { ReportType, reportTypeToString, isUrlValidForSubmission } from "./helpers";
+import { SubmitRequestBody, SendReportResponse, SubmitModal } from "./types";
+import useGetMetadata from "./useGetMetadata";
+import { NCIIContentSubCategoryKey, USNCIILimits } from "./constants";
 
-import FormField from './components/FormField';
-import ContactFields from './components/ContactFields';
-import PrivacyNotice from './components/PrivacyNotice';
-import BackButton from './components/BackButton';
-import Checkbox from './components/Checkbox';
-import UrlInput from './components/UrlInput';
-import CustomModal from '../components/CustomModal';
+import FormField from "./components/FormField";
+import ContactFields from "./components/ContactFields";
+import PrivacyNotice from "./components/PrivacyNotice";
+import BackButton from "./components/BackButton";
+import Checkbox from "./components/Checkbox";
+import UrlInput from "./components/UrlInput";
+import CustomModal from "../components/CustomModal";
 
 /**
  * Props for the US NCII Removal Request form.
@@ -50,71 +50,71 @@ const USNCIIForm: React.FC<USNCIIFormProps> = ({ isAuthorizedRep, onBack }) => {
   const { translate } = useTranslations();
   const { data, error } = useGetMetadata();
 
-  const [contentLocation, setContentLocation] = useState('');
-  const [description, setDescription] = useState('');
-  const [circumstances, setCircumstances] = useState('');
+  const [contentLocation, setContentLocation] = useState("");
+  const [description, setDescription] = useState("");
+  const [circumstances, setCircumstances] = useState("");
   const [attestation, setAttestation] = useState(false);
-  const [signature, setSignature] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [signature, setSignature] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [submittedModalInfo, setSubmittedModalInfo] = useState<SubmitModal | null>(null);
 
   const clearAllInputs = useCallback(() => {
-    setContentLocation('');
-    setDescription('');
-    setCircumstances('');
+    setContentLocation("");
+    setDescription("");
+    setCircumstances("");
     setAttestation(false);
-    setSignature('');
-    setName('');
-    setEmail('');
+    setSignature("");
+    setName("");
+    setEmail("");
   }, []);
 
   const mutation = useMutation(sendReport, {
     onSuccess: (response: SendReportResponse) => {
       const submitModal: SubmitModal = response?.success
         ? {
-            title: translate('Title.Modal.USNCIIReportSuccess'),
+            title: translate("Title.Modal.USNCIIReportSuccess"),
             content: (
               <React.Fragment>
-                {translate('Message.Modal.USNCIIReportSuccess1')}
+                {translate("Message.Modal.USNCIIReportSuccess1")}
                 <br />
                 <br />
-                {translate('Message.Modal.USNCIIReportSuccess2')}
+                {translate("Message.Modal.USNCIIReportSuccess2")}
               </React.Fragment>
             ),
-            buttonText: translate('Action.Modal.SubmitAnother')
+            buttonText: translate("Action.Modal.SubmitAnother"),
           }
         : {
-            title: translate('Title.Modal.ReportFailure'),
-            content: response?.message || 'Error',
-            buttonText: translate('Action.Modal.Ok')
+            title: translate("Title.Modal.ReportFailure"),
+            content: response?.message || "Error",
+            buttonText: translate("Action.Modal.Ok"),
           };
       setSubmittedModalInfo(submitModal);
       clearAllInputs();
     },
     onError: (mutationError: unknown) => {
       const errorMessage =
-        (mutationError as { message: string })?.message || translate('Message.Modal.Error');
+        (mutationError as { message: string })?.message || translate("Message.Modal.Error");
       setSubmittedModalInfo({
-        title: translate('Title.Modal.ReportFailure'),
+        title: translate("Title.Modal.ReportFailure"),
         content: errorMessage,
-        buttonText: translate('Action.Modal.Ok')
+        buttonText: translate("Action.Modal.Ok"),
       });
-    }
+    },
   });
 
   useEffect(() => {
-    setName(data?.name ?? '');
+    setName(data?.name ?? "");
   }, [data?.name]);
 
   useEffect(() => {
     if (error) {
       const errorMessage =
-        (error as { message: string })?.message || translate('Message.Modal.Error');
+        (error as { message: string })?.message || translate("Message.Modal.Error");
       setSubmittedModalInfo({
-        title: translate('Title.Modal.MetadataError'),
+        title: translate("Title.Modal.MetadataError"),
         content: errorMessage,
-        buttonText: translate('Action.Modal.Ok')
+        buttonText: translate("Action.Modal.Ok"),
       });
     }
   }, [error, translate]);
@@ -154,8 +154,8 @@ const USNCIIForm: React.FC<USNCIIFormProps> = ({ isAuthorizedRep, onBack }) => {
       Custom: {
         ElectronicSignature: signature,
         SignatureTimestamp: signatureTimestamp,
-        IsAuthorizedRep: String(isAuthorizedRep)
-      }
+        IsAuthorizedRep: String(isAuthorizedRep),
+      },
     };
 
     mutation.mutate(requestBody);
@@ -165,40 +165,40 @@ const USNCIIForm: React.FC<USNCIIFormProps> = ({ isAuthorizedRep, onBack }) => {
     setSubmittedModalInfo(null);
   };
 
-  const attestationLabelKey = 'Label.USNCII.GoodFaithAttestation';
+  const attestationLabelKey = "Label.USNCII.GoodFaithAttestation";
 
   return (
-    <div className='form-container'>
+    <div className="form-container">
       {onBack && (
         <BackButton
           onClick={onBack}
-          label={translate('Action.Back')}
-          title={translate('Action.Back')}
+          label={translate("Action.Back")}
+          title={translate("Action.Back")}
         />
       )}
 
-      <div className='section'>
-        <h1>{translate('Title.USNCII')}</h1>
+      <div className="section">
+        <h1>{translate("Title.USNCII")}</h1>
       </div>
 
-      <div className='main-card'>
-        <div id='us-ncii-description' className='section dsa-description'>
-          <p>{translate('Message.USNCII.Description1')}</p>
-          <p>{translate('Message.USNCII.Description2')}</p>
-          <p>{translate('Message.USNCII.Description3')}</p>
+      <div className="main-card">
+        <div id="us-ncii-description" className="section dsa-description">
+          <p>{translate("Message.USNCII.Description1")}</p>
+          <p>{translate("Message.USNCII.Description2")}</p>
+          <p>{translate("Message.USNCII.Description3")}</p>
         </div>
 
         <UrlInput
           value={contentLocation}
           onChange={setContentLocation}
-          labelKey='Label.USNCII.ContentLocation'
+          labelKey="Label.USNCII.ContentLocation"
           addStar
-          className='section'
+          className="section"
         />
 
         <FormField
-          id='ncii-description'
-          label={translate('Label.USNCII.Description')}
+          id="ncii-description"
+          label={translate("Label.USNCII.Description")}
           value={description}
           onUpdate={setDescription}
           maxLength={USNCIILimits.MAX_DESCRIPTION_LENGTH}
@@ -207,12 +207,12 @@ const USNCIIForm: React.FC<USNCIIFormProps> = ({ isAuthorizedRep, onBack }) => {
         />
 
         <FormField
-          id='ncii-circumstances'
+          id="ncii-circumstances"
           label={
             <React.Fragment>
-              {translate('Label.USNCII.Circumstances')}{' '}
-              <span className='dsa-reason-limit' style={{ display: 'inline' }}>
-                {translate('Label.Optional')}
+              {translate("Label.USNCII.Circumstances")}{" "}
+              <span className="dsa-reason-limit" style={{ display: "inline" }}>
+                {translate("Label.Optional")}
               </span>
             </React.Fragment>
           }
@@ -222,18 +222,13 @@ const USNCIIForm: React.FC<USNCIIFormProps> = ({ isAuthorizedRep, onBack }) => {
           rows={4}
         />
 
-        <ContactFields
-          name={name}
-          email={email}
-          onNameChange={setName}
-          onEmailChange={setEmail}
-        />
+        <ContactFields name={name} email={email} onNameChange={setName} onEmailChange={setEmail} />
 
-        <div id='ncii-signature' className='section'>
-          <h5>{`${translate('Label.USNCII.ElectronicSignature')}*`}</h5>
+        <div id="ncii-signature" className="section">
+          <h5>{`${translate("Label.USNCII.ElectronicSignature")}*`}</h5>
           <input
-            type='text'
-            className='form-control input-field'
+            type="text"
+            className="form-control input-field"
             value={signature}
             maxLength={USNCIILimits.MAX_SIGNATURE_LENGTH}
             onChange={e => setSignature(e.target.value)}
@@ -241,26 +236,27 @@ const USNCIIForm: React.FC<USNCIIFormProps> = ({ isAuthorizedRep, onBack }) => {
         </div>
 
         <Checkbox
-          id='ncii-good-faith'
+          id="ncii-good-faith"
           checked={attestation}
           onChange={setAttestation}
           label={translate(attestationLabelKey)}
-          className='section'
+          className="section"
           required
         />
 
-        <div id='submit-button' className='section' style={{ marginTop: 48 }}>
+        <div id="submit-button" className="section" style={{ marginTop: 48 }}>
           {mutation.isLoading ? (
-            <button type='button' className='btn-primary-md btn-full-width loading-button' disabled>
-              <span className='loading-spinner' />
+            <button type="button" className="btn-primary-md btn-full-width loading-button" disabled>
+              <span className="loading-spinner" />
             </button>
           ) : (
             <button
-              type='button'
-              className='btn-primary-md btn-full-width'
+              type="button"
+              className="btn-primary-md btn-full-width"
               disabled={!canSubmit()}
-              onClick={handleSubmit}>
-              {translate('Action.Submit')}
+              onClick={handleSubmit}
+            >
+              {translate("Action.Submit")}
             </button>
           )}
         </div>
@@ -272,8 +268,9 @@ const USNCIIForm: React.FC<USNCIIFormProps> = ({ isAuthorizedRep, onBack }) => {
         open={!!submittedModalInfo}
         onClose={handleModalClose}
         title={submittedModalInfo?.title}
-        content={submittedModalInfo?.content}>
-        <button type='button' className='btn-control-md btn-full-width' onClick={handleModalClose}>
+        content={submittedModalInfo?.content}
+      >
+        <button type="button" className="btn-control-md btn-full-width" onClick={handleModalClose}>
           {submittedModalInfo?.buttonText}
         </button>
       </CustomModal>

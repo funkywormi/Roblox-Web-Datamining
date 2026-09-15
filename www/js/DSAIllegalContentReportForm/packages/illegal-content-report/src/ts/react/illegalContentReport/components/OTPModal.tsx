@@ -1,5 +1,5 @@
-import React, { ReactElement } from 'react';
-import { Dialog, DialogContent, DialogBody, DialogTitle } from '@rbx/foundation-ui';
+import React, { ReactElement } from "react";
+import { Dialog, DialogContent, DialogBody, DialogTitle } from "@rbx/foundation-ui";
 
 type Props = {
   /* A boolean indicating whether the modal is open or not */
@@ -30,13 +30,14 @@ const OTPModal = ({ open, onClose, title, content, children }: Props): ReactElem
       open={open}
       onOpenChange={handleOpenChange}
       isModal
-      size='Medium'
-      type='Default'
+      size="Medium"
+      type="Default"
       hasCloseAffordance
-      closeLabel='Close'>
+      closeLabel="Close"
+    >
       <DialogContent>
-        <DialogBody className='gap-large flex flex-col'>
-          <DialogTitle className='text-heading-medium'>{title}</DialogTitle>
+        <DialogBody className="gap-large flex flex-col">
+          <DialogTitle className="text-heading-medium">{title}</DialogTitle>
           {content && <p>{content}</p>}
           {children}
         </DialogBody>
@@ -46,10 +47,9 @@ const OTPModal = ({ open, onClose, title, content, children }: Props): ReactElem
 };
 
 OTPModal.defaultProps = {
-  title: 'Default Modal Title',
-  content: '',
-  children: null
+  title: "Default Modal Title",
+  content: "",
+  children: null,
 };
 
 export default OTPModal;
-

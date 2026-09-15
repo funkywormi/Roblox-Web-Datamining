@@ -1216,5 +1216,7 @@
     "Label.Dimension.PlacementType": "Placement Type",
     "Label.Dimension.PlacementType.PlayWithReward": "Managed Rewarded",
     "Label.Dimension.PlacementType.OnDemandAd": "Custom Rewarded",
-    "Label.Dimension.PlacementType.Unknown": "Unknown"
+    "Label.Dimension.PlacementType.Unknown": "Unknown",
+    "Label.Dimension.AcquisitionSource.Moments": "Moments",
+    "Description.Dimension.AcquisitionSource.Moments": "Includes joins from the Moments video feed"
 }

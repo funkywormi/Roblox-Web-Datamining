@@ -1,6 +1,12 @@
 import { type ReactElement } from "react";
 import { clsx, Icon, type TIconSize } from "@rbx/foundation-ui";
 
+/** English fallback for the verified-badge a11y label, used when the translation namespace isn't loaded. */
+export const VERIFIED_BADGE_ARIA_LABEL = "Verified Badge Icon";
+
+/** Translations Hub key (within the `Feature.ProfileBadges` namespace) for the verified-badge a11y label. */
+export const VERIFIED_BADGE_ARIA_LABEL_KEY = "Creator.VerifiedBadgeIconAccessibilityText";
+
 export type VerifiedBadgeIconProps = {
   /** Accessible label for the badge (e.g. a localized "Verified Badge"). */
   titleText: string;

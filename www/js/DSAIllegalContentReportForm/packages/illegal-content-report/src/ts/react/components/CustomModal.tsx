@@ -1,5 +1,5 @@
-import React, { Fragment, ReactElement, useCallback, useEffect } from 'react';
-import './CustomModal.scss';
+import React, { Fragment, ReactElement, useCallback, useEffect } from "react";
+import "./CustomModal.scss";
 
 type Props = {
   /* A boolean indicating whether the modal is open or not */
@@ -20,40 +20,41 @@ type Props = {
 const CustomModal = ({ open, onClose, title, content, children }: Props): ReactElement => {
   useEffect(() => {
     const escFunction = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
       }
     };
 
     if (open) {
-      document.addEventListener('keydown', escFunction, false);
+      document.addEventListener("keydown", escFunction, false);
     }
 
     return () => {
-      document.removeEventListener('keydown', escFunction, false);
+      document.removeEventListener("keydown", escFunction, false);
     };
   }, [open, onClose]);
 
   return (
     <Fragment>
       {open && (
-        <div className='modal-overlay'>
-          <div className='custom-modal'>
-            <div className='modal-header'>
-              <div className='modal-head-left'>
+        <div className="modal-overlay">
+          <div className="custom-modal">
+            <div className="modal-header">
+              <div className="modal-head-left">
                 <h2>{title}</h2>
               </div>
-              <div className='modal-head-right'>
+              <div className="modal-head-right">
                 <button
-                  type='button'
+                  type="button"
                   onClick={onClose}
-                  className='transparent-button'
-                  aria-label='Close'>
-                  <span className='close-icon' />
+                  className="transparent-button"
+                  aria-label="Close"
+                >
+                  <span className="close-icon" />
                 </button>
               </div>
             </div>
-            {content && <p className='modal-content'>{content}</p>}
+            {content && <p className="modal-content">{content}</p>}
             {children}
           </div>
         </div>
@@ -63,9 +64,9 @@ const CustomModal = ({ open, onClose, title, content, children }: Props): ReactE
 };
 
 CustomModal.defaultProps = {
-  title: 'Default Modal Title',
-  content: '',
-  children: null
+  title: "Default Modal Title",
+  content: "",
+  children: null,
 };
 
 export default CustomModal;

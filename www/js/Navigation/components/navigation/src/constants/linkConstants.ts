@@ -111,8 +111,8 @@ export default {
       url: getAbsoluteUrl("https://blog.roblox.com"),
       idSelector: "nav-blog",
       iconClass: "icon-nav-blog",
-      name: "blog",
-      labelTranslationKey: "Label.sBlog",
+      name: "newsroom",
+      labelTranslationKey: "Label.Newsroom",
       blankTarget: true,
     },
     shop: {

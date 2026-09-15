@@ -1,12 +1,12 @@
-import React, { useState, useCallback } from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@rbx/core-scripts/react';
-import { TranslationProvider } from '../util/translation';
-import USNCIISelector, { USNCIIReportOption } from './USNCIISelector';
-import USNCIIForm from './USNCIIForm';
-import { dsaTranslationConfig } from '../../../translation.config';
-import '../style/shared.scss';
-import './style.scss';
+import React, { useState, useCallback } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@rbx/core-scripts/react";
+import { TranslationProvider } from "../util/translation";
+import USNCIISelector, { USNCIIReportOption } from "./USNCIISelector";
+import USNCIIForm from "./USNCIIForm";
+import { dsaTranslationConfig } from "../../../translation.config";
+import "../style/shared.scss";
+import "./style.scss";
 
 interface USNCIIFlowProps {
   selectedOption: USNCIIReportOption | null;
@@ -21,7 +21,7 @@ interface USNCIIFlowProps {
 const USNCIIFlow = ({
   selectedOption,
   onOptionSelection,
-  onBack
+  onBack,
 }: USNCIIFlowProps): React.ReactElement => {
   if (!selectedOption) {
     return <USNCIISelector onSelectionChange={onOptionSelection} />;
@@ -48,7 +48,7 @@ const USNCIIApp = (): React.ReactElement => {
   return (
     <TranslationProvider translationConfig={dsaTranslationConfig}>
       <QueryClientProvider client={queryClient}>
-        <div id='generic-challenge-container' />
+        <div id="generic-challenge-container" />
         <USNCIIFlow
           selectedOption={selectedOption}
           onOptionSelection={handleOptionSelection}

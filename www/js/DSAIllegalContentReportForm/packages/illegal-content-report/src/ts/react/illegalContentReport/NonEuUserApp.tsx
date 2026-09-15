@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 import { EnvironmentUrls } from "@rbx/legacy-webapp-types/Roblox";
-import { TranslationProvider, useTranslations } from '../util/translation';
-import { NonEuUserInfo } from './constants';
-import '../style/shared.scss';
-import './style.scss';
-import { dsaTranslationConfig } from '../../../translation.config';
+import { TranslationProvider, useTranslations } from "../util/translation";
+import { NonEuUserInfo } from "./constants";
+import "../style/shared.scss";
+import "./style.scss";
+import { dsaTranslationConfig } from "../../../translation.config";
 
 /** Page when non EU user access IllegalContentReport website */
 const NonEuUserPage = (): React.ReactElement => {
@@ -14,19 +14,19 @@ const NonEuUserPage = (): React.ReactElement => {
     : NonEuUserInfo.DefaultSupportFormLink;
 
   return (
-    <div className='form-container'>
-      <div className='main-card'>
-        <p className='text-description'>
-          {translateHtml('Message.NonEuUserPage', [
+    <div className="form-container">
+      <div className="main-card">
+        <p className="text-description">
+          {translateHtml("Message.NonEuUserPage", [
             [
-              'link',
-              'linkEnd',
+              "link",
+              "linkEnd",
               text => (
-                <a href={supportWebsiteUrl} className='text-link' target='_blank' rel='noreferrer'>
+                <a href={supportWebsiteUrl} className="text-link" target="_blank" rel="noreferrer">
                   {text}
                 </a>
-              )
-            ]
+              ),
+            ],
           ])}
         </p>
       </div>

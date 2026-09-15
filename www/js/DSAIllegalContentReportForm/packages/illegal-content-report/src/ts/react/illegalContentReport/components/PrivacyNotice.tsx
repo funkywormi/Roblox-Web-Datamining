@@ -1,6 +1,6 @@
-import React from 'react';
-import { useTranslations } from '../../util/translation';
-import { Urls } from '../constants';
+import React from "react";
+import { useTranslations } from "../../util/translation";
+import { Urls } from "../constants";
 
 /**
  * PrivacyNotice component that displays privacy policy information.
@@ -10,26 +10,27 @@ import { Urls } from '../constants';
 const PrivacyNotice: React.FC = () => {
   const { translateHtml } = useTranslations();
 
-  const personalDataTranslationHtml = translateHtml('Message.PrivacyAndCookiePolicy', [
+  const personalDataTranslationHtml = translateHtml("Message.PrivacyAndCookiePolicy", [
     [
-      'docLink',
-      'docLinkEnd',
+      "docLink",
+      "docLinkEnd",
       text => (
         <a
           href={Urls.PRIVACY_AND_COOKIE_POLICY}
           key={Urls.PRIVACY_AND_COOKIE_POLICY}
-          className='text-link'
-          target='_blank'
-          rel='noreferrer'>
+          className="text-link"
+          target="_blank"
+          rel="noreferrer"
+        >
           {text}
         </a>
-      )
-    ]
+      ),
+    ],
   ]);
 
   return (
-    <div className='section'>
-      <p className='dsa-reason-limit'>{personalDataTranslationHtml}</p>
+    <div className="section">
+      <p className="dsa-reason-limit">{personalDataTranslationHtml}</p>
     </div>
   );
 };

@@ -1,13 +1,16 @@
 import { EnvironmentUrls } from "@rbx/legacy-webapp-types/Roblox";
-import { getUrlsList, isTooManyUrls } from '../util/urls';
-import { OSAComplaintType } from './types';
-import { BrazilECARoleOtherKey } from './constants';
+import { getUrlsList, isTooManyUrls } from "../util/urls";
+import { OSAComplaintType } from "./types";
+import { BrazilECARoleOtherKey } from "./constants";
 
 /** Number of contents reported per submission  */
 export const MAX_NUMBER_OF_CONTENTS = 5;
 
-export const tooManyUrls = (rawUrl: string): boolean => {
-  return isTooManyUrls(rawUrl, MAX_NUMBER_OF_CONTENTS);
+export const tooManyUrls = (
+  rawUrl: string,
+  maxNumberOfContents = MAX_NUMBER_OF_CONTENTS,
+): boolean => {
+  return isTooManyUrls(rawUrl, maxNumberOfContents);
 };
 
 // The type of the report, e.g. whether it's for DSA, OSA, or CHCR
@@ -19,29 +22,38 @@ export enum ReportType {
   AU_OSA,
   AU_OSA_NON_COMPLIANCE,
   BR_ECA,
-  US_NCII
+  US_NCII,
+  BR_INTIMATE_CONTENT,
+  BR_WOMEN_SAFETY,
+  BR_AD,
 }
 
 export const reportTypeToString = (reportType?: ReportType): string => {
   switch (reportType) {
     case ReportType.DSA:
-      return 'DSA';
+      return "DSA";
     case ReportType.OSA:
-      return 'OSA';
+      return "OSA";
     case ReportType.CHCR:
-      return 'CHCR';
+      return "CHCR";
     case ReportType.OSA_COMPLAINT:
-      return 'OSASpecificComplaints';
+      return "OSASpecificComplaints";
     case ReportType.AU_OSA:
-      return 'AuOSA';
+      return "AuOSA";
     case ReportType.AU_OSA_NON_COMPLIANCE:
-      return 'AuOSANonCompliance';
+      return "AuOSANonCompliance";
     case ReportType.BR_ECA:
-      return 'BrECA';
+      return "BrECA";
     case ReportType.US_NCII:
-      return 'UnitedStatesNCII';
+      return "UnitedStatesNCII";
+    case ReportType.BR_INTIMATE_CONTENT:
+      return "BrIntimateContent";
+    case ReportType.BR_WOMEN_SAFETY:
+      return "BrWomenSafety";
+    case ReportType.BR_AD:
+      return "BrAd";
     default:
-      return '';
+      return "";
   }
 };
 
@@ -57,7 +69,7 @@ export const isValidRobloxUrl = (rawUrl: string): boolean => {
   const allValid = urls.every(url => {
     try {
       const parsedUrl = new URL(url);
-      const parsedDomain = parsedUrl.hostname.replace('www.', '');
+      const parsedDomain = parsedUrl.hostname.replace("www.", "");
 
       // Not sure if we need this still, but basically checks to see if we have
       // multiple protocols in the URL. e.g.

@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useMemo, PropsWithChildren } from 'react';
+import React, { createContext, useContext, useMemo, PropsWithChildren } from "react";
 import { TranslationConfig } from "@rbx/core-scripts/legacy/react-utilities";
-import { translateHtmlLegacy } from '@rbx/translation-utils';
-import { TranslateFn, TranslateHtml, TranslationResource } from './types';
-import { createTranslationBase } from './createBase';
+import { translateHtmlLegacy } from "@rbx/translation-utils";
+import { TranslateFn, TranslateHtml, TranslationResource } from "./types";
+import { createTranslationBase } from "./createBase";
 
 /**
  * Creates a translation instance that we'll use in the provider and hook for
@@ -13,24 +13,23 @@ export const createTranslationProvider = (config: TranslationConfig): Translatio
 
   const translate: TranslateFn = (key, params = {}) => {
     // Return empty string if the translation key is not given
-    if (key === '') {
-      return '';
+    if (key === "") {
+      return "";
     }
 
     const humanLabel = resource.get(key, params);
     if (!humanLabel) {
-      return `${key} ${Object.values(params).join(',')}`;
+      return `${key} ${Object.values(params).join(",")}`;
     }
     return humanLabel;
   };
 
-  const translateHtml: TranslateHtml = (key, params) =>
-    translateHtmlLegacy(translate, key, params);
+  const translateHtml: TranslateHtml = (key, params) => translateHtmlLegacy(translate, key, params);
 
   return {
     translate,
     intl,
-    translateHtml
+    translateHtml,
   };
 };
 
@@ -57,7 +56,7 @@ export const TranslationProvider: React.FC<
 export const useTranslations = (): TranslationResource => {
   const resource = useContext(TranslationContext);
   if (!resource) {
-    throw new Error('useTranslations must be used within a TranslationProvider');
+    throw new Error("useTranslations must be used within a TranslationProvider");
   }
   return resource;
 };

@@ -1,8 +1,8 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import * as EmailValidator from 'email-validator';
-import { useTranslations } from '../../util/translation';
-import { sendCode, resendCode } from '../services/otpService';
-import useAutoVerifyCode from './useAutoVerifyCode';
+import { useState, useCallback, useRef, useEffect } from "react";
+import * as EmailValidator from "email-validator";
+import { useTranslations } from "../../util/translation";
+import { sendCode, resendCode } from "../services/otpService";
+import useAutoVerifyCode from "./useAutoVerifyCode";
 
 const VERIFICATION_CODE_LENGTH = 6;
 const SECONDS_BETWEEN_RESENDS = 30;
@@ -11,7 +11,7 @@ const SECONDS_BETWEEN_RESENDS = 30;
  * Helper function to extract HTTP status code from error
  */
 const getErrorStatusCode = (error: unknown): number | null => {
-  if (typeof error === 'object' && error !== null) {
+  if (typeof error === "object" && error !== null) {
     // Check for axios-style error structure
     const axiosError = error as any;
     if (axiosError.response?.status) {
@@ -51,15 +51,15 @@ export interface UseEmailVerificationResult {
 
 export const useEmailVerification = (
   onVerified?: (token: string) => void,
-  onVerificationStatusChange?: (isVerified: boolean) => void
+  onVerificationStatusChange?: (isVerified: boolean) => void,
 ): UseEmailVerificationResult => {
   const { translate } = useTranslations();
   const [showModal, setShowModal] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
-  const [otpSessionToken, setOtpSessionToken] = useState('');
-  const [code, setCode] = useState('');
-  const [codeError, setCodeError] = useState('');
-  const [emailError, setEmailError] = useState('');
+  const [otpSessionToken, setOtpSessionToken] = useState("");
+  const [code, setCode] = useState("");
+  const [codeError, setCodeError] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [isValidatingCode, setIsValidatingCode] = useState(false);
   const [isCodeVerified, setIsCodeVerified] = useState(false);
   const [isResendEnabled, setIsResendEnabled] = useState(false);
@@ -93,8 +93,8 @@ export const useEmailVerification = (
 
   const closeModal = useCallback((keepVerifiedState = false) => {
     setShowModal(false);
-    setCode('');
-    setCodeError('');
+    setCode("");
+    setCodeError("");
     setIsResendEnabled(false);
     setTimeUntilResend(0);
 
@@ -109,80 +109,80 @@ export const useEmailVerification = (
   }, []);
 
   const clearEmailError = useCallback(() => {
-    setEmailError('');
+    setEmailError("");
   }, []);
 
   const clearCodeError = useCallback(() => {
-    setCodeError('');
+    setCodeError("");
   }, []);
 
   const verify = useCallback(
     async (email: string) => {
       // Validate email before sending code
       if (!email.trim() || !EmailValidator.validate(email)) {
-        setEmailError(translate('Message.EmailError'));
+        setEmailError(translate("Message.EmailError"));
         return;
       }
 
       setIsSendingCode(true);
-      setCodeError('');
-      setEmailError('');
+      setCodeError("");
+      setEmailError("");
       try {
         const response = await sendCode({
-          origin: 'IllegalContentReport',
-          contactType: 'Email',
-          contactValue: email
+          origin: "IllegalContentReport",
+          contactType: "Email",
+          contactValue: email,
         });
         setOtpSessionToken(response.otpSessionToken);
         setShowModal(true);
-        setCode('');
+        setCode("");
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Error sending OTP code:', error);
-        
+        console.error("Error sending OTP code:", error);
+
         const statusCode = getErrorStatusCode(error);
         if (statusCode === 429) {
           // Rate limit error - show specific message but don't disable the button
-          setCodeError(translate('Message.RateLimitError'));
+          setCodeError(translate("Message.RateLimitError"));
         } else {
           // Other errors - show generic error and disable button
-          setEmailError(translate('Message.EmailError'));
+          setEmailError(translate("Message.EmailError"));
         }
       } finally {
         setIsSendingCode(false);
       }
     },
-    [translate]
+    [translate],
   );
 
   const handleCodeChange = useCallback((value: string) => {
-    const sanitized = value.replace(/\D/g, '');
+    const sanitized = value.replace(/\D/g, "");
     if (sanitized.length <= VERIFICATION_CODE_LENGTH) {
       setCode(sanitized);
-      setCodeError('');
+      setCodeError("");
     }
   }, []);
 
   const handleResendCode = useCallback(async () => {
     setIsResending(true);
-    setCodeError('');
+    setCodeError("");
     try {
       const response = await resendCode({
         otpSessionToken,
-        origin: 'IllegalContentReport',
-        contactType: 'Email'
+        origin: "IllegalContentReport",
+        contactType: "Email",
       });
       setOtpSessionToken(response.otpSessionToken);
       startCountdownTimer();
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('Error resending OTP code:', error);
-      
+      console.error("Error resending OTP code:", error);
+
       const statusCode = getErrorStatusCode(error);
       if (statusCode === 429) {
-        setCodeError(translate('Message.RateLimitError'));
+        setCodeError(translate("Message.RateLimitError"));
       } else {
-        setCodeError(translate('Message.ResendError'));
+        setCodeError(translate("Message.ResendError"));
       }
     } finally {
       setIsResending(false);
@@ -193,10 +193,10 @@ export const useEmailVerification = (
     // Clear all OTP states
     setShowModal(false);
     setIsSendingCode(false);
-    setOtpSessionToken('');
-    setCode('');
-    setCodeError('');
-    setEmailError('');
+    setOtpSessionToken("");
+    setCode("");
+    setCodeError("");
+    setEmailError("");
     setIsValidatingCode(false);
     setIsCodeVerified(false);
     setIsResendEnabled(false);
@@ -230,11 +230,11 @@ export const useEmailVerification = (
     codeLength: VERIFICATION_CODE_LENGTH,
     otpSessionToken,
     isValidatingCode,
-    origin: 'IllegalContentReport',
-    contactType: 'Email',
+    origin: "IllegalContentReport",
+    contactType: "Email",
     onValidationStart: useCallback(() => {
       setIsValidatingCode(true);
-      setCodeError('');
+      setCodeError("");
     }, []),
     onValidationSuccess: useCallback(() => {
       setIsCodeVerified(true);
@@ -249,11 +249,11 @@ export const useEmailVerification = (
       }, 1500);
     }, [onVerified, otpSessionToken, onVerificationStatusChange, closeModal]),
     onValidationError: useCallback(() => {
-      setCodeError(translate('Message.CodeInvalid'));
+      setCodeError(translate("Message.CodeInvalid"));
     }, [translate]),
     onValidationEnd: useCallback(() => {
       setIsValidatingCode(false);
-    }, [])
+    }, []),
   });
 
   return {
@@ -274,6 +274,6 @@ export const useEmailVerification = (
     closeModal,
     resetVerification,
     clearEmailError,
-    clearCodeError
+    clearCodeError,
   };
 };

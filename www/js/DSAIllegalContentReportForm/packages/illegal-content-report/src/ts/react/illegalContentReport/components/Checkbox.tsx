@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 /**
  * Checkbox component for form inputs with validation support.
@@ -30,22 +30,22 @@ const Checkbox: React.FC<CheckboxProps> = ({
   checked,
   onChange,
   label,
-  className = '',
-  required = false
+  className = "",
+  required = false,
 }) => {
   const requiredLabel = required ? `${label}*` : label;
 
   return (
     <div className={className}>
-      <div className='checkbox'>
+      <div className="checkbox">
         <input
           id={id}
-          type='checkbox'
+          type="checkbox"
           checked={checked}
           onChange={e => onChange(e.target.checked)}
           required={required}
         />
-        <label htmlFor={id} className='checkbox-label'>
+        <label htmlFor={id} className="checkbox-label">
           {requiredLabel}
         </label>
       </div>

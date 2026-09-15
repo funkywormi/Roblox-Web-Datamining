@@ -2,7 +2,7 @@ import {
   Intl,
   RobloxIntlInstance,
   RobloxTranslationResource,
-  TranslationResourceProvider
+  TranslationResourceProvider,
 } from "@rbx/legacy-webapp-types/Roblox";
 import { TranslationConfig } from "@rbx/core-scripts/legacy/react-utilities";
 
@@ -13,7 +13,7 @@ import { TranslationConfig } from "@rbx/core-scripts/legacy/react-utilities";
  * seemed like it wasn't worth the effort.
  */
 export const createTranslationBase = (
-  translationConfig: TranslationConfig
+  translationConfig: TranslationConfig,
 ): {
   resource: RobloxTranslationResource;
   intl: RobloxIntlInstance;
@@ -21,14 +21,13 @@ export const createTranslationBase = (
   const intl = new Intl();
 
   if (Array.isArray(translationConfig)) {
-
     const translationProvider = new TranslationResourceProvider(intl);
     const languageResources = translationConfig
       .filter(namespace => !!namespace)
       .map(namespace => translationProvider.getTranslationResource(namespace));
 
     const mergedLanguageResources = translationProvider.mergeTranslationResources(
-      ...languageResources
+      ...languageResources,
     );
 
     return { resource: mergedLanguageResources, intl };
@@ -37,11 +36,11 @@ export const createTranslationBase = (
   const { common, feature } = translationConfig;
   const translationProvider = new TranslationResourceProvider(intl);
   const languageResources = [...common, feature]
-  .filter(namespace => !!namespace)
+    .filter(namespace => !!namespace)
     .map(namespace => translationProvider.getTranslationResource(namespace));
 
   const mergedLanguageResources = translationProvider.mergeTranslationResources(
-    ...languageResources
+    ...languageResources,
   );
   return { resource: mergedLanguageResources, intl };
 };

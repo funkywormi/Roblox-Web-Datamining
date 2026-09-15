@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import classNames from "classnames";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import * as http from "@rbx/core-scripts/http";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { AuthenticatedUser, isBlackbirdUser } from "@rbx/core-scripts/meta/user";
+import { isReferralEnabled as isPlusReferralRolloutEnabled } from "@rbx/core-scripts/meta/subscription";
+import { AuthenticatedUser } from "@rbx/core-scripts/meta/user";
 import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
 import {
   Icon,
@@ -20,6 +21,14 @@ import {
 } from "@rbx/foundation-ui";
 import VerifiedBadgeIcon from "@rbx/www-common/components/verified-badge";
 import { UncheckedBadge, showUncheckedBadge } from "@rbx/identity-badges";
+import {
+  PLUS_REFERRALS_PATH,
+  PlusReferralSheet,
+  REFERRAL_REWARD_ROBUX,
+  useIsPlusSubscriber,
+  usePendingPlusReferrals,
+  type SubscriptionReferral,
+} from "@rbx/subscriptions-common";
 import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
 import {
   EntrypointExposure,
@@ -29,6 +38,11 @@ import {
 } from "@rbx/community-telemetry";
 import { useRealTime } from "./useRealTime";
 import { useLiveUserNameForDisplay } from "../../hooks/useLiveUserNameForDisplay";
+import {
+  recordReferralNavClick,
+  shouldShowReferralNewBadge,
+  type ReferralNavEntry,
+} from "../../util/plusReferralBadgeUtil";
 
 // Temporarily copied from `@rbx/foundation-ui` since the NavigationRail component is not available yet.
 const interactable =
@@ -51,11 +65,13 @@ const ProfileNavItem = ({
   displayName,
   hasVerifiedBadge,
   verifiedBadgeLabel,
+  isPlusSubscriber,
 }: {
   id: number;
   displayName: string;
   hasVerifiedBadge: boolean;
   verifiedBadgeLabel: string;
+  isPlusSubscriber: boolean;
 }) => (
   <li>
     <a href="/users/profile" className={classNames(navItemClasses, interactable)}>
@@ -76,7 +92,7 @@ const ProfileNavItem = ({
           {hasVerifiedBadge ? (
             <VerifiedBadgeIcon size="Small" titleText={verifiedBadgeLabel} />
           ) : null}
-          {isBlackbirdUser() ? <Icon name="icon-regular-roblox-plus" size="Small" /> : null}
+          {isPlusSubscriber ? <Icon name="icon-regular-roblox-plus" size="Small" /> : null}
         </span>
         {showUncheckedBadge() ? (
           <span className="flex items-center large:fill large:basis-auto large:padding-x-small large:justify-end">
@@ -249,6 +265,115 @@ const BlackbirdNavItem = ({ currentPath }: { currentPath: string }) => {
   );
 };
 
+/** Card layout shared by the referral entries, pinned above the nav links. */
+const ReferralNavItem = ({
+  href,
+  label,
+  entry,
+  onSelect,
+}: {
+  /** Omitted by entries that open a popup in place rather than navigating. */
+  href?: string;
+  label: string;
+  entry: ReferralNavEntry;
+  onSelect?: () => void;
+}) => {
+  const { translate } = useTranslation();
+  const [showNewBadge, setShowNewBadge] = useState(() => shouldShowReferralNewBadge(entry));
+
+  const cardClassName = classNames(
+    interactable,
+    // Same outlined card as the app / Figma flyout: 12px padding, 12px gap, 24px icon.
+    // No 40px icon box — that made this row taller than the Robux/Share Plus cards.
+    "bg-none stroke-default stroke-thick width-full gap-medium padding-medium radius-medium text-body-medium content-emphasis flex items-center",
+  );
+
+  const onClick = () => {
+    recordReferralNavClick(entry);
+    setShowNewBadge(false);
+    onSelect?.();
+  };
+
+  const cardContent = (
+    <Fragment>
+      <StateLayer />
+      <Icon className="shrink-0" name="icon-regular-roblox-plus" size="Large" />
+      <span className="min-width-0 text-truncate-end grow-1 text-align-x-left">{label}</span>
+      {showNewBadge ? (
+        <Badge label={translate("Label.New", undefined, "New")} variant="Contrast" />
+      ) : null}
+    </Fragment>
+  );
+
+  return (
+    <li>
+      {href === undefined ? (
+        <button className={cardClassName} type="button" onClick={onClick}>
+          {cardContent}
+        </button>
+      ) : (
+        <a className={cardClassName} href={href} onClick={onClick}>
+          {cardContent}
+        </a>
+      )}
+    </li>
+  );
+};
+
+/**
+ * Referral entry for subscribers. Navigates to `/plus?referrals` so notifications and other entry
+ * points share the same destination.
+ */
+const BlackbirdReferralNavItem = () => {
+  const { translate, intl } = useTranslation();
+  // Locale-formatted, matching the recipient entry below: the two sit in the same nav and would
+  // otherwise disagree on grouping separators.
+  const rewardAmount = intl.n(REFERRAL_REWARD_ROBUX);
+
+  return (
+    <ReferralNavItem
+      entry="share"
+      href={getAbsoluteUrl(PLUS_REFERRALS_PATH)}
+      label={translate(
+        "Heading.ReferralEntry",
+        { amount: rewardAmount },
+        `Share Plus to get ${rewardAmount} Robux`,
+      )}
+    />
+  );
+};
+
+/**
+ * Recipient side of the same entry, for a non-subscriber with an invite waiting. The invite opens
+ * over the current page — only subscribing navigates — and carries the referrer for credit.
+ */
+const BlackbirdJoinReferralNavItem = ({ referral }: { referral: SubscriptionReferral }) => {
+  const { translate, intl } = useTranslation();
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const rewardAmount = intl.n(REFERRAL_REWARD_ROBUX);
+
+  return (
+    <Fragment>
+      <ReferralNavItem
+        entry="join"
+        label={translate(
+          "Heading.ReferralRecipientEntry",
+          { amount: rewardAmount },
+          `Join Plus to get ${rewardAmount} Robux`,
+        )}
+        onSelect={() => {
+          setIsInviteOpen(true);
+        }}
+      />
+      <PlusReferralSheet
+        invite={{ referrerId: String(referral.senderUserId) }}
+        open={isInviteOpen}
+        onOpenChange={setIsInviteOpen}
+      />
+    </Fragment>
+  );
+};
+
 const BlackbirdUpsellNavItem = ({ currentPath }: { currentPath: string }) => {
   const { translate } = useTranslation();
 
@@ -306,6 +431,15 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
   }, []);
 
   const { translate } = useTranslation();
+
+  // Not `isBlackbirdUser`: the page-load meta tag still says no on the screen that follows a
+  // purchase, which left the recipient entry up and the share entry hidden until a reload.
+  const isBlackbird = useIsPlusSubscriber();
+  const isReferralRolloutEnabled = isPlusReferralRolloutEnabled();
+  const { latestPendingReferral } = usePendingPlusReferrals();
+  // Only a non-subscriber with an invite waiting gets the referral card; everyone else keeps the
+  // plain Plus upsell below.
+  const pendingReferral = isBlackbird ? undefined : latestPendingReferral;
 
   const queryClient = useQueryClient();
 
@@ -365,7 +499,12 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
           displayName={liveNameForDisplay}
           hasVerifiedBadge={user.hasVerifiedBadge}
           verifiedBadgeLabel={translate("Creator.VerifiedBadgeIconAccessibilityText")}
+          isPlusSubscriber={isBlackbird}
         />
+        {isReferralRolloutEnabled && isBlackbird && !blackbirdPathRegex.test(currentPath) ? (
+          <BlackbirdReferralNavItem />
+        ) : null}
+        {pendingReferral ? <BlackbirdJoinReferralNavItem referral={pendingReferral} /> : null}
         <NavItem
           path="/home"
           isCurrentPath={/^\/([a-z]{2}\/)?home(\/|$)/.test(currentPath)}
@@ -417,7 +556,7 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
           path={new URL("https://blog.roblox.com")}
           isCurrentPath={false}
           icon="icon-regular-fountain-pen-nib"
-          text={translate("Label.sBlog")}
+          text={translate("Label.Newsroom")}
         />
         <ShopNavItem />
         <NavItem
@@ -426,7 +565,9 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
           icon="icon-regular-gift-card"
           text={translate("Label.GiftCards")}
         />
-        {!isBlackbirdUser() ? <BlackbirdUpsellNavItem currentPath={currentPath} /> : null}
+        {!isBlackbird && !pendingReferral ? (
+          <BlackbirdUpsellNavItem currentPath={currentPath} />
+        ) : null}
       </ul>
     </nav>
   );

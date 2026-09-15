@@ -1,15 +1,15 @@
-import React, { useState, useCallback } from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@rbx/core-scripts/react';
-import { TranslationProvider } from '../util/translation';
-import IllegalContentReportForm from './IllegalContentReportForm';
-import IllegalContentReportAppealForm from './illegalContentReportAppealForm';
-import AUOSASelector, { AUOSAReportOption } from './AUOSASelector';
-import AUOSANonComplianceForm from './AUOSANonComplianceForm';
-import { dsaTranslationConfig } from '../../../translation.config';
-import '../style/shared.scss';
-import './style.scss';
-import { ReportType } from './helpers';
+import React, { useState, useCallback } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@rbx/core-scripts/react";
+import { TranslationProvider } from "../util/translation";
+import IllegalContentReportForm from "./IllegalContentReportForm";
+import IllegalContentReportAppealForm from "./illegalContentReportAppealForm";
+import AUOSASelector, { AUOSAReportOption } from "./AUOSASelector";
+import AUOSANonComplianceForm from "./AUOSANonComplianceForm";
+import { dsaTranslationConfig } from "../../../translation.config";
+import "../style/shared.scss";
+import "./style.scss";
+import { ReportType } from "./helpers";
 
 interface AUOSAFlowProps {
   selectedOption: AUOSAReportOption | null;
@@ -26,7 +26,7 @@ const AUOSAFlow = ({
   selectedOption,
   contentURLParam,
   onOptionSelection,
-  onBack
+  onBack,
 }: AUOSAFlowProps): React.ReactElement => {
   if (!selectedOption) {
     // Step 1: Show AU OSA selector
@@ -60,9 +60,9 @@ const AUOSAFlow = ({
  */
 const AUOSAApp = (): React.ReactElement => {
   const queryParams = new URLSearchParams(window.location.search);
-  const appealParam = queryParams.get('appeal');
-  const caseIDParam = queryParams.get('caseID');
-  const contentURLParam = queryParams.get('contentURL');
+  const appealParam = queryParams.get("appeal");
+  const caseIDParam = queryParams.get("caseID");
+  const contentURLParam = queryParams.get("contentURL");
 
   const [selectedOption, setSelectedOption] = useState<AUOSAReportOption | null>(null);
 
@@ -75,11 +75,11 @@ const AUOSAApp = (): React.ReactElement => {
   }, []);
 
   // Handle appeals first (before showing the AU OSA flow)
-  if (appealParam && appealParam === 'true') {
+  if (appealParam && appealParam === "true") {
     return (
       <TranslationProvider translationConfig={dsaTranslationConfig}>
         <QueryClientProvider client={queryClient}>
-          <div id='generic-challenge-container' />
+          <div id="generic-challenge-container" />
           <IllegalContentReportAppealForm
             reportType={ReportType.AU_OSA}
             defaultCaseID={caseIDParam}
@@ -92,7 +92,7 @@ const AUOSAApp = (): React.ReactElement => {
   return (
     <TranslationProvider translationConfig={dsaTranslationConfig}>
       <QueryClientProvider client={queryClient}>
-        <div id='generic-challenge-container' />
+        <div id="generic-challenge-container" />
         <AUOSAFlow
           selectedOption={selectedOption}
           contentURLParam={contentURLParam}
@@ -105,4 +105,3 @@ const AUOSAApp = (): React.ReactElement => {
 };
 
 export default AUOSAApp;
-

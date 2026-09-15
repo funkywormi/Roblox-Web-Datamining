@@ -1,15 +1,15 @@
-import React, { useState, useCallback } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { TranslationProvider } from '../util/translation';
-import IllegalContentReportForm from './IllegalContentReportForm';
-import IllegalContentReportAppealForm from './illegalContentReportAppealForm';
-import UKReportSelector, { UKReportOption } from './UKReportSelector';
-import OSAComplaintsSelector from './OSAComplaintsSelector';
-import OSAComplaintsForm from './OSAComplaintsForm';
-import { dsaTranslationConfig } from '../../../translation.config';
-import '../style/shared.scss';
-import './style.scss';
-import { ReportType } from './helpers';
+import React, { useState, useCallback } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { TranslationProvider } from "../util/translation";
+import IllegalContentReportForm from "./IllegalContentReportForm";
+import IllegalContentReportAppealForm from "./illegalContentReportAppealForm";
+import UKReportSelector, { UKReportOption } from "./UKReportSelector";
+import OSAComplaintsSelector from "./OSAComplaintsSelector";
+import OSAComplaintsForm from "./OSAComplaintsForm";
+import { dsaTranslationConfig } from "../../../translation.config";
+import "../style/shared.scss";
+import "./style.scss";
+import { ReportType } from "./helpers";
 
 const queryClient = new QueryClient();
 
@@ -29,7 +29,7 @@ interface OSAComplaintsFlowProps {
 const OSAComplaintsFlow = ({
   selectedOSAComplaintType,
   onSelectionChange,
-  onBack
+  onBack,
 }: OSAComplaintsFlowProps): React.ReactElement => {
   if (!selectedOSAComplaintType) {
     // Step 2a: Show OSA complaints selector
@@ -64,7 +64,7 @@ const UKUserFlow = ({
   contentURLParam,
   onUKOptionSelection,
   onOSAComplaintSelection,
-  onBack
+  onBack,
 }: UKUserFlowProps): React.ReactElement => {
   if (!selectedUKOption) {
     // Step 1: Show UK selector
@@ -136,10 +136,10 @@ const ReportContent = ({
   selectedOSAComplaintType,
   onUKOptionSelection,
   onOSAComplaintSelection,
-  onBack
+  onBack,
 }: ReportContentProps): React.ReactElement => {
   // Handle appeals first (same for all report types)
-  if (appealParam && appealParam === 'true') {
+  if (appealParam && appealParam === "true") {
     return (
       <IllegalContentReportAppealForm reportType={ReportType.OSA} defaultCaseID={caseIDParam} />
     );
@@ -205,9 +205,9 @@ export interface Props {
  */
 const IllegalContentReportApp = ({ isUKUser }: Props): React.ReactElement => {
   const queryParams = new URLSearchParams(window.location.search);
-  const appealParam = queryParams.get('appeal');
-  const caseIDParam = queryParams.get('caseID');
-  const contentURLParam = queryParams.get('contentURL');
+  const appealParam = queryParams.get("appeal");
+  const caseIDParam = queryParams.get("caseID");
+  const contentURLParam = queryParams.get("contentURL");
 
   // State for UK multi-step flow
   const [selectedUKOption, setSelectedUKOption] = useState<UKReportOption | null>(null);
@@ -234,7 +234,7 @@ const IllegalContentReportApp = ({ isUKUser }: Props): React.ReactElement => {
   return (
     <TranslationProvider translationConfig={dsaTranslationConfig}>
       <QueryClientProvider client={queryClient}>
-        <div id='generic-challenge-container' />
+        <div id="generic-challenge-container" />
         <ReportContent
           isUKUser={isUKUser}
           appealParam={appealParam}
