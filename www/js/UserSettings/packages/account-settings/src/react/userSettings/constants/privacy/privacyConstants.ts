@@ -6,6 +6,7 @@ import {
   CommunicationPrivacyLevel,
   PartySettingsValue,
   TradeQualityFilterValue,
+  UserSetting,
 } from "@rbx/user-settings";
 import { TSettingsPage } from "../../../../types/commonTypes";
 import SettingCategoryPageName from "../../../../enums/SettingCategoryPageName";
@@ -548,6 +549,13 @@ export const getPrivatePlaytestOptions = (): TRadioButtonOptionV2[] => {
     name: "private-playtest-off",
   };
   return [on, off];
+};
+
+export const consentSettingOptions = {
+  [UserSetting.whoCanChatWithMeInExperiences]: getExperienceChatOptionsV2,
+  [UserSetting.whoCanWhisperChatWithMeInExperiences]: getExperienceDirectChatOptionsV2,
+  [UserSetting.whoCanPartyWithMe]: getWhoCanPartyWithMeOptions,
+  [UserSetting.privatePlaytest]: getPrivatePlaytestOptions,
 };
 
 export const getPresetChatOptions = (): TRadioButtonOptionV2[] => {

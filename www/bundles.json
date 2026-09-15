@@ -3188,7 +3188,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/bf326782a22f026c9136b1c995128dbb7b5663af2e360f76c54511864625702a.js",
+            "url": "https://js.rbxcdn.com/33476bb890a9bbcfc49108ab1ab849d2cafc2b1564be8547839b194c36535d26.js",
             "sources": [
                 "/home",
                 "/",
@@ -5482,7 +5482,7 @@
         },
         {
             "name": "ItemPurchase",
-            "url": "https://js.rbxcdn.com/f03f5cfcf75630103ff9505c7e05585c1ee6bdc9096b89021c07b16ef3f09abd-ItemPurchase.js",
+            "url": "https://js.rbxcdn.com/ae69070e60c63e310cf707f3e989fa923354923d002f40d5ff8b24cc8f0426e7-ItemPurchase.js",
             "sources": [
                 "/home",
                 "/",
@@ -6847,7 +6847,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/b7d2d01ee6d4dc322c7ddf7f06e06397b85deedf78549181f158d6176c1aeeb8-UserSettings.js",
+            "url": "https://js.rbxcdn.com/39c15a35d66fe332f21faa81ad48cce83b8e3ae5e425f84ae1a25cad06346e87-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -7984,7 +7984,7 @@
         },
         {
             "name": "ItemPurchase",
-            "url": "https://css.rbxcdn.com/3408b46f5db5261266fe187e582c87e980ac50a5047314613bc4a7486de21e8c-ItemPurchase.css",
+            "url": "https://css.rbxcdn.com/ee1f0c1b337218d452840cda3c2ac8ec030451007efb0e4a5c86989eb80f4d3d-ItemPurchase.css",
             "sources": [
                 "/home",
                 "/",

@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { withTranslations, queryClient } from '@rbx/core-scripts/react';
 import { createSystemFeedback } from '@rbx/core-ui/legacy/react-style-guide';
-import { paymentFlowAnalyticsService } from '@rbx/core-scripts/legacy/core-roblox-utilities';
-import { ItemPurchaseUpsellService, CurrentUser, AccountIntegrityChallengeService } from '@rbx/legacy-webapp-types/Roblox';
-import { uuidService } from '@rbx/core-scripts/legacy/core-utilities';
+import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
+// TODO(Next): ItemPurchaseUpsellService is a window.Roblox global; swap to the local
+// itemPurchaseUpsellService, which itself needs its GUAC/barrel deps de-globaled first.
+import { ItemPurchaseUpsellService } from '@rbx/legacy-webapp-types/Roblox';
+import * as AccountIntegrityChallengeService from '@rbx/account-security/challenge/runtime';
+import { userId, isAuthenticated } from '@rbx/core-scripts/meta/user';
+import { generateRandomUuid } from '@rbx/core-lib/uuid';
 import { QueryClientProvider, useQuery } from '@tanstack/react-query';
 import translationConfig from '../translation.config';
 import { getMetaData } from '../util/itemPurchaseUtil';
@@ -184,7 +188,8 @@ export default function createItemPurchase({
     subscriptionFooterDisclaimer = '',
     subscriptionCancelPath = '',
     displayPrice = '',
-    priceSuffix = ''
+    priceSuffix = '',
+    deepLinkId = null
   }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -192,7 +197,7 @@ export default function createItemPurchase({
     const [robuxNeeded, setRobuxNeeded] = useState(expectedPrice - userRobuxBalance);
     const [confirmData, setConfirmData] = useState(null);
     const [currentRobuxBalance, setCurrentRobuxBalance] = useState(userRobuxBalance);
-    const [idempotencyKey] = useState(() => uuidService.generateRandomUuid());
+    const [idempotencyKey] = useState(() => generateRandomUuid());
 
     const [isTwoStepVerificationActive, setIsTwoStepVerificationActive] = useState(false);
     const startTwoStepVerification = () => setIsTwoStepVerificationActive(true);
@@ -201,7 +206,7 @@ export default function createItemPurchase({
     const [shouldShowUnifiedPurchaseModal, setShouldShowUnifiedPurchaseModal] = useState(false);
 
     const { data: subscriptionProductInfo = null } = useQuery({
-      queryKey: ['list-available-subscription-products', CurrentUser.userId],
+      queryKey: ['list-available-subscription-products', userId()],
       queryFn: () => listAvailableSubscriptionProductsV2(ProductType.Blackbird, false),
       select: ({ products }) => products[0] ?? null,
       enabled: shouldShowUnifiedPurchaseModal,
@@ -211,7 +216,7 @@ export default function createItemPurchase({
 
     const getCurrentUserBalance = () => {
       itemDetailsService
-        .getCurrentUserBalance(CurrentUser.userId)
+        .getCurrentUserBalance(userId())
         .then((result) => {
           setCurrentRobuxBalance(result.data.robux);
           setRobuxNeeded(expectedPrice - result.data.robux);
@@ -222,7 +227,7 @@ export default function createItemPurchase({
     };
     useEffect(() => {
       const metaBalance = getMetaData().userRobuxBalance;
-      if (CurrentUser.isAuthenticated && !Number.isFinite(metaBalance)) {
+      if (isAuthenticated() && !Number.isFinite(metaBalance)) {
         getCurrentUserBalance();
       } else {
         setCurrentRobuxBalance(metaBalance);
@@ -237,7 +242,7 @@ export default function createItemPurchase({
     }, [isTwoStepVerificationActive]);
 
     useEffect(() => {
-      if (!CurrentUser.isAuthenticated) {
+      if (!isAuthenticated()) {
         return;
       }
       setShouldShowUnifiedPurchaseModal(true);
@@ -599,7 +604,7 @@ export default function createItemPurchase({
         collectibleItemId,
         expectedCurrency,
         expectedPrice: price,
-        expectedPurchaserId: CurrentUser.userId,
+        expectedPurchaserId: userId(),
         expectedPurchaserType: 'User',
         rentalOptionDays,
         expectedSellerId,
@@ -614,6 +619,9 @@ export default function createItemPurchase({
       }
       if (offerIds?.length) {
         params.offerIds = offerIds;
+      }
+      if (deepLinkId) {
+        params.deepLinkId = deepLinkId;
       }
 
       if (handlePurchase) {
@@ -749,7 +757,9 @@ export default function createItemPurchase({
         }
         itemPurchaseService
           .purchaseSubscriptionWithRobux(subscriptionTargetKey, {
-            priceInRobux: price
+            priceInRobux: price,
+            // Stable idempotency key for retries — minted once per purchase intent.
+            idempotencyKey
           })
           .then(response => {
             const { data } = response;
@@ -1046,7 +1056,8 @@ export default function createItemPurchase({
     displayPrice: '',
     priceSuffix: '',
     subscriptionProductType: null,
-    subscriptionProductId: null
+    subscriptionProductId: null,
+    deepLinkId: null
   };
 
   ItemPurchase.propTypes = {
@@ -1107,7 +1118,8 @@ export default function createItemPurchase({
     displayPrice: PropTypes.string,
     priceSuffix: PropTypes.string,
     subscriptionProductType: PropTypes.string,
-    subscriptionProductId: PropTypes.string
+    subscriptionProductId: PropTypes.string,
+    deepLinkId: PropTypes.string
   };
   const ItemPurchaseTranslated = withTranslations(
     ItemPurchase,

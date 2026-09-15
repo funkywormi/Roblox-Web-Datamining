@@ -5,16 +5,14 @@ import { LegallySensitiveContentService } from "Roblox";
 import { uuidService } from "core-utilities";
 import { UserProfileField, useUserProfiles } from "@rbx/user-profile-api-client";
 import {
-  PartySettingsValue,
-  EnabledStatusValue,
   TUpdateChildSettingsError,
   UpdateChildSettingsErrorCode,
-  UserPrivacyLevel,
   UserSetting,
   useSnackbar,
 } from "@rbx/user-settings";
 import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
 import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOptions";
+import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAndOptionsV2";
 import { selectChildPagesForChildUserId } from "../../../../apis/slices/childPagesSlice";
 import { useAppSelector } from "../../../../redux/hooks";
 import SpendSettingName from "../../../../../enums/SpendSettingName";
@@ -42,6 +40,7 @@ import {
   requestSettingLabels,
 } from "../../../constants/contentConstants/consentTranslationConstants";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
+import { consentSettingOptions } from "../../../constants/privacy/privacyConstants";
 import { useWrappedTranslation } from "../../../hooks/useWrappedTranslation";
 import {
   getConsentDetailsPageUrl,
@@ -66,6 +65,7 @@ const ConsentCenterCard = ({
     parentalControlsTranslationConstants;
 
   const [childSettings] = useGetSettingsAndOptions(consent?.childUserId);
+  const [childSettingsV2] = useGetSettingsAndOptionsV2(consent?.childUserId);
   const [answerConsentRequest] = useAnswerConsentRequestMutation();
 
   const userProfileFields = [UserProfileField.Names.CombinedName];
@@ -165,22 +165,13 @@ const ConsentCenterCard = ({
     child.canSeeChatTerminology,
   ]);
 
-  const modifySettingsValueForLabel = (settingName: UserSetting, settingValue: unknown) => {
-    if (settingName === UserSetting.whoCanPartyWithMe) {
-      return (settingValue as PartySettingsValue) === PartySettingsValue.AllConnections
-        ? EnabledStatusValue.Enabled
-        : EnabledStatusValue.Disabled;
+  const getTranslatedSettingValue = (settingName: UserSetting, settingValue: unknown): string => {
+    const options = consentSettingOptions[settingName as keyof typeof consentSettingOptions]?.();
+    if (options) {
+      const labelKey = options.find(option => option.value === settingValue)?.label;
+      return labelKey ? translate(labelKey) : "";
     }
-    if (
-      settingName === UserSetting.whoCanChatWithMeInExperiences ||
-      settingName === UserSetting.whoCanWhisperChatWithMeInExperiences
-    ) {
-      settingValue =
-        (settingValue as UserPrivacyLevel) === UserPrivacyLevel.AllUsers
-          ? EnabledStatusValue.Enabled
-          : EnabledStatusValue.Disabled;
-    }
-    return settingValue;
+    return getTranslatedOptionValue(settingValue, translate);
   };
 
   const getCurrentValue = (): string => {
@@ -188,10 +179,10 @@ const ConsentCenterCard = ({
       case ParentConsentType.UpdateBirthdate:
         return birthdayUtils.formatBirthdateFromISO(child.birthDate);
       case ParentConsentType.UpdateUserSetting: {
-        if (childSettings && settingName) {
-          const currValue = childSettings[settingName as keyof typeof childSettings]?.currentValue;
-          const labelCorrectedSettingValue = modifySettingsValueForLabel(settingName, currValue);
-          return getTranslatedOptionValue(labelCorrectedSettingValue, translate);
+        if (settingName) {
+          const settings = { ...childSettings, ...childSettingsV2 };
+          const currValue = settings[settingName as keyof typeof settings]?.currentValue;
+          return getTranslatedSettingValue(settingName, currValue);
         }
         return "";
       }
@@ -209,8 +200,7 @@ const ConsentCenterCard = ({
         const settingName = getFirstSettingNameInConsentData(consent);
         const settingValue = getFirstSettingValueInConsentData(consent);
         if (!settingName) return "";
-        const labelCorrectedSettingValue = modifySettingsValueForLabel(settingName, settingValue);
-        return getTranslatedOptionValue(labelCorrectedSettingValue, translate);
+        return getTranslatedSettingValue(settingName, settingValue);
       }
       default:
         return "";

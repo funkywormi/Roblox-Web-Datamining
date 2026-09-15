@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Loading } from '@rbx/core-ui/legacy/react-style-guide';
-import { withTranslations } from '@rbx/core-scripts/react';
-import { urlService } from '@rbx/core-scripts/legacy/core-utilities';
+import { Button, ProgressCircle } from '@rbx/foundation-ui';
+import { getUrlWithQueries } from '@rbx/core-scripts/util/url';
 import { formatNumber } from '@rbx/core-scripts/format/number';
 import * as httpService from '@rbx/core-scripts/http';
 import { isAuthenticated, isPremiumUser } from '@rbx/core-scripts/meta/user';
 import createMultiItemPurchaseModal from '../factories/createMultiItemPurchaseModal';
 import createInsufficientFundsModal from '../factories/createInsufficientFundsModal';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
-import translationConfig from '../translation.config';
 import createLeaveRobloxWarningModal from '../factories/createLeaveRobloxWarningModal';
 import urlConstants from '../constants/urlConstants';
 import universalAppConfigurationService from '../services/universalAppConfigurationService';
@@ -17,14 +15,15 @@ import universalAppConfigurationService from '../services/universalAppConfigurat
 const { resources } = itemPurchaseConstants;
 
 const [InsufficientFundsModal, InsufficientFundsModalService] = createInsufficientFundsModal();
-const [MultiItemPurchaseModal, MultiItemPurchaseModalService] = createMultiItemPurchaseModal();
-const [LeaveRobloxWarningModal, LeaveRobloxWarningModalService] = createLeaveRobloxWarningModal();
+const MultiItemPurchaseModal = createMultiItemPurchaseModal();
+const LeaveRobloxWarningModal = createLeaveRobloxWarningModal();
 
 export function BatchBuyItems({
   currentUserBalance,
   items,
   itemDetails,
   purchaseMetadata,
+  marketplaceOfferPricing,
   onBuyButtonClick,
   onConfirm,
   onCancel,
@@ -33,8 +32,8 @@ export function BatchBuyItems({
   displayPriceOnButton,
   systemFeedbackService,
   translate,
-  variant = Button.variants.growth,
-  size = Button.sizes.large
+  variant = 'Emphasis',
+  size = 'Large'
 }) {
   let shouldDisplayBuyButton = false;
   let price = 0;
@@ -42,14 +41,19 @@ export function BatchBuyItems({
   const resaleItems = [];
   const [purchasePending, setPurchasePending] = useState(false);
   const [shouldRedirectToVng, setShouldRedirectToVng] = useState(false);
-  const [purchaseModal, setPurchaseModal] = useState(null);
+  const [isMultiItemModalOpen, setIsMultiItemModalOpen] = useState(false);
+  const [isLeaveRobloxModalOpen, setIsLeaveRobloxModalOpen] = useState(false);
+  // Keep the multi-item modal mounted once opened so its sibling 2SV modal survives
+  // a confirm while the bulk purchase is still in flight (a 2SV challenge can come back
+  // in the purchase response).
+  const [hasMultiItemModalMounted, setHasMultiItemModalMounted] = useState(false);
   const [insufficientFundsModal, setInsufficientFundsModal] = useState(null);
 
   const getLoginUrl = () => {
     const parsedParams = {
       ReturnUrl: window.location.pathname
     };
-    const loginRedirUrl = urlService.getUrlWithQueries('/login', parsedParams);
+    const loginRedirUrl = getUrlWithQueries('/login', parsedParams);
     return loginRedirUrl;
   };
 
@@ -101,7 +105,7 @@ export function BatchBuyItems({
           variant={variant}
           size={size}
           isDisabled>
-          <Loading />
+          <ProgressCircle variant="Indeterminate" size="Small" ariaLabel="Loading" />
         </Button>
       </div>
     );
@@ -133,7 +137,10 @@ export function BatchBuyItems({
       shouldDisplayBuyButton = true;
     }
     const itemPurchaseInfo = items.find(i => i.id === item.id && i.itemType === item.itemType);
-    if (itemPurchaseInfo?.timedOption) {
+    const marketplaceOfferPrice = marketplaceOfferPricing[item.collectibleItemId]?.priceInRobux;
+    if (marketplaceOfferPrice !== undefined) {
+      price += marketplaceOfferPrice;
+    } else if (itemPurchaseInfo?.timedOption) {
       price += itemPurchaseInfo.timedOption.price;
     } else if (item.collectibleItemDetails !== undefined) {
       if (item.collectibleItemDetails.lowestPrice) {
@@ -174,40 +181,13 @@ export function BatchBuyItems({
       setInsufficientFundsModal(modal);
       InsufficientFundsModalService.open();
     } else {
-      const modal = (
-        <MultiItemPurchaseModal
-          title={translate(resources.buyNowAction)}
-          expectedTotalPrice={price + premiumPrice}
-          items={items}
-          purchaseMetadata={purchaseMetadata}
-          itemDetails={itemDetails}
-          resaleItems={resaleItems}
-          currentRobuxBalance={currentUserBalance}
-          onCancel={() => {
-            MultiItemPurchaseModalService?.close?.();
-            onCancel();
-          }}
-          onTransactionComplete={result => {
-            setPurchasePending(false);
-            onTransactionComplete(result);
-          }}
-          onAction={() => {
-            MultiItemPurchaseModalService?.close?.();
-            setPurchasePending(true);
-            onConfirm();
-          }}
-          loading={false}
-          productSurface={productSurface}
-          systemFeedbackService={systemFeedbackService}
-        />
-      );
-      setPurchaseModal(modal);
-      MultiItemPurchaseModalService.open();
+      setHasMultiItemModalMounted(true);
+      setIsMultiItemModalOpen(true);
     }
     onBuyButtonClick();
   };
 
-  let innerButton = <Loading />;
+  let innerButton = <ProgressCircle variant="Indeterminate" size="Small" ariaLabel="Loading" />;
   if (!purchasePending) {
     innerButton = displayPriceOnButton ? (
       <div className='purchase-price'>
@@ -222,7 +202,7 @@ export function BatchBuyItems({
   }
   const handleInsufficientFundsButtonClick = () => {
     if (shouldRedirectToVng) {
-      LeaveRobloxWarningModalService.open();
+      setIsLeaveRobloxModalOpen(true);
     } else {
       window.location = urlConstants.getRobuxUpgradesUrl('');
     }
@@ -243,7 +223,7 @@ export function BatchBuyItems({
         window.open(urlConstants.getVngShopFallbackUrl, '_blank').focus();
       });
 
-    LeaveRobloxWarningModalService.close();
+    setIsLeaveRobloxModalOpen(false);
   };
 
   return (
@@ -261,10 +241,44 @@ export function BatchBuyItems({
       {robuxNeeded > 0 && <div id='insufficient-funds-modal'>{insufficientFundsModal}</div>}
       {shouldRedirectToVng && (
         <div id='leave-roblox-warning-modal'>
-          <LeaveRobloxWarningModal onContinueToPayment={handleLeaveRobloxWarningButtonClick} />
+          <LeaveRobloxWarningModal
+            open={isLeaveRobloxModalOpen}
+            onContinueToPayment={handleLeaveRobloxWarningButtonClick}
+            onClose={() => setIsLeaveRobloxModalOpen(false)}
+          />
         </div>
       )}
-      {purchaseModal && <div id='multi-item-purchase-modal'>{purchaseModal}</div>}
+      {hasMultiItemModalMounted && (
+        <div id='multi-item-purchase-modal'>
+          <MultiItemPurchaseModal
+            open={isMultiItemModalOpen}
+            title={translate(resources.buyNowAction)}
+            expectedTotalPrice={price + premiumPrice}
+            items={items}
+            purchaseMetadata={purchaseMetadata}
+            marketplaceOfferPricing={marketplaceOfferPricing}
+            itemDetails={itemDetails}
+            resaleItems={resaleItems}
+            currentRobuxBalance={currentUserBalance}
+            onCancel={() => {
+              setIsMultiItemModalOpen(false);
+              onCancel();
+            }}
+            onTransactionComplete={result => {
+              setPurchasePending(false);
+              onTransactionComplete(result);
+            }}
+            onAction={() => {
+              setIsMultiItemModalOpen(false);
+              setPurchasePending(true);
+              onConfirm();
+            }}
+            loading={false}
+            productSurface={productSurface}
+            systemFeedbackService={systemFeedbackService}
+          />
+        </div>
+      )}
     </React.Fragment>
   );
 }
@@ -282,6 +296,12 @@ BatchBuyItems.propTypes = {
     })
   ).isRequired,
   purchaseMetadata: PropTypes.instanceOf(Map).isRequired,
+  marketplaceOfferPricing: PropTypes.objectOf(
+    PropTypes.shape({
+      priceInRobux: PropTypes.number.isRequired,
+      offerIds: PropTypes.arrayOf(PropTypes.string).isRequired
+    })
+  ),
   itemDetails: PropTypes.arrayOf(
     PropTypes.shape({
       productId: PropTypes.number.isRequired,
@@ -324,11 +344,11 @@ BatchBuyItems.propTypes = {
 };
 
 BatchBuyItems.defaultProps = {
-  variant: Button.variants.growth,
-  size: Button.sizes.large
+  marketplaceOfferPricing: {},
+  variant: 'Emphasis',
+  size: 'Large'
 };
 
-export const BatchBuyItemsButton = withTranslations(
-  BatchBuyItems,
-  translationConfig.purchasingResources
-);
+// BatchBuyPriceContainer always passes `translate` as a prop, so the withTranslations
+// HOC is redundant here (and would clobber that prop on Next).
+export const BatchBuyItemsButton = BatchBuyItems;

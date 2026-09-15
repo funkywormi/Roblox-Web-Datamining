@@ -1,5 +1,5 @@
 import * as httpService from '@rbx/core-scripts/http';
-import { CurrentUser } from '@rbx/legacy-webapp-types/Roblox';
+import { userId } from '@rbx/core-scripts/meta/user';
 import urlConstants from '../constants/urlConstants';
 
 const {
@@ -20,7 +20,7 @@ type TTwoStepVerificationConfigRes = {
 
 export const checkTwoStepVerificationEnabled = async (): Promise<boolean> => {
   const urlConfig = {
-    url: getTwoStepVerificationConfig(CurrentUser.userId),
+    url: getTwoStepVerificationConfig(userId() ?? ''),
     retryable: true,
     withCredentials: true
   };

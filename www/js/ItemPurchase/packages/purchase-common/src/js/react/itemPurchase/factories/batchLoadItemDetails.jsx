@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { isAuthenticated } from '@rbx/core-scripts/meta/user';
-import { ItemDetailsHydrationService, TDetailEntry, TItemDetailRequestEntry } from '@rbx/legacy-webapp-types/Roblox';
 import itemDetailsService from '../services/itemDetailsService';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
 import itemDetailParsingUtils from '../util/itemDetailParsingUtils';
+import hydrateCollectibleItemDetails from '../util/hydrateCollectibleItemDetails';
 import ItemType from '../../../../ts/react/enums/ItemType';
 
 const { errorMessages, maxBatchLoadRetries } = itemPurchaseConstants;
@@ -117,7 +117,12 @@ function BatchLoadItemDetails(items) {
           id: item.id
         })
       );
-      result = await ItemDetailsHydrationService.getItemDetails(itemsToHydrate, false, true);
+      // Replaces window.Roblox ItemDetailsHydrationService.getItemDetails.
+      const response = await itemDetailsService.postItemDetails(itemsToHydrate);
+      result = response.data.data;
+      await hydrateCollectibleItemDetails(result, ids =>
+        itemDetailsService.getCollectibleItemsDetails(ids)
+      );
     }
     const itemDetailsResult = [];
     items.forEach(item => {
