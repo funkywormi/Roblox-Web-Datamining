@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { isEqual } from "lodash";
+import { isEqual } from "es-toolkit";
 import { isStringNumberOrBooleanValue, parseStringField } from "../utils/analyticsParsingUtils";
 import {
   SduiPresenceConditionKey,

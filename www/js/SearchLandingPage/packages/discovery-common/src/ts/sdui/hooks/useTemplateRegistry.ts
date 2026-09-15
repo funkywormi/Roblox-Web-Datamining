@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { merge, cloneDeep } from "lodash";
+import { cloneDeep, merge } from "es-toolkit";
 import {
   TSduiPageContext,
   TSduiTemplateRegistry,
@@ -13,6 +13,11 @@ const deepCopyAndMerge = (
 ): Record<string, unknown> | undefined => {
   if (!base) {
     return cloneDeep(override);
+  }
+
+  // es-toolkit's merge requires a defined source, unlike lodash's, which ignored undefined.
+  if (override === undefined) {
+    return cloneDeep(base);
   }
 
   return merge(cloneDeep(base), override);
