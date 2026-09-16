@@ -166,6 +166,7 @@ export enum UserSetting {
   allowIdentityVerification = "allowIdentityVerification",
   robuxTransferLimits = "robuxTransferLimits",
   iarcAgeRating = "iarcAgeRating",
+  allowThirdPartyFriendAccess = "allowThirdPartyFriendAccess",
 }
 
 // The type of a given option for a setting

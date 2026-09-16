@@ -5,6 +5,7 @@ import { usePaymentSession } from "@rbx/payments/services/paymentSession";
 import {
   BillingInfoDisplay,
   PlusReferralLandingContainer,
+  readPlusReferralLanding,
   RobloxPlusHeading,
   ProductFeaturesList,
   RobloxPlusGiftItemUpsellBanner,
@@ -47,6 +48,9 @@ const PurchaseView: FC<PurchaseViewProps> = ({
 }) => {
   const { translate } = useTranslation();
   const { id: paymentSessionId } = usePaymentSession() ?? {};
+
+  const landing = useMemo(() => readPlusReferralLanding(window.location.search), []);
+  const referrerId = landing.kind === "invite" ? landing.referrerId : undefined;
 
   const baselineProduct = robloxSubscriptionProducts[0];
   const isMultiProduct = robloxSubscriptionProducts.length > 1;
@@ -177,6 +181,7 @@ const PurchaseView: FC<PurchaseViewProps> = ({
     deviceMeta,
     isDisabled: isEntrypointDisabled,
     paymentSessionId,
+    referrerId,
     trackSubscriptionButtonClick: trackSubscribeClick,
     onSubscribeClick: isMobileInApp ? onMobilePurchaseInitiated : undefined,
   };
@@ -350,6 +355,7 @@ const PurchaseView: FC<PurchaseViewProps> = ({
           isOpen={isSheetOpen}
           paymentSessionId={paymentSessionId}
           products={robloxSubscriptionProducts}
+          referrerId={referrerId}
           onMobilePurchaseInitiated={onMobilePurchaseInitiated}
           onOpenChange={setIsSheetOpen}
         />

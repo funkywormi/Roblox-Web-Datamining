@@ -59,6 +59,53 @@ export function asButtons(value: unknown): TextScreenButton[] | undefined {
   return buttons.length > 0 ? buttons : undefined;
 }
 
+/** Which party a consent row is granted for. Echoed back verbatim; the client never reads into it. */
+export const CONSENT_TARGETS = ["self", "child", "both"] as const;
+
+export type ConsentTarget = (typeof CONSENT_TARGETS)[number];
+
+export type AgreementConsentRow = {
+  id: string;
+  target: ConsentTarget;
+  /** Pre-translated, with any anchors already embedded. */
+  label: string;
+  isRequired: boolean;
+};
+
+function asConsentTarget(value: unknown): ConsentTarget | undefined {
+  return CONSENT_TARGETS.find(target => target === value);
+}
+
+/**
+ * Parses a server-authored `rows` array of `{ id, target, label, isRequired }`. An entry without an
+ * id or a recognised target is dropped, since reporting one back would fail the service's payload
+ * read; a missing `label` degrades to empty and a non-boolean `isRequired` to optional.
+ */
+export function asConsentRows(value: unknown): AgreementConsentRow[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+  const items: unknown[] = value;
+  const rows: AgreementConsentRow[] = [];
+  for (const item of items) {
+    if (typeof item !== "object" || item === null || !("id" in item) || !("target" in item)) {
+      continue;
+    }
+    const id = asText(item.id);
+    const target = asConsentTarget(item.target);
+    if (id === undefined || id === "" || target === undefined) {
+      continue;
+    }
+    rows.push({
+      id,
+      target,
+      label: ("label" in item ? asText(item.label) : undefined) ?? "",
+      isRequired: "isRequired" in item && item.isRequired === true,
+    });
+  }
+  return rows.length > 0 ? rows : undefined;
+}
+
 export type VerificationMethodOption = { id: string; label: string; description: string };
 
 /**

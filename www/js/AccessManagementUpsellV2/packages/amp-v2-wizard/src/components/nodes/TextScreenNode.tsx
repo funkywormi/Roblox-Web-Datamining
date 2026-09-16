@@ -27,23 +27,31 @@ export function TextScreenNode({ props, report }: NodeProps): JSX.Element {
   const buttons = asButtons(props.buttons) ?? [];
 
   return (
-    <div className="gap-medium flex flex-col items-center">
-      {imageUrl ? <img src={imageUrl} alt="" className="max-w-full" /> : null}
-      <h2 className="text-heading-medium content-emphasis text-center">{title}</h2>
-      <p className="text-body-medium content-default text-center">{description}</p>
-      {buttons.map((button, index) => (
-        <Button
-          key={button.outcome}
-          variant={index === 0 ? "Emphasis" : "Standard"}
-          size="Medium"
-          className="w-full"
-          onClick={() => {
-            report(button.outcome);
-          }}
-        >
-          {button.label}
-        </Button>
-      ))}
+    <div className="gap-large flex flex-col">
+      {imageUrl ? <img src={imageUrl} alt="" className="width-full" /> : null}
+      <div className="gap-xsmall flex flex-col">
+        <h2 className="text-heading-medium content-emphasis margin-none">{title}</h2>
+        <p className="text-body-medium content-default margin-none">{description}</p>
+      </div>
+      <div className="gap-small flex flex-col">
+        {buttons.map((button, index) => (
+          <Button
+            key={button.outcome}
+            variant={index === 0 ? "Emphasis" : "Standard"}
+            size="Medium"
+            className="width-full"
+            onClick={() => {
+              report(button.outcome);
+            }}
+          >
+            {button.label}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }
+
+// The host's dialog draws an X that reports Cancel, the same outcome a flow's own Cancel button
+// reports — the two are interchangeable ways to leave the screen, not separate branches.
+TextScreenNode.dismissesOnCancel = true;

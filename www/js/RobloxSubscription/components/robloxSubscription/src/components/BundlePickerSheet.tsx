@@ -27,6 +27,7 @@ export type BundlePickerSheetProps = {
   onMobilePurchaseInitiated: () => void;
   /** Payments-gateway session id for checkout handoff (from {@link usePaymentSession}). */
   paymentSessionId?: string;
+  referrerId?: string;
 };
 
 const BundlePickerSheet: FC<BundlePickerSheetProps> = ({
@@ -37,6 +38,7 @@ const BundlePickerSheet: FC<BundlePickerSheetProps> = ({
   isEntrypointDisabled,
   onMobilePurchaseInitiated,
   paymentSessionId,
+  referrerId,
 }) => {
   const { translate } = useTranslation();
   const baselineProductId = products[0]?.productKey.id;
@@ -207,6 +209,7 @@ const BundlePickerSheet: FC<BundlePickerSheetProps> = ({
               paymentSessionId={paymentSessionId}
               productId={selectedProductId ?? ""}
               productType={selectedProduct.productKey.type}
+              referrerId={referrerId}
               size="Medium"
               trackSubscriptionButtonClick={trackSubscribeClick}
               onSubscribeClick={isMobileInApp ? onMobilePurchaseInitiated : undefined}

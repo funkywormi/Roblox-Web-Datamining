@@ -33,13 +33,21 @@ export const OdpHandoffNode: NodeComponent = ({
   const onBack = useCallback(() => {
     report("Back");
   }, [report]);
+  const onCancel = useCallback(() => {
+    report("Cancel");
+  }, [report]);
 
   // Back is transition-driven: the server only declares a `Back` transition when a Prologue preceded
-  // this node, so the affordance appears exactly when there is somewhere to go back to.
+  // this node. Without one, the server declares `Cancel` for the close affordance.
   const hasBack = transitions?.Back != null;
+  const hasCancel = transitions?.Cancel != null;
 
   return (
-    <FullPageChrome title={headerTitle} onBack={hasBack ? onBack : undefined}>
+    <FullPageChrome
+      title={headerTitle}
+      onBack={hasBack ? onBack : undefined}
+      onClose={!hasBack && hasCancel ? onCancel : undefined}
+    >
       <div className="gap-large flex grow flex-col" data-testid="amp-v2-wizard-odp-handoff">
         <div className="gap-xlarge flex flex-col">
           <ODPTiltedCardsArt />

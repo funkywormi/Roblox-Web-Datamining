@@ -28,7 +28,7 @@ export type PinEntryDetails = {
   attemptsRemaining?: number;
 };
 
-export function PinEntryNode({ props, report }: NodeProps): JSX.Element {
+export function PinEntryNode({ props, report, transitions }: NodeProps): JSX.Element {
   const headerTitle = asText(props.headerTitle);
   const title = asText(props.title) ?? "";
   const description = asText(props.description);
@@ -61,8 +61,21 @@ export function PinEntryNode({ props, report }: NodeProps): JSX.Element {
     report("ForgotPin");
   }, [report]);
 
+  const hasBack = transitions?.Back != null;
+  const onBack = useCallback(() => {
+    report("Back");
+  }, [report]);
+  const hasCancel = transitions?.Cancel != null;
+  const onCancel = useCallback(() => {
+    report("Cancel");
+  }, [report]);
+
   return (
-    <FullPageChrome title={headerTitle}>
+    <FullPageChrome
+      title={headerTitle}
+      onBack={hasBack ? onBack : undefined}
+      onClose={!hasBack && hasCancel ? onCancel : undefined}
+    >
       <div className="relative flex grow flex-col" data-testid="amp-v2-wizard-pin-entry">
         <div className="gap-xlarge flex flex-col">
           <div className="gap-none flex flex-col">

@@ -385,3 +385,6 @@ export const RemoteParentRequestNode: NodeComponent = ({
 };
 
 RemoteParentRequestNode.ownsLoadingState = true;
+
+// The host's dialog draws an X reporting Cancel, the same outcome as this node's own Cancel button.
+RemoteParentRequestNode.dismissesOnCancel = true;

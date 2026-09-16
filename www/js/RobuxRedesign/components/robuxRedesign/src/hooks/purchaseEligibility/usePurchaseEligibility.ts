@@ -79,9 +79,11 @@ export function usePurchaseEligibility(): {
 
     const { currentValue, options } = enablePurchasesSetting.enablePurchases;
 
-    return options.some(
-      ({ option: { optionValue }, requirement }) =>
-        optionValue !== currentValue && requirement === RequirementType.SelfUpdateSetting,
+    return (
+      options?.some(
+        ({ option: { optionValue }, requirement }) =>
+          optionValue !== currentValue && requirement === RequirementType.SelfUpdateSetting,
+      ) ?? false
     );
   }, []);
 

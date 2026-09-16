@@ -3,6 +3,7 @@
  * `capabilities()` advertises them on /entrypoint so the backend only emits nodes we can render.
  */
 
+import { AgreementConsentsNode } from "./components/nodes/AgreementConsentsNode";
 import { CreateOdpSessionNode } from "./components/nodes/CreateOdpSessionNode";
 import { OdpAgeEstimationNode } from "./components/nodes/OdpAgeEstimationNode";
 import { OdpGovernmentIdNode } from "./components/nodes/OdpGovernmentIdNode";
@@ -18,6 +19,7 @@ import type { NodeComponent, Registry } from "./types";
 
 /** Keys MUST match the backend's node-type discriminators. */
 export const defaultRegistry: Registry = {
+  AgreementConsents: AgreementConsentsNode,
   CreateOdpSession: CreateOdpSessionNode,
   OdpAgeEstimation: OdpAgeEstimationNode,
   OdpGovernmentId: OdpGovernmentIdNode,

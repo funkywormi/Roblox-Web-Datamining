@@ -212,6 +212,11 @@ export type NodeComponent = ((props: NodeProps) => ReactElement | null) & {
    * Set when the node hands off to an overlay of its own, mounted outside the wizard's dialog.
    */
   ownsOverlay?: boolean;
+  /**
+   * Set when the node treats dismissing the wizard's dialog as a `Cancel` outcome: the host draws
+   * the close affordance for it, but only when the server declares a `Cancel` transition.
+   */
+  dismissesOnCancel?: boolean;
 };
 
 /** Maps a server node `type` discriminator to the component that renders it. */

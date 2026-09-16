@@ -10,6 +10,7 @@ import { Dialog, DialogBody, DialogContent, ProgressCircle } from "@rbx/foundati
 
 import { defaultRegistry, getNodeComponent } from "../componentRegistry";
 import { useWizardWalker, type WalkerEvent } from "../hooks/useWizardWalker";
+import { WizardLoadingContext } from "./WizardLoadingContext";
 import type {
   FlowApi,
   FlowExitResult,
@@ -32,11 +33,41 @@ export type WizardHostProps = {
   onEvent?: (event: WalkerEvent) => void;
 };
 
-function Overlay({ children }: { children: ReactNode }): JSX.Element {
+function Overlay({
+  children,
+  onClose,
+}: {
+  children: ReactNode;
+  onClose?: () => void;
+}): JSX.Element {
   return (
-    <Dialog open isModal size="Medium" type="Default" hasCloseAffordance={false}>
+    <Dialog
+      open
+      isModal
+      size="Medium"
+      type="Default"
+      hasCloseAffordance={onClose != null}
+      closeLabel="Close"
+      onOpenChange={isOpen => {
+        // Covers Escape and the X alike, both of which close the dialog.
+        if (!isOpen) {
+          onClose?.();
+        }
+      }}
+    >
       <DialogContent>
-        <DialogBody className="gap-large flex flex-col">{children}</DialogBody>
+        {/* The close affordance is positioned absolutely, so a heading that runs the dialog's full
+            width renders underneath it; leave it room on the screens that draw one. The button is
+            36px wide and sits 13px in from the edge, so 2.5rem clears it with a gap to spare. */}
+        <DialogBody
+          className={
+            onClose == null
+              ? "gap-large flex flex-col"
+              : "gap-large flex flex-col [&_h2]:[padding-inline-end:2.5rem]"
+          }
+        >
+          {children}
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );
@@ -117,8 +148,26 @@ export function WizardHost(props: WizardHostProps): JSX.Element | null {
 
   // A node handing off to an overlay of its own gets no additional overlay.
   if (Component.ownsOverlay === true) {
-    return node;
+    return <WizardLoadingContext.Provider value={isLoading}>{node}</WizardLoadingContext.Provider>;
   }
 
-  return <Overlay>{node}</Overlay>;
+  // Nodes that treat dismissal as Cancel get the dialog's X alongside whatever buttons the flow
+  // declares, but only where the server declared the transition — dismissing into an outcome the
+  // flow doesn't know would error-exit.
+  const dismissesOnCancel =
+    Component.dismissesOnCancel === true && currentNode.transitions.Cancel != null;
+
+  return (
+    <Overlay
+      onClose={
+        dismissesOnCancel
+          ? () => {
+              report("Cancel");
+            }
+          : undefined
+      }
+    >
+      {node}
+    </Overlay>
+  );
 }

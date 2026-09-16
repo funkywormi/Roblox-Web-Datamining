@@ -1,18 +1,18 @@
 /** The ODP parent-mode agreement screen. */
 
-import { useCallback, type ComponentProps, type JSX, type ReactNode } from "react";
+import { useCallback, type ComponentProps, type JSX } from "react";
 import {
   Button,
-  IconButton,
-  Link,
   List,
   ListItem,
   ListItemLeadingAccessorySpacer,
   ListItemLeadingIcon,
 } from "@rbx/foundation-ui";
 
+import { FullPageChrome } from "../FullPageChrome";
+import { renderAnchoredCopy } from "../../utils/anchoredCopy";
 import { asText } from "../../utils/nodeDetails";
-import type { NodeProps } from "../../types";
+import type { NodeComponent, NodeProps } from "../../types";
 
 type AgreementBullet = {
   icon?: string;
@@ -24,8 +24,6 @@ const BUILDER_ICONS: Record<string, ComponentProps<typeof ListItemLeadingIcon>["
   Tilt: "icon-regular-tilt",
   ShieldCheck: "icon-regular-shield-check",
 };
-
-const ANCHOR = /<a\s+href=(?:"([^"]*)"|'([^']*)')\s*>(.*?)<\/a>/gi;
 
 function asBullets(input: unknown): AgreementBullet[] {
   if (!Array.isArray(input)) {
@@ -49,74 +47,6 @@ function asBullets(input: unknown): AgreementBullet[] {
     });
   }
   return bullets;
-}
-
-function isHttpUrl(value: string): boolean {
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:";
-  } catch {
-    return false;
-  }
-}
-
-function decodeEntities(value: string): string {
-  if (typeof document === "undefined") {
-    return value;
-  }
-  const textarea = document.createElement("textarea");
-  textarea.innerHTML = value;
-  return textarea.value;
-}
-
-/** Renders the server's intentionally small legal-copy markup without injecting raw HTML. */
-function LegalText({ text }: { text: string }): JSX.Element {
-  const content: ReactNode[] = [];
-  let index = 0;
-  let lastIndex = 0;
-
-  for (const match of text.matchAll(ANCHOR)) {
-    const [anchor] = match;
-    const start = match.index;
-    if (start > lastIndex) {
-      content.push(decodeEntities(text.slice(lastIndex, start)));
-    }
-
-    const href = match.at(1) ?? match.at(2) ?? "";
-    const linkLabel = decodeEntities(match.at(3) ?? "");
-    content.push(
-      isHttpUrl(href) ? (
-        <Link
-          key={`link-${index}`}
-          href={href}
-          target="_blank"
-          rel="noreferrer"
-          variant="Inline"
-          underline="always"
-          isExternal={false}
-        >
-          {linkLabel}
-        </Link>
-      ) : (
-        <span key={`text-${index}`}>{linkLabel}</span>
-      ),
-    );
-    index += 1;
-    lastIndex = start + anchor.length;
-  }
-
-  if (lastIndex < text.length) {
-    content.push(decodeEntities(text.slice(lastIndex)));
-  }
-
-  return (
-    <p
-      className="text-body-small content-default margin-none"
-      data-testid="amp-v2-wizard-agreement-legal-text"
-    >
-      {content}
-    </p>
-  );
 }
 
 function BulletLeading({ bullet }: { bullet: AgreementBullet }): JSX.Element | null {
@@ -151,7 +81,11 @@ function Bullet({ bullet }: { bullet: AgreementBullet }): JSX.Element {
   );
 }
 
-export function UserAgreementNode({ props, report }: NodeProps): JSX.Element {
+export const UserAgreementNode: NodeComponent = ({
+  props,
+  report,
+  transitions,
+}: NodeProps): JSX.Element => {
   const headerTitle = asText(props.headerTitle);
   const title = asText(props.title) ?? "";
   const description = asText(props.description);
@@ -165,47 +99,50 @@ export function UserAgreementNode({ props, report }: NodeProps): JSX.Element {
     report("Back");
   }, [report]);
 
+  // Back is transition-driven: the server declares a `Back` transition only when there is an earlier
+  // screen to return to, so the header chevron appears exactly then.
+  const hasBack = transitions?.Back != null;
+
   return (
-    <div className="gap-large flex flex-col" data-testid="amp-v2-wizard-user-agreement">
-      <div className="flex items-center">
-        <IconButton
-          icon="icon-regular-chevron-large-left"
-          ariaLabel="Back"
-          variant="Utility"
-          size="Small"
-          onClick={onBack}
-        />
-        {headerTitle ? (
-          <span className="text-title-medium content-emphasis fill text-align-x-center">
-            {headerTitle}
-          </span>
-        ) : null}
-        <div className="width-800" aria-hidden />
-      </div>
-      <div className="gap-xlarge flex flex-col">
-        <div className="gap-none flex flex-col" data-testid="amp-v2-wizard-agreement-intro">
-          <h2 className="text-heading-medium content-emphasis margin-none">{title}</h2>
-          {description ? (
-            <p className="text-body-large content-default margin-none">{description}</p>
+    <FullPageChrome title={headerTitle} onBack={hasBack ? onBack : undefined}>
+      <div className="gap-large flex grow flex-col" data-testid="amp-v2-wizard-user-agreement">
+        <div className="gap-xlarge flex flex-col">
+          <div className="gap-none flex flex-col" data-testid="amp-v2-wizard-agreement-intro">
+            <h2 className="text-heading-medium content-emphasis margin-none">{title}</h2>
+            {description ? (
+              <p className="text-body-large content-default margin-none">{description}</p>
+            ) : null}
+          </div>
+          {bullets.length > 0 ? (
+            <List className="flex flex-col gap-large">
+              {bullets.map(bullet => (
+                <Bullet
+                  key={`${bullet.icon ?? ""}-${bullet.title}-${bullet.description ?? ""}`}
+                  bullet={bullet}
+                />
+              ))}
+            </List>
           ) : null}
         </div>
-        {bullets.length > 0 ? (
-          <List className="flex flex-col gap-large">
-            {bullets.map(bullet => (
-              <Bullet
-                key={`${bullet.icon ?? ""}-${bullet.title}-${bullet.description ?? ""}`}
-                bullet={bullet}
-              />
-            ))}
-          </List>
-        ) : null}
+        <div className="gap-small flex flex-col [margin-top:auto]">
+          <Button variant="Emphasis" size="Medium" className="width-full" onClick={onContinue}>
+            {continueLabel}
+          </Button>
+          {legalText ? (
+            <p
+              className="text-body-small content-default margin-none"
+              data-testid="amp-v2-wizard-agreement-legal-text"
+            >
+              {renderAnchoredCopy(legalText)}
+            </p>
+          ) : null}
+        </div>
       </div>
-      <div className="gap-small flex flex-col">
-        <Button variant="Emphasis" size="Medium" className="width-full" onClick={onContinue}>
-          {continueLabel}
-        </Button>
-        {legalText ? <LegalText text={legalText} /> : null}
-      </div>
-    </div>
+    </FullPageChrome>
   );
-}
+};
+
+// Renders its own full-page surface (FullPageChrome): the host must not add a modal overlay, nor a
+// loading spinner that would mis-position against this fixed, out-of-flow node.
+UserAgreementNode.ownsOverlay = true;
+UserAgreementNode.ownsLoadingState = true;
