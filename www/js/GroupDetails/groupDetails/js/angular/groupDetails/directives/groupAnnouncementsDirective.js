@@ -15,6 +15,7 @@ function groupAnnouncements() {
       policies: '<',
       metadata: '<',
       canCreateAnnouncements: '<',
+      canViewAnnouncements: '<',
       onAnnouncementLoaded: '<',
       announcementsData: '<',
       refreshAnnouncements: '<'
@@ -56,6 +57,7 @@ function groupAnnouncements() {
           policies: scope.policies,
           metadata: scope.metadata,
           canCreateAnnouncements: scope.canCreateAnnouncements,
+          canViewAnnouncements: scope.canViewAnnouncements,
           onAnnouncementLoaded: () => {
             return scope.onAnnouncementLoaded();
           },
@@ -75,6 +77,7 @@ function groupAnnouncements() {
         'isOwner',
         'announcement',
         'canCreateAnnouncements',
+        'canViewAnnouncements',
         'announcementsData'
       ].forEach(prop => {
         scope.$watch(

@@ -1,38 +1,40 @@
-import { GroupForumsService } from 'Roblox';
+import { GroupPostsService } from 'Roblox';
 import groupModule from '../groupModule';
 
-function groupForums() {
+function groupPosts() {
   'ngInject';
 
   return {
-    restrict: 'A',
+    restrict: 'E',
     scope: {
       group: '<',
       permissions: '<',
       channelsPermissions: '<',
       userId: '<',
       isGroupMember: '<',
-      isEnabled: '<'
+      forumsEnabled: '<',
+      policies: '<'
     },
     link(scope, element) {
-      const renderForums = () => {
+      const renderPosts = () => {
         if (!scope.group?.id || !scope.permissions) {
           return;
         }
-        GroupForumsService?.renderGroupForums(element[0], {
+        GroupPostsService?.renderGroupPosts(element[0], {
           group: scope.group,
           permissions: scope.permissions,
           channelsPermissions: scope.channelsPermissions,
           userId: scope.userId,
           isGroupMember: scope.isGroupMember,
-          isEnabled: scope.isEnabled
+          forumsEnabled: scope.forumsEnabled,
+          policies: scope.policies
         });
       };
 
-      element.ready(renderForums);
+      element.ready(renderPosts);
 
       scope.$on('$destroy', () => {
-        GroupForumsService?.unmountGroupForums?.(element[0]);
+        GroupPostsService?.unmountGroupPosts?.(element[0]);
       });
 
       scope.$watch(
@@ -42,7 +44,8 @@ function groupForums() {
           channelsPermissions: scope.channelsPermissions,
           userId: scope.userId,
           isGroupMember: scope.isGroupMember,
-          isEnabled: scope.isEnabled
+          forumsEnabled: scope.forumsEnabled,
+          policies: scope.policies
         }),
         (newVal, oldVal) => {
           // Don't rerender until we have both group and permissions
@@ -58,9 +61,10 @@ function groupForums() {
               JSON.stringify(oldVal.channelsPermissions) ||
             newVal.userId !== oldVal.userId ||
             newVal.isGroupMember !== oldVal.isGroupMember ||
-            newVal.isEnabled !== oldVal.isEnabled
+            newVal.forumsEnabled !== oldVal.forumsEnabled ||
+            JSON.stringify(newVal.policies) !== JSON.stringify(oldVal.policies)
           ) {
-            renderForums();
+            renderPosts();
           }
         },
         true
@@ -69,6 +73,6 @@ function groupForums() {
   };
 }
 
-groupModule.directive('groupForums', groupForums);
+groupModule.directive('groupPosts', groupPosts);
 
-export default groupForums;
+export default groupPosts;

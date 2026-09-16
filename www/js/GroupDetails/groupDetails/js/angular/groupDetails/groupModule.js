@@ -61,6 +61,21 @@ const group = angular
           label: 'Forums',
           authenticate: false
         })
+        .state('announcements', {
+          url: '/announcements',
+          label: 'Posts',
+          authenticate: false
+        })
+        .state('announcements.detail', {
+          url: '/:announcementId',
+          label: 'Posts',
+          authenticate: false
+        })
+        .state('announcements.detail.edit', {
+          url: '/edit',
+          label: 'Posts',
+          authenticate: false
+        })
         .state('forums.category', {
           url: '/:categoryId',
           label: 'Forums',

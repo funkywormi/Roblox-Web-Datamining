@@ -854,12 +854,12 @@ configure-group-payouts .rbx-tab {
     justify-content: center
 }
 
-.group-forums-user-display {
+.group-posts-user-display {
     display: flex;
     align-items: center
 }
 
-.group-forums-user-display .user-display-meta {
+.group-posts-user-display .user-display-meta {
     display: flex;
     align-items: center;
     min-width: 0;
@@ -867,21 +867,21 @@ configure-group-payouts .rbx-tab {
     font-size: var(--font-size-350)
 }
 
-.group-forums-user-display .verified-badge-icon-user-display {
+.group-posts-user-display .verified-badge-icon-user-display {
     width: 12px;
     height: 12px;
     margin-left: 4px
 }
 
-.group-forums-user-display .foundation-web-badge {
+.group-posts-user-display .foundation-web-badge {
     margin-left: 4px
 }
 
-.group-forums-user-display .user-display-tooltip-container {
+.group-posts-user-display .user-display-tooltip-container {
     display: inline
 }
 
-.group-forums-user-display .user-display-role-name-interactive {
+.group-posts-user-display .user-display-role-name-interactive {
     cursor: pointer
 }
 
@@ -921,13 +921,13 @@ configure-group-payouts .rbx-tab {
     border-bottom-color: var(--color-stroke-default)
 }
 
-.group-forums-user-display-avatar-container {
+.group-posts-user-display-avatar-container {
     height: 28px;
     width: 28px;
     margin-right: 8px
 }
 
-.group-forums-user-display-avatar-thumbnail {
+.group-posts-user-display-avatar-thumbnail {
     height: 100%;
     width: 100%;
     border-radius: 50%;
@@ -935,11 +935,11 @@ configure-group-payouts .rbx-tab {
     border: 0
 }
 
-.group-forums-user-display-avatar-thumbnail img {
+.group-posts-user-display-avatar-thumbnail img {
     vertical-align: initial
 }
 
-.group-forums-user-display-avatar-username-link {
+.group-posts-user-display-avatar-username-link {
     display: flex;
     align-items: center;
     font-weight: 700;
@@ -948,7 +948,7 @@ configure-group-payouts .rbx-tab {
     white-space: nowrap
 }
 
-.group-forums-user-display-avatar-username-link-username {
+.group-posts-user-display-avatar-username-link-username {
     font-size: 16px
 }
 

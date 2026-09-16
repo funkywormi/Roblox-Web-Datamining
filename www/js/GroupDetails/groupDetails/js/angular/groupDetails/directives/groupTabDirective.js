@@ -17,7 +17,7 @@ function groupTab(groupResources) {
       // Logged on a real user click (not $stateChangeSuccess) so programmatic
       // redirects between tabs don't emit false events.
       scope.onTabClick = function onTabClick() {
-        sendTabClickEvent(scope.tab && scope.tab.state);
+        sendTabClickEvent(scope.tab && scope.tab.key);
       };
     }
   };

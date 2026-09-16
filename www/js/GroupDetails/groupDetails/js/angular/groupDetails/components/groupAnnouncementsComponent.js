@@ -12,6 +12,7 @@ const groupAnnouncements = {
     policies: '<',
     metadata: '<',
     canCreateAnnouncements: '<',
+    canViewAnnouncements: '<',
     onAnnouncementLoaded: '<',
     announcementsData: '<',
     refreshAnnouncements: '<'

@@ -3,6 +3,7 @@ import { initRobloxBadgesFrameworkAgnostic } from 'roblox-badges';
 import { Component } from '@rbx/profile-platform';
 import { GROUP_MEMBERSHIP_CHANGED_EVENT } from '../../../../ts/react/shared/constants/groupMembershipConstants';
 import groupModule from '../groupModule';
+import createTabConfiguration from '../utils/createTabConfiguration';
 
 function groupController(
   $scope,
@@ -30,6 +31,21 @@ function groupController(
   $state
 ) {
   'ngInject';
+
+  const postsTabs = createTabConfiguration(groupDetailsConstants.tabs, {
+    about: { translationKey: 'Heading.Home' },
+    forums: { translationKey: 'Heading.Posts' }
+  });
+  const announcementOnlyPostsTabs = createTabConfiguration(postsTabs, {
+    forums: { state: 'announcements' }
+  });
+  const getBaseGroupDetailsTabs = () => {
+    if (!$scope.isAnnouncementArchiveEnabled) {
+      return groupDetailsConstants.tabs;
+    }
+
+    return $scope.canViewForums() ? postsTabs : announcementOnlyPostsTabs;
+  };
 
   function loadGroupData() {
     const whenLoadGroupData = $scope.loadGroup($scope.library.currentGroup.id);
@@ -64,7 +80,7 @@ function groupController(
   }
 
   let hasHandledAboutTabExposure = false;
-  const getStateName = state => {
+  const getTabKeyForState = state => {
     return groupDetailsConstants.stateToTab[state?.name] ?? state?.name;
   };
   const tryExposeAboutTabExperiment = state => {
@@ -72,7 +88,7 @@ function groupController(
       return;
     }
 
-    if (getStateName(state ?? $state.current) !== groupDetailsConstants.tabs.about.state) {
+    if (getTabKeyForState(state ?? $state.current) !== groupDetailsConstants.tabs.about.key) {
       return;
     }
 
@@ -475,17 +491,17 @@ function groupController(
   };
 
   $scope.$on('$stateChangeSuccess', (event, toState) => {
-    const stateName = getStateName(toState);
+    const tabKey = getTabKeyForState(toState);
     // Redirect to about tab if user doesn't have access to forums from policy
     // Only redirect if the policy is loaded
-    if ($scope.policiesLoaded && stateName === groupDetailsConstants.tabs.forums.state) {
+    if ($scope.policiesLoaded && $state.includes(groupDetailsConstants.tabs.forums.state)) {
       const canViewForums = $scope.canViewForums();
       if (!canViewForums) {
         $state.go(groupDetailsConstants.tabs.about.state, { success: true }, { reload: true });
         return;
       }
     }
-    $scope.layout.activeTab = groupDetailsConstants.tabs[stateName];
+    $scope.layout.activeTab = getBaseGroupDetailsTabs()[tabKey];
     tryExposeAboutTabExperiment(toState);
   });
 
@@ -518,7 +534,7 @@ function groupController(
       .finally(() => {
         // If we are trying to access the forums tab but forums are not enabled, then redirect to about tab
         if (
-          $state.current.label === groupDetailsConstants.tabs.forums.label &&
+          $state.includes(groupDetailsConstants.tabs.forums.state) &&
           !$scope.library.currentGroup.forumsEnabled
         ) {
           $state.go(groupDetailsConstants.tabs.about.state, { success: true }, { reload: true });
@@ -824,15 +840,18 @@ function groupController(
   };
 
   $scope.canViewCommunityTabs = () => {
+    if ($scope.isAnnouncementArchiveEnabled) {
+      return true;
+    }
     return !($scope.isHidingEmptyCommunityTabsEnabled && $scope.groupDetailsNumTabs() <= 1);
   };
 
   $scope.groupDetailsTabs = () => {
-    const tabs = { ...groupDetailsConstants.tabs };
+    const tabs = { ...getBaseGroupDetailsTabs() };
     if (!$scope.canViewEvents()) {
       delete tabs.events;
     }
-    if (!$scope.canViewForums()) {
+    if (!$scope.isAnnouncementArchiveEnabled && !$scope.canViewForums()) {
       delete tabs.forums;
     }
     if (!$scope.canViewStore()) {
@@ -844,7 +863,8 @@ function groupController(
 
     if ($scope.availableProfilePlatformTabs !== undefined) {
       Object.keys(tabs).forEach(key => {
-        if (!$scope.availableProfilePlatformTabs.has(key)) {
+        const isPostsTab = key === 'forums' && $scope.isAnnouncementArchiveEnabled;
+        if (!isPostsTab && !$scope.availableProfilePlatformTabs.has(key)) {
           delete tabs[key];
         }
       });
@@ -976,21 +996,24 @@ function groupController(
   // Resolve the React-vs-legacy affiliates decision from product features,
   // independent of the guac policy load. Kept off the policies object since
   // the guac response replaces it wholesale.
-  $scope.loadReactAffiliatesFlag = groupId => {
+  $scope.loadGroupProductFeatures = groupId => {
     groupsService.getGroupProductFeatures(groupId).then(
       features => {
         $scope.isReactAffiliatesEnabled = features?.ReactGroupAffiliates === true;
         $scope.reactAffiliatesFlagLoaded = true;
+        $scope.isAnnouncementArchiveEnabled =
+          features?.AnnouncementArchive === true && features?.AnnouncementsUsingCommsPlat === true;
       },
       () => {
         $scope.isReactAffiliatesEnabled = false;
         $scope.reactAffiliatesFlagLoaded = true;
+        $scope.isAnnouncementArchiveEnabled = false;
       }
     );
   };
 
   $scope.loadGroupDetailPolicies = groupId => {
-    $scope.loadReactAffiliatesFlag(groupId);
+    $scope.loadGroupProductFeatures(groupId);
 
     if ($scope.library.metadata.isGroupDetailsPolicyEnabled) {
       groupsService.getGroupDetailRules($scope.library.currentUser.id).then(
@@ -1007,7 +1030,7 @@ function groupController(
 
           if ($scope.policies.displayGroupForums) {
             $scope.loadGroupForums(groupId);
-          } else if ($state.current.label === groupDetailsConstants.tabs.forums.label) {
+          } else if ($state.includes(groupDetailsConstants.tabs.forums.state)) {
             $state.go(groupDetailsConstants.tabs.about.state, { success: true }, { reload: true });
           }
 

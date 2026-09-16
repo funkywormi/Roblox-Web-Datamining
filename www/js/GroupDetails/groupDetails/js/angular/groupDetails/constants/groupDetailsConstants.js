@@ -25,29 +25,37 @@ const groupDetailsConstants = {
 
   tabs: {
     about: {
+      key: 'about',
       translationKey: 'Heading.About',
       state: 'about'
     },
     forums: {
+      key: 'forums',
       translationKey: 'Heading.Forums',
       state: 'forums',
       label: 'Forums'
     },
     events: {
+      key: 'events',
       translationKey: 'Heading.Events',
       state: 'events'
     },
     store: {
+      key: 'store',
       translationKey: 'Heading.Store',
       state: 'store'
     },
     affiliates: {
+      key: 'affiliates',
       translationKey: 'Heading.Affiliates',
       state: 'affiliates'
     }
   },
 
   stateToTab: {
+    announcements: 'forums',
+    'announcements.detail': 'forums',
+    'announcements.detail.edit': 'forums',
     'forums.category': 'forums',
     'forums.category.post': 'forums',
     'forums.category.post.comment': 'forums',

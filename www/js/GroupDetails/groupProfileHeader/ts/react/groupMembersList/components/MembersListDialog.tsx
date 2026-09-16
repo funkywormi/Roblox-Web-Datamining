@@ -3,6 +3,7 @@ import { useTranslation } from 'react-utilities';
 import { Badge } from '@rbx/ui';
 import { abbreviateNumber } from 'core-utilities';
 import { UserListDialog, Action } from '@rbx/profile-platform';
+import { ProfileFrameDefaultContext } from 'roblox-thumbnails';
 import { GroupRole, GroupMember } from '../types';
 import { useGroupMembers, RoleFilterOption } from '../hooks/useGroupMembers';
 import { eventConstants } from '../constants/groupMembersListConstants';
@@ -85,7 +86,7 @@ const MembersListDialogInner: React.FC<MembersListDialogProps> = ({
 
   const title = hasSocialModules ? translate('Heading.Members') : translate('Heading.Followers');
 
-  return (
+  const dialog = (
     <UserListDialog<GroupMember, RoleFilterOption>
       open={open}
       onClose={onClose}
@@ -99,6 +100,16 @@ const MembersListDialogInner: React.FC<MembersListDialogProps> = ({
       onCtaAction={onCtaAction}
       userDisplayNameTrailingLabel={userDisplayNameTrailingLabel}
     />
+  );
+
+  // UserListDialog renders its own avatars and exposes no thumbnail options, so profile frames are
+  // enabled for its subtree via context rather than a prop. The thumbnails bundle providing that
+  // context deploys separately from this webapp, so a bundle predating it yields `undefined` here —
+  // render without frames in that case rather than throwing on `.Provider`.
+  return ProfileFrameDefaultContext ? (
+    <ProfileFrameDefaultContext.Provider value>{dialog}</ProfileFrameDefaultContext.Provider>
+  ) : (
+    dialog
   );
 };
 
