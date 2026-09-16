@@ -6,6 +6,7 @@ import {
   GetSubscriptionProductInfoResponse,
   GetProductPaymentMetadataResponse,
   ListAvailableSubscriptionProductsResponse,
+  PreparePurchaseV2Request,
   PreparePurchaseV2Response,
   PaymentProvider,
   ProviderPurchaseOptions,
@@ -60,22 +61,42 @@ export const getProductPaymentMetadata = (
     subscriptionProductId,
   });
 
-/**
- * Prepare a subscription purchase (V2)
- */
+const resolveReferrerIdFromUrl = (): number | undefined => {
+  if (typeof window === "undefined") {
+    return undefined;
+  }
+  const raw = new URLSearchParams(window.location.search).get("referrerId");
+  if (!raw) {
+    return undefined;
+  }
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+};
+
+/** Prepare purchase (V2). Reads `?referrerId=` when the arg is omitted. */
 export const preparePurchaseV2 = (
   subscriptionProductType: ProductType,
   subscriptionProductId: string,
   paymentProvider: PaymentProvider,
   paymentProviderPurchaseOptions?: ProviderPurchaseOptions,
   paymentSessionId?: string,
-): Promise<PreparePurchaseV2Response> =>
-  subscriptionsV2Api.subscriptionsV2PreparePurchaseV2({
+  referrerId?: number | null,
+): Promise<PreparePurchaseV2Response> => {
+  const resolvedReferrerId = referrerId !== undefined ? referrerId : resolveReferrerIdFromUrl();
+  // Typed rather than spread inline: the generated request model copies fields one by one, so a
+  // client version without `referrerId` would drop it at serialization with no error. `Pick`
+  // turns that into a compile failure. A purchase with no referrer stays absent, as before.
+  const referral: Pick<PreparePurchaseV2Request, "referrerId"> =
+    resolvedReferrerId == null ? {} : { referrerId: resolvedReferrerId };
+
+  return subscriptionsV2Api.subscriptionsV2PreparePurchaseV2({
     subscriptionProductType,
     subscriptionProductId,
     preparePurchaseV2Request: {
       paymentProvider,
       paymentProviderPurchaseOptions,
       paymentSessionId,
+      ...referral,
     },
   });
+};

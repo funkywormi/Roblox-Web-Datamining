@@ -4,6 +4,7 @@ import {
   RobloxPlusHeading,
   RobloxPlusGiftItemUpsellBanner,
   RobloxPlusFreeTrialBanner,
+  useSenderReferralEligibility,
 } from "@rbx/subscriptions-common";
 import { useMemo } from "react";
 
@@ -50,6 +51,7 @@ const SubscriberView: FC<SubscriberViewProps> = ({
   onOpenReferrals,
 }) => {
   const { translate } = useTranslation();
+  const { eligibility: senderEligibility } = useSenderReferralEligibility();
   const savedRobux = robloxPlusUserBenefits?.robuxSavedWithPlus;
   const itemsBoughtWithDiscountCount = robloxPlusUserBenefits?.itemsBoughtWithPlusDiscount;
   const privateServersCreatedCount = robloxPlusUserBenefits?.privateServersCreatedForFree;
@@ -142,7 +144,7 @@ const SubscriberView: FC<SubscriberViewProps> = ({
         <div className="flex flex-col gap-y-[32px]">
           {/* The invite card is the rail's only item today, so the whole section goes away with
               it rather than leaving a heading above an empty carousel. */}
-          {isPlusReferralRolloutEnabled() ? (
+          {isPlusReferralRolloutEnabled() && senderEligibility === "Eligible" ? (
             <InteractWithPlusSection>
               <PlusReferralShareCard onOpenDashboard={onOpenReferrals} />
             </InteractWithPlusSection>

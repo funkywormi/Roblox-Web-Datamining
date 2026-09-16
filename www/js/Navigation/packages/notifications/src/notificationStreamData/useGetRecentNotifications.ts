@@ -7,9 +7,6 @@ import { sendBundleCreated, sendNotificationRetrieved } from "./notificationStre
 
 export const GET_RECENT_QUERY_KEY = ["notification-stream-get-recent"];
 
-// NEEDS CLEANUP due Angular parity.
-const REPLAY_PAGES = 3;
-
 const byEventDateDesc = (a: StreamNotification, b: StreamNotification): number =>
   new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime();
 
@@ -87,44 +84,15 @@ export const useGetRecentNotifications = (): ReturnType<
     onError: error => reportNotificationStreamError("getRecent", error),
   });
 
-  // Parity: Angular pages eagerly on open rather than on scroll, so its
-  // nsNotificationRetrieved covers every row; demand-loading page 0 alone under-reports it.
-  // pageCount is the dep that actually changes per page: isFetchingNextPage can resolve
-  // between commits and fetchNextPage is a stable ref, so keying on those alone drains once.
-  const { hasNextPage, isFetchingNextPage, fetchNextPage, refetch, isFetching } = query;
+  const { hasNextPage, fetchNextPage } = query;
   const pageCount = query.data?.pages.length ?? 0;
+  const prefetchedRef = useRef(false);
   useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      // Rejections already reach reportNotificationStreamError via the query's onError.
+    if (pageCount === 1 && hasNextPage && !prefetchedRef.current) {
+      prefetchedRef.current = true;
       fetchNextPage().catch(() => undefined);
     }
-  }, [pageCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  // NEEDS CLEANUP due Angular parity.
-  //
-  // DELIBERATE DUPLICATE FETCH, bounded to the first REPLAY_PAGES pages. Do not "optimise"
-  // this away, and do not widen it back to every page.
-  //
-  // Angular replays only the OPENING pages of its get-recent sequence, not the whole list.
-  // Measured 2026-09-04 at N = 20/60/150/250/510/1000 against an identical stubbed payload:
-  //
-  //   Angular   nsNotificationRetrieved = N + min(60, N)
-  //
-  // Replaying every page instead logs 2N, which over-reports received on long lists and grows
-  // without bound in N: at N = 1000 that is 2000 events against Angular's 1060. Bounding the
-  // replay to 3 pages reproduces Angular's count exactly at every size measured. It is
-  // metric-inert either way, since unique_received is COUNT(DISTINCT notification_id).
-  //
-  // refetchPage re-requests only the pages whose index passes the predicate, and fetchPage logs
-  // on each response. Ref-guarded so it happens once, and the shell unmounts when the popover
-  // closes, which resets it to once per open.
-  const replayedRef = useRef(false);
-  useEffect(() => {
-    if (pageCount > 0 && !hasNextPage && !isFetching && !replayedRef.current) {
-      replayedRef.current = true;
-      refetch({ refetchPage: (_page, index) => index < REPLAY_PAGES }).catch(() => undefined);
-    }
-  }, [pageCount, hasNextPage, isFetching, refetch]);
+  }, [pageCount, hasNextPage, fetchNextPage]);
 
   const all = (query.data?.pages ?? []).flat();
   const gameUpdates = all
