@@ -47,7 +47,10 @@ import { setClientInterceptors } from "@rbx/www-common/http";
 import { defaultLocale, locales } from "@rbx/www-common/locale";
 import { userIdFromNumber } from "@rbx/www-common/user";
 
+import { AsyncResult, errAsync } from "@rbx/core-lib";
+import { HttpError } from "@rbx/core-lib/http";
 import { initializeTheme } from "@rbx/core-scripts/theme/internal";
+import { interceptChallenge, Migrate } from "@rbx/generic-challenges";
 import { initializeBoundAuthTokensForJQuery } from "./src/boundAuthTokenHeaderInjector";
 import { initializeGamepadNavigation } from "./src/directional-navigation";
 import heartbeatInit from "./src/pageHeartbeat";
@@ -66,7 +69,42 @@ try {
       const locale = new Intl().getLocale();
       return coreLib.arrayIncludes(locales, locale) ? locale : defaultLocale;
     },
-    challengeContainerId: "generic-challenge-container",
+    gcs: AsyncResult.fn(async (url, options, error, next) => {
+      if (error instanceof HttpError) {
+        const genericChallengeIdHeader = "rblx-challenge-id";
+        const genericChallengeTypeHeader = "rblx-challenge-type";
+        const genericChallengeMetadataHeader = "rblx-challenge-metadata";
+
+        const responseHeaders = error.response.headers;
+        const challengeId = responseHeaders.get(genericChallengeIdHeader);
+        const challengeTypeRaw = responseHeaders.get(genericChallengeTypeHeader);
+        const challengeMetadataJsonBase64 = responseHeaders.get(genericChallengeMetadataHeader);
+        if (
+          challengeId != null &&
+          challengeTypeRaw != null &&
+          challengeMetadataJsonBase64 != null
+        ) {
+          if (Migrate.isSupportedByGrasshopper(challengeTypeRaw)) {
+            return interceptChallenge({
+              retryRequest: (challengeIdInner, redemptionMetadataJsonBase64) => {
+                options.headers.set(genericChallengeIdHeader, challengeIdInner);
+                options.headers.set(genericChallengeTypeHeader, challengeTypeRaw);
+                options.headers.set(genericChallengeMetadataHeader, redemptionMetadataJsonBase64);
+                return next(url, options);
+              },
+              containerId: "generic-challenge-container",
+              challengeId,
+              challengeTypeRaw,
+              challengeMetadataJsonBase64,
+            });
+          } else {
+            // TODO: use legacy Roblox.AccountSecurity
+          }
+        }
+      }
+
+      return errAsync(error);
+    }),
   });
 } catch {
   // do nothing for now

@@ -15,6 +15,9 @@ export const INVALID_REDIRECT_OUTCOME = "__invalidRedirect__";
 /** Reported once the browser has been sent to the destination. */
 export const REDIRECT_DONE_OUTCOME = "Done";
 
+/** Param the redirect destintion reads to send the user back to the initial entrypoint where the wizard launched. */
+export const RETURN_PARAM = "redirectUrl";
+
 export function RedirectNode({ props, report }: NodeProps): JSX.Element {
   const url = asText(props.url);
   // The host keeps this instance across fragments, so a re-render must not navigate a second time.
@@ -25,6 +28,10 @@ export function RedirectNode({ props, report }: NodeProps): JSX.Element {
     if (destination === undefined) {
       report(INVALID_REDIRECT_OUTCOME);
       return;
+    }
+
+    if (!destination.searchParams.has(RETURN_PARAM)) {
+      destination.searchParams.set(RETURN_PARAM, window.location.href);
     }
 
     if (handedOffTo.current === destination.href) {

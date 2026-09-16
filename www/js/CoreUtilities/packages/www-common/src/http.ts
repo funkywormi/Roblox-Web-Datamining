@@ -1,20 +1,31 @@
 import { getClient, startInactiveSpan } from "@sentry/browser";
-import { arrayIncludes, AsyncResult, errAsync } from "@rbx/core-lib";
+import { arrayIncludes, AsyncResult, Mutable } from "@rbx/core-lib";
 import * as http from "@rbx/core-lib/http";
-import { HttpError } from "@rbx/core-lib/http";
+import {
+  type FetchError,
+  type FetchFunction,
+  HttpError,
+  type RequestInfo,
+} from "@rbx/core-lib/http";
 import { retryInterceptor } from "@rbx/core-lib/http/retry";
-import { interceptChallenge, Migrate } from "@rbx/generic-challenges";
+import type { Url } from "@rbx/core-lib/url";
+import type { InternalUrl } from "@rbx/core-lib/url/internal";
 import { UserId } from "./user";
 import { Locale, localeToUppercaseDash } from "./locale";
 
 export const setClientInterceptors = ({
   getUserId,
   getLocale,
-  challengeContainerId,
+  gcs,
 }: {
   getUserId: () => UserId | null;
   getLocale: () => Locale;
-  challengeContainerId: string;
+  gcs: (
+    url: Url | InternalUrl,
+    options: Mutable<RequestInfo>,
+    error: FetchError,
+    next: FetchFunction,
+  ) => AsyncResult<Response, FetchError>;
 }): void => {
   let csrfToken: string | null = null;
 
@@ -79,43 +90,7 @@ export const setClientInterceptors = ({
             }
           }
 
-          if (error instanceof HttpError) {
-            const genericChallengeIdHeader = "rblx-challenge-id";
-            const genericChallengeTypeHeader = "rblx-challenge-type";
-            const genericChallengeMetadataHeader = "rblx-challenge-metadata";
-
-            const responseHeaders = error.response.headers;
-            const challengeId = responseHeaders.get(genericChallengeIdHeader);
-            const challengeTypeRaw = responseHeaders.get(genericChallengeTypeHeader);
-            const challengeMetadataJsonBase64 = responseHeaders.get(genericChallengeMetadataHeader);
-            if (
-              challengeId != null &&
-              challengeTypeRaw != null &&
-              challengeMetadataJsonBase64 != null
-            ) {
-              if (Migrate.isSupportedByGrasshopper(challengeTypeRaw)) {
-                return interceptChallenge({
-                  retryRequest: (challengeIdInner, redemptionMetadataJsonBase64) => {
-                    options.headers.set(genericChallengeIdHeader, challengeIdInner);
-                    options.headers.set(genericChallengeTypeHeader, challengeTypeRaw);
-                    options.headers.set(
-                      genericChallengeMetadataHeader,
-                      redemptionMetadataJsonBase64,
-                    );
-                    return next(url, options);
-                  },
-                  containerId: challengeContainerId,
-                  challengeId,
-                  challengeTypeRaw,
-                  challengeMetadataJsonBase64,
-                });
-              } else {
-                // TODO: use legacy Roblox.AccountSecurity
-              }
-            }
-          }
-
-          return errAsync(error);
+          return gcs(url, options, error, next);
         });
 
         if (sentrySpan != null) {

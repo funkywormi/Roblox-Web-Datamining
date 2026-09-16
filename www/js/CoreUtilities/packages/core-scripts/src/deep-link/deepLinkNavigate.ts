@@ -169,9 +169,9 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
                 ? `referralCode=${code}${referrerParam}`
                 : `referralStatus=${referralStatus}`;
             // Recipients subscribe on web, so never hand off to the desktop client — that would
-            // leave `/share-links` spinning. Home carries the referral params and opens the popup
-            // over the feed, rather than loading the whole Plus page just to show a popup.
-            window.location.href = `${UrlPart.Home}?ctx=plus_referral&${referralQuery}`;
+            // leave `/share-links` spinning. The Plus page reads the referral params and opens the
+            // referral sheet inline, so the recipient lands directly on the subscribe surface.
+            window.location.href = `${UrlPart.Plus}?ctx=plus_referral&${referralQuery}`;
             return true;
           }
           if (response.data.status === "Invalid") {
