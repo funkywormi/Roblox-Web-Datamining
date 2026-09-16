@@ -1,0 +1,264 @@
+:root {
+    --ink: #000;
+    --link: #000;
+    --subtle: #333;
+    --page-max: 1240px;
+    --font: Arial, Helvetica, "Liberation Sans", sans-serif
+}
+
+* {
+    box-sizing: border-box
+}
+
+html {
+    -webkit-text-size-adjust: 100%
+}
+
+body {
+    margin: 0;
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 17px;
+    line-height: 1.4;
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    text-rendering: optimizeSpeed
+}
+
+.page {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    padding: 28px 32px 48px
+}
+
+.masthead {
+    text-align: center;
+    margin-bottom: 40px
+}
+
+.logo {
+    display: block;
+    margin: 0 auto;
+    max-width: 640px;
+    width: 60%;
+    height: auto
+}
+
+.countdown-strip {
+    margin-top: 40px;
+    text-align: center
+}
+
+.hit-counter {
+    margin-top: 0
+}
+
+.hit-counter__digits {
+    display: inline-flex;
+    gap: 2px;
+    padding: 4px;
+    background: #000;
+    border: 2px outset #888
+}
+
+.hit-counter__digit {
+    min-width: 20px;
+    padding: 3px 4px;
+    background: #000;
+    border: 1px solid #1c4d1c;
+    font-family: Courier New, Courier, monospace;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    color: #3f3;
+    text-shadow: 0 0 4px rgba(51, 255, 51, .7)
+}
+
+.hit-counter__sep {
+    align-self: center;
+    padding: 0 2px;
+    font-family: Courier New, Courier, monospace;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    color: #3f3;
+    text-shadow: 0 0 4px rgba(51, 255, 51, .7)
+}
+
+.hit-counter--rainbow .hit-counter__digits {
+    background: #000
+}
+
+.hit-counter--rainbow .hit-counter__digit {
+    background: #000;
+    border-color: #333;
+    text-shadow: none
+}
+
+.hit-counter--rainbow .hit-counter__sep {
+    color: #eee;
+    text-shadow: none
+}
+
+.hit-counter--rainbow .hit-counter__digit--c0 {
+    color: #ed0150
+}
+
+.hit-counter--rainbow .hit-counter__digit--c1 {
+    color: #ff7e2a
+}
+
+.hit-counter--rainbow .hit-counter__digit--c2 {
+    color: #c1cf09
+}
+
+.hit-counter--rainbow .hit-counter__digit--c3 {
+    color: #5c9905
+}
+
+.hit-counter--rainbow .hit-counter__digit--c4 {
+    color: #38ce8c
+}
+
+.hit-counter--rainbow .hit-counter__digit--c5 {
+    color: #99d8e6
+}
+
+.hit-counter--rainbow .hit-counter__digit--c6 {
+    color: #3d4acc
+}
+
+.hit-counter--rainbow .hit-counter__digit--c7 {
+    color: #a248a2
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr 1fr 1.25fr;
+    gap: 32px 40px;
+    align-items: start
+}
+
+.col {
+    min-width: 0
+}
+
+.block {
+    margin-bottom: 26px
+}
+
+.block h2 {
+    margin: 0 0 6px;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: underline
+}
+
+.block h2 .link {
+    color: inherit
+}
+
+.subtle {
+    margin: 0;
+    color: var(--subtle)
+}
+
+.links {
+    list-style: none;
+    margin: 0;
+    padding: 0
+}
+
+.links li {
+    margin: 1px 0
+}
+
+.links--spaced {
+    margin-top: 20px
+}
+
+.link {
+    color: var(--link);
+    text-decoration: none
+}
+
+.players-online {
+    margin-top: 30px
+}
+
+.col--showcase {
+    display: flex;
+    flex-direction: column;
+    gap: 26px
+}
+
+.showcase {
+    margin: 0
+}
+
+.showcase__img {
+    display: block;
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    border: 1px solid #000
+}
+
+.showcase figcaption {
+    margin-top: 8px;
+    max-width: 380px;
+    line-height: 1.35
+}
+
+.showcase figcaption .link {
+    text-decoration: underline
+}
+
+.site-footer {
+    margin-top: 48px;
+    text-align: center
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 26px
+}
+
+.footer-links .link {
+    text-decoration: underline
+}
+
+.copyright {
+    margin: 10px 0 0
+}
+
+@media(max-width:900px) {
+    .grid {
+        grid-template-columns: 1fr 1fr
+    }
+
+    .col--showcase {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        flex-wrap: wrap
+    }
+}
+
+@media(max-width:560px) {
+    body {
+        font-size: 16px
+    }
+
+    .grid {
+        grid-template-columns: 1fr
+    }
+
+    .logo {
+        width: 85%
+    }
+}
