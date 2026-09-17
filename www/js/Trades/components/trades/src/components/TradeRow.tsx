@@ -1,4 +1,5 @@
 import { useTranslation } from "@rbx/core-scripts/react";
+import { Divider } from "@rbx/foundation-ui";
 import { Thumbnail2d, ThumbnailTypes, ThumbnailAvatarHeadshotSize } from "@rbx/thumbnails";
 import { TradeSummary } from "../types";
 import { getTradeStatusLabel } from "../utils/tradeLabels";
@@ -37,7 +38,7 @@ export const TradeRow = ({
         }
       }}
     >
-      <div className="rbx-divider" />
+      <Divider className="trade-row-divider" />
       <div className="trade-row-container">
         <div className="trade-row-details">
           <div>

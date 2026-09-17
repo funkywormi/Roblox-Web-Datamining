@@ -19,9 +19,13 @@ import { EventContext } from '../constants/eventConstants';
 import { EventContext as SharedEventContext } from '../../shared/constants/eventConstants';
 import NotificationsUpsellBanner from '../components/NotificationsUpsellBanner';
 import groupsService from '../services/groupsService';
-import groupAnnouncementsConstants from '../constants/groupAnnouncementsConstants';
+import groupAnnouncementsConstants, {
+  isAnnouncementArchiveFeatureEnabled
+} from '../constants/groupAnnouncementsConstants';
 import queryKeys from '../utils/queryKeys';
 import { useGroupMembershipChangedListener } from '../../shared/hooks/useGroupMembershipChangedListener';
+import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
+import announcementRoutes from '../constants/announcementRoutes';
 
 export type GroupAnnouncementsDisplayProps = {
   group: Group;
@@ -30,6 +34,7 @@ export type GroupAnnouncementsDisplayProps = {
   policies: GroupDetailsPolicies;
   metadata: GroupMetadata;
   canCreateAnnouncements: boolean;
+  canViewAnnouncements?: boolean;
   onAnnouncementLoaded?: () => void;
   announcementsData?: { id: string } | null;
   onAnnouncementDeleted?: () => void | Promise<void>;
@@ -42,6 +47,7 @@ const GroupAnnouncementsDisplay = ({
   policies,
   metadata,
   canCreateAnnouncements,
+  canViewAnnouncements = false,
   onAnnouncementLoaded,
   announcementsData,
   onAnnouncementDeleted,
@@ -49,6 +55,16 @@ const GroupAnnouncementsDisplay = ({
 }: GroupAnnouncementsDisplayProps): JSX.Element | null => {
   const { SystemFeedbackComponent, systemFeedbackService } = useSystemFeedback();
   const history = useHistory();
+  const { features } = useCommunityProductFeatures();
+  const isAnnouncementArchiveEnabled = isAnnouncementArchiveFeatureEnabled(features);
+  const canUseAnnouncementArchive = isAnnouncementArchiveEnabled && canViewAnnouncements;
+  const handleArchiveLinkClicked = useCallback(() => {
+    logGroupPageClickEvent({
+      groupId: group.id,
+      clickTargetType: 'seeMorePosts',
+      context: SharedEventContext.GroupHomepage
+    });
+  }, [group.id]);
 
   const [isNotificationsUpsellDismissed, setIsNotificationsUpsellDismissed] = useState(
     getHasUserDismissedNotificationsUpsell(group.id)
@@ -79,14 +95,7 @@ const GroupAnnouncementsDisplay = ({
     data: announcement,
     refetch: fetchLatestAnnouncement
   } = useQuery<AnnouncementModel | null>({
-    queryKey: [
-      ...queryKeys.getGroupLatestAnnouncementKey(group.id),
-      // Scope the cache entry to the current announcement id. When the composer publishes a
-      // new announcement, the section container updates `announcementsData.id`; the
-      // queryKey change here is what makes react-query issue a fresh fetch for it rather
-      // than surfacing the previous announcement's cached value.
-      announcementsData?.id ?? null
-    ],
+    queryKey: [...queryKeys.getGroupLatestAnnouncementKey(group.id), announcementsData?.id ?? null],
     queryFn: async () => {
       if (!announcementsData?.id) {
         return null;
@@ -258,26 +267,37 @@ const GroupAnnouncementsDisplay = ({
         )}
       </div>
       {!!announcement && (
-        <div className='group-section-content'>
-          {showNotificationsUpsell && (
-            <NotificationsUpsellBanner
-              group={group}
-              onNotifyClicked={handleNotificationUpsellClicked}
-              onDismiss={userDismissedNotificationsUpsell}
-              eventContext={SharedEventContext.GroupHomepage}
+        <React.Fragment>
+          <div className='group-section-content'>
+            {showNotificationsUpsell && (
+              <NotificationsUpsellBanner
+                group={group}
+                onNotifyClicked={handleNotificationUpsellClicked}
+                onDismiss={userDismissedNotificationsUpsell}
+                eventContext={SharedEventContext.GroupHomepage}
+              />
+            )}
+            <AnnouncementDisplay
+              groupId={group.id}
+              announcement={announcement}
+              policies={policies}
+              isMemberOfGroup={isMemberOfGroup}
+              canCreateAnnouncements={canCreateAnnouncements}
+              onDeleted={onAnnouncementDeleted}
+              // eslint-disable-next-line no-void
+              onRefetchAnnouncement={() => void fetchLatestAnnouncement()}
             />
+          </div>
+          {canUseAnnouncementArchive && (
+            <a
+              className='group-announcements-see-more-posts'
+              href={`#!${announcementRoutes.announcementsRoute}`}
+              onClick={handleArchiveLinkClicked}>
+              {translate('Action.SeeMorePosts')}
+              <span className='icon-right group-announcements-see-more-posts-icon' aria-hidden />
+            </a>
           )}
-          <AnnouncementDisplay
-            groupId={group.id}
-            announcement={announcement}
-            policies={policies}
-            isMemberOfGroup={isMemberOfGroup}
-            canCreateAnnouncements={canCreateAnnouncements}
-            onDeleted={onAnnouncementDeleted}
-            // eslint-disable-next-line no-void
-            onRefetchAnnouncement={() => void fetchLatestAnnouncement()}
-          />
-        </div>
+        </React.Fragment>
       )}
       {!isLoadingAnnouncement && !announcement && (
         <div className='group-section-content-transparent text-center group-announcements-empty-state'>

@@ -18,6 +18,7 @@ import {
 } from '../constants/types';
 import { translateCatalogGet, catalogTranslations } from '../services/translationService';
 import { isInExperienceOnly, isCollectible, isLimited } from './itemDetailUtils';
+import getDeepLinkId from './deepLinkAttributionUtils';
 
 type TItemPurchaseParams = {
   translate: TranslateFunction;
@@ -46,6 +47,7 @@ type TItemPurchaseParams = {
   isLimited?: boolean;
   rentalOptionDays?: number | null;
   discountInformation?: TDiscountInformation | null;
+  deepLinkId?: string | null;
 };
 
 type TCollectibleBestSellerInfo = {
@@ -145,7 +147,8 @@ function genBasePurchaseParams({
     rentalOptionDays: timedOption !== null ? timedOption?.days : null,
     discountInformation: timedOption
       ? timedOption.discountInformation
-      : itemDetails.discountInformation
+      : itemDetails.discountInformation,
+    deepLinkId: getDeepLinkId()
   };
 }
 

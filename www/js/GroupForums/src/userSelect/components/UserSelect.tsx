@@ -12,6 +12,7 @@ import {
   Typography,
 } from '@rbx/ui';
 import type { User } from '../../clients/users';
+import TranslationNamespace from '../../constants/TranslationNamespace';
 import UserThumbnailWithNames from '../../members/components/common/UserThumbnailWithNames';
 import type { UserSelectProps, UserSelectLogState } from '../types';
 
@@ -46,7 +47,7 @@ const UserSelect: FunctionComponent<UserSelectProps> = ({
   const {
     classes: { rootClass, noOverflow, bottomTextWrapper },
   } = useStyles();
-  const { translate } = useTranslation();
+  const { translate, translateWithNamespace } = useTranslation();
   const logState = useRef<UserSelectLogState>({});
   const inputValue = useRef('');
 
@@ -152,7 +153,10 @@ const UserSelect: FunctionComponent<UserSelectProps> = ({
           InputProps={{
             ...params.InputProps,
             startAdornment: <SearchIcon />,
-            placeholder: translate('Label.SearchCreators'),
+            placeholder: translateWithNamespace(
+              TranslationNamespace.GroupManagement,
+              'Label.SearchMembers',
+            ),
           }}
           label=''
         />

@@ -43,7 +43,14 @@ const getNoopTelemetry = (): CommunityTelemetryApi => {
     logCmntyEntrypointClickEvent: noop,
     logCmntySearchConductedEvent: noop,
     logCmntySearchResultsReturnedEvent: noop,
-    logGroupForumsClickEvent: noop
+    logGroupForumsClickEvent: noop,
+    logCmntyForumsSearchConductedEvent: noop,
+    logCmntyForumsSearchResultsReturnedEvent: noop,
+    logCmntyForumsSearchResultClickedEvent: noop,
+    logCmntyForumsConcealedContentShownEvent: noop,
+    logCmntyForumsConcealedContentRevealedEvent: noop,
+    logCmntyForumsDeleteDialogShownEvent: noop,
+    logCmntyForumsDeleteConfirmEvent: noop
   };
   return noopApi;
 };

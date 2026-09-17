@@ -5,8 +5,21 @@
     right: 0
 }
 
+.top-\[0\] {
+    top: 0
+}
+
+.gap-\[var\(--size-150\)\] {
+    gap: var(--size-150)
+}
+
 .scroll {
     overflow: auto
+}
+
+.size-\[1em\] {
+    width: 1em;
+    height: 1em
 }
 
 .size-\[var\(--icon-size-large\)\] {
@@ -43,6 +56,12 @@
     max-width: calc(var(--size-100)*50)
 }
 
+.width-\[fit-content\] {
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content
+}
+
 .padding-left-\[var\(--size-150\)\] {
     padding-left: var(--size-150)
 }
@@ -55,12 +74,32 @@
     padding-right: var(--size-250)
 }
 
+.content-\[var\(--dark-mode-content-emphasis\)\] {
+    color: var(--dark-mode-content-emphasis)
+}
+
 .content-\[var\(--inverse-surface-0\)\] {
     color: var(--inverse-surface-0)
 }
 
+.bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
+    background-color: rgb(from var(--color-system-alert)r g b/.2)
+}
+
+.bg-\[rgb\(from_var\(--color-system-success\)_r_g_b_\/_0\.2\)\] {
+    background-color: rgb(from var(--color-system-success)r g b/.2)
+}
+
+.bg-\[rgb\(from_var\(--color-system-warning\)_r_g_b_\/_0\.2\)\] {
+    background-color: rgb(from var(--color-system-warning)r g b/.2)
+}
+
 .opacity-\[0\.5\] {
     opacity: .5
+}
+
+.icon-regular-arrow-small-left {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M10.7071 10.2929C10.3166 9.90237 9.68342 9.90237 9.29289 10.2929L4.29289 15.2929C3.90237 15.6834 3.90237 16.3166 4.29289 16.7071L9.29289 21.7071C9.68342 22.0976 10.3166 22.0976 10.7071 21.7071C11.0976 21.3166 11.0976 20.6834 10.7071 20.2929L7.41422 17H27C27.5523 17 28 16.5523 28 16C28 15.4477 27.5523 15 27 15H7.41422L10.7071 11.7071C11.0976 11.3166 11.0976 10.6834 10.7071 10.2929Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-regular-arrow-up-right-from-square {
@@ -83,8 +122,24 @@
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M8.83591 16.9463C8.35579 16.3571 8.3904 15.4885 8.93942 14.9394L18.9394 4.93942L19.0537 4.83591C19.6428 4.35579 20.5115 4.3904 21.0605 4.93942C21.6095 5.48845 21.6441 6.35711 21.164 6.94626L21.0605 7.06052L12.1211 16L21.0605 24.9394C21.6463 25.5252 21.6463 26.4747 21.0605 27.0605C20.4747 27.6463 19.5252 27.6463 18.9394 27.0605L8.93942 17.0605L8.83591 16.9463Z' fill='black'/%3E%3C/svg%3E")
 }
 
+.icon-regular-chevron-small-left {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M11.2929 16.7071C10.9024 16.3166 10.9024 15.6834 11.2929 15.2929L17.2929 9.29289C17.6834 8.90237 18.3166 8.90237 18.7071 9.29289C19.0976 9.68342 19.0976 10.3166 18.7071 10.7071L13.4142 16L18.7071 21.2929C19.0976 21.6834 19.0976 22.3166 18.7071 22.7071C18.3166 23.0976 17.6834 23.0976 17.2929 22.7071L11.2929 16.7071Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-chevron-small-right {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M20.7071 16.7071C21.0976 16.3166 21.0976 15.6834 20.7071 15.2929L14.7071 9.29289C14.3166 8.90237 13.6834 8.90237 13.2929 9.29289C12.9024 9.68342 12.9024 10.3166 13.2929 10.7071L18.5858 16L13.2929 21.2929C12.9024 21.6834 12.9024 22.3166 13.2929 22.7071C13.6834 23.0976 14.3166 23.0976 14.7071 22.7071L20.7071 16.7071Z' fill='black'/%3E%3C/svg%3E")
+}
+
 .icon-regular-circle-i {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M17 21H19.5V23H12.5V21H15V14H13V12H17V21Z' fill='black'/%3E %3Cpath d='M17 10H15V8H17V10Z' fill='black'/%3E %3Cpath d='M16 2C23.732 2 30 8.26801 30 16C30 23.732 23.732 30 16 30C8.26801 30 2 23.732 2 16C2 8.26801 8.26801 2 16 2ZM16 4C9.37258 4 4 9.37258 4 16C4 22.6274 9.37258 28 16 28C22.6274 28 28 22.6274 28 16C28 9.37258 22.6274 4 16 4Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-clock {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M17 9C17 8.44772 16.5523 8 16 8C15.4477 8 15 8.44772 15 9V16C15 16.2652 15.1054 16.5196 15.2929 16.7071L18.2929 19.7071C18.6834 20.0976 19.3166 20.0976 19.7071 19.7071C20.0976 19.3166 20.0976 18.6834 19.7071 18.2929L17 15.5858V9Z' fill='black'/%3E %3Cpath d='M16 2C8.26801 2 2 8.26801 2 16C2 23.732 8.26801 30 16 30C23.732 30 30 23.732 30 16C30 8.26801 23.732 2 16 2ZM4 16C4 9.37258 9.37258 4 16 4C22.6274 4 28 9.37258 28 16C28 22.6274 22.6274 28 16 28C9.37258 28 4 22.6274 4 16Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-controller {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M20.9998 15C21.69 15.0002 22.2498 15.5598 22.2498 16.25C22.2498 16.9402 21.69 17.4998 20.9998 17.5C20.3094 17.5 19.7498 16.9404 19.7498 16.25C19.7498 15.5596 20.3094 15 20.9998 15Z' fill='black'/%3E %3Cpath d='M10.4998 11C10.7757 11.0002 10.9998 11.224 10.9998 11.5V13L12.6004 13.0098C12.8282 13.0564 12.9998 13.2584 12.9998 13.5V14.5C12.9998 14.776 12.7757 14.9998 12.4998 15H10.9998V16.5C10.9998 16.776 10.7757 16.9998 10.4998 17H9.49979C9.22365 17 8.99979 16.7761 8.99979 16.5V15H7.49979C7.22365 15 6.99979 14.7761 6.99979 14.5V13.5C6.99979 13.2239 7.22365 13 7.49979 13H8.99979V11.5C8.99979 11.2239 9.22365 11 9.49979 11H10.4998Z' fill='black'/%3E %3Cpath d='M18.4998 12.5C19.19 12.5002 19.7498 13.0598 19.7498 13.75C19.7498 14.4402 19.19 14.9998 18.4998 15C17.8094 15 17.2498 14.4404 17.2498 13.75C17.2498 13.0596 17.8094 12.5 18.4998 12.5Z' fill='black'/%3E %3Cpath d='M23.4998 12.5C24.19 12.5002 24.7498 13.0598 24.7498 13.75C24.7498 14.4402 24.19 14.9998 23.4998 15C22.8094 15 22.2498 14.4404 22.2498 13.75C22.2498 13.0596 22.8094 12.5 23.4998 12.5Z' fill='black'/%3E %3Cpath d='M20.9998 10C21.69 10.0002 22.2498 10.5598 22.2498 11.25C22.2498 11.9402 21.69 12.4998 20.9998 12.5C20.3094 12.5 19.7498 11.9404 19.7498 11.25C19.7498 10.5596 20.3094 10 20.9998 10Z' fill='black'/%3E %3Cpath d='M21.1346 4C24.5137 4.0002 27.4112 6.41447 28.0203 9.73828L30.1492 21.3564C30.3567 22.4888 30.2163 23.6583 29.7459 24.709C27.9291 28.7659 22.3704 29.2682 19.8562 25.6025L17.3953 22.0137H14.6599L12.6385 25.252C10.2454 29.085 4.58473 28.8399 2.53202 24.8145C1.97591 23.7237 1.77906 22.485 1.96854 21.2754L3.74784 9.91602C4.28169 6.51015 7.21639 4.00003 10.6639 4H21.1346ZM10.6639 6C8.20147 6.00003 6.10582 7.79295 5.7244 10.2256L3.94413 21.585C3.8199 22.3781 3.94964 23.19 4.31424 23.9053C5.66041 26.5453 9.37268 26.707 10.9422 24.1934L13.5515 20.0137H18.449L21.5057 24.4707C23.1364 26.8483 26.7423 26.523 27.9207 23.8916C28.2257 23.2102 28.3169 22.4521 28.1824 21.7178L26.0525 10.0986C25.6156 7.71473 23.5214 6.05189 21.1346 6H10.6639Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-filled-flag {
@@ -112,11 +167,31 @@
 }
 
 .icon-filled-person-clock {
-    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M25.8754 19.9961C25.9772 19.9961 26.0835 19.9988 26.184 20.0039C29.3505 20.1665 31.8724 22.7899 31.8754 25.9961C31.874 29.2035 29.3513 31.8255 26.184 31.9883C26.0835 31.9933 25.9772 31.996 25.8754 31.9961C25.7737 31.996 25.6673 31.9933 25.5668 31.9883C22.3979 31.8272 19.8768 29.2047 19.8754 25.9961C19.8784 22.7888 22.3988 20.1649 25.5668 20.0039C25.6673 19.9989 25.7738 19.9961 25.8754 19.9961ZM25.7729 22.0009C25.271 22.0525 24.8783 22.4812 24.8754 22.9961V25.582C24.8762 26.1105 25.0881 26.6218 25.4613 26.9961L26.6684 28.2031C26.8387 28.3725 27.0577 28.4697 27.2797 28.4912C27.3418 28.4969 27.4091 28.4971 27.4711 28.4912C27.6922 28.469 27.9129 28.3722 28.0824 28.2031C28.4682 27.8129 28.4697 27.1783 28.0824 26.789L26.8754 25.582V22.9961C26.8725 22.482 26.4778 22.0535 25.977 22.0009C25.9453 21.9978 25.9081 21.9962 25.8754 21.9961C25.8427 21.9961 25.805 21.9979 25.7729 22.0009Z' fill='black'/%3E %3Cpath d='M20.1508 14.9961C21.8252 14.9974 23.344 15.8326 24.2563 17.1416C20.0607 17.9042 16.8781 21.5811 16.8754 25.9961C16.8759 27.8112 17.4155 29.5064 18.3402 30.9199C17.7763 30.9564 17.1704 30.9813 16.5307 30.9912C16.3183 30.9944 16.0965 30.996 15.8754 30.9961C15.6643 30.9961 15.4517 30.9941 15.2484 30.9912C8.90531 30.898 6.3849 29.3964 5.45157 28.5205C4.94007 28.0384 4.87796 27.3776 4.98185 26.8965L6.71329 18.9336C7.21521 16.6388 9.24955 14.9966 11.599 14.9961H20.1508Z' fill='black'/%3E %3Cpath d='M13.3412 1.01657C13.4755 0.998149 13.618 0.991785 13.7563 0.999973C13.8948 1.00852 14.0398 1.03114 14.1791 1.06833L20.307 2.71091C21.4312 3.01403 22.1002 4.17561 21.8022 5.30075L20.1606 11.4287C19.8574 12.5539 18.6968 13.2236 17.5707 12.9238L11.4428 11.2812C10.3165 10.9785 9.64714 9.81818 9.94767 8.69138L11.5893 2.56345C11.8177 1.72119 12.5276 1.1304 13.3412 1.01657Z' fill='black'/%3E%3C/svg%3E")
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M25.8754 19.9962C25.9772 19.9963 26.0835 19.9989 26.184 20.004C29.3505 20.1666 31.8724 22.79 31.8754 25.9962C31.874 29.2036 29.3513 31.8256 26.184 31.9884C26.0835 31.9935 25.9772 31.9961 25.8754 31.9962C25.7737 31.9962 25.6673 31.9934 25.5668 31.9884C22.3979 31.8273 19.8768 29.2048 19.8754 25.9962C19.8784 22.7889 22.3988 20.165 25.5668 20.004C25.6673 19.999 25.7738 19.9962 25.8754 19.9962ZM25.7729 22.0011C25.271 22.0526 24.8783 22.4814 24.8754 22.9962V25.5821C24.8762 26.1107 25.0881 26.622 25.4613 26.9962L26.6684 28.2032C26.8387 28.3727 27.0577 28.4699 27.2797 28.4913C27.3418 28.497 27.4091 28.4972 27.4711 28.4913C27.6922 28.4691 27.9129 28.3723 28.0824 28.2032C28.4682 27.813 28.4697 27.1785 28.0824 26.7892L26.8754 25.5821V22.9962C26.8725 22.4821 26.4778 22.0536 25.977 22.0011C25.9453 21.9979 25.9081 21.9963 25.8754 21.9962C25.8427 21.9962 25.805 21.998 25.7729 22.0011Z' fill='black'/%3E %3Cpath d='M20.1508 14.9962C21.8252 14.9975 23.344 15.8327 24.2563 17.1417C20.0607 17.9043 16.8781 21.5812 16.8754 25.9962C16.8759 27.8113 17.4155 29.5065 18.3402 30.92C17.7763 30.9565 17.1704 30.9814 16.5307 30.9913C16.3183 30.9946 16.0965 30.9962 15.8754 30.9962C15.6643 30.9962 15.4517 30.9943 15.2484 30.9913C8.90531 30.8981 6.3849 29.3965 5.45157 28.5206C4.94007 28.0385 4.87796 27.3778 4.98185 26.8966L6.71329 18.9337C7.21521 16.6389 9.24955 14.9967 11.599 14.9962H20.1508Z' fill='black'/%3E %3Cpath d='M13.3412 1.0167C13.4755 0.998271 13.618 0.991907 13.7563 1.0001C13.8948 1.00864 14.0398 1.03127 14.1791 1.06845L20.307 2.71103C21.4312 3.01415 22.1002 4.17573 21.8022 5.30088L20.1606 11.4288C19.8574 12.554 18.6968 13.2237 17.5707 12.9239L11.4428 11.2813C10.3165 10.9786 9.64714 9.8183 9.94767 8.6915L11.5893 2.56357C11.8177 1.72131 12.5276 1.13052 13.3412 1.0167Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-roblox-plus {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M13.8555 2.5606C15.1824 1.81313 16.8176 1.81313 18.1445 2.5606L26.8555 7.46782C28.1824 8.21534 28.9999 9.59781 29 11.0928V20.9073C29 22.4024 28.1824 23.7847 26.8555 24.5323L18.1445 29.4395L17.8926 29.5704C16.6996 30.143 15.3004 30.143 14.1074 29.5704L13.8555 29.4395L11.0176 27.8409C10.3887 27.4864 10 26.8196 10 26.0977V12.001C10.0002 10.8967 10.8957 10.0012 12 10.001L20 10.0001C21.1044 10 21.9998 10.8957 22 12.0001V19.0001C22 20.1046 21.1046 21.0001 20 21.0001H16C15.4477 21.0001 15 20.5523 15 20.0001C15.0002 19.4479 15.4478 19.0001 16 19.0001H20V12.0001L12 12.001V26.0987L14.8369 27.6973C15.5545 28.1016 16.4455 28.1016 17.1631 27.6973L25.874 22.7891C26.5863 22.3877 27 21.6636 27 20.9073V11.0928C26.9999 10.3366 26.5863 9.61234 25.874 9.21099L17.1631 4.30278C16.4456 3.89864 15.5544 3.89864 14.8369 4.30278L6.12598 9.21099C5.41372 9.61234 5.00013 10.3366 5 11.0928V20.9073C5 21.6636 5.4137 22.3877 6.12598 22.7891L6.49023 22.9942C6.80495 23.1714 7 23.5051 7 23.8663C6.99984 24.6314 6.17549 25.1128 5.50879 24.7374L5.14453 24.5323C3.81763 23.7847 3 22.4024 3 20.9073V11.0928C3.00012 9.69126 3.71827 8.38846 4.90137 7.61528L5.14453 7.46782L13.8555 2.5606Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-robux {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M15.0762 7.29574C15.6479 6.96571 16.3521 6.96571 16.9238 7.29574L23.0762 10.8479C23.6479 11.1779 24 11.7878 24 12.4479V19.5521C24 20.2122 23.6479 20.8221 23.0762 21.1521L16.9238 24.7043C16.3521 25.0343 15.6479 25.0343 15.0762 24.7043L8.92376 21.1521C8.35214 20.8221 8 20.2122 8 19.5521V12.4479C8 11.7878 8.35214 11.1779 8.92376 10.8479L15.0762 7.29574ZM11.9998 13V19C11.9998 19.5523 12.4475 20 12.9998 20H18.9998C19.5521 20 19.9998 19.5523 19.9998 19V13C19.9998 12.4477 19.5521 12 18.9998 12H12.9998C12.4475 12 11.9998 12.4477 11.9998 13Z' fill='black'/%3E %3Cpath d='M13.8556 2.56068C15.1825 1.81311 16.8175 1.81311 18.1444 2.56068L26.8556 7.46819C28.1825 8.21577 29 9.59734 29 11.0925V20.9075C29 22.4027 28.1825 23.7842 26.8556 24.5318L18.1444 29.4393C16.8175 30.1869 15.1825 30.1869 13.8556 29.4393L5.14444 24.5318C3.81746 23.7842 3 22.4027 3 20.9075V11.0925C3 9.59734 3.81746 8.21577 5.14444 7.46819L13.8556 2.56068ZM17.1628 4.30319C16.4452 3.89894 15.5548 3.89894 14.8372 4.30319L6.12611 9.2107C5.41362 9.61209 5 10.336 5 11.0925V20.9075C5 21.664 5.41362 22.3879 6.12611 22.7893L14.8372 27.6968C15.5548 28.1011 16.4452 28.1011 17.1628 27.6968L25.8739 22.7893C26.5864 22.3879 27 21.664 27 20.9075V11.0925C27 10.336 26.5864 9.61209 25.8739 9.2107L17.1628 4.30319Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-shield-check {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M21.7065 11.2929C22.097 11.6834 22.097 12.3166 21.7065 12.7071L14.7065 19.7071C14.3159 20.0977 13.6828 20.0977 13.2922 19.7071L10.2922 16.7071C9.90172 16.3166 9.90172 15.6834 10.2922 15.2929C10.6828 14.9024 11.3159 14.9024 11.7065 15.2929L13.9994 17.5858L20.2922 11.2929C20.6828 10.9024 21.3159 10.9024 21.7065 11.2929Z' fill='black'/%3E %3Cpath d='M15.2276 29.6697C4.43337 24.9244 4.01613 19.1787 4 7.4448C3.99882 6.58395 4.5502 5.81641 5.36687 5.54417L15.3663 2.21086C15.7768 2.07401 16.2206 2.074 16.6312 2.21084L26.6318 5.5442C27.4485 5.81642 27.9999 6.58397 27.9987 7.44484C27.9826 19.1787 27.5653 24.9244 16.7716 29.6697C16.2834 29.8843 15.7159 29.8843 15.2276 29.6697ZM7.4184 20.4093C8.60623 23.2624 10.9061 25.5796 15.9996 27.8243C21.0928 25.5796 23.3926 23.2625 24.5804 20.4093C25.8541 17.3498 25.9905 13.4078 25.9987 7.44209L15.9988 4.10822L5.99936 7.44152C6.00756 13.4073 6.14466 17.3498 7.4184 20.4093Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-regular-shopping-cart {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.6951 4C7.63498 4 8.44805 4.65444 8.6489 5.57261L8.96115 7H26.1844C27.507 7 28.4654 8.2609 28.1114 9.53529L26.167 16.5353C25.9265 17.4009 25.1383 18 24.2399 18H11.3674L11.6329 19.2137C11.7333 19.6728 12.1399 20 12.6098 20H24C24.5523 20 25 20.4477 25 21C25 21.5523 24.5523 22 24 22H12.6098C11.2 22 9.98037 21.0183 9.67909 19.6411L6.6951 6L5 6C4.44772 6 4 5.55228 4 5C4 4.44772 4.44772 4 5 4H6.6951ZM10.9304 16.0024C10.9534 16.0008 10.9766 16 11 16L24.2399 16L26.1844 9H9.39865L10.9304 16.0024Z' fill='black'/%3E %3Cpath d='M22 28C20.8954 28 20 27.1046 20 26C20 24.8954 20.8954 24 22 24C23.1046 24 24 24.8954 24 26C24 27.1046 23.1046 28 22 28Z' fill='black'/%3E %3Cpath d='M10 26C10 27.1046 10.8954 28 12 28C13.1046 28 14 27.1046 14 26C14 24.8954 13.1046 24 12 24C10.8954 24 10 24.8954 10 26Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-tag {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M23.4998 7C24.328 7.00022 24.9998 7.67172 24.9998 8.5C24.9998 9.32829 24.328 9.99978 23.4998 10C22.6713 10 21.9998 9.32843 21.9998 8.5C21.9998 7.67158 22.6714 7 23.4998 7Z' fill='black'/%3E %3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M26.9998 3C28.1042 3.00017 28.9998 3.89553 28.9998 5V15.5859C28.9997 16.1162 28.7888 16.625 28.4138 17L15.9138 29.5C15.1328 30.2809 13.8668 30.2808 13.0857 29.5L2.49978 18.9141C1.71882 18.133 1.71882 16.867 2.49978 16.0859L14.9998 3.58594C15.3748 3.21101 15.8835 3.00004 16.4138 3H26.9998ZM3.91384 17.5L14.4998 28.0859L26.9998 15.5859V5H16.4138L3.91384 17.5Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-tag-arrow-up {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M26.0003 20C26.2696 20.0001 26.528 20.1089 26.7161 20.3018L31.2161 24.917C31.6013 25.3123 31.5934 25.9455 31.1985 26.3311C30.8032 26.7165 30.17 26.7086 29.7844 26.3135L27.0003 23.458V31C27.0003 31.5521 26.5523 31.9998 26.0003 32C25.448 32 25.0003 31.5523 25.0003 31V23.458L22.2161 26.3135C21.8306 26.7087 21.1974 26.7163 20.802 26.3311C20.4068 25.9455 20.399 25.3123 20.7844 24.917L25.2844 20.3018C25.4726 20.109 25.7308 20 26.0003 20Z' fill='black'/%3E %3Cpath d='M27.0003 3C28.1047 3.00017 29.0003 3.89554 29.0003 5V16C29.0003 16.5522 28.5524 16.9998 28.0003 17C27.448 17 27.0003 16.5523 27.0003 16V5H16.4143L3.91433 17.5L14.5003 28.0859L15.7932 26.793C16.1838 26.4026 16.8168 26.4025 17.2073 26.793C17.5976 27.1834 17.5976 27.8166 17.2073 28.207L15.9143 29.5C15.1334 30.2809 13.8672 30.2808 13.0862 29.5L2.50026 18.9141C1.71931 18.133 1.71931 16.867 2.50026 16.0859L15.0003 3.58594C15.3753 3.21101 15.884 3.00004 16.4143 3H27.0003Z' fill='black'/%3E %3Cpath d='M23.5003 7C24.3285 7.00025 25.0003 7.67172 25.0003 8.5C25.0003 9.32828 24.3285 9.99975 23.5003 10C22.6718 10 22.0003 9.32843 22.0003 8.5C22.0003 7.67157 22.6718 7 23.5003 7Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-regular-two-arrows-left-right {
@@ -132,6 +207,30 @@
     -moz-appearance: none;
     -ms-appearance: none;
     appearance: none
+}
+
+.\[background-image\:linear-gradient\(var\(--color-shift-200\)\,var\(--color-shift-200\)\)\] {
+    background-image: linear-gradient(var(--color-shift-200), var(--color-shift-200))
+}
+
+.\[box-shadow\:inset_0_0_0_var\(--stroke-standard\)_var\(--color-stroke-default\)\] {
+    box-shadow: inset 0 0 0 var(--stroke-standard)var(--color-stroke-default)
+}
+
+.\[box-shadow\:inset_0_calc\(var\(--stroke-standard\)\*-1\)_0_0_var\(--color-stroke-default\)\] {
+    box-shadow: inset 0 calc(var(--stroke-standard)*-1)0 0 var(--color-stroke-default)
+}
+
+.\[box-sizing\:border-box\] {
+    box-sizing: border-box
+}
+
+.\[text-align\:inherit\] {
+    text-align: inherit
+}
+
+.\[z-index\:1\] {
+    z-index: 1
 }
 
 .content {
@@ -171,48 +270,29 @@
     max-width: 1075px
 }
 
-#trades-container .trade-request-window .trade-request-item .icon-close,
-.trades-container .trade-request-window .trade-request-item .icon-close {
+#trades-container .trade-request-window .trade-request-item .trade-request-item-remove,
+.trades-container .trade-request-window .trade-request-item .trade-request-item-remove {
     opacity: 0
 }
 
-#trades-container .trade-request-window .trade-request-item:hover .icon-close,
-#trades-container .trade-request-window .trade-request-item .icon-close:focus,
-.trades-container .trade-request-window .trade-request-item:hover .icon-close,
-.trades-container .trade-request-window .trade-request-item .icon-close:focus {
+#trades-container .trade-request-window .trade-request-item:hover .trade-request-item-remove,
+#trades-container .trade-request-window .trade-request-item .trade-request-item-remove:focus,
+.trades-container .trade-request-window .trade-request-item:hover .trade-request-item-remove,
+.trades-container .trade-request-window .trade-request-item .trade-request-item-remove:focus {
     opacity: 1
 }
 
-#trades-container .trade-request-window .trade-request-item:focus-within .icon-close {
+#trades-container .trade-request-window .trade-request-item:focus-within .trade-request-item-remove {
     opacity: 1
 }
 
-.trades-container .trade-request-window .trade-request-item:focus-within .icon-close {
+.trades-container .trade-request-window .trade-request-item:focus-within .trade-request-item-remove {
     opacity: 1
-}
-
-#trades-container .trade-request-window .icon-close,
-.trades-container .trade-request-window .icon-close {
-    float: right;
-    margin-top: -2px
-}
-
-#trades-container .trade-request-window .item-card-container .icon-background-circle,
-.trades-container .trade-request-window .item-card-container .icon-background-circle {
-    pointer-events: none;
-    top: 49px;
-    left: 49px
 }
 
 #trades-container .trade-request-window .rbx-tab,
 .trades-container .trade-request-window .rbx-tab {
     width: 50%
-}
-
-#trades-container .trade-request-window>div,
-.trades-container .trade-request-window>div {
-    float: left;
-    display: inline
 }
 
 #trades-container .trade-request-window .trade-request-window-offers-parent,
@@ -228,32 +308,7 @@
 
 #trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer,
 .trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer {
-    padding: 2px
-}
-
-@media screen and (min-width:1092px) {
-
-    #trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer:first-child,
-    .trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer:first-child {
-        min-height: 554px
-    }
-}
-
-#trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer:nth-child(2),
-.trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer:nth-child(2) {
-    margin-top: 38px
-}
-
-#trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer:last-child,
-.trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer:last-child {
-    margin-top: 40px
-}
-
-.light-theme #trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer:last-child,
-.light-theme .trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer:last-child,
-.dark-theme #trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer:last-child,
-.dark-theme .trades-container .trade-request-window .trade-request-window-offers .trade-request-window-offer:last-child {
-    background: var(--color-surface-100)
+    padding: 0 2px 2px
 }
 
 #trades-container .trade-request-window .trade-request-window-offers button,
@@ -303,35 +358,38 @@
     cursor: pointer
 }
 
-@media screen and (min-width:768px) {
-
-    #trades-container .trade-request-window .robux-input-group,
-    .trades-container .trade-request-window .robux-input-group {
-        margin-bottom: -18px
-    }
+#trades-container .trade-request-window .robux-input-group,
+.trades-container .trade-request-window .robux-input-group {
+    margin-bottom: 12px
 }
 
-#trades-container .trade-request-window .robux-input-group input,
-.trades-container .trade-request-window .robux-input-group input {
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-    width: 100%;
-    padding-left: 34px;
-    display: inline-block
+#trades-container .trade-request-window .robux-input-group.robux-input-group-locked input::-webkit-input-placeholder {
+    font-size: 12px
 }
 
-#trades-container .trade-request-window .robux-input-group .input-addon-btn,
-.trades-container .trade-request-window .robux-input-group .input-addon-btn {
-    cursor: default
+#trades-container .trade-request-window .robux-input-group.robux-input-group-locked input::placeholder {
+    font-size: 12px
 }
 
-#trades-container .trade-request-window .robux-input-group .icon-robux-gray-16x16,
-.trades-container .trade-request-window .robux-input-group .icon-robux-gray-16x16 {
-    margin-top: 8px;
-    margin-left: 8px;
-    position: relative;
-    top: 0;
-    right: 0
+#trades-container .trade-request-window .robux-input-group.robux-input-group-locked input::placeholder {
+    font-size: 12px
+}
+
+.trades-container .trade-request-window .robux-input-group.robux-input-group-locked input::-webkit-input-placeholder {
+    font-size: 12px
+}
+
+.trades-container .trade-request-window .robux-input-group.robux-input-group-locked input::placeholder {
+    font-size: 12px
+}
+
+.trades-container .trade-request-window .robux-input-group.robux-input-group-locked input::placeholder {
+    font-size: 12px
+}
+
+#trades-container .trade-request-window .robux-input-group input:disabled,
+.trades-container .trade-request-window .robux-input-group input:disabled {
+    cursor: not-allowed
 }
 
 #trades-container .trade-request-window .robux-input-group input[type=number] {
@@ -459,12 +517,15 @@
     outline-color: #494d5a
 }
 
-#trades-container .trade-request-window .trade-request-item .icon-background-circle,
-.trades-container .trade-request-window .trade-request-item .icon-background-circle {
-    float: right;
+#trades-container .trade-request-window .trade-request-item .trade-request-item-remove,
+.trades-container .trade-request-window .trade-request-item .trade-request-item-remove {
+    z-index: 1;
+    margin-top: auto;
+    margin-bottom: auto;
     position: absolute;
-    top: 21px;
-    right: 16px
+    top: 0;
+    bottom: 0;
+    right: 11px
 }
 
 #trades-container .trade-request-window .trade-request-item .add-item-text,
@@ -595,7 +656,7 @@
     cursor: pointer
 }
 
-.trade-row .rbx-divider {
+.trade-row .trade-row-divider {
     margin-left: 72px
 }
 
@@ -818,11 +879,11 @@
     }
 }
 
-.trades-list-detail .trade-list-detail-offer:first-child .rbx-divider {
+.trades-list-detail .trade-list-detail-offer:first-child .trade-offer-divider {
     display: none
 }
 
-.trades-list-detail .rbx-divider {
+.trades-list-detail .trade-offer-divider {
     margin-bottom: 12px
 }
 
@@ -866,7 +927,24 @@
     background-color: #e6e7ea
 }
 
-.trade-buttons button {
+.trade-buttons {
+    clear: both;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 12px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.trade-buttons-loading {
+    display: -ms-inline-flexbox;
+    display: inline-flex
+}
+
+.trade-detail-back {
+    vertical-align: middle;
     margin-right: 12px
 }
 
@@ -880,15 +958,12 @@
     }
 }
 
-.inventory-panel-holder>div:nth-child(2) .trade-inventory-panel,
-.inventory-panel-holder>.trade-inventory-panel:nth-child(2) {
-    margin-top: 10px
-}
-
 .light-theme .inventory-panel-holder>div:nth-child(2) .trade-inventory-panel,
 .light-theme .inventory-panel-holder>.trade-inventory-panel:nth-child(2),
+.light-theme .inventory-panel-holder~.inventory-panel-holder .trade-inventory-panel,
 .dark-theme .inventory-panel-holder>div:nth-child(2) .trade-inventory-panel,
-.dark-theme .inventory-panel-holder>.trade-inventory-panel:nth-child(2) {
+.dark-theme .inventory-panel-holder>.trade-inventory-panel:nth-child(2),
+.dark-theme .inventory-panel-holder~.inventory-panel-holder .trade-inventory-panel {
     border-top: 1px solid var(--color-surface-300)
 }
 
@@ -996,6 +1071,11 @@
     .container-footer {
         display: none
     }
+}
+
+.container-footer,
+footer.container-footer {
+    position: relative
 }
 
 @media (max-width:543px) {
@@ -1125,6 +1205,95 @@
     right: 0
 }
 
+.trades-react .trades-quota-banner {
+    margin-bottom: 12px
+}
+
+.trades-react .trades-quota-banner .trades-quota-banner-message {
+    white-space: normal
+}
+
+.trades-react .trades-upsell-card {
+    background-color: var(--color-shift-200);
+    border-radius: 8px;
+    -ms-flex-align: center;
+    align-items: center;
+    margin-bottom: 16px;
+    display: -ms-flexbox;
+    display: flex;
+    position: relative;
+    overflow: hidden
+}
+
+.trades-react .trades-upsell-card .trades-upsell-card-dismiss {
+    position: absolute;
+    top: 8px;
+    right: 8px
+}
+
+.trades-react .trades-upsell-card .trades-upsell-card-content {
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -ms-flex: auto;
+    flex: auto;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+    padding: 12px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.trades-react .trades-upsell-card .trades-upsell-card-title {
+    color: var(--color-content-emphasis);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px
+}
+
+.trades-react .trades-upsell-card .trades-upsell-card-body {
+    color: var(--color-content-emphasis);
+    padding-top: 2px;
+    font-size: 12px;
+    line-height: 18px
+}
+
+.trades-react .trades-upsell-card .trades-upsell-card-media {
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -ms-flexbox;
+    display: flex;
+    position: relative
+}
+
+.trades-react .trades-upsell-card .trades-upsell-card-media .tilted-glyph-frame {
+    border: 1.5px solid var(--color-content-emphasis);
+    opacity: .16;
+    border-radius: 4px;
+    width: 64px;
+    height: 64px;
+    position: absolute;
+    transform: rotate(-15deg)
+}
+
+.trades-react .trades-upsell-card .trades-upsell-card-media .tilted-glyph {
+    width: 40px;
+    height: 40px;
+    color: var(--color-content-emphasis);
+    transform: rotate(-15deg)
+}
+
+.trades-react .trades-upsell-card .trades-upsell-card-media {
+    -ms-flex: none;
+    flex: none;
+    width: 81px;
+    height: 102px;
+    margin-right: -10px
+}
+
 .trades-react #trade-row-scroll-container {
     margin-top: 8px
 }
@@ -1220,6 +1389,7 @@
     align-items: center;
     gap: 16px;
     margin: 0 0 8px;
+    padding-top: 0;
     padding-bottom: 0;
     display: -ms-flexbox;
     display: flex
@@ -1241,13 +1411,9 @@
     align-items: center;
     gap: 12px;
     margin-top: 32px;
+    padding-bottom: 24px;
     display: -ms-flexbox;
     display: flex
-}
-
-.trade-request-react .trade-inventory-pager button:disabled {
-    opacity: .4;
-    cursor: default
 }
 
 .trade-request-react .trade-request-item .thumbnail-2d-container {
@@ -1303,7 +1469,7 @@
 .trades-container .trade-request-react .trade-request-window>p,
 .trades-container .trade-request-react .trade-request-window>h1,
 .trades-container .trade-request-react .trade-request-window>.trade-holding-container,
-.trades-container .trade-request-react .trade-request-window>.spinner,
+.trades-container .trade-request-react .trade-request-window>.trade-request-loading,
 .trades-container .trade-request-react .trade-request-window>.text-error {
     float: none;
     -ms-flex: 0 0 100%;
@@ -1327,30 +1493,67 @@
     display: inline-flex
 }
 
-.trades-container .trade-request-react .trade-request-window>.inventory-panel-holder,
-.trades-container .trade-request-react .trade-request-window>.trade-request-window-offers-parent {
-    float: none;
-    display: block
+.trades-container .trade-request-react .trade-request-window>.trade-request-window-body {
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%
 }
 
-.trades-container .trade-request-react .trade-request-window .inventory-panel-holder {
-    -ms-flex: 680px;
-    flex: 680px;
-    min-width: 0
+.trades-container .trade-request-react .trade-request-window-body {
+    -ms-flex-direction: column;
+    flex-direction: column;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.trades-container .trade-request-react .trade-request-window-body>.inventory-panel-holder {
+    -ms-flex-order: 1;
+    order: 1
+}
+
+.trades-container .trade-request-react .trade-request-window-body>.trade-request-window-offers-parent {
+    -ms-flex-order: 2;
+    order: 2
+}
+
+.trades-container .trade-request-react .trade-inventory-panel,
+.trades-container .trade-request-react .trade-request-window-offers {
+    padding-top: 24px
+}
+
+.trades-container .trade-request-react .inventory-panel-holder~.inventory-panel-holder .trade-inventory-panel {
+    padding-top: 34px
+}
+
+.trades-container .trade-request-react .trade-request-window-offers-parent~.trade-request-window-offers-parent .trade-request-window-offers {
+    border-top: 1px solid transparent;
+    padding-top: 34px
 }
 
 @media screen and (min-width:1092px) {
-    .trades-container .trade-request-react .trade-request-window .trade-request-window-offers-parent {
-        -ms-flex: 0 0 375px;
-        flex: 0 0 375px;
-        width: 375px
+    .trades-container .trade-request-react .trade-request-window-body {
+        grid-template-columns: minmax(0, 1fr) 375px;
+        display: grid
     }
 
-    .trades-container .trade-request-react .trade-request-window .trade-request-window-offers {
-        width: 100%
+    .trades-container .trade-request-react .inventory-panel-holder {
+        grid-area: 1/1;
+        min-width: 0
     }
 
-    .trades-container .trade-request-react .trade-request-window .trade-inventory-panel {
+    .trades-container .trade-request-react .trade-request-window-offers-parent {
+        grid-area: 1/2
+    }
+
+    .trades-container .trade-request-react .inventory-panel-holder~.inventory-panel-holder,
+    .trades-container .trade-request-react .trade-request-window-offers-parent~.trade-request-window-offers-parent {
+        grid-row: 2
+    }
+
+    .trades-container .trade-request-react .trade-request-window-offers {
+        height: 100%
+    }
+
+    .trades-container .trade-request-react .trade-inventory-panel {
         width: 100%;
         max-width: 680px
     }
@@ -1369,6 +1572,13 @@
     display: block
 }
 
+.trades-container .trade-request-react.is-mobile .trade-request-window .trade-request-window-body {
+    -ms-flex-direction: column;
+    flex-direction: column;
+    display: -ms-flexbox;
+    display: flex
+}
+
 .trades-container .trade-request-react.is-mobile .trade-request-window .inventory-panel-holder,
 .trades-container .trade-request-react.is-mobile .trade-request-window .trade-request-window-offers-parent {
     float: none;
@@ -1379,8 +1589,14 @@
     padding-right: 0
 }
 
+.trades-container .trade-request-react.is-mobile .trade-request-window .inventory-panel-holder {
+    -ms-flex-order: 1;
+    order: 1
+}
+
 .trades-container .trade-request-react.is-mobile .trade-request-window .trade-request-window-offers-parent {
-    margin-top: 24px
+    -ms-flex-order: 2;
+    order: 2
 }
 
 .trades-container .trade-request-react.is-mobile .trade-request-window .trade-inventory-panel {
@@ -1414,6 +1630,10 @@
 
 .trades-sheet-full-bleed {
     max-width: none !important
+}
+
+.trades-sheet-flush-actions>[role=separator] {
+    display: none !important
 }
 
 .trade-quality-sheet-description {
@@ -1468,6 +1688,132 @@
 .how-to-trade-actions>* {
     -ms-flex: 1 1 0;
     flex: 1 1 0
+}
+
+.trade-plus-upsell-title {
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 4px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.trade-plus-benefits {
+    margin: 0;
+    padding: 0;
+    list-style: none
+}
+
+.trade-plus-benefits .trade-plus-benefit {
+    color: var(--color-content-default);
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    line-height: 20px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.trade-plus-benefits .trade-plus-benefit+.trade-plus-benefit {
+    margin-top: 12px
+}
+
+.trade-plus-benefits .trade-plus-benefit-icon {
+    color: var(--color-content-emphasis);
+    -ms-flex: none;
+    flex: none
+}
+
+.trade-plus-upsell-actions>* {
+    width: 100%
+}
+
+.trade-age-check-art {
+    width: 100%;
+    max-width: 320px;
+    height: 180px;
+    margin: 0 auto;
+    position: relative
+}
+
+.trade-age-check-art .trade-age-check-art-card {
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -ms-flexbox;
+    display: flex;
+    position: relative
+}
+
+.trade-age-check-art .trade-age-check-art-card .tilted-glyph-frame {
+    border: 1.5px solid var(--color-content-emphasis);
+    opacity: .16;
+    border-radius: 4px;
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    transform: rotate(-15deg)
+}
+
+.trade-age-check-art .trade-age-check-art-card .tilted-glyph {
+    width: 72px;
+    height: 72px;
+    color: var(--color-content-emphasis);
+    transform: rotate(-15deg)
+}
+
+.trade-age-check-art .trade-age-check-art-card {
+    width: 100px;
+    height: 100px;
+    position: absolute
+}
+
+.trade-age-check-art .trade-age-check-art-card-shield {
+    margin-left: -136.5px;
+    top: 53px;
+    left: 50%
+}
+
+.trade-age-check-art .trade-age-check-art-card-trade {
+    margin-left: -21.5px;
+    top: 23px;
+    left: 50%
+}
+
+.trade-age-check-art .trade-age-check-art-card-trade .tilted-glyph-frame,
+.trade-age-check-art .trade-age-check-art-card-trade .tilted-glyph {
+    transform: rotate(15deg)
+}
+
+.trade-age-check-copy {
+    -ms-flex-direction: column;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.trade-age-check-title {
+    letter-spacing: -.2px;
+    color: var(--color-content-emphasis);
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2
+}
+
+.trade-age-check-description {
+    color: var(--color-content-default);
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px
+}
+
+.trade-age-check-actions>* {
+    width: 100%
 }
 
 .placeholder\:text-body-large::-webkit-input-placeholder {
@@ -1535,9 +1881,36 @@
     border-color: var(--color-system-emphasis)
 }
 
+.hover\:underline:hover {
+    -webkit-text-decoration-skip-ink: none;
+    text-decoration-skip-ink: none;
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline
+}
+
+.hover\:cursor-pointer:hover {
+    cursor: pointer
+}
+
+.hover\:\[opacity\:0\.8\]:hover {
+    opacity: .8
+}
+
 .focus-visible\:outline-focus:focus-visible {
     outline: var(--stroke-thicker)solid var(--color-selection-start);
     outline-offset: var(--stroke-thicker)
+}
+
+.focus-visible\:\[outline-color\:var\(--color-system-emphasis\)\]:focus-visible {
+    outline-color: var(--color-system-emphasis)
+}
+
+.focus-visible\:\[outline-style\:solid\]:focus-visible {
+    outline-style: solid
+}
+
+.focus-visible\:\[outline-width\:var\(--stroke-standard\)\]:focus-visible {
+    outline-width: var(--stroke-standard)
 }
 
 .focus-visible\:hover\:outline-none:hover:focus-visible {
@@ -1562,6 +1935,14 @@
 
 .data-\[state\=checked\]\:bg-action-sub-emphasis[data-state=checked] {
     background-color: var(--color-action-sub-emphasis-background)
+}
+
+@media (prefers-reduced-motion:no-preference) {
+    .motion-safe\:transition-opacity {
+        transition-property: opacity;
+        transition-timing-function: var(--ease-linear);
+        transition-duration: var(--time-100)
+    }
 }
 
 .\[\&\:\:-webkit-search-cancel-button\]\:hidden::-webkit-search-cancel-button {

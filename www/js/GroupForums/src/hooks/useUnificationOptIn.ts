@@ -10,6 +10,7 @@ import {
 } from '../queries/migrationQueries';
 import type { BreakingChangeEntry } from '../utils/unificationUtils';
 import {
+  MIGRATION_SOURCE,
   MIGRATION_STATUS,
   ModalState,
   isSnoozed,
@@ -47,13 +48,14 @@ export function useUnificationOptIn({
   const status = migrationStatus?.status;
   const isNotMigrated = status === MIGRATION_STATUS.NOT_MIGRATED;
   const isMigrated = status === MIGRATION_STATUS.MIGRATED;
+  const isNewGroup = migrationStatus?.source === MIGRATION_SOURCE.NEW_GROUP;
 
   const {
     data: acknowledgedGroupIds,
     isLoading: isAcknowledgementsLoading,
     isError: isAcknowledgementsError,
   } = useGetGroupUnifiedAcknowledgements(userId, {
-    enabled: isMigrated,
+    enabled: isMigrated && !isNewGroup,
   });
 
   const {
@@ -78,7 +80,7 @@ export function useUnificationOptIn({
       return ModalState.None;
     }
 
-    if (isMigrated) {
+    if (isMigrated && !isNewGroup) {
       if (isAcknowledgementsLoading || isAcknowledgementsError) {
         return ModalState.None;
       }
@@ -100,6 +102,7 @@ export function useUnificationOptIn({
     status,
     isModalSuppressed,
     isMigrated,
+    isNewGroup,
     isAcknowledgementsLoading,
     isAcknowledgementsError,
     acknowledgedGroupIds,
@@ -136,7 +139,9 @@ export function useUnificationOptIn({
     modalState,
     breakingChanges,
     isLoading:
-      isStatusLoading || isBreakingChangesLoading || (isMigrated && isAcknowledgementsLoading),
+      isStatusLoading ||
+      isBreakingChangesLoading ||
+      (isMigrated && !isNewGroup && isAcknowledgementsLoading),
     onContinue,
     onAskLater,
     onAcknowledge,

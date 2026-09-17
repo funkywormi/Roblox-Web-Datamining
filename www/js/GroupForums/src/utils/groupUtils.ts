@@ -10,12 +10,15 @@ import {
   RoleColorTokenMap,
 } from './constants';
 
+export const isGroupRoleColor = (color: unknown): color is GroupRoleColorType =>
+  typeof color === 'number' && Object.hasOwn(RoleColorTokenMap, color);
+
 export const getRoleStyle = (
-  color?: GroupRoleColorType,
+  color?: number,
   themeMode?: string,
   property: 'fill' | 'background' | 'color' = 'fill',
 ): CSSProperties => {
-  const resolvedColor = typeof color === 'number' ? color : DefaultRoleColor;
+  const resolvedColor = color !== undefined && isGroupRoleColor(color) ? color : DefaultRoleColor;
   const tokens = RoleColorTokenMap[resolvedColor];
   const token = themeMode === 'dark' ? tokens.dark : tokens.light;
   return { [property]: `var(--${token})` };

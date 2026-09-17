@@ -3,6 +3,7 @@ import localStorage from "@rbx/core-scripts/local-storage";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { isTestSite } from "@rbx/core-scripts/meta/environment";
 import ixp from "@rbx/experimentation";
+import { LEFT_NAV_LAYER_NAME } from "../util/leftNavIxpUtil";
 
 type LocalStorageData = Record<string, boolean>;
 const localStorageKey = "new-left-nav";
@@ -32,7 +33,7 @@ export const useNewLeftNav = () => {
       if (isTestSite()) {
         return true;
       }
-      const ixpData = await ixp.getAllValuesForLayer("Website.Navigation");
+      const ixpData = await ixp.getAllValuesForLayer(LEFT_NAV_LAYER_NAME);
       const ixpNewLeftNav = ixpData.IsNewLeftNavEnabled === true;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       userLookup[id!] = ixpNewLeftNav;

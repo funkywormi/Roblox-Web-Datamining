@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatNumber } from "@rbx/core-scripts/format/number";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
+import { authenticatedUser, isBlackbirdUser } from "@rbx/core-scripts/meta/user";
 import { useTranslation } from "@rbx/core-scripts/react";
 import tradesConstants from "../constants/tradesConstants";
 import {
   buildNameForDisplay,
+  canTrade,
   canTradeWith,
   counterTrade,
   getAllInventoryByUserId,
@@ -12,6 +13,10 @@ import {
   getErrorCodes,
   getTrade,
   getUserById,
+  isAgeCheckEligibility,
+  isFreeTradesLimitEligibility,
+  refreshCanTrade,
+  resolveCannotTradeAction,
   sendTrade,
 } from "../services/tradesApi";
 import {
@@ -21,7 +26,7 @@ import {
   sendEvent,
   tradeEvents,
 } from "../services/tradeEvents";
-import { is2SVEnabled } from "../services/verification";
+import { is2SVEnabled, startFacialAgeEstimation } from "../services/verification";
 import { useTradesRouter } from "../tradesRouter";
 import {
   DraftOffer,
@@ -34,8 +39,11 @@ import {
 } from "../types";
 import { getCommonErrorMessage, getInvalidTradableItemLabel } from "../utils/tradeErrors";
 import getEntryContext from "../utils/tradeEntryContext";
-import { isRobuxAmountValid } from "../utils/tradesUtils";
+import { isCappedByFreeTrades, isRobuxAmountValid } from "../utils/tradesUtils";
 import { log, warn } from "../utils/logger";
+import useAgeCheckRequired from "./useAgeCheckRequired";
+import useCurrencyTransfer from "./useCurrencyTransfer";
+import useTradeQuota from "./useTradeQuota";
 import useTwoStepVerification from "./useTwoStepVerification";
 
 type SystemFeedbackService = {
@@ -78,6 +86,12 @@ export type UseTradeRequest = {
   isItemUnavailable: (item: TradableItem) => boolean;
   doesItemHaveError: (item: TradableItem) => boolean;
   getItemErrorReason: (item: TradableItem) => string;
+  /**
+   * The partner cannot attach Robux (`canRequest` on can-trade), so their
+   * Robux field is read-only on create and counter regardless of the viewer's own
+   * eligibility.
+   */
+  isPartnerRobuxLocked: boolean;
   // Send flow.
   confirmSendOpen: boolean;
   requestSend: () => void;
@@ -87,6 +101,14 @@ export type UseTradeRequest = {
   dismissEconomic: () => void;
   verificationRedirectOpen: boolean;
   dismissVerificationRedirect: () => void;
+  plusUpsellOpen: boolean;
+  /** Title key when the pitch is for Robux in the offer rather than the monthly cap. */
+  plusUpsellTitleKey?: string;
+  dismissPlusUpsell: () => void;
+  /** Prelude explaining the age check before the shared flow takes over. */
+  ageCheckPromptOpen: boolean;
+  dismissAgeCheckPrompt: () => void;
+  startAgeCheck: () => void;
 };
 
 /**
@@ -123,12 +145,31 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
   const [confirmSendOpen, setConfirmSendOpen] = useState(false);
   const [economicBody, setEconomicBody] = useState<string | null>(null);
   const [verificationRedirectOpen, setVerificationRedirectOpen] = useState(false);
+  const [plusUpsellOpen, setPlusUpsellOpen] = useState(false);
+  const [plusUpsellTitleKey, setPlusUpsellTitleKey] = useState<string | undefined>(undefined);
+  const [ageCheckPromptOpen, setAgeCheckPromptOpen] = useState(false);
+  const tradeQuota = useTradeQuota();
+  const currencyTransfer = useCurrencyTransfer(partner?.id);
+  const ageCheck = useAgeCheckRequired();
 
   // Refs mirror state for reads inside async callbacks / event handlers.
   const offersRef = useRef<DraftOffer[]>([]);
   const partnerRef = useRef<TradeUser | null>(null);
   const counterTradeIdRef = useRef<number | null>(null);
   const invalidItemIdsRef = useRef<Record<string, string | null>>({});
+  const faeRetryAttemptedRef = useRef(false);
+  // Set once the shared flow reports the check as passed. The cached can-trade
+  // eligibility still says otherwise, so without this the offer would be gated
+  // again the moment it resumes.
+  const ageCheckPassedRef = useRef(false);
+  // What to run once the check passes: the offer the viewer asked for, or the
+  // send the trade API rejected.
+  const resumeAfterAgeCheckRef = useRef<() => void>(() => {
+    // Replaced whenever the prompt is opened.
+  });
+  const requestSendRef = useRef<() => void>(() => {
+    // Replaced with requestSend once it's defined below.
+  });
 
   const commitOffers = useCallback((next: DraftOffer[]) => {
     offersRef.current = next;
@@ -232,8 +273,44 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
     [addItemToOffer, isItemInOffers, removeItem],
   );
 
+  // The two flags are independent after the backend split: `canSend` is the
+  // viewer's Plus, `canRequest` is the partner's. A partner who cannot attach
+  // Robux is a hard block no subscription of the viewer's would lift, so their
+  // field is locked outright. The viewer's own ineligibility is a soft block
+  // handled on send.
+  const isPartnerRobuxLocked = currencyTransfer.isLoaded && !currencyTransfer.canRequest;
+  // Read inside callbacks, which capture the first render's value.
+  const isPartnerRobuxLockedRef = useRef(isPartnerRobuxLocked);
+  isPartnerRobuxLockedRef.current = isPartnerRobuxLocked;
+
+  // Eligibility usually resolves after the draft is seeded, so a countered
+  // trade can arrive with Robux already on the partner's side. Drop it once the
+  // answer says it cannot be requested, matching the now-locked field.
+  useEffect(() => {
+    if (!isPartnerRobuxLocked) {
+      return;
+    }
+    const partnerId = partnerRef.current?.id;
+    if (partnerId == null) {
+      return;
+    }
+    const needsClearing = offersRef.current.some(
+      offer => offer.user.id === partnerId && offer.robux !== null,
+    );
+    if (needsClearing) {
+      commitOffers(
+        offersRef.current.map(offer =>
+          offer.user.id === partnerId ? { ...offer, robux: null } : offer,
+        ),
+      );
+    }
+  }, [commitOffers, isPartnerRobuxLocked, offers]);
+
   const setRobux = useCallback(
     (offerUserId: number, value: string) => {
+      if (offerUserId === partnerRef.current?.id && isPartnerRobuxLockedRef.current) {
+        return;
+      }
       const trimmed = value.replace(/[^0-9]/g, "");
       let parsed: number | null = trimmed === "" ? null : parseInt(trimmed, 10);
       if (parsed === 0) {
@@ -283,7 +360,10 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
     const recipientOffer = tradeOffers.find(offer => offer.userId !== authenticatedUser()?.id);
     return {
       senderOffer: senderOffer!,
-      recipientOffer: recipientOffer!,
+      recipientOffer: {
+        ...recipientOffer!,
+        robux: isPartnerRobuxLockedRef.current ? 0 : recipientOffer!.robux,
+      },
     };
   };
 
@@ -324,11 +404,69 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
         return "insufficientRobux";
       case tradeErrors.tooManyRobux:
         return "tooManyRobux";
+      case tradeErrors.robuxRequiresPlus:
+        return "robuxRequiresPlus";
       case tradeErrors.tradeFrictionEncountered:
         return "tradeFrictionEncountered";
       default:
         return "unknown";
     }
+  };
+
+  // Explains the age check before the shared flow takes over, and remembers
+  // what the check was standing in the way of. Guarded against a second pass so
+  // a still-blocked retry surfaces an error instead of looping.
+  const promptAgeCheck = (resume: () => void) => {
+    if (faeRetryAttemptedRef.current) {
+      systemFeedbackService.warning(translate("Response.VerificationError"));
+      return;
+    }
+    resumeAfterAgeCheckRef.current = resume;
+    setAgeCheckPromptOpen(true);
+  };
+
+  // Handoff to the shared age-check flow, once the user has accepted the
+  // prelude. The guard is spent here rather than when the prelude opens, so
+  // dismissing the prelude leaves the user free to try the send again.
+  const startAgeCheck = () => {
+    setAgeCheckPromptOpen(false);
+    faeRetryAttemptedRef.current = true;
+    const source = counterTradeIdRef.current === null ? "send-trade" : "counter-trade";
+    startFacialAgeEstimation(source)
+      .then(hasAccess => {
+        if (hasAccess) {
+          ageCheckPassedRef.current = true;
+          resumeAfterAgeCheckRef.current();
+        }
+      })
+      .catch((error: unknown) => {
+        warn("startAgeCheck: FAE flow failed", error);
+        sendAXError("facialAgeEstimation", error as Error, { source });
+        systemFeedbackService.warning(translate("Response.VerificationError"));
+      });
+  };
+
+  const handleUserCannotTrade = (err: unknown) => {
+    resolveCannotTradeAction(err)
+      .then(action => {
+        if (action === "ageCheck") {
+          // The draft was already confirmed, so the check resumes the send
+          // itself rather than reopening the confirmation.
+          promptAgeCheck(() => {
+            retrySendRef.current();
+          });
+          return;
+        }
+        if (action === "upsell" && !isBlackbirdUser()) {
+          setPlusUpsellTitleKey(undefined);
+          setPlusUpsellOpen(true);
+          return;
+        }
+        systemFeedbackService.warning(translate("Error.TradeUsersCannotTrade"));
+      })
+      .catch(() => {
+        systemFeedbackService.warning(translate("Error.TradeUsersCannotTrade"));
+      });
   };
 
   const handleSendTradeError = (err: unknown) => {
@@ -340,7 +478,8 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
         systemFeedbackService.warning(translate("Error.TradeUnauthorized"));
         break;
       case tradeErrors.userCannotTrade:
-        systemFeedbackService.warning(translate("Error.TradeUsersCannotTrade"));
+        // Covers the age-check block too, which arrives under this code.
+        handleUserCannotTrade(err);
         break;
       case tradeErrors.userPrivacyTooStrict:
         systemFeedbackService.warning(
@@ -375,6 +514,19 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
           ),
         );
         break;
+      // This one is the partner's blocker, not the viewer's: the trade asks
+      // someone without Plus to send Robux. The viewer subscribing would not
+      // change that, so name the blocker rather than pitch the membership.
+      // A viewer who is themselves ineligible is caught before the send.
+      case tradeErrors.robuxRequiresPlus:
+        systemFeedbackService.warning(
+          translate(
+            "Message.YouCanOnlyRequestRobuxFromPlusUsers",
+            undefined,
+            "This user needs Roblox Plus to send Robux as part of the trade",
+          ),
+        );
+        break;
       case tradeErrors.tradeFrictionEncountered:
         is2SVEnabled()
           .then(enabled => {
@@ -406,7 +558,7 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
     // Analytics expect [requested(partner), offered(me)] ordering.
     const offeredOffer = currentOffers.find(offer => offer.user.id === authenticatedUser()?.id);
     const requestedOffer = currentOffers.find(offer => offer.user.id !== authenticatedUser()?.id);
-    const baseParameters: Record<string, unknown> = {
+    const baseParameters: Record<string, string | number | boolean | null | undefined> = {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...getTradeItemParameters({ offers: [requestedOffer, offeredOffer] } as any),
       hasRobux: tradeHasRobux(),
@@ -428,7 +580,10 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
           return;
         }
 
-        const parameters: Record<string, unknown> = { ...baseParameters, success: true };
+        const parameters: Record<string, string | number | boolean | null | undefined> = {
+          ...baseParameters,
+          success: true,
+        };
         if (tradeResponse?.tradeId) {
           parameters.tradeId = tradeResponse.tradeId;
         }
@@ -448,6 +603,7 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
         systemFeedbackService.success(
           translate(isCounter ? "Message.TradeCounteredSuccess" : "Message.TradeSentSuccess"),
         );
+        refreshCanTrade();
         closeRequestWindow();
       },
       (err: unknown) => {
@@ -471,6 +627,42 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
   retrySendRef.current = processSend;
 
   const requestSend = useCallback(() => {
+    // Each press of Send is a fresh attempt, so the one-shot age-check guard is
+    // returned here (as TradeDetail does on accept). Spending it only inside a
+    // single attempt is what keeps a still-blocked retry from looping; leaving
+    // it spent would strand a viewer who abandoned the check with nothing but
+    // an error until they reloaded.
+    faeRetryAttemptedRef.current = false;
+    // An age-check-ineligible viewer is on the builder on purpose (openNewTrade
+    // skips the membership redirect for them), so the check they need is asked
+    // for here instead of at the end of a confirmation the server would reject.
+    // The rejection is still handled on send, for a viewer whose eligibility
+    // could not be read up front or changed under them.
+    if (ageCheck.isRequired && !ageCheckPassedRef.current) {
+      promptAgeCheck(() => {
+        requestSendRef.current();
+      });
+      return;
+    }
+    // Sending draws on the monthly allowance, so once it is spent the send is
+    // replaced by the membership pitch rather than a confirmation the server
+    // would only reject. Countering sends a trade too, so it is gated the same
+    // way. This comes before validating the draft because no amount of fixing
+    // the offer would get the send through.
+    if (tradeQuota.isOutOfTrades) {
+      setPlusUpsellTitleKey(undefined);
+      setPlusUpsellOpen(true);
+      return;
+    }
+    // A viewer who cannot attach Robux still builds their own side freely and
+    // meets the pitch only here. Any Robux in the trade counts, because taking
+    // part in a Robux exchange at all is what the membership unlocks. The
+    // partner's field is a separate gate (`canRequest`) and may already be locked.
+    if (currencyTransfer.isLoaded && !currencyTransfer.canSend && tradeHasRobux()) {
+      setPlusUpsellTitleKey("Title.TradeWithRobuxWithPlus");
+      setPlusUpsellOpen(true);
+      return;
+    }
     if (!isEligibleForSend()) {
       return;
     }
@@ -478,7 +670,17 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
     invalidItemIdsRef.current = {};
     setConfirmSendOpen(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clearError, translate]);
+  }, [
+    ageCheck.isRequired,
+    clearError,
+    currencyTransfer.canSend,
+    currencyTransfer.isLoaded,
+    translate,
+    tradeQuota.isOutOfTrades,
+  ]);
+
+  // Lets a passed age check pick the offer back up where the viewer left it.
+  requestSendRef.current = requestSend;
 
   const cancelSend = useCallback(() => {
     setConfirmSendOpen(false);
@@ -494,6 +696,13 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
   }, []);
   const dismissVerificationRedirect = useCallback(() => {
     setVerificationRedirectOpen(false);
+  }, []);
+  const dismissPlusUpsell = useCallback(() => {
+    setPlusUpsellOpen(false);
+    setPlusUpsellTitleKey(undefined);
+  }, []);
+  const dismissAgeCheckPrompt = useCallback(() => {
+    setAgeCheckPromptOpen(false);
   }, []);
 
   // ---- Initialization (openNewTrade / openCounterTrade) --------------------
@@ -612,16 +821,46 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
       // tradesController trade-with-user state (redirect on ineligible pairs so
       // a cold /users/{id}/trade load matches the legacy behavior).
       const { canTradeWithStatus, urls } = tradesConstants;
-      canTradeWith(userId)
-        .then(response => {
+      // Soft sender blocks (age check, spent free trades) used to arrive as
+      // SenderCannotTrade; can-trade is fetched in parallel to identify those
+      // collapsed cases. Dedicated pair statuses are matched on the status
+      // string, not on the viewer's own eligibility.
+      Promise.all([canTradeWith(userId), canTrade().catch(() => null)])
+        .then(([response, tradeResponse]) => {
           const status = response?.status;
-          log("openNewTrade: canTradeWith status=", status);
+          log(
+            "openNewTrade: canTradeWith status=",
+            status,
+            "tradeEligibility=",
+            tradeResponse?.tradeEligibility,
+          );
 
           if (status === canTradeWithStatus.canTrade) {
             loadTradePartner(userId);
             return;
           }
+          // Dedicated sender statuses (SenderAgeCheckRequired, and a spent
+          // free-trades spelling if can-trade-with ever reports one) stay on
+          // the builder so send can offer the check or Plus sheet. Match the
+          // pair status itself — viewer can-trade eligibility must not override
+          // CannotTradeWithSelf, UnknownError, empty, or receiver/privacy 403s.
+          if (isAgeCheckEligibility(status) || isFreeTradesLimitEligibility(status)) {
+            loadTradePartner(userId);
+            return;
+          }
           if (status === canTradeWithStatus.senderCannotTrade) {
+            // Soft sender blocks used to collapse here. can-trade is the source
+            // of truth for age-check and spent free trades; a remaining
+            // allowance also stays so send can show the Plus sheet instead of
+            // force-navigating to membership.
+            if (
+              isAgeCheckEligibility(tradeResponse?.tradeEligibility) ||
+              isFreeTradesLimitEligibility(tradeResponse?.tradeEligibility) ||
+              isCappedByFreeTrades(tradeResponse?.freeTradesAllowance)
+            ) {
+              loadTradePartner(userId);
+              return;
+            }
             window.location.href = urls.membership;
             return;
           }
@@ -724,6 +963,7 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
     isItemUnavailable,
     doesItemHaveError,
     getItemErrorReason,
+    isPartnerRobuxLocked,
     confirmSendOpen,
     requestSend,
     cancelSend,
@@ -732,6 +972,12 @@ export const useTradeRequest = (systemFeedbackService: SystemFeedbackService): U
     dismissEconomic,
     verificationRedirectOpen,
     dismissVerificationRedirect,
+    plusUpsellOpen,
+    plusUpsellTitleKey,
+    dismissPlusUpsell,
+    ageCheckPromptOpen,
+    dismissAgeCheckPrompt,
+    startAgeCheck,
   };
 };
 

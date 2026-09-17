@@ -22,7 +22,7 @@ const DeleteForumEntityModal = ({ translate }: WithTranslationsProps): JSX.Eleme
   const { dialogState, closeDeleteDialog } = useModerateDialog();
   const { type, isReply, showPreventSimilar, onConfirmDelete } = dialogState;
   const { features } = useCommunityProductFeatures();
-  const [preventSimilarChecked, setPreventSimilarChecked] = useState(true);
+  const [preventSimilarChecked, setPreventSimilarChecked] = useState(false);
 
   const isDeletePost = type === 'deletePost';
   const isDeleteComment = type === 'deleteComment';
@@ -37,7 +37,7 @@ const DeleteForumEntityModal = ({ translate }: WithTranslationsProps): JSX.Eleme
 
   useEffect(() => {
     if (isOpen) {
-      setPreventSimilarChecked(true);
+      setPreventSimilarChecked(false);
       if (features.ForumPreventSimilar) {
         impressionIdRef.current = mintEntrypointImpressionId();
         logCmntyForumsDeleteDialogShownEvent({

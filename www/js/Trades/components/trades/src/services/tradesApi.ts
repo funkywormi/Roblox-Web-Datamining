@@ -4,7 +4,10 @@ import tradesConstants from "../constants/tradesConstants";
 import {
   AcceptTradeResponse,
   ApiFieldError,
+  CanTradeResponse,
+  CanTradeWithCurrencyResponse,
   CanTradeWithResponse,
+  CurrencyTransferEligibility,
   InventoryPage,
   PagingParameters,
   SendTradeRequest,
@@ -16,6 +19,7 @@ import {
   TradeSummary,
   UserSettings,
 } from "../types";
+import { isSpentFreeTradesAllowance } from "../utils/tradesUtils";
 
 export const buildNameForDisplay = (displayName?: string | null, name?: string | null): string =>
   concat([escapeHtml(displayName ?? ""), escapeHtml(name ?? "")], undefined, true);
@@ -117,17 +121,68 @@ export const setTradeQuality = async (quality: string): Promise<void> => {
   await http.post(urlConfig, { tradeQualityFilter: quality });
 };
 
+let canTradeRequest: Promise<CanTradeResponse | null> | null = null;
+/** Latest successful can-trade payload, or `null` if the request returned empty. */
+let lastCanTradeResponse: CanTradeResponse | null | undefined;
+
+type CanTradeListener = (response: CanTradeResponse | null) => void;
+const canTradeListeners = new Set<CanTradeListener>();
+
 /**
- * Regional-restriction / eligibility check used to decide whether the trade
- * list shows the regional-restrictions banner. Port of tradesService.canTrade.
+ * Subscribe to successful `/v2/users/me/can-trade` responses. Used so every
+ * quota hook updates after a refresh without each one polling.
  */
-export const canTrade = async (): Promise<{ tradeEligibility?: string } | null> => {
-  const urlConfig = {
-    url: `${tradesConstants.urls.tradesApi}/v2/users/me/can-trade`,
-    withCredentials: true,
+export const subscribeCanTrade = (listener: CanTradeListener): (() => void) => {
+  canTradeListeners.add(listener);
+  return () => {
+    canTradeListeners.delete(listener);
   };
-  const { data } = await http.get<{ tradeEligibility?: string }>(urlConfig);
-  return data ?? null;
+};
+
+const publishCanTrade = (response: CanTradeResponse | null) => {
+  lastCanTradeResponse = response;
+  canTradeListeners.forEach(listener => {
+    listener(response);
+  });
+};
+
+/** Last can-trade response, for analytics that need the free-trade cap. */
+export const getCachedCanTrade = (): CanTradeResponse | null | undefined => lastCanTradeResponse;
+
+/**
+ * Trade eligibility plus the monthly free-trade allowance. Port of
+ * tradesService.canTrade.
+ *
+ * The regional-restrictions banner and the Plus upsell both read this and mount
+ * together, so the in-flight request is shared instead of being issued twice.
+ * Failures are not cached, leaving a later caller free to retry.
+ */
+export const canTrade = ({ refresh = false } = {}): Promise<CanTradeResponse | null> => {
+  if (refresh) {
+    canTradeRequest = null;
+  }
+
+  canTradeRequest ??= http
+    .get<CanTradeResponse>({
+      url: `${tradesConstants.urls.tradesApi}/v2/users/me/can-trade`,
+      withCredentials: true,
+    })
+    .then(({ data }) => {
+      const response = data ?? null;
+      publishCanTrade(response);
+      return response;
+    })
+    .catch((error: unknown) => {
+      canTradeRequest = null;
+      throw error;
+    });
+
+  return canTradeRequest;
+};
+
+/** Drop the cached can-trade response and fetch again, updating subscribers. */
+export const refreshCanTrade = (): void => {
+  canTrade({ refresh: true }).catch(() => undefined);
 };
 
 /**
@@ -184,6 +239,22 @@ export const canTradeWith = async (userId: number): Promise<CanTradeWithResponse
   };
   const { data } = await http.get<CanTradeWithResponse>(urlConfig);
   return data ?? null;
+};
+
+/**
+ * Robux permissions for this pairing, which only v2 reports. Kept separate
+ * from `canTradeWith` because v2 drops the `status` the builder's eligibility
+ * gate reads, so each version is called for the half it answers.
+ */
+export const getCurrencyTransferEligibility = async (
+  userId: number,
+): Promise<CurrencyTransferEligibility | null> => {
+  const urlConfig = {
+    url: `${tradesConstants.urls.tradesApi}/v2/users/${userId}/can-trade-with`,
+    withCredentials: true,
+  };
+  const { data } = await http.get<CanTradeWithCurrencyResponse>(urlConfig);
+  return data?.currencyTransferEligibility ?? null;
 };
 
 const normalizeInstance = (instance: TradableItem, userId: number): TradableItem => ({
@@ -284,13 +355,91 @@ export const counterTrade = async (
   return data ?? {};
 };
 
-/** Extract API error codes from a rejected http promise. */
+/**
+ * Extract API error codes from a rejected http promise.
+ *
+ * The core-scripts interceptor rejects with the Axios *response* rather than
+ * the error, so the payload sits under `data` — and `getApiErrorCodes` only
+ * reads a top-level `errors`. Each wrapper is tried so the codes are found
+ * whichever shape the rejection arrives in.
+ */
 export const getErrorCodes = (error: unknown): number[] => {
-  try {
-    return http.getApiErrorCodes(error) || [];
-  } catch {
-    return [];
+  const read = (value: unknown): number[] => {
+    try {
+      return http.getApiErrorCodes(value) || [];
+    } catch {
+      return [];
+    }
+  };
+
+  const err = error as Record<string, unknown> | undefined;
+  const response = err?.response as Record<string, unknown> | undefined;
+
+  for (const candidate of [err, err?.data, response?.data]) {
+    const codes = read(candidate);
+    if (codes.length > 0) {
+      return codes;
+    }
   }
+
+  return [];
+};
+
+const normalizeEligibility = (value: unknown): string | null =>
+  typeof value === "string" ? value.replace(/[^a-z]/gi, "").toLowerCase() : null;
+
+/**
+ * Matches the age-check trade eligibility (`IneligibleAgeCheckRequired`),
+ * tolerating whether the API spells out the `Ineligible` prefix.
+ */
+export const isAgeCheckEligibility = (value: unknown): boolean =>
+  (normalizeEligibility(value) ?? "").endsWith("agecheckrequired");
+
+/**
+ * Matches a spent free-trade allowance (`IneligibleFreeTradesLimitReached`),
+ * including a `Sender…` spelling if can-trade-with reports the same stem.
+ */
+export const isFreeTradesLimitEligibility = (value: unknown): boolean =>
+  (normalizeEligibility(value) ?? "").endsWith("freetradeslimitreached");
+
+const isAgeCheckReason = (value: unknown): boolean => {
+  if (value === 7) {
+    return true;
+  }
+  if (typeof value !== "string") {
+    return false;
+  }
+  const normalized = value.replace(/[^a-z]/gi, "").toLowerCase();
+  return normalized === "reasonsenderagecheckrequired" || normalized === "senderagecheckrequired";
+};
+
+/**
+ * Detects SendTradeError.UsersCannotTrade.REASON_SENDER_AGE_CHECK_REQUIRED.
+ * The gateway may expose protobuf details directly or under an HTTP error
+ * response, so walk the rejected value without relying on one wrapper shape.
+ */
+export const isAgeCheckRequiredError = (error: unknown): boolean => {
+  const visited = new WeakSet<object>();
+
+  const visit = (value: unknown): boolean => {
+    if (!value || typeof value !== "object" || visited.has(value)) {
+      return false;
+    }
+    visited.add(value);
+
+    return Object.entries(value).some(([key, nestedValue]) => {
+      const normalizedKey = key.replace(/[^a-z]/gi, "").toLowerCase();
+      if (
+        normalizedKey === "senderagecheckrequired" ||
+        (normalizedKey === "reason" && isAgeCheckReason(nestedValue))
+      ) {
+        return true;
+      }
+      return visit(nestedValue);
+    });
+  };
+
+  return visit(error);
 };
 
 /**
@@ -311,4 +460,71 @@ export const getApiError = (error: unknown): ApiFieldError | null => {
   const response = err?.response as Record<string, unknown> | undefined;
   const errors = readErrors(err) || readErrors(err?.data) || readErrors(response?.data);
   return errors && errors.length > 0 ? errors[0]! : null;
+};
+
+/**
+ * Whether a failed send/counter/accept was blocked because the viewer still
+ * needs an age check.
+ *
+ * The REST layer collapses `UsersCannotTrade` into the legacy
+ * `userCannotTrade` code and drops the underlying reason, so the age-check case
+ * is indistinguishable from the other reasons (privacy, blocks) on the error
+ * alone. `can-trade` reports the viewer's own eligibility, which is exactly the
+ * side an age check would unblock, so it settles the ambiguity. It is fetched
+ * fresh because a cached response predates the failure.
+ */
+export const requiresAgeCheck = async (error: unknown): Promise<boolean> => {
+  if (isAgeCheckRequiredError(error)) {
+    return true;
+  }
+
+  const code = getApiError(error)?.code ?? getErrorCodes(error)[0];
+  if (code !== tradesConstants.tradeErrors.userCannotTrade) {
+    return false;
+  }
+
+  try {
+    const response = await canTrade({ refresh: true });
+    return isAgeCheckEligibility(response?.tradeEligibility);
+  } catch {
+    // Without eligibility we cannot tell the age-check case apart, so leave the
+    // caller on its generic "cannot trade" message rather than opening a flow
+    // that may not apply.
+    return false;
+  }
+};
+
+export type CannotTradeAction = "ageCheck" | "upsell" | "cannotTrade";
+
+/**
+ * What to do with a `userCannotTrade` (error 7) rejection.
+ *
+ * That code is shared by the age-check block and a spent free-trade allowance,
+ * so eligibility and the allowance are read (fresh, via `requiresAgeCheck`)
+ * before choosing the age-check prelude, the Plus pitch, or the generic
+ * warning.
+ */
+export const resolveCannotTradeAction = async (error: unknown): Promise<CannotTradeAction> => {
+  if (await requiresAgeCheck(error)) {
+    return "ageCheck";
+  }
+
+  const code = getApiError(error)?.code ?? getErrorCodes(error)[0];
+  if (code !== tradesConstants.tradeErrors.userCannotTrade) {
+    return "cannotTrade";
+  }
+
+  try {
+    const response = await canTrade();
+    if (
+      isFreeTradesLimitEligibility(response?.tradeEligibility) ||
+      isSpentFreeTradesAllowance(response?.freeTradesAllowance)
+    ) {
+      return "upsell";
+    }
+  } catch {
+    // Fall through to the generic warning when the allowance cannot be read.
+  }
+
+  return "cannotTrade";
 };

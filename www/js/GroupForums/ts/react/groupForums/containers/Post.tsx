@@ -181,7 +181,7 @@ const Post = ({ translate }: WithTranslationsProps): JSX.Element => {
     <div className='group-forums-post'>
       {isPostInaccessible ? (
         // Show the categories the user can access so they can navigate away from the unavailable post.
-        <div className='group-forums-categories-list-container'>
+        <div className='group-posts-destinations-container'>
           <CategoriesList activeCategoryId={null} onSetActiveCategory={onSelectCategory} />
         </div>
       ) : (

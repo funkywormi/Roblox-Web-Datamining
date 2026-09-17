@@ -32,9 +32,13 @@ import { SaveConfirmationDialog } from './SaveConfirmationDialog';
 export type PermissionGroupListProps = {
   entity?: EntityDetails;
   creator?: CreatorDetails;
+  selectedTab?: PermissionTab;
+  onSelectedTabChange?: (tab: PermissionTab) => void;
 };
 
 const FORUM_BUG_REPORTER_PERMISSION_ID = 'Group.ForumBugReporter';
+const UNIVERSE_TICKET_REVIEWER_PERMISSION_ID = 'Universe.TicketReviewer';
+const GUEST_ROLE_PERMISSION_ID = 'Group.AnnouncementViewer';
 
 const usePermissionsContainerStyles = makeStyles()((theme) => ({
   rootClass: {
@@ -60,11 +64,16 @@ const usePermissionsContainerStyles = makeStyles()((theme) => ({
   },
 }));
 
-const PermissionGroupList: FunctionComponent<PermissionGroupListProps> = ({ creator, entity }) => {
+const PermissionGroupList: FunctionComponent<PermissionGroupListProps> = ({
+  creator,
+  entity,
+  selectedTab,
+  onSelectedTabChange,
+}) => {
   const {
     classes: { rootClass, footerButton, stickyFooter },
   } = usePermissionsContainerStyles();
-  const { showConfirmationOnSave } = usePermissionsUiConfig();
+  const { showConfirmationOnSave, showUniverseTicketReviewerPermission } = usePermissionsUiConfig();
   const { translate, displayMessage } = usePermissionsTranslation();
   const { translateWithNamespace } = useTranslation();
   const { organization, surface, isOrganizationLoading } = useCurrentGroup();
@@ -99,8 +108,12 @@ const PermissionGroupList: FunctionComponent<PermissionGroupListProps> = ({ crea
   );
   const [trackedInitialPermissions, setTrackedInitialPermissions] = useState(initialPermissions);
   const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<PermissionTab>(PermissionTab.GENERAL);
+  const [internalSelectedTab, setInternalSelectedTab] = useState<PermissionTab>(
+    PermissionTab.GENERAL,
+  );
+  const activeTab = selectedTab ?? internalSelectedTab;
   const isGuestRole = creator?.type === CreatorTypes.GUEST_ROLE;
+  const isReadOnly = creator?.disabled === true;
 
   if (trackedInitialPermissions !== initialPermissions && initialPermissions != null) {
     setTrackedInitialPermissions(initialPermissions);
@@ -121,8 +134,10 @@ const PermissionGroupList: FunctionComponent<PermissionGroupListProps> = ({ crea
         ...group,
         permissions: group.permissions.filter(
           (permission) =>
-            permission.permissionId !== FORUM_BUG_REPORTER_PERMISSION_ID ||
-            showForumBugReporterPermission,
+            (permission.permissionId !== FORUM_BUG_REPORTER_PERMISSION_ID ||
+              showForumBugReporterPermission) &&
+            (permission.permissionId !== UNIVERSE_TICKET_REVIEWER_PERMISSION_ID ||
+              showUniverseTicketReviewerPermission === true),
         ),
       }))
       .filter((group) => group.permissions.length > 0);
@@ -132,12 +147,12 @@ const PermissionGroupList: FunctionComponent<PermissionGroupListProps> = ({ crea
           .map((group) => ({
             ...group,
             permissions: group.permissions.filter(
-              (permission) => initialPermissions?.[permission.permissionId]?.canEdit,
+              (permission) => permission.permissionId === GUEST_ROLE_PERMISSION_ID,
             ),
           }))
           .filter((group) => group.permissions.length > 0)
       : featureFilteredMetadata;
-  }, [initialPermissions, isGuestRole, metadata, showForumBugReporterPermission]);
+  }, [isGuestRole, metadata, showForumBugReporterPermission, showUniverseTicketReviewerPermission]);
 
   const onPermissionChange = useCallback((permissionId: string, isGranted: boolean) => {
     setExplicitGrants((prev) => {
@@ -221,12 +236,14 @@ const PermissionGroupList: FunctionComponent<PermissionGroupListProps> = ({ crea
     );
   }
 
-  const isAnyEditable = visibleMetadata.some((group) =>
-    group.permissions.some((permission) => {
-      const initialPermission = initialPermissions[permission.permissionId];
-      return initialPermission ? canPermissionChange(initialPermission) : false;
-    }),
-  );
+  const isAnyEditable =
+    !isReadOnly &&
+    visibleMetadata.some((group) =>
+      group.permissions.some((permission) => {
+        const initialPermission = initialPermissions[permission.permissionId];
+        return initialPermission ? canPermissionChange(initialPermission) : false;
+      }),
+    );
   const { selected, unselected } = findUpdatedPermissions(initialPermissions, permissionData);
 
   let info;
@@ -245,7 +262,7 @@ const PermissionGroupList: FunctionComponent<PermissionGroupListProps> = ({ crea
   const showTabChips = isGroupEntity && !isGuestRole;
 
   const filteredMetadata = showTabChips
-    ? visibleMetadata.filter((group) => PERMISSION_TAB_GROUP_IDS[selectedTab].has(group.groupId))
+    ? visibleMetadata.filter((group) => PERMISSION_TAB_GROUP_IDS[activeTab].has(group.groupId))
     : visibleMetadata;
 
   return (
@@ -264,12 +281,15 @@ const PermissionGroupList: FunctionComponent<PermissionGroupListProps> = ({ crea
           ).map((tab) => (
             <Grid pr={1} key={tab}>
               <Chip
-                isChecked={selectedTab === tab}
+                isChecked={activeTab === tab}
                 text={translateWithNamespace(
                   TranslationNamespace.GroupManagement,
                   `Group.Chip.${tab}.Label`,
                 )}
-                onCheckedChange={() => setSelectedTab(tab)}
+                onCheckedChange={() => {
+                  setInternalSelectedTab(tab);
+                  onSelectedTabChange?.(tab);
+                }}
                 size='Medium'
                 variant='Standard'
                 data-testid={`permission-tab-chip-${tab}`}
@@ -286,6 +306,7 @@ const PermissionGroupList: FunctionComponent<PermissionGroupListProps> = ({ crea
             metadata={permissionGroup}
             initialSelections={initialPermissions}
             currentSelections={permissionData}
+            isReadOnly={isReadOnly}
             onPermissionChange={onPermissionChange}
           />
         ))}

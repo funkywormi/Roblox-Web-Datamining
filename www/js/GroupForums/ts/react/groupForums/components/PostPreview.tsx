@@ -27,7 +27,7 @@ import ScrollFlashOverlay from './ScrollFlashOverlay';
 import renderHighlightedText from '../utils/renderHighlightedText';
 
 const META_DATA_SEPARATOR = ' • ';
-const POST_PREVIEW_MENU_CLASS = 'group-forums-post-preview-menu';
+const POST_PREVIEW_MENU_CLASS = 'group-posts-preview-menu';
 
 // Module-scope so the optional callbacks' defaults keep a stable identity across renders.
 const NOOP = (): void => undefined;
@@ -224,7 +224,7 @@ const PostPreview = ({
     <a
       ref={postPreviewRef}
       className={classNames(
-        'group-forums-post-preview',
+        'group-posts-preview',
         isConcealedAndShown && 'group-forums-post-preview-concealed-shown'
       )}
       data-id={post.shortId}
@@ -239,7 +239,7 @@ const PostPreview = ({
         post.shortId,
         post.name
       )}>
-      <div className='group-forums-post-preview-header'>
+      <div className='group-posts-preview-header'>
         <UserDisplay
           userId={createdBy}
           groupId={post.groupId}
@@ -288,43 +288,41 @@ const PostPreview = ({
       <div
         role='button'
         tabIndex={0}
-        className='group-forums-post-preview-content'
+        className='group-posts-preview-content'
         onKeyDown={hasRouter ? handleKeyDown : undefined}>
-        <div className='group-forums-post-preview-title-container'>
+        <div className='group-posts-preview-title-container'>
           {hasStatuses && (
-            <div className='group-forums-post-preview-statuses'>
-              {isUnread && <div className='group-forums-post-preview-unread-status' />}
+            <div className='group-posts-preview-statuses'>
+              {isUnread && <div className='group-posts-preview-unread-status' />}
               {showPinned && isPinned && (
-                <span className='group-forums-post-preview-pinned-status-icon' />
+                <span className='group-posts-preview-pinned-status-icon' />
               )}
-              {isLocked && <span className='group-forums-post-preview-locked-status-icon' />}
+              {isLocked && <span className='group-posts-preview-locked-status-icon' />}
             </div>
           )}
-          <h2 className='group-forums-post-preview-title text-emphasis text-overflow'>
+          <h2 className='group-posts-preview-title text-emphasis text-overflow'>
             {highlightedTitle ? renderHighlightedText(highlightedTitle) : postTitle}
           </h2>
         </div>
         <div
           className={classNames(
-            'group-forums-post-preview-content-comment',
+            'group-posts-preview-content-comment',
             'richtext-base',
             isUnread ? 'font-bold text-emphasis' : 'text-default'
           )}>
           {highlightedBody ? renderHighlightedText(highlightedBody) : <Message content={content} />}
         </div>
-        <div className='group-forums-post-preview-meta-data'>
+        <div className='group-posts-preview-meta-data'>
           {hasReactions && (
             <React.Fragment>
               <div className='group-forums-post-preview-meta-data-reactions text-default'>
                 <PostPreviewReactions reactions={reactions} />
               </div>
-              <div className='group-forums-post-preview-meta-data-separator'>
-                {META_DATA_SEPARATOR}
-              </div>
+              <div className='group-posts-preview-meta-data-separator'>{META_DATA_SEPARATOR}</div>
             </React.Fragment>
           )}
-          <div className='group-forums-post-preview-meta-data-replies text-default'>
-            <span className='group-forums-post-preview-replies-icon' />
+          <div className='group-posts-preview-meta-data-replies text-default'>
+            <span className='group-posts-preview-replies-icon' />
             <AnimatedAbbreviatedCount variant='reply' value={replyCount} />{' '}
             {replyCount === 1 ? translate('Label.Reply') : translate('Label.Replies')}
           </div>

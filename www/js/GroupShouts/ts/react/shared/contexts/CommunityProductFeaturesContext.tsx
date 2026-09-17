@@ -10,12 +10,14 @@ type CommunityProductFeaturesState = {
 };
 
 export const defaultCommunityProductFeatures: CommunityProductFeatures = {
-  ForumsRichTextRead: false,
-  ForumsRichTextWrite: false,
   ForumsAgeCheck: false,
   ForumsRestrictedCategories: false,
+  ForumsSearch: false,
+  ForumsUnrestrictedMessages: false,
   RealtimeMessaging: false,
   AnnouncementPolls: false,
+  AnnouncementArchive: false,
+  AnnouncementsUsingCommsPlat: false,
   AnnouncementsRichTextRead: false,
   AnnouncementsRichTextWrite: false,
   IsOwnerRolesetDeprecated: false,

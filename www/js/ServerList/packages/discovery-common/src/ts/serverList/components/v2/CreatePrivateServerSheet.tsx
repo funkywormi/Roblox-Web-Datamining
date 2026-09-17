@@ -22,6 +22,105 @@ const { resources } = serverListConstants;
 
 const TERMS_OF_USE_URL = "https://www.roblox.com/info/terms";
 
+type PriceDetailsProps = {
+  isPlusUser: boolean;
+  price: number;
+  discountTotal: number;
+};
+
+const PriceDetails = ({
+  isPlusUser,
+  price,
+  discountTotal,
+}: PriceDetailsProps): React.ReactElement => {
+  const { translate } = useTranslation();
+
+  const hasDiscount = discountTotal > 0;
+  const originalPrice = price + discountTotal;
+
+  // Private server is discounted due to Plus
+  // Not free since they are over the Plus free private server cap
+  const isPlusDiscounted = isPlusUser && hasDiscount && price > 0;
+
+  const strikethroughOriginalPrice = (
+    <span className="relative text-body-medium content-muted flex items-center gap-[2px]">
+      <Icon name="icon-filled-robux" size="Medium" />
+      {translate(resources.pricePerMonthText, { price: String(originalPrice) })}
+      <span
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: "50%",
+          borderTop: "1px solid currentColor",
+        }}
+      />
+    </span>
+  );
+
+  const savingsTags = [
+    {
+      opening: "amountStart",
+      closing: "amountEnd",
+      render: () => (
+        <span className="inline-flex items-center gap-xxsmall">
+          <Icon name="icon-filled-robux" size="XSmall" />
+          {String(discountTotal)}
+        </span>
+      ),
+    },
+  ];
+
+  // Plus user over the free cap: original price struck through, then the price
+  // they pay, followed by the amount saved with Plus.
+  if (isPlusDiscounted) {
+    return (
+      <React.Fragment>
+        <span className="text-body-medium content-emphasis flex items-center gap-xsmall">
+          {strikethroughOriginalPrice}
+          <span className="flex flex-row items-center gap-[2px]">
+            <Icon name="icon-filled-robux" size="Medium" />
+            <span>{translate(resources.pricePerMonthText, { price: String(price) })}</span>
+          </span>
+        </span>
+        <span className="text-body-small content-muted flex items-center gap-xxsmall">
+          <Icon name="icon-regular-roblox-plus" size="Small" />
+          {translateHtml(translate, resources.savingWithPlusText, savingsTags, {
+            robuxAmount: String(discountTotal),
+          })}
+        </span>
+      </React.Fragment>
+    );
+  }
+
+  // Plus user, buying a private server with a configured price (Plus free private server)
+  if (isPlusUser && price === 0 && hasDiscount) {
+    return (
+      <span className="text-body-medium content-emphasis flex items-center gap-xsmall">
+        <span>{translate(resources.includedWithBlackbirdText)}</span>
+        {strikethroughOriginalPrice}
+      </span>
+    );
+  }
+
+  // Plus user, buying a private server which is set to free by the developer
+  if (isPlusUser && price === 0) {
+    return (
+      <span className="text-body-medium content-emphasis flex items-center gap-xsmall">
+        {translate(resources.unlimitedIncludedWithBlackbirdText)}
+      </span>
+    );
+  }
+
+  // Non-Plus user (or the unreachable Plus + paid + no discount): plain price.
+  return (
+    <span className="text-body-medium content-emphasis flex flex-row items-center gap-[2px]">
+      <Icon name="icon-filled-robux" size="Medium" />
+      <span>{translate(resources.pricePerMonthText, { price: String(price) })}</span>
+    </span>
+  );
+};
+
 export type CreatePrivateServerSheetProps = {
   universeId: number;
   placeName: string;
@@ -52,6 +151,7 @@ const CreatePrivateServerSheet = ({
   const [displayPrivacyDisclaimer, setDisplayPrivacyDisclaimer] = useState(false);
   const [pspV2Enabled, setPspV2Enabled] = useState(false);
   const [privacyAcknowledged, setPrivacyAcknowledged] = useState(false);
+
   const discountTotal = discounts.reduce((sum, d) => sum + d.robux, 0);
 
   useEffect(() => {
@@ -158,37 +258,7 @@ const CreatePrivateServerSheet = ({
               <span className="text-title-medium content-emphasis text-truncate-end">
                 {translate(resources.placeNamePrivateServer, { placeName })}
               </span>
-              {isPlusUser ? (
-                <span className="text-body-medium content-emphasis flex items-center gap-xsmall">
-                  <span>
-                    {discountTotal > 0
-                      ? translate(resources.includedWithBlackbirdText)
-                      : translate(resources.unlimitedIncludedWithBlackbirdText)}
-                  </span>
-                  {discountTotal > 0 && (
-                    <span className="relative text-body-small content-muted flex items-center gap-xxsmall">
-                      <Icon name="icon-filled-robux" size="XSmall" />
-                      {translate(resources.pricePerMonthText, {
-                        price: String(price + discountTotal),
-                      })}
-                      <span
-                        style={{
-                          position: "absolute",
-                          left: 0,
-                          right: 0,
-                          top: "50%",
-                          borderTop: "1px solid currentColor",
-                        }}
-                      />
-                    </span>
-                  )}
-                </span>
-              ) : (
-                <span className="text-body-medium content-emphasis flex flex-row items-center gap-[2px]">
-                  <Icon name="icon-filled-robux" size="Medium" />
-                  <span>{translate(resources.pricePerMonthText, { price: String(price) })}</span>
-                </span>
-              )}
+              <PriceDetails isPlusUser={isPlusUser} price={price} discountTotal={discountTotal} />
             </div>
           </div>
 
@@ -248,7 +318,8 @@ const CreatePrivateServerSheet = ({
               </span>
             )}
 
-            {!isPlusUser && (
+            {/* TOS notice renders both non-Plus users (always), and Plus users (when they are over the cap and get charged) */}
+            {price > 0 && (
               <span className="text-caption-medium content-muted">
                 {translateHtml(translate, resources.subscriptionLegalText, [
                   {

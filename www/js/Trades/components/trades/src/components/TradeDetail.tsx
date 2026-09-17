@@ -1,7 +1,15 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { isBlackbirdUser } from "@rbx/core-scripts/meta/user";
 import { useTranslation } from "@rbx/core-scripts/react";
+import { Button, IconButton, ProgressCircle } from "@rbx/foundation-ui";
 import tradesConstants from "../constants/tradesConstants";
-import { acceptTrade, declineTrade, getErrorCodes } from "../services/tradesApi";
+import {
+  acceptTrade,
+  declineTrade,
+  getErrorCodes,
+  refreshCanTrade,
+  resolveCannotTradeAction,
+} from "../services/tradesApi";
 import {
   getTradeItemParameters,
   sendAXError,
@@ -9,16 +17,23 @@ import {
   sendEvent,
   tradeEvents,
 } from "../services/tradeEvents";
-import { is2SVEnabled, redirectToSettings } from "../services/verification";
+import {
+  is2SVEnabled,
+  redirectToSettings,
+  startFacialAgeEstimation,
+} from "../services/verification";
 import { EconomicRestriction, TradeDetail as TradeDetailType } from "../types";
 import { getOfferLabel, isMyOffer } from "../utils/tradeLabels";
 import { getCommonErrorMessage } from "../utils/tradeErrors";
 import { localizeDate } from "../utils/tradesUtils";
 import { log, warn } from "../utils/logger";
 import { useTradesRouter } from "../tradesRouter";
+import useTradeQuota from "../hooks/useTradeQuota";
 import useTwoStepVerification from "../hooks/useTwoStepVerification";
 import ConfirmDialog from "./ConfirmDialog";
 import TradeOffer from "./TradeOffer";
+import TradePlusUpsellSheet from "./TradePlusUpsellSheet";
+import TradeAgeCheckPrompt from "./TradeAgeCheckPrompt";
 
 type SystemFeedbackService = {
   success: (message?: string, timeoutShow?: number, timeoutHide?: number) => void;
@@ -35,7 +50,14 @@ export type TradeDetailProps = {
   systemFeedbackService: SystemFeedbackService;
 };
 
-type DialogKind = "accept" | "decline" | "economic" | "verificationRedirect" | null;
+type DialogKind =
+  | "accept"
+  | "decline"
+  | "economic"
+  | "verificationRedirect"
+  | "plusUpsell"
+  | "ageCheck"
+  | null;
 
 export const TradeDetail = ({
   trade,
@@ -49,9 +71,13 @@ export const TradeDetail = ({
   const { translate } = useTranslation();
   const { navigate } = useTradesRouter();
   const twoStepVerification = useTwoStepVerification(systemFeedbackService);
+  const tradeQuota = useTradeQuota();
   const [dialog, setDialog] = useState<DialogKind>(null);
   const [economicBody, setEconomicBody] = useState("");
   const [processing, setProcessing] = useState(false);
+  const faeRetryAttemptedRef = useRef(false);
+  // The accept to replay once the age check clears, held across the prelude.
+  const retryAcceptRef = useRef<(() => void) | null>(null);
 
   // Nothing selected yet. On mobile the panes swap rather than sit side by side,
   // so there is no empty pane to fill and the placeholder would be a dead screen.
@@ -89,6 +115,37 @@ export const TradeDetail = ({
     setDialog("economic");
   };
 
+  // Explains the age check the trade API asked for before the shared flow takes
+  // over. Guarded so a still-blocked retry surfaces an error instead of looping.
+  const promptAgeCheck = (retryAccept: () => void) => {
+    if (faeRetryAttemptedRef.current) {
+      systemFeedbackService.warning(translate("Response.VerificationError"));
+      return;
+    }
+    retryAcceptRef.current = retryAccept;
+    setDialog("ageCheck");
+  };
+
+  // Handoff to the shared age-check flow, then replay the accept so the user
+  // does not have to find the trade again. The guard is spent here rather than
+  // when the prelude opens, so dismissing it leaves the accept retryable.
+  const startAgeCheck = () => {
+    setDialog(null);
+    faeRetryAttemptedRef.current = true;
+    const retryAccept = retryAcceptRef.current;
+    startFacialAgeEstimation("accept-trade")
+      .then(hasAccess => {
+        if (hasAccess) {
+          retryAccept?.();
+        }
+      })
+      .catch((faeError: unknown) => {
+        warn("startAgeCheck: FAE flow failed", faeError);
+        sendAXError("facialAgeEstimation", faeError as Error, { source: "acceptTrade" });
+        systemFeedbackService.warning(translate("Response.VerificationError"));
+      });
+  };
+
   const processAccept = () => {
     log("processAccept: accepting trade", trade.id);
     setProcessing(true);
@@ -108,6 +165,7 @@ export const TradeDetail = ({
 
         setProcessing(false);
         systemFeedbackService.success(translate("Message.AcceptedTrade"));
+        refreshCanTrade();
         onTradeRemoved(trade.id);
         sendEvent(tradeEvents.tradesList, "accept", eventParameters);
         sendAXEvent(tradeEvents.tradeCompleted, "accept", eventParameters);
@@ -116,6 +174,28 @@ export const TradeDetail = ({
         const codes = getErrorCodes(error);
         warn("processAccept: acceptTrade failed", codes, error);
         sendAXError("accept", error as Error, { tradeId: trade.id });
+        // The age-check block arrives as userCannotTrade, so confirm the
+        // viewer's eligibility before choosing between the age-check flow and
+        // the generic "cannot trade" message.
+        if (codes.includes(tradesConstants.tradeErrors.userCannotTrade)) {
+          setProcessing(false);
+          resolveCannotTradeAction(error)
+            .then(action => {
+              if (action === "ageCheck") {
+                promptAgeCheck(processAccept);
+                return;
+              }
+              if (action === "upsell" && !isBlackbirdUser()) {
+                setDialog("plusUpsell");
+                return;
+              }
+              systemFeedbackService.warning(getCommonErrorMessage(codes, translate));
+            })
+            .catch(() => {
+              systemFeedbackService.warning(getCommonErrorMessage(codes, translate));
+            });
+          return;
+        }
         if (codes.includes(tradesConstants.tradeErrors.tradeFrictionEncountered)) {
           is2SVEnabled()
             .then(enabled => {
@@ -167,21 +247,33 @@ export const TradeDetail = ({
     navigate({ view: "counter", tradeId: trade.id });
   };
 
+  const onAccept = () => {
+    // Accepting completes a trade, so it draws on the monthly allowance. Pitch
+    // the membership instead of walking the user through a confirmation the
+    // server would only reject.
+    if (tradeQuota.isOutOfTrades) {
+      log("accept button clicked while out of trades, opening upsell");
+      sendEvent(tradeEvents.tradesList, "acceptOutOfTradesUpsell");
+      setDialog("plusUpsell");
+      return;
+    }
+
+    log("accept button clicked, opening confirm dialog");
+    faeRetryAttemptedRef.current = false;
+    setDialog("accept");
+  };
+
   return (
     <div>
       <h2 className="trades-header-nowrap font-title">
         {isMobile && (
-          <span
-            className="icon-back"
-            role="button"
-            tabIndex={0}
-            aria-label={translate("Action.Back")}
+          <IconButton
+            className="trade-detail-back"
+            icon="icon-regular-arrow-small-left"
+            ariaLabel={translate("Action.Back")}
+            variant="Utility"
+            size="Small"
             onClick={onBack}
-            onKeyDown={event => {
-              if (event.key === "Enter" || event.key === " ") {
-                onBack();
-              }
-            }}
           />
         )}
         {trade.user ? (
@@ -217,7 +309,15 @@ export const TradeDetail = ({
         </div>
       )}
 
-      {(!trade.offers || detailLoading) && <span className="spinner spinner-default" />}
+      {(!trade.offers || detailLoading) && (
+        <div className="flex justify-center margin-y-large">
+          <ProgressCircle
+            ariaLabel={translate("Label.Loading", undefined, "Loading")}
+            size="Medium"
+            variant="Indeterminate"
+          />
+        </div>
+      )}
 
       <div className="col-xs-12">
         {orderedOffers.map((offer, index) => (
@@ -233,42 +333,37 @@ export const TradeDetail = ({
       {isOpen && (
         <div className="trade-buttons">
           {isInbound && (
-            <button
-              type="button"
-              className="btn-cta-md"
-              disabled={processing}
-              onClick={() => {
-                log("accept button clicked, opening confirm dialog");
-                setDialog("accept");
-              }}
-            >
+            <Button variant="Emphasis" size="Medium" isDisabled={processing} onClick={onAccept}>
               {translate("Action.AcceptTrade")}
-            </button>
+            </Button>
           )}
           {isInbound && trade.user && (
-            <button
-              type="button"
-              className="btn-control-md"
-              disabled={processing}
-              onClick={onCounter}
-            >
+            <Button variant="Standard" size="Medium" isDisabled={processing} onClick={onCounter}>
               {translate("Action.CounterTrade")}
-            </button>
+            </Button>
           )}
           {(isInbound || isOutbound) && (
-            <button
-              type="button"
-              className="btn-control-md"
-              disabled={processing}
+            <Button
+              variant="Standard"
+              size="Medium"
+              isDisabled={processing}
               onClick={() => {
                 log("decline button clicked, opening confirm dialog");
                 setDialog("decline");
               }}
             >
               {translate("Action.DeclineTrade")}
-            </button>
+            </Button>
           )}
-          {processing && <span className="spinner spinner-sm" />}
+          {processing && (
+            <span className="trade-buttons-loading">
+              <ProgressCircle
+                ariaLabel={translate("Label.Loading", undefined, "Loading")}
+                size="Small"
+                variant="Indeterminate"
+              />
+            </span>
+          )}
         </div>
       )}
 
@@ -356,6 +451,28 @@ export const TradeDetail = ({
           setDialog(null);
           setProcessing(false);
         }}
+      />
+
+      <TradePlusUpsellSheet
+        isOpen={dialog === "plusUpsell"}
+        onOpenChange={isOpen => {
+          if (!isOpen) {
+            setDialog(null);
+          }
+        }}
+        onGetPlusClick={() => {
+          sendEvent(tradeEvents.tradesList, "getPlusUpsell");
+        }}
+      />
+
+      <TradeAgeCheckPrompt
+        isOpen={dialog === "ageCheck"}
+        onOpenChange={isOpen => {
+          if (!isOpen) {
+            setDialog(null);
+          }
+        }}
+        onContinue={startAgeCheck}
       />
     </div>
   );

@@ -149,6 +149,15 @@ export const catalogTranslations = {
     return translationResources
       .featureCatalog()
       .get('Label.Subtotal', { count: `${itemCount}`, itemWord });
+  },
+  labelOfferApplied: (): string => {
+    return translationResources.featureCatalog().get('Label.OfferApplied', {});
+  },
+  labelItemOwned: (): string => {
+    return translationResources.featureCatalog().get('Label.ItemOwned', {});
+  },
+  labelOffSale: (): string => {
+    return translationResources.featureCatalog().get('Label.OffSale', {});
   }
 };
 
@@ -224,6 +233,16 @@ export const robloxSubscriptionTranslations = {
     return translationResources
       .featureRobloxSubscription()
       .get('Description.SavingWithPlus', params);
+  },
+  descriptionSavingWithPlusAndOffer: (params: Record<string, string>): string => {
+    return translationResources
+      .featureRobloxSubscription()
+      .get('Description.SavingWithPlusAndOffer', params);
+  },
+  descriptionSavingWithOffer: (params: Record<string, string>): string => {
+    return translationResources
+      .featureRobloxSubscription()
+      .get('Description.SavingWithOffer', params);
   },
   labelBlackbirdUpsellBanner: (params: Record<string, string>): string => {
     return translationResources

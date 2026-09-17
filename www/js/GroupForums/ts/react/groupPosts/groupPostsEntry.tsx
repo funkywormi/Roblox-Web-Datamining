@@ -1,24 +1,28 @@
 import Roblox from 'Roblox';
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
-import { TranslationProvider } from 'react-utilities';
+import { queryClient, TranslationProvider } from 'react-utilities';
 import { SystemFeedbackProvider } from 'react-style-guide';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import GroupForums, { GroupForumsProps } from './containers/GroupForums';
+import { QueryClientProvider } from '@tanstack/react-query';
 import GroupForumsConfigSection, {
   GroupForumsConfigSectionProps
-} from './components/GroupForumsConfigSection';
-import { groupsConfig } from './translation.config';
+} from '../groupForums/components/GroupForumsConfigSection';
+import { groupsConfig as groupForumsConfig } from '../groupForums/translation.config';
 import '../../../css/tailwind.css';
 import '../../../css/groupForums/groupForums.scss';
-import GroupForumsDiscovery, { GroupForumsDiscoveryProps } from './containers/GroupForumsDiscovery';
+import '../../../css/groupPosts/groupPosts.scss';
+import GroupForumsDiscovery, {
+  GroupForumsDiscoveryProps
+} from '../groupForums/containers/GroupForumsDiscovery';
 import { CommunityProductFeaturesContextProvider } from '../shared/contexts/CommunityProductFeaturesContext';
+import GroupPosts, { GroupPostsProps } from './containers/GroupPosts';
+import { groupPostsConfig } from './translation.config';
 
-const renderGroupForums = (container: Element, props: GroupForumsProps) => {
+const renderGroupPosts = (container: Element, props: GroupPostsProps) => {
   unmountComponentAtNode(container); // make sure we aren't double-rendering components
   render(
-    <TranslationProvider config={groupsConfig}>
-      <GroupForums {...props} />
+    <TranslationProvider config={groupPostsConfig}>
+      <GroupPosts {...props} />
     </TranslationProvider>,
     container
   );
@@ -27,14 +31,12 @@ const renderGroupForums = (container: Element, props: GroupForumsProps) => {
 const renderGroupForumsDiscovery = (container: Element, props: GroupForumsDiscoveryProps) => {
   unmountComponentAtNode(container); // make sure we aren't double-rendering components
   render(
-    <TranslationProvider config={groupsConfig}>
+    <TranslationProvider config={groupForumsConfig}>
       <GroupForumsDiscovery {...props} />
     </TranslationProvider>,
     container
   );
 };
-
-const queryClient = new QueryClient();
 
 const renderGroupForumsConfigSection = (
   container: Element,
@@ -43,7 +45,7 @@ const renderGroupForumsConfigSection = (
   unmountComponentAtNode(container); // make sure we aren't double-rendering components
 
   render(
-    <TranslationProvider config={groupsConfig}>
+    <TranslationProvider config={groupForumsConfig}>
       <SystemFeedbackProvider>
         <QueryClientProvider client={queryClient}>
           <CommunityProductFeaturesContextProvider groupId={props.group.id}>
@@ -59,17 +61,22 @@ const renderGroupForumsConfigSection = (
 // The group/configure pages mount these React roots inside Angular `ng-if` regions. Angular removes
 // the host element on tab/scope teardown without notifying React, so anything foundation-ui portals
 // to <body> would be orphaned there.
-const unmountGroupForums = (container: Element) => {
+const unmountComponent = (container: Element) => {
   unmountComponentAtNode(container);
 };
 
+const GroupPostsService = {
+  renderGroupPosts,
+  unmountGroupPosts: unmountComponent
+};
+
 const GroupForumsService = {
-  renderGroupForums,
   renderGroupForumsConfigSection,
   renderGroupForumsDiscovery,
-  unmountGroupForums
+  unmountGroupForums: unmountComponent
 };
 
 Object.assign(Roblox, {
+  GroupPostsService,
   GroupForumsService
 });

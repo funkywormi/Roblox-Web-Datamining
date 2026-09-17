@@ -1,9 +1,19 @@
 /** Thin shim over the `Roblox.CommunityTelemetry` global; log helpers live in @rbx/community-telemetry. */
 import { EventContext } from '../constants/eventConstants';
 import getCommunityTelemetry from './communityTelemetryGlobal';
-import type { SearchResultGroup } from './communityTelemetryTypes';
+import type {
+  SearchResultGroup,
+  ForumContentType,
+  ForumsSearchContentType,
+  ForumsSearchMode,
+  ForumsSearchResultItem,
+  ForumsSearchResultType,
+  ForumsSearchTimeRange,
+  ForumsSearchTrigger,
+  SearchSurface
+} from './communityTelemetryTypes';
 
-export type { SearchResultGroup } from './communityTelemetryTypes';
+export type { SearchResultGroup, ForumContentType } from './communityTelemetryTypes';
 
 export const logGroupPageExposureEvent = (params: {
   groupId?: number;
@@ -77,3 +87,67 @@ export const logGroupForumsClickEvent = (params: {
     ...params,
     context: EventContext.GroupForums
   });
+
+export const logCmntyForumsConcealedContentShownEvent = (params: {
+  groupId?: number;
+  contentType: ForumContentType;
+  concealedCount: number;
+  concealmentImpressionId: string;
+}): void => getCommunityTelemetry().logCmntyForumsConcealedContentShownEvent(params);
+
+export const logCmntyForumsConcealedContentRevealedEvent = (params: {
+  groupId?: number;
+  contentType: ForumContentType;
+  concealedCount: number;
+  concealmentImpressionId: string;
+}): void => getCommunityTelemetry().logCmntyForumsConcealedContentRevealedEvent(params);
+
+export const logCmntyForumsDeleteDialogShownEvent = (params: {
+  groupId?: number;
+  contentType: ForumContentType;
+  preventSimilarShown: boolean;
+  deleteDialogImpressionId: string;
+}): void => getCommunityTelemetry().logCmntyForumsDeleteDialogShownEvent(params);
+
+export const logCmntyForumsDeleteConfirmEvent = (params: {
+  groupId?: number;
+  contentType: ForumContentType;
+  preventSimilarShown: boolean;
+  preventSimilar: boolean;
+  deleteDialogImpressionId: string;
+}): void => getCommunityTelemetry().logCmntyForumsDeleteConfirmEvent(params);
+
+export const logCmntyForumsSearchConductedEvent = (params: {
+  searchId: string;
+  groupId: number;
+  surface: SearchSurface;
+  searchMode: ForumsSearchMode;
+  searchKeyword: string;
+  isMemberSearch: boolean;
+  searchTrigger: ForumsSearchTrigger;
+  contentType: ForumsSearchContentType;
+  timeRange: ForumsSearchTimeRange;
+  categoryScope: string;
+}): void => getCommunityTelemetry().logCmntyForumsSearchConductedEvent(params);
+
+export const logCmntyForumsSearchResultsReturnedEvent = (params: {
+  searchId: string;
+  groupId: number;
+  surface: SearchSurface;
+  totalResults: number;
+  pageIndex: number;
+  hasMore: boolean;
+  results: ForumsSearchResultItem[];
+}): void => getCommunityTelemetry().logCmntyForumsSearchResultsReturnedEvent(params);
+
+export const logCmntyForumsSearchResultClickedEvent = (params: {
+  searchId: string;
+  groupId: number;
+  surface: SearchSurface;
+  resultType: ForumsSearchResultType;
+  postId: string;
+  commentId?: string;
+  positionInList: number;
+  positionOnPage: number;
+  pageIndex: number;
+}): void => getCommunityTelemetry().logCmntyForumsSearchResultClickedEvent(params);

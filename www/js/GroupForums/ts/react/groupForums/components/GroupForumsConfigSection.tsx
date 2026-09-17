@@ -126,12 +126,23 @@ const GroupForumsConfigSectionInner = ({
     [channelsPermissions, hasGroupLevelCategoryManagement]
   );
 
-  const canManageCategory = useCallback(
+  const canManageArchivedCategory = useCallback(
     (category: ForumCategory) =>
-      isUnified
+      channelsPermissions?.find(channelPermissions => channelPermissions.channelId === category.id)
+        ?.groupForumsPermissions?.manageCategories ?? hasGroupLevelCategoryManagement,
+    [channelsPermissions, hasGroupLevelCategoryManagement]
+  );
+
+  const canManageCategory = useCallback(
+    (category: ForumCategory) => {
+      if (isUnified && category.archivedBy != null) {
+        return canManageArchivedCategory(category);
+      }
+      return isUnified
         ? resolvedCategoryPermissions[category.id]?.manageCategories ?? false
-        : canManageLegacyCategory(category),
-    [canManageLegacyCategory, isUnified, resolvedCategoryPermissions]
+        : canManageLegacyCategory(category);
+    },
+    [canManageArchivedCategory, canManageLegacyCategory, isUnified, resolvedCategoryPermissions]
   );
 
   const fetchForumCategories = useCallback(
@@ -149,16 +160,12 @@ const GroupForumsConfigSectionInner = ({
           forumsService.getGroupForumCategories(group.id, true)
         ]);
         if (isUnified) {
-          const allCategories = [
-            ...getCategoriesResponse.data,
-            ...getArchivedCategoriesResponse.data
-          ];
           const categoryPermissions: Record<
             string,
             GroupPermissions['groupForumsPermissions']
           > = {};
           const resolvedPermissions = await Promise.all(
-            allCategories.map(async category => {
+            getCategoriesResponse.data.map(async category => {
               try {
                 const response = await forumsService.getResolvedGroupForumCategoryPermissions(
                   group.id,
@@ -185,7 +192,7 @@ const GroupForumsConfigSectionInner = ({
             (categoryPermissions[category.id]?.manageCategories ?? false);
           setForumCategories(getCategoriesResponse.data.filter(canViewFetchedCategory));
           setArchivedForumCategories(
-            getArchivedCategoriesResponse.data.filter(canViewFetchedCategory)
+            getArchivedCategoriesResponse.data.filter(canManageArchivedCategory)
           );
         } else {
           // Group-level category managers can order every active category, so they see them all.
@@ -217,6 +224,7 @@ const GroupForumsConfigSectionInner = ({
       setIsLoading,
       setForumCategories,
       systemFeedbackService,
+      canManageArchivedCategory,
       canManageLegacyCategory,
       canManageRolePermissions,
       hasPermissionsToOrderForumCategories,

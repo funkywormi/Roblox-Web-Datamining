@@ -2,7 +2,7 @@ import { formatNumber } from "@rbx/core-scripts/format/number";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import Intl from "@rbx/core-scripts/intl";
 import tradesConstants from "../constants/tradesConstants";
-import { DraftOffer, TradableItem, TradeOffer } from "../types";
+import { DraftOffer, FreeTradesAllowance, TradableItem, TradeOffer } from "../types";
 
 type TranslateFn = (key: string, params?: Record<string, unknown>) => string;
 
@@ -88,7 +88,49 @@ export const renderSerialTooltip = (item: TradableItem, translate: TranslateFn):
   return total ? `${noSerial} /${total}` : noSerial;
 };
 
+/**
+ * Whether the free-trade allowance actually caps the viewer, i.e. free trades
+ * are unlocked for them.
+ *
+ * A negative `remaining` is the endpoint's sentinel for an allowance that does
+ * not apply rather than one that is spent, so `{ limit: 2, remaining: -1 }`
+ * means uncapped. An absent allowance means the same (a member, say).
+ */
+export const isCappedByFreeTrades = (allowance: FreeTradesAllowance | null | undefined): boolean =>
+  allowance != null && allowance.limit > 0 && allowance.remaining >= 0;
+
+/**
+ * Whether the viewer has used every free trade in the current window.
+ *
+ * Distinct from "uncapped": a negative remaining is a sentinel that no
+ * allowance applies, so that is not spent. Callers that hide this from Plus
+ * members still need to AND with membership themselves.
+ */
+export const isSpentFreeTradesAllowance = (
+  allowance: FreeTradesAllowance | null | undefined,
+): boolean => isCappedByFreeTrades(allowance) && (allowance?.remaining ?? 0) <= 0;
+
+/**
+ * Whether a free-trade allowance resets monthly, which decides whether the
+ * counter can be worded as "this month".
+ *
+ * The window is matched loosely because the API has spelled it several ways
+ * (`Month`, `MONTH`, the raw `FREE_TRADES_WINDOW_MONTH` enum name), and an
+ * unrecognized value silently downgrades the copy to the generic counter.
+ */
+export const isMonthlyWindow = (window: string): boolean =>
+  window
+    .replace(/[^a-z]/gi, "")
+    .toLowerCase()
+    .includes(tradesConstants.freeTradesWindow.month.toLowerCase());
+
 export const isMobile = (): boolean => Boolean(getDeviceMeta()?.isPhone);
 
 export const localizeDate = (date: string): string =>
   new Intl().getDateTimeFormatter().getShortDate(new Date(date));
+
+/** Abbreviated month and day, e.g. `Dec 31`. */
+export const formatShortMonthDate = (date: string): string =>
+  new Intl()
+    .getDateTimeFormatter()
+    .getCustomDateTime(new Date(date), { month: "short", day: "numeric" });

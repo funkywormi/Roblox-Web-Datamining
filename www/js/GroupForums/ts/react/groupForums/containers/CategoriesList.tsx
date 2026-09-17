@@ -57,7 +57,7 @@ const CategoriesList: FC<CategoriesContainerProps> = ({
 
   if (!categoriesLoaded) {
     return (
-      <div className='group-forums-categories-list list-vignette'>
+      <div className='group-forums-categories-list group-posts-destination-list list-vignette'>
         <CategoryPillSkeleton size={StyleSize.Small} />
         <CategoryPillSkeleton size={StyleSize.Large} />
         <CategoryPillSkeleton size={StyleSize.Medium} />
@@ -69,7 +69,7 @@ const CategoriesList: FC<CategoriesContainerProps> = ({
 
   return (
     <div
-      className={classNames('group-forums-categories-list', {
+      className={classNames('group-forums-categories-list group-posts-destination-list', {
         'group-forums-categories-list-locked': locked
       })}
       ref={listRef}>

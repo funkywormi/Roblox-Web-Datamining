@@ -14,7 +14,7 @@ import { useTranslation } from '@rbx/intl';
 import type { GroupRoleColorType } from '../clients/groups';
 import TranslationNamespace from '../constants/TranslationNamespace';
 import RoleIcon from '../members/components/common/RoleIcon';
-import { RoleColorTokenMap } from '../utils/constants';
+import { isGroupRoleColor } from '../utils/groupUtils';
 import {
   AssignSameRolePermission,
   LINKED_OUT_MODAL_SUPPRESSION_QUERY_PARAM,
@@ -36,9 +36,6 @@ type BreakingChangeRow = {
   isOrgRole: boolean;
   permissions: string[];
 };
-
-const isGroupRoleColor = (value: unknown): value is GroupRoleColorType =>
-  typeof value === 'number' && Object.hasOwn(RoleColorTokenMap, value);
 
 const getRoleColor = (
   role: RobloxGroupsApiBreakingChangeRoleEntry,
@@ -132,15 +129,17 @@ const BreakingChangesTable: FC<BreakingChangesTableProps> = ({
         </TableHeader>
         <TableBody className='flex flex-col min-width-0 max-width-full'>
           {rows.map((row) => {
-            const translatedPermissions = row.permissions.map((perm) =>
+            const translatedPermissions = row.permissions.map((perm) => {
               // Non-org member role can carry Organization.* perms, so route by perm name.
-              perm.startsWith('Organization.')
+              const translatedPermission = perm.startsWith('Organization.')
                 ? tPerms(
                     `${perm}.Label`,
                     perm === AssignSameRolePermission ? { creatorName: row.roleName } : undefined,
                   )
-                : tGroups(`Label.${perm}`),
-            );
+                : tGroups(`Label.${perm}`);
+
+              return `"${translatedPermission}"`;
+            });
             const roleUrl = row.isOrgRole
               ? row.roleId === undefined
                 ? undefined

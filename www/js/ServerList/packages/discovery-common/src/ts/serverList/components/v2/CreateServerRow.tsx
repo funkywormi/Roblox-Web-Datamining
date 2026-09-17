@@ -276,13 +276,68 @@ const CreateServerRow = ({
   const discountTotal = discounts.reduce((sum, d) => sum + d.robux, 0);
   const hasDiscount = discountTotal > 0;
   const originalPrice = price + discountTotal;
-  const plusSubtitle = hasDiscount
-    ? translate(resources.includedWithBlackbirdText)
-    : translate(resources.unlimitedIncludedWithBlackbirdText);
 
   const isPaidNonPlus = !isPlusUser && price > 0;
   const isFreeNonPlus = !isPlusUser && price === 0;
+  const isFreeAndHasPlus = isPlusUser && price === 0;
   const buttonDisabled = !isReady || !canCreatePrivateServer;
+
+  // Private server is discounted due to Plus
+  // Not free since they are over the Plus free private server cap
+  const isPlusDiscounted = isPlusUser && hasDiscount && price > 0;
+
+  const strikethroughOriginalPrice = (
+    <span className="relative text-body-medium content-muted flex items-center gap-[2px]">
+      <Icon name="icon-filled-robux" size="Medium" />
+      {translate(resources.pricePerMonthText, { price: String(originalPrice) })}
+      <span
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: "50%",
+          borderTop: "1px solid currentColor",
+        }}
+      />
+    </span>
+  );
+
+  let subtitle: React.ReactNode;
+  if (isPlusDiscounted) {
+    // Plus user over the Plus free cap; original price struck through then the discounted price
+    subtitle = (
+      <span className="flex items-center gap-xsmall">
+        {strikethroughOriginalPrice}
+        <span className="flex items-center gap-[2px]">
+          <Icon name="icon-filled-robux" size="Medium" />
+          <span>{translate(resources.pricePerMonthText, { price: String(price) })}</span>
+        </span>
+      </span>
+    );
+  } else if (isFreeAndHasPlus && hasDiscount) {
+    // Plus user buying a private server configured by the dev to be free
+    subtitle = (
+      <span className="flex items-center gap-xsmall">
+        <span>{translate(resources.includedWithBlackbirdText)}</span>
+        {strikethroughOriginalPrice}
+      </span>
+    );
+  } else if (isFreeAndHasPlus) {
+    // Plus user buying a private server configured by the dev to be paid
+    subtitle = translate(resources.unlimitedIncludedWithBlackbirdText);
+  } else if (price > 0) {
+    // Any paid case: non-Plus, or a Plus user with no discount.
+    subtitle = (
+      <span className="flex items-center gap-[2px]">
+        <Icon name="icon-filled-robux" size="Medium" />
+        <span>{translate(resources.pricePerMonthText, { price: String(price) })}</span>
+      </span>
+    );
+  } else if (!canCreatePrivateServer) {
+    subtitle = translate(resources.freeServerLimitReachedText);
+  } else {
+    subtitle = translate(resources.limitedToServersText);
+  }
 
   const createServerSheet = createSheetOpen ? (
     <SheetRoot
@@ -423,30 +478,7 @@ const CreateServerRow = ({
         <FirstServerCard
           universeId={universeId}
           title={translate(resources.placeNamePrivateServer, { placeName })}
-          subtitle={
-            hasDiscount ? (
-              <span className="flex items-center gap-xsmall">
-                <span>{translate(resources.includedWithBlackbirdText)}</span>
-                <span className="relative text-body-small content-muted flex items-center gap-xxsmall">
-                  <Icon name="icon-filled-robux" size="XSmall" />
-                  {translate(resources.pricePerMonthText, {
-                    price: String(originalPrice),
-                  })}
-                  <span
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      right: 0,
-                      top: "50%",
-                      borderTop: "1px solid currentColor",
-                    }}
-                  />
-                </span>
-              </span>
-            ) : (
-              plusSubtitle
-            )
-          }
+          subtitle={subtitle}
           actions={
             <CreateButton
               label={translate(resources.createText)}
@@ -460,41 +492,6 @@ const CreateServerRow = ({
         {successSnackbar}
       </React.Fragment>
     );
-  }
-
-  let subtitle: React.ReactNode;
-  if (isPlusUser && hasDiscount) {
-    subtitle = (
-      <span className="flex items-center gap-xsmall">
-        <span>{translate(resources.includedWithBlackbirdText)}</span>
-        <span className="relative text-body-small content-muted flex items-center gap-xxsmall">
-          <Icon name="icon-filled-robux" size="XSmall" />
-          {translate(resources.pricePerMonthText, { price: String(originalPrice) })}
-          <span
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              top: "50%",
-              borderTop: "1px solid currentColor",
-            }}
-          />
-        </span>
-      </span>
-    );
-  } else if (isPlusUser) {
-    subtitle = plusSubtitle;
-  } else if (price > 0) {
-    subtitle = (
-      <span className="flex items-center gap-[2px]">
-        <Icon name="icon-filled-robux" size="Medium" />
-        <span>{translate(resources.pricePerMonthText, { price: String(price) })}</span>
-      </span>
-    );
-  } else if (!canCreatePrivateServer) {
-    subtitle = translate(resources.freeServerLimitReachedText);
-  } else {
-    subtitle = translate(resources.limitedToServersText);
   }
 
   return (

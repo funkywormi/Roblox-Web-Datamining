@@ -41,6 +41,7 @@ import {
 } from '../../utils/constants';
 import { OrganizationsEventName, logOrganizationsEvent } from '../../utils/eventUtils';
 import {
+  canEditRolePermissions,
   canViewAnyRoleTab,
   canViewRoleMembersTab,
   canViewRolePermissionsTab,
@@ -334,6 +335,9 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
   useEffect(() => {
     if (pendingNavigationId !== undefined) {
       navigation?.navigateToRole?.(pendingNavigationId);
+      // Reset to prevent a loop when `navigation` changes.
+      // oxlint-disable-next-line react/react-compiler -- one-shot navigation trigger reset
+      setPendingNavigationId(undefined);
     }
   }, [navigation, pendingNavigationId]);
 
@@ -539,6 +543,16 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
   const newRolePermissionsTabContent = useMemo(() => {
     const isDefaultMemberRole = selectedRole?.metadata?.id === DefaultMemberRoleIdNumber;
     const isGuestRole = selectedRole?.metadata?.rank === GuestRoleRank;
+    const selectedRoleId = selectedRole?.metadata?.id;
+    const isRecentlyCreatedRole =
+      selectedRole?.isNewRole === true &&
+      (isOwner === true || permissions?.canCreateRoles === true);
+    const canEditPermissions =
+      isRecentlyCreatedRole || isOwner
+        ? true
+        : canEditRolePermissions(
+            selectedRoleId === undefined ? undefined : rolePermissions?.[selectedRoleId.toString()],
+          );
     const creatorType = isDefaultMemberRole
       ? CreatorTypes.MEMBER_ROLE
       : isGuestRole
@@ -549,6 +563,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
         type: creatorType,
         id: selectedRole?.metadata?.id?.toString() ?? '',
         name: selectedRole?.metadata?.name ?? '',
+        disabled: !canEditPermissions,
       },
     ] satisfies CreatorDetails[];
     const entity = {
@@ -564,12 +579,15 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             singleCreatorExperience: true,
             showConfirmationOnSave: isDefaultMemberRole,
           }}
-          key={selectedRole?.metadata?.id}
         />
       </Grid>
     );
   }, [
+    isOwner,
     organization?.groupId,
+    permissions?.canCreateRoles,
+    rolePermissions,
+    selectedRole?.isNewRole,
     selectedRole?.metadata?.id,
     selectedRole?.metadata?.name,
     selectedRole?.metadata?.rank,

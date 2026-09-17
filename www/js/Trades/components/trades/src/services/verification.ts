@@ -1,5 +1,6 @@
 import * as http from "@rbx/core-scripts/http";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
+import type { AccessManagementUpsellV2Service } from "@rbx/legacy-webapp-types/Roblox/accessManagementUpsellService";
 import tradesConstants from "../constants/tradesConstants";
 
 // TypeScript port of js/angular/trades/services/verificationService.js. Handles
@@ -7,6 +8,28 @@ import tradesConstants from "../constants/tradesConstants";
 
 type TwoStepConfiguration = {
   methods: { enabled: boolean }[];
+};
+
+export type FacialAgeEstimationSource = "accept-trade" | "counter-trade" | "send-trade";
+
+/** Launches the built-in age-check recourse after trades-service requires it. */
+export const startFacialAgeEstimation = (source: FacialAgeEstimationSource): Promise<boolean> => {
+  const service = window.Roblox.AccessManagementUpsellV2Service as
+    | AccessManagementUpsellV2Service
+    | undefined;
+  if (!service) {
+    return Promise.reject(new Error("AccessManagementUpsellV2Service is unavailable"));
+  }
+
+  return service.startAccessManagementUpsell({
+    featureName: "TriggerFacialAgeEstimationRecourse",
+    namespace: "account_identity/AgeCheck",
+    isAsyncCall: false,
+    featureSpecificData: {
+      context: "trades",
+      source,
+    },
+  });
 };
 
 export const is2SVEnabled = async (): Promise<boolean> => {

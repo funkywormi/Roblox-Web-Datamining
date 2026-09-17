@@ -1,40 +1,29 @@
 import React, { FC, ReactNode, useEffect, useMemo } from 'react';
-import { HashRouter } from 'react-router-dom';
 import { useTranslation } from 'react-utilities';
-import { SystemFeedbackProvider, useSystemFeedback } from 'react-style-guide';
+import { useSystemFeedback } from 'react-style-guide';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MIGRATION_STATUS, useGetMigrationStatus } from '@rbx/group-management';
 import { GroupPermissions, GroupChannelPermissions } from '../../shared/types';
 import { ForumPermissionsProvider } from '../contexts/ForumPermissionsContext';
-import { ModerateUserPermissionsProvider } from '../../shared/contexts/ModerateUserPermissionsContext';
-import { ModerateDialogProvider } from '../../shared/contexts/ModerateDialogContext';
-import { EmotesProvider } from '../../shared/contexts/EmoteContext';
-import useViewportSize from '../../shared/hooks/useViewportSize';
 import { ForumExperimentsProvider } from '../contexts/ForumExperimentsContext';
 import useForumStore from '../hooks/useForumStore';
-import {
-  CommunityProductFeaturesContextProvider,
-  useCommunityProductFeatures
-} from '../../shared/contexts/CommunityProductFeaturesContext';
-import { CommunityFeatureFreezesContextProvider } from '../../shared/contexts/CommunityFeatureFreezesContext';
-import { RealtimeProvider } from '../../shared/contexts/RealtimeContext';
+import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
 import useResolvedForumCategoryPermissions from '../hooks/useResolvedForumCategoryPermissions';
 import useCanViewMembers from '../../shared/hooks/useCanViewMembers';
 
-export type Props = {
+export type ForumProvidersProps = {
   children: ReactNode;
   permissions: GroupPermissions;
   channelsPermissions: GroupChannelPermissions[];
-  userId: number;
   groupId: number;
   isGroupMember: boolean;
   isOwner: boolean;
 };
 
-const queryClient = new QueryClient();
+const forumsQueryClient = new QueryClient();
 
 type ForumPermissionsBridgeProps = Pick<
-  Props,
+  ForumProvidersProps,
   'children' | 'permissions' | 'channelsPermissions' | 'groupId' | 'isGroupMember' | 'isOwner'
 >;
 
@@ -110,52 +99,24 @@ const ForumPermissionsBridge: FC<ForumPermissionsBridgeProps> = ({
   );
 };
 
-const Providers: FC<Props> = ({
+const ForumProviders: FC<ForumProvidersProps> = ({
   children,
   permissions,
   channelsPermissions,
   groupId,
-  userId,
   isGroupMember,
   isOwner
-}) => {
-  const { isSmallViewport } = useViewportSize();
-  const hydrate = useForumStore.use.hydrate();
+}) => (
+  <ForumExperimentsProvider>
+    <ForumPermissionsBridge
+      groupId={groupId}
+      permissions={permissions}
+      channelsPermissions={channelsPermissions}
+      isGroupMember={isGroupMember}
+      isOwner={isOwner}>
+      <QueryClientProvider client={forumsQueryClient}>{children}</QueryClientProvider>
+    </ForumPermissionsBridge>
+  </ForumExperimentsProvider>
+);
 
-  // hydrate store
-  useEffect(() => {
-    hydrate({ groupId, userId, useInlineReply: !isSmallViewport });
-  }, [isSmallViewport, groupId, userId, hydrate]);
-
-  // Hash Type "hashbang" is needed to handle the #!/ in the url for group details tabs
-  return (
-    <SystemFeedbackProvider>
-      <RealtimeProvider>
-        <QueryClientProvider client={queryClient}>
-          <CommunityProductFeaturesContextProvider groupId={groupId}>
-            <CommunityFeatureFreezesContextProvider groupId={groupId} isOwner={isOwner}>
-              <EmotesProvider groupId={groupId}>
-                <ForumExperimentsProvider>
-                  <ModerateDialogProvider>
-                    <ModerateUserPermissionsProvider permissions={permissions}>
-                      <ForumPermissionsBridge
-                        groupId={groupId}
-                        permissions={permissions}
-                        channelsPermissions={channelsPermissions}
-                        isGroupMember={isGroupMember}
-                        isOwner={isOwner}>
-                        <HashRouter hashType='hashbang'>{children}</HashRouter>
-                      </ForumPermissionsBridge>
-                    </ModerateUserPermissionsProvider>
-                  </ModerateDialogProvider>
-                </ForumExperimentsProvider>
-              </EmotesProvider>
-            </CommunityFeatureFreezesContextProvider>
-          </CommunityProductFeaturesContextProvider>
-        </QueryClientProvider>
-      </RealtimeProvider>
-    </SystemFeedbackProvider>
-  );
-};
-
-export default Providers;
+export default ForumProviders;

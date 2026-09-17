@@ -16,6 +16,8 @@ export const defaultCommunityProductFeatures: CommunityProductFeatures = {
   ForumsUnrestrictedMessages: false,
   RealtimeMessaging: false,
   AnnouncementPolls: false,
+  AnnouncementArchive: false,
+  AnnouncementsUsingCommsPlat: false,
   AnnouncementsRichTextRead: false,
   AnnouncementsRichTextWrite: false,
   IsOwnerRolesetDeprecated: false,

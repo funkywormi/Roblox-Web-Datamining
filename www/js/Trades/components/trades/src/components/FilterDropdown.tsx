@@ -28,9 +28,14 @@ export type FilterDropdownProps = {
 };
 
 /**
- * Single-select filter shown as a chip naming the current selection, which opens
- * a menu of the rest. Foundation's Dropdown is a full-width boxed input, so the
- * chip is the compact form that fits beside the inventory search toggle.
+ * Foundation dropdown used for the inventory-category filter (the status tabs
+ * render as chips — see FilterChips — and trade quality as a radio group in
+ * TradeQualityFilterSheet). Shown as a chip naming the current selection, which
+ * opens a menu of the rest — Foundation's Dropdown is a full-width boxed input,
+ * so the chip is the compact form that fits beside the inventory search toggle.
+ * Replaces the Bootstrap `dropdown-menu` markup from the Angular template (UI
+ * differs slightly per design guidance). No visible `label` is set — the
+ * selected value is shown via the trigger placeholder.
  */
 export const FilterDropdown = ({
   options,

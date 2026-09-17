@@ -1,5 +1,6 @@
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { useTranslation } from "@rbx/core-scripts/react";
+import { IconButton, TextInput } from "@rbx/foundation-ui";
 import { Thumbnail2d, ThumbnailTypes, DefaultThumbnailSize } from "@rbx/thumbnails";
 import { DraftOffer, TradableItem } from "../types";
 import {
@@ -17,6 +18,8 @@ export type OfferColumnProps = {
   isRobuxValid: (robux: number | null) => boolean;
   doesItemHaveError: (item: TradableItem) => boolean;
   getItemErrorReason: (item: TradableItem) => string;
+  /** True when this column is the partner's and they cannot send Robux. */
+  robuxLocked?: boolean;
 };
 
 const buildSeoName = (name: string): string =>
@@ -40,10 +43,18 @@ export const OfferColumn = ({
   isRobuxValid,
   doesItemHaveError,
   getItemErrorReason,
+  robuxLocked = false,
 }: OfferColumnProps): JSX.Element => {
   const { translate } = useTranslation();
   const robuxValid = isRobuxValid(offer.robux);
   const hasRobux = Boolean(offer.robux && offer.robux > 0);
+  // Doubles as the disabled field's placeholder, so the reason sits in the
+  // control it explains rather than on a line of its own below it.
+  const robuxLockMessage = translate(
+    "Message.YouCanOnlyRequestRobuxFromPlusUsers",
+    undefined,
+    "This user needs Roblox Plus to send Robux as part of the trade",
+  );
 
   const renderItemSlot = (item: TradableItem) => {
     const isBundle = item.itemTarget.itemType === "Bundle";
@@ -54,23 +65,17 @@ export const OfferColumn = ({
 
     return (
       <div className={`trade-request-item${hasError ? " invalid-request-item" : ""}`}>
-        <span className="icon-background-circle">
-          <span
-            className="icon-close cursor-pointer"
-            role="button"
-            tabIndex={0}
-            aria-label={`${translate("Action.Remove")} ${item.itemName}`}
-            onClick={() => {
-              onRemoveItem(item);
-            }}
-            onKeyDown={event => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                onRemoveItem(item);
-              }
-            }}
-          />
-        </span>
+        <IconButton
+          className="trade-request-item-remove"
+          icon="icon-regular-x"
+          ariaLabel={`${translate("Action.Remove")} ${item.itemName}`}
+          variant="Utility"
+          size="Small"
+          isCircular
+          onClick={() => {
+            onRemoveItem(item);
+          }}
+        />
         <Thumbnail2d
           type={isBundle ? ThumbnailTypes.bundleThumbnail : ThumbnailTypes.assetThumbnail}
           targetId={item.itemTarget.targetId}
@@ -117,32 +122,33 @@ export const OfferColumn = ({
         return <div key={`empty-${index}`} className="trade-request-item blank-item" />;
       })}
 
-      <div
-        className={`input-group robux-input-group${
-          robuxValid ? "" : " form-has-error form-has-feedback"
-        }`}
-      >
-        <input
-          className="form-control input-field"
-          name="robux"
-          type="text"
-          inputMode="numeric"
-          pattern="\d*"
-          placeholder={translate("Label.PlusRobuxAmount")}
-          value={offer.robux === null ? "" : String(offer.robux)}
-          onChange={event => {
-            onRobuxChange(offer.user.id, event.target.value);
-          }}
-          onBlur={() => {
-            onRobuxBlur(offer);
-          }}
-        />
-        <div className="input-group-btn">
-          <span className="input-addon-btn">
-            <span className="icon-robux-gray-16x16" />
-          </span>
-        </div>
-      </div>
+      <TextInput
+        className={`robux-input-group${robuxLocked ? " robux-input-group-locked" : ""}`}
+        size="Medium"
+        name="robux"
+        type="text"
+        inputMode="numeric"
+        pattern="\d*"
+        autoComplete="off"
+        placeholder={robuxLocked ? robuxLockMessage : translate("Label.PlusRobuxAmount")}
+        value={offer.robux === null ? "" : String(offer.robux)}
+        isDisabled={robuxLocked}
+        hasError={!robuxValid}
+        leadingIconName="icon-regular-robux"
+        // A placeholder is not announced once the field has a value, and it
+        // truncates when the column is narrow, so the reason is repeated here.
+        title={robuxLocked ? robuxLockMessage : undefined}
+        aria-label={robuxLocked ? robuxLockMessage : undefined}
+        onChange={event => {
+          if (robuxLocked) {
+            return;
+          }
+          onRobuxChange(offer.user.id, event.target.value);
+        }}
+        onBlur={() => {
+          onRobuxBlur(offer);
+        }}
+      />
 
       {hasRobux && (
         <div className="robux-line">

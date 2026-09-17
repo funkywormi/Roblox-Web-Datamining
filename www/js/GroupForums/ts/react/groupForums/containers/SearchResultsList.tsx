@@ -5,14 +5,14 @@ import { ForumsMode, ForumSearchResultView } from '../types/search';
 import { isAllCategories } from '../utils/forumsSearchUrl';
 import ForumsSearchResultPost from '../components/ForumsSearchResultPost';
 import ForumsSearchResultComment from '../components/ForumsSearchResultComment';
-import PostPreviewSkeleton from '../components/skeletons/PostPreviewSkeleton';
+import PostPreviewSkeleton from '../../groupPosts/components/PostPreviewSkeleton';
 import InfiniteLoader from '../../shared/components/InfiniteLoader';
 import SectionDisclaimer from '../../shared/components/SectionDisclaimer';
 import { logCmntyForumsSearchResultClickedEvent } from '../../shared/utils/logging';
 import { SearchSurface } from '../../shared/constants/eventConstants';
 
 const SearchResultsSkeleton = (): JSX.Element => (
-  <div className='group-forums-posts-list group-forums-posts-list-skeleton'>
+  <div className='group-posts-list group-posts-list-skeleton'>
     <PostPreviewSkeleton />
     <PostPreviewSkeleton />
     <PostPreviewSkeleton />
@@ -87,7 +87,7 @@ const SearchResultsList = (): JSX.Element => {
   }
 
   return (
-    <div className='group-forums-posts-list'>
+    <div className='group-posts-list'>
       <div className='group-forums-post-list-content'>
         {results.map(result =>
           result.contentType === 'Comment' && result.comment ? (

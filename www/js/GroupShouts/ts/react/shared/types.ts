@@ -261,6 +261,12 @@ export type GetUsersInGroupResponse = {
   previousPageCursor?: string;
 };
 
+export type SearchUsersInGroupResponse = {
+  data: Array<UserAndRoles>;
+  nextPageCursor: string | null;
+  totalResults?: number;
+};
+
 export interface GroupBasicResponse {
   id: number;
   name: string;
@@ -400,12 +406,14 @@ interface ServiceErrorResponse {
   };
 }
 interface CommunityProductFeatures {
-  ForumsRichTextRead: boolean;
-  ForumsRichTextWrite: boolean;
   ForumsAgeCheck: boolean;
   ForumsRestrictedCategories: boolean;
+  ForumsSearch: boolean;
+  ForumsUnrestrictedMessages: boolean;
   RealtimeMessaging: boolean;
   AnnouncementPolls: boolean;
+  AnnouncementArchive: boolean;
+  AnnouncementsUsingCommsPlat: boolean;
   AnnouncementAnalytics: boolean;
   AnnouncementsRichTextRead: boolean;
   AnnouncementsRichTextWrite: boolean;

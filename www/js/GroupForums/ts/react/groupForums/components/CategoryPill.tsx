@@ -42,7 +42,7 @@ const CategoryPill = ({ category, isActive, onClick }: CategoryPillProps): JSX.E
       role='button'
       tabIndex={0}
       className={classNames(
-        'content-action-forum-category group-forums-category-pill',
+        'content-action-forum-category group-posts-destination-pill',
         isActive && 'active',
         !!onClick && 'clickable'
       )}
@@ -57,7 +57,7 @@ const CategoryPill = ({ category, isActive, onClick }: CategoryPillProps): JSX.E
         <Icon
           name='icon-filled-lock-closed'
           size='Small'
-          className='group-forums-category-pill-lock-icon'
+          className='group-posts-destination-pill-lock-icon'
         />
       )}
       {category.name}

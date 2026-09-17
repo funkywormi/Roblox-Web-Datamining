@@ -252,6 +252,24 @@ export function calculateOriginalPrice(cartState: TCartState, items: TCartItem[]
 
 export const isBundle = (item: TCartItem): boolean => item.itemType?.toLowerCase() === 'bundle';
 
+// The key cart state uses for per-item records such as selected items, which
+// have to stay distinct for an asset and a bundle sharing an id.
+export const getCartItemKey = (item: { itemId: number; itemType: string }): string =>
+  `${item.itemType.toLowerCase()}${item.itemId}`;
+
+// Covers Limited 1.0 (Limited/LimitedUnique) and Limited 2.0 (Collectible),
+// which a user can own several copies of.
+export const isLimitedItemDetail = (itemDetail: TItemDetails | undefined): boolean =>
+  ['Limited', 'LimitedUnique', 'Collectible'].some(restriction =>
+    itemDetail?.itemRestrictions?.includes(restriction)
+  );
+
+// An item the creator has taken off sale is still buyable while resellers hold
+// copies, so only the two together make it unavailable. Mirrors how look
+// details decides whether an included item can be purchased.
+export const isItemOffSale = (itemDetail: TItemDetails | undefined): boolean =>
+  itemDetail?.isOffSale === true && itemDetail?.hasResellers !== true;
+
 export function standardizeCartItem(item: TUnsanitizedItemDetails): TCartItem {
   return {
     ...item,

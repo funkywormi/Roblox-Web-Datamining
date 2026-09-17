@@ -114,6 +114,8 @@ const serverListConstants = {
     createOneForFreeText: "Action.CreateOneForFree",
     createAPrivateServerText: "Label.CreateAPrivateServer",
     includedWithBlackbirdText: "Label.IncludedWithBlackbird",
+    // Purchasing.PurchaseDialog namespace — shared "X with Plus" savings string
+    savingWithPlusText: "Description.SavingWithPlus",
     createText: "Action.Create",
     createPrivateServerSheetTitle: "Title.CreatePrivateServer",
     subscribeToServerSheetTitle: "Title.SubscribeToServer",

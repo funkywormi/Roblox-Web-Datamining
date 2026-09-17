@@ -66,9 +66,8 @@ const GroupForumsCategoryConfigSection = ({
   const canEditPermissions = useMemo(
     () =>
       displayPermissionsConfig &&
-      (isUnified
-        ? canManageRolePermissions
-        : !isArchived && group.owner?.userId === Number(CurrentUser.userId)),
+      !isArchived &&
+      (isUnified ? canManageRolePermissions : group.owner?.userId === Number(CurrentUser.userId)),
     [canManageRolePermissions, displayPermissionsConfig, group, isArchived, isUnified]
   );
 
@@ -212,7 +211,7 @@ const GroupForumsCategoryConfigSection = ({
             )}
           </div>
         </div>
-        {isExpanded && (
+        {canEditPermissions && isExpanded && (
           <GroupForumsCategoryConfigSectionExpanded
             group={group}
             forumCategory={forumCategory}

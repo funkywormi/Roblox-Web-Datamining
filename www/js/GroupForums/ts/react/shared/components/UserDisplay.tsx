@@ -9,7 +9,7 @@ import OwnerPill from './OwnerPill';
 import useIsCommunityOwner from '../hooks/useIsCommunityOwner';
 
 export const USER_DISPLAY_AVATAR_USERNAME_LINK_CLASS =
-  'group-forums-user-display-avatar-username-link';
+  'group-posts-user-display-avatar-username-link';
 const SEPARATOR = '•';
 
 export type UserDisplayProps = {
@@ -55,20 +55,20 @@ const UserDisplay = ({
   const isOwner = useIsCommunityOwner(userId, groupId);
   const createdDate = new Date(createdTime);
   return (
-    <div className='group-forums-user-display'>
+    <div className='group-posts-user-display'>
       <Link
         className={`${USER_DISPLAY_AVATAR_USERNAME_LINK_CLASS} text-default`}
         url={Endpoints.getAbsoluteUrl(`/users/${userId}/profile`)}>
-        <div className='group-forums-user-display-avatar-container avatar'>
+        <div className='group-posts-user-display-avatar-container avatar'>
           <Thumbnail2d
             type={ThumbnailTypes.avatarHeadshot}
             size={ThumbnailAvatarHeadshotSize.size48}
             targetId={userId}
-            containerClass='group-forums-user-display-avatar-thumbnail avatar-card-image'
+            containerClass='group-posts-user-display-avatar-thumbnail avatar-card-image'
             altName={userDisplayName}
           />
         </div>
-        <span className='group-forums-user-display-avatar-username-link-username'>
+        <span className='group-posts-user-display-avatar-username-link-username'>
           {userDisplayName}
         </span>
         {hasVerifiedBadge && (

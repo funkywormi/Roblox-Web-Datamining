@@ -43,7 +43,13 @@ const DISABLED_TOKENIZERS = {
     html: () => undefined,
     table: () => undefined,
     def: () => undefined,
-    fences: () => undefined
+    fences: () => undefined,
+    // Disable marked's built-in GFM strikethrough. It matches single-tilde
+    // `~text~` and emits `del` tokens without a triggerLength, which both
+    // (a) converts single tildes we don't want to treat as strikethrough and
+    // (b) breaks the trigger-stripping index math in normalizeMark. All tilde
+    // handling is owned by linethroughExtension, which requires `~~`.
+    del: () => undefined
 };
 // ============================================================================
 // Shared Extensions (used by both interactive and non-interactive tokenizers)
@@ -86,7 +92,11 @@ export const linethroughExtension = {
     },
     tokenizer(src, tokens) {
         const prevToken = getPrevToken(tokens);
-        if (prevToken && prevToken.raw.match(/~+/)) {
+        // Only bail when the tilde run is glued to the end of the previous token
+        // (e.g. a stray leading `~` in `~~~foo~~`). Anchoring to the end avoids
+        // false negatives like `~ foo ~~bar~~`, where an earlier tilde in the
+        // preceding text must not block the `~~bar~~` match.
+        if (prevToken && prevToken.raw.match(/~$/)) {
             return undefined;
         }
         // Manual check replaces negative lookbehind (?<!\s) to ensure text doesn't end with whitespace

@@ -14,6 +14,7 @@ import type {
 import { CreatorTypes, EntityTypes } from '../utils/types';
 
 const CREATOR_PERMISSIONS_KEY_PREFIX = 'creator_permissions_';
+const GUEST_ROLE_EDITABLE_PERMISSION = 'Group.AnnouncementViewer';
 
 export function useGetUniverseLegacyPermissions(universeId: string | undefined) {
   return useQuery({
@@ -70,8 +71,6 @@ async function getUniversePermissionsWithInheritance(
   );
 }
 
-const GUEST_ROLE_EDITABLE_PERMISSION = 'Group.AnnouncementViewer';
-
 async function fetchGroupPermissions(
   creator: CreatorDetails,
   entity: EntityDetails,
@@ -101,9 +100,9 @@ async function fetchGroupPermissions(
         permissionId,
         {
           isGranted: permission.isGranted ?? false,
-          canEdit: isGuestRole
-            ? permissionId === GUEST_ROLE_EDITABLE_PERMISSION
-            : (permission.canEdit ?? false),
+          canEdit:
+            (!isGuestRole || permissionId === GUEST_ROLE_EDITABLE_PERMISSION) &&
+            (permission.canEdit ?? false),
           isInherited: permission.isGrantedByParentScope ?? false,
         } satisfies PermissionResponse,
       ]),

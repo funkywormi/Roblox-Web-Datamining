@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import groupsClient from '../clients/groups';
 
 const MIGRATION_KEY_PREFIX = 'groupMigration_';
+export const GROUP_MIGRATION_STATUS_QUERY_KEY = `${MIGRATION_KEY_PREFIX}status`;
 
 export type MigrationStatusQueryOptions = {
   enabled?: boolean;
@@ -17,7 +18,7 @@ export function useGetMigrationStatus(
 ) {
   return useQuery({
     enabled: !!groupId && (options?.enabled ?? true),
-    queryKey: [`${MIGRATION_KEY_PREFIX}status`, groupId],
+    queryKey: [GROUP_MIGRATION_STATUS_QUERY_KEY, groupId],
     queryFn: async () => {
       if (!groupId) {
         throw new Error('groupId required');
@@ -49,7 +50,7 @@ export function useMigrateGroup() {
     mutationFn: (groupId: number) => groupsClient.migrateGroup(groupId),
     onSuccess: (_data, groupId) => {
       void queryClient.invalidateQueries({
-        queryKey: [`${MIGRATION_KEY_PREFIX}status`, groupId],
+        queryKey: [GROUP_MIGRATION_STATUS_QUERY_KEY, groupId],
       });
     },
   });

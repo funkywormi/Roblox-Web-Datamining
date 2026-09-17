@@ -84,4 +84,5 @@ export type PermissionsUIConfig = {
   showMobileView?: boolean;
   singleCreatorExperience?: boolean;
   showConfirmationOnSave?: boolean;
+  showUniverseTicketReviewerPermission?: boolean;
 };

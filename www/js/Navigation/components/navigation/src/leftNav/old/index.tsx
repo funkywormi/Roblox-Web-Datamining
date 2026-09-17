@@ -11,6 +11,7 @@ import ScrollListContainer from "./ScrollListContainer";
 import { useLiveUserNameForDisplay } from "../../hooks/useLiveUserNameForDisplay";
 import layoutConstants from "../../constants/layoutConstants";
 import { sendLeftSidebarEvent } from "../../services/eventService";
+import { logLeftNavExposure } from "../../util/leftNavIxpUtil";
 
 const { headerMenuIconClickEvent } = layoutConstants;
 
@@ -24,6 +25,9 @@ export default function LeftNavigation() {
     setIsLeftNavOpen(isOpen => {
       const open = !isOpen;
       sendLeftSidebarEvent(open, "OLD");
+      if (open) {
+        logLeftNavExposure();
+      }
       return open;
     });
   }, [setIsLeftNavOpen]);

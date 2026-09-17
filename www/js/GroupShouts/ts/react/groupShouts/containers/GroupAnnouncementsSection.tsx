@@ -25,6 +25,7 @@ export type GroupAnnouncementsSectionProps = {
   policies: GroupDetailsPolicies;
   metadata: GroupMetadata;
   canCreateAnnouncements: boolean;
+  canViewAnnouncements?: boolean;
   onAnnouncementLoaded?: () => void;
   /**
    * Initial announcement id for the group, fetched by an outer (user-profile-scoped) service.
@@ -52,6 +53,7 @@ const GroupAnnouncementsSection = ({
   policies,
   metadata,
   canCreateAnnouncements,
+  canViewAnnouncements = false,
   onAnnouncementLoaded,
   announcementsData: initialAnnouncementsData,
   refreshAnnouncements,
@@ -133,6 +135,7 @@ const GroupAnnouncementsSection = ({
                         policies={policies}
                         metadata={metadata}
                         canCreateAnnouncements={canCreateAnnouncements}
+                        canViewAnnouncements={canViewAnnouncements}
                         onAnnouncementLoaded={onAnnouncementLoaded}
                         announcementsData={announcementsData}
                         onAnnouncementDeleted={handleDeleted}

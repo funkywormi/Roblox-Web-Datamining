@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import type { ComponentType } from 'react';
 import { useSystemFeedback } from 'react-style-guide';
 import { IconButton, Tooltip, TooltipTrigger } from '@rbx/foundation-ui';
 import { useTranslation, withTranslations, WithTranslationsProps } from 'react-utilities';
@@ -30,7 +31,15 @@ import RoleRestrictedCategoryDialog from '../components/dialogs/RoleRestrictedCa
 import { EventTriggerReason } from '../../shared/constants/eventConstants';
 import AgeRestrictedCategoryUpsell from '../components/AgeRestrictedCategoryUpsell';
 
-export type CategoriesProps = {} & WithTranslationsProps;
+export type CategoriesProps = {
+  navigationComponent?: CategoriesNavigationComponent;
+} & WithTranslationsProps;
+
+export type CategoriesNavigationProps = {
+  onSetActiveCategory: (categoryShortId: string, categoryName: string) => void;
+};
+
+export type CategoriesNavigationComponent = ComponentType<CategoriesNavigationProps>;
 
 /**
  * The heading above the list: the browsed category while browsing, or the scope the results
@@ -50,7 +59,7 @@ const CategoriesHeaderTitle = (): JSX.Element => {
     return categories.find(category => category.id === scopeId)?.name ?? categoryName;
   }, [mode, urlState, categories, categoryName, translate]);
 
-  return <h2 className='group-forums-categories-header-category-name'>{title}</h2>;
+  return <h2 className='group-posts-section-heading'>{title}</h2>;
 };
 
 /**
@@ -101,7 +110,8 @@ const CategoriesMainContent = ({
   );
 };
 
-const CategoriesContent = ({ translate }: CategoriesProps): JSX.Element => {
+const CategoriesContent = ({ translate, navigationComponent }: CategoriesProps): JSX.Element => {
+  const Navigation = navigationComponent;
   const groupId = useForumStore.use.groupId();
   const categoryId = useForumStore.use.categoryId();
   const categoryShortId = useForumStore.use.categoryShortId()!;
@@ -202,12 +212,16 @@ const CategoriesContent = ({ translate }: CategoriesProps): JSX.Element => {
 
   return (
     <div className='group-forums-categories'>
-      <div className='group-forums-categories-list-container'>
-        <CategoriesList onSetActiveCategory={setActiveCategory} />
+      <div className='group-posts-destinations-container'>
+        {Navigation ? (
+          <Navigation onSetActiveCategory={setActiveCategory} />
+        ) : (
+          <CategoriesList onSetActiveCategory={setActiveCategory} />
+        )}
         {isForumsSearchEnabled && <ForumsSearch />}
       </div>
-      <div className='group-forums-categories-header'>
-        <div className='group-forums-categories-header-title'>
+      <div className='group-posts-section-header'>
+        <div className='group-posts-section-header-title'>
           <CategoriesHeaderTitle />
           {isCategoryRestricted && (
             <Tooltip
@@ -267,9 +281,11 @@ const CategoriesContent = ({ translate }: CategoriesProps): JSX.Element => {
 
 const TranslatedCategoriesContent = withTranslations(CategoriesContent, groupsConfig);
 
-const Categories = (): JSX.Element => (
+const Categories = ({
+  navigationComponent
+}: Pick<CategoriesProps, 'navigationComponent'>): JSX.Element => (
   <ForumsSearchProvider>
-    <TranslatedCategoriesContent />
+    <TranslatedCategoriesContent navigationComponent={navigationComponent} />
   </ForumsSearchProvider>
 );
 

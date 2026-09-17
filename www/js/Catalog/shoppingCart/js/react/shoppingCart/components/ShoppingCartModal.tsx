@@ -14,6 +14,7 @@ import { eventStreamService, paymentFlowAnalyticsService } from 'core-roblox-uti
 import { Dropdown, Menu, MenuSection, MenuItem, Icon } from '@rbx/foundation-ui';
 import useShoppingCart from '../hooks/useShoppingCart';
 import useSubscriptionStatus from '../hooks/useSubscriptionStatus';
+import useCartItemsOwnership from '../hooks/useCartItemsOwnership';
 import { removeItemAction } from '../utils/actions';
 import {
   TItemDetails,
@@ -30,11 +31,20 @@ import {
   calculateOriginalPrice,
   setCartState,
   fetchCartState,
+  getCartItemKey,
   getItemLink,
-  getItemPrice
+  getItemPrice,
+  isItemOffSale
 } from '../utils/cartUtils';
 import shoppingCartConstants from '../constants/shoppingCartConstants';
 import SubscribeUpsellContainer from './SubscribeUpsellContainer';
+import useMarketplaceOffers from '../hooks/useMarketplaceOffers';
+import type {
+  MarketplaceOfferPricing,
+  UseMarketplaceOffersResult
+} from '../hooks/useMarketplaceOffers';
+import type { CartPricingItemRequest } from '../../catalog/services/marketplaceSalesOffersService';
+import EmbeddableText from '../../catalog/components/EmbeddableText';
 import {
   trackShoppingCartRemoveClick,
   trackShoppingCartCloseClick,
@@ -68,7 +78,96 @@ type TPurchaseEventItem = {
   isTimedOptionPurchase: boolean;
 };
 
-function ItemPrice({ item, itemDetails }: { item: TCartItem; itemDetails: TItemDetails }) {
+function checkIfItemShouldPurchaseFromReseller(itemDetail: TDetailEntry) {
+  if (
+    itemDetail.itemRestrictions.includes('LimitedUnique') ||
+    itemDetail.itemRestrictions.includes('Limited')
+  ) {
+    return true;
+  }
+  if (
+    itemDetail.collectibleItemId !== undefined &&
+    itemDetail.collectibleItemDetails !== undefined &&
+    itemDetail.itemRestrictions.includes('Collectible')
+  ) {
+    const collectible = itemDetail.collectibleItemDetails;
+    if (
+      collectible.unitsAvailableForConsumption !== undefined &&
+      collectible.unitsAvailableForConsumption > 0
+    ) {
+      // Mirrors purchaseFromCreator in createMultiItemPurchaseModal: while the
+      // creator still has stock the purchase only routes to a reseller when the
+      // creator price fails to undercut the lowest resale price.
+      const resaleIsNotBeatenByCreator =
+        (collectible.hasResellers ?? itemDetail.hasResellers) === true &&
+        collectible.lowestResalePrice !== undefined &&
+        collectible.lowestResalePrice > 0 &&
+        collectible.lowestResalePrice <= collectible.price;
+      if (resaleIsNotBeatenByCreator || collectible.saleLocationType === 'ExperiencesDevApiOnly') {
+        return true;
+      }
+    } else {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Mirrors the single-item purchase eligibility rules: cart-pricing is keyed on
+// `collectibleItemId` alone, and only free items and reseller purchases are
+// excluded. `collectibleProductId` is deliberately not required -- it lives on
+// the separately hydrated `collectibleItemDetails` and is not part of the
+// cart-pricing request.
+function buildOfferEligibleItems(
+  selectedItemsList: TCartItem[],
+  itemDetails: Record<string, TDetailEntry>
+): CartPricingItemRequest[] {
+  const eligibleItems: CartPricingItemRequest[] = [];
+  selectedItemsList.forEach(item => {
+    const detail = itemDetails[item.itemId];
+    if (!detail?.collectibleItemId || checkIfItemShouldPurchaseFromReseller(detail)) {
+      return;
+    }
+
+    const selectedTimedOption =
+      item.timedOptions?.find(option => option.selected) ?? item.timedOptions?.[0];
+    if (
+      selectedTimedOption?.days &&
+      detail.timedOptions?.some(option => option.days === selectedTimedOption.days)
+    ) {
+      if (selectedTimedOption.price <= 0) {
+        return;
+      }
+      eligibleItems.push({
+        collectibleItemId: detail.collectibleItemId,
+        rentalDays: selectedTimedOption.days
+      });
+      return;
+    }
+
+    if (getItemPrice(detail) <= 0) {
+      return;
+    }
+    eligibleItems.push({
+      collectibleItemId: detail.collectibleItemId,
+      isPermanent: true
+    });
+  });
+  // TDetailEntry is supplied by the legacy Roblox declaration and is treated as
+  // any by type-aware ESLint even though eligibleItems is explicitly typed.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return eligibleItems;
+}
+
+function ItemPrice({
+  item,
+  itemDetails,
+  offerPricing
+}: {
+  item: TCartItem;
+  itemDetails: TItemDetails;
+  offerPricing?: MarketplaceOfferPricing[string];
+}) {
   let expectedPrice = getItemPrice(itemDetails);
   let originalPrice: number | null = null;
   let discountInfo = itemDetails.discountInformation;
@@ -113,6 +212,17 @@ function ItemPrice({ item, itemDetails }: { item: TCartItem; itemDetails: TItemD
     originalPrice = discountInfo.originalPrice;
   }
 
+  // For offer-eligible items cart-pricing is authoritative: its price already
+  // folds in the marketplace offer and any Plus benefit, and it is what the cart
+  // total and the submitted order use. Without this the row would keep showing
+  // the catalog price while the total below it was discounted.
+  if (offerPricing) {
+    const catalogPrice = expectedPrice;
+    expectedPrice = offerPricing.priceInRobux;
+    const preDiscountPrice = offerPricing.originalPrice ?? originalPrice ?? catalogPrice;
+    originalPrice = preDiscountPrice > expectedPrice ? preDiscountPrice : null;
+  }
+
   if (itemDetails.collectibleItemId !== undefined) {
     const isMarketPlaceEnabled =
       itemDetails.saleLocationType === 'ShopAndAllExperiences' ||
@@ -138,6 +248,14 @@ function ItemPrice({ item, itemDetails }: { item: TCartItem; itemDetails: TItemD
           <span className='original-price'>
             <span className='icon-robux-16x16' />
             <span>{numberFormat.getNumberFormat(originalPrice)}</span>
+          </span>
+        )}
+        {offerPricing?.hasOfferDiscount && (
+          <span className='offer-applied-badge'>
+            <Icon name='icon-filled-tag-sparkle' size='Small' />
+            <span className='offer-applied-badge-text'>
+              {catalogTranslations.labelOfferApplied()}
+            </span>
           </span>
         )}
       </div>
@@ -194,16 +312,23 @@ function ShoppingCartModalItem({
   itemDetails,
   dispatch,
   onCheckboxClicked,
-  selectedItemsRecord
+  selectedItemsRecord,
+  marketplaceOfferPricing,
+  isOwned
 }: {
   item: TCartItem;
   itemDetails: TItemDetails;
   dispatch: TCartDispatcher;
   onCheckboxClicked: (item: TCartItem, overrideValue?: boolean) => void;
   selectedItemsRecord: Record<string, boolean>;
+  marketplaceOfferPricing: MarketplaceOfferPricing;
+  isOwned: boolean;
 }) {
   const itemName = itemDetails?.name || item.itemName;
   const creatorName = itemDetails?.creatorName;
+  const isOffSale = isItemOffSale(itemDetails);
+  // Nothing to select: buying it again is either impossible or pointless.
+  const isUnpurchasable = isOwned || isOffSale;
   // Only render the timed-options dropdown when the item still offers timed
   // options. A creator can remove them after the item was added to the cart,
   // leaving stale persisted timedOptions in cart state; in that case the item
@@ -245,7 +370,11 @@ function ShoppingCartModalItem({
       <div className='cart-item'>
         <div
           className='thumbnail-container'
-          onClick={() => onCheckboxClicked(item)}
+          onClick={() => {
+            if (!isUnpurchasable) {
+              onCheckboxClicked(item);
+            }
+          }}
           aria-hidden='true'>
           <Thumbnail2d
             type={
@@ -266,11 +395,11 @@ function ShoppingCartModalItem({
             className='input-checkbox'
             id={`checkbox-${item.itemId}`}
             type='checkbox'
-            checked={selectedItemsRecord[`${item.itemType.toLowerCase()}${item.itemId}`]}
+            checked={!isUnpurchasable && !!selectedItemsRecord[getCartItemKey(item)]}
             onChange={() => {
               onCheckboxClicked(item);
             }}
-            disabled={false}
+            disabled={isUnpurchasable}
           />
           <label htmlFor={`checkbox-${item.itemId}`} />
         </div>
@@ -355,7 +484,28 @@ function ShoppingCartModalItem({
               </Menu>
             </Dropdown>
           )}
-          <ItemPrice item={item} itemDetails={itemDetails} />
+          {/* Neither an owned item nor an off-sale one can be bought, so the
+              price is replaced by that state rather than shown alongside it. */}
+          {isOwned && (
+            <div className='item-owned'>
+              <span className='item-owned-icon' />
+              <span className='item-owned-text'>{catalogTranslations.labelItemOwned()}</span>
+            </div>
+          )}
+          {!isOwned && isOffSale && (
+            <div className='item-status-label'>{catalogTranslations.labelOffSale()}</div>
+          )}
+          {!isOwned && !isOffSale && (
+            <ItemPrice
+              item={item}
+              itemDetails={itemDetails}
+              offerPricing={
+                itemDetails?.collectibleItemId
+                  ? marketplaceOfferPricing[itemDetails.collectibleItemId]
+                  : undefined
+              }
+            />
+          )}
         </div>
       </div>
       <div className='rm-item-btn-container icon-actions-clear-sm'>
@@ -386,7 +536,8 @@ function ShoppingCartModalFooter({
   totalCartValue,
   itemDetails,
   dispatch,
-  subscriptionStatus
+  subscriptionStatus,
+  marketplaceOffers
 }: {
   totalPrice: number;
   subtotal: number;
@@ -398,58 +549,68 @@ function ShoppingCartModalFooter({
   itemDetails: Record<string, TDetailEntry>;
   dispatch: TCartDispatcher;
   subscriptionStatus: TSubscriptionStatus;
+  marketplaceOffers: UseMarketplaceOffersResult;
 }) {
-  const checkIfItemShouldPurchaseFromReseller = (itemDetail: TDetailEntry) => {
-    if (
-      itemDetail.itemRestrictions.includes('LimitedUnique') ||
-      itemDetail.itemRestrictions.includes('Limited')
-    ) {
-      return true;
-    }
-    if (
-      itemDetail.collectibleItemId !== undefined &&
-      itemDetail.collectibleItemDetails !== undefined &&
-      itemDetail.itemRestrictions.includes('Collectible')
-    ) {
-      if (
-        itemDetail.collectibleItemDetails.unitsAvailableForConsumption !== undefined &&
-        itemDetail.collectibleItemDetails.unitsAvailableForConsumption > 0
-      ) {
-        if (
-          (itemDetail.collectibleItemDetails.lowestResalePrice !== undefined &&
-            itemDetail.collectibleItemDetails.lowestResalePrice >
-              itemDetail.collectibleItemDetails?.price) ||
-          itemDetail.collectibleItemDetails.saleLocationType === 'ExperiencesDevApiOnly'
-        ) {
-          return true;
-        }
-      } else {
-        return true;
-      }
-    }
-    return false;
-  };
   // "Limited" for analytics includes Limited 2.0 (Collectible) items, whose
   // itemRestrictions carry 'Collectible' rather than 'Limited'/'LimitedUnique'.
   const isItemLimited = (itemDetail: TDetailEntry) =>
     itemDetail.itemRestrictions.includes('LimitedUnique') ||
     itemDetail.itemRestrictions.includes('Limited') ||
     itemDetail.itemRestrictions.includes('Collectible');
+  const {
+    offerSelections,
+    marketplaceOfferPricing,
+    savingsSummary,
+    isPricingLoading,
+    handleOfferCheckedChange
+  } = marketplaceOffers;
+  const offerAdjustedTotalPrice = useMemo(() => {
+    let adjustedTotal = totalPrice;
+    selectedItemsList.forEach(item => {
+      const detail = itemDetails[item.itemId];
+      if (!detail?.collectibleItemId) {
+        return;
+      }
+      const pricedItem = marketplaceOfferPricing[detail.collectibleItemId];
+      if (!pricedItem) {
+        return;
+      }
+
+      const selectedTimedOption =
+        item.timedOptions?.find(option => option.selected) ?? item.timedOptions?.[0];
+      const matchingTimedOption = detail.timedOptions?.find(
+        option => option.days === selectedTimedOption?.days
+      );
+      const catalogPrice = matchingTimedOption?.price ?? getItemPrice(detail);
+      adjustedTotal += pricedItem.priceInRobux - catalogPrice;
+    });
+    return adjustedTotal;
+  }, [itemDetails, marketplaceOfferPricing, selectedItemsList, totalPrice]);
+  const offerAdjustedRemainingBalance = remainingBalance + totalPrice - offerAdjustedTotalPrice;
   // The per-item amount charged, mirroring how totalTransactionValue is summed:
   // reseller purchases use the lowest resale/original price, otherwise the
   // catalog price.
-  const getTransactionItemPrice = (itemDetail: TDetailEntry): number => {
-    if (checkIfItemShouldPurchaseFromReseller(itemDetail)) {
-      if (
-        itemDetail.collectibleItemId !== undefined &&
-        itemDetail.collectibleItemDetails?.lowestResalePrice !== undefined
-      ) {
-        return itemDetail.collectibleItemDetails.lowestResalePrice;
+  const getTransactionItemPrice = useCallback(
+    (itemDetail: TDetailEntry): number => {
+      if (itemDetail.collectibleItemId) {
+        const offerPrice = marketplaceOfferPricing[itemDetail.collectibleItemId];
+        if (offerPrice) {
+          return offerPrice.priceInRobux;
+        }
       }
-      return itemDetail.lowestPrice ?? 0;
-    }
-    return itemDetail.price ?? 0;
-  };
+      if (checkIfItemShouldPurchaseFromReseller(itemDetail)) {
+        if (
+          itemDetail.collectibleItemId !== undefined &&
+          itemDetail.collectibleItemDetails?.lowestResalePrice !== undefined
+        ) {
+          return itemDetail.collectibleItemDetails.lowestResalePrice;
+        }
+        return itemDetail.lowestPrice ?? 0;
+      }
+      return itemDetail.price ?? 0;
+    },
+    [marketplaceOfferPricing]
+  );
   // A timed-option purchase means the user checked out with a non-permanent
   // (days > 0) option selected. Mirror getSelectedItems: fall back to the first
   // option when none is explicitly flagged as selected.
@@ -606,7 +767,7 @@ function ShoppingCartModalFooter({
     // wasTimedOptionPurchased closes over selectedItemsList and is re-created each
     // render, so listing it here keeps this callback in sync with the latest cart
     // selection (fixing the stale-closure isTimedOptionPurchase bug).
-    [dispatch, itemDetails, items, totalCartValue, wasTimedOptionPurchased]
+    [dispatch, getTransactionItemPrice, itemDetails, items, totalCartValue, wasTimedOptionPurchased]
   );
   const parseItems = () => {
     const selectedItems = [] as TBatchPurchaseItem[];
@@ -636,6 +797,24 @@ function ShoppingCartModalFooter({
     return selectedItems;
   };
 
+  // BatchBuyPriceContainer hydrates its own item details from the `items` prop
+  // asynchronously, and builds the submitted order from those details rather
+  // than from `items`. Until they catch up with a selection change its details
+  // still describe the previous selection -- and a slower earlier response can
+  // land after a newer one and restore them -- so an item the user just
+  // unchecked can still be purchased. Keying on the selected set remounts it on
+  // every selection change, which discards those details (leaving the buy
+  // button disabled until the current selection has loaded) and orphans any
+  // response still in flight for the previous selection.
+  const checkoutSelectionKey = useMemo(
+    () =>
+      selectedItemsList
+        .map(item => getCartItemKey(item))
+        .sort()
+        .join(','),
+    [selectedItemsList]
+  );
+
   const onTooManyItemsButtonClick = () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     systemFeedbackService.warning(
@@ -651,12 +830,33 @@ function ShoppingCartModalFooter({
 
   return (
     <div className='shopping-cart-footer'>
+      {offerSelections.length > 0 && (
+        <div className='marketplace-offers-container'>
+          {offerSelections.map(offer => (
+            <div className='checkbox marketplace-offer-selection' key={offer.offerId}>
+              <input
+                className='input-checkbox'
+                id={`shopping-cart-offer-${offer.offerId}`}
+                type='checkbox'
+                checked={offer.selected}
+                disabled={isPricingLoading}
+                onChange={event => handleOfferCheckedChange(offer.offerId, event.target.checked)}
+              />
+              <label className='checkbox-label' htmlFor={`shopping-cart-offer-${offer.offerId}`}>
+                <EmbeddableText text={offer.localizedText} />
+              </label>
+            </div>
+          ))}
+        </div>
+      )}
       <SubscribeUpsellContainer
         subtotal={subtotal}
         itemCount={selectedItemsList.length}
         selectedItems={selectedItemsList}
         itemDetails={itemDetails}
         subscriptionStatus={subscriptionStatus}
+        marketplaceOfferPricing={marketplaceOfferPricing}
+        savingsSummary={savingsSummary}
       />
       <div className='cart-total-section-container'>
         <div className='total-label'>
@@ -664,7 +864,7 @@ function ShoppingCartModalFooter({
         </div>
         <div className='total-price-container'>
           <span className='icon-robux-16x16' />
-          <span className='price-text'>{totalPrice.toLocaleString()}</span>
+          <span className='price-text'>{offerAdjustedTotalPrice.toLocaleString()}</span>
         </div>
       </div>
       {selectedItemsList.length > shoppingCartConstants.maxSelectedItems && (
@@ -678,7 +878,9 @@ function ShoppingCartModalFooter({
       )}
       {selectedItemsList.length <= shoppingCartConstants.maxSelectedItems && (
         <BatchBuyPriceContainer
+          key={checkoutSelectionKey}
           items={parseItems()}
+          marketplaceOfferPricing={marketplaceOfferPricing}
           purchaseMetadata={purchaseMetadata}
           onBuyButtonClick={() => {
             const transactionItems = selectedItemsList
@@ -695,14 +897,14 @@ function ShoppingCartModalFooter({
                 isTimedOptionPurchase: wasTimedOptionPurchased(itemDetail)
               }));
             trackPurchaseButtonClick(TPurchaseSource.ShoppingCart, {
-              totalTransactionValue: totalPrice,
+              totalTransactionValue: offerAdjustedTotalPrice,
               transactionItems: JSON.stringify(transactionItems),
               purchaseType: 'shopping-cart',
-              userId: CurrentUser.userId
+              userId: Number(CurrentUser.userId)
             });
           }}
           onTransactionComplete={(results: Array<Record<string, TPurchaseDataResult>>) => {
-            onTransactionComplete(results, selectedItemsList.length, totalPrice);
+            onTransactionComplete(results, selectedItemsList.length, offerAdjustedTotalPrice);
           }}
           // using any as a type for systemFeedbackService because we don't have an exported type for ts
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -711,13 +913,13 @@ function ShoppingCartModalFooter({
       )}
 
       <div className='balance-disclaimer-container'>
-        {remainingBalance >= 0 ? (
+        {offerAdjustedRemainingBalance >= 0 ? (
           <div
             className='balance-disclaimer-text'
             dangerouslySetInnerHTML={{
               __html: catalogTranslations.messageRemainingBalance({
                 remainingBalance: `<span class='icon-robux-16x16'></span><span class='text-robux'>${escapeHtml()(
-                  remainingBalance.toLocaleString()
+                  offerAdjustedRemainingBalance.toLocaleString()
                 )}</span>`
               })
             }}
@@ -728,6 +930,15 @@ function ShoppingCartModalFooter({
           </div>
         )}
       </div>
+      {/* Deliberately not given the cart-pricing result: the banner advertises the
+          Plus discount rate, and an offer line would otherwise be picked up as the
+          rate to advertise. */}
+      <SubscribeUpsellContainer
+        placement='upsell'
+        selectedItems={selectedItemsList}
+        itemDetails={itemDetails}
+        subscriptionStatus={subscriptionStatus}
+      />
     </div>
   );
 }
@@ -754,9 +965,32 @@ function ShoppingCartModal(props: {
   const [originalPrice, setOriginalPrice] = useState(0);
   const [remainingBalance, setRemainingBalance] = useState(0);
   const [selectedItemsList, setSelectedItemsList] = useState([] as TCartItem[]);
-  const [selectedItemsObject, setSelectedItemsObject] = useState({} as Record<string, boolean>);
+  // Seeded synchronously rather than in an effect so the first render already
+  // reflects the stored selection instead of showing every box unchecked.
+  const [selectedItemsObject, setSelectedItemsObject] = useState(
+    () => fetchCartState().selectedItems as Record<string, boolean>
+  );
   const [isScrollable, setIsScrollable] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const ownershipRecord = useCartItemsOwnership(items, itemDetails);
+  // Items that can't be bought: already owned, or off sale with no resellers.
+  // Treated as unselected wherever the selection is read rather than written
+  // back to cart state as unchecked. Both states are only known once the
+  // ownership check and the item details land, and a stored correction would
+  // race every other write to the cart -- deriving it always wins instead.
+  const unpurchasableItemKeys = useMemo(
+    () =>
+      new Set(
+        items
+          .filter(
+            item =>
+              ownershipRecord[getCartItemKey(item)] === true ||
+              isItemOffSale(itemDetails[item.itemId])
+          )
+          .map(item => getCartItemKey(item))
+      ),
+    [items, itemDetails, ownershipRecord]
+  );
 
   const updateTotalPrice = useCallback(
     (itemList: TCartItem[]) => {
@@ -775,23 +1009,19 @@ function ShoppingCartModal(props: {
   useEffect(() => {
     const updatedCart = fetchCartState();
     setSelectedItemsObject(updatedCart.selectedItems);
-  }, []);
-
-  useEffect(() => {
-    const updatedCart = fetchCartState();
-    setSelectedItemsObject(updatedCart.selectedItems);
   }, [itemIds]);
 
   useEffect(() => {
     const updatedSelectedItemsList = [] as TCartItem[];
     items.forEach(item => {
-      if (selectedItemsObject[`${item.itemType.toLowerCase()}${item.itemId}`]) {
+      const itemKey = getCartItemKey(item);
+      if (selectedItemsObject[itemKey] && !unpurchasableItemKeys.has(itemKey)) {
         updatedSelectedItemsList.push(item);
       }
     });
     updateTotalPrice(updatedSelectedItemsList);
     setSelectedItemsList(updatedSelectedItemsList);
-  }, [selectedItemsObject, itemIds, items, updateTotalPrice]);
+  }, [selectedItemsObject, itemIds, items, unpurchasableItemKeys, updateTotalPrice]);
 
   // Check if scroll container has scrollable content
   useEffect(() => {
@@ -945,7 +1175,7 @@ function ShoppingCartModal(props: {
 
   const onCheckboxClicked = (item: TCartItem, overrideValue?: boolean) => {
     const selectedItems = selectedItemsObject;
-    const selectedItemKey = `${item.itemType.toLowerCase()}${item.itemId}`;
+    const selectedItemKey = getCartItemKey(item);
     let selectedValue = false;
     if (overrideValue === undefined) {
       if (selectedItems[selectedItemKey] !== undefined) {
@@ -980,6 +1210,15 @@ function ShoppingCartModal(props: {
     };
   }, [handleWindowClick]);
   const itemCountFormatted = `(${items.length})`;
+  // Priced here rather than in the footer so the item rows and the cart total
+  // read the same cart-pricing result.
+  const offerEligibleItems = useMemo(() => {
+    // TDetailEntry is supplied by the legacy Roblox declaration and is treated as
+    // any by type-aware ESLint, which erases the helper's declared return type.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return buildOfferEligibleItems(selectedItemsList, itemDetails);
+  }, [selectedItemsList, itemDetails]);
+  const marketplaceOffers = useMarketplaceOffers(offerEligibleItems);
   return (
     <div ref={ref} className='shopping-cart-modal-container'>
       <div
@@ -1005,6 +1244,8 @@ function ShoppingCartModal(props: {
                   dispatch={dispatch}
                   onCheckboxClicked={onCheckboxClicked}
                   selectedItemsRecord={selectedItemsObject}
+                  marketplaceOfferPricing={marketplaceOffers.marketplaceOfferPricing}
+                  isOwned={ownershipRecord[getCartItemKey(item)] === true}
                 />
               ))}
             </div>
@@ -1022,6 +1263,7 @@ function ShoppingCartModal(props: {
           itemDetails={itemDetails}
           dispatch={dispatch}
           subscriptionStatus={subscriptionStatus}
+          marketplaceOffers={marketplaceOffers}
         />
       </div>
     </div>

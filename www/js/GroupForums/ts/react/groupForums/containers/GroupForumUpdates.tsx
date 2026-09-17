@@ -57,7 +57,7 @@ const GroupForumUpdates: FC<Props> = ({ translate, groupId }: Props) => {
           {translate('Action.SeeAll')}
         </a>
       </div>
-      <div className='group-forums-posts-list'>
+      <div className='group-posts-list'>
         <div className='group-forums-post-list-content'>
           {posts.map(post => {
             return (

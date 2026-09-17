@@ -1,6 +1,6 @@
 import { httpService } from 'core-utilities';
 import groupMembershipConstants from '../constants/groupMembershipConstants';
-import { GetUsersInGroupResponse } from '../types';
+import { GetUsersInGroupResponse, SearchUsersInGroupResponse } from '../types';
 
 const getUsersInGroup = async ({
   groupId,
@@ -31,6 +31,20 @@ const getUsersInGroup = async ({
   return response.data as GetUsersInGroupResponse;
 };
 
+const searchUsersInGroup = async (
+  groupId: number,
+  query: string
+): Promise<SearchUsersInGroupResponse> => {
+  const urlConfig = {
+    url: groupMembershipConstants.urls.searchUsersInGroup(groupId, query),
+    withCredentials: true
+  };
+
+  const response = await httpService.get(urlConfig);
+
+  return response.data as SearchUsersInGroupResponse;
+};
+
 const kickUserFromGroup = async (groupId: number, profileId: number): Promise<void> => {
   const urlConfig = {
     url: groupMembershipConstants.urls.kickUser(groupId, profileId),
@@ -51,6 +65,7 @@ const banUserFromGroup = async (groupId: number, profileId: number): Promise<voi
 
 export default {
   getUsersInGroup,
+  searchUsersInGroup,
   kickUserFromGroup,
   banUserFromGroup
 };

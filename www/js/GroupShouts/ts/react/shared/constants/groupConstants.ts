@@ -27,6 +27,9 @@ export default {
     getGroupURL(groupId: number): string {
       return `${EnvironmentUrls.groupsApi}/v1/groups/${groupId}`;
     },
+    getGroupMembershipURL(groupId: number): string {
+      return `${EnvironmentUrls.groupsApi}/v1/groups/${groupId}/membership`;
+    },
     getGroupFeaturesURL(groupId: number): string {
       return `${EnvironmentUrls.groupsApi}/v1/groups/${groupId}/product-features`;
     },

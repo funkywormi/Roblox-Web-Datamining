@@ -8,12 +8,11 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import BenefitList from "./BenefitList";
 import BillingInfoDisplay from "./BillingInfoDisplay";
 import useLocalizedMoney from "../../hooks/useLocalizedMoney";
+import { SUBSCRIPTION_TERMS_URL } from "../../subscriptionConstants";
 import SubscriptionButton from "../shared/SubscriptionButton";
 
 import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v1";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
-
-const SUBSCRIPTION_TERMS_URL = "https://www.roblox.com/info/terms";
 
 const { ENUM_TRIGGERING_CONTEXT } = paymentFlowAnalyticsService;
 

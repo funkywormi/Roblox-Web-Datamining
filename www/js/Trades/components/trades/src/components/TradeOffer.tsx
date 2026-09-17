@@ -1,5 +1,6 @@
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { useTranslation } from "@rbx/core-scripts/react";
+import { Divider } from "@rbx/foundation-ui";
 import { TradeOffer as TradeOfferType } from "../types";
 import { calculateOfferValue, calculateRobuxMinusFee, getFeeAsPercent } from "../utils/tradesUtils";
 import TradeItemCard from "./TradeItemCard";
@@ -16,7 +17,7 @@ export const TradeOffer = ({ offer, label }: TradeOfferProps): JSX.Element => {
 
   return (
     <div className="trade-list-detail-offer">
-      <div className="rbx-divider" />
+      <Divider className="trade-offer-divider" />
       <h3 className="trade-list-detail-offer-header font-header-1">{label}</h3>
 
       <ul className="hlist item-cards item-cards-stackable">

@@ -16,6 +16,10 @@ export const MIGRATION_STATUS = {
 
 export type MigrationStatus = (typeof MIGRATION_STATUS)[keyof typeof MIGRATION_STATUS];
 
+export const MIGRATION_SOURCE = {
+  NEW_GROUP: 'NewGroup',
+} as const;
+
 export enum ModalState {
   None,
   Breaking,
@@ -25,8 +29,7 @@ export enum ModalState {
 
 export const LINKED_OUT_MODAL_SUPPRESSION_QUERY_PARAM = 'suppressUnificationModal';
 export const AssignSameRolePermission = 'Organization.AssignSameRole';
-export const DEVFORUM_URL =
-  'https://devforum.roblox.com/t/private-beta-unified-roles-permissions-for-communities-and-creator-hub/4667049';
+export const DEVFORUM_URL = 'https://devforum.roblox.com/unified-group-roles-and-permissions';
 
 export const SNOOZE_DURATION_MS = 18 * 60 * 60 * 1000;
 

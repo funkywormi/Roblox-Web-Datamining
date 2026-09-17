@@ -8,7 +8,7 @@ import { ForumPost, ForumPostsResponse, NotificationPreferenceType } from '../ty
 import { groupsConfig } from '../translation.config';
 import forumsService from '../services/forumsService';
 import PostPreview from '../components/PostPreview';
-import PostPreviewSkeleton from '../components/skeletons/PostPreviewSkeleton';
+import PostPreviewSkeleton from '../../groupPosts/components/PostPreviewSkeleton';
 import groupForumsConstants from '../constants/groupForumsConstants';
 import InfiniteLoader from '../../shared/components/InfiniteLoader';
 import { useForumPermissions } from '../contexts/ForumPermissionsContext';
@@ -260,7 +260,7 @@ const PostPreviewList = ({ translate }: PostPreviewListProps): JSX.Element => {
 
   if (isLoading || isLoadingPinnedPosts) {
     return (
-      <div className='group-forums-posts-list group-forums-posts-list-skeleton'>
+      <div className='group-posts-list group-posts-list-skeleton'>
         <PostPreviewSkeleton />
         <PostPreviewSkeleton />
         <PostPreviewSkeleton />
@@ -297,7 +297,7 @@ const PostPreviewList = ({ translate }: PostPreviewListProps): JSX.Element => {
 
   return (
     <div
-      className={classNames('group-forums-posts-list', {
+      className={classNames('group-posts-list', {
         'group-forums-posts-list-with-footer': canCreatePost
       })}>
       {newPostIds.size > 0 && hasScrolledPastFirstViewport && (

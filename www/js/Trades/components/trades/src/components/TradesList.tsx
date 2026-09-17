@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { IconButton } from "@rbx/foundation-ui";
+import { IconButton, ProgressCircle } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import tradesConstants from "../constants/tradesConstants";
@@ -22,12 +22,23 @@ import {
   TradeStatusType,
   TradeSummary,
 } from "../types";
-import { isMobile as detectMobile } from "../utils/tradesUtils";
+import {
+  isFreeTradesUpsellDismissed,
+  markFreeTradesUpsellDismissed,
+} from "../utils/freeTradesUpsellDismiss";
+import {
+  isMobile as detectMobile,
+  formatShortMonthDate,
+  isMonthlyWindow,
+} from "../utils/tradesUtils";
 import useTradesPager from "../hooks/useTradesPager";
+import useTradeQuota from "../hooks/useTradeQuota";
 import FilterChips, { FilterChipOption } from "./FilterChips";
 import TradeRow from "./TradeRow";
 import TradeDetail from "./TradeDetail";
 import TradesEmptyState from "./TradesEmptyState";
+import TradesQuotaBanner from "./TradesQuotaBanner";
+import TradesUpsellCard from "./TradesUpsellCard";
 import HowToTradeSheet from "./HowToTradeSheet";
 import TradeQualityFilterSheet, { TradeQualityOption } from "./TradeQualityFilterSheet";
 
@@ -83,6 +94,7 @@ const QUALITY_OPTIONS: { value: TradeQualityType; labelKey: string }[] = [
 export const TradesList = ({ systemFeedbackService }: TradesListProps): JSX.Element => {
   const { translate } = useTranslation();
   const pager = useTradesPager();
+  const tradeQuota = useTradeQuota();
   const isMobile = useMemo(() => detectMobile(), []);
 
   const [selectedTab, setSelectedTab] = useState<TradeStatusType>(
@@ -96,6 +108,7 @@ export const TradesList = ({ systemFeedbackService }: TradesListProps): JSX.Elem
   const [mobileView, setMobileView] = useState<"list" | "detail">("list");
   const [isQualityFilterOpen, setIsQualityFilterOpen] = useState(false);
   const [isHowToTradeOpen, setIsHowToTradeOpen] = useState(false);
+  const [isUpsellCardDismissed, setIsUpsellCardDismissed] = useState(isFreeTradesUpsellDismissed);
 
   const selectedTradeIdRef = useRef<number | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -304,6 +317,16 @@ export const TradesList = ({ systemFeedbackService }: TradesListProps): JSX.Elem
     sendEvent(tradeEvents.tradesList, "shopLimiteds");
   };
 
+  const onGetPlusClick = () => {
+    sendEvent(tradeEvents.tradesList, "getPlusUpsell");
+  };
+
+  const onDismissUpsellCard = () => {
+    markFreeTradesUpsellDismissed();
+    setIsUpsellCardDismissed(true);
+    sendAXEvent(tradeEvents.bannerDismiss, "close", { banner: "freeTradesUpsell" });
+  };
+
   const onQualityFilterOpen = () => {
     setIsQualityFilterOpen(true);
     sendEvent(tradeEvents.tradesList, "tradeQualityFilter");
@@ -324,6 +347,11 @@ export const TradesList = ({ systemFeedbackService }: TradesListProps): JSX.Elem
     }
     onScroll();
   };
+
+  // Only the monthly allowance has a string that names its window.
+  const quotaMessageKey = isMonthlyWindow(tradeQuota.window)
+    ? "Message.FreeTradesLeftThisMonth"
+    : "Label.FreeTradesRemaining";
 
   const showListPane = !isMobile || mobileView === "list";
   const showDetailPane = !isMobile || mobileView === "detail";
@@ -354,6 +382,29 @@ export const TradesList = ({ systemFeedbackService }: TradesListProps): JSX.Elem
 
           <FilterChips options={tabOptions} value={selectedTab} onSelect={onTabClick} />
 
+          {tradeQuota.shouldShowQuota && (
+            <TradesQuotaBanner
+              message={translate(quotaMessageKey, {
+                number: tradeQuota.remaining,
+                maxNumber: tradeQuota.total,
+              })}
+              endsLabel={translate("Label.EndsDate", {
+                date: formatShortMonthDate(tradesConstants.freeTradesEndDate),
+              })}
+            />
+          )}
+          {tradeQuota.shouldShowUpsell && !isUpsellCardDismissed && (
+            <TradesUpsellCard
+              title={translate("Label.UnlockUnlimitedTrades")}
+              body={translate("Message.CompleteAsManyTradesAsYouWantWithPlus")}
+              ctaLabel={translate("Action.Subscribe")}
+              ctaHref={tradesConstants.urls.membership}
+              dismissLabel={translate("Action.Close")}
+              onCtaClick={onGetPlusClick}
+              onDismiss={onDismissUpsellCard}
+            />
+          )}
+
           <div id="trade-row-scroll-container" ref={scrollRef} onScroll={onScroll}>
             {pager.trades.map(trade => (
               <TradeRow
@@ -364,7 +415,15 @@ export const TradesList = ({ systemFeedbackService }: TradesListProps): JSX.Elem
                 onProfileClick={onProfileClick}
               />
             ))}
-            {pager.loading && <span className="spinner spinner-default" />}
+            {pager.loading && (
+              <div className="flex justify-center margin-y-small">
+                <ProgressCircle
+                  ariaLabel={translate("Label.Loading", undefined, "Loading")}
+                  size="Medium"
+                  variant="Indeterminate"
+                />
+              </div>
+            )}
             {pager.noResults && !pager.loading && (
               <TradesEmptyState
                 title={translate(activeTab.emptyTitleKey)}

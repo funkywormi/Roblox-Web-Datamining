@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { useTranslation } from "@rbx/core-scripts/react";
+import { IconButton, ProgressCircle } from "@rbx/foundation-ui";
 import tradesConstants from "../constants/tradesConstants";
 import useInventoryPager from "../hooks/useInventoryPager";
 import { sendAXEvent, sendEvent, tradeEvents } from "../services/tradeEvents";
@@ -151,7 +152,15 @@ export const InventoryPanel = ({
           ))}
         </ul>
 
-        {pager.loading && <span className="spinner spinner-default" />}
+        {pager.loading && (
+          <div className="flex justify-center margin-y-small">
+            <ProgressCircle
+              ariaLabel={translate("Label.Loading", undefined, "Loading")}
+              size="Medium"
+              variant="Indeterminate"
+            />
+          </div>
+        )}
 
         {!pager.loading && pager.loadFailed && (
           <div className="col-xs-12 container-empty">{translate("Error.TradeUnknownError")}</div>
@@ -161,27 +170,27 @@ export const InventoryPanel = ({
 
         {(pager.hasPrev || pager.hasNext) && (
           <div className="trade-inventory-pager">
-            <button
-              type="button"
-              className="btn-generic-left-sm"
-              disabled={!pager.hasPrev || pager.loading}
-              aria-label={translate("Action.Back")}
+            <IconButton
+              icon="icon-regular-chevron-small-left"
+              variant="Utility"
+              size="Small"
+              isCircular
+              isDisabled={!pager.hasPrev || pager.loading}
+              ariaLabel={translate("Action.Back")}
               onClick={pager.loadPrev}
-            >
-              <span className="icon-left" />
-            </button>
+            />
             <span className="trade-inventory-pager-label">
               {translate("Label.CurrentPage", { currentPage: pager.page })}
             </span>
-            <button
-              type="button"
-              className="btn-generic-right-sm"
-              disabled={!pager.hasNext || pager.loading}
-              aria-label={translate("Action.Next")}
+            <IconButton
+              icon="icon-regular-chevron-small-right"
+              variant="Utility"
+              size="Small"
+              isCircular
+              isDisabled={!pager.hasNext || pager.loading}
+              ariaLabel={translate("Action.Next")}
               onClick={onNext}
-            >
-              <span className="icon-right" />
-            </button>
+            />
           </div>
         )}
       </div>

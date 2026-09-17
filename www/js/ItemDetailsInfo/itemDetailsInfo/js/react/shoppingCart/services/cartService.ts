@@ -5,8 +5,10 @@ import {
   rand,
   fetchCartState,
   standardizeItemDetailsFromHydratedItemDetails,
-  extractLimiteds
+  extractLimiteds,
+  isBundle
 } from '../utils/cartUtils';
+import { urlConfigs } from '../constants/urlConfigs';
 import {
   TCartState,
   TCartItem,
@@ -113,6 +115,13 @@ export async function fetchCartItemDetails(
   });
 
   return resByItemId;
+}
+
+export async function fetchItemOwnership(item: TCartItem): Promise<boolean> {
+  const res = await httpService.get<boolean>(
+    urlConfigs.isItemOwned(CurrentUser.userId, isBundle(item) ? 'Bundle' : 'Asset', item.itemId)
+  );
+  return !!res?.data;
 }
 
 export async function getCollectibleResellers(

@@ -68,13 +68,31 @@ const tradesConstants = {
     cannotTradeWithSelf: 21,
     userPrivacyTooStrict: 22,
     tradeFrictionEncountered: 23,
+    // The trade asks a partner without Plus to send Robux. The locked partner
+    // field heads this off, so this is the backstop for a draft built before
+    // eligibility landed or changed underneath it.
+    robuxRequiresPlus: 30,
   },
   tradeEligibility: {
     legalOrRegulatoryRestrictions: "IneligibleLegalOrRegulatoryRestrictions",
+    ageCheckRequired: "IneligibleAgeCheckRequired",
+    freeTradesLimitReached: "IneligibleFreeTradesLimitReached",
   },
+  freeTradesWindow: {
+    month: "Month",
+  },
+  // When the free-trade allowance promotion stops running. Spelled out with a
+  // time so it parses as local midnight — a bare "2026-12-31" is UTC midnight
+  // and would render as Dec 30 anywhere west of Greenwich.
+  freeTradesEndDate: "2026-12-31T00:00:00",
+  // Per-user localStorage key prefix for the Plus upsell card dismiss. The
+  // user id is appended so a shared device does not hide the card for someone
+  // who never closed it. Same pattern as catalog marketplace-offer banners.
+  freeTradesUpsellStorageKey: "Roblox.Trades.FreeTradesUpsell",
   canTradeWithStatus: {
     canTrade: "CanTrade",
     senderCannotTrade: "SenderCannotTrade",
+    senderAgeCheckRequired: "SenderAgeCheckRequired",
     cannotTradeWithSelf: "CannotTradeWithSelf",
     unknownError: "UnknownError",
   },

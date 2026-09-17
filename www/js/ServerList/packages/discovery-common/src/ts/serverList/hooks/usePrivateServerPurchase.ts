@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
 import serverListService from "../../../js/serverList/services/serverListService";
 import { PrivateServerEventType } from "../../../js/serverList/analytics/privateServerLogging";
 import type { GameInstanceQueryParams } from "../../../js/serverList/services/serverListService";
+import { privateServerListKeys } from "../constants/queryKeys";
 
 type CreateServerSuccessData = {
   vipServerId: number;
@@ -31,6 +32,7 @@ const usePrivateServerPurchase = ({
   onError,
 }: UsePrivateServerPurchaseParams) => {
   const [idempotencyKey] = useState(() => uuidService.generateRandomUuid());
+  const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async ({ serverName }: CreateServerVariables) => {
       const response = await serverListService.createPrivateServer(
@@ -44,6 +46,11 @@ const usePrivateServerPurchase = ({
     onSuccess: data => {
       window.EventTracker?.start(PrivateServerEventType.PRIVATE_SERVER_LOAD);
       refreshServers({ startTime: performance.now() });
+      // Price/discount can change after a purchase, so refetch the server list metadata.
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      queryClient.invalidateQueries({
+        queryKey: privateServerListKeys.universePrivateServerMetadata(universeId),
+      });
       onSuccess?.(data);
     },
     onError: (error: unknown) => {

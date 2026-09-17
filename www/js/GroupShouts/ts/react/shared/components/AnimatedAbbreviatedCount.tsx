@@ -9,6 +9,21 @@ export type AnimatedAbbreviatedCountProps = {
   variant: 'reaction' | 'reply';
 };
 
+// Reply counts exclude the original post from the backend's capped count of 500 messages.
+const MAX_EXACT_REPLY_COUNT = 499;
+
+export const getAbbreviatedCountText = (
+  value: number,
+  variant: AnimatedAbbreviatedCountProps['variant']
+): string => {
+  if (variant === 'reaction') {
+    return String(abbreviateNumberWithTruncateLength(value));
+  }
+
+  const abbreviatedValue = String(abbreviateNumber.getAbbreviatedValue(value));
+  return value >= MAX_EXACT_REPLY_COUNT ? `${abbreviatedValue}+` : abbreviatedValue;
+};
+
 type AnimatedAbbreviatedValueProps = {
   tick: number;
   text: string;
@@ -52,10 +67,7 @@ const AnimatedAbbreviatedCount = ({
     }
   }, [value]);
 
-  const text =
-    variant === 'reaction'
-      ? abbreviateNumberWithTruncateLength(value)
-      : abbreviateNumber.getAbbreviatedValue(value);
+  const text = getAbbreviatedCountText(value, variant);
 
   const valueEl = (
     <AnimatedAbbreviatedValue

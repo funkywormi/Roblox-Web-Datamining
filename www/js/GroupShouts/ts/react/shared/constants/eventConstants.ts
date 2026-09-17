@@ -3,6 +3,8 @@ export enum EventType {
   GroupPageExposureEvent = 'groupPageExposureEvent',
   GroupForumsExposureEvent = 'groupForumsExposureEvent',
   GroupForumPostExposureEvent = 'groupForumPostExposureEvent',
+  // Product telemetry, not the iXP enrollment signal (that is the layer exposure).
+  GroupForumsSearchExposureEvent = 'groupForumsSearchExposureEvent',
   CmntyAgeCheckBannerShownEvent = 'cmntyAgeCheckBannerShownEvent',
   CmntyAnalyticsExposureEvent = 'cmntyAnalyticsExposureEvent',
   CmntyAnalyticsClickEvent = 'cmntyAnalyticsClickEvent'
@@ -32,7 +34,25 @@ export enum EntryPointDetail {
 }
 
 export enum SearchSurface {
-  CommunitiesSearch = 'communitiesSearch'
+  CommunitiesSearch = 'communitiesSearch',
+  ForumsSearch = 'forumsSearch'
+}
+
+export enum ForumsSearchMode {
+  Text = 'text',
+  Member = 'member',
+  FiltersOnly = 'filtersOnly'
+}
+
+export enum ForumsSearchTrigger {
+  Search = 'search',
+  Reset = 'reset',
+  Navigation = 'navigation'
+}
+
+export enum ForumsSearchResultType {
+  Post = 'Post',
+  Comment = 'Comment'
 }
 
 export enum EventLocationTab {

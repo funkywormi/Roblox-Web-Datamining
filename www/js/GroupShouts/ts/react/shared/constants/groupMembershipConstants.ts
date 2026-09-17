@@ -46,6 +46,9 @@ export default {
       params.append('limit', '50');
       return `${groupsApi}/v2/groups/${groupId}/users?${params.toString()}`;
     },
+    searchUsersInGroup(groupId: number, query: string): string {
+      return `${groupsApi}/v2/groups/${groupId}/users/search?query=${encodeURIComponent(query)}`;
+    },
     kickUser(groupId: number, profileId: number): string {
       return `${groupsUrlPrefix}/${groupId}/users/${profileId}`;
     },

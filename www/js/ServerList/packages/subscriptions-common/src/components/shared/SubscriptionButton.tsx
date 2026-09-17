@@ -17,6 +17,7 @@ export type SubscriptionButtonProps = {
   className?: string;
   isDisabled?: boolean;
   redirectUrl?: string;
+  referrerId?: string;
   paymentSessionId?: string;
   onSubscribeClick?: () => void;
   /**
@@ -49,6 +50,7 @@ const SubscriptionButton = ({
   className,
   isDisabled = false,
   redirectUrl,
+  referrerId,
   paymentSessionId,
   onSubscribeClick,
   onMobilePurchaseInitiated,
@@ -77,11 +79,14 @@ const SubscriptionButton = ({
     if (paymentSessionId) {
       url.searchParams.append("paymentSessionId", paymentSessionId);
     }
+    if (referrerId) {
+      url.searchParams.append("referrerId", referrerId);
+    }
     if (!isMobileInApp && redirectUrl) {
       url.searchParams.append("redirectUrl", redirectUrl);
     }
     return url.toString();
-  }, [isMobileInApp, urlProductType, productId, paymentSessionId, redirectUrl]);
+  }, [isMobileInApp, urlProductType, productId, paymentSessionId, referrerId, redirectUrl]);
 
   const onClick = useCallback(() => {
     if (isDisabled) {
