@@ -187,5 +187,6 @@
     "Description.InlineContextCardDescription": "Be careful when you chat with strangers. Don't share personal info or move to another chat app. You can block or report anyone from their profile.",
     "Heading.SafeChattingWithUsername": "Be safe chatting with {displayName}",
     "Heading.SafeChattingWithThisUser": "Be safe chatting with this person",
-    "Label.UnfilteredChat": "Unfiltered chat"
+    "Label.UnfilteredChat": "Unfiltered chat",
+    "Label.Trusted": "Trusted"
 }
