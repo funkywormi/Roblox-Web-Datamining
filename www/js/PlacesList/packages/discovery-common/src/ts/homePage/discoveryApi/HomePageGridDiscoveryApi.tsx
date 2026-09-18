@@ -63,6 +63,7 @@ type THomePageGridDiscoveryApiProps = {
   translate: WithTranslationsProps["translate"];
   enableSponsoredFeedback?: boolean;
   sponsoredUserCohort?: string;
+  enableReportExperience?: boolean;
   enableReportAd?: boolean;
   sponsoredFooterAdLabelText?: string;
   sponsoredFooterAdLabelFirst?: boolean;
@@ -92,6 +93,7 @@ export const HomePageGrid = ({
   setHiddenUniverses,
   enableSponsoredFeedback,
   sponsoredUserCohort,
+  enableReportExperience,
   enableReportAd,
   sponsoredFooterAdLabelText,
   sponsoredFooterAdLabelFirst,
@@ -258,6 +260,7 @@ export const HomePageGrid = ({
         page={PageContext.HomePage}
         enableSponsoredFeedback={enableSponsoredFeedback}
         sponsoredUserCohort={sponsoredUserCohort}
+        enableReportExperience={enableReportExperience}
         enableReportAd={enableReportAd}
         sponsoredFooterAdLabelText={sponsoredFooterAdLabelText}
         sponsoredFooterAdLabelFirst={sponsoredFooterAdLabelFirst}

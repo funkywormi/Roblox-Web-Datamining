@@ -1,3 +1,10 @@
+button.btn-common-play-game-lg,
+button.btn-economy-robux-white-lg,
+button.btn-common-play-game-action-needed-lg,
+button.btn-common-play-game-unplayable-lg {
+    height: auto
+}
+
 .inset-\[0\] {
     top: 0;
     bottom: 0;

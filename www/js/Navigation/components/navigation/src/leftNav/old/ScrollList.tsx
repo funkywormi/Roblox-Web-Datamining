@@ -7,6 +7,7 @@ import links from "../../constants/linkConstants";
 import layoutConstants from "../../constants/layoutConstants";
 import LeftNavItem from "./LeftNavItem";
 import { sendClickEvent } from "../../util/navigationUtil";
+import { EventNavItem } from "../EventNavItem";
 
 const { shopEvents } = layoutConstants;
 
@@ -74,6 +75,7 @@ export default function ScrollList(props: {
       {listNavItems}
       {upgradeBtn}
       {shopModal}
+      <EventNavItem />
     </ul>
   );
 }

@@ -442,7 +442,7 @@ export const ContentMaturitySlider = ({ childUserId }: { childUserId?: number })
     />
   );
 
-  const restrictedOptionIsAllowed = settingsAndOptions?.contentAgeRestriction?.options.find(
+  const restrictedOptionIsAllowed = settingsAndOptions?.contentAgeRestriction?.options?.find(
     optionAndRequirement =>
       optionAndRequirement.option.optionValue === ContentControls.SeventeenPlus,
   );

@@ -1,4 +1,4 @@
-import { downcast, SubType } from "@rbx/core-lib";
+import { downcast, SubType } from "@rbx/core-lib/types";
 
 /** A 2 letter country code string that is taken from Request Context. */
 export type CountryCode = SubType<"CountryCode", string>;

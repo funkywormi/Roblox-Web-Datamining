@@ -53,6 +53,8 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
       Clear: translate("Action.Clear") || "Clear",
       Create: translate("Action.Create") || "Create",
       Delete: translate("Action.Delete") || "Delete",
+      Copy: translate("Action.Copy") || "Copy",
+      Download: translate("Action.Download") || "Download",
       Done: translate("Action.Done"),
       Edit: translate("Action.Edit") || "Edit",
       CreateAgain: translate("Action.CreateAgain") || "Create again",
@@ -179,7 +181,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
         EmailRequired: translate("Label.Dialog.EmailRequired"),
         GenerateNewRecoveryCodesClearNotice: (activeCodeCount: number) =>
           translate("Label.Dialog.GenerateNewRecoveryCodesClearNotice", { activeCodeCount }),
-        RecoveryCodesSavedConfirmation: translate("Label.Dialog.RecoveryCodesSavedConfirmation"),
         YourPassword: translate("Label.Dialog.YourPassword"),
       },
       DisableAuthenticator: {
@@ -259,6 +260,10 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
       },
       ItemTradeTwoStepVerificationMessage: translate("Message.ItemTradeTwoStepVerificationMessage"),
       ManualKeyCopied: translate("Message.ManualKeyCopied"),
+      RecoveryCodesCopied:
+        translate("Message.RecoveryCodesCopied") || "Backup Codes Copied to Clipboard",
+      RecoveryCodesNotCopied:
+        translate("Message.RecoveryCodesNotCopied") || "Backup Codes Failed to Copy",
       ResaleTwoStepVerificationMessage: translate("Message.ResaleTwoStepVerificationMessage"),
       RobuxSpendTwoStepVerificationMessage: translate(
         "Message.RobuxSpendTwoStepVerificationMessage",

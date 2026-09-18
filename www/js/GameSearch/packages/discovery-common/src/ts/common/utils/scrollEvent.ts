@@ -13,8 +13,9 @@ type ScrollEventProps = {
   startingPosition: number;
   currentPage: string;
   pageSession: string;
-  gameSetTypeId?: number | string;
+  gameSetTypeId?: number;
   gameSetTargetId?: number;
+  sortId?: string;
   sortPosition?: number;
 };
 
@@ -27,6 +28,7 @@ export const sendScrollEvent = ({
   pageSession,
   gameSetTypeId,
   gameSetTargetId,
+  sortId,
   sortPosition,
 }: ScrollEventProps): void => {
   const eventData: TFeedScroll = {
@@ -36,6 +38,7 @@ export const sendScrollEvent = ({
     [EventStreamMetadata.PageSession]: pageSession,
     [EventStreamMetadata.GameSetTypeId]: gameSetTypeId,
     [EventStreamMetadata.GameSetTargetId]: gameSetTargetId,
+    [EventStreamMetadata.SortId]: sortId,
     [EventStreamMetadata.SortPos]: sortPosition,
     [EventStreamMetadata.ScrollDepth]: distance / scrollAreaSize,
     [EventStreamMetadata.StartDepth]: startingPosition / scrollAreaSize,

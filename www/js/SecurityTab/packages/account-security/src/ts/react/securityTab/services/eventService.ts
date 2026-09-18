@@ -220,6 +220,24 @@ export class EventServiceDefault {
       },
     );
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  sendRecoveryCodesCopyEvent(): void {
+    eventStreamService.sendEventWithTarget(
+      eventStreamService.eventTypes.buttonClick!,
+      EVENT_CONSTANTS.settingsContext,
+      { btn: EVENT_CONSTANTS.button.recoveryCodesCopy },
+    );
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  sendRecoveryCodesDownloadEvent(): void {
+    eventStreamService.sendEventWithTarget(
+      eventStreamService.eventTypes.buttonClick!,
+      EVENT_CONSTANTS.settingsContext,
+      { btn: EVENT_CONSTANTS.button.recoveryCodesDownload },
+    );
+  }
 }
 
 /**

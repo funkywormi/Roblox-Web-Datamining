@@ -99,7 +99,6 @@ export type TGuacPlayButtonUIResponse = {
   useCameraU13Design: boolean;
   useVoiceUpsellV2Design: boolean;
   useExperienceApprovalForParentalConsent: boolean;
-  isDemoModeEnabled: boolean;
 };
 
 export type TUniversePlaceVoiceEnabledSettings = {

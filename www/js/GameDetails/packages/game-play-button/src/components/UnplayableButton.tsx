@@ -1,15 +1,20 @@
-import { Button } from "@rbx/core-ui/legacy/react-style-guide";
+import classNames from "classnames";
+import { Button } from "@rbx/foundation-ui";
 import { TranslateFunction, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
 import playButtonConstants from "../constants/playButtonConstants";
 import { translations } from "../constants/translations";
+import {
+  buttonWidths,
+  fuiButtonStyle,
+  fullWidthClassName,
+  TButtonWidth,
+} from "../constants/buttonWidths";
 
 const { playButtonTextTranslationMap } = playButtonConstants;
 
-type ValueOf<T> = T[keyof T];
-
 export type TUnplayableProps = {
   iconClassName?: string;
-  buttonWidth?: ValueOf<typeof Button.widths>;
+  buttonWidth?: TButtonWidth;
   buttonClassName?: string;
   hideButtonText?: boolean;
 };
@@ -17,7 +22,7 @@ export type TUnplayableProps = {
 const UnplayableButton = ({
   translate,
   iconClassName = "icon-status-unavailable-secondary",
-  buttonWidth = Button.widths.full,
+  buttonWidth = buttonWidths.full,
   buttonClassName = "btn-common-play-game-unplayable-lg",
   hideButtonText = false,
 }: TUnplayableProps & {
@@ -25,8 +30,9 @@ const UnplayableButton = ({
 }) => (
   <Button
     data-testid="play-unplayable-button"
-    width={buttonWidth}
-    className={buttonClassName}
+    variant="Emphasis"
+    style={fuiButtonStyle}
+    className={classNames(fullWidthClassName(buttonWidth), buttonClassName)}
     isDisabled
     onClick={() => null}
   >

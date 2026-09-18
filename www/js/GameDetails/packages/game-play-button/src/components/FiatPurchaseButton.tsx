@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { ValidHttpUrl, isValidStripeCheckoutUrl } from "@rbx/core-scripts/util/url";
-import { Button } from "@rbx/core-ui/legacy/react-style-guide";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import playButtonService from "../services/playButtonService";
-import { TGetProductDetails, ValueOf, type TPlayButtonPageContext } from "../types/playButtonTypes";
+import { TGetProductDetails, type TPlayButtonPageContext } from "../types/playButtonTypes";
+import { TButtonWidth } from "../constants/buttonWidths";
 import { sendUnlockPlayIntentEvent } from "../utils/playButtonUtils";
 import PurchaseButtonUI from "./PurchaseButtonUI";
 
@@ -18,7 +18,7 @@ type TFiatPurchaseButtonProps = {
   productDetails: TGetProductDetails;
   translate: TranslateFunction;
   iconClassName?: string;
-  buttonWidth?: ValueOf<typeof Button.widths>;
+  buttonWidth?: TButtonWidth;
   buttonClassName?: string;
   hideButtonText?: boolean;
   redirectPurchaseUrl?: ValidHttpUrl;

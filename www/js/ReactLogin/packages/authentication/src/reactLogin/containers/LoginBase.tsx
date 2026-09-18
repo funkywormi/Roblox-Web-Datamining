@@ -113,6 +113,7 @@ import LoginAlternative from "../components/LoginAlternative";
 import LoginIdVerification from "../components/LoginIdVerification";
 import LoginSecurityQuestions from "../components/LoginSecurityQuestions";
 import SignupLink from "../components/SignupLink";
+import StudioLegalLinks from "../components/StudioLegalLinks";
 import ForgotCredentialLink from "../components/ForgotCredentialLink";
 import AccountSelectorComponent from "@rbx/authentication-common/components/AccountSelectorComponent";
 import { EmailVerifyCodeModalParams } from "../../emailVerifyCodeModal/interface";
@@ -142,6 +143,15 @@ import {
   removeMagicLinkTokenFromLoginUrl,
 } from "../revamp/magicLinkLoginUtils";
 import MagicLinkLoginErrorModal from "../revamp/MagicLinkLoginErrorModal";
+
+type StudioEmbeddedWindow = Window & {
+  rbx?: {
+    postMessage?: unknown;
+  };
+};
+
+const isStudioEmbeddedWebView = (): boolean =>
+  typeof (window as StudioEmbeddedWindow).rbx?.postMessage === "function";
 
 export const LoginBase = (): JSX.Element => {
   const { translate } = useTranslation();
@@ -1078,7 +1088,10 @@ export const LoginBase = (): JSX.Element => {
     return <Loading />;
   }
 
-  const loginBaseContainerClass = "login-base-container";
+  const isStudioWebView = isStudioEmbeddedWebView();
+  const loginBaseContainerClass = `login-base-container${
+    isStudioWebView ? " studio-embedded-auth" : ""
+  }`;
 
   const loginBase = (
     <div id="login-base" className={loginBaseContainerClass}>
@@ -1152,6 +1165,7 @@ export const LoginBase = (): JSX.Element => {
             translate={translate}
           />
           <SignupLink />
+          {isStudioWebView && <StudioLegalLinks />}
         </div>
       )}
       {unifiedCaptchaId && dataExchange && (

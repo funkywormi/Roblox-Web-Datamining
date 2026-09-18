@@ -60,7 +60,10 @@ const GameTileVideoPlayer = ({
 
   return (
     <CacheProvider cache={cache}>
-      <UIThemeProvider theme={theme} cssBaselineMode="disabled">
+      <UIThemeProvider
+        theme={theme === "dark" ? "foundation-dark" : "foundation-light"}
+        cssBaselineMode="disabled"
+      >
         <GamePreviewVideoPlayer
           isActive
           className="wide-game-tile-video-player"

@@ -19,7 +19,8 @@ export const PageSessionProvider: React.FC = ({ children }) => {
     urlParams &&
     (urlParams.discoverPageSessionInfo ||
       urlParams.homePageSessionInfo ||
-      urlParams.spotlightPageSessionInfo);
+      urlParams.spotlightPageSessionInfo ||
+      urlParams.preAuthLandingPageSessionInfo);
   const [session, setSession] = useState(
     referredSession && typeof referredSession === "string"
       ? referredSession

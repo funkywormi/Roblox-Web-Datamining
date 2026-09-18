@@ -1,3 +1,5 @@
+export const ABUSE_VECTOR_PLACE = "place";
+
 /**
  * Retrieves the abuse report URL with the specified parameters.
  *

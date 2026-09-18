@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Modal } from "react-style-guide";
 import { authenticatedUser } from "header-scripts";
+import { Button } from "@rbx/foundation-ui";
 import { ModalFragmentProps } from "../../constants/types";
 import useSecurityTabContext from "../../hooks/useSecurityTabContext";
 import ModalState from "../../store/modalState";
@@ -10,14 +11,15 @@ const ModalRecoveryCodesDisplay: React.FC<ModalFragmentProps> = ({
   closeModal,
 }: ModalFragmentProps) => {
   const {
-    state: { resources, requestService, modalStateAndProps },
+    state: { resources, requestService, modalStateAndProps, systemFeedbackService, eventService },
     dispatch,
   } = useSecurityTabContext();
 
   /*
    * Component State
    */
-  const [confirmSavedCodes, setConfirmSavedCodes] = useState<boolean>(false);
+  const [hasCopied, setHasCopied] = useState<boolean>(false);
+  const [hasDownloaded, setHasDownloaded] = useState<boolean>(false);
 
   /*
    * Effects
@@ -32,8 +34,34 @@ const ModalRecoveryCodesDisplay: React.FC<ModalFragmentProps> = ({
    * Event Handlers
    */
 
-  const checkboxToggle = () => {
-    setConfirmSavedCodes(!confirmSavedCodes);
+  const handleCopy = async () => {
+    const allRecoveryCodes = modalStateAndProps.additionalModalProps.recoveryCodes.join("\n");
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(allRecoveryCodes);
+        systemFeedbackService.success(resources.Message.RecoveryCodesCopied);
+        eventService.sendRecoveryCodesCopyEvent();
+      }
+    } catch {
+      systemFeedbackService.warning(resources.Message.RecoveryCodesNotCopied);
+    } finally {
+      setHasCopied(true);
+    }
+  };
+
+  const handleDownload = () => {
+    const allRecoveryCodes = modalStateAndProps.additionalModalProps.recoveryCodes.join("\n");
+    const blob = new Blob([allRecoveryCodes], { type: "text/plain;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "roblox_backup_codes.txt";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => window.URL.revokeObjectURL(url), 0);
+    eventService.sendRecoveryCodesDownloadEvent();
+    setHasDownloaded(true);
   };
 
   const updateStateAndCloseModal = async () => {
@@ -101,11 +129,27 @@ const ModalRecoveryCodesDisplay: React.FC<ModalFragmentProps> = ({
             {recoveryCodesDisplayElement(modalStateAndProps.additionalModalProps.recoveryCodes)}
           </div>
           <br />
-          <div className="checkbox">
-            <input id="confirm-recovery-codes-checkbox" type="checkbox" onClick={checkboxToggle} />
-            <label htmlFor="confirm-recovery-codes-checkbox">
-              {resources.Label.Dialog.RecoveryCodesSavedConfirmation}
-            </label>
+          <div className="recovery-codes-actions" data-testid="recovery-codes-actions">
+            <Button
+              variant="Emphasis"
+              size="Medium"
+              icon="icon-regular-arrow-down-to-line"
+              className="flex-col fill"
+              data-testid="recovery-codes-download-button"
+              onClick={handleDownload}
+            >
+              {resources.Action.Download}
+            </Button>
+            <Button
+              variant="Standard"
+              size="Medium"
+              icon="icon-regular-clipboard-pencil"
+              className="flex-col fill"
+              data-testid="recovery-codes-copy-button"
+              onClick={handleCopy}
+            >
+              {resources.Action.Copy}
+            </Button>
           </div>
         </div>
       </Modal.Body>
@@ -113,8 +157,9 @@ const ModalRecoveryCodesDisplay: React.FC<ModalFragmentProps> = ({
         <button
           type="submit"
           className="btn-secondary-md btn-full-width"
+          data-testid="recovery-codes-close-button"
           onClick={updateStateAndCloseModal}
-          disabled={!confirmSavedCodes}
+          disabled={!hasCopied && !hasDownloaded}
         >
           {resources.Action.Dialog.Close}
         </button>

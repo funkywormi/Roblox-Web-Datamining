@@ -1342,6 +1342,20 @@ div.account-switcher-modal.account-switcher-foundation-dialog .account-switcher-
     margin: 24px 0
 }
 
+.login-base-container.studio-embedded-auth .signup-option {
+    margin-bottom: 0
+}
+
+.login-base-container.studio-embedded-auth .studio-legal-links {
+    -ms-flex-pack: center;
+    justify-content: center;
+    gap: 24px;
+    margin: 6px 0;
+    font-size: 12px;
+    display: -ms-flexbox;
+    display: flex
+}
+
 .login-base-container .no-account-text,
 .login-base-container .account-not-needed-text,
 .login-revamp-container .no-account-text,

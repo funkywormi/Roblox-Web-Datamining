@@ -67,5 +67,6 @@
     "Label.Active": "Active",
     "Label.Inactive": "Inactive",
     "Label.Expiring": "Expiring",
-    "Label.Unavailable": "Unavailable"
+    "Label.Unavailable": "Unavailable",
+    "Description.PerMonth": "{price}/month"
 }

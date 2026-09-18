@@ -11,6 +11,7 @@ export enum PageContext {
   SpotlightPage = "spotlightPage",
   UserProfilePage = "userProfilePage",
   SongListPage = "songListPage",
+  PreAuthLandingPage = "preAuthLandingPage",
 }
 
 export default {

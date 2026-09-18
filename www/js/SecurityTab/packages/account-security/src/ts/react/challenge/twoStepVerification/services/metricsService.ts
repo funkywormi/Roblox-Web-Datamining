@@ -1,5 +1,5 @@
 import EventTimer from "../../../../common/eventTimer";
-import RobloxEventTracker from "../../../../common/eventTracker";
+import defaultEventTracker, { type RobloxEventTracker } from "../../../../common/eventTracker";
 import { RequestServiceDefault } from "../../../../common/request";
 import { MetricName } from "../../../../common/request/types/metrics";
 import { FEATURE_NAME, METRICS_CONSTANTS } from "../app.config";
@@ -19,23 +19,28 @@ export class MetricsServiceDefault {
 
   private requestServiceDefault: RequestServiceDefault;
 
+  private eventTracker: RobloxEventTracker | undefined;
+
   constructor(
     actionType: ActionType,
     appType: string | undefined,
     requestServiceDefault: RequestServiceDefault,
+    // Defaults to .NET's window.EventTracker global; Next passes @rbx/www-common's tracker instead.
+    eventTracker: RobloxEventTracker | undefined = defaultEventTracker,
   ) {
     this.appType = appType || "unknown";
     this.actionType = actionType;
     this.solveTimeSequenceName = `${this.actionType}_${FEATURE_NAME}_${METRICS_CONSTANTS.sequence.solveTime}`;
     this.eventTimer = new EventTimer();
     this.requestServiceDefault = requestServiceDefault;
+    this.eventTracker = eventTracker;
   }
 
   fireInitializedEvent(): void {
-    if (RobloxEventTracker) {
+    if (this.eventTracker) {
       const eventName = `${this.actionType}_${FEATURE_NAME}_${METRICS_CONSTANTS.event.initialized}`;
-      RobloxEventTracker.fireEvent(eventName, `${eventName}_${this.appType}`);
-      RobloxEventTracker.start(
+      this.eventTracker.fireEvent(eventName, `${eventName}_${this.appType}`);
+      this.eventTracker.start(
         this.solveTimeSequenceName,
         `${this.solveTimeSequenceName}_${this.appType}`,
       );
@@ -63,10 +68,10 @@ export class MetricsServiceDefault {
       return;
     }
 
-    if (RobloxEventTracker) {
+    if (this.eventTracker) {
       const eventName = `${this.actionType}_${FEATURE_NAME}_${METRICS_CONSTANTS.event.verified}${mediaType}`;
-      RobloxEventTracker.fireEvent(eventName, `${eventName}_${this.appType}`);
-      RobloxEventTracker.endSuccess(
+      this.eventTracker.fireEvent(eventName, `${eventName}_${this.appType}`);
+      this.eventTracker.endSuccess(
         this.solveTimeSequenceName,
         `${this.solveTimeSequenceName}_${this.appType}`,
       );
@@ -108,10 +113,10 @@ export class MetricsServiceDefault {
   }
 
   fireInvalidatedEvent(): void {
-    if (RobloxEventTracker) {
+    if (this.eventTracker) {
       const eventName = `${this.actionType}_${FEATURE_NAME}_${METRICS_CONSTANTS.event.invalidated}`;
-      RobloxEventTracker.fireEvent(eventName, `${eventName}_${this.appType}`);
-      RobloxEventTracker.endFailure(
+      this.eventTracker.fireEvent(eventName, `${eventName}_${this.appType}`);
+      this.eventTracker.endFailure(
         this.solveTimeSequenceName,
         `${this.solveTimeSequenceName}_${this.appType}`,
       );
@@ -153,10 +158,10 @@ export class MetricsServiceDefault {
   }
 
   fireAbandonedEvent(): void {
-    if (RobloxEventTracker) {
+    if (this.eventTracker) {
       const eventName = `${this.actionType}_${FEATURE_NAME}_${METRICS_CONSTANTS.event.abandoned}`;
-      RobloxEventTracker.fireEvent(eventName, `${eventName}_${this.appType}`);
-      RobloxEventTracker.endCancel(
+      this.eventTracker.fireEvent(eventName, `${eventName}_${this.appType}`);
+      this.eventTracker.endCancel(
         this.solveTimeSequenceName,
         `${this.solveTimeSequenceName}_${this.appType}`,
       );

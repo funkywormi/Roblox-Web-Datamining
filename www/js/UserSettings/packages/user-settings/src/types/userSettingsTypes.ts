@@ -133,7 +133,8 @@ export type TSettingOptionAndRequirement = {
 
 export type TUserSettingAndOptions<T> = {
   currentValue?: T;
-  options: TSettingOptionAndRequirement[];
+  // If there are no options, a user is ineligible for viewing/modifying this setting
+  options?: TSettingOptionAndRequirement[];
 };
 
 export type TUserSettingsAndOptionsBody = {

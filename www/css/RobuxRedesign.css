@@ -1161,10 +1161,6 @@ p.personalized-bonus-items__report-popover {
     gap: var(--size-150)
 }
 
-.scroll {
-    overflow: auto
-}
-
 .\!size-1800 {
     width: var(--size-1800) !important;
     height: var(--size-1800) !important
@@ -1243,10 +1239,6 @@ p.personalized-bonus-items__report-popover {
     max-width: 320px
 }
 
-.max-width-\[calc\(var\(--size-100\)\*50\)\] {
-    max-width: calc(var(--size-100)*50)
-}
-
 .min-height-\[120px\] {
     min-height: 120px
 }
@@ -1269,18 +1261,6 @@ p.personalized-bonus-items__report-popover {
 
 .width-\[313px\] {
     width: 313px
-}
-
-.width-\[35\%\] {
-    width: 35%
-}
-
-.width-\[40\%\] {
-    width: 40%
-}
-
-.width-\[55\%\] {
-    width: 55%
 }
 
 .width-\[60px\] {
@@ -1312,10 +1292,6 @@ p.personalized-bonus-items__report-popover {
 
 .content-\[var\(--inverse-content-emphasis\)\] {
     color: var(--inverse-content-emphasis)
-}
-
-.content-\[var\(--inverse-surface-0\)\] {
-    color: var(--inverse-surface-0)
 }
 
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
@@ -1384,10 +1360,6 @@ p.personalized-bonus-items__report-popover {
 
 .icon-filled-chevron-large-up {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M15.0536 8.83591C15.6427 8.35579 16.5114 8.3904 17.0604 8.93942L27.0604 18.9394L27.1639 19.0537C27.6441 19.6428 27.6095 20.5115 27.0604 21.0605C26.5114 21.6095 25.6428 21.6441 25.0536 21.164L24.9393 21.0605L15.9999 12.1211L7.06043 21.0605C6.47465 21.6463 5.52513 21.6463 4.93934 21.0605C4.35355 20.4747 4.35355 19.5252 4.93934 18.9394L14.9393 8.93942L15.0536 8.83591Z' fill='black'/%3E%3C/svg%3E")
-}
-
-.icon-regular-circle-i {
-    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M17 21H19.5V23H12.5V21H15V14H13V12H17V21Z' fill='black'/%3E %3Cpath d='M17 10H15V8H17V10Z' fill='black'/%3E %3Cpath d='M16 2C23.732 2 30 8.26801 30 16C30 23.732 23.732 30 16 30C8.26801 30 2 23.732 2 16C2 8.26801 8.26801 2 16 2ZM16 4C9.37258 4 4 9.37258 4 16C4 22.6274 9.37258 28 16 28C22.6274 28 28 22.6274 28 16C28 9.37258 22.6274 4 16 4Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-filled-circle-i {
@@ -1556,10 +1528,6 @@ p.personalized-bonus-items__report-popover {
 
 .\!\[max-height\:97vh\] {
     max-height: 97vh !important
-}
-
-.\[min-height\:40vh\] {
-    min-height: 40vh
 }
 
 .\!\[padding-bottom\:env\(safe-area-inset-bottom\)\] {

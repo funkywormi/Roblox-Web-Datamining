@@ -29,7 +29,7 @@ import RobuxLimitField from "./RobuxLimitField";
 const ChildRobuxTransferLimits = ({ child }: { child: TChildInfo }): JSX.Element => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
-  const { spendControls, robuxTransferLimits } = parentalControlsTranslationConstants;
+  const { robuxTransferLimits } = parentalControlsTranslationConstants;
   const pageDescription = translate(robuxTransferLimits.parentSideDescription);
 
   // The caps the parent has already saved come from user-settings, which owns
@@ -115,7 +115,7 @@ const ChildRobuxTransferLimits = ({ child }: { child: TChildInfo }): JSX.Element
           maxLabelKey={robuxTransferLimits.maximumDailyLimit}
           cap={limits.daily}
           tierCap={transferLimits.tierDailyTransferLimit}
-          placeholder={translate(spendControls.noLimit)}
+          placeholder={translate(robuxTransferLimits.noLimit)}
           onChange={daily => setLimits(current => ({ ...current, daily }))}
         />
         <RobuxLimitField
@@ -124,7 +124,7 @@ const ChildRobuxTransferLimits = ({ child }: { child: TChildInfo }): JSX.Element
           maxLabelKey={robuxTransferLimits.maximumMonthlyLimit}
           cap={limits.monthly}
           tierCap={transferLimits.tierMonthlyTransferLimit}
-          placeholder={translate(spendControls.noLimit)}
+          placeholder={translate(robuxTransferLimits.noLimit)}
           onChange={monthly => setLimits(current => ({ ...current, monthly }))}
         />
 

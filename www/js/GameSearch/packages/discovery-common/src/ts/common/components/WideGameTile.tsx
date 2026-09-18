@@ -1,16 +1,13 @@
 import classNames from "classnames";
-import React, { Ref, useCallback, useMemo, useState } from "react";
+import React, { Ref, useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Link } from "@rbx/core-ui";
 import { TranslateFunction } from "@rbx/core-scripts/react";
-import { sendEvent } from "@rbx/core-scripts/event-stream";
+import { AbuseReportDialog, prefetchAbuseUI } from "@rbx/abuse-report-ui";
+import { ABUSE_VECTOR_PLACE } from "../constants/abuseReportConstants";
 import configConstants from "../constants/configConstants";
 import { FeaturePlacesList } from "../constants/translationConstants";
-import eventStreamConstants, {
-  EventStreamMetadata,
-  TGameTileOverflowMenuAction,
-  GameTileOverflowMenuActionType,
-} from "../constants/eventStreamConstants";
 import useFocused from "../hooks/useFocused";
+import useGameTileOverflowMenu from "../hooks/useGameTileOverflowMenu";
 import useReferralPlaceId from "../hooks/useReferralPlaceId";
 import { TGameData, TGetFriendsResponse } from "../types/bedev1Types";
 import {
@@ -21,17 +18,17 @@ import {
   TWideTileComponentType,
 } from "../types/bedev2Types";
 import { GameTileOverflowMenuItems } from "../types/gameTileOverflowMenuItems";
+import { PageContext } from "../types/pageContext";
 import browserUtils from "../utils/browserUtils";
 import {
   getFriendVisits,
   getInGameFriends,
-  getSessionInfoTypeFromPageContext,
   getThumbnailOverrideAssetId,
   getVideoOverrideAssetId,
 } from "../utils/parsingUtils";
 import GameTileOverlayPill from "./GameTileOverlayPill";
 import GameTilePlayButton from "./GameTilePlayButton";
-import GameTileOverflowMenu from "./GameTileOverflowMenu";
+import GameTileOverflowMenu, { getGameTileOverflowMenuItemsToShow } from "./GameTileOverflowMenu";
 import {
   GameTileIconWithTextFooter,
   GameTileRatingContent,
@@ -51,8 +48,6 @@ import {
   getGameTileRatingWithGenreFooterData,
   getGameTileTextFooterData,
 } from "../utils/gameTileLayoutUtils";
-import { usePageSession } from "../utils/PageSessionContext";
-import { PageContext } from "../types/pageContext";
 
 const WideGameTileLinkWrapper = ({
   wrapperClassName,
@@ -101,6 +96,7 @@ export type TWideGameTileProps = {
   toggleInterest?: () => void;
   enableSponsoredFeedback?: boolean;
   sponsoredUserCohort?: string;
+  enableReportExperience?: boolean;
   enableReportAd?: boolean;
   sponsoredFooterAdLabelText?: string;
   sponsoredFooterAdLabelFirst?: boolean;
@@ -133,6 +129,7 @@ const WideGameTile = React.forwardRef(
       toggleInterest = undefined,
       enableSponsoredFeedback = false,
       sponsoredUserCohort,
+      enableReportExperience = false,
       enableReportAd = false,
       sponsoredFooterAdLabelText,
       sponsoredFooterAdLabelFirst = true,
@@ -150,9 +147,14 @@ const WideGameTile = React.forwardRef(
     const isFirstTile = id === 0;
     const isLastTile = id === configConstants.homePage.maxWideGameTilesPerCarouselPage - 1;
     const [isFocused, onFocus, onFocusLost] = useFocused();
-    const pageSession = usePageSession();
+    const [isReportExperienceDialogOpen, setIsReportExperienceDialogOpen] = useState(false);
 
     const referralPlaceId = useReferralPlaceId(gameData, navigationRootPlaceId);
+    const reportExperienceAttributes = useMemo(
+      () =>
+        gameData.placeId === undefined ? undefined : { targetId: gameData.placeId.toString() },
+      [gameData.placeId],
+    );
 
     const clientReferralUrl = useMemo(() => {
       return browserUtils.buildGameDetailUrl(
@@ -355,55 +357,53 @@ const WideGameTile = React.forwardRef(
       }
     }, [toggleInterest]);
 
-    const sendGameTileOverflowMenuAction = useCallback(
-      (
-        actionType: GameTileOverflowMenuActionType,
-        availableMenuItems: GameTileOverflowMenuItems[],
-        menuItem?: GameTileOverflowMenuItems,
-      ) => {
-        const sessionInfoType = getSessionInfoTypeFromPageContext(page);
+    const {
+      overflowMenuOpen,
+      sendGameTileOverflowMenuAction,
+      closeOverflowMenu,
+      toggleOverflowMenu,
+    } = useGameTileOverflowMenu(gameData.universeId, topicId, page);
 
-        const params: TGameTileOverflowMenuAction = {
-          [EventStreamMetadata.UniverseId]: gameData.universeId.toString(),
-          [EventStreamMetadata.SortId]: topicId,
-          [EventStreamMetadata.ActionType]: actionType,
-          [EventStreamMetadata.MenuItem]: menuItem,
-          [EventStreamMetadata.AvailableMenuItems]: availableMenuItems,
-          ...(sessionInfoType && { [sessionInfoType]: pageSession }),
-        };
-
-        const eventParams = eventStreamConstants.gameTileOverflowMenuAction(params, page);
-        sendEvent(...eventParams);
-      },
-      [gameData.universeId, topicId, page, pageSession],
+    const menuItemsToShow = useMemo(
+      () =>
+        getGameTileOverflowMenuItemsToShow({
+          enableExplicitFeedback,
+          setIsHidden,
+          enableSponsoredFeedback,
+          isSponsored: gameData.isSponsored,
+          enableReportExperience: enableReportExperience,
+          reportExperienceAttributes: reportExperienceAttributes,
+          enableReportAd,
+          encryptedAdTrackingData: gameData.nativeAdData,
+        }),
+      [
+        enableExplicitFeedback,
+        setIsHidden,
+        enableSponsoredFeedback,
+        gameData.isSponsored,
+        enableReportExperience,
+        reportExperienceAttributes,
+        enableReportAd,
+        gameData.nativeAdData,
+      ],
     );
 
-    const [overflowMenuOpen, setOverflowMenuOpen] = useState(false);
-    const closeOverflowMenu = useCallback(
-      (availableMenuItems: GameTileOverflowMenuItems[]) => {
-        setOverflowMenuOpen(false);
-        sendGameTileOverflowMenuAction(
-          GameTileOverflowMenuActionType.GameTileOverflowMenuItemClosed,
-          availableMenuItems,
-        );
-      },
-      [sendGameTileOverflowMenuAction],
+    const canReportExperience = menuItemsToShow.includes(
+      GameTileOverflowMenuItems.ReportExperience,
     );
 
-    const toggleOverflowMenu = useCallback(
-      (availableMenuItems: GameTileOverflowMenuItems[]) => {
-        setOverflowMenuOpen(prevOpen => {
-          sendGameTileOverflowMenuAction(
-            prevOpen
-              ? GameTileOverflowMenuActionType.GameTileOverflowMenuItemClosed
-              : GameTileOverflowMenuActionType.GameTileOverflowMenuItemOpened,
-            availableMenuItems,
-          );
-          return !prevOpen;
+    useEffect(() => {
+      if (overflowMenuOpen && canReportExperience && reportExperienceAttributes) {
+        prefetchAbuseUI({
+          abuseVector: ABUSE_VECTOR_PLACE,
+          attributes: reportExperienceAttributes,
         });
-      },
-      [sendGameTileOverflowMenuAction],
-    );
+      }
+    }, [overflowMenuOpen, canReportExperience, reportExperienceAttributes]);
+
+    const openReportExperienceDialog = useCallback(() => {
+      setIsReportExperienceDialogOpen(true);
+    }, []);
 
     return (
       <li
@@ -453,9 +453,10 @@ const WideGameTile = React.forwardRef(
                   playerCount={gameData.playerCount}
                   isFocused={isFocused}
                 />
-                {(isFocused || overflowMenuOpen) && (
+                {menuItemsToShow.length > 0 && (isFocused || overflowMenuOpen) && (
                   <GameTileOverflowMenu
                     open={overflowMenuOpen}
+                    menuItemsToShow={menuItemsToShow}
                     closeMenu={closeOverflowMenu}
                     toggleMenu={toggleOverflowMenu}
                     sendActionEvent={sendGameTileOverflowMenuAction}
@@ -472,6 +473,7 @@ const WideGameTile = React.forwardRef(
                     enableReportAd={enableReportAd}
                     encryptedAdTrackingData={gameData.nativeAdData}
                     adCreativeAssetId={getThumbnailOverrideAssetId(gameData, topicId)?.toString()}
+                    onReportExperience={openReportExperienceDialog}
                     translate={translate}
                   />
                 )}
@@ -506,6 +508,15 @@ const WideGameTile = React.forwardRef(
                 )}
               </div>
             </WideGameTileLinkWrapper>
+            {canReportExperience && reportExperienceAttributes && (
+              <AbuseReportDialog
+                abuseVector={ABUSE_VECTOR_PLACE}
+                attributes={reportExperienceAttributes}
+                analyticsTargetId={reportExperienceAttributes.targetId}
+                open={isReportExperienceDialogOpen}
+                onClose={() => setIsReportExperienceDialogOpen(false)}
+              />
+            )}
             {isFocused && hoverStyle !== THoverStyle.imageOverlay && isPlayButtonVisible && (
               <div data-testid="game-tile-hover-game-tile-contents" className="game-card-contents">
                 <GameTilePlayButton

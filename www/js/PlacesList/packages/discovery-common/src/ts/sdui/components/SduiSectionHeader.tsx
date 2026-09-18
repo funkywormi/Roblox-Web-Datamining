@@ -149,7 +149,9 @@ const SduiSectionHeader = ({
       titleLinkPath={onTitleActivated?.linkPath}
       titleText={titleText}
       titleTextColor={titleColor ?? tokens.Color.Content.Emphasis}
-      titleFontStyle={titleFontStyle ?? tokens.Typography.HeadingSmall}
+      titleFontStyle={
+        titleFontStyle ?? { ...tokens.Typography.HeadingSmall, FontFamily: "inherit" }
+      }
       titleGap={titleGap ?? tokens.Gap.XXSmall}
       titleIconClassName={titleIcon}
       titleIconWidth={titleIconWidth ?? tokens.Size.Size_600}
@@ -159,7 +161,9 @@ const SduiSectionHeader = ({
       subtitleLinkPath={onSubtitleActivated?.linkPath}
       subtitleText={subtitleText}
       subtitleTextColor={subtitleColor ?? tokens.Color.Content.Default}
-      subtitleFontStyle={subtitleFontStyle ?? tokens.Typography.BodyMedium}
+      subtitleFontStyle={
+        subtitleFontStyle ?? { ...tokens.Typography.BodyMedium, FontFamily: "inherit" }
+      }
       subtitleGap={subtitleGap ?? tokens.Gap.XXSmall}
       subtitleIconClassName={subtitleIcon}
       subtitleIconWidth={subtitleIconWidth ?? tokens.Size.Size_400}

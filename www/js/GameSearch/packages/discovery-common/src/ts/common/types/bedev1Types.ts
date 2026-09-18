@@ -338,6 +338,8 @@ export type TGetGameDetails = {
   localizedFiatPrice?: string;
   refundPolicy?: TRefundPolicy;
   isContentRestricted?: boolean;
+  /** Studio creation source (e.g. "build" for Build experiences). */
+  creationSource?: string;
 };
 
 // GetFriends

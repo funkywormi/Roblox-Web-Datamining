@@ -1,5 +1,5 @@
 import { useState, useLayoutEffect, useMemo } from "react";
-import { throttle } from "lodash";
+import { throttle } from "es-toolkit";
 import { useElementWidthResizeObserver } from "@rbx/discovery-sdui-components";
 import { getNumTilesPerRow } from "../../common/components/GameTileUtils";
 import { TComponentType } from "../../common/types/bedev2Types";

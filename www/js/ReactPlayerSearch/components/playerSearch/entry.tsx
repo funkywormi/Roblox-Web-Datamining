@@ -7,6 +7,7 @@ import "./src/main.css";
 
 ready(() => {
   const container =
+    document.getElementById("react-player-search-web-app") ??
     document.getElementById("player-search-web-app") ??
     document.getElementById("player-search-container");
 

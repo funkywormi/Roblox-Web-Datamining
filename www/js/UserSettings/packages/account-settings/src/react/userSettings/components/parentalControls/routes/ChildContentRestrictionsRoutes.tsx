@@ -16,7 +16,6 @@ import BlockedExperiencesSearch from "../../privacy/BlockedExperiencesSearch";
 import ApprovedExperiences from "../../privacy/ApprovedExperiences";
 import SensitiveIssues from "../../privacy/SensitiveIssues";
 import PrivatePlaytestPrivacy from "../../privacy/PrivatePlaytestPrivacy";
-import { privatePlaytestOptionLabels } from "../../../constants/privacy/privacyConstants";
 
 export const ChildContentRestrictionsRoutes = ({
   child,
@@ -58,16 +57,12 @@ export const ChildContentRestrictionsRoutes = ({
             translate,
           );
           break;
-        case PrivacySettingName.PrivatePlaytest: {
-          const privatePlaytestValue = childSettingsV2?.[UserSetting.privatePlaytest]?.currentValue;
-          const labelKey = privatePlaytestValue
-            ? privatePlaytestOptionLabels[privatePlaytestValue]
-            : undefined;
-          if (labelKey) {
-            currValueLabel = translate(labelKey);
-          }
+        case PrivacySettingName.PrivatePlaytest:
+          currValueLabel = getTranslatedOptionValue(
+            childSettingsV2?.[UserSetting.privatePlaytest]?.currentValue,
+            translate,
+          );
           break;
-        }
         default:
       }
       result[key] = {

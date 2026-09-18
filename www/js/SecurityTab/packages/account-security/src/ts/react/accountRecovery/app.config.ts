@@ -19,6 +19,7 @@ export const EVENT_CONSTANTS = {
     contactMethodSent: "contactMethodSent",
     userSelected: "userSelected",
     passwordReset: "passwordReset",
+    recoveryIntentVerification: "recoveryIntentVerification",
   },
 } as const;
 

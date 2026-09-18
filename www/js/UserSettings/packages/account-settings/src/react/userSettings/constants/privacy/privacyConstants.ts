@@ -87,6 +87,7 @@ export const privacyOptionLabels = {
   olderAgeGroupsAllowed: "Label.OlderAgeGroupsAllowed",
   similarAgeGroupsOnly: "Label.SimilarAgeGroupsOnly",
   similarAgeGroupsOrTrustedConnections: "Label.SimilarAgeGroupsOrTrustedConnections",
+  similarAgeGroupsOrTrustedFriends: "Label.SimilarAgeGroupsOrTrustedFriends",
   allConnections: "Label.AllFriends",
   trustedConnectionsOnly: "Label.OnlyTrustedFriends",
   trustedFriends: "Label.TrustedFriends",
@@ -527,23 +528,16 @@ export const getStudioCollaborationOptions = (): TRadioButtonOptionV2[] => {
   return [olderAgeGroupsAllowed, similarAgeGroupsOrTrustedConnections, similarAgeGroupsOnly, noOne];
 };
 
-// Only NoOne and SimilarAgeGroupsAndTrustedFriends launch, shown as Off/On.
-export const privatePlaytestOptionLabels = {
-  [PrivatePlaytestValue.AllAgeGroups]: undefined,
-  [PrivatePlaytestValue.SimilarAgeGroupsAndTrustedFriends]: privacyOptionLabels.on,
-  [PrivatePlaytestValue.TrustedFriends]: undefined,
-  [PrivatePlaytestValue.NoOne]: privacyOptionLabels.off,
-} satisfies Record<PrivatePlaytestValue, string | undefined>;
-
+// Only NoOne and SimilarAgeGroupsAndTrustedFriends are available at launch.
 export const getPrivatePlaytestOptions = (): TRadioButtonOptionV2[] => {
   const on: TRadioButtonOptionV2 = {
-    label: privatePlaytestOptionLabels[PrivatePlaytestValue.SimilarAgeGroupsAndTrustedFriends],
+    label: privacyOptionLabels.similarAgeGroupsOrTrustedFriends,
     value: PrivatePlaytestValue.SimilarAgeGroupsAndTrustedFriends,
     id: "private-playtest-on",
     name: "private-playtest-on",
   };
   const off: TRadioButtonOptionV2 = {
-    label: privatePlaytestOptionLabels[PrivatePlaytestValue.NoOne],
+    label: privacyOptionLabels.noOne,
     value: PrivatePlaytestValue.NoOne,
     id: "private-playtest-off",
     name: "private-playtest-off",
@@ -555,7 +549,6 @@ export const consentSettingOptions = {
   [UserSetting.whoCanChatWithMeInExperiences]: getExperienceChatOptionsV2,
   [UserSetting.whoCanWhisperChatWithMeInExperiences]: getExperienceDirectChatOptionsV2,
   [UserSetting.whoCanPartyWithMe]: getWhoCanPartyWithMeOptions,
-  [UserSetting.privatePlaytest]: getPrivatePlaytestOptions,
 };
 
 export const getPresetChatOptions = (): TRadioButtonOptionV2[] => {

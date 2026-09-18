@@ -9,6 +9,7 @@ import { AttributionType, getAttributionId } from "../utils/attributionUtils";
 import { getHttpReferrer } from "../utils/browserUtils";
 import { PageContext } from "../types/pageContext";
 import { GameTileOverflowMenuItems } from "../types/gameTileOverflowMenuItems";
+import { GameTileHiddenReason } from "../types/gameTileHiddenReason";
 import { common } from "./configConstants";
 
 // converts a PageContext to an EventContext to get a ctx that matches app ctx
@@ -28,6 +29,10 @@ export const getEventContext = (pageContext?: PageContext): EventContext | strin
       return EventContext.SongList;
     case PageContext.SearchPage:
       return EventContext.SearchPage;
+    case PageContext.UserProfilePage:
+      return EventContext.UserProfile;
+    case PageContext.PreAuthLandingPage:
+      return EventContext.PreAuthLanding;
     default:
       window.EventTracker?.fireEvent(common.NoMatchingEventContextFoundCounterEvent);
       return "UNKNOWN";
@@ -155,6 +160,7 @@ export enum EventStreamMetadata {
   InterestedUniverseIds = "interestedUniverseIds",
   MenuItem = "menuItem",
   AvailableMenuItems = "availableMenuItems",
+  HiddenReason = "hiddenReason",
 }
 
 export enum EventType {
@@ -168,6 +174,7 @@ export enum EventType {
   GamesFilterClick = "gamesFilterClick",
   RequestRefundClick = "requestRefundClick",
   GameTileOverflowMenuAction = "gameTileOverflowMenuAction",
+  GameTileHiddenAction = "gameTileHiddenAction",
   NotInterestedFeedbackFormAction = "notInterestedFeedbackFormAction",
   MediaGalleryMediaChanged = "mediaGalleryMediaChanged",
   QuerySuggestionClicked = "querySuggestionClicked",
@@ -182,6 +189,7 @@ export enum SessionInfoType {
   DiscoverPageSessionInfo = "discoverPageSessionInfo",
   SearchLandingPageSessionInfo = "searchLandingPageSessionInfo",
   SpotlightPageSessionInfo = "spotlightPageSessionInfo",
+  PreAuthLandingPageSessionInfo = "preAuthLandingPageSessionInfo",
 }
 
 export type TDiscoverySessionInfo = {
@@ -202,6 +210,7 @@ type TBaseGameImpressions = {
   [EventStreamMetadata.UniverseIds]: number[];
   [EventStreamMetadata.GameSetTypeId]?: number | string;
   [EventStreamMetadata.GameSetTargetId]?: number | string;
+  [EventStreamMetadata.SortId]?: string;
   [EventStreamMetadata.SortSubId]?: string;
   [EventStreamMetadata.AdsPositions]?: number[];
   [EventStreamMetadata.AdFlags]?: number[];
@@ -246,8 +255,9 @@ export type TFeedScroll = {
   [EventStreamMetadata.Distance]: number;
   [EventStreamMetadata.Direction]: ScrollDirection;
   [EventStreamMetadata.PageSession]: string;
-  [EventStreamMetadata.GameSetTypeId]?: number | string;
+  [EventStreamMetadata.GameSetTypeId]?: number;
   [EventStreamMetadata.GameSetTargetId]?: number;
+  [EventStreamMetadata.SortId]?: string;
   [EventStreamMetadata.SortPos]?: number;
   [EventStreamMetadata.ScrollDepth]: number;
   [EventStreamMetadata.StartDepth]: number;
@@ -273,6 +283,7 @@ export type TCarouselGameImpressions = TBaseGameImpressions & {
   [SessionInfoType.HomePageSessionInfo]?: string;
   [SessionInfoType.DiscoverPageSessionInfo]?: string;
   [SessionInfoType.SearchLandingPageSessionInfo]?: string;
+  [SessionInfoType.PreAuthLandingPageSessionInfo]?: string;
   [EventStreamMetadata.Page]:
     | PageContext.SortDetailPageDiscover
     | PageContext.SortDetailPageHome
@@ -281,7 +292,8 @@ export type TCarouselGameImpressions = TBaseGameImpressions & {
     | PageContext.GameDetailPage
     | PageContext.SearchLandingPage
     | PageContext.SpotlightPage
-    | PageContext.SongListPage;
+    | PageContext.SongListPage
+    | PageContext.PreAuthLandingPage;
 };
 
 export type TGameImpressions = TCarouselGameImpressions | TGridGameImpressions;
@@ -310,12 +322,14 @@ export type TCommonReferralParams = {
   [EventStreamMetadata.SortPos]?: number;
   [EventStreamMetadata.NumberOfLoadedTiles]?: number;
   [EventStreamMetadata.GameSetTypeId]?: number | string;
+  [EventStreamMetadata.SortId]?: string;
   [EventStreamMetadata.SortSubId]?: string;
   [EventStreamMetadata.AttributionId]?: string;
   [SessionInfoType.DiscoverPageSessionInfo]?: string;
   [SessionInfoType.GameSearchSessionInfo]?: string;
   [SessionInfoType.HomePageSessionInfo]?: string;
   [SessionInfoType.SpotlightPageSessionInfo]?: string;
+  [SessionInfoType.PreAuthLandingPageSessionInfo]?: string;
   [EventStreamMetadata.Page]:
     | PageContext.SearchPage
     | PageContext.SortDetailPageDiscover
@@ -327,7 +341,8 @@ export type TCommonReferralParams = {
     | PageContext.SearchLandingPage
     | PageContext.SpotlightPage
     | PageContext.UserProfilePage
-    | PageContext.SongListPage;
+    | PageContext.SongListPage
+    | PageContext.PreAuthLandingPage;
   [EventStreamMetadata.PlaceIdOverride]?: number;
   [EventStreamMetadata.LaunchData]?: string;
 };
@@ -346,6 +361,7 @@ export type TGameDetailReferral =
       [SessionInfoType.GameSearchSessionInfo]?: string;
       [SessionInfoType.HomePageSessionInfo]?: string;
       [SessionInfoType.SearchLandingPageSessionInfo]?: string;
+      [SessionInfoType.PreAuthLandingPageSessionInfo]?: string;
       [EventStreamMetadata.Page]:
         | PageContext.SearchPage
         | PageContext.SortDetailPageDiscover
@@ -357,7 +373,8 @@ export type TGameDetailReferral =
         | PageContext.SearchLandingPage
         | PageContext.SpotlightPage
         | PageContext.UserProfilePage
-        | PageContext.SongListPage;
+        | PageContext.SongListPage
+        | PageContext.PreAuthLandingPage;
       // PlayContext is included so it gets passed through the URL to the game
       // detail page, where the play button reads it from query params.
       // It is not actually used for the referral event
@@ -367,7 +384,8 @@ export type TGameDetailReferral =
         | PageContext.GamesPage
         | PageContext.SearchLandingPage
         | PageContext.SpotlightPage
-        | PageContext.SortDetailPageDiscover;
+        | PageContext.SortDetailPageDiscover
+        | PageContext.PreAuthLandingPage;
       [EventStreamMetadata.ShareLinkType]?: string;
       [EventStreamMetadata.ShareLinkId]?: string;
     })
@@ -383,7 +401,8 @@ export type TPlayGameClicked = TCommonReferralParams & {
     | PageContext.GamesPage
     | PageContext.SpotlightPage
     | PageContext.SortDetailPageDiscover
-    | PageContext.SongListPage;
+    | PageContext.SongListPage
+    | PageContext.PreAuthLandingPage;
 };
 
 export type TRequestRefundClick =
@@ -467,6 +486,20 @@ export type TGameTileOverflowMenuAction =
       [EventStreamMetadata.ActionType]: GameTileOverflowMenuActionType;
       [EventStreamMetadata.MenuItem]?: GameTileOverflowMenuItems;
       [EventStreamMetadata.AvailableMenuItems]?: string[];
+      [SessionInfoType.HomePageSessionInfo]?: string;
+    }
+  | {};
+
+export enum GameTileHiddenActionType {
+  GameTileHiddenUndone = "GameTileHiddenUndone",
+}
+
+export type TGameTileHiddenAction =
+  | {
+      [EventStreamMetadata.UniverseId]: string;
+      [EventStreamMetadata.SortId]?: string;
+      [EventStreamMetadata.ActionType]: GameTileHiddenActionType;
+      [EventStreamMetadata.HiddenReason]?: GameTileHiddenReason;
       [SessionInfoType.HomePageSessionInfo]?: string;
     }
   | {};
@@ -646,6 +679,16 @@ export default {
     {
       name: EventType.GameTileOverflowMenuAction,
       type: EventType.GameTileOverflowMenuAction,
+      context: getEventContext(page),
+    },
+    parseEventParamsUnifiedLogging({
+      ...params,
+    }),
+  ],
+  [EventType.GameTileHiddenAction]: (params: TGameTileHiddenAction, page?: PageContext): TEvent => [
+    {
+      name: EventType.GameTileHiddenAction,
+      type: EventType.GameTileHiddenAction,
       context: getEventContext(page),
     },
     parseEventParamsUnifiedLogging({

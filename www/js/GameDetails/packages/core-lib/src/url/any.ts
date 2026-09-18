@@ -1,4 +1,4 @@
-import { downcast } from "../commonTypes";
+import { downcast } from "../types";
 import { err, ok, Result } from "../result";
 import { BaseUrl } from "./base";
 import { IntoSearchParams, UrlSearchParams } from "./searchParams";

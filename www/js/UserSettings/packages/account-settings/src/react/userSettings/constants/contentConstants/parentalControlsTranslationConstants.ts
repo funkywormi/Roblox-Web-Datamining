@@ -102,6 +102,7 @@ export default {
     parentSideDescription: "Description.ParentSide.RobuxTransferLimits",
     dailyLimitLabel: "Label.DailyLimit",
     monthlyLimitLabel: "Label.MonthlyLimit",
+    noLimit: "Label.NoLimitSetByParent",
     // Both carry {maxTransferLimit} and spell out the units, so the caller passes
     // the formatted ceiling and concatenates nothing.
     maximumDailyLimit: "Label.MaximumDailyRobuxTransferLimit",

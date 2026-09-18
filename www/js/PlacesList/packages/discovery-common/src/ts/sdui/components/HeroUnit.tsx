@@ -91,9 +91,9 @@ const HeroUnit = ({
       return (
         <AttributionRow
           title={asset.title}
-          titleFontStyle={tokens.Typography.TitleMedium}
+          titleFontStyle={{ ...tokens.Typography.TitleMedium, FontFamily: "inherit" }}
           subtitle={asset.subtitle}
-          subtitleFontStyle={tokens.Typography.BodyMedium}
+          subtitleFontStyle={{ ...tokens.Typography.BodyMedium, FontFamily: "inherit" }}
           imageComponent={asset.image}
           rightButtonContent={ctaButtonComponent}
           subtitleMaxLines={1}

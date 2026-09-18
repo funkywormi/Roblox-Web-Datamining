@@ -1,5 +1,5 @@
 import { Result, ok, err } from "../result";
-import { downcast } from "../commonTypes";
+import { downcast } from "../types";
 import { arrayIncludes } from "../util";
 import { UrlSearchParams } from "./searchParams";
 import { Unique } from "./types";

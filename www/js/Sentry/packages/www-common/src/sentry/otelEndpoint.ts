@@ -8,7 +8,7 @@ const SITE_TEST_OTEL_ENDPOINTS: Record<string, string> = {
   sitetest3: DEFAULT_OTEL_ENDPOINT,
 };
 
-type EnvironmentMeta = {
+export type EnvironmentMeta = {
   domain?: string;
   isTestingSite?: string;
 };

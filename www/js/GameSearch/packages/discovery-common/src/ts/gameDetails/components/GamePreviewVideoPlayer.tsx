@@ -1,11 +1,15 @@
 import React, { useRef, useState, useCallback, useMemo } from "react";
 import classNames from "classnames";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
-import { RobloxVideoPlayer, VideoPlayerRef, VideoAnalyticsConfig } from "@rbx/video-player";
+import {
+  getCurrentEnvironment,
+  RobloxVideoPlayer,
+  VideoPlayerRef,
+  VideoAnalyticsConfig,
+} from "@rbx/video-player";
 import { md5 } from "js-md5";
 import useAutoPlayVideoCarouselItem from "../hooks/useAutoPlayVideoCarouselItem";
 import ErrorBoundary from "../../common/components/ErrorBoundary";
-import getCurrentEnvironment from "../utils/environmentUtils";
 import gamePreviewVideoConstants from "../constants/gamePreviewVideoConstants";
 import {
   getVideoCmcdInstanceType,

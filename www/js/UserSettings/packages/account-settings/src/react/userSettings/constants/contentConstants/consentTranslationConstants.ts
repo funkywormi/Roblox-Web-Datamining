@@ -10,6 +10,7 @@ import {
   UpdateFriendsAboutMyActivitySettingValue,
   UserPrivacyLevel,
   PartySettingsValue,
+  PrivatePlaytestValue,
   UserSetting,
 } from "@rbx/user-settings";
 import ContentMaturityLevel from "../../../../enums/parentalControls/ContentMaturityLevel";
@@ -205,6 +206,10 @@ export const requestOptionLabels = {
   // Party Setting
   [PartySettingsValue.AllConnections]: "Label.AllFriends",
   [PartySettingsValue.TrustedConnectionsOnly]: "Label.OnlyTrustedFriends",
+
+  // Private playtest
+  [PrivatePlaytestValue.SimilarAgeGroupsAndTrustedFriends]:
+    privacyOptionLabels.similarAgeGroupsOrTrustedFriends,
 };
 
 export const getTranslatedOptionValue = (value: unknown, translate: TranslateFunction): string => {

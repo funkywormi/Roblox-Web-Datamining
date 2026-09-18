@@ -16,7 +16,6 @@ import BlockedExperiences from "../BlockedExperiences";
 import ApprovedExperiences from "../ApprovedExperiences";
 import {
   contentRestrictionsPages,
-  privatePlaytestOptionLabels,
   privacySettingCategoryPages,
 } from "../../../constants/privacy/privacyConstants";
 import SensitiveIssues from "../SensitiveIssues";
@@ -56,17 +55,12 @@ export const ContentRestrictionsRoutes = (): JSX.Element => {
               translate,
             );
             break;
-          case PrivacySettingName.PrivatePlaytest: {
-            const privatePlaytestValue =
-              settingsAndOptionsV2?.[UserSetting.privatePlaytest]?.currentValue;
-            const labelKey = privatePlaytestValue
-              ? privatePlaytestOptionLabels[privatePlaytestValue]
-              : undefined;
-            if (labelKey) {
-              currValueLabel = translate(labelKey);
-            }
+          case PrivacySettingName.PrivatePlaytest:
+            currValueLabel = getTranslatedOptionValue(
+              settingsAndOptionsV2?.[UserSetting.privatePlaytest]?.currentValue,
+              translate,
+            );
             break;
-          }
           default:
         }
         result[key] = {

@@ -27,7 +27,7 @@ const GroupInviteDialog = ({
   const [groupName, setGroupName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFriendIds, setSelectedFriendIds] = useState<number[]>([]);
-  const { friends: suggestedFriends } = useFriendsDirectory();
+  const { friends: suggestedFriends } = useFriendsDirectory(isOpen);
   const filteredFriends = useMemo(() => {
     const normalizedSearchTerm = searchTerm.trim().toLowerCase();
 

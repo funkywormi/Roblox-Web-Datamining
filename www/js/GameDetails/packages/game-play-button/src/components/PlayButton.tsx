@@ -1,13 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useQuery, QueryClientProvider } from "@tanstack/react-query";
+import classNames from "classnames";
 import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
-import { Button, Loading } from "@rbx/core-ui/legacy/react-style-guide";
+import { Button } from "@rbx/foundation-ui";
 import { queryClient } from "@rbx/core-scripts/react";
 import * as NavigationService from "@rbx/navigation";
 import ExperimentationService from "@rbx/experimentation";
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
+import {
+  buttonWidths,
+  fuiButtonStyle,
+  fullWidthClassName,
+  TButtonWidth,
+} from "../constants/buttonWidths";
 import playButtonService from "../services/playButtonService";
 import {
   TAppsFlyerReferralProperties,
@@ -15,7 +22,6 @@ import {
   TPlayabilityStatuses,
   TShowAgeVerificationOverlayResponse,
   TUniversePlaceVoiceEnabledSettings,
-  ValueOf,
   type TPlayButtonPageContext,
 } from "../types/playButtonTypes";
 import {
@@ -34,6 +40,8 @@ import UnplayableButton from "./UnplayableButton";
 import useLaunchGameWithPlayableUxTreatment from "../hooks/useLaunchGameWithPlayableUxTreatment";
 import usePurchaseProductData from "../hooks/usePurchaseProductData";
 import { AgeCheckNeededButton } from "./AgeCheckNeededButton";
+import LoadingButton from "./LoadingButton";
+import "./playButton.css";
 
 const { counterEvents, avatarChatUpsellLayer, avatarChatUpsellLayerU13 } = playButtonConstants;
 
@@ -141,7 +149,7 @@ export type TPlayButtonProps = {
   privateServerLinkCode?: string;
   gameInstanceId?: string;
   iconClassName?: string;
-  buttonWidth?: ValueOf<typeof Button.widths>;
+  buttonWidth?: TButtonWidth;
   buttonClassName?: string;
   eventProperties?: Record<string, string | number | undefined>;
   appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
@@ -163,7 +171,7 @@ const PlayButtonContents = ({
   eventProperties = EMPTY_OBJECT,
   appsFlyerReferralProperties = EMPTY_OBJECT,
   iconClassName = "icon-common-play",
-  buttonWidth = Button.widths.full,
+  buttonWidth = buttonWidths.full,
   buttonClassName = "btn-common-play-game-lg",
   disableLoadingState = false,
   buttonText = undefined,
@@ -260,18 +268,19 @@ const PlayButtonContents = ({
     useLaunchGameWithPlayableUxTreatment(universeId, doGameLaunch, pageContext);
 
   if (showVerification === undefined && !disableLoadingState) {
-    return <Loading />;
+    return <LoadingButton buttonClassName={buttonClassName} buttonWidth={buttonWidth} />;
   }
 
   return (
     <React.Fragment>
       <Button
         data-testid="play-button"
-        width={buttonWidth}
-        className={buttonClassName}
+        variant="Emphasis"
+        style={fuiButtonStyle}
+        className={classNames(fullWidthClassName(buttonWidth), buttonClassName)}
         // TODO: old, migrated code
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClick={async e => {
+        onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
           e.preventDefault();
           e.stopPropagation();
 
@@ -434,7 +443,7 @@ export const DefaultPlayButton = ({
   switch (playabilityStatus) {
     case undefined:
       if (!disableLoadingState) {
-        return <Loading />;
+        return <LoadingButton buttonClassName={buttonClassName} />;
       }
 
       return (
