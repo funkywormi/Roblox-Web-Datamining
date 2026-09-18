@@ -46,7 +46,7 @@ function getTextFilterEducationDisplayStrings(
       : "Experiment.TextFilterEducation.Kids.Title.Warning";
 
     const dialogBodyKey =
-      (reminderData.contentVariant && KIDS_BODY_KEYS[reminderData.contentVariant]) ??
+      (reminderData.contentVariant && KIDS_BODY_KEYS[reminderData.contentVariant]) ||
       KIDS_BODY_KEYS.kind_word;
 
     return {
@@ -62,7 +62,7 @@ function getTextFilterEducationDisplayStrings(
     : GENERAL_WARNING_BODY_KEYS.kind_word;
 
   const dialogBodyKey =
-    (reminderData.contentVariant && bodyKeys[reminderData.contentVariant]) ?? fallbackBodyKey;
+    (reminderData.contentVariant && bodyKeys[reminderData.contentVariant]) || fallbackBodyKey;
 
   return {
     dialogTitle: translate(
