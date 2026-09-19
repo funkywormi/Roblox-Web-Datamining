@@ -469,6 +469,8 @@
     "Email.PrivatePlaytest.Intro": "Your child will soon be able to preview games created by friends in similar age groups or trusted friends, before they're available in our games catalog for kids and young teens. When your child tests a game, Roblox will conduct a preliminary review against our safety standards.",
     "Email.PrivatePlaytest.Control": "You can manage your child's game preview access anytime in {aTagWithHref}{parentalControlsLink}{hrefEnd}Parental Controls{htmlCloseAHref}.",
     "Email.PrivatePlaytest.Closing": "Thank you,{lineBreak}The Roblox Team",
+    "Description.ChildCardViewMessagingActivity": "View your child's messaging activity directly in their account.",
+    "Description.ChildCardViewCommunitiesAndCreations": "View your child’s communities and creations on their profile.",
     "Action.CloseParentMode": "Close parent mode",
     "Action.OnDeviceParent.HidePin": "Hide",
     "Action.OnDeviceParent.RemovePin": "Remove PIN",

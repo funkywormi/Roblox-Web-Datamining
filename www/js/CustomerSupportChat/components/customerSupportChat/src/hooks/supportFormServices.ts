@@ -5,8 +5,11 @@ import * as Sentry from "@sentry/react";
 import debounce from "lodash/debounce";
 import { SupportMetaData } from "../core/types/serviceMetadataResponse";
 import { GenericResponse, SupportContextKey, SupportedReceivedValues } from "../core/types/common";
-import { CreateSupportTicketRequestModel } from "../core/types/supportTicket";
-import { normalizeUsername } from "../core/helpers/supportFormHelpers";
+import {
+  CreateSupportTicketRequestModel,
+  UsernameValidationResponseCode,
+} from "../core/types/supportTicket";
+import { toUsernameValidationBirthday } from "../core/helpers/ageGateHelper";
 import { UserSettingsLegacy, UserSettingsV1 } from "../core/types/userSettings";
 import { SupportContext } from "../providers/SupportContextProvider";
 import fetchMetadata from "./fetchMetadata";
@@ -38,30 +41,48 @@ type UseValidateUsernameResult = UseMutationResult<boolean, unknown, string | un
 };
 
 /**
+ * `AlreadyInUse` is the only code that confirms a username is or was real. `ValidUsername` means
+ * nobody has ever held it, and the length, whitespace, and character codes describe strings that
+ * could never have been registered at all.
+ *
+ * Every other code is a rejection that real accounts still trip — moderation, PII, reserved
+ * names, and above all the `roblox_user_{userId}` names that moderation assigns, which fail the
+ * one-underscore rule. Those say nothing about whether the account exists, so they must not
+ * block a submission.
+ */
+const neverRegisterableCodes: UsernameValidationResponseCode[] = [
+  UsernameValidationResponseCode.ValidUsername,
+  UsernameValidationResponseCode.InvalidLength,
+  UsernameValidationResponseCode.StartsOrEndsWithUnderscore,
+  UsernameValidationResponseCode.ContainsSpaces,
+  UsernameValidationResponseCode.InvalidCharacters,
+];
+
+const isUsernameAcceptable = (code: UsernameValidationResponseCode): boolean =>
+  !neverRegisterableCodes.includes(code);
+
+/**
  * Provides a custom hook/wrapper providing closure/loading state to validate a username manually, including states for loading and validation result.
  * We introduce this wrapper so we only fetch validation when needed (e.g. only on username input blur instead of each username change) instead of useQuery directly.
  */
 export const useValidateUsername = (): UseValidateUsernameResult => {
-  // Validates the username via `${EnvironmentUrls.authApi}/v2/usernames`; useCallback to maintain func ref and queryClient wrapper to avoid unnecessary fetches on each input change.
-  // https://auth.sitetest3.robloxlabs.com/v2/usernames/validate?username=chatEligibleRabi223&context=2&birthday=Thu+Jun+21+2018
+  const { ageGate, ageGateTag } = useContext(SupportContext);
 
   const request = useMutation({
     mutationFn: async (username?: string) => {
       if (!username) return false;
-      let isValidUsername = false;
 
       try {
-        const data = await lookupUsername(username);
-        const normalizedUsername = normalizeUsername(username);
-        isValidUsername = Boolean(
-          data?.usernames?.some(
-            (inboundUsername: string) => normalizeUsername(inboundUsername) === normalizedUsername,
-          ),
+        const { code } = await lookupUsername(
+          username,
+          toUsernameValidationBirthday(ageGate, ageGateTag),
         );
-      } catch (error) {
-        isValidUsername = false;
+        return isUsernameAcceptable(code);
+      } catch {
+        // This check only exists to catch typos, so an unreachable or disabled endpoint
+        // should never be the reason somebody cannot file a ticket.
+        return true;
       }
-      return isValidUsername;
     },
   });
 

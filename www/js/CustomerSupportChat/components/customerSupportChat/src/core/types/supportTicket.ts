@@ -107,4 +107,4 @@ export enum UsernameValidationContext {
   UsernameChange = 2,
 }
 
-export type UsernameValidationResponse = { usernames: string[] };
+export type UsernameValidationResponse = { code: UsernameValidationResponseCode };
