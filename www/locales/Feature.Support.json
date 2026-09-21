@@ -256,5 +256,9 @@
     "Label.ContentMaturityAppealRestore": "My experience was taken down due to inaccurate content maturity, and I want to restore it",
     "Label.ContentMaturityAppeal": "My experience was taken down due to inaccurate content maturity, and I want to appeal",
     "Label.VSPrivateServer": "I have an issue with a private server purchase",
-    "Label.VCPrivateServer": "I have an issue with a private server purchase"
+    "Label.VCPrivateServer": "I have an issue with a private server purchase",
+    "Chat.Description.FeedbackPrompt": "How did we do?",
+    "Chat.Label.FeedbackRatingGroup": "Rate this chat",
+    "Chat.Label.FeedbackStarRating": "Rate {rating} out of 5 stars",
+    "Chat.Response.FeedbackSaved": "Thanks for your feedback!"
 }
