@@ -8,7 +8,7 @@ import BenefitDetailDialog from "./BenefitDetailDialog";
 import Divider from "./ui/Divider";
 import { getFeatureConfig } from "../utils/subscriptionProductInfo";
 
-import type { SubscriptionProductInfo, Subscription } from "@rbx/client-subscriptions-api/v1";
+import type { SubscriptionProductInfo, Subscription } from "@rbx/client-subscriptions-api/v2";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
 import type { FC } from "react";
 

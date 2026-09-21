@@ -1,7 +1,7 @@
 import type {
   RobloxSubscriptionProductFeatureConfig,
   SubscriptionTenureDiscount,
-} from "@rbx/client-subscriptions-api/v1";
+} from "@rbx/client-subscriptions-api/v2";
 
 export type ResolvedDiscountTier = {
   current: SubscriptionTenureDiscount | null;

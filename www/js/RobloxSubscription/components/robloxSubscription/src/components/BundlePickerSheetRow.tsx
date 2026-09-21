@@ -7,7 +7,7 @@ import { Event } from "../utils/eventsCounter";
 import { publishMetric } from "../utils/publishMetric";
 import { getEntitledRobux } from "../utils/subscriptionProductInfo";
 
-import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v1";
+import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v2";
 import type { FC } from "react";
 
 type TierRowProps = {

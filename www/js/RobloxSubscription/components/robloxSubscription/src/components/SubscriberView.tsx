@@ -27,7 +27,7 @@ import { calculateCurrentPeriodIndex } from "../utils/subscriptionDates";
 import { getFeatureConfig } from "../utils/subscriptionProductInfo";
 
 import type { GetRobloxPlusUserBenefitsResponse } from "@rbx/client-roblox-subscriptions-api/v1";
-import type { SubscriptionProductInfo, Subscription } from "@rbx/client-subscriptions-api/v1";
+import type { SubscriptionProductInfo, Subscription } from "@rbx/client-subscriptions-api/v2";
 import type { FC } from "react";
 
 // Keep the promotion implementation available for a future rerun without rendering it currently.

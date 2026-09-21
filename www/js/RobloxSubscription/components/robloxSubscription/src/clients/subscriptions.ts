@@ -1,4 +1,4 @@
-import { Configuration, SubscriptionsV2Api } from "@rbx/client-subscriptions-api/v1";
+import { Configuration, SubscriptionsV2Api } from "@rbx/client-subscriptions-api/v2";
 
 import { getBEDEV2ServiceBasePath } from "../utils/getBasePaths";
 import { getDomainInfo } from "../utils/getDomainInfo";

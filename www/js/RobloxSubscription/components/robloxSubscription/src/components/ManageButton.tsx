@@ -2,7 +2,7 @@ import { useTranslation } from "@rbx/core-scripts/react";
 import { Button } from "@rbx/foundation-ui";
 import { useCallback, useState, useMemo } from "react";
 
-import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v1";
+import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v2";
 import type { FC } from "react";
 
 export type ManageButtonProps = {

@@ -1,4 +1,4 @@
-import { SubscriptionReferralEligibility } from "@rbx/client-subscriptions-api/v1";
+import { SubscriptionReferralEligibility } from "@rbx/client-subscriptions-api/v2";
 import { subscriptionsV2Api } from "@rbx/payments/services/subscriptions";
 import { useQuery } from "@tanstack/react-query";
 

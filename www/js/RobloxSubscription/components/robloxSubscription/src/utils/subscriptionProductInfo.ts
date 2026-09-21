@@ -2,7 +2,7 @@ import type {
   RobloxSubscriptionProductFeatureConfig,
   SubscriptionOffer,
   SubscriptionProductInfo,
-} from "@rbx/client-subscriptions-api/v1";
+} from "@rbx/client-subscriptions-api/v2";
 
 export function getFeatureConfig(
   product: SubscriptionProductInfo,

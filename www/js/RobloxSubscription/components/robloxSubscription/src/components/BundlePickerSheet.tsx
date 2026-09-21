@@ -13,7 +13,7 @@ import { Event } from "../utils/eventsCounter";
 import { publishMetric } from "../utils/publishMetric";
 import { findFreeTrialOffer, isFreeTrialEligible } from "../utils/subscriptionProductInfo";
 
-import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v1";
+import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v2";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
 import type { FC, ReactNode } from "react";
 

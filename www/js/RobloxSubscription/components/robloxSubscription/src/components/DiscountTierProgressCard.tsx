@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { addBillingPeriod } from "../utils/subscriptionDates";
 
-import type { PeriodType, SubscriptionTenureDiscount } from "@rbx/client-subscriptions-api/v1";
+import type { PeriodType, SubscriptionTenureDiscount } from "@rbx/client-subscriptions-api/v2";
 import type { FC, ReactNode } from "react";
 
 export type DiscountTierProgressCardProps = {

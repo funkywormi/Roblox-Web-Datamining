@@ -1,4 +1,4 @@
-import { GrantType, PeriodType, ProductType } from "@rbx/client-subscriptions-api/v1";
+import { GrantType, PeriodType, ProductType } from "@rbx/client-subscriptions-api/v2";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { callBehaviour } from "@rbx/core-scripts/guac";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";

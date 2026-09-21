@@ -24,7 +24,7 @@ import { GIFT_ITEM, navigateToGiftItemDetails } from "../utils/giftItemNavigatio
 import { publishMetric } from "../utils/publishMetric";
 import { getFeatureConfig } from "../utils/subscriptionProductInfo";
 
-import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v1";
+import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v2";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
 import type { FC, ReactNode } from "react";
 // Keep the promotion implementation available for a future rerun without rendering it currently.
@@ -148,8 +148,27 @@ const PurchaseView: FC<PurchaseViewProps> = ({
       variant: isMultiProduct ? "multi" : "single",
       tierCount: String(robloxSubscriptionProducts.length),
       isFreeTrial: String(isFreeTrial),
+      referralLanding: landing.kind,
     });
-  }, [paymentSessionId, isFreeTrial, isMultiProduct, robloxSubscriptionProducts.length]);
+  }, [
+    paymentSessionId,
+    isFreeTrial,
+    isMultiProduct,
+    robloxSubscriptionProducts.length,
+    landing.kind,
+  ]);
+
+  const hasFiredReferralLanding = useRef(false);
+  useEffect(() => {
+    if (hasFiredReferralLanding.current || landing.kind === "none") {
+      return;
+    }
+    hasFiredReferralLanding.current = true;
+    publishMetric(Event.REFERRAL_LANDING_DETECTED, {
+      kind: landing.kind,
+      hasReferrerId: String(referrerId !== undefined),
+    });
+  }, [landing.kind, referrerId]);
 
   const isMobileInApp = deviceMeta.isAndroidApp || deviceMeta.isIosApp;
 
