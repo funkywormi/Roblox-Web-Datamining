@@ -1,6 +1,7 @@
 import { CurrentUser, DeviceMeta } from 'Roblox';
 import assetsExplorerModule from '../assetsExplorerModule';
 import { getUserIdFromUrl } from '../../utils/userInfo';
+import { sendUserItemsPage } from '../../utils/sendUserItemsPage';
 
 function assetsExplorerController(
   $scope,
@@ -55,6 +56,43 @@ function assetsExplorerController(
     }
 
     return true;
+  };
+
+  // Picks a single price label so two never render into the fixed-width, ellipsis-truncated
+  // price line at once. Order matches the historical DOM order (first-rendered label wins).
+  ctrl.getItemPriceDisplay = item => {
+    const product = item.Product;
+    if (product && product.NoPriceText) {
+      return 'noPriceText';
+    }
+    if (item.priceStatus) {
+      return 'priceStatus';
+    }
+    if (product && product.TranslateFree) {
+      return 'free';
+    }
+    if (ctrl.doesItemHavePrice(item)) {
+      return 'price';
+    }
+    return 'offsale';
+  };
+
+  ctrl.onItemCardClick = item => {
+    const itemId = item.itemV2?.id;
+    if (!itemId) {
+      return;
+    }
+
+    sendUserItemsPage({
+      pageType: ctrl.pageType,
+      eventType: 'click',
+      component: 'item',
+      categoryName: ctrl.currentData.category?.name,
+      subcategoryName: ctrl.currentData.subcategory?.name,
+      isOwnPage: ctrl.staticData.isOwnPage,
+      componentId: String(itemId),
+      itemType: item.itemV2?.type
+    });
   };
 
   const init = () => {

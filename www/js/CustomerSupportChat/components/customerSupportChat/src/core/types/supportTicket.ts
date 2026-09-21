@@ -106,5 +106,3 @@ export enum UsernameValidationContext {
   Signup = 1,
   UsernameChange = 2,
 }
-
-export type UsernameValidationResponse = { code: UsernameValidationResponseCode };

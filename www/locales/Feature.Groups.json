@@ -1339,5 +1339,7 @@
     "Error.SupportTicketIneligible": "You can’t submit a bug report for this experience right now.",
     "Placeholder.PollQuestion": "Write your question",
     "Label.OverflowMenu": "More options",
-    "Label.AddImage": "Add image"
+    "Label.AddImage": "Add image",
+    "ResponseCountSingular": "response",
+    "ResponseCountPlural": "responses"
 }

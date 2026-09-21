@@ -98,37 +98,6 @@ export const getDateOptionComponentItems = (
     intVal: labelComponents.intVal,
   }));
 
-// Ages used to stand in for a real date of birth. Only the under-13 vs 13-and-over bracket
-// reaches auth-api, so any age on the correct side of 13 behaves identically.
-const assumedAgeUnder13 = 8;
-const assumedAge13AndOver = 20;
-
-const toISODateOnly = (date: Date): string =>
-  [date.getFullYear(), `0${date.getMonth() + 1}`.slice(-2), `0${date.getDate()}`.slice(-2)].join(
-    "-",
-  );
-
-/**
- * Builds the `birthday` value for username validation. Guests have picked a real date of birth
- * at the age gate, but authenticated users skip the gate entirely and only ever have a bracket
- * tag, so derive a date from the tag in that case.
- */
-export const toUsernameValidationBirthday = (
-  dateOfBirth: Date | undefined,
-  ageGroupTag: AgeGateDOBGroupLabel | undefined,
-): string => {
-  if (dateOfBirth) {
-    return toISODateOnly(dateOfBirth);
-  }
-
-  const assumedAge =
-    ageGroupTag === AgeGateDOBGroupLabel.AgeUnder13 ? assumedAgeUnder13 : assumedAge13AndOver;
-  const assumedDateOfBirth = new Date();
-  assumedDateOfBirth.setFullYear(assumedDateOfBirth.getFullYear() - assumedAge);
-
-  return toISODateOnly(assumedDateOfBirth);
-};
-
 export const toDOBToAgeGroupTag = (dateOfBirth: Date): AgeGateDOBGroupLabel => {
   const now = new Date(Date.now());
 

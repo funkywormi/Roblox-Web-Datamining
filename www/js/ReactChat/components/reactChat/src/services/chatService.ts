@@ -6,6 +6,7 @@ import type {
   TGetChatMetadataResponse,
   TGetConversationMessagesResponse,
   TGetConversationMetadataResponse,
+  TGetConversationsParticipantsMetadataResponse,
   TGetModalSequenceResponse,
   TGetUserConversationsResponse,
   TSendMessageResponse,
@@ -36,6 +37,14 @@ const post = <TResponse>(path: string, data?: Record<string, unknown>): Promise<
       withCredentials: true,
     },
     data,
+  );
+
+export const getConversationsParticipantsMetadata = async (
+  conversationIds: string[],
+): Promise<TGetConversationsParticipantsMetadataResponse> =>
+  post<TGetConversationsParticipantsMetadataResponse>(
+    "/v1/get-conversations-participants-metadata",
+    { conversation_ids: conversationIds },
   );
 
 export const getUserConversations = async (

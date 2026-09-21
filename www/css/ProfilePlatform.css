@@ -89,11 +89,11 @@
 }
 
 .light-theme .game-card-container.grid-item-container .game-tile-hidden-placeholder {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .game-card-container.grid-item-container .game-tile-hidden-placeholder {
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .game-card-container.grid-item-container .game-tile-hidden-placeholder .game-tile-hidden-placeholder-contents {
@@ -407,6 +407,8 @@
 }
 
 .game-card-link .game-card-creator-name {
+    -ms-flex-align: center;
+    align-items: center;
     max-height: 20px;
     margin-bottom: 6px;
     font-size: 12px;
@@ -1732,6 +1734,10 @@
 
 .content-\[var\(--light-mode-content-emphasis\)\] {
     color: var(--light-mode-content-emphasis)
+}
+
+.content-\[white\] {
+    color: #fff
 }
 
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {

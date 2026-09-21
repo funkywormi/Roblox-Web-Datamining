@@ -30,6 +30,12 @@ export const chatQueryKeys = {
   presenceAll: () => [...chatQueryKeys.all, "presence"] as const,
   modalSequence: (conversationId: string) =>
     [...chatQueryKeys.all, "modalSequence", conversationId] as const,
+  /** Per-conversation participant metadata (is_blocked) for the group-OSA consent modal. */
+  participantsMetadata: (conversationId: string) =>
+    [...chatQueryKeys.all, "participantsMetadata", conversationId] as const,
+  /** Trusted-connection status for a set of users (group-OSA consent modal Trusted badge). */
+  trustedConnections: (userIdsKey: string) =>
+    [...chatQueryKeys.all, "trustedConnections", userIdsKey] as const,
   profileInsights: (userId: number) => [...chatQueryKeys.all, "profileInsights", userId] as const,
   countryRegions: () => [...chatQueryKeys.all, "countryRegions"] as const,
   gamePlaceDetails: (placeId: string) =>

@@ -2,6 +2,12 @@ import { Endpoints, EnvironmentUrls } from 'Roblox';
 import inventoryModule from '../inventoryModule';
 
 const inventoryConstants = {
+  // Forked from the recommendations Angular module's own constants, which Inventory used to reach into
+  // via DI. inventoryContentController.js carried a TODO asking for exactly this.
+  recommendationTypes: {
+    asset: 0,
+    bundle: 2
+  },
   urls: {
     getUser: `${EnvironmentUrls.usersApi}/v1/users/{userId}`,
     getCreatorStoreItemDetails: `${EnvironmentUrls.apiGatewayUrl}/toolbox-service/v1/items/details?assetIds={assetIds}`,

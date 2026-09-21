@@ -146,7 +146,7 @@ function assetsService(
       item.itemType = 'Asset';
     },
 
-    translatePrivateServer(item) {
+    translatePrivateServer(item, isMyPrivateServers, inventoryUpdatesEnabled) {
       item.Item = {
         Name: item.name,
         AbsoluteUrl: Endpoints.getAbsoluteUrl(`/games/${item.placeId}#!/game-instances`)
@@ -166,7 +166,12 @@ function assetsService(
         Name: item.ownerName,
         CreatorProfileLink: Endpoints.getAbsoluteUrl(`/users/${item.ownerId}/profile`)
       };
-      getNameForDisplay(item.Creator);
+      if (inventoryUpdatesEnabled && isMyPrivateServers) {
+        item.Creator.nameForDisplay = item.universeName;
+        item.Creator.CreatorProfileLink = Endpoints.getAbsoluteUrl(`/games/${item.placeId}`);
+      } else {
+        getNameForDisplay(item.Creator);
+      }
 
       item.Product = {
         IsFree: item.priceInRobux === null,

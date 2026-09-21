@@ -1,6 +1,7 @@
 import { CurrentUser, Endpoints } from 'Roblox';
 import favoritesModule from '../favoritesModule';
 import { getUserIdFromUrl } from '../../utils/userInfo';
+import { sendUserItemsPage } from '../../utils/sendUserItemsPage';
 
 function favoritesContentController(
   $httpParamSerializer,
@@ -152,6 +153,15 @@ function favoritesContentController(
       ctrl.currentData.category = category;
       ctrl.currentData.subcategory = subcategory;
       ctrl.currentData.AssetTypeId = subcategory.id;
+
+      sendUserItemsPage({
+        pageType: ctrl.pageType,
+        eventType: 'show',
+        component: 'page',
+        categoryName: category.name,
+        subcategoryName: subcategory.name,
+        isOwnPage: ctrl.isOwnFavorites
+      });
 
       const itemSection = assetsService.getItemSection(category);
       if (itemSection === 'library') {

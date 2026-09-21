@@ -25,7 +25,11 @@ import {
   pruneRemovedFriendUserIds,
 } from "../utils/chatTransforms";
 import { conversationsRetryDelayMs, shouldRetryConversations } from "../utils/conversationsRetry";
-import { getChatDisabledReason, type TChatDisabledReason } from "../utils/chatEnabledState";
+import {
+  getChatDisabledReason,
+  getIsChatVisible,
+  type TChatDisabledReason,
+} from "../utils/chatEnabledState";
 import { getCurrentUserId } from "../utils/currentUser";
 
 export type TUseChatDataResult = {
@@ -57,6 +61,8 @@ export type TUseChatDataResult = {
    * `/v1/metadata`; drives the "change your privacy settings" CTA instead of the error/list.
    */
   chatDisabledReason: TChatDisabledReason | null;
+  /** False hides the whole widget (U9 kids); distinct from chatDisabledReason's disabled bar. */
+  isChatVisible: boolean;
 };
 
 export const useChatData = (): TUseChatDataResult => {
@@ -249,5 +255,6 @@ export const useChatData = (): TUseChatDataResult => {
     isMetadataLoaded: chatSettingsQuery.data !== undefined,
     areConversationsLoaded: conversationsQuery.isSuccess,
     chatDisabledReason: getChatDisabledReason(chatSettingsQuery.data),
+    isChatVisible: getIsChatVisible(chatSettingsQuery.data),
   };
 };

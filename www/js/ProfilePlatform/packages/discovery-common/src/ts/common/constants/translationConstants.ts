@@ -93,6 +93,7 @@ export const FeatureGameDetails = {
   ActionReportAd: "Action.ReportAd",
   ActionRemoveFromFavorites: "Action.RemoveFromFavorites",
   MessageRemovedFromFavorites: "Message.RemovedFromFavorites",
+  ActionReport: "Action.Report",
   ActionUndo: "Action.Undo",
   ActionGiveFeedback: "Action.GiveFeedback",
   MessageSuggestLessOften: "Message.SuggestLessOften",

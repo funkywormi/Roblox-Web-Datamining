@@ -25,6 +25,10 @@ const formatCreatedOn = (createdAt?: string): string => {
 type TConsentModalProps = {
   conversation: TChatConversation;
   expandedChatEnabled: boolean;
+  /** Participants the viewer has blocked — shown with a Blocked badge (legacy parity). */
+  blockedUserIds?: ReadonlySet<number>;
+  /** Participants that are the viewer's trusted connections — shown with a "• Trusted" label. */
+  trustedUserIds?: ReadonlySet<number>;
   onAccept: () => void;
   onDecline: () => void;
   onClose: () => void;
@@ -39,12 +43,15 @@ type TConsentModalProps = {
 const ConsentModal = ({
   conversation,
   expandedChatEnabled,
+  blockedUserIds,
+  trustedUserIds,
   onAccept,
   onDecline,
   onClose,
 }: TConsentModalProps) => {
   const { translate } = useTranslation();
   const createdOn = formatCreatedOn(conversation.createdAt);
+  const trustedLabel = ` • ${translate("Label.Trusted")}`;
 
   const groupInfo = expandedChatEnabled
     ? translate("Description.ConversationInviteGroupCreatedOn", { creation_date: createdOn })
@@ -109,8 +116,17 @@ const ConsentModal = ({
                       </div>
                       <div className="text-caption-medium content-muted text-truncate-end">
                         {usernameLabel}
+                        {trustedUserIds?.has(member.id) && trustedLabel}
                       </div>
                     </div>
+                    {blockedUserIds?.has(member.id) && (
+                      <span
+                        className="shrink-0 bg-system-warning text-label-small padding-x-small radius-circle"
+                        style={{ color: "var(--light-mode-content-emphasis)", paddingBlock: "2px" }}
+                      >
+                        {translate("Label.Blocked")}
+                      </span>
+                    )}
                   </li>
                 );
               })}

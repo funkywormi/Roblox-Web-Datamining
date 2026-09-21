@@ -28,7 +28,9 @@ function inventoryService($q, $filter, inventoryConstants, assetsConstants, asse
           })
           .then(function (response) {
             const items = response.data;
-            angular.forEach(items, assetsService.translatePrivateServer);
+            angular.forEach(items, function (item) {
+              assetsService.translatePrivateServer(item, pagingParameters.placeTab === assetsConstants.types.myPrivateServers, pagingParameters.inventoryUpdatesEnabled);
+            });
 
             const isOtherServersTab =
               pagingParameters.placeTab === assetsConstants.types.otherPrivateServers;

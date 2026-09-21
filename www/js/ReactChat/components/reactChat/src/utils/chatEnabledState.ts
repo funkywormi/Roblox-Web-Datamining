@@ -23,3 +23,8 @@ export function getChatDisabledReason(
   }
   return null;
 }
+
+// Widget visibility from /v1/metadata. Fail-open: hidden only when explicitly false (U9 kids).
+export function getIsChatVisible(metadata: TGetChatMetadataResponse | undefined): boolean {
+  return metadata?.isChatVisible !== false;
+}

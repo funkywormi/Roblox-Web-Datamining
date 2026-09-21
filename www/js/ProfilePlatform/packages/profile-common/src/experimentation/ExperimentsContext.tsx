@@ -10,6 +10,7 @@ type ExperimentsSchema = {
   [ExperimentKey.IsIARCProfileRedesignEnabled]: boolean;
   [ExperimentKey.IsWebProfileBackgroundEnabled]: boolean;
   [ExperimentKey.IsCurrentlyPlayingCardClickableEnabled]: boolean;
+  [ExperimentKey.IsWebProfileCreationsMigrationEnabled]: boolean;
 };
 
 interface ExperimentsContextValue {

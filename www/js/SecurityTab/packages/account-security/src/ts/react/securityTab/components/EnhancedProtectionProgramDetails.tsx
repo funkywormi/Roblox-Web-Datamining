@@ -116,7 +116,10 @@ const EnhancedProtectionProgramDetails: React.FC<EnhancedProtectionProgramDetail
   const passkeyCount = credentialsList?.credentials?.length ?? 0;
   const passKeyTextMap: TextByEnum = {
     [ChecklistStatus.INCOMPLETE]: resources.Label.AddPasskeyEnsureAccess,
-    [ChecklistStatus.COMPLETE]: resources.Label.PasskeysAddedEnsureAccess(passkeyCount),
+    [ChecklistStatus.COMPLETE]:
+      passkeyCount === 1
+        ? resources.Label.PasskeysAddedEnsureAccessSingular(passkeyCount)
+        : resources.Label.PasskeysAddedEnsureAccessPlural(passkeyCount),
   };
   const passKeyButtonTextMap: TextByEnum = {
     [ChecklistStatus.INCOMPLETE]: resources.Action.Add,

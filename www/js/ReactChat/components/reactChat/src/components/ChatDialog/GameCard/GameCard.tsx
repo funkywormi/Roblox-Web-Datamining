@@ -140,6 +140,7 @@ const GameCard = ({ placeId, url, conversationId, privateServerLinkCode }: TGame
       {/* DefaultPlayButton owns the launch + its own game-play intent; capture the click here to
           also fire the chat-specific play eventstream event. */}
       <span
+        className="react-chat-game-card-play"
         onClickCapture={() => {
           sendClickPlayFromGameLinkCardEvent(placeId, conversationId);
         }}

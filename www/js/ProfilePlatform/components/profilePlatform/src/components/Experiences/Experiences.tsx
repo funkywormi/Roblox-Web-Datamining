@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import classNames from "classnames";
 import { GameTile, type TBuildEventProperties, type TGameTileProps } from "@rbx/discovery-common";
+import { Component } from "@rbx/profile-platform";
 import type { TExperienceGameData } from "../../hooks/useFetchExperiencesData";
 import useProgressiveReveal from "../../hooks/useProgressiveReveal";
+import ProfileCarouselWithAnalytics from "../Common/ProfileCarouselWithAnalytics";
 import ExperiencesSlideshow from "./ExperiencesSlideshow";
 import "./experiences.scss";
 
@@ -13,15 +15,47 @@ type ExperiencesProps = {
   games: TExperienceGameData[];
   translate: TGameTileProps["translate"];
   buildEventProperties: TBuildEventProperties;
+  isCarouselEnabled: boolean;
 };
 
-const Experiences = ({ games, translate, buildEventProperties }: ExperiencesProps) => {
+const Experiences = ({
+  games,
+  translate,
+  buildEventProperties,
+  isCarouselEnabled,
+}: ExperiencesProps) => {
   const [isGridOn, setIsGridOn] = useState(false);
   const { visibleCount, sentinelRef } = useProgressiveReveal(
     games.length,
     INITIAL_VISIBLE,
     REVEAL_STEP,
   );
+  const renderGameItem = useCallback(
+    (game: TExperienceGameData, index: number) => (
+      <GameTile
+        id={index}
+        gameData={game}
+        translate={translate}
+        buildEventProperties={buildEventProperties}
+      />
+    ),
+    [buildEventProperties, translate],
+  );
+  const getItemId = useCallback((game: TExperienceGameData) => game.universeId, []);
+
+  if (isCarouselEnabled) {
+    return (
+      <div className="profile-experiences">
+        <ProfileCarouselWithAnalytics
+          headerTitle={translate("Heading.GameTitle")}
+          items={games}
+          renderItem={renderGameItem}
+          getItemId={getItemId}
+          component={Component.Experiences}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="profile-experiences profile-game section">
@@ -65,12 +99,7 @@ const Experiences = ({ games, translate, buildEventProperties }: ExperiencesProp
         <ul className="hlist game-cards">
           {games.slice(0, visibleCount).map((game, index) => (
             <li className="game-container shown" data-index={index} key={game.universeId}>
-              <GameTile
-                id={index}
-                gameData={game}
-                translate={translate}
-                buildEventProperties={buildEventProperties}
-              />
+              {renderGameItem(game, index)}
             </li>
           ))}
           {visibleCount < games.length && (

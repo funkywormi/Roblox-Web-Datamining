@@ -2,6 +2,7 @@ import angular from 'angular';
 import { CurrentUser, Endpoints } from 'Roblox';
 import inventoryModule from '../inventoryModule';
 import { getUserIdFromUrl } from '../../utils/userInfo';
+import { sendUserItemsPage } from '../../utils/sendUserItemsPage';
 
 function inventoryContentController(
   $httpParamSerializer,
@@ -11,10 +12,11 @@ function inventoryContentController(
   assetsConstants,
   assetsService,
   $document,
-  recommendationsConstants,
+  inventoryConstants,
   cursorPaginationServiceV2,
   cursorPaginationConstants,
-  inventoryService
+  inventoryService,
+  inventoryExperimentsService
 ) {
   'ngInject';
 
@@ -33,12 +35,12 @@ function inventoryContentController(
     getItems(pagingParameters) {
       if (pagingParameters.type === 'Bundle') {
         if (ctrl.catalogMetadata && ctrl.catalogMetadata.isDynamicHeadsEnabled) {
-          ctrl.recommendationsType = recommendationsConstants.recommendationTypes.bundle;
+          ctrl.recommendationsType = inventoryConstants.recommendationTypes.bundle;
           return inventoryService.getBundlesWithBundleType(pagingParameters);
         }
         return inventoryService.getBundles(pagingParameters);
       }
-      ctrl.recommendationsType = recommendationsConstants.recommendationTypes.asset;
+      ctrl.recommendationsType = inventoryConstants.recommendationTypes.asset;
 
       if (ctrl.currentData.isPrivateServerCategoryType) {
         return inventoryService.getPrivateServers(pagingParameters);
@@ -74,11 +76,27 @@ function inventoryContentController(
     return result;
   };
 
+  // The React recommendations island mounts on #item-recommendations-container once and cannot see an
+  // Angular binding change, so every subtype change has to be published.
+  const dispatchRecommendationsRender = () => {
+    window.dispatchEvent(
+      new CustomEvent('recommendations:render', {
+        detail: {
+          recommendationType: ctrl.recommendationsType,
+          recommendationSubtype: ctrl.currentData.AssetTypeId,
+          pageName: 'Inventory',
+          available: ctrl.isRecommendationAvailable()
+        }
+      })
+    );
+  };
+
   const pageLoaded = items => {
     // Only shuffle when viewing another user's inventory. The owner sees their
     // own inventory in its original order.
     ctrl.assets = ctrl.isOwnInventory ? items : shuffle(items);
     ctrl.currentData.templateVisible = true;
+    dispatchRecommendationsRender();
   };
 
   const pageLoadError = e => {
@@ -87,6 +105,7 @@ function inventoryContentController(
       return;
     }
     ctrl.currentData.templateVisible = true;
+    dispatchRecommendationsRender();
     // This page does nothing with errors right now.
     $log.error(e);
   };
@@ -100,6 +119,12 @@ function inventoryContentController(
       .catch(() => {
         return '';
       });
+  };
+
+  const getInventoryUpdatesEnabled = () => {
+    return $q.when(inventoryExperimentsService.getInventoryUpdatesEnabled()).catch(() => {
+      return false;
+    });
   };
 
   const getCategories = () => {
@@ -161,6 +186,19 @@ function inventoryContentController(
     ctrl.currentData.AssetTypeId = subcategory.id;
     ctrl.currentData.isPrivateServerCategoryType = isPrivateServerCategoryType(category);
 
+    if (subcategory.filter === assetsConstants.types.myPrivateServers) {
+      inventoryExperimentsService.logExposure();
+    }
+
+    sendUserItemsPage({
+      pageType: ctrl.pageType,
+      eventType: 'show',
+      component: 'page',
+      categoryName: category.name,
+      subcategoryName: subcategory.name,
+      isOwnPage: ctrl.isOwnInventory
+    });
+
     ctrl.constructCatalogUrl();
     // Remove behind switch in AVBURST-564
     $document.triggerHandler('Roblox.Recommendations.GetItems', [
@@ -175,7 +213,8 @@ function inventoryContentController(
         placeTab: subcategory.filter,
         assetTypeId: subcategory.id,
         sortOrder: cursorPaginationConstants.sortOrder.descending,
-        type: subcategory.type
+        type: subcategory.type,
+        inventoryUpdatesEnabled: ctrl.currentData.inventoryUpdatesEnabled
       })
       .then(pageLoaded)
       .catch(pageLoadError);
@@ -240,7 +279,7 @@ function inventoryContentController(
   const init = () => {
     ctrl.showCreatorName = true;
     ctrl.isOwnInventory = Number(CurrentUser.userId) === ctrl.userId;
-    ctrl.recommendationsType = recommendationsConstants.recommendationTypes.asset; // TODO: we need to pull this into separated file from core script instead of cross other project because there is no way to tell there is change there
+    ctrl.recommendationsType = inventoryConstants.recommendationTypes.asset;
 
     ctrl.currentData = {
       currentPage: 1,
@@ -254,7 +293,8 @@ function inventoryContentController(
       AssetTypeId: 0,
       itemSection: assetsConstants.types.catalog,
       templateVisible: true,
-      isRecommendationAvailable: false
+      isRecommendationAvailable: false,
+      inventoryUpdatesEnabled: false
     };
 
     const loadingPromises = [];
@@ -263,6 +303,7 @@ function inventoryContentController(
     loadingPromises.push(assetsService.getAssetToSubcategoryMappings());
     loadingPromises.push(getCategories());
     loadingPromises.push(assetsService.getCatalogMetadata());
+    loadingPromises.push(getInventoryUpdatesEnabled());
 
     $q.all(loadingPromises).then(results => {
       [
@@ -270,7 +311,8 @@ function inventoryContentController(
         ctrl.assetToCategoryMappings,
         ctrl.assetToSubcategoryMappings,
         ctrl.categories,
-        ctrl.catalogMetadata
+        ctrl.catalogMetadata,
+        ctrl.currentData.inventoryUpdatesEnabled
       ] = results;
 
       if (ctrl.currentData.categoryName) {

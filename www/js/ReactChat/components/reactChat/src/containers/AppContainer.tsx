@@ -98,7 +98,7 @@ const AppContainer = () => {
   // Otherwise this tab can never receive the realtime event that creates its first conversation.
   const { isConnectionLost } = useChatRealtimeBridge({
     enabled: !chatData.isLoading,
-    isChatEnabled: chatData.chatDisabledReason === null,
+    isChatEnabled: chatData.chatDisabledReason === null && chatData.isChatVisible,
   });
   const { shouldRespectConversationHasUnreadMessageToMarkAsRead } = useChatMetadataConfig();
   const { scheduleMarkRead } = useMarkAsRead({
@@ -328,7 +328,12 @@ const AppContainer = () => {
   }, [showFeatureRestrictionFromRealtime, useChatTimeouts]);
 
   useEffect(() => {
-    if (deepLinkConsumedRef.current || chatData.isLoading || conversations.length === 0) {
+    if (
+      deepLinkConsumedRef.current ||
+      chatData.isLoading ||
+      !chatData.isChatVisible ||
+      conversations.length === 0
+    ) {
       return;
     }
 
@@ -368,19 +373,18 @@ const AppContainer = () => {
       }
     };
     consumeStartIntent().catch(() => undefined);
-  }, [chatData.isLoading, conversations, openConversation, queryClient]);
+  }, [chatData.isLoading, chatData.isChatVisible, conversations, openConversation, queryClient]);
 
-  // webChatRendered — one-shot, fired once the chat has rendered and event sampling is configured off
-  // the conversation metadata (isMetadataLoaded, whose effect in useChatData runs earlier this
-  // commit). isChatEnabled is always true here: reactChat only mounts for chat-enabled users;
-  // isChatOpen mirrors the expanded (non-collapsed) chat bar.
+  // webChatRendered — one-shot, once the chat has rendered and event sampling is configured off the
+  // metadata (isMetadataLoaded). Skipped when hidden (U9 kids) so a chat that never renders isn't
+  // counted; isChatOpen mirrors the expanded (non-collapsed) bar.
   useEffect(() => {
-    if (!chatData.isMetadataLoaded || webChatRenderedSentRef.current) {
+    if (!chatData.isMetadataLoaded || !chatData.isChatVisible || webChatRenderedSentRef.current) {
       return;
     }
     webChatRenderedSentRef.current = true;
     sendWebChatRendered({ isChatEnabled: true, isChatOpen: !layout.isCollapsed });
-  }, [chatData.isMetadataLoaded, layout.isCollapsed]);
+  }, [chatData.isMetadataLoaded, chatData.isChatVisible, layout.isCollapsed]);
 
   // webChatConversationsLoaded — one-shot, fired once the conversation list has *succeeded* (gating
   // on areConversationsLoaded, not merely !isLoading, so a failed fetch never emits a phantom empty
@@ -391,6 +395,7 @@ const AppContainer = () => {
     if (
       !chatData.isMetadataLoaded ||
       !chatData.areConversationsLoaded ||
+      !chatData.isChatVisible ||
       conversationsLoadedSentRef.current
     ) {
       return;
@@ -412,6 +417,7 @@ const AppContainer = () => {
   }, [
     chatData.isMetadataLoaded,
     chatData.areConversationsLoaded,
+    chatData.isChatVisible,
     chatData.conversations,
     layout.isCollapsed,
   ]);
@@ -656,6 +662,12 @@ const AppContainer = () => {
     },
     [translate],
   );
+
+  // Hide the whole widget until metadata resolves, and whenever hidden (U9 kids). Legacy keeps
+  // #chat-container hidden until isChatVisible !== false, so U9 never flashes.
+  if (!chatData.isMetadataLoaded || !chatData.isChatVisible) {
+    return null;
+  }
 
   return (
     <div className="react-chat-root fixed bottom-[0] right-[var(--margin-small)] pointer-events-none content-default">

@@ -15,6 +15,7 @@ enum ExperimentKey {
   IsCurrentlyPlayingCardClickableEnabled = "isCurrentlyPlayingCardClickableEnabled",
   WebPlayerBadgesRedesign = "isWebPlayerBadgesRedesignEnabled",
   IsWebProfileBackgroundEnabled = "isWebProfileBackgroundEnabled",
+  IsWebProfileCreationsMigrationEnabled = "isWebProfileCreationsMigrationEnabled",
 }
 
 enum CacheKeyVariant {

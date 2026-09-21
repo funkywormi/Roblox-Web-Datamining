@@ -1,7 +1,7 @@
 import angular from "angular";
 import { TranslationResourceProvider } from "Roblox";
 
-let inventory = angular.module("inventory", ["assetsExplorer", "inventoryAppTemplates", "recommendations", "cursorPagination"])
+let inventory = angular.module("inventory", ["assetsExplorer", "inventoryAppTemplates", "cursorPagination"])
     .config(["languageResourceProvider", function (languageResourceProvider) {
         const translationProvider = new TranslationResourceProvider();
         const featureRecommendationsResources = translationProvider.getTranslationResource('Feature.Recommendations');

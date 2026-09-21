@@ -305,7 +305,7 @@
 }
 
 .c3-chat-message.is-user>.c3-chat-message-markdown-styling * {
-    color: #fff !important
+    color: var(--color-extended-white-100) !important
 }
 
 .c3-chat-message.is-agent>.c3-chat-message-markdown-styling * {
@@ -5172,61 +5172,61 @@ a:hover .icon-female-white {
 }
 
 input::-moz-placeholder {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     opacity: 1;
     font-weight: 400
 }
 
 textarea::-moz-placeholder {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     opacity: 1;
     font-weight: 400
 }
 
 input:-ms-placeholder-shown {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     opacity: 1;
     font-weight: 400
 }
 
 textarea:-ms-placeholder-shown {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     opacity: 1;
     font-weight: 400
 }
 
 input::-webkit-input-placeholder {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     opacity: 1;
     font-weight: 400
 }
 
 input::placeholder {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     opacity: 1;
     font-weight: 400
 }
 
 input::placeholder {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     opacity: 1;
     font-weight: 400
 }
 
 textarea::-webkit-input-placeholder {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     opacity: 1;
     font-weight: 400
 }
 
 textarea::placeholder {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     opacity: 1;
     font-weight: 400
 }
 
 textarea::placeholder {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     opacity: 1;
     font-weight: 400
 }
@@ -5249,8 +5249,8 @@ textarea::placeholder {
 }
 
 .light-theme .form-control {
-    background-color: transparent;
-    border-color: #bcbec8
+    border-color: var(--color-extended-gray-500);
+    background-color: transparent
 }
 
 .light-theme .form-control[disabled],
@@ -5263,8 +5263,8 @@ textarea::placeholder {
 }
 
 .dark-theme .form-control {
-    background-color: transparent;
-    border-color: #494d5a
+    border-color: var(--color-extended-gray-700);
+    background-color: transparent
 }
 
 .dark-theme .form-control[disabled],
@@ -5277,9 +5277,9 @@ textarea::placeholder {
 }
 
 .form-control {
-    background-color: #fff;
+    background-color: var(--color-extended-white-100);
+    border: 1px solid var(--color-extended-gray-500);
     background-image: none;
-    border: 1px solid #bcbec8;
     border-radius: 0;
     width: 100%;
     display: block
@@ -5293,8 +5293,8 @@ textarea::placeholder {
 .form-control[disabled],
 .form-control[readonly] {
     cursor: not-allowed;
-    opacity: 1;
-    background-color: #f7f7f8
+    background-color: var(--color-extended-gray-100);
+    opacity: 1
 }
 
 textarea.form-control {
@@ -5382,14 +5382,14 @@ textarea.form-control {
 
 .form-has-feedback .form-control-feedback {
     visibility: visible;
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     font-size: 10px;
     font-weight: var(--font-weight-400);
     margin: 0
 }
 
 .form-has-feedback .form-control-label {
-    color: #bcbec8;
+    color: var(--color-extended-gray-500);
     font-size: 10px;
     font-weight: var(--font-weight-400);
     margin: 0;
@@ -5397,21 +5397,21 @@ textarea.form-control {
 }
 
 .form-has-success .input-field {
-    border-color: #39c582
+    border-color: var(--color-extended-green-500)
 }
 
 .form-has-error .input-field,
 .form-has-error .input-field:focus,
 .input-group.form-has-error .input-field,
 .input-group.form-has-error .input-field:focus {
-    border-color: #e75750
+    border-color: var(--color-extended-red-700)
 }
 
 .form-has-error .form-control-feedback,
 .form-has-error .form-control-label,
 .input-group.form-has-error .form-control-feedback,
 .input-group.form-has-error .form-control-label {
-    color: #e75750;
+    color: var(--color-extended-red-700);
     line-height: 1em
 }
 
@@ -5459,7 +5459,7 @@ textarea.form-control {
 
 .light-theme .input-field:focus {
     background-color: var(--color-shift-200);
-    border-color: rgba(0, 0, 0, .3)
+    border-color: var(--color-extended-black-30)
 }
 
 .light-theme .input-field.rbx-placeholder {
@@ -5510,7 +5510,7 @@ textarea.form-control {
 
 .dark-theme .input-field:focus {
     background-color: var(--color-shift-200);
-    border-color: rgba(255, 255, 255, .3)
+    border-color: var(--color-extended-white-30)
 }
 
 .dark-theme .input-field.rbx-placeholder {
@@ -5540,15 +5540,15 @@ textarea.form-control {
 
 .light-theme .rbx-select-group:hover,
 .light-theme .rbx-select-group:focus {
+    background-color: var(--color-extended-black-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    color: var(--color-content-emphasis)
 }
 
 .light-theme .rbx-select-group:active,
 .light-theme .rbx-select-group.active {
     box-shadow: none;
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .rbx-select-group {
@@ -5557,15 +5557,15 @@ textarea.form-control {
 
 .dark-theme .rbx-select-group:hover,
 .dark-theme .rbx-select-group:focus {
+    background-color: var(--color-extended-white-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    color: var(--color-content-emphasis)
 }
 
 .dark-theme .rbx-select-group:active,
 .dark-theme .rbx-select-group.active {
     box-shadow: none;
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .light-theme .rbx-select-group .rbx-select {
@@ -5574,15 +5574,15 @@ textarea.form-control {
 
 .light-theme .rbx-select-group .rbx-select:hover,
 .light-theme .rbx-select-group .rbx-select:focus {
+    background-color: var(--color-extended-black-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    color: var(--color-content-emphasis)
 }
 
 .light-theme .rbx-select-group .rbx-select:active,
 .light-theme .rbx-select-group .rbx-select.active {
     box-shadow: none;
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .rbx-select-group .rbx-select {
@@ -5591,15 +5591,15 @@ textarea.form-control {
 
 .dark-theme .rbx-select-group .rbx-select:hover,
 .dark-theme .rbx-select-group .rbx-select:focus {
+    background-color: var(--color-extended-white-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    color: var(--color-content-emphasis)
 }
 
 .dark-theme .rbx-select-group .rbx-select:active,
 .dark-theme .rbx-select-group .rbx-select.active {
     box-shadow: none;
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .light-theme .rbx-select-group .rbx-select option {
@@ -5608,15 +5608,15 @@ textarea.form-control {
 
 .light-theme .rbx-select-group .rbx-select option:hover,
 .light-theme .rbx-select-group .rbx-select option:focus {
+    background-color: var(--color-extended-black-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    color: var(--color-content-emphasis)
 }
 
 .light-theme .rbx-select-group .rbx-select option:active,
 .light-theme .rbx-select-group .rbx-select option.active {
     box-shadow: none;
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .rbx-select-group .rbx-select option {
@@ -5625,15 +5625,15 @@ textarea.form-control {
 
 .dark-theme .rbx-select-group .rbx-select option:hover,
 .dark-theme .rbx-select-group .rbx-select option:focus {
+    background-color: var(--color-extended-white-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    color: var(--color-content-emphasis)
 }
 
 .dark-theme .rbx-select-group .rbx-select option:active,
 .dark-theme .rbx-select-group .rbx-select option.active {
     box-shadow: none;
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .rbx-select-group {
@@ -5649,9 +5649,9 @@ textarea.form-control {
 }
 
 .rbx-select-group:hover .rbx-select {
-    color: #fff;
-    cursor: pointer;
-    background-color: #70a0ff
+    background-color: var(--color-extended-blue-500);
+    color: var(--color-extended-white-100);
+    cursor: pointer
 }
 
 .rbx-select-group .rbx-select {
@@ -5659,7 +5659,7 @@ textarea.form-control {
     -moz-appearance: none;
     -ms-appearance: none;
     appearance: none;
-    background: #fff url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyOCIgaGVpZ2h0PSIyOCIgdmlld0JveD0iMCAwIDI4IDI4Ij48cGF0aCBmaWxsPSIjMTkxOTE5IiBkPSJNMTQgMTljLS4zIDAtLjUtLjEtLjctLjNsLTgtOGMtLjQtLjQtLjQtMSAwLTEuNHMxLS40IDEuNCAwbDcuMyA3LjMgNy4zLTcuM2MuNC0uNCAxLS40IDEuNCAwcy40IDEgMCAxLjRsLTggOGMtLjIuMi0uNC4zLS43LjMiLz48L3N2Zz4=) 98% 3px no-repeat;
+    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyOCIgaGVpZ2h0PSIyOCIgdmlld0JveD0iMCAwIDI4IDI4Ij48cGF0aCBmaWxsPSIjMTkxOTE5IiBkPSJNMTQgMTljLS4zIDAtLjUtLjEtLjctLjNsLTgtOGMtLjQtLjQtLjQtMSAwLTEuNHMxLS40IDEuNCAwbDcuMyA3LjMgNy4zLTcuM2MuNC0uNCAxLS40IDEuNCAwcy40IDEgMCAxLjRsLTggOGMtLjIuMi0uNC4zLS43LjMiLz48L3N2Zz4=) no-repeat scroll 98% 3px var(--color-extended-white-100);
     border-radius: 3px;
     width: 100%;
     min-width: 105px;
@@ -5679,14 +5679,14 @@ textarea.form-control {
 }
 
 .rbx-select-group .rbx-select:hover {
-    color: #fff;
+    color: var(--color-extended-white-100);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyOCIgaGVpZ2h0PSIyOCIgdmlld0JveD0iMCAwIDI4IDI4Ij48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMTQgMTljLS4zIDAtLjUtLjEtLjctLjNsLTgtOGMtLjQtLjQtLjQtMSAwLTEuNHMxLS40IDEuNCAwbDcuMyA3LjMgNy4zLTcuM2MuNC0uNCAxLS40IDEuNCAwcy40IDEgMCAxLjRsLTggOGMtLjIuMi0uNC4zLS43LjMiLz48L3N2Zz4=)
 }
 
 .rbx-select-group .rbx-select option {
-    color: #121215;
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-1200);
     white-space: nowrap;
-    background-color: #fff;
     outline: none;
     padding: 10px 12px
 }
@@ -5709,15 +5709,15 @@ textarea.form-control {
 
 .light-theme .select-group .select-option:hover,
 .light-theme .select-group .select-option:focus {
+    background-color: var(--color-extended-black-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    color: var(--color-content-emphasis)
 }
 
 .light-theme .select-group .select-option:active,
 .light-theme .select-group .select-option.active {
     box-shadow: none;
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .select-group .select-option {
@@ -5726,15 +5726,15 @@ textarea.form-control {
 
 .dark-theme .select-group .select-option:hover,
 .dark-theme .select-group .select-option:focus {
+    background-color: var(--color-extended-white-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    color: var(--color-content-emphasis)
 }
 
 .dark-theme .select-group .select-option:active,
 .dark-theme .select-group .select-option.active {
     box-shadow: none;
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .light-theme .select-group .select-option option {
@@ -5743,15 +5743,15 @@ textarea.form-control {
 
 .light-theme .select-group .select-option option:hover,
 .light-theme .select-group .select-option option:focus {
+    background-color: var(--color-extended-black-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    color: var(--color-content-emphasis)
 }
 
 .light-theme .select-group .select-option option:active,
 .light-theme .select-group .select-option option.active {
     box-shadow: none;
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .select-group .select-option option {
@@ -5760,15 +5760,15 @@ textarea.form-control {
 
 .dark-theme .select-group .select-option option:hover,
 .dark-theme .select-group .select-option option:focus {
+    background-color: var(--color-extended-white-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    color: var(--color-content-emphasis)
 }
 
 .dark-theme .select-group .select-option option:active,
 .dark-theme .select-group .select-option option.active {
     box-shadow: none;
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .select-group {

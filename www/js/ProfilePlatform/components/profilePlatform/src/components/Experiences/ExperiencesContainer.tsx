@@ -1,6 +1,8 @@
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Component } from "@rbx/profile-platform";
+import { useExperiments } from "@rbx/profile-common/ExperimentsContext";
+import { ExperimentKey } from "@rbx/profile-common/experimentationUtils";
 import { PageContext, type TBuildEventProperties } from "@rbx/discovery-common";
 import useProfileJsonComponent from "../../hooks/useProfileJsonComponent";
 import useFetchExperiencesData from "../../hooks/useFetchExperiencesData";
@@ -8,6 +10,9 @@ import Experiences from "./Experiences";
 
 const ExperiencesContainer = () => {
   const { translate } = useTranslation();
+  const { isInTreatment } = useExperiments();
+  const isCarouselEnabled =
+    isInTreatment(ExperimentKey.IsWebProfileCreationsMigrationEnabled) === true;
   const experiencesData = useProfileJsonComponent(Component.Experiences);
   const universeIds = useMemo(
     () =>
@@ -33,7 +38,12 @@ const ExperiencesContainer = () => {
   }
 
   return (
-    <Experiences games={games} translate={translate} buildEventProperties={buildEventProperties} />
+    <Experiences
+      games={games}
+      translate={translate}
+      buildEventProperties={buildEventProperties}
+      isCarouselEnabled={isCarouselEnabled}
+    />
   );
 };
 

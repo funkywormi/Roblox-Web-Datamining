@@ -626,6 +626,12 @@ button.btn-common-play-game-unplayable-lg {
     transform: scale(.6)
 }
 
+.react-chat-game-card-play {
+    min-height: var(--size-800);
+    display: -ms-flexbox;
+    display: flex
+}
+
 .react-chat-game-card-thumb {
     border-radius: var(--radius-small);
     width: 48px;

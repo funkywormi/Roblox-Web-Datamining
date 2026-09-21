@@ -207,9 +207,12 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
       PasskeyAdded: translate("Label.PasskeyAdded") || "Passkey added",
       AddPasskeyEnsureAccess:
         translate("Label.AddPasskeyEnsureAccess") || "Add a passkey you will always have access to",
-      PasskeysAddedEnsureAccess: (passkeyCount: number) =>
-        translate("Label.PasskeysAddedEnsureAccess", { passkeyCount }) ||
-        `${passkeyCount} passkey(s) added. Make sure you will always have access to at least one of them`,
+      PasskeysAddedEnsureAccessSingular: (passkeyCount: number) =>
+        translate("Label.PasskeysAddedEnsureAccessSingular", { passkeyCount }) ||
+        `${passkeyCount} passkey added. Make sure you will always have access to it`,
+      PasskeysAddedEnsureAccessPlural: (passkeyCount: number) =>
+        translate("Label.PasskeysAddedEnsureAccessPlural", { passkeyCount }) ||
+        `${passkeyCount} passkeys added. Make sure you will always have access to at least one of them`,
       PlayStationConnected: translate("Label.PlayStationConnected"),
       RecoveryCodesHelpText: translate("Label.RecoveryCodesHelpText"),
       SecurityKey: {

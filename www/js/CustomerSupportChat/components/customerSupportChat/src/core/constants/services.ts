@@ -33,11 +33,8 @@ export const apiSet: APISets = {
     withCredentials: true,
   },
   validateUsername: {
-    url: `${EnvironmentUrls.authApi}/v1/usernames/validate`,
+    url: `${EnvironmentUrls.usersApi}/v1/usernames/users`,
     retryable: true,
-    // Staying unauthenticated keeps auth-api on its age-bracket code path. The authenticated
-    // path reports a username the caller already owns as free, which would read as "no such
-    // account" for anyone asking about their own.
     withCredentials: false,
   },
   fetchChatConfigPayload: {

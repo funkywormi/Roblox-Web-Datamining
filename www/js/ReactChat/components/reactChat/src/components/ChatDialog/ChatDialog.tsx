@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Icon } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { useDialog } from "../../hooks/useDialog";
@@ -7,6 +7,8 @@ import { useChatKeystrokeTelemetry } from "../../hooks/useChatKeystrokeTelemetry
 import { useChatUiPolicies } from "../../hooks/useChatUiPolicies";
 import { useConversationOverlay } from "../../hooks/useConversationOverlay";
 import { useConsentModal } from "../../hooks/useConsentModal";
+import { useParticipantBlockedUserIds } from "../../hooks/useParticipantBlockedUserIds";
+import { useParticipantTrustedUserIds } from "../../hooks/useParticipantTrustedUserIds";
 import { useOsaInlineCard } from "../../hooks/useOsaInlineCard";
 import { resolveConsentVariant } from "../../utils/consent";
 import {
@@ -114,6 +116,14 @@ const ChatDialog = ({
     onClose,
   });
 
+  // Blocked / trusted participants for the group-OSA consent modal's badges; only fetched when shown.
+  const blockedUserIds = useParticipantBlockedUserIds(conversation.id, consentVariant != null);
+  const participantIds = useMemo(
+    () => conversation.participants.map(participant => participant.id),
+    [conversation.participants],
+  );
+  const trustedUserIds = useParticipantTrustedUserIds(participantIds, consentVariant != null);
+
   // webChatConversationRendered — emitted once per open. Gated on isMetadataLoaded (the event
   // sampling decision is fixed from that same metadata) so a dialog mounted before settings resolve
   // — a restored/persisted or deep-link open, since conversations and metadata load in parallel —
@@ -162,6 +172,8 @@ const ChatDialog = ({
       <ConsentModal
         conversation={conversation}
         expandedChatEnabled={expandedChatEnabled}
+        blockedUserIds={blockedUserIds}
+        trustedUserIds={trustedUserIds}
         onAccept={acceptConsent}
         onDecline={declineConsent}
         onClose={dismissConsent}
