@@ -11,7 +11,7 @@ import useLocalizedMoney from "../../hooks/useLocalizedMoney";
 import { SUBSCRIPTION_TERMS_URL } from "../../subscriptionConstants";
 import SubscriptionButton from "../shared/SubscriptionButton";
 
-import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v1";
+import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v2";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
 
 const { ENUM_TRIGGERING_CONTEXT } = paymentFlowAnalyticsService;

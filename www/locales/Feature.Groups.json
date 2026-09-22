@@ -1341,5 +1341,6 @@
     "Label.OverflowMenu": "More options",
     "Label.AddImage": "Add image",
     "ResponseCountSingular": "response",
-    "ResponseCountPlural": "responses"
+    "ResponseCountPlural": "responses",
+    "Voted": "Voted"
 }

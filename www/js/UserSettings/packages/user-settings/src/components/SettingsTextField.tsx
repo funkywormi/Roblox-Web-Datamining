@@ -14,6 +14,7 @@ interface SettingsTextFieldProps {
   primaryEditLabel: string;
   primaryOnEdit: () => void;
   primaryActionId?: string;
+  primaryEditDisabled?: boolean;
   secondaryEditLabel?: string;
   secondaryOnEdit?: () => void;
   displayEditButton?: boolean;
@@ -27,6 +28,7 @@ export const SettingsTextField: React.FC<SettingsTextFieldProps> = ({
   primaryEditLabel,
   primaryOnEdit,
   primaryActionId = "",
+  primaryEditDisabled = false,
   secondaryEditLabel = "",
   secondaryOnEdit = () => null,
   displayEditButton = true,
@@ -37,6 +39,7 @@ export const SettingsTextField: React.FC<SettingsTextFieldProps> = ({
       size="Small"
       onClick={primaryOnEdit}
       id={primaryActionId}
+      isDisabled={primaryEditDisabled}
     >
       {primaryEditLabel}
     </Button>
@@ -63,6 +66,7 @@ export const SettingsTextField: React.FC<SettingsTextFieldProps> = ({
       aria-label={primaryEditLabel}
       onClick={primaryOnEdit}
       id={primaryActionId}
+      disabled={primaryEditDisabled}
       data-testid="setting-text-field-edit-btn"
     >
       <span className="icon-edit" />

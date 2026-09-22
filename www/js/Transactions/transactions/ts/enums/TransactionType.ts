@@ -27,7 +27,8 @@ enum TransactionType {
   LicensingPaymentClawback = 'LicensingPaymentClawback',
   CurrencyTransfer = 'CurrencyTransfer',
   RobloxSelectTransfer = 'RobloxSelectTransfer',
-  CreatorRewardsPayout = 'CreatorRewardsPayout'
+  CreatorRewardsPayout = 'CreatorRewardsPayout',
+  SubscriptionReferralPayout = 'SubscriptionReferralPayout'
 }
 
 export default TransactionType;

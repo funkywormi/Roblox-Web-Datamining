@@ -24,8 +24,10 @@ const SourceCell: FunctionComponent<SourceCellProps> = ({ transaction, translate
   switch (transaction.transactionType) {
     case TransactionOriginType.SubscriptionsRevsharePayout:
     case TransactionOriginType.GroupSubscriptionsRevsharePayout:
-    case TransactionOriginType.LicensingPayment:
       RenderSourceAsUniverse = true;
+      break;
+    case TransactionOriginType.LicensingPayment:
+      RenderSourceAsUniverse = Boolean(transaction.details?.place);
       break;
     case TransactionOriginType.SubscriptionsRevshareClawback:
     case TransactionOriginType.GroupSubscriptionsRevshareClawback:

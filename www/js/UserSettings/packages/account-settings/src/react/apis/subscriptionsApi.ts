@@ -4,7 +4,7 @@ import {
   ProductType,
   SubscriptionsV2Api,
   type SubscriptionProductInfo,
-} from "@rbx/client-subscriptions-api/v1";
+} from "@rbx/client-subscriptions-api/v2";
 import baseApi from "./common/baseApi";
 
 const configuration = new Configuration({

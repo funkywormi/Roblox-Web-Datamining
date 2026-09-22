@@ -149,6 +149,9 @@ export type TAccountInfoBody = {
 export type TUsernameChangePriceResponse = {
   priceInRobux: number;
   basePriceInRobux: number;
+  // Absent until the Auth service reports the internal-reset exemption, so callers must
+  // treat a missing value as "not known to be free" rather than assume it is present.
+  isFreeUsernameChange?: boolean;
 };
 
 export type TUpdatePasswordBody = {

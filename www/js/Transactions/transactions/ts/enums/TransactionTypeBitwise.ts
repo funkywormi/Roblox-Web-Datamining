@@ -33,7 +33,7 @@ enum TransactionTypeBitwise {
   CurrencyTransfer = 1 << 25,
   RobloxSelectTransfer = 1 << 26,
   PrivateServerEngagementPayout = 1 << 27,
-  // Bit 28 is currently not integrated
+  SubscriptionReferralPayout = 1 << 28,
   CreatorRewardsPayout = 1 << 29
 }
 

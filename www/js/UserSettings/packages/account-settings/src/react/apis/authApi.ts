@@ -45,6 +45,9 @@ const authApi = baseApi.injectEndpoints({
     // Username
     getUsernameChangePrice: builder.query<TUsernameChangePriceResponse, void>({
       query: (): TBaseQueryArgs => ({ url: usernameChangePriceEndpoint }),
+      // The quote is per-user and stops being free once a change is spent, so it has to be
+      // invalidated alongside the account info that updateUsername already refetches.
+      providesTags: [ApiCacheTag.AccountInfo],
     }),
     updateUsername: builder.mutation<Promise<unknown>, string>({
       query: (username: string): TBaseQueryArgs => {

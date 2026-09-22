@@ -200,6 +200,15 @@ function SummaryTable({ translate, data, transactionTypes, onTransactionTypeSele
             translate={translate}
           />
         )}
+        {TransactionType.SubscriptionReferralPayout in transactionTypes && (
+          <SummaryTableRowComponent
+            transactionTypeLabel={translate(
+              transactionTypeTranslationKeys[TransactionType.SubscriptionReferralPayout]
+            )}
+            amount={data.subscriptionReferralPayoutsTotal}
+            translate={translate}
+          />
+        )}
         {TransactionType.CsAdjustment in transactionTypes && data.csAdjustmentTotal >= 0 && (
           <SummaryTableRowComponent
             transactionTypeLabel={translate(
@@ -229,7 +238,8 @@ function SummaryTable({ translate, data, transactionTypes, onTransactionTypeSele
           TransactionType.AffiliatePayout in transactionTypes ||
           TransactionType.CreatorRewardsPayout in transactionTypes ||
           TransactionType.CurrencyTransfer in transactionTypes ||
-          TransactionType.LicensingPayment in transactionTypes) && (
+          TransactionType.LicensingPayment in transactionTypes ||
+          TransactionType.SubscriptionReferralPayout in transactionTypes) && (
           <SummaryTableRowComponent
             transactionTypeLabel={translate('Label.TransactionTypePendingRobux')}
             amount={data.pendingRobuxTotal}
@@ -369,7 +379,8 @@ SummaryTable.propTypes = {
     robloxSelectIncomingTotal: PropTypes.number.isRequired,
     robloxSelectOutgoingTotal: PropTypes.number.isRequired,
     privateServerEngagementPayoutsTotal: PropTypes.number.isRequired,
-    creatorRewardsPayoutsTotal: PropTypes.number.isRequired
+    creatorRewardsPayoutsTotal: PropTypes.number.isRequired,
+    subscriptionReferralPayoutsTotal: PropTypes.number.isRequired
   }).isRequired,
   transactionTypes: PropTypes.shape({}).isRequired,
   onTransactionTypeSelect: PropTypes.func.isRequired

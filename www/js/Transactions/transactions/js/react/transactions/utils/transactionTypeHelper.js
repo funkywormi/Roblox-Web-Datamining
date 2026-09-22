@@ -102,6 +102,10 @@ function getUsedTransactionTypes(
     usedTransactionTypes[TransactionType.CreatorRewardsPayout] = true;
   }
 
+  if (usedTransactionTypeFlags.HasSubscriptionReferralPayout) {
+    usedTransactionTypes[TransactionType.SubscriptionReferralPayout] = true;
+  }
+
   return usedTransactionTypes;
 }
 
@@ -199,6 +203,9 @@ function generateBitwiseFlagFromUsedTypes(usedTransactionTypes) {
         case TransactionType.CreatorRewardsPayout:
           bitwiseFlag |= TransactionTypeBitwise.CreatorRewardsPayout;
           break;
+        case TransactionType.SubscriptionReferralPayout:
+          bitwiseFlag |= TransactionTypeBitwise.SubscriptionReferralPayout;
+          break;
         default:
           break;
       }
@@ -266,6 +273,8 @@ function convertBitwiseFlagToUsedTypes(bitwiseFlag) {
     (bitwiseFlag & TransactionTypeBitwise.PrivateServerEngagementPayout) !== 0;
   usedTransactionTypes[TransactionType.CreatorRewardsPayout] =
     (bitwiseFlag & TransactionTypeBitwise.CreatorRewardsPayout) !== 0;
+  usedTransactionTypes[TransactionType.SubscriptionReferralPayout] =
+    (bitwiseFlag & TransactionTypeBitwise.SubscriptionReferralPayout) !== 0;
 
   return usedTransactionTypes;
 }

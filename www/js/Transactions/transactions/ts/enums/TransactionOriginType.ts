@@ -48,7 +48,8 @@ enum TransactionOriginType {
   LicensingPaymentClawback = 'Licensing Payment Clawback',
   CurrencyTransfer = 'CurrencyTransfer',
   RobloxSelectTransfer = 'RobloxSelectTransfer',
-  CreatorRewardsPayout = 'CreatorRewardsPayout'
+  CreatorRewardsPayout = 'CreatorRewardsPayout',
+  SubscriptionReferralPayout = 'Plus Referral Payouts'
 }
 
 export default TransactionOriginType;

@@ -39,7 +39,8 @@ export const transactionTypeTranslationKeys: { [key in TransactionType]: string 
   [TransactionType.CurrencyTransfer]: 'Label.CurrencyTransfers',
   [TransactionType.RobloxSelectTransfer]: 'Label.RobloxSelect',
   [TransactionType.PrivateServerEngagementPayout]: 'Label.PrivateServerEngagementPayouts',
-  [TransactionType.CreatorRewardsPayout]: 'Label.TransactionTypeCreatorRewards'
+  [TransactionType.CreatorRewardsPayout]: 'Label.TransactionTypeCreatorRewards',
+  [TransactionType.SubscriptionReferralPayout]: 'Label.ReferralPayouts'
 };
 
 export const transactionOriginTypeTranslationKeys: { [key in TransactionOriginType]: string } = {
@@ -98,7 +99,8 @@ export const transactionOriginTypeTranslationKeys: { [key in TransactionOriginTy
   // Rendered exactly like a Private Server sale: "Sold Private Server" (item name set in the
   // data service) plus the game icon and place link.
   [TransactionOriginType.PrivateServerEngagementPayout]: 'Description.SoldItem',
-  [TransactionOriginType.CreatorRewardsPayout]: 'Description.CreatorRewards'
+  [TransactionOriginType.CreatorRewardsPayout]: 'Description.CreatorRewards',
+  [TransactionOriginType.SubscriptionReferralPayout]: 'Description.ReferralPayout'
 };
 
 export const licensedPaymentTransactionOriginTypeTranslationKeys: {

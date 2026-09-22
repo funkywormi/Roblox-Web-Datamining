@@ -58,6 +58,9 @@ function TransactionsTableRow({ translate, transaction, showReportColumn }) {
     case TransactionOriginType.LicensingPayment:
       TooltipContent = translate('Description.PendingRobuxLicensingPayment');
       break;
+    case TransactionOriginType.SubscriptionReferralPayout:
+      TooltipContent = translate('Description.PendingRobuxReferralPayout');
+      break;
     case TransactionOriginType.CurrencyTransfer:
       // Pending currency transfers use an inline sandglass + text instead of the clock tooltip.
       break;

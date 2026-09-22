@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AccessManagementUpsellV2Service } from "Roblox";
 import { useTranslation } from "react-utilities";
 import { IModalService, Loading } from "react-style-guide";
@@ -42,6 +42,7 @@ const useChangeBirthdateModal = (): [JSX.Element, IModalService] => {
   const [ampRecourseData, setAmpRecourseData] = useState<Record<string, any>>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSameBirthdate, setIsSameBirthdate] = useState<boolean>(true);
+  const changeAgeModalServiceRef = useRef<IModalService | null>(null);
   const [errorModal, errorModalService] = useSettingsInfoModal(
     commonTranslationConstants.modal.error.title,
     commonTranslationConstants.modal.error.body,
@@ -79,6 +80,12 @@ const useChangeBirthdateModal = (): [JSX.Element, IModalService] => {
   }, [birthdate, selectedBirthdate]);
 
   const changeBirthdayHandler = async (callbackService: IModalService) => {
+    // AMP v2 renders a Radix dialog with its own focus lock. Close the settings dialog first so
+    // its Bootstrap focus management cannot prevent interaction with the wizard's form controls.
+    callbackService.close();
+    // Age-down passes the nested warning as callbackService; the birthday modal stays open
+    // otherwise and restores focus to Continue under AMP. Closing it here covers both paths.
+    changeAgeModalServiceRef.current?.close();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const access = await AccessManagementUpsellV2Service.startAccessManagementUpsell({
       featureName: AMPFeaturesConstants.ageCorrectionAmpFeature,
@@ -105,7 +112,6 @@ const useChangeBirthdateModal = (): [JSX.Element, IModalService] => {
         snackbarService.success(translate(commonTranslationConstants.successDialogMessage));
       }
     }
-    callbackService.close();
   };
   const [ageDownModal, ageDownModalService] = useSettingsModal({
     titleResourceId: birthdateTranslation.warnings.ageDownInModal.title,
@@ -147,7 +153,6 @@ const useChangeBirthdateModal = (): [JSX.Element, IModalService] => {
     <div>
       {loading}
       {birthdateSelector}
-      {errorModal}
       {ageDownModal}
     </div>
   );
@@ -188,8 +193,15 @@ const useChangeBirthdateModal = (): [JSX.Element, IModalService] => {
     size: "sm",
     disableActionButton: !selectedBirthdate || !isBirthdayValid || isSameBirthdate,
   });
+  changeAgeModalServiceRef.current = changeAgeModalService;
 
-  return [changeAgeModal, changeAgeModalService];
+  return [
+    <React.Fragment>
+      {errorModal}
+      {changeAgeModal}
+    </React.Fragment>,
+    changeAgeModalService,
+  ];
 };
 
 export default useChangeBirthdateModal;
