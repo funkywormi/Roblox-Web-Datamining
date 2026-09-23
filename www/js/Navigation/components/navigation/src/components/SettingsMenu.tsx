@@ -3,10 +3,13 @@ import ClassNames from "classnames";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
-import { Link } from "@rbx/core-ui";
+import { Menu, MenuItem, MenuSection } from "@rbx/foundation-ui";
+
 import links from "../constants/linkConstants";
-import { logoutUser, switchAccount } from "../util/authUtil";
+import { logoutUser, openAccountSwitcher, switchAccount } from "../util/authUtil";
 import layoutConstants from "../constants/layoutConstants";
+import Link from "./NavLink";
+import { useIsTopNavFoundation } from "../util/topNavFoundationIxp";
 
 const { settingsUrl, quickLoginUrl } = links;
 const { quickLogin, settings, logout, switchAccountKey } = layoutConstants.menuKeys;
@@ -21,6 +24,7 @@ export default function SettingsMenu({
   isCrossDeviceLoginCodeValidationDisplayed = false,
 }: Props) {
   const { translate } = useTranslation();
+  const isFoundation = useIsTopNavFoundation();
   const notificationClasses = ClassNames("notification-blue notification nav-setting-highlight", {
     hidden: accountNotificationCount === 0,
   });
@@ -31,12 +35,65 @@ export default function SettingsMenu({
       await logoutUser();
     },
   });
-  const handleLogoutClick: MouseEventHandler = e => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleLogoutSelect = () => {
     if (logoutMutation.isPending) return;
     logoutMutation.mutate(undefined);
   };
+  const handleLogoutClick: MouseEventHandler = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleLogoutSelect();
+  };
+
+  const isHidden = (urlKey: string) =>
+    (urlKey === switchAccountKey && !isAccountSwitchingEnabledForBrowser) ||
+    (urlKey === quickLogin && !isCrossDeviceLoginCodeValidationDisplayed);
+
+  if (isFoundation) {
+    return (
+      <Menu size="Large" className="nav-foundation-menu">
+        <MenuSection>
+          {Object.entries(settingsUrl).map(([urlKey, { url, label }]) => {
+            if (isHidden(urlKey)) {
+              return null;
+            }
+            const title = translate(label);
+            const trailing =
+              urlKey === settings && accountNotificationCount > 0
+                ? String(accountNotificationCount)
+                : undefined;
+
+            if (urlKey === logout) {
+              return (
+                <MenuItem key={urlKey} value={urlKey} title={title} onSelect={handleLogoutSelect} />
+              );
+            }
+            if (urlKey === switchAccountKey) {
+              return (
+                <MenuItem
+                  key={urlKey}
+                  value={urlKey}
+                  title={title}
+                  onSelect={openAccountSwitcher}
+                />
+              );
+            }
+            return (
+              <MenuItem
+                key={urlKey}
+                value={urlKey}
+                as="a"
+                href={urlKey === quickLogin ? quickLoginUrl : url}
+                title={title}
+                trailing={trailing}
+              />
+            );
+          })}
+        </MenuSection>
+      </Menu>
+    );
+  }
+
   return (
     <React.Fragment>
       {Object.entries(settingsUrl).map(([urlKey, { url, label }]) => (

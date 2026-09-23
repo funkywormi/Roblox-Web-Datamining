@@ -1,7 +1,7 @@
 import { Button, TSystemFeedbackService } from "react-style-guide";
 import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { TranslateFunction } from "@rbx/core-scripts/react";
-import { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v1";
+import { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v2";
 import {
   TRANSLATION_KEYS,
   useHeuristicCreditConversionModal,

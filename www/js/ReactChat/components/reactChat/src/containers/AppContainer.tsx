@@ -16,6 +16,7 @@ import { useChatRealtimeBridge } from "../hooks/useChatRealtimeBridge";
 import { useChatUiPolicies } from "../hooks/useChatUiPolicies";
 import { useMarkAsRead } from "../hooks/useMarkAsRead";
 import { useModerationTimeouts } from "../hooks/useModerationTimeouts";
+import { usePartyChatReactiveFeatureRestriction } from "../hooks/usePartyChatReactiveFeatureRestriction";
 import { useUnreadTabTitle } from "../hooks/useUnreadTabTitle";
 import {
   addUsersToConversation,
@@ -134,7 +135,7 @@ const AppContainer = () => {
         .map(conversation => conversation.id),
     [conversations, chatData.moderationEligibleIds],
   );
-  const { resolveTimeout } = useModerationTimeouts(openModerationIds);
+  const { resolveTimeout, refreshModerationStatuses } = useModerationTimeouts(openModerationIds);
   const {
     conversations: filteredConversations,
     searchTerm,
@@ -151,17 +152,70 @@ const AppContainer = () => {
     [expandedChatEnabled],
   );
 
+  /**
+   * Universal feature restriction for party chat presentation matrix.
+   * Restrictions are either PROACTIVE (never require acknowledgment) or REACTIVE (require the user
+   * to acknowledge). Each can arrive over realtime (live SignalR event) or already be in effect when
+   * the user loads/opens chat (non-realtime, discovered by fetching moderation statuses):
+   *
+   *   Proactive             Whether to show the UFR dialog
+   *     • Realtime          → always show the dialog
+   *     • Non-realtime      → only show when the user clicks the "chat disabled" bar
+   *   Reactive
+   *     • Realtime          → always show the dialog
+   *     • Non-realtime, acknowledged    → only show on "chat disabled" bar click
+   *     • Non-realtime, un-acknowledged → auto-show once the chat surface becomes visible. Chat surface is
+   *                                       visible when the chat bar is expanded OR a conversation dialog
+   *                                       is open (not minimized/collapsed).
+   */
   const { showFeatureRestriction, showFeatureRestrictionFromRealtime } =
     useUniversalFeatureRestrictions();
+  // On a successful acknowledgment the server state has changed, so we issue a fresh request
+  // (forceFresh) rather than dedupe onto a pre-acknowledgment fetch that may still be in flight and
+  // could still report requires_acknowledgement as true, leaving the input blocked.
+  const handleAcknowledgmentSuccess = useCallback(() => {
+    refreshModerationStatuses({ forceFresh: true, retry: 3 }).catch((): undefined => undefined);
+  }, [refreshModerationStatuses]);
   const showPartyChatFeatureRestriction = useCallback(() => {
-    showFeatureRestriction({ abuseVector: "party_chat", onAppeal: handlePartyChatAppeal });
-  }, [showFeatureRestriction]);
+    showFeatureRestriction({
+      abuseVector: "party_chat",
+      onAppeal: handlePartyChatAppeal,
+      onAcknowledgmentSuccess: handleAcknowledgmentSuccess,
+    });
+  }, [showFeatureRestriction, handleAcknowledgmentSuccess]);
 
   const [feedback, setFeedback] = useState<TChatFeedback | null>(null);
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
   const { useChatTimeouts } = useChatUiPolicies();
   const conversationsRef = useRef(conversations);
   conversationsRef.current = conversations;
+
+  const hasVisibleConversation = conversations.some(
+    conversation => conversation.isOpen && !conversation.isMinimized && !conversation.isCollapsed,
+  );
+  const isChatSurfaceVisible = !layout.isCollapsed || hasVisibleConversation;
+
+  // isPartyChatReactiveRestrictionEligible is true only when useChatTimeouts rollout is on,
+  // chat data has loaded, chat is enabled, AND chat surface is visible. Chat surface is considered
+  // visible if either the chat bar is expanded so you can see the list of friends you can chat with
+  // OR a conversation dialog is open so you can see the content of the conversation.
+  const isPartyChatReactiveRestrictionEligible =
+    useChatTimeouts &&
+    !chatData.isLoading &&
+    chatData.isMetadataSettled &&
+    chatData.chatDisabledReason === null &&
+    isChatSurfaceVisible;
+  // The reactive entry check reuses a recent cached status (up to the query's 60s staleTime) so
+  // repeatedly toggling the chat bar doesn't POST get-chat-moderation-statuses on every toggle.
+  const refreshModerationStatusesForEntryCheck = useCallback(
+    () => refreshModerationStatuses({ staleTime: 60_000 }),
+    [refreshModerationStatuses],
+  );
+  usePartyChatReactiveFeatureRestriction({
+    isEligible: isPartyChatReactiveRestrictionEligible,
+    refreshModerationStatuses: refreshModerationStatusesForEntryCheck,
+    showPartyChatFeatureRestriction,
+  });
 
   const deepLinkConsumedRef = useRef(false);
   const webChatRenderedSentRef = useRef(false);
@@ -310,6 +364,7 @@ const AppContainer = () => {
         abuseVector: "party_chat",
         intervention: event.detail,
         onAppeal: handlePartyChatAppeal,
+        onAcknowledgmentSuccess: handleAcknowledgmentSuccess,
       });
     };
     const onNudge = (event: WindowEventMap["reactChatNudge"]) => {
@@ -317,6 +372,7 @@ const AppContainer = () => {
         abuseVector: "party_chat",
         intervention: event.detail,
         onAppeal: handlePartyChatAppeal,
+        onAcknowledgmentSuccess: handleAcknowledgmentSuccess,
       });
     };
     window.addEventListener("reactChatFeatureIntervention", onTimeout);
@@ -325,7 +381,7 @@ const AppContainer = () => {
       window.removeEventListener("reactChatFeatureIntervention", onTimeout);
       window.removeEventListener("reactChatNudge", onNudge);
     };
-  }, [showFeatureRestrictionFromRealtime, useChatTimeouts]);
+  }, [showFeatureRestrictionFromRealtime, useChatTimeouts, handleAcknowledgmentSuccess]);
 
   useEffect(() => {
     if (

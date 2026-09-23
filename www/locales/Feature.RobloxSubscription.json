@@ -212,5 +212,12 @@
     "Title.SubscribeToPlus": "Subscribe to Plus",
     "Description.Benefit.AppThemeAndFrame": "Customize profile and app theme",
     "Description.Benefit.DiscountBuyRobux": "Up to {discountPercent} off on items and avatars",
-    "Message.AlreadySubscribed": "You already have Plus. This link is for new members. Share your own to invite friends and get rewards."
+    "Message.AlreadySubscribed": "You already have Plus. This link is for new members. Share your own to invite friends and get rewards.",
+    "Label.BillingPeriodOption": "{months, plural, =1 {Monthly} =12 {Yearly} other {{months} months}}",
+    "Action.Close": "Close",
+    "Heading.ChooseBillingPeriod": "Choose billing period",
+    "Description.ChooseBillingPeriod": "The longer you subscribe, the more you save.",
+    "Label.BillingPeriodSavings": "{pricePerMonth}/month · Save {savingsPercent}",
+    "Label.BestValue": "Best value",
+    "Description.SubscriptionLegalBillingCycle": "By clicking \"Subscribe,\" you agree to the {linkStart}Roblox Subscription Terms{linkEnd}. You will be charged one time automatically at the beginning of every billing cycle and you can cancel anytime."
 }

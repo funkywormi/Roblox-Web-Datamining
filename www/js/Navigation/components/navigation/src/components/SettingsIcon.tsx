@@ -1,4 +1,5 @@
 import ClassNames from "classnames";
+import NavIcon from "./NavIcon";
 
 export default function SettingsIcon({
   accountNotificationCount = 0,
@@ -10,7 +11,12 @@ export default function SettingsIcon({
   });
   return (
     <span id="settings-icon" className="nav-settings-icon rbx-menu-item" aria-hidden="true">
-      <span className="icon-nav-settings roblox-popover-close" id="nav-settings" />
+      <NavIcon
+        legacyClass="icon-nav-settings roblox-popover-close"
+        name="icon-regular-gear"
+        size="XLarge"
+        id="nav-settings"
+      />
       <span className={notificationClasses}>{accountNotificationCount}</span>
     </span>
   );

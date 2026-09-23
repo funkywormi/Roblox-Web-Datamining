@@ -506,5 +506,14 @@
     "Description.ODPRequestExpired": "The request expired due to inactivity, restart the request",
     "Description.ODPSessionExpired": "This session and request expired due to inactivity. Visit Settings > Parental Controls to make additional changes",
     "Heading.ODPRequestExpired": "Request has expired",
-    "Heading.ODPSessionExpired": "Session expired"
+    "Heading.ODPSessionExpired": "Session expired",
+    "Heading.OnDeviceParent.EnterPin": "Enter the PIN you set on your child's account",
+    "Description.OnDeviceParent.CreateAndLinkAccount": "To create and link an account, enter the PIN set on the child account.",
+    "Heading.OnDeviceParent.LinkExpired": "Link expired",
+    "Description.OnDeviceParent.LinkExpired": "To create and link your account, go back to your child's device and try again.",
+    "Heading.OnDeviceParent.AccountCreatedAndLinked": "Your account is created and linked to {childName}",
+    "Heading.OnDeviceParent.AccountLinked": "Your account is linked to {childName}",
+    "Description.OnDeviceParent.UpgradeSuccess": "You can now manage their settings, approve requests, and get weekly emails about their activity.",
+    "Description.EnterParentEmailV6": "Ask your parents to help you with this step. We’ll send an email to your parent to verify their age and link them to your account.{lineBreak}Parents, after linking, you’ll get access to parental controls and insights on your child’s screen time, spending, and more.",
+    "Description.ParentalEmailFooterV2": "This email will be associated with your Roblox parent account. To learn more about our data practices, please see our {linkStart}Privacy Policy{linkEnd}."
 }

@@ -3,6 +3,7 @@ import { CHAT_MODERATION_TYPE } from "../constants/chatPolicyConstants";
 export type TModerationTimeoutRange = {
   start_time?: string;
   end_time?: string;
+  requires_acknowledgement?: boolean;
 };
 
 export type TConversationTimeoutRangeRow = {
@@ -17,9 +18,14 @@ export type TChatModerationStatusesResponse = {
 
 export type TModerationTimeoutMap = {
   /** User-level timeout end (applies to every *moderated* conversation), or null. */
-  userTimedOutUntil: Date | null;
+  userTimedOutUntil: TModerationTimeoutActive | null;
   /** Per-conversation timeout ends, keyed by conversation id. */
   conversationTimedOutUntilById: Map<string, Date>;
+};
+
+export type TModerationTimeoutActive = {
+  requiresAcknowledgment: boolean;
+  endDate: Date;
 };
 
 export type TResolvedTimeout = {
@@ -28,7 +34,10 @@ export type TResolvedTimeout = {
   expiresAtMs: number | null;
 };
 
-function parseTimeoutEnd(range: TModerationTimeoutRange | undefined, now: Date): Date | null {
+function parseTimeoutEnd(
+  range: TModerationTimeoutRange | undefined,
+  now: Date,
+): TModerationTimeoutActive | null {
   if (range?.end_time == null) {
     return null;
   }
@@ -37,10 +46,16 @@ function parseTimeoutEnd(range: TModerationTimeoutRange | undefined, now: Date):
     return null;
   }
   const start = range.start_time != null ? new Date(range.start_time) : null;
-  if (start !== null && !Number.isNaN(start.getTime()) && end.getTime() <= start.getTime()) {
+  if (start !== null && !Number.isNaN(start.getTime()) && end.getTime() < start.getTime()) {
     return null;
   }
-  return end.getTime() > now.getTime() ? end : null;
+
+  const requiresAcknowledgment = Boolean(range.requires_acknowledgement);
+  // A restriction is active while it still requires acknowledgment OR its window hasn't expired.
+  if (requiresAcknowledgment || end.getTime() > now.getTime()) {
+    return { requiresAcknowledgment, endDate: end };
+  }
+  return null;
 }
 
 export function buildModerationTimeoutMap(
@@ -57,7 +72,9 @@ export function buildModerationTimeoutMap(
     }
     const until = parseTimeoutEnd(row.timeout_range, now);
     if (until !== null) {
-      conversationTimedOutUntilById.set(id, until);
+      // Convo-level timeouts are never acknowledgeable, so we only store the endDate and
+      // omit the requiresAcknowledgment.
+      conversationTimedOutUntilById.set(id, until.endDate);
     }
   }
 
@@ -83,11 +100,17 @@ export function resolveConversationTimeout(
 
   const nowMs = now.getTime();
   const userUntil = map.userTimedOutUntil;
-  const userMs = userUntil !== null && userUntil.getTime() > nowMs ? userUntil.getTime() : null;
+  const userMs =
+    userUntil?.endDate && userUntil.endDate.getTime() > nowMs ? userUntil.endDate.getTime() : null;
 
   const convUntil = map.conversationTimedOutUntilById.get(conversationId);
   const convMs = convUntil != null && convUntil.getTime() > nowMs ? convUntil.getTime() : null;
 
+  const requiresAcknowledgment = userUntil?.requiresAcknowledgment ?? false;
   const expiresAtMs = Math.max(userMs ?? 0, convMs ?? 0) || null;
-  return { isTimedOut: expiresAtMs !== null, expiresAtMs };
+
+  return {
+    isTimedOut: expiresAtMs !== null || requiresAcknowledgment,
+    expiresAtMs,
+  };
 }

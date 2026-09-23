@@ -213,9 +213,12 @@ export const sendChatKeystrokes = (
   keystrokes: readonly TChatKeystroke[],
 ): void => {
   const { keyPressedData, eventTypeData, timestampData } = splitKeystrokeData(keystrokes);
+  // eventstream stores these as `repeated string`; bare-number elements get dropped on the www
+  // ingestion path, so stringify each element (["0","1"], ["1790..."]) before serializing.
+  // keyPressedData is already strings.
   sendEventWithTarget(KEYSTROKES_EVENT, flushReason, {
     keyPressedData: JSON.stringify(keyPressedData),
-    eventTypeData: JSON.stringify(eventTypeData),
-    timestampData: JSON.stringify(timestampData),
+    eventTypeData: JSON.stringify(eventTypeData.map(String)),
+    timestampData: JSON.stringify(timestampData.map(String)),
   });
 };

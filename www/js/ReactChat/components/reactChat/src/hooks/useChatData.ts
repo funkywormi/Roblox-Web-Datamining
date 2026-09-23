@@ -51,6 +51,13 @@ export type TUseChatDataResult = {
    */
   isMetadataLoaded: boolean;
   /**
+   * True once the chat-settings query has settled. Settled means that it succeeded OR errored as opposed to
+   * isMetadataLoaded, which is only true on success. The shared query client does not retry, so on a
+   * error isMetadataLoaded stays false forever. Callers can use this to proceed after a settled error
+   * instead of waiting on a load that will never complete.
+   */
+  isMetadataSettled: boolean;
+  /**
    * True once the conversation-list query has *succeeded* (not merely stopped loading). Callers gate
    * the one-shot "conversations loaded" event on this so a failed fetch never emits a phantom
    * empty-list event (and never latches the one-shot ref before a later refetch succeeds).
@@ -253,6 +260,7 @@ export const useChatData = (): TUseChatDataResult => {
     hasNextPage,
     moderationEligibleIds,
     isMetadataLoaded: chatSettingsQuery.data !== undefined,
+    isMetadataSettled: chatSettingsQuery.isSuccess || chatSettingsQuery.isError,
     areConversationsLoaded: conversationsQuery.isSuccess,
     chatDisabledReason: getChatDisabledReason(chatSettingsQuery.data),
     isChatVisible: getIsChatVisible(chatSettingsQuery.data),

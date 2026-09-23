@@ -367,7 +367,7 @@
 }
 
 #confirmation-modal .modal-header {
-    border-bottom-color: rgba(39, 41, 48, .2);
+    border-bottom-color: color-mix(in srgb, var(--color-extended-gray-900)20%, transparent);
     padding: 15px 32px
 }
 
@@ -1113,7 +1113,7 @@
 }
 
 #credit-conversion-modal .modal-header {
-    border-bottom-color: rgba(39, 41, 48, .2);
+    border-bottom-color: color-mix(in srgb, var(--color-extended-gray-900)20%, transparent);
     padding: 15px 32px
 }
 
@@ -1194,7 +1194,7 @@
 }
 
 #cancel-credit-conversion-modal .modal-header {
-    border-bottom-color: rgba(39, 41, 48, .2);
+    border-bottom-color: color-mix(in srgb, var(--color-extended-gray-900)20%, transparent);
     padding: 15px 32px
 }
 
@@ -1438,7 +1438,7 @@
 .light-theme .postal-code-input-container input,
 .light-theme .postal-code-input-container select.rbx-select {
     color: var(--color-content-default);
-    border-color: #bcbec8
+    border-color: var(--color-extended-gray-500)
 }
 
 .dark-theme .state-select-container input,
@@ -1450,7 +1450,7 @@
 .dark-theme .postal-code-input-container input,
 .dark-theme .postal-code-input-container select.rbx-select {
     color: var(--color-content-default);
-    border-color: #494d5a
+    border-color: var(--color-extended-gray-700)
 }
 
 .state-select-container input:focus,
@@ -1488,8 +1488,8 @@
 .light-theme .postal-code-input-container input:hover,
 .light-theme .postal-code-input-container select.rbx-select:focus,
 .light-theme .postal-code-input-container select.rbx-select:hover {
-    border-color: rgba(0, 0, 0, .3);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, .25)
+    border-color: var(--color-extended-black-30);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-extended-black-30)25%, transparent)
 }
 
 .dark-theme .state-select-container input:focus,
@@ -1508,8 +1508,8 @@
 .dark-theme .postal-code-input-container input:hover,
 .dark-theme .postal-code-input-container select.rbx-select:focus,
 .dark-theme .postal-code-input-container select.rbx-select:hover {
-    border-color: rgba(255, 255, 255, .3);
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, .25)
+    border-color: var(--color-extended-white-30);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-extended-white-30)25%, transparent)
 }
 
 .light-theme .state-select-container input.error,

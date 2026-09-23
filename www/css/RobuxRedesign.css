@@ -565,7 +565,7 @@
 }
 
 .light-theme .custom-select .error-message {
-    color: #e75750;
+    color: var(--color-extended-red-700);
     margin-top: 8px;
     font-size: 12px
 }
@@ -597,7 +597,7 @@
 }
 
 .light-theme .custom-select .select-button.error {
-    border-color: #e75750
+    border-color: var(--color-extended-red-700)
 }
 
 .light-theme .custom-select .selected-value {
@@ -623,9 +623,9 @@
 
 .light-theme .custom-select .select-dropdown .dropdown-selection-button {
     cursor: pointer;
+    border-color: var(--color-extended-gray-500);
     background-color: transparent;
     border-width: 1px 0 0;
-    border-color: #bcbec8;
     -ms-flex-align: center;
     align-items: center;
     width: 100%;
@@ -671,7 +671,7 @@
 }
 
 .dark-theme .custom-select .error-message {
-    color: #e75750;
+    color: var(--color-extended-red-700);
     margin-top: 8px;
     font-size: 12px
 }
@@ -703,7 +703,7 @@
 }
 
 .dark-theme .custom-select .select-button.error {
-    border-color: #e75750
+    border-color: var(--color-extended-red-700)
 }
 
 .dark-theme .custom-select .selected-value {
@@ -729,9 +729,9 @@
 
 .dark-theme .custom-select .select-dropdown .dropdown-selection-button {
     cursor: pointer;
+    border-color: var(--color-extended-gray-700);
     background-color: transparent;
     border-width: 1px 0 0;
-    border-color: #494d5a;
     -ms-flex-align: center;
     align-items: center;
     width: 100%;
@@ -917,13 +917,13 @@
 }
 
 .light-theme .divider {
-    border-bottom: 1px solid rgba(0, 0, 0, .1);
+    border-bottom: 1px solid var(--color-extended-black-10);
     margin-top: 7px;
     margin-bottom: 7px
 }
 
 .dark-theme .divider {
-    border-bottom: 1px solid rgba(255, 255, 255, .1);
+    border-bottom: 1px solid var(--color-extended-white-10);
     margin-top: 7px;
     margin-bottom: 7px
 }
@@ -1482,10 +1482,6 @@ p.personalized-bonus-items__report-popover {
     appearance: none
 }
 
-.\[background-color\:var\(--color-action-emphasis-background\)\] {
-    background-color: var(--color-action-emphasis-background)
-}
-
 .\[color\:var\(--color-extended-gray-600\)\] {
     color: var(--color-extended-gray-600)
 }
@@ -1800,11 +1796,11 @@ p.personalized-bonus-items__report-popover {
 }
 
 .light-theme .buy-robux-section-header {
-    color: #272930
+    color: var(--color-extended-gray-900)
 }
 
 .dark-theme .buy-robux-section-header {
-    color: #fff
+    color: var(--color-extended-white-100)
 }
 
 body {

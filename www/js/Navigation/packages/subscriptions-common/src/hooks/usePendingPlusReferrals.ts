@@ -1,10 +1,10 @@
-import { SubscriptionReferralStatus } from "@rbx/client-subscriptions-api/v1";
+import { SubscriptionReferralStatus } from "@rbx/client-subscriptions-api/v2";
 import { isReferralEnabled } from "@rbx/core-scripts/meta/subscription";
 import { isBlackbirdUser, userId } from "@rbx/core-scripts/meta/user";
 import { subscriptionsV2Api } from "@rbx/payments/services/subscriptions";
 import { useQuery } from "@tanstack/react-query";
 
-import type { SubscriptionReferral } from "@rbx/client-subscriptions-api/v1";
+import type { SubscriptionReferral } from "@rbx/client-subscriptions-api/v2";
 
 const PENDING_REFERRALS_PAGE_SIZE = 5;
 

@@ -1,11 +1,23 @@
-import type { AxiosResponse } from "axios";
 import PropTypes from "prop-types";
 import { ErrorBoundary } from "@sentry/react";
 import React, { useEffect, useState } from "react";
+import type { AxiosResponse } from "axios";
 import { createSystemFeedback } from "react-style-guide";
-import { TranslateFunction } from "@rbx/core-scripts/react";
 import { CurrentUser } from "Roblox";
-import { Alert, Button, IconButton, TextInput, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
+import { TranslateFunction } from "@rbx/core-scripts/react";
+import {
+  Alert,
+  Button,
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  IconButton,
+  TextInput,
+  Tooltip,
+  TooltipTrigger,
+} from "@rbx/foundation-ui";
 import type { CreditConversionData, RedeemReponse, RedemptionResult } from "@rbx/payments/types";
 import { useRedeemConsent } from "@rbx/payments/redeemConsent";
 import {
@@ -17,6 +29,8 @@ import {
   trackCriticalError,
   trackError,
 } from "@rbx/payments/creditCheckout";
+import { REDEMPTION_STATUS_FAILURE_REASONS } from "@rbx/payments/gift-card";
+import type { RedemptionStatusResponse } from "@rbx/payments/gift-card";
 import { getRobloxPlusProductIdFromTargetKey } from "@rbx/payments/services/subscriptions";
 import { redeemPromoCode } from "@rbx/payments/promoCodes";
 import HeuristicConvertToCredit from "./HeuristicConvertToCredit";
@@ -29,6 +43,7 @@ import {
   supportLinkURL,
 } from "../constants/redeemGiftCardConstants";
 import sendRedeemGiftCardEvent from "../utils/events";
+import useRedemptionStatusPoll from "../hooks/useRedemptionStatusPoll";
 import ConfirmationModal from "./confirmationModal";
 import ScanGiftCardModal from "./ScanGiftCardModal";
 
@@ -84,6 +99,7 @@ function RedeemGiftCardForm({
   const [pinValue, setPinValue] = useState("");
   const [error, setError] = useState<GiftCardFormError>();
   const [loading, setLoading] = useState(false);
+  const [showTakingLonger, setShowTakingLonger] = useState(false);
   const [redeemDisabled, setRedeemDisabled] = useState(false);
   const [confirmationData, setConfirmationData] = useState<RedemptionResult>({});
   const [showModal, setShowModal] = useState(false);
@@ -224,6 +240,7 @@ function RedeemGiftCardForm({
     // Parse billing api redeem promo code response
     if (data?.errorMsg) {
       if (data.errorMsg === "Captcha") {
+        setRedeemDisabled(false);
         return;
       }
       errorData = {
@@ -272,6 +289,8 @@ function RedeemGiftCardForm({
             setConvertedValue(creditConversionData.grantCredit);
             setConvertedCurrency(creditConversionData.grantCurrencyCode);
             setExchangeRate(creditConversionData.exchangeRate);
+            // The request finished; allow the confirmed conversion to start a new one.
+            setRedeemDisabled(false);
             creditconversionModalService.open();
             return;
           }
@@ -332,6 +351,55 @@ function RedeemGiftCardForm({
     cancelCreditconversionModalService.open();
   };
 
+  const resolveRedeemResponse = (data?: RedeemReponse) => {
+    if (!data) {
+      setLoading(false);
+      setRedeemDisabled(false);
+      showError({
+        message: translate("Response.UnexpectedError"),
+        type: "server-error",
+      });
+      return;
+    }
+    if ((data.errorMsg && data.errorMsg.length > 0) || (data.errors && data.errors.length > 0)) {
+      handleFailure(data);
+    } else {
+      handleSuccess(data);
+    }
+  };
+
+  const handleTerminalRedemptionStatus = (response: RedemptionStatusResponse) => {
+    if (response.state === "Succeeded") {
+      handleSuccess({ redemptionResult: response.result });
+      return;
+    }
+
+    // Use the errors array so handleFailure maps the status code to gift-card copy.
+    handleFailure({ errors: [{ code: response.errorCode ?? 0 }] });
+  };
+
+  const handleRedemptionTakingLonger = () => {
+    // The workflow may still be running or already succeeded server-side.
+    setLoading(false);
+    setRedeemDisabled(false);
+    setShowTakingLonger(true);
+  };
+
+  const { startPoll, isPolling } = useRedemptionStatusPoll({
+    onTerminal: handleTerminalRedemptionStatus,
+    onExhausted: handleRedemptionTakingLonger,
+    onFailed: err => {
+      if (
+        err.reason === REDEMPTION_STATUS_FAILURE_REASONS.Throttled ||
+        err.reason === REDEMPTION_STATUS_FAILURE_REASONS.Transient
+      ) {
+        handleRedemptionTakingLonger();
+        return;
+      }
+      handleFailure({});
+    },
+  });
+
   const redeemCode = (
     unifiedCaptchaId: string,
     captchaToken: string,
@@ -339,6 +407,9 @@ function RedeemGiftCardForm({
     continueWithCreditConversion = false,
     pinOverride?: string,
   ) => {
+    if (isPolling || redeemDisabled) {
+      return;
+    }
     if (needFirstTimeConsent && !redeemConsentChecked) {
       return;
     }
@@ -346,48 +417,47 @@ function RedeemGiftCardForm({
       isPromoCode: isPromoCode(),
     });
     showError();
+    setShowTakingLonger(false);
     setLoading(true);
     setRedeemDisabled(true);
 
     trackCounter("GiftCard_RedeemStarted");
 
-    let response: Promise<AxiosResponse<RedeemReponse>>;
+    const sanitizedPinValue = normalizePin(pinOverride ?? hiddenPin ?? pinValue);
+
+    // Promo codes have no redemption workflow to poll.
     if (isPromoCode()) {
-      response = redeemPromoCode<RedeemReponse>(normalizePin(pinOverride ?? hiddenPin ?? pinValue));
-    } else {
-      const sanitizedPinValue = normalizePin(pinOverride ?? hiddenPin ?? pinValue).toUpperCase();
-      response = redeemPaymentsGateway(
-        sanitizedPinValue,
+      redeemPromoCode<RedeemReponse>(sanitizedPinValue)
+        .then(res => {
+          resolveRedeemResponse(res.data);
+        })
+        .catch(errors => {
+          handleFailure(errors);
+        });
+      return;
+    }
+
+    (
+      redeemPaymentsGateway(
+        sanitizedPinValue.toUpperCase(),
         unifiedCaptchaId,
         captchaToken,
         captchaProvider,
         redeemConsentChecked,
         continueWithCreditConversion,
-      ) as Promise<AxiosResponse<RedeemReponse>>; // TODO: fix my typecasting;
-    }
-
-    response.then(
-      res => {
-        if (!res.data) {
-          showError({
-            message: translate("Response.UnexpectedError"),
-            type: "server-error",
-          });
+      ) as Promise<AxiosResponse<RedeemReponse>>
+    )
+      .then(res => {
+        // Poll iff there is a workflowId. Otherwise, `res.data` contains the sync response.
+        if (res.data?.redemptionWorkflowId) {
+          startPoll(res.data.redemptionWorkflowId);
           return;
         }
-        if (
-          (res.data.errorMsg && res.data.errorMsg.length > 0) ||
-          (res.data.errors && res.data.errors.length > 0)
-        ) {
-          handleFailure(res.data);
-        } else {
-          handleSuccess(res.data);
-        }
-      },
-      errors => {
+        resolveRedeemResponse(res.data);
+      })
+      .catch(errors => {
         handleFailure(errors);
-      },
-    );
+      });
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -467,9 +537,11 @@ function RedeemGiftCardForm({
             isDisabled={
               (needFirstTimeConsent && !redeemConsentChecked) ||
               normalizePin(pinValue).length < 4 ||
-              redeemDisabled
+              redeemDisabled ||
+              isPolling
             }
-            isLoading={loading}
+            // handleChange clears loading, but typing must not hide an active poll's spinner.
+            isLoading={loading || isPolling}
             onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
               if (!CurrentUser.isAuthenticated) {
                 window.location.href = `/NewLogin?ReturnUrl=%2Fredeem?code=${pinValue}`;
@@ -537,6 +609,39 @@ function RedeemGiftCardForm({
         }}
         translate={translate}
       />
+      {/* TODO(translations): Finalize copy and add missing RedemptionTakingLonger translations. */}
+      <Dialog
+        open={showTakingLonger}
+        onOpenChange={(nextOpen: boolean) => {
+          if (!nextOpen) {
+            setShowTakingLonger(false);
+          }
+        }}
+        size="Medium"
+        isModal
+        hasCloseAffordance
+        closeLabel={translate("Action.Dialog.Close")}
+      >
+        <DialogContent className="relative width-full">
+          <DialogBody className="gap-large flex flex-col">
+            <DialogTitle className="text-heading-medium">
+              {translate("Heading.RedemptionTakingLonger")}
+            </DialogTitle>
+            <div className="text-body-medium">{translate("Message.RedemptionTakingLonger")}</div>
+          </DialogBody>
+          <DialogFooter className="flex flex-row-reverse">
+            <Button
+              variant="Emphasis"
+              size="Medium"
+              onClick={() => {
+                setShowTakingLonger(false);
+              }}
+            >
+              {translate("Action.Dialog.Close")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <SystemFeedback />
       {isShowingScanGiftCardModal && (
         <ErrorBoundary

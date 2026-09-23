@@ -1,4 +1,4 @@
-import { PeriodType, ProductType } from "@rbx/client-subscriptions-api/v1";
+import { PeriodType, ProductType } from "@rbx/client-subscriptions-api/v2";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Button, Icon } from "@rbx/foundation-ui";
 import { type FC, useEffect } from "react";
@@ -10,7 +10,7 @@ import { trackCounter } from "../../utils/trackCounter";
 import SubscriptionButton from "../shared/SubscriptionButton";
 
 import type { SectionSubscriptionV2 } from "../../types/sectionSubscriptionV2";
-import type { Money } from "@rbx/client-subscriptions-api/v1";
+import type { Money } from "@rbx/client-subscriptions-api/v2";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
 
 const SECTION_PRODUCT_TYPE_TO_API: Record<string, ProductType> = {

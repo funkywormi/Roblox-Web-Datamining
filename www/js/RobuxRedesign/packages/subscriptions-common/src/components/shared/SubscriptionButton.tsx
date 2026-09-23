@@ -1,4 +1,4 @@
-import { ProductType } from "@rbx/client-subscriptions-api/v1";
+import { ProductType } from "@rbx/client-subscriptions-api/v2";
 import { Button } from "@rbx/foundation-ui";
 import { useCallback, useMemo, useState } from "react";
 

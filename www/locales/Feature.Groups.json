@@ -1342,5 +1342,7 @@
     "Label.AddImage": "Add image",
     "ResponseCountSingular": "response",
     "ResponseCountPlural": "responses",
-    "Voted": "Voted"
+    "Label.Voted": "Voted",
+    "Label.ResponseCountSingular": "response",
+    "Label.ResponseCountPlural": "responses"
 }

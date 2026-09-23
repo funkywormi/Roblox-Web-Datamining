@@ -15,6 +15,8 @@ import { PageNameProvider } from "@rbx/core-scripts/util/page-name";
 import events from "../constants/searchEventStreamConstants";
 import NewSearchLinks from "./NewSearchLinks";
 import { Suggestion } from "../util/searchUtil";
+import NavIcon from "./NavIcon";
+import { useIsTopNavFoundation } from "../util/topNavFoundationIxp";
 
 export default function SearchInput({
   searchInput,
@@ -46,6 +48,7 @@ export default function SearchInput({
   resetSessionInfo: () => void;
 }) {
   const { translate } = useTranslation();
+  const isFoundation = useIsTopNavFoundation();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLUListElement | null>(null);
   const searchLandingRef = useRef<HTMLDivElement | null>(null);
@@ -166,22 +169,35 @@ export default function SearchInput({
                   aria-label="Clear Search"
                   onClick={clearSearch}
                   onKeyDown={clearSearch}
-                  className="clear-search icon-actions-clear-sm"
+                  className={
+                    isFoundation
+                      ? "clear-search clear-search-foundation"
+                      : "clear-search icon-actions-clear-sm"
+                  }
                 >
-                  <span />
+                  {isFoundation ? (
+                    <NavIcon legacyClass="" name="icon-filled-circle-x" size="Medium" />
+                  ) : (
+                    <span />
+                  )}
                 </span>
               )}
             </div>
           </form>
           <div className="input-group-btn">
             {/* TODO: old, migrated code. */}
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <button
               data-testid="navigation-search-input-search-button"
               className="input-addon-btn"
               type="submit"
+              aria-label={translate("Label.sSearch")}
             >
-              <span className="icon-common-search-sm" />
+              <NavIcon
+                legacyClass="icon-common-search-sm"
+                name="icon-regular-magnifying-glass"
+                size="Medium"
+                foundationClassName="margin-x-[6px] opacity-[0.7]"
+              />
             </button>
           </div>
         </div>

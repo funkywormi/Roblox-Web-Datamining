@@ -2,7 +2,7 @@ import type { RegistryInput } from "@rbx/observability-framework/schema";
 import type { MakeObservabilityTypes } from "@rbx/observability-framework/types";
 import { createTrackers } from "@rbx/observability-framework/trackers";
 import { captureException } from "../../error";
-import { createWithApiMetrics } from "../../withApiMetrics";
+import { createWithApiMetrics, createWithApiMetricsV2 } from "../../withApiMetrics";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
 
 export const observabilityRegistry = {
@@ -10,8 +10,16 @@ export const observabilityRegistry = {
   team: "Economy > Payments & Fraud",
   features: {
     health: {
+      apiCalls: ["GetRedemptionStatus"],
       criticalErrors: ["Error_ReactCrash", "Error_NoRootContainer"],
-      counters: ["Page_Viewed"],
+      counters: [
+        "Page_Viewed",
+        "GiftCard_RedeemPollStarted",
+        { name: "GiftCard_RedeemPollResolved", dimensions: ["state", "polls"] },
+        "GiftCard_RedeemPollExhausted",
+        "GiftCard_RedeemPollUnmounted",
+      ],
+      errors: [{ name: "Error_GiftCard_RedeemPollFailed", dimensions: ["reason"] }],
       flows: [
         {
           id: "gift_card_redeem",
@@ -139,3 +147,5 @@ export const { trackCounter, trackError, trackCriticalError } = createTrackers(
 );
 
 export const withApiEvents = createWithApiMetrics<ApiCall>(publishMetric);
+
+export const withApiEventsV2 = createWithApiMetricsV2<ApiCall>(publishMetric, captureException);

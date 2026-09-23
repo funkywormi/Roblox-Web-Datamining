@@ -1,6 +1,6 @@
 import { authenticatedUser, isBlackbirdUser } from "@rbx/core-scripts/meta/user";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { Link } from "@rbx/core-ui";
+
 import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
 import VerifiedBadgeIcon from "@rbx/www-common/components/verified-badge";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@rbx/identity-badges";
 import links from "../constants/linkConstants";
 import { useLiveUserNameForDisplay } from "../hooks/useLiveUserNameForDisplay";
+import Link from "./NavLink";
 
 export default function AgeBracketDisplayContent() {
   const { translate } = useTranslation();

@@ -14,6 +14,7 @@ import type { TrackSubscriptionV2SubscribeClickArgs } from "../../hooks/subscrip
 
 import { SubscriptionTileBenefits } from "./SubscriptionTileBenefits";
 import { UseRedirectResult } from "../../hooks/useRedirect";
+import { stampRedirectStartTsOnClick } from "../../utils/stampRedirectStartTs";
 
 const SECTION_PRODUCT_TYPE_TO_API: Record<string, string> = {
   PRODUCT_TYPE_ROBLOX_PLUS: "Blackbird",
@@ -59,7 +60,7 @@ function convertPeriodTypeForTranslation(periodType: PeriodType): SubscriptionPe
 
 const RedirectButton: FC<{
   href: string;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLAnchorElement>) => void;
   isEmphasized: boolean;
   children: React.ReactNode;
 }> = ({ href, onClick, isEmphasized, children }) => {
@@ -183,7 +184,8 @@ export const SubscriptionTile: FC<SubscriptionTileProps> = ({
       {isRedirect ? (
         <RedirectButton
           href={redirectHref}
-          onClick={() => {
+          onClick={event => {
+            stampRedirectStartTsOnClick(event);
             onSubscribeClick?.({
               isFreeTrial: false,
               productId: product.subscriptionProductId,

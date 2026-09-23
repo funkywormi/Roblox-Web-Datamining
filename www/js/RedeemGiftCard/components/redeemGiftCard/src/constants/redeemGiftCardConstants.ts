@@ -65,6 +65,10 @@ export const gameCardMessageMapping: Record<
     translationKey: "Response.RedeemGiftCardCurrencyCodeNotMatchV2",
     type: "input-error",
   },
+  170: {
+    translationKey: "Response.InvalidCard",
+    type: "input-error",
+  },
 };
 
 export const eventTypes = {

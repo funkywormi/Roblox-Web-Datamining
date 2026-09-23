@@ -379,5 +379,8 @@
     "Label.ProfileFrame.Black": "Black",
     "Label.ProfileFrame.White": "White",
     "Label.ProfileFrame.Turquoise": "Turquoise",
-    "Label.ProfileFrame.Redcliff": "Redcliff"
+    "Label.ProfileFrame.Redcliff": "Redcliff",
+    "Label.LicensingLicensed": "Licensed",
+    "Label.LicensingOfficial": "Official",
+    "profile.tooltip": "Your profile"
 }

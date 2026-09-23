@@ -8,6 +8,7 @@ import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { useTranslation } from "@rbx/core-scripts/react";
 import localStorageService from "@rbx/core-scripts/local-storage";
 import { createSystemFeedback } from "@rbx/core-ui";
+import { Snackbar } from "@rbx/foundation-ui";
 import {
   getUserCurrency,
   getGuacBehavior,
@@ -24,6 +25,7 @@ import AgeBracketDisplay from "../components/AgeBracketDisplay";
 import layoutConstants from "../constants/layoutConstants";
 import RobuxBadgeType from "../constants/robuxBadgeConstants";
 import { shouldShowRobuxUpdateBadge } from "../util/robuxBadgeUtil";
+import { useIsTopNavFoundation } from "../util/topNavFoundationIxp";
 
 const [SystemFeedback, systemFeedbackService] = createSystemFeedback();
 
@@ -35,6 +37,8 @@ export default function HeaderIconsGroup({
   const { translate } = useTranslation();
   const user = authenticatedUser();
   const userId = user?.id;
+  const isFoundation = useIsTopNavFoundation();
+  const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
   const [accountNotificationCount, setAccountNotificationCount] = useState(0);
   const [isGetCurrencyCallDone, setGetCurrencyCallDone] = useState(false);
   const [robuxAmount, setRobuxAmount] = useState(0);
@@ -174,13 +178,19 @@ export default function HeaderIconsGroup({
         );
 
         if (accountSwitched) {
-          systemFeedbackService.success(
-            translate(layoutConstants.accountSwitchConfirmationKeys.accountSwitchedMessage, {
-              accountName: user.name,
-            }),
-            0 /* show delay */,
-            5000 /* banner duration */,
+          const accountSwitchedMessage = translate(
+            layoutConstants.accountSwitchConfirmationKeys.accountSwitchedMessage,
+            { accountName: user.name },
           );
+          if (isFoundation) {
+            setSnackbarMessage(accountSwitchedMessage);
+          } else {
+            systemFeedbackService.success(
+              accountSwitchedMessage,
+              0 /* show delay */,
+              5000 /* banner duration */,
+            );
+          }
           localStorageService.removeLocalStorage(
             layoutConstants.accountSwitchConfirmationKeys.accountSwitchedFlag,
           );
@@ -209,8 +219,23 @@ export default function HeaderIconsGroup({
   }
 
   return (
-    <ul className="nav navbar-right rbx-navbar-icon-group">
-      <SystemFeedback />
+    <ul className="[&>li]:relative navbar-right rbx-navbar-icon-group">
+      {isFoundation ? (
+        snackbarMessage != null && (
+          <Snackbar
+            title={snackbarMessage}
+            icon="icon-filled-check"
+            shouldAutoDismiss
+            autoDismissDurationMs={5000}
+            onClose={() => {
+              setSnackbarMessage(null);
+            }}
+            closeIconAriaLabel={translate("Action.Close")}
+          />
+        )
+      ) : (
+        <SystemFeedback />
+      )}
       <DownloadAppNavItem />
       <AgeBracketDisplay />
       <UniverseSearchIcon toggleUniverseSearch={toggleUniverseSearch} />

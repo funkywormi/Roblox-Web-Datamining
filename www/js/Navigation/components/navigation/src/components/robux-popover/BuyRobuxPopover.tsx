@@ -4,7 +4,8 @@ import { ValueOf } from "@rbx/core-types";
 import { useTranslation, TranslationProvider } from "@rbx/core-scripts/react";
 import analytics from "@rbx/core-scripts/payments-flow";
 import { formatNumber } from "@rbx/core-scripts/format/number";
-import { Popover } from "@rbx/core-ui";
+import { Popover as CoreUiPopover } from "@rbx/core-ui";
+import { Popover as FoundationPopover, PopoverContent, PopoverTrigger } from "@rbx/foundation-ui";
 import BuyRobuxIcon from "./BuyRobuxIcon";
 import RobuxMenu from "./RobuxMenu";
 import CreditIcon from "../CreditIcon";
@@ -14,6 +15,8 @@ import LeaveRobloxPopupDisclaimer from "./LeaveRobloxPopupDisclaimer";
 import { getVngShopSignedRedirectionUrl } from "../../services/navigationService";
 import RobuxBadgeType from "../../constants/robuxBadgeConstants";
 import { translations } from "../../../component.json";
+import { useIsTopNavFoundation } from "../../util/topNavFoundationIxp";
+import { popoverDismissGuard } from "../../util/popoverDismissGuard";
 
 export default function BuyRobuxPopover({
   creditAmount,
@@ -47,6 +50,7 @@ export default function BuyRobuxPopover({
   const containerRef = useRef<HTMLLIElement>(null);
 
   // vng buy robux pop up a disclaimer before redirecting
+  const isFoundation = useIsTopNavFoundation();
   const [isLeaveRobloxDisclaimerModalOpen, setIsLeaveRobloxDisclaimerModalOpen] = useState(false);
 
   const sendAnalyticsEvent = (viewMessage: ValueOf<typeof ENUM_VIEW_MESSAGE>) => {
@@ -85,6 +89,50 @@ export default function BuyRobuxPopover({
   };
 
   // Wallet credit balance only shown on showCreditAndRobux variant
+  const triggerLabel =
+    robuxAmount > 0
+      ? translate("Label.sRobuxBalance", { robuxAmount: formatNumber(robuxAmount) }) ||
+        `Robux: ${formatNumber(robuxAmount)}`
+      : translate("Label.sRobux");
+
+  const trigger = (
+    <button
+      type="button"
+      className="btn-navigation-nav-robux-md"
+      aria-label={triggerLabel}
+      aria-haspopup="true"
+    >
+      <BuyRobuxIcon
+        robuxAmount={robuxAmount}
+        isGetCurrencyCallDone={isGetCurrencyCallDone}
+        robuxError={robuxError}
+        creditDisplayConfig={creditDisplayConfig}
+        robuxBadgeType={robuxBadgeType}
+      />
+      {creditDisplayConfig === layoutConstants.creditDisplayConfigVariants.showCreditAndRobux && (
+        <CreditIcon
+          creditAmount={creditAmount}
+          currencyCode={currencyCode}
+          creditError={creditError}
+        />
+      )}
+    </button>
+  );
+
+  const robuxMenu = (
+    <RobuxMenu
+      isEligibleForVng={isEligibleForVng}
+      robuxAmount={robuxAmount}
+      robuxError={robuxError}
+      creditAmount={creditAmount}
+      currencyCode={currencyCode}
+      creditError={creditError}
+      creditDisplayConfig={creditDisplayConfig}
+      onBuyRobuxExternalClick={onBuyRobuxExternalClick}
+      robuxBadgeType={robuxBadgeType}
+    />
+  );
+
   return (
     <li
       id="navbar-robux"
@@ -101,66 +149,37 @@ export default function BuyRobuxPopover({
           onContinue={onBuyRobuxExternalContinue}
         />
       )}
-      {isExperimentCallDone && (
-        <Popover
-          id="buy-robux-popover"
-          trigger="click"
-          placement="bottom"
-          button={
-            <button
-              type="button"
-              className="btn-navigation-nav-robux-md"
-              aria-label={
-                robuxAmount > 0
-                  ? translate("Label.sRobuxBalance", {
-                      robuxAmount: formatNumber(robuxAmount),
-                    }) || `Robux: ${formatNumber(robuxAmount)}`
-                  : translate("Label.sRobux")
-              }
-              aria-haspopup="true"
+      {isExperimentCallDone &&
+        (isFoundation ? (
+          <FoundationPopover>
+            <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+            <PopoverContent
+              side="bottom"
+              align="end"
+              ariaLabel={triggerLabel}
+              {...popoverDismissGuard(containerRef)}
             >
-              <BuyRobuxIcon
-                robuxAmount={robuxAmount}
-                isGetCurrencyCallDone={isGetCurrencyCallDone}
-                robuxError={robuxError}
-                creditDisplayConfig={creditDisplayConfig}
-                robuxBadgeType={robuxBadgeType}
-              />
-              {
-                // Wallet credit balance only shown on showCreditAndRobux variant
-                creditDisplayConfig ===
-                  layoutConstants.creditDisplayConfigVariants.showCreditAndRobux && (
-                  <CreditIcon
-                    creditAmount={creditAmount}
-                    currencyCode={currencyCode}
-                    creditError={creditError}
-                  />
-                )
-              }
-            </button>
-          }
-          role="menu"
-          container={containerRef.current}
-        >
-          <TranslationProvider config={translations}>
-            <div>
-              <ul id="buy-robux-popover-menu" className="dropdown-menu">
-                <RobuxMenu
-                  isEligibleForVng={isEligibleForVng}
-                  robuxAmount={robuxAmount}
-                  robuxError={robuxError}
-                  creditAmount={creditAmount}
-                  currencyCode={currencyCode}
-                  creditError={creditError}
-                  creditDisplayConfig={creditDisplayConfig}
-                  onBuyRobuxExternalClick={onBuyRobuxExternalClick}
-                  robuxBadgeType={robuxBadgeType}
-                />
-              </ul>
-            </div>
-          </TranslationProvider>
-        </Popover>
-      )}
+              <TranslationProvider config={translations}>{robuxMenu}</TranslationProvider>
+            </PopoverContent>
+          </FoundationPopover>
+        ) : (
+          <CoreUiPopover
+            id="buy-robux-popover"
+            trigger="click"
+            placement="bottom"
+            button={trigger}
+            role="menu"
+            container={containerRef.current}
+          >
+            <TranslationProvider config={translations}>
+              <div>
+                <ul id="buy-robux-popover-menu" className="dropdown-menu">
+                  {robuxMenu}
+                </ul>
+              </div>
+            </TranslationProvider>
+          </CoreUiPopover>
+        ))}
     </li>
   );
 }

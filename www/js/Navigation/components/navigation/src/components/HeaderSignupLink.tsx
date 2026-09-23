@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@rbx/core-ui";
+
 import { useTranslation } from "@rbx/core-scripts/react";
 import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
 import dataStores from "@rbx/core-scripts/data-store";
 import { getSignupUrl, getIsVNGLandingRedirectEnabled } from "../util/authUtil";
 import { isAccountExperienceRevampEnabled } from "../util/accountExperienceUtils";
+import Link from "./NavLink";
 
 export default function HeaderSignupLink() {
   const { translate } = useTranslation();

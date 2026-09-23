@@ -4,7 +4,7 @@ import {
   PaymentProvider,
   ProductType,
   SubscriptionProductInfo,
-} from "@rbx/client-subscriptions-api/v1";
+} from "@rbx/client-subscriptions-api/v2";
 import { listAvailableSubscriptionProductsV2 } from "@rbx/payments/services/subscriptions";
 import { trackCounter, trackError } from "@rbx/payments/creditCheckout";
 

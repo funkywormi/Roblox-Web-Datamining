@@ -82,12 +82,11 @@ export default function DownloadAppNavItem() {
   );
 
   return (
-    <li className="navbar-icon-item navbar-download-app-item">
+    <li className="!padding-y-xsmall !padding-left-xsmall !padding-right-medium">
       <DownloadButton
         text={translate("Action.Download") || "Download"}
         variant="Emphasis"
         size="Small"
-        className="navbar-download-app-button"
         download={download}
         renderInstallInstructions={() => installInstructions}
         onClick={handleClick}

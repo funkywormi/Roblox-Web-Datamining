@@ -502,7 +502,7 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .react-chat-presence-online {
-    background-color: var(--color-action-emphasis-background)
+    background-color: var(--color-system-emphasis)
 }
 
 .react-chat-presence-in-game {

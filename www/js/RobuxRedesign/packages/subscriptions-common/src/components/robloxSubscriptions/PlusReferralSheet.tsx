@@ -1,4 +1,4 @@
-import { PeriodType } from "@rbx/client-subscriptions-api/v1";
+import { PeriodType } from "@rbx/client-subscriptions-api/v2";
 import { isReferralEnabled } from "@rbx/core-scripts/meta/subscription";
 import { TranslationProvider, useTranslation } from "@rbx/core-scripts/react";
 import plusRobuxDark from "@rbx/foundation-images/pictograms/plus_robux_dark.svg";
@@ -13,7 +13,7 @@ import {
   SheetTitle,
 } from "@rbx/foundation-ui";
 import { translateHtml } from "@rbx/translation-utils";
-import { useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 
 import BenefitList from "./BenefitList";
 import { useCreateSubscriptionReferral } from "../../hooks/useCreateSubscriptionReferral";
@@ -22,6 +22,7 @@ import { usePlusSubscribeProduct } from "../../hooks/usePlusSubscribeProduct";
 import { useReferralEligibility } from "../../hooks/useReferralEligibility";
 import { useReferrerHandle } from "../../hooks/useReferrerHandle";
 import { REFERRAL_REWARD_ROBUX, SUBSCRIPTION_TERMS_URL } from "../../subscriptionConstants";
+import { trackCounter } from "../../utils/trackCounter";
 import SubscriptionButton from "../shared/SubscriptionButton";
 
 import type { PlusSubscribeButtonProps } from "../../hooks/usePlusSubscribeProduct";
@@ -29,7 +30,7 @@ import type {
   Money,
   RobloxSubscriptionProductFeatureConfig,
   SubscriptionOffer,
-} from "@rbx/client-subscriptions-api/v1";
+} from "@rbx/client-subscriptions-api/v2";
 import type { FC, ReactNode } from "react";
 
 const REFERRAL_TRANSLATION_CONFIG = ["Feature.RobloxSubscription"] as const;
@@ -330,6 +331,25 @@ const PlusReferralSheetBody: FC<PlusReferralSheetBodyProps> = ({
   );
 };
 
+const PlusReferralSheetImpression: FC<{
+  face: PlusReferralSheetFace;
+  hasReferrerId: boolean;
+  open: boolean;
+}> = ({ face, hasReferrerId, open }) => {
+  const hasFired = useRef(false);
+  useEffect(() => {
+    if (hasFired.current || !open) {
+      return;
+    }
+    hasFired.current = true;
+    trackCounter("PlusReferralSheetShown", {
+      face,
+      hasReferrerId: String(hasReferrerId),
+    });
+  }, [face, hasReferrerId, open]);
+  return null;
+};
+
 /**
  * The referral sheet a recipient gets, in whichever state the invite resolves to.
  *
@@ -412,19 +432,26 @@ const PlusReferralSheet: FC<PlusReferralSheetProps> = ({
   }
 
   return (
-    <TranslationProvider config={[...REFERRAL_TRANSLATION_CONFIG]}>
-      <PlusReferralSheetBody
+    <React.Fragment>
+      <PlusReferralSheetImpression
         face={face}
-        featureConfig={resolvedSubscribeFeatureConfig}
+        hasReferrerId={invite?.referrerId !== undefined}
         open={open}
-        referralCode={invite?.code}
-        referrerUserId={invite?.referrerId}
-        subscribeButtonProps={resolvedSubscribeProps}
-        subscribePeriodType={resolvedSubscribePeriodType}
-        subscribePrice={resolvedSubscribePrice}
-        onOpenChange={onOpenChange}
       />
-    </TranslationProvider>
+      <TranslationProvider config={[...REFERRAL_TRANSLATION_CONFIG]}>
+        <PlusReferralSheetBody
+          face={face}
+          featureConfig={resolvedSubscribeFeatureConfig}
+          open={open}
+          referralCode={invite?.code}
+          referrerUserId={invite?.referrerId}
+          subscribeButtonProps={resolvedSubscribeProps}
+          subscribePeriodType={resolvedSubscribePeriodType}
+          subscribePrice={resolvedSubscribePrice}
+          onOpenChange={onOpenChange}
+        />
+      </TranslationProvider>
+    </React.Fragment>
   );
 };
 

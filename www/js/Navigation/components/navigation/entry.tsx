@@ -24,7 +24,11 @@ import * as navigation from "./src";
 import { translations } from "./component.json";
 
 import "./src/main.css";
-import "./src/css/navigation.scss";
+import "./src/css/_header.css";
+import "./src/css/_leftnav.css";
+import "./src/css/_themes.css";
+import "./src/css/_searchLanding.css";
+import "./src/css/_downloadAppNavItem.css";
 
 const rightNavigationHeaderContainerId = "right-navigation-header";
 const leftNavigationContainerId = "left-navigation-container";

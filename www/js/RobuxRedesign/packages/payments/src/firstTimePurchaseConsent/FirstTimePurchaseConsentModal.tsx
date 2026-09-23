@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import classNames from "classnames";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { translateHtml } from "@rbx/translation-utils";
 import {
@@ -160,9 +159,6 @@ export function FirstTimePurchaseConsentModal({
         <DialogFooter>
           <div className="flex flex-col gap-small padding-top-xsmall">
             <Button
-              className={classNames({
-                "[background-color:var(--color-action-emphasis-background)]": !isConsentChecked,
-              })}
               isDisabled={!isConsentChecked}
               onClick={handleConfirm}
               variant="Emphasis"

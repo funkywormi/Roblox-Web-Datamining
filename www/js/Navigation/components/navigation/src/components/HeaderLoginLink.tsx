@@ -1,6 +1,6 @@
-import { Link } from "@rbx/core-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { isLoginLinkAvailable, getLoginLinkUrl } from "../util/authUtil";
+import Link from "./NavLink";
 
 export default function HeaderLoginLink() {
   const { translate } = useTranslation();

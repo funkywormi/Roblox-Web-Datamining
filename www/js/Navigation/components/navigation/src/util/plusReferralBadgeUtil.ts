@@ -11,6 +11,9 @@ const localStorageKey = "plus-referral-nav-badge";
 /** Stop showing the New badge once the entry has been clicked this many times. */
 const maxClicks = 1;
 
+/** Hide the entire referral entry after this many clicks (banner blindness). */
+const maxEntryClicks = 10;
+
 /**
  * Namespaced by user so a shared device doesn't hide the badge for a sibling, and by entry so a
  * recipient who opens "Join Plus" still gets a badge on "Share Plus" after subscribing.
@@ -44,6 +47,11 @@ const readClickCounts = (): ClickCounts => {
 export const shouldShowReferralNewBadge = (entry: ReferralNavEntry): boolean => {
   const count = readClickCounts()[entryKey(entry)];
   return typeof count === "number" ? count < maxClicks : true;
+};
+
+export const shouldShowReferralEntry = (entry: ReferralNavEntry): boolean => {
+  const count = readClickCounts()[entryKey(entry)];
+  return typeof count === "number" ? count < maxEntryClicks : true;
 };
 
 export const recordReferralNavClick = (entry: ReferralNavEntry): void => {

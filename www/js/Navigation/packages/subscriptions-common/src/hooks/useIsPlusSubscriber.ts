@@ -27,8 +27,9 @@ export const useIsPlusSubscriber = (): boolean => {
     queryKey: ["plus-referrals", "viewer-subscription"],
     enabled: canHaveSubscribedSince,
     queryFn: async () => {
+      const namespace = encodeURIComponent("subscriptions/PlusSubscription");
       const { data } = await http.get<AmpFeatureResponse>({
-        url: `${environmentUrls.apiGatewayUrl}/access-management/v1/upsell-feature-access?featureName=IsRobloxPlusSubscribed`,
+        url: `${environmentUrls.apiGatewayUrl}/access-management/v1/upsell-feature-access?featureName=IsRobloxPlusSubscribed&namespace=${namespace}`,
         withCredentials: true,
       });
       return data.access === "Granted";

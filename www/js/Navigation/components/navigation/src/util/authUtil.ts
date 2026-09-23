@@ -108,9 +108,7 @@ const refreshCurrentSession = async () => {
 };
 
 // Account Switching
-const switchAccount: MouseEventHandler = e => {
-  e.stopPropagation();
-  e.preventDefault();
+const openAccountSwitcher = () => {
   sendSwitchAccountButtonClickEvent(window.location.href);
 
   // clear cached user id
@@ -152,6 +150,12 @@ const switchAccount: MouseEventHandler = e => {
   tryOpenAccountSwitcherModal();
 };
 
+const switchAccount: MouseEventHandler = e => {
+  e.stopPropagation();
+  e.preventDefault();
+  openAccountSwitcher();
+};
+
 const isLoginLinkAvailable = () => {
   const currentPath = window.location.pathname.toLowerCase();
   return !currentPath.startsWith("/login") && !currentPath.startsWith("/newlogin");
@@ -187,7 +191,7 @@ const cacheUserId = () => {
 
   // listen for login event
   window.addEventListener(loginEvent.name, e => {
-    const userId = (e as unknown as { detail: { userId?: string } }).detail.userId;
+    const { userId } = (e as unknown as { detail: { userId?: string } }).detail;
     if (userId != null) {
       localStorageService.setLocalStorage(userCacheKey, userId);
     }
@@ -195,7 +199,7 @@ const cacheUserId = () => {
 
   // listen for signup event
   window.addEventListener(signupEvent.name, e => {
-    const userId = (e as unknown as { detail: { userId?: string } }).detail.userId;
+    const { userId } = (e as unknown as { detail: { userId?: string } }).detail;
     if (userId != null) {
       localStorageService.setLocalStorage(userCacheKey, userId);
     }
@@ -210,6 +214,7 @@ export {
   refreshCurrentSession,
   isLoginLinkAvailable,
   switchAccount,
+  openAccountSwitcher,
   getIsVNGLandingRedirectEnabled,
   navigateToLoginWithRedirect,
   cacheUserId,

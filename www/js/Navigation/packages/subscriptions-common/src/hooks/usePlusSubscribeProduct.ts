@@ -1,4 +1,4 @@
-import { ProductType } from "@rbx/client-subscriptions-api/v1";
+import { ProductType } from "@rbx/client-subscriptions-api/v2";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { subscriptionsV2Api } from "@rbx/payments/services/subscriptions";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ import type {
   RobloxSubscriptionProductFeatureConfig,
   SubscriptionOffer,
   SubscriptionProductInfo,
-} from "@rbx/client-subscriptions-api/v1";
+} from "@rbx/client-subscriptions-api/v2";
 
 /** What the referral sheets need to hand `SubscriptionButton`; the rest is styling they own. */
 export type PlusSubscribeButtonProps = Omit<

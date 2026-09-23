@@ -6591,3 +6591,81 @@ html body[data-scroll-locked] {
     --typography-title-medium-font: var(--font-weight-700)var(--font-size-350)/var(--line-height-140)var(--config-text-font);
     --typography-title-small-font: var(--font-weight-700)var(--font-size-300)/var(--line-height-140)var(--config-text-font)
 }
+
+.classic-theme.classic-theme-variant-1 {
+    --light-mode-action-emphasis-background: #12891d;
+    --dark-mode-action-emphasis-background: #137f1f;
+    --light-mode-action-emphasis-foreground: #fff;
+    --dark-mode-action-emphasis-foreground: #f7f7f8;
+    --light-mode-action-soft-emphasis-background: rgba(18, 137, 29, .3);
+    --dark-mode-action-soft-emphasis-background: rgba(19, 127, 31, .4);
+    --light-mode-action-soft-emphasis-foreground: #022708;
+    --dark-mode-action-soft-emphasis-foreground: #e2f8e3;
+    --color-action-emphasis-background: var(--light-mode-action-emphasis-background);
+    --color-action-emphasis-foreground: var(--light-mode-action-emphasis-foreground);
+    --color-action-soft-emphasis-background: var(--light-mode-action-soft-emphasis-background);
+    --color-action-soft-emphasis-foreground: var(--light-mode-action-soft-emphasis-foreground);
+    --inverse-action-emphasis-background: var(--dark-mode-action-emphasis-background);
+    --inverse-action-emphasis-foreground: var(--dark-mode-action-emphasis-foreground);
+    --inverse-action-soft-emphasis-background: var(--dark-mode-action-soft-emphasis-background);
+    --inverse-action-soft-emphasis-foreground: var(--dark-mode-action-soft-emphasis-foreground)
+}
+
+@media (prefers-color-scheme:dark) {
+    .classic-theme.classic-theme-variant-1 {
+        --color-action-emphasis-background: var(--dark-mode-action-emphasis-background);
+        --color-action-emphasis-foreground: var(--dark-mode-action-emphasis-foreground);
+        --color-action-soft-emphasis-background: var(--dark-mode-action-soft-emphasis-background);
+        --color-action-soft-emphasis-foreground: var(--dark-mode-action-soft-emphasis-foreground);
+        --inverse-action-emphasis-background: var(--light-mode-action-emphasis-background);
+        --inverse-action-emphasis-foreground: var(--light-mode-action-emphasis-foreground);
+        --inverse-action-soft-emphasis-background: var(--light-mode-action-soft-emphasis-background);
+        --inverse-action-soft-emphasis-foreground: var(--light-mode-action-soft-emphasis-foreground)
+    }
+}
+
+.light-theme.classic-theme.classic-theme-variant-1 {
+    --color-action-emphasis-background: var(--light-mode-action-emphasis-background);
+    --color-action-emphasis-foreground: var(--light-mode-action-emphasis-foreground);
+    --color-action-soft-emphasis-background: var(--light-mode-action-soft-emphasis-background);
+    --color-action-soft-emphasis-foreground: var(--light-mode-action-soft-emphasis-foreground);
+    --inverse-action-emphasis-background: var(--dark-mode-action-emphasis-background);
+    --inverse-action-emphasis-foreground: var(--dark-mode-action-emphasis-foreground);
+    --inverse-action-soft-emphasis-background: var(--dark-mode-action-soft-emphasis-background);
+    --inverse-action-soft-emphasis-foreground: var(--dark-mode-action-soft-emphasis-foreground)
+}
+
+.dark-theme.classic-theme.classic-theme-variant-1 {
+    --color-action-emphasis-background: var(--dark-mode-action-emphasis-background);
+    --color-action-emphasis-foreground: var(--dark-mode-action-emphasis-foreground);
+    --color-action-soft-emphasis-background: var(--dark-mode-action-soft-emphasis-background);
+    --color-action-soft-emphasis-foreground: var(--dark-mode-action-soft-emphasis-foreground);
+    --inverse-action-emphasis-background: var(--light-mode-action-emphasis-background);
+    --inverse-action-emphasis-foreground: var(--light-mode-action-emphasis-foreground);
+    --inverse-action-soft-emphasis-background: var(--light-mode-action-soft-emphasis-background);
+    --inverse-action-soft-emphasis-foreground: var(--light-mode-action-soft-emphasis-foreground)
+}
+
+.system-theme.classic-theme.classic-theme-variant-1 {
+    --color-action-emphasis-background: var(--light-mode-action-emphasis-background);
+    --color-action-emphasis-foreground: var(--light-mode-action-emphasis-foreground);
+    --color-action-soft-emphasis-background: var(--light-mode-action-soft-emphasis-background);
+    --color-action-soft-emphasis-foreground: var(--light-mode-action-soft-emphasis-foreground);
+    --inverse-action-emphasis-background: var(--dark-mode-action-emphasis-background);
+    --inverse-action-emphasis-foreground: var(--dark-mode-action-emphasis-foreground);
+    --inverse-action-soft-emphasis-background: var(--dark-mode-action-soft-emphasis-background);
+    --inverse-action-soft-emphasis-foreground: var(--dark-mode-action-soft-emphasis-foreground)
+}
+
+@media (prefers-color-scheme:dark) {
+    .system-theme.classic-theme.classic-theme-variant-1 {
+        --color-action-emphasis-background: var(--dark-mode-action-emphasis-background);
+        --color-action-emphasis-foreground: var(--dark-mode-action-emphasis-foreground);
+        --color-action-soft-emphasis-background: var(--dark-mode-action-soft-emphasis-background);
+        --color-action-soft-emphasis-foreground: var(--dark-mode-action-soft-emphasis-foreground);
+        --inverse-action-emphasis-background: var(--light-mode-action-emphasis-background);
+        --inverse-action-emphasis-foreground: var(--light-mode-action-emphasis-foreground);
+        --inverse-action-soft-emphasis-background: var(--light-mode-action-soft-emphasis-background);
+        --inverse-action-soft-emphasis-foreground: var(--light-mode-action-soft-emphasis-foreground)
+    }
+}

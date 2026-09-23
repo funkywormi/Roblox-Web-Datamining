@@ -1,5 +1,6 @@
 import { MouseEventHandler } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
+import NavIcon from "./NavIcon";
 
 export default function UniverseSearchIcon({
   toggleUniverseSearch,
@@ -15,7 +16,11 @@ export default function UniverseSearchIcon({
         aria-label={translate("Label.sSearch")}
         onClick={toggleUniverseSearch}
       >
-        <span className="icon-nav-search-white" aria-hidden="true" />
+        <NavIcon
+          legacyClass="icon-nav-search-white"
+          name="icon-regular-magnifying-glass"
+          size="XLarge"
+        />
       </button>
     </li>
   );

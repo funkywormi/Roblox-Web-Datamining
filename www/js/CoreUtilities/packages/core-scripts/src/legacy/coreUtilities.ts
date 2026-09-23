@@ -93,5 +93,5 @@ export const uuidService = {
 export type { TValidHttpUrl, ValidStripeCheckoutUrl } from "../util/url";
 // Backward compatibility alias
 export type { ValidStripeCheckoutUrl as TValidStripeCheckoutUrl } from "../util/url";
-export type { AxiosPromise } from "axios";
+export type { AxiosPromise, AxiosResponse } from "axios";
 export type { UrlConfig } from "../http/types";

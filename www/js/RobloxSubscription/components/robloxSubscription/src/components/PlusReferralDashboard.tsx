@@ -3,7 +3,12 @@ import { TranslationProvider, useTranslation } from "@rbx/core-scripts/react";
 import sharePlusDark from "@rbx/foundation-images/pictograms/share_plus_dark.svg";
 import sharePlusLight from "@rbx/foundation-images/pictograms/share_plus_light.svg";
 import { Button, Icon, ListItem, TextInput } from "@rbx/foundation-ui";
-import { PlusReferralSheet, REFERRAL_REWARD_ROBUX, translateHtml } from "@rbx/subscriptions-common";
+import {
+  PlusReferralSheet,
+  REFERRAL_REWARD_ROBUX,
+  referralEventService,
+  translateHtml,
+} from "@rbx/subscriptions-common";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { subscriptionsV2Api } from "../clients/subscriptions";
@@ -18,10 +23,10 @@ const REFERRAL_TRANSLATION_CONFIG = ["Feature.RobloxSubscription"] as const;
 const COPIED_LABEL_DURATION_MS = 2000;
 
 /**
- * Full 320x180 canvas, centred, per the referral Figma. Anything smaller shrinks the artwork
- * inside it, which sits well within the canvas edges.
+ * Centred pictogram, sized so the copy-link CTA stays above the fold on mobile. From medium up
+ * there is enough room for the full 320px canvas.
  */
-const PICTOGRAM_CLASS = "margin-x-auto width-full max-width-[320px]";
+const PICTOGRAM_CLASS = "margin-x-auto width-full max-width-[200px] medium:max-width-[320px]";
 
 /**
  * The artwork stops 16.5px short of the canvas bottom, and the heading below carries its own
@@ -60,17 +65,6 @@ const CONTENT_COLUMN_CLASS =
  * keeps the link field, not the button, absorbing a long URL.
  */
 const COPY_BUTTON_WIDTH_CLASS = "width-[200px] shrink-0";
-
-/**
- * Cancels the bottom margin `ViewContainer` gives every view so its content clears the site
- * footer. This page hides that footer, so the margin would read as an empty band under Copy link.
- *
- * Mirrors `ViewContainer`'s own pair, which must stay in step: 160px, dropping to 120px from the
- * `large` variant up. Note that Foundation's variant names sit one step below its token names, so
- * `large:` is `min-width: 1141px` rather than the 1520px `--breakpoint-large` would suggest —
- * reusing the variant rather than a hand-written query keeps the two aligned either way.
- */
-const WRAPPER_MARGIN_CANCEL_CLASS = "margin-bottom-[-160px] large:margin-bottom-[-120px]";
 
 /**
  * Two per row on phones, so a third card wraps below. From medium up every card shares one row, so
@@ -227,6 +221,15 @@ const DashboardBody: FC<DashboardBodyProps> = ({
   const shareUrl = knownShareUrl ?? lookedUpShareUrl;
   const [didCopy, setDidCopy] = useState(false);
   const copiedTimeoutRef = useRef<number>();
+  const hasFiredImpression = useRef(false);
+
+  useEffect(() => {
+    if (hasFiredImpression.current) {
+      return;
+    }
+    hasFiredImpression.current = true;
+    referralEventService.referrerImpression();
+  }, []);
 
   useEffect(
     () => () => {
@@ -241,10 +244,12 @@ const DashboardBody: FC<DashboardBodyProps> = ({
   useEffect(() => {
     const footer = document.getElementById("footer-container");
     const containerMain = document.querySelector<HTMLElement>(".container-main");
+    const viewContainer = document.getElementById("roblox-subscription-container")?.parentElement;
     const footerDisplay = footer?.style.display;
     const bodyMarginBottom = document.body.style.marginBottom;
     const containerPaddingBottom = containerMain?.style.paddingBottom;
     const containerMinHeight = containerMain?.style.minHeight;
+    const viewContainerMarginBottom = viewContainer?.style.marginBottom;
 
     if (footer) {
       footer.style.display = "none";
@@ -253,6 +258,9 @@ const DashboardBody: FC<DashboardBodyProps> = ({
     if (containerMain) {
       containerMain.style.paddingBottom = "0px";
       containerMain.style.minHeight = "0px";
+    }
+    if (viewContainer) {
+      viewContainer.style.marginBottom = "0px";
     }
 
     return () => {
@@ -264,6 +272,9 @@ const DashboardBody: FC<DashboardBodyProps> = ({
         containerMain.style.paddingBottom = containerPaddingBottom ?? "";
         containerMain.style.minHeight = containerMinHeight ?? "";
       }
+      if (viewContainer) {
+        viewContainer.style.marginBottom = viewContainerMarginBottom ?? "";
+      }
     };
   }, []);
 
@@ -271,6 +282,7 @@ const DashboardBody: FC<DashboardBodyProps> = ({
     if (!shareUrl) {
       return;
     }
+    referralEventService.referrerCopyClick();
     navigator.clipboard
       .writeText(shareUrl)
       .then(() => {
@@ -292,7 +304,7 @@ const DashboardBody: FC<DashboardBodyProps> = ({
   const title = translate("Heading.ReferralShare", undefined, "Share Plus, get");
 
   return (
-    <main className={`${WRAPPER_MARGIN_CANCEL_CLASS} bg-surface-0 flex flex-col`}>
+    <main className="bg-surface-0 flex flex-col">
       {/* 48px top offset matches PurchaseView, so switching views does not shift the content. */}
       <div
         className={`${CONTENT_COLUMN_CLASS} gap-y-large medium:gap-y-xxlarge margin-top-[48px] padding-bottom-large flex flex-col`}

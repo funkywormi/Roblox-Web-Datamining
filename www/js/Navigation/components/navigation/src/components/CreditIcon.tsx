@@ -1,5 +1,6 @@
 import { Fragment, useEffect } from "react";
 import layoutConstants from "../constants/layoutConstants";
+import NavIcon from "./NavIcon";
 
 export default function CreditIcon({
   creditAmount = 0,
@@ -12,7 +13,12 @@ export default function CreditIcon({
 }) {
   const icon = (
     <Fragment>
-      <span className="icon-menu-wallet roblox-popover-close" id="nav-credit-icon" />
+      <NavIcon
+        legacyClass="icon-menu-wallet roblox-popover-close"
+        name="icon-regular-wallet"
+        size="XLarge"
+        id="nav-credit-icon"
+      />
       <span className="rbx-text-navbar-right text-header" id="nav-robux-amount">
         {!creditError ? (
           <div

@@ -74,11 +74,16 @@ export const UniversalFeatureRestrictionsProvider = ({ Surface, children }: Prop
     });
 
   const showFeatureRestriction = useCallback((options: ShowFeatureRestrictionOptions) => {
-    setActiveRestriction(current => ({
-      request: options,
-      open: true,
-      presentationToggle: !current.presentationToggle,
-    }));
+    setActiveRestriction(current => {
+      if (current.open && current.request?.abuseVector === options.abuseVector) {
+        return current;
+      }
+      return {
+        request: options,
+        open: true,
+        presentationToggle: !current.presentationToggle,
+      };
+    });
   }, []);
 
   const showFeatureRestrictionFromRealtime = useCallback(

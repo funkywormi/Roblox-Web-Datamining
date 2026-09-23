@@ -17,7 +17,7 @@ import {
   PaymentProvider,
   ProductType,
   SubscriptionProductInfo,
-} from "@rbx/client-subscriptions-api/v1";
+} from "@rbx/client-subscriptions-api/v2";
 import type { TranslateFunction } from "@rbx/core-scripts/react";
 import {
   SYSTEM_FEEDBACK_CONFIG,
