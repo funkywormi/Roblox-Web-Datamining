@@ -53,7 +53,10 @@ export type WizardWalker = {
   currentNodeId?: string;
   isLoading: boolean;
   exited: boolean;
+  presentingError: boolean;
+  acknowledgeError: () => void;
   analyticsStrings?: FlowAnalyticsStrings;
+  analyticsSessionId: string;
   report: ReportFn;
   eventContext: WizardEventContext;
   logEvent: LogEventFn;
@@ -211,12 +214,19 @@ export function useWizardWalker(options: UseWizardWalkerOptions): WizardWalker {
     [api, target, rootFlow, surface, onEvent, sendEvent],
   );
 
+  const acknowledgeError = useCallback(() => {
+    dispatch({ type: WalkerActionType.AcknowledgeError });
+  }, []);
+
   return {
     currentNode,
     currentNodeId: state.currentNodeId,
     isLoading: state.isLoading,
     exited,
+    presentingError: state.presentingError,
+    acknowledgeError,
     analyticsStrings: state.analyticsStrings,
+    analyticsSessionId: state.analyticsSessionId,
     report,
     eventContext,
     logEvent,

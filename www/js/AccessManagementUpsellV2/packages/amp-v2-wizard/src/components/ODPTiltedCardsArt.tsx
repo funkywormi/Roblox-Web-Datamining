@@ -1,6 +1,6 @@
 /**
- * Hero art for the ODP handoff: two tilted, overlapping cards — a phone (back) and the trusted-
- * connection glyph (front, opaque so it covers the phone). Web counterpart of the lua ODPTiltedCardsArt.
+ * Hero art for the ODP handoff: two tilted, overlapping cards — a shield checkmark (back) and the trusted-
+ * connection glyph (front, opaque so it covers the shield). Web counterpart of the lua ODPTiltedCardsArt.
  */
 
 import type { JSX } from "react";
@@ -26,7 +26,7 @@ export function ODPTiltedCardsArt(): JSX.Element {
       data-testid="amp-v2-wizard-tilted-cards-art"
     >
       <div className={`${CARD_CLASS} ${BACK_CARD}`}>
-        <Icon name="icon-regular-smartphone-portrait" size="XXLarge" className={GLYPH_SIZE} />
+        <Icon name="icon-regular-shield-check" size="XXLarge" className={GLYPH_SIZE} />
       </div>
       <div className={`${CARD_CLASS} ${FRONT_CARD}`}>
         <Icon

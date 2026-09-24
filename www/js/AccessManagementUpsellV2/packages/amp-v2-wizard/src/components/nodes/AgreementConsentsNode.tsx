@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useMemo, useState, type JSX, type MouseEvent } from "react";
 import { Button, Checkbox, Divider } from "@rbx/foundation-ui";
 
-import { FullPageChrome } from "../FullPageChrome";
+import { FullPageChrome, FULL_PAGE_CTA_INSET_CLASS } from "../FullPageChrome";
 import { renderAnchoredCopy } from "../../utils/anchoredCopy";
 import { asConsentRows, asText, type AgreementConsentRow } from "../../utils/nodeDetails";
 import type { NodeComponent, NodeProps } from "../../types";
@@ -207,7 +207,10 @@ export const AgreementConsentsNode: NodeComponent = ({
             onToggle={onToggleRow}
           />
         </div>
-        <div className="gap-small flex flex-col [margin-top:auto]">
+        <div
+          className={`gap-small flex flex-col [margin-top:auto] ${FULL_PAGE_CTA_INSET_CLASS}`}
+          data-testid="amp-v2-wizard-full-page-cta-stack"
+        >
           <Button
             variant="Emphasis"
             size="Medium"

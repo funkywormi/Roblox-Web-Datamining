@@ -1,6 +1,10 @@
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Button } from "@rbx/foundation-ui";
-import { REFERRAL_REWARD_ROBUX } from "@rbx/subscriptions-common";
+import { REFERRAL_REWARD_ROBUX, referralEventService } from "@rbx/subscriptions-common";
+import { useEffect, useRef } from "react";
+
+import { Event } from "../utils/eventsCounter";
+import { publishMetric } from "../utils/publishMetric";
 
 import type { FC } from "react";
 
@@ -19,6 +23,16 @@ const PlusReferralShareCard: FC<PlusReferralShareCardProps> = ({ onOpenDashboard
   const { translate, intl } = useTranslation();
   const amount = intl.n(REFERRAL_REWARD_ROBUX);
 
+  const hasFiredImpression = useRef(false);
+  useEffect(() => {
+    if (hasFiredImpression.current) {
+      return;
+    }
+    hasFiredImpression.current = true;
+    referralEventService.shareCardImpression();
+    publishMetric(Event.SHARE_CARD_SHOWN);
+  }, []);
+
   return (
     <div
       // `height-full` keeps every card in the rail level; the minimum holds the design height when
@@ -35,7 +49,15 @@ const PlusReferralShareCard: FC<PlusReferralShareCardProps> = ({ onOpenDashboard
           "Invite someone to Plus and you both get 100 Robux when they join.",
         )}
       </p>
-      <Button size="Small" variant="Standard" onClick={onOpenDashboard}>
+      <Button
+        size="Small"
+        variant="Standard"
+        onClick={() => {
+          referralEventService.shareCardInviteClick();
+          publishMetric(Event.SHARE_CARD_INVITE_CLICK);
+          onOpenDashboard();
+        }}
+      >
         {translate("Action.ReferralInvite", undefined, "Invite")}
       </Button>
     </div>

@@ -11,6 +11,7 @@ import type { JSX } from "react";
 import { Button } from "@rbx/foundation-ui";
 
 import { asButtons, asText, type TextScreenButton } from "../../utils/nodeDetails";
+import { renderAnchoredCopy } from "../../utils/anchoredCopy";
 import type { NodeProps } from "../../types";
 
 export type TextScreenDetails = {
@@ -18,6 +19,8 @@ export type TextScreenDetails = {
   description: string;
   imageUrl?: string;
   buttons: TextScreenButton[];
+  /** Small print beneath the buttons, with any documents it references marked up as anchors. */
+  footerText?: string;
 };
 
 export function TextScreenNode({ props, report }: NodeProps): JSX.Element {
@@ -25,6 +28,7 @@ export function TextScreenNode({ props, report }: NodeProps): JSX.Element {
   const description = asText(props.description) ?? "";
   const imageUrl = asText(props.imageUrl);
   const buttons = asButtons(props.buttons) ?? [];
+  const footerText = asText(props.footerText);
 
   return (
     <div className="gap-large flex flex-col">
@@ -33,20 +37,30 @@ export function TextScreenNode({ props, report }: NodeProps): JSX.Element {
         <h2 className="text-heading-medium content-emphasis margin-none">{title}</h2>
         <p className="text-body-medium content-default margin-none">{description}</p>
       </div>
-      <div className="gap-small flex flex-col">
-        {buttons.map((button, index) => (
-          <Button
-            key={button.outcome}
-            variant={index === 0 ? "Emphasis" : "Standard"}
-            size="Medium"
-            className="width-full"
-            onClick={() => {
-              report(button.outcome);
-            }}
+      <div className="gap-medium flex flex-col">
+        <div className="gap-small flex flex-col">
+          {buttons.map((button, index) => (
+            <Button
+              key={button.outcome}
+              variant={index === 0 ? "Emphasis" : "Standard"}
+              size="Medium"
+              className="width-full"
+              onClick={() => {
+                report(button.outcome);
+              }}
+            >
+              {button.label}
+            </Button>
+          ))}
+        </div>
+        {footerText ? (
+          <p
+            className="text-body-small content-default margin-none"
+            data-testid="amp-v2-wizard-text-screen-footer"
           >
-            {button.label}
-          </Button>
-        ))}
+            {renderAnchoredCopy(footerText)}
+          </p>
+        ) : null}
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import { Loading } from "react-style-guide";
 import { useSnackbar } from "@rbx/user-settings";
 import useScrollRestoration from "../../common/hooks/useScrollRestoration";
 import ParentalControlsPageName from "../../../enums/parentalControls/ParentalControlsPageName";
-import { Access } from "../../../types/accessManagementTypes";
+import ParentalControlsActor from "../../../enums/parentalControls/ParentalControlsActor";
 import RouterPath from "../../../enums/RouterPath";
 import BackLink from "../../common/components/routing/BackLink";
 import {
@@ -20,15 +20,16 @@ import ChildDashboardRoutes from "../components/parentalControls/routes/ChildDas
 import commonTranslationConstants from "../constants/contentConstants/commonTranslationConstants";
 import ParentDashboardLandingPage from "../components/parentalControls/parentDashboard/ParentDashboardLandingPage";
 import ParentDashboardRoutes from "../components/parentalControls/routes/ParentDashboardRoutes";
+import ParentZoneLandingPage from "../components/parentalControls/parentZone/ParentZoneLandingPage";
 import { useAppSelector } from "../../redux/hooks";
 import {
   selectAllChildPages,
   selectChildDetailLandingPages,
 } from "../../apis/slices/childPagesSlice";
 import { useGetChildrenInfoQuery } from "../../apis/parentalControlsApi";
-import { useGetFeatureAccessQuery } from "../../apis/accessManagementApi";
-import AMPFeaturesConstants from "../constants/AMPFeaturesConstants";
+import useParentalControlsActor from "../hooks/useParentalControlsActor";
 import { sendParentalControlsParentPageloadEvent } from "../services/eventServices/parentalControlsEventService";
+import useSettingsJourneyScreen from "../hooks/useSettingsJourneyScreen";
 
 export const ParentalControlsContainer = (): JSX.Element => {
   const { translate } = useTranslation();
@@ -37,29 +38,19 @@ export const ParentalControlsContainer = (): JSX.Element => {
   const { snackbarService } = useSnackbar();
   useScrollRestoration();
   const { data: childrenInfo, status: childrenInfoStatus } = useGetChildrenInfoQuery();
-  const {
-    data: ageOfMajorityResult,
-    status: ageOfMajorityStatus,
-    isLoading,
-  } = useGetFeatureAccessQuery({ featureName: AMPFeaturesConstants.ageOfMajorityAmpFeature });
-
-  const isChild: boolean = useMemo(() => {
-    // User is below age of majority
-    return ageOfMajorityResult?.access === Access.Denied;
-  }, [ageOfMajorityResult]);
+  const { actor, isChild, isLoading, hasError: hasActorError } = useParentalControlsActor();
 
   useEffect(() => {
     // Error handling
     const hasError =
       childrenInfoStatus === QueryStatus.rejected ||
       (childrenInfoStatus === QueryStatus.fulfilled && !childrenInfo) ||
-      ageOfMajorityStatus === QueryStatus.rejected ||
-      (ageOfMajorityStatus === QueryStatus.fulfilled && !ageOfMajorityResult);
+      hasActorError;
 
     if (hasError) {
       snackbarService.warning(translate(commonTranslationConstants.unknownError));
     }
-  }, [ageOfMajorityResult, ageOfMajorityStatus, childrenInfo, childrenInfoStatus]);
+  }, [hasActorError, childrenInfo, childrenInfoStatus]);
 
   const allParentalControlsPages = useAppSelector(selectAllChildPages);
 
@@ -105,6 +96,23 @@ export const ParentalControlsContainer = (): JSX.Element => {
     [pathNameNoTrailingSlash, childrenInfo],
   );
 
+  const isJourneyLandingPage = pathNameNoTrailingSlash === baseParentalControlsPath;
+  const journeyPageReady =
+    !isLoading &&
+    !hasActorError &&
+    (isJourneyLandingPage
+      ? isChild || (Boolean(childrenInfo) && childrenInfo?.childrenInfoList.length !== 1)
+      : !isChild && Boolean(currentChild) && Boolean(currentPage));
+
+  // A one-child parent landing page renders no content and redirects immediately.
+  // Track the resulting child page, and exclude child-side routes that redirect.
+  useSettingsJourneyScreen(
+    "parental-controls",
+    isJourneyLandingPage ? ParentalControlsPageName.ParentalControlsEntrypoint : currentPage?.name,
+    pathNameNoTrailingSlash,
+    journeyPageReady,
+  );
+
   // Event tracking
   useEffect(() => {
     if (currentChild) {
@@ -121,10 +129,13 @@ export const ParentalControlsContainer = (): JSX.Element => {
     if (isLoading) {
       return <Loading />;
     }
-    if (isChild) {
-      return <ChildDashboardLandingPage />;
+    if (actor === ParentalControlsActor.OnDeviceParent) {
+      return <ParentZoneLandingPage />;
     }
-    return <ParentDashboardLandingPage />;
+    if (actor === ParentalControlsActor.RemoteParent) {
+      return <ParentDashboardLandingPage />;
+    }
+    return <ChildDashboardLandingPage />;
   };
 
   return (
@@ -160,7 +171,7 @@ export const ParentalControlsContainer = (): JSX.Element => {
       {isCurrentlyOnParentalControlsEntryPage && getParentalControlsInnerComponent()}
       {/* Scope the wildcard redirect so it does not intercept valid parent routes. */}
       {isChild && <ChildDashboardRoutes />}
-      <ParentDashboardRoutes />
+      {!isChild && <ParentDashboardRoutes />}
     </div>
   );
 };

@@ -26,6 +26,7 @@ interface SubmitModal {
 interface MetadataResponse {
   countryList: string[];
   illegalTypeList: string[];
+  ukOSAIllegalTypeList: string[];
   chcrIllegalTypeList: string[];
   osaSpecificComplaintsIllegalTypeList: string[];
   auOSAIllegalTypeList: string[];

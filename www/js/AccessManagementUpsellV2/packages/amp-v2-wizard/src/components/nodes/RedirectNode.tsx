@@ -12,9 +12,6 @@ import type { NodeProps } from "../../types";
 /** Reported when `url` is missing or is not a Roblox URL. No node declares it, so the walker error-exits. */
 export const INVALID_REDIRECT_OUTCOME = "__invalidRedirect__";
 
-/** Reported once the browser has been sent to the destination. */
-export const REDIRECT_DONE_OUTCOME = "Done";
-
 /** Param the redirect destintion reads to send the user back to the initial entrypoint where the wizard launched. */
 export const RETURN_PARAM = "redirectUrl";
 
@@ -46,7 +43,9 @@ export function RedirectNode({ props, report }: NodeProps): JSX.Element {
     }
 
     handedOffTo.current = destination.href;
-    report(REDIRECT_DONE_OUTCOME);
+
+    // Don't report any outcome on success, which would be reported as an exit and tear the amp wizard down while the
+    // browser is still on the initial entrypoint page.
   }, [url, report]);
 
   return (

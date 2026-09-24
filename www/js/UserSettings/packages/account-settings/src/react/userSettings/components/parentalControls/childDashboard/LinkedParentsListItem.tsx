@@ -9,22 +9,28 @@ import {
   ListItem,
   ListItemChevronTrailingAccessory,
   ListItemLeadingAccessorySpacer,
+  type TListItemDivider,
 } from "@rbx/foundation-ui";
 import { TParentInfo } from "../../../../../types/parentInfoTypes";
 import { getProfileUrl } from "../../../constants/urlConstants";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import { useGetSettingsUiPolicyQuery } from "../../../../apis/universalAppConfigurationApi";
 
-export const LinkedParentListItem = ({ parent }: { parent: TParentInfo }): JSX.Element => {
+export const LinkedParentListItem = ({
+  parent,
+  divider,
+}: {
+  parent: TParentInfo;
+  divider: TListItemDivider;
+}): JSX.Element => {
   const { translate } = useTranslation();
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
 
   return (
     <ListItem
-      className="bg-shift-100 radius-medium clip"
       isContained={false}
-      size="Large"
-      divider="None"
+      size="Medium"
+      divider={divider}
       title={parent.displayName}
       metadata={parent.email}
       description={
@@ -34,7 +40,7 @@ export const LinkedParentListItem = ({ parent }: { parent: TParentInfo }): JSX.E
       }
       leading={
         <ListItemLeadingAccessorySpacer>
-          <div className="size-1400 radius-circle clip">
+          <div className="size-1000 radius-circle clip">
             <Thumbnail2d
               containerClass="size-full"
               type={ThumbnailTypes.avatarHeadshot}

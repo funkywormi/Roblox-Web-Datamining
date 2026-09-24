@@ -1,5 +1,6 @@
 {
     "Label.Error": "Error",
+    "Label.Loading": "Loading",
     "Response.TooManyAttemptsText": "Too Many Attempts",
     "Action.Close": "Close",
     "Response.BadRequest": "Bad Request",

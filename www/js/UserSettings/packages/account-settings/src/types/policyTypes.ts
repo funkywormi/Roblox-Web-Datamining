@@ -88,6 +88,7 @@ export type TSettingsUIPolicyBody = {
   isIarcAgeRatingEnabled: boolean;
   canSeeChatTerminology: boolean;
   appThemesAccess: AppThemesAccess;
+  onDeviceParentalControlsEnabled: boolean;
 };
 
 export type TSettingsUIRequest = {

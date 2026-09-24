@@ -1,4 +1,5 @@
 import { ReportType } from "../illegalContentReport/helpers";
+import { IPInfringementSubCategoryKey } from "../illegalContentReport/constants";
 
 /**
  * Given a report type, return a filtering function. This function returns whether the illegal type should be displayed
@@ -9,7 +10,7 @@ export const getIllegalTypeFilter = (
 ): ((illegalType: string) => boolean) => {
   switch (reportType) {
     case ReportType.OSA:
-      return illegalType => illegalType !== "IPInfringement";
+      return illegalType => illegalType !== IPInfringementSubCategoryKey;
     default:
       return () => true;
   }

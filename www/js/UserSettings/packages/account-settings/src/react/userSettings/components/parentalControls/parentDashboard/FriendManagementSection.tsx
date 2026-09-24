@@ -186,6 +186,16 @@ const FriendManagementSection = ({
     );
   };
 
+  const getMessagingActivityDescription = (): string | null => {
+    if (!child.shouldShowNebraskaU18Copy) {
+      return null;
+    }
+
+    return translate(
+      parentalControlsTranslationConstants.friendManagement.childCardViewMessagingActivity,
+    );
+  };
+
   const getDisclaimerTranslationKey = (): string => {
     switch (getAddTrustedConnectionFeatureSet(child.trustedFriendsAvailableFeatures)) {
       case AddTrustedConnectionFeatureSet.ChatAcrossAgeGroups:
@@ -201,21 +211,23 @@ const FriendManagementSection = ({
   };
 
   const getDisclaimer = (): JSX.Element | null => {
-    if (!child.shouldShowTrustedFriendsDisclaimer) {
+    const messagingActivity = getMessagingActivityDescription();
+    if (!child.shouldShowTrustedFriendsDisclaimer && !messagingActivity) {
       return null;
     }
 
-    return (
-      <div
-        className="text-body-medium"
-        dangerouslySetInnerHTML={{
-          __html: translate(getDisclaimerTranslationKey(), {
-            linkStart: `<br /><a class="text-link" target="_blank" rel="noreferrer" href="${trustedConnectionsHelpPageUrl}">`,
-            linkEnd: "</a>",
-          }),
-        }}
-      />
-    );
+    const disclaimerHtml = child.shouldShowTrustedFriendsDisclaimer
+      ? translate(getDisclaimerTranslationKey(), {
+          linkStart: `<a class="text-link" target="_blank" rel="noreferrer" href="${trustedConnectionsHelpPageUrl}">`,
+          linkEnd: "</a>",
+        })
+      : "";
+
+    const combinedHtml = messagingActivity
+      ? `${messagingActivity} ${disclaimerHtml}`
+      : disclaimerHtml;
+
+    return <div className="text-body-medium" dangerouslySetInnerHTML={{ __html: combinedHtml }} />;
   };
 
   const getSectionContent = (): JSX.Element | null => {

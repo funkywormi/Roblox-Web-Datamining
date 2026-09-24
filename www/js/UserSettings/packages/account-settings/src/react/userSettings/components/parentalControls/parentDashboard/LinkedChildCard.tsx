@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Thumbnail2d,
   ThumbnailTypes,
@@ -8,6 +8,14 @@ import {
 import { Link, NavLink } from "react-router-dom";
 import { useTranslation } from "react-utilities";
 import classNames from "classnames";
+import {
+  EducationalTooltip,
+  EducationalTooltipTrigger,
+  EducationalTooltipContent,
+  EducationalTooltipBody,
+  EducationalTooltipTitle,
+  EducationalTooltipDescription,
+} from "@rbx/foundation-ui";
 import useGetAllPendingParentalConsents from "../../../hooks/useGetAllPendingParentalConsents";
 import { selectChildPagesForChildUserId } from "../../../../apis/slices/childPagesSlice";
 import { useAppSelector } from "../../../../redux/hooks";
@@ -47,6 +55,16 @@ export const LinkedChildCard = ({
 
   const childAge = birthdayUtils.calculateAgeFromISO(childInfo.birthDate);
 
+  const [showNebraskaTooltip, setShowNebraskaTooltip] = useState(
+    !!childInfo.shouldShowNebraskaU18Copy,
+  );
+
+  useEffect(() => {
+    if (!childInfo.shouldShowNebraskaU18Copy) return undefined;
+    const timer = setTimeout(setShowNebraskaTooltip, 5000, false);
+    return () => clearTimeout(timer);
+  }, [childInfo.shouldShowNebraskaU18Copy]);
+
   const numPendingConsents = allConsents?.length || 0;
   const pendingConsentsDisplay = hasMore ? `${numPendingConsents}+` : numPendingConsents;
 
@@ -78,7 +96,25 @@ export const LinkedChildCard = ({
         <div className="linked-profile-card-thumbnails-container">{getChildThumbnail()}</div>
       </a>
       <span className="card-display-name font-header-1">{childInfo?.displayName}</span>
-      <span className="small text">{childUsername}</span>
+      {childInfo.shouldShowNebraskaU18Copy ? (
+        <EducationalTooltip open={showNebraskaTooltip} onOpenChange={setShowNebraskaTooltip}>
+          <EducationalTooltipTrigger asChild>
+            <span className="small text">{childUsername}</span>
+          </EducationalTooltipTrigger>
+          <EducationalTooltipContent position="bottom-center">
+            <EducationalTooltipBody>
+              <EducationalTooltipTitle>
+                {translate(parentalControlsTranslationConstants.nebraskaU18TooltipTitle)}
+              </EducationalTooltipTitle>
+              <EducationalTooltipDescription>
+                {translate(parentalControlsTranslationConstants.nebraskaU18Description)}
+              </EducationalTooltipDescription>
+            </EducationalTooltipBody>
+          </EducationalTooltipContent>
+        </EducationalTooltip>
+      ) : (
+        <span className="small text">{childUsername}</span>
+      )}
       <span className="small text child-description">
         {translate(parentalControlsTranslationConstants.ageLabel, { ageInYears: childAge })}
       </span>

@@ -2,6 +2,7 @@ import { eventStreamService } from "core-roblox-utilities";
 import { TUpdateUserSettingValueRequest } from "@rbx/user-settings";
 import { btnClickEvent, getEventParams } from "../../constants/eventConstants";
 import wrapEventServiceWithTryCatch from "../../../../core/utils/eventUtils";
+import settingsJourneyService from "../journeys/settingsJourneyService";
 
 const eventService = {
   btnClicked: wrapEventServiceWithTryCatch((btn: string): void => {
@@ -22,6 +23,7 @@ const eventService = {
   }),
   authButtonClickSettingsUpdateAttempt: wrapEventServiceWithTryCatch(
     (request: TUpdateUserSettingValueRequest): void => {
+      settingsJourneyService.editAttempted("privacy", request.setting);
       const params = getEventParams.authButtonClickSettingsUpdateAttempt(request);
       eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
     },

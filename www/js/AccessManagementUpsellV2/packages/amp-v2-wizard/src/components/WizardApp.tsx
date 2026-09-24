@@ -54,7 +54,7 @@ export function WizardApp(): JSX.Element | null {
           ),
         )
         .then(fragment => {
-          if (fragment.entry === "") {
+          if (fragment.entry === "" && fragment.outcome !== "Error") {
             // Nothing to run (granted / denied / no upsell) — resolve without rendering, and do NOT
             // fire onComplete: no flow ran, so there's nothing for the caller to refresh against.
             busyRef.current = false;

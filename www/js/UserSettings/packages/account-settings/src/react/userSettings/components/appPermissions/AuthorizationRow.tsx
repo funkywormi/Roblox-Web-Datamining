@@ -17,7 +17,7 @@ export const AuthorizationRow = ({
   authorization: TAuthorization;
   scopesConfiguration?: TScopesResponse;
 }): JSX.Element => {
-  const { translate } = useTranslation();
+  const { translate, intl } = useTranslation();
   const { snackbarService } = useSnackbar();
   const [deleteAuthorizationMutation] = useDeleteAuthorizationMutation();
 
@@ -81,6 +81,14 @@ export const AuthorizationRow = ({
   const [reportAuthorizationModal, reportAuthorizationModalService] =
     useOAuthAbuseReportModal(authorization);
 
+  const authorizedOnDate = intl
+    .getDateTimeFormatter()
+    .getCustomDateTime(authorization.lastConsentedUtc ?? authorization.createdUtc, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
   return (
     <React.Fragment>
       {removeAuthorizationModal}
@@ -106,6 +114,11 @@ export const AuthorizationRow = ({
           <p className="text-overflow font-subheader-2">
             {authorization.application.summary ||
               translate(appPermissionsTranslationConstants.noDescriptionLabel)}
+          </p>
+          <p className="text-description font-caption-body">
+            {translate(appPermissionsTranslationConstants.authorizedOn, {
+              date: authorizedOnDate,
+            })}
           </p>
         </div>
         <div>

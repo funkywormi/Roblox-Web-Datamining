@@ -1,53 +1,36 @@
-import React from "react";
 import { useTranslation } from "react-utilities";
-import {
-  List,
-  ListItem,
-  ListItemLeadingAccessorySpacer,
-  ListItemLeadingIcon,
-} from "@rbx/foundation-ui";
-import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
+import { List, type TListItemDivider } from "@rbx/foundation-ui";
 import PreviewCard from "../../../../common/components/routing/PreviewCard";
+import AddParentListItem from "./AddParentListItem";
 import LinkedParentListItem from "./LinkedParentsListItem";
-import useHandleParentLinking from "../../../hooks/useHandleParentLinking";
+import ParentPinManagementListItem from "./ParentPinManagementListItem";
+import useLinkedParentsState from "../../../hooks/useLinkedParentsState";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 
 export const LinkedParentsList = (): JSX.Element => {
   const { translate } = useTranslation();
-  const { data: parentData } = useGetParentInfoQuery();
-  const handleParentLinking = useHandleParentLinking();
+  const { hasOnDeviceParent, remoteParents, canAddRemoteParent } = useLinkedParentsState();
 
-  const getLinkedParentsListItems = (): JSX.Element | undefined => {
-    if (!parentData?.parents) {
-      return undefined;
-    }
+  const rows: ((divider: TListItemDivider) => JSX.Element)[] = [];
 
-    const listItems = parentData.parents.map(parent => (
-      <LinkedParentListItem key={parent.userId} parent={parent} />
+  remoteParents.forEach(parent => {
+    rows.push(divider => (
+      <LinkedParentListItem key={parent.userId} parent={parent} divider={divider} />
     ));
+  });
 
-    return <React.Fragment>{listItems}</React.Fragment>;
-  };
+  if (hasOnDeviceParent) {
+    rows.push(divider => <ParentPinManagementListItem key="parent-pin" divider={divider} />);
+  }
+
+  if (canAddRemoteParent) {
+    rows.push(divider => <AddParentListItem key="add-parent" divider={divider} />);
+  }
 
   return (
     <PreviewCard title={translate(parentalControlsTranslationConstants.linkedParentsHeading)}>
-      <List className="flex flex-col gap-xlarge">
-        {getLinkedParentsListItems()}
-        {parentData?.canAddParent && (
-          <ListItem
-            className="bg-shift-100 radius-medium clip"
-            isContained={false}
-            size="Large"
-            divider="None"
-            title={translate(parentalControlsTranslationConstants.addParentLink.addParentAction)}
-            leading={
-              <ListItemLeadingAccessorySpacer>
-                <ListItemLeadingIcon name="icon-regular-plus-large" />
-              </ListItemLeadingAccessorySpacer>
-            }
-            onSelect={handleParentLinking}
-          />
-        )}
+      <List className="bg-shift-100 stroke-standard stroke-default radius-large clip">
+        {rows.map((renderRow, index) => renderRow(index === rows.length - 1 ? "None" : "Inset"))}
       </List>
     </PreviewCard>
   );

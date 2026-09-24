@@ -1235,8 +1235,8 @@ p.personalized-bonus-items__report-popover {
     height: 75px
 }
 
-.max-width-\[320px\] {
-    max-width: 320px
+.max-width-\[200px\] {
+    max-width: 200px
 }
 
 .min-height-\[120px\] {
@@ -2105,6 +2105,10 @@ h5 {
 
     .medium\:max-width-3000 {
         max-width: var(--size-3000)
+    }
+
+    .medium\:max-width-\[320px\] {
+        max-width: 320px
     }
 
     .medium\:min-height-3000 {

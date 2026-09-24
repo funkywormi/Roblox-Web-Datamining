@@ -142,7 +142,7 @@ export const CodeInput = ({
               aria-hidden="true"
               data-testid="code-input-box"
               className={classNames(
-                "height-1600 radius-medium bg-shift-200 stroke-thick flex basis-0 grow-1 items-center justify-center",
+                "aspect-3-4 radius-medium bg-shift-200 stroke-thick flex basis-0 grow-1 items-center justify-center",
                 // Stands in for the text cursor, which is invisible along with its input.
                 isNext ? "stroke-system-emphasis" : "[border-color:transparent]",
               )}

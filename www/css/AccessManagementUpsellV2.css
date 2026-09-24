@@ -61,8 +61,8 @@
     height: 200px
 }
 
-.max-width-\[480px\] {
-    max-width: 480px
+.max-width-\[730px\] {
+    max-width: 730px
 }
 
 .max-width-\[calc\(var\(--size-100\)\*50\)\] {
@@ -133,10 +133,6 @@
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M21.7065 11.2929C22.097 11.6834 22.097 12.3166 21.7065 12.7071L14.7065 19.7071C14.3159 20.0977 13.6828 20.0977 13.2922 19.7071L10.2922 16.7071C9.90172 16.3166 9.90172 15.6834 10.2922 15.2929C10.6828 14.9024 11.3159 14.9024 11.7065 15.2929L13.9994 17.5858L20.2922 11.2929C20.6828 10.9024 21.3159 10.9024 21.7065 11.2929Z' fill='black'/%3E %3Cpath d='M15.2276 29.6697C4.43337 24.9244 4.01613 19.1787 4 7.4448C3.99882 6.58395 4.5502 5.81641 5.36687 5.54417L15.3663 2.21086C15.7768 2.07401 16.2206 2.074 16.6312 2.21084L26.6318 5.5442C27.4485 5.81642 27.9999 6.58397 27.9987 7.44484C27.9826 19.1787 27.5653 24.9244 16.7716 29.6697C16.2834 29.8843 15.7159 29.8843 15.2276 29.6697ZM7.4184 20.4093C8.60623 23.2624 10.9061 25.5796 15.9996 27.8243C21.0928 25.5796 23.3926 23.2625 24.5804 20.4093C25.8541 17.3498 25.9905 13.4078 25.9987 7.44209L15.9988 4.10822L5.99936 7.44152C6.00756 13.4073 6.14466 17.3498 7.4184 20.4093Z' fill='black'/%3E%3C/svg%3E")
 }
 
-.icon-regular-smartphone-portrait {
-    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M14 24C13.4477 24 13 24.4477 13 25C13 25.5523 13.4477 26 14 26H18C18.5523 26 19 25.5523 19 25C19 24.4477 18.5523 24 18 24H14Z' fill='black'/%3E %3Cpath d='M6 6C6 3.79086 7.79086 2 10 2H22C24.2091 2 26 3.79086 26 6V26C26 28.2091 24.2091 30 22 30H10C7.79086 30 6 28.2091 6 26V6ZM10 4C8.89543 4 8 4.89543 8 6V26C8 27.1046 8.89543 28 10 28H22C23.1046 28 24 27.1046 24 26V6C24 4.89543 23.1046 4 22 4H10Z' fill='black'/%3E%3C/svg%3E")
-}
-
 .icon-regular-square-person {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M27.2041 3.01074C28.2128 3.11301 29 3.96435 29 5V27L28.9893 27.2041C28.8938 28.1457 28.1457 28.8938 27.2041 28.9893L27 29H5L4.7959 28.9893C3.85435 28.8938 3.1062 28.1457 3.01074 27.2041L3 27V5C3 3.89543 3.89543 3 5 3H27L27.2041 3.01074ZM5 27H7.54199L8.81934 21.1211C9.2107 19.3208 10.8042 18.0363 12.6465 18.0361H19.3457C21.188 18.0362 22.7815 19.3208 23.1729 21.1211L24.4502 27H27V5H5V27ZM12.6465 20.0361C11.7451 20.0363 10.9649 20.665 10.7734 21.5459L9.58691 27H22.4033L21.2178 21.5459C21.0263 20.665 20.2472 20.0362 19.3457 20.0361H12.6465ZM12.6426 8.29883C12.8793 7.4152 13.7882 6.89019 14.6719 7.12695L19.4717 8.41309C20.355 8.65005 20.8793 9.55892 20.6426 10.4424L19.3564 15.2422L19.3047 15.4033C19.0263 16.1357 18.2666 16.5737 17.4932 16.4482L17.3281 16.4131L12.5283 15.127C11.645 14.8903 11.1203 13.982 11.3564 13.0986L12.6426 8.29883ZM13.377 13.2832L17.5127 14.3916L18.6211 10.2559L14.4854 9.14746L13.377 13.2832Z' fill='black'/%3E%3C/svg%3E")
 }
@@ -200,6 +196,30 @@
     right: 0
 }
 
+.\[margin-inline-start\:-15px\]:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    margin-left: -15px
+}
+
+.\[margin-inline-start\:-15px\]:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    margin-left: -15px
+}
+
+.\[margin-inline-start\:-15px\]:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    margin-left: -15px
+}
+
+.\[margin-inline-start\:-15px\]:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    margin-right: -15px
+}
+
+.\[margin-inline-start\:-15px\]:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    margin-right: -15px
+}
+
+.\[margin-inline-start\:-15px\]:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    margin-right: -15px
+}
+
 .\[margin-top\:auto\] {
     margin-top: auto
 }
@@ -238,6 +258,14 @@
 
 .\!\[overflow\:hidden\] {
     overflow: hidden !important
+}
+
+.\[padding-bottom\:64px\] {
+    padding-bottom: 64px
+}
+
+.\[scrollbar-gutter\:stable_both-edges\] {
+    scrollbar-gutter: stable both-edges
 }
 
 .\[text-align\:inherit\] {
@@ -780,6 +808,13 @@
         transition-property: opacity;
         transition-timing-function: var(--ease-linear);
         transition-duration: var(--time-100)
+    }
+}
+
+@media (min-width:601px) {
+    .medium\:\[margin-inline\:20px\] {
+        margin-left: 20px;
+        margin-right: 20px
     }
 }
 

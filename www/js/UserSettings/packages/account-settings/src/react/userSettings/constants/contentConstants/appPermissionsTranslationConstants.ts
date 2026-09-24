@@ -2,6 +2,7 @@ export default {
   heading: "Heading.Tab.AppPermissions",
   description: "Message.ChangeExternalAppPermissions",
   permissionsCountLabel: "Label.PermissionsCount",
+  authorizedOn: "Description.AuthorizedOn",
   noDescriptionLabel: "Message.NoDescription",
   removeLabel: "Action.Remove",
   reportLabel: "Action.Report",

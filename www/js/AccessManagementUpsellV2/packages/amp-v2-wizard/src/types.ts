@@ -51,9 +51,16 @@ export type FlowResponse = {
   chosenFlow: string;
   /** A correlation tag, not a server-state handle: minted on /entrypoint, echoed on /continue. */
   flowId: string;
+  /**
+   * Per-run analytics correlation id, stable across /continue. Optional on the wire: absent until the
+   * server side (FAMEX-209) is fully deployed. The reducer defaults it, so `WalkerState` stays non-null.
+   */
+  analyticsSessionId?: string;
   /** Id of the first node to render. */
   entry: string;
   nodes: Record<string, FlowNode>;
+  /** Terminal disposition supplied by the backend when there is no entry node. */
+  outcome?: string;
   /** Omitted when the run has nothing left to resume. */
   state?: FlowState;
   /** Server-resolved strings for the client's own events. */
@@ -162,6 +169,8 @@ export type NodeContext = {
   analytics: WizardEventContext;
   logEvent: LogEventFn;
   analyticsStrings?: FlowAnalyticsStrings;
+  /** Per-run analytics correlation id a node can stamp on its events. */
+  analyticsSessionId?: string;
 };
 
 /** Reports a node's outcome (a transition-map key like "Success"); `data` is forwarded to /continue. */
@@ -191,6 +200,8 @@ export type FlowExitResult = {
 /** Tree-local walker state, driven by the reducer (see useWizardWalker). */
 export type WalkerState = {
   flowId: string;
+  /** Analytics correlation id, held stable across steps like `flowId`. */
+  analyticsSessionId: string;
   chosenFlow: string;
   nodes: Record<string, FlowNode>;
   currentNodeId?: string;
@@ -201,6 +212,8 @@ export type WalkerState = {
   flowInputs?: FlowInputs;
   analyticsStrings?: FlowAnalyticsStrings;
   isLoading: boolean;
+  /** Holds a terminal backend error open until the user acknowledges the error modal. */
+  presentingError: boolean;
   exited: boolean;
   exitResult?: FlowExitResult;
 };

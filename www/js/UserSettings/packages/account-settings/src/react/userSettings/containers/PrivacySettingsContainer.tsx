@@ -38,6 +38,7 @@ import AMPFeaturesConstants from "../constants/AMPFeaturesConstants";
 import ContentRestrictionsRoutes from "../components/privacy/routes/ContentRestrictionsRoutes";
 import BlockedUsers from "../components/privacy/BlockedUsers";
 import useWrappedTranslation from "../hooks/useWrappedTranslation";
+import useSettingsJourneyScreen from "../hooks/useSettingsJourneyScreen";
 
 export const PrivacySettingsContainer = (): JSX.Element => {
   const { translate } = useWrappedTranslation();
@@ -68,6 +69,13 @@ export const PrivacySettingsContainer = (): JSX.Element => {
     const page = allPrivacyPages.find(p => p.path === pathNameNoTrailingSlash);
     return page;
   }, [pathNameNoTrailingSlash]);
+
+  useSettingsJourneyScreen(
+    "privacy",
+    currentPage?.name,
+    pathNameNoTrailingSlash,
+    Boolean(settingConsentRequirements),
+  );
 
   const currentLegallySensitiveMapping = currentPage
     ? legallySensitivePageTitleMap[currentPage.name]

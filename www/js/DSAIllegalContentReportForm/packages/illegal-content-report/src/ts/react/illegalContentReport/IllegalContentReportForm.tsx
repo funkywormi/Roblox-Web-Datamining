@@ -8,6 +8,7 @@ import ContactFields from "./components/ContactFields";
 import FormField from "./components/FormField";
 import PrivacyNotice from "./components/PrivacyNotice";
 import Checkbox from "./components/Checkbox";
+import UKOSAIntimateImageIntake from "./components/UKOSAIntimateImageIntake";
 import UrlInput from "./components/UrlInput";
 import { sendReport } from "./services";
 import useGetMetadata from "./useGetMetadata";
@@ -33,7 +34,9 @@ import {
   UKCHCROtherSubCategoryKey,
   ChildSexualExploitationSubCategoryKey,
   IPInfringementSubCategoryKey,
+  IntimateImagesSubCategoryKey,
 } from "./constants";
+import { UKOSAIntimateImageStanding, buildUKOSAIntimateImageCustom } from "./ukOsaIntimateImage";
 import { useTranslationKeyMap } from "../util/translation/translationKeyMap";
 import { getIllegalTypeFilter } from "../util/filter";
 import BackButton from "./components/BackButton";
@@ -63,6 +66,14 @@ const IllegalContentReportForm = ({
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
+  const [isUKOSAIntimateImageDeclarationConfirmed, setIsUKOSAIntimateImageDeclarationConfirmed] =
+    useState<boolean>(false);
+  const [ukOSAIntimateImageStanding, setUKOSAIntimateImageStanding] =
+    useState<UKOSAIntimateImageStanding | null>(null);
+  const [
+    ukOSAIntimateImageRelationshipToDepictedPerson,
+    setUKOSAIntimateImageRelationshipToDepictedPerson,
+  ] = useState<string>("");
   const [submittedModalInfo, setSubmittedModalInfo] = useState<SubmitModal | null>(null);
   const [needsVerificationFromBackend, setNeedsVerificationFromBackend] = useState<boolean>(false);
 
@@ -84,6 +95,11 @@ const IllegalContentReportForm = ({
   }, [error, translate]);
 
   const mutation = useMutation(sendReport);
+  const clearUKOSAIntimateImageInputs = useCallback(() => {
+    setIsUKOSAIntimateImageDeclarationConfirmed(false);
+    setUKOSAIntimateImageStanding(null);
+    setUKOSAIntimateImageRelationshipToDepictedPerson("");
+  }, []);
   const clearAllInputs = useCallback(() => {
     setIssueType("");
     setOtherIssue("");
@@ -93,7 +109,8 @@ const IllegalContentReportForm = ({
     setName(data?.name ?? "");
     setEmail("");
     setIsConfirmed(false);
-  }, [data?.name]);
+    clearUKOSAIntimateImageInputs();
+  }, [clearUKOSAIntimateImageInputs, data?.name]);
 
   useEffect(() => {
     if (mutation.isSuccess) {
@@ -191,6 +208,17 @@ const IllegalContentReportForm = ({
       otpSessionToken?: string;
       includeVerificationToken?: boolean;
     }): SubmitRequestBody => {
+      const custom =
+        reportType === ReportType.OSA &&
+        issueType === IntimateImagesSubCategoryKey &&
+        ukOSAIntimateImageStanding
+          ? buildUKOSAIntimateImageCustom({
+              isDeclarationConfirmed: isUKOSAIntimateImageDeclarationConfirmed,
+              standing: ukOSAIntimateImageStanding,
+              relationshipToDepictedPerson: ukOSAIntimateImageRelationshipToDepictedPerson,
+            })
+          : undefined;
+
       const body: SubmitRequestBody = {
         IllegalType: issueType,
         OtherViolation: otherIssue,
@@ -202,6 +230,7 @@ const IllegalContentReportForm = ({
         IsAppeal: false,
         ReportType: reportTypeToString(reportType),
         OptOutCommunication: false,
+        ...(custom ? { Custom: custom } : {}),
       };
       // optional fields for OTP and verification token
       if (opts?.otpSessionToken) {
@@ -213,7 +242,19 @@ const IllegalContentReportForm = ({
       }
       return body;
     },
-    [issueType, otherIssue, urlStr, description, selectedCountry, name, email, reportType],
+    [
+      issueType,
+      otherIssue,
+      urlStr,
+      description,
+      selectedCountry,
+      name,
+      email,
+      reportType,
+      ukOSAIntimateImageStanding,
+      isUKOSAIntimateImageDeclarationConfirmed,
+      ukOSAIntimateImageRelationshipToDepictedPerson,
+    ],
   );
 
   const submitReport = () => {
@@ -244,7 +285,17 @@ const IllegalContentReportForm = ({
       } else {
         setOtherIssue("");
       }
+      if (reportType !== ReportType.OSA || selectedIssue !== IntimateImagesSubCategoryKey) {
+        clearUKOSAIntimateImageInputs();
+      }
       setIssueType(selectedIssue);
+    }
+  };
+
+  const handleUKOSAIntimateImageStandingChange = (standing: UKOSAIntimateImageStanding): void => {
+    setUKOSAIntimateImageStanding(standing);
+    if (standing !== UKOSAIntimateImageStanding.AUTHORIZED_REPRESENTATIVE) {
+      setUKOSAIntimateImageRelationshipToDepictedPerson("");
     }
   };
 
@@ -267,6 +318,14 @@ const IllegalContentReportForm = ({
 
   // AU OSA allows submission without a URL; other report types still require one.
   const isUrlRequired = reportType !== ReportType.AU_OSA;
+  const isUKOSAIntimateImageSelected =
+    reportType === ReportType.OSA && issueType === IntimateImagesSubCategoryKey;
+  const isUKOSAIntimateImageIntakeValid =
+    !isUKOSAIntimateImageSelected ||
+    (isUKOSAIntimateImageDeclarationConfirmed &&
+      !!ukOSAIntimateImageStanding &&
+      (ukOSAIntimateImageStanding !== UKOSAIntimateImageStanding.AUTHORIZED_REPRESENTATIVE ||
+        !!ukOSAIntimateImageRelationshipToDepictedPerson.trim()));
   const canSubmit =
     !!issueType &&
     isUrlValidForSubmission(urlStr, isUrlRequired) &&
@@ -280,10 +339,14 @@ const IllegalContentReportForm = ({
     (issueType === ChildSexualExploitationSubCategoryKey
       ? !email.trim() || EmailValidator.validate(email)
       : !!name && EmailValidator.validate(email)) &&
+    isUKOSAIntimateImageIntakeValid &&
     // AU_OSA doesn't require confirmation checkbox
     (reportType === ReportType.AU_OSA || isConfirmed);
 
   const getTypeList = (): string[] => {
+    if (reportType === ReportType.OSA) {
+      return data?.ukOSAIllegalTypeList ?? [];
+    }
     if (reportType === ReportType.CHCR) {
       return data?.chcrIllegalTypeList! || [];
     }
@@ -429,6 +492,16 @@ const IllegalContentReportForm = ({
           onOtpVerified={handleOtpVerified}
           onOtpModalClosedWithoutVerify={() => setNeedsVerificationFromBackend(false)}
         />
+        {isUKOSAIntimateImageSelected && (
+          <UKOSAIntimateImageIntake
+            isDeclarationConfirmed={isUKOSAIntimateImageDeclarationConfirmed}
+            onDeclarationChange={setIsUKOSAIntimateImageDeclarationConfirmed}
+            standing={ukOSAIntimateImageStanding}
+            onStandingChange={handleUKOSAIntimateImageStandingChange}
+            relationshipToDepictedPerson={ukOSAIntimateImageRelationshipToDepictedPerson}
+            onRelationshipChange={setUKOSAIntimateImageRelationshipToDepictedPerson}
+          />
+        )}
         {/* Hide confirmation checkbox for AU_OSA */}
         {reportType !== ReportType.AU_OSA && (
           <Checkbox

@@ -105,14 +105,18 @@ export type RedemptionPollResult =
       outcome: typeof REDEMPTION_POLL_OUTCOMES.Cancelled;
     };
 
+export type RedemptionPollSource = "redeem" | "checkout";
+
 export const pollRedemptionStatus = async ({
   workflowId,
   isCancelled,
+  source,
 }: {
   workflowId: string;
+  source: RedemptionPollSource;
   isCancelled?: () => boolean;
 }): Promise<RedemptionPollResult> => {
-  trackCounter("GiftCard_RedeemPollStarted");
+  trackCounter("GiftCard_RedeemPollStarted", { source });
 
   let polls = 0;
   let consecutiveTransientFailures = 0;
@@ -140,7 +144,11 @@ export const pollRedemptionStatus = async ({
 
     if (!result.ok) {
       if (result.reason !== REDEMPTION_STATUS_FAILURE_REASONS.Transient) {
-        trackError("Error_GiftCard_RedeemPollFailed", { reason: result.reason }, result.error);
+        trackError(
+          "Error_GiftCard_RedeemPollFailed",
+          { reason: result.reason, source },
+          result.error,
+        );
         return {
           outcome: REDEMPTION_POLL_OUTCOMES.Failed,
           reason: result.reason,
@@ -154,7 +162,11 @@ export const pollRedemptionStatus = async ({
       }
       consecutiveTransientFailures += 1;
       if (consecutiveTransientFailures >= MAX_CONSECUTIVE_TRANSIENT_FAILURES) {
-        trackError("Error_GiftCard_RedeemPollFailed", { reason: result.reason }, result.error);
+        trackError(
+          "Error_GiftCard_RedeemPollFailed",
+          { reason: result.reason, source },
+          result.error,
+        );
         return {
           outcome: REDEMPTION_POLL_OUTCOMES.Failed,
           reason: result.reason,
@@ -174,6 +186,7 @@ export const pollRedemptionStatus = async ({
 
     if (isTerminalRedemptionState(response.state)) {
       trackCounter("GiftCard_RedeemPollResolved", {
+        source,
         state: response.state ?? "Unowned",
         polls: String(polls),
       });
@@ -187,6 +200,6 @@ export const pollRedemptionStatus = async ({
     }
   }
 
-  trackCounter("GiftCard_RedeemPollExhausted");
+  trackCounter("GiftCard_RedeemPollExhausted", { source });
   return { outcome: REDEMPTION_POLL_OUTCOMES.Exhausted, polls };
 };

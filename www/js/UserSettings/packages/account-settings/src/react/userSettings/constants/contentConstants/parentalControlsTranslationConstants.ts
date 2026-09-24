@@ -3,6 +3,7 @@ import { urlService } from "core-utilities";
 import SpendSettingName from "../../../../enums/SpendSettingName";
 import RobuxSettingName from "../../../../enums/RobuxSettingName";
 import SettingCategoryPageName from "../../../../enums/SettingCategoryPageName";
+import AddParentUpsellVariant from "../../../../enums/parentalControls/AddParentUpsellVariant";
 import ContentMaturityLevel from "../../../../enums/parentalControls/ContentMaturityLevel";
 import ParentalControlsPageName from "../../../../enums/parentalControls/ParentalControlsPageName";
 
@@ -138,6 +139,7 @@ export default {
     maxUsersBlocked: "Description.ChildMaxBlockedUsers",
     trustedConnectionsHeading: "Label.TrustedConnections",
     noTrustedConnections: "Label.ZeroStateTrustedConnections",
+    childCardViewMessagingActivity: "Description.ChildCardViewMessagingActivity",
     trustedFriendDisclaimers: {
       v1: "Description.Parent.TrustedFriendDisclaimer",
       chatAcrossAgeGroups: "Description.ChatAcrossAgeGroups",
@@ -245,6 +247,21 @@ export default {
     descriptionForTeen: "Description.AddLinkedParentForTeen",
     descriptionForU13: "Description.AddLinkedParentForU13",
     addParentAction: "Action.AddParent",
+    upsellVariantHeadings: {
+      [AddParentUpsellVariant.UnlockMoreFeatures]: "Heading.ParentCanUnlockMoreFeatures",
+      [AddParentUpsellVariant.DoMoreOnRoblox]: "Heading.ParentCanHelpYouDoMore",
+    },
+    upsellVariantDescription: "Description.AddParentOnDeviceOrEmail",
+    addOnDeviceParentAction: "Action.AskParentOnThisDevice",
+    addRemoteParentAction: "Action.SendParentEmail",
+  },
+  parentPinManagement: {
+    listItemTitle: "Label.ParentPin",
+    listItemMetadata: "Action.ManageParentPin",
+  },
+  odpAccountUpgrade: {
+    heading: "Heading.CreateYourOwnRobloxAccount",
+    description: "Description.OdpAccountUpgradeUpsell",
   },
   parentConsentsLegallySensitiveContent: {
     consentCenterAllowActionConsentName: "consentCenterAllowAction",
@@ -324,6 +341,8 @@ export default {
     limitModalDescriptionV2: "Description.13Plus.ScreentimeLimitDialogV2",
   },
   ageLabel: "Label.Age",
+  nebraskaU18TooltipTitle: "Action.ViewProfile",
+  nebraskaU18Description: "Description.ChildCardViewCommunitiesAndCreations",
   unlinkChildAccount: {
     action: "Action.UnlinkAccounts",
     modal: {

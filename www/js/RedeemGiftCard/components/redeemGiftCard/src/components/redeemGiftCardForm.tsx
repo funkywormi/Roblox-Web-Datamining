@@ -29,7 +29,10 @@ import {
   trackCriticalError,
   trackError,
 } from "@rbx/payments/creditCheckout";
-import { REDEMPTION_STATUS_FAILURE_REASONS } from "@rbx/payments/gift-card";
+import {
+  useRedemptionStatusPoll,
+  REDEMPTION_STATUS_FAILURE_REASONS,
+} from "@rbx/payments/gift-card";
 import type { RedemptionStatusResponse } from "@rbx/payments/gift-card";
 import { getRobloxPlusProductIdFromTargetKey } from "@rbx/payments/services/subscriptions";
 import { redeemPromoCode } from "@rbx/payments/promoCodes";
@@ -43,7 +46,6 @@ import {
   supportLinkURL,
 } from "../constants/redeemGiftCardConstants";
 import sendRedeemGiftCardEvent from "../utils/events";
-import useRedemptionStatusPoll from "../hooks/useRedemptionStatusPoll";
 import ConfirmationModal from "./confirmationModal";
 import ScanGiftCardModal from "./ScanGiftCardModal";
 
@@ -386,6 +388,7 @@ function RedeemGiftCardForm({
   };
 
   const { startPoll, isPolling } = useRedemptionStatusPoll({
+    source: "redeem",
     onTerminal: handleTerminalRedemptionStatus,
     onExhausted: handleRedemptionTakingLonger,
     onFailed: err => {
@@ -609,7 +612,6 @@ function RedeemGiftCardForm({
         }}
         translate={translate}
       />
-      {/* TODO(translations): Finalize copy and add missing RedemptionTakingLonger translations. */}
       <Dialog
         open={showTakingLonger}
         onOpenChange={(nextOpen: boolean) => {

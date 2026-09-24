@@ -35,8 +35,9 @@ import ExpNewChildModal from '../enums/ExpNewChildModal';
 import UpdateSettingsContainer from '../recourses/settings/UpdateSettingsContainer';
 import UserSetting from '../../legallySensitiveContent/enums/UserSetting';
 import VPCForFAETransformContainer from '../recourses/parentalRequest/VPCForFAETransformContainer';
-import { TVpcV2Handoff } from '../types/AmpTypes';
+import { RecourseResponse, TVpcV2Handoff } from '../types/AmpTypes';
 import { buildVpcPrologueCopy } from './constants/prologueSettings';
+import { getVpcV2Candidate, isVpcRequestTypeExcluded } from './services/vpcV2Eligibility';
 
 function AccessManagementContainer({
   translate,
@@ -70,6 +71,10 @@ function AccessManagementContainer({
   const [vpcExcludedRequestTypes, setVpcExcludedRequestTypes] = useState<string[] | undefined>(
     undefined
   );
+  const [selectedVpcV2Recourse, setSelectedVpcV2Recourse] = useState<RecourseResponse | null>(
+    null
+  );
+  const vpcV2LaunchStarted = useRef(false);
   const vpcHandoffRequest = useRef<{
     isAsyncCall: boolean;
     requestDetails: Record<string, string> | null;
@@ -99,6 +104,8 @@ function AccessManagementContainer({
     setOnHideCallback(() => (access: Access): string => closeCallback(access));
     setVpcV2PolicyEnabled(undefined);
     setVpcExcludedRequestTypes(undefined);
+    setSelectedVpcV2Recourse(null);
+    vpcV2LaunchStarted.current = false;
     try {
       await dispatch(fetchFeatureAccess({ featureName, ampFeatureCheckData, namespace }));
     } catch (error) {
@@ -178,24 +185,23 @@ function AccessManagementContainer({
     }
 
     if ((featureAccess?.data?.recourses?.length ?? 0) > 0 && shouldSetStagePrologue) {
-      const recourseAction = featureAccess.data!.recourses[0]?.action;
-      const isVpcHandoffRecourse =
-        featureAccess.data!.recourses.length === 1 &&
-        (recourseAction === Recourse.ParentConsentRequest ||
-          recourseAction === Recourse.ParentLinkRequest);
-      const requestType = featureAccess.data!.recourses[0]?.parentConsentTypes?.[0];
-      const requestTypeExcludedFromV2 =
-        vpcExcludedRequestTypes !== undefined &&
-        requestType !== undefined &&
-        vpcExcludedRequestTypes.includes(requestType);
+      const vpcV2Candidate = getVpcV2Candidate(featureAccess.data!.recourses);
+      const requestTypeExcludedFromV2 = isVpcRequestTypeExcluded(
+        vpcV2Candidate,
+        vpcExcludedRequestTypes
+      );
 
       if (
-        isVpcHandoffRecourse &&
+        vpcV2Candidate &&
         (vpcV2PolicyEnabled === undefined || vpcExcludedRequestTypes === undefined)
       ) {
         return;
       }
-      if (isVpcHandoffRecourse && vpcV2PolicyEnabled === true && !requestTypeExcludedFromV2) {
+      if (
+        vpcV2Candidate?.kind === 'SingleVpc' &&
+        vpcV2PolicyEnabled === true &&
+        !requestTypeExcludedFromV2
+      ) {
         // v2 serves its own prologue; suppress web's native modal on the handoff path.
         setshouldSetStagePrologue(false);
         dispatch(setStage(UpsellStage.Verification));
@@ -237,18 +243,20 @@ function AccessManagementContainer({
 
   const onHideFunction = asyncExit ? asyncOnHide : onHide;
 
-  const isVpcHandoffCandidate =
-    featureAccess?.data?.recourses?.length === 1 &&
-    (verificationStageRecourse?.action === Recourse.ParentConsentRequest ||
-      verificationStageRecourse?.action === Recourse.ParentLinkRequest);
+  const vpcV2Candidate = getVpcV2Candidate(featureAccess?.data?.recourses);
+  const isVpcHandoffCandidate = vpcV2Candidate !== undefined;
   // Excluded request types roll back to v1 even when the v2 policy is on.
-  const vpcRequestType = verificationStageRecourse?.parentConsentTypes?.[0];
-  const requestTypeExcludedFromV2 =
-    vpcExcludedRequestTypes !== undefined &&
-    vpcRequestType !== undefined &&
-    vpcExcludedRequestTypes.includes(vpcRequestType);
+  const requestTypeExcludedFromV2 = isVpcRequestTypeExcluded(
+    vpcV2Candidate,
+    vpcExcludedRequestTypes
+  );
   const vpcServedByV2 =
-    isVpcHandoffCandidate &&
+    vpcV2Candidate?.kind === 'SingleVpc' &&
+    vpcV2PolicyEnabled === true &&
+    vpcExcludedRequestTypes !== undefined &&
+    !requestTypeExcludedFromV2;
+  const vpcChoiceServedByV2 =
+    vpcV2Candidate?.kind === 'IdvAndVpc' &&
     vpcV2PolicyEnabled === true &&
     vpcExcludedRequestTypes !== undefined &&
     !requestTypeExcludedFromV2;
@@ -274,19 +282,24 @@ function AccessManagementContainer({
 
   useEffect(() => {
     const request = vpcHandoffRequest.current;
-    if (!vpcServedByV2 || !verificationStageRecourse || !request || !featureAccess?.data) {
+    const recourse = vpcServedByV2 ? vpcV2Candidate?.vpcRecourse : selectedVpcV2Recourse;
+    if (!recourse || !request || !featureAccess?.data || vpcV2LaunchStarted.current) {
       return;
     }
+    vpcV2LaunchStarted.current = true;
     const accessToReport = request.isAsyncCall ? Access.Denied : featureAccess.data.access;
+    const usePrologue = selectedVpcV2Recourse === null && request.usePrologue;
     vpcV2Handoff.launch({
-      recourseAction: verificationStageRecourse.action,
-      parentConsentTypes: verificationStageRecourse.parentConsentTypes,
+      recourseAction: recourse.action,
+      parentConsentTypes: recourse.parentConsentTypes,
       translate,
-      requestType: verificationStageRecourse.parentConsentTypes?.[0],
+      requestType: recourse.parentConsentTypes?.[0],
       requestDetails: request.requestDetails,
-      usePrologue: request.usePrologue,
+      // The legacy IDV-or-VPC chooser is already the user's prologue. Do not
+      // render a second VPC-only prologue after they select its VPC option.
+      usePrologue,
       prologueCopy:
-        request.usePrologue && featureName
+        usePrologue && featureName
           ? buildVpcPrologueCopy(featureName, translate, request.requestDetails, expChildModalType)
           : undefined,
       onClose: () => {
@@ -300,7 +313,8 @@ function AccessManagementContainer({
     featureAccess.data?.access,
     featureName,
     translate,
-    verificationStageRecourse,
+    selectedVpcV2Recourse,
+    vpcV2Candidate,
     vpcServedByV2,
     vpcV2Handoff
   ]);
@@ -389,7 +403,7 @@ function AccessManagementContainer({
     displayContainer = getVerificationContainer();
   }, [verificationStageRecourse]);
 
-  if (vpcServedByV2) {
+  if (vpcServedByV2 || selectedVpcV2Recourse !== null) {
     return null;
   }
 
@@ -406,6 +420,11 @@ function AccessManagementContainer({
               recourseParameters={recourseParameters}
               expChildModalType={expChildModalType}
               featureSpecificParams={featureSpecificParams}
+              onVpcSelected={
+                vpcChoiceServedByV2 && vpcV2Candidate
+                  ? () => setSelectedVpcV2Recourse(vpcV2Candidate.vpcRecourse)
+                  : undefined
+              }
             />
           );
         }

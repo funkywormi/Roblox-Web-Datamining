@@ -25,10 +25,12 @@ import {
 
 const IdvAndVpcPrologue = ({
   translate,
-  onHide
+  onHide,
+  onVpcSelected
 }: {
   translate: TranslateFunction;
   onHide: () => void;
+  onVpcSelected?: () => void;
 }): [JSX.Element, IModalService] => {
   const dispatch = useAppDispatch();
   const featureName = useSelector(selectFeatureName)!;
@@ -83,9 +85,13 @@ const IdvAndVpcPrologue = ({
       const vpcRecourse = recourseResponses.find(
         response => response.action !== Recourse.GovernmentId
       );
-      dispatch(setVerificationStageRecourse(vpcRecourse!));
-      dispatch(setStage(UpsellStage.Verification));
       IdvAndVpcSelectionModalService.close();
+      if (onVpcSelected) {
+        onVpcSelected();
+      } else {
+        dispatch(setVerificationStageRecourse(vpcRecourse!));
+        dispatch(setStage(UpsellStage.Verification));
+      }
     }
   });
 

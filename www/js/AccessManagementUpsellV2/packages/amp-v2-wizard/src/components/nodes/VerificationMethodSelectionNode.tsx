@@ -13,7 +13,7 @@ import {
   type TOptionSelectorProps,
 } from "@rbx/foundation-ui";
 
-import { FullPageChrome } from "../FullPageChrome";
+import { FullPageChrome, FULL_PAGE_CTA_INSET_CLASS } from "../FullPageChrome";
 import { useOdpAnalytics } from "../../analytics/odpAnalytics";
 import { asMethodOptions, asText, type VerificationMethodOption } from "../../utils/nodeDetails";
 import type { NodeProps } from "../../types";
@@ -113,7 +113,10 @@ export function VerificationMethodSelectionNode({
         </div>
         {selected !== undefined ? (
           // Pinned to the bottom of the page, rather than sitting under the list as it did in the card.
-          <div className="gap-small flex flex-col [margin-top:auto]">
+          <div
+            className={`gap-small flex flex-col [margin-top:auto] ${FULL_PAGE_CTA_INSET_CLASS}`}
+            data-testid="amp-v2-wizard-full-page-cta-stack"
+          >
             <Button
               variant="Emphasis"
               size="Medium"

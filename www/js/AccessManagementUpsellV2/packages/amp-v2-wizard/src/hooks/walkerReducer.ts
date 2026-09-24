@@ -22,12 +22,14 @@ export const WalkerActionType = {
   ReportOutcome: "ReportOutcome",
   FragmentLoaded: "FragmentLoaded",
   ContinueFailed: "ContinueFailed",
+  AcknowledgeError: "AcknowledgeError",
 } as const;
 
 export type WalkerAction =
   | { type: typeof WalkerActionType.ReportOutcome; outcome: string; data?: Record<string, unknown> }
   | { type: typeof WalkerActionType.FragmentLoaded; response: FlowResponse }
-  | { type: typeof WalkerActionType.ContinueFailed; message?: string };
+  | { type: typeof WalkerActionType.ContinueFailed; message?: string }
+  | { type: typeof WalkerActionType.AcknowledgeError };
 
 function appendStep(history: FlowStep[], step: FlowStep): FlowStep[] {
   return [...history, step];
@@ -38,6 +40,7 @@ function errorExit(state: WalkerState, history: FlowStep[], outcome?: string): W
     ...state,
     history,
     isLoading: false,
+    presentingError: false,
     exited: true,
     exitResult: { reason: "Error", flowId: state.flowId, outcome },
   };
@@ -62,21 +65,26 @@ function enterFragment(
   response: FlowResponse,
   history: FlowStep[],
   flowId: string,
+  analyticsSessionId: string,
   chosenFlow: string,
   previous?: WalkerState,
 ): WalkerState {
   const hasEntry = response.entry !== "";
   const entryRenderable = hasEntry && response.nodes[response.entry] != null;
 
+  const presentingError = !hasEntry && response.outcome === "Error";
   let exitResult: FlowExitResult | undefined;
   if (!hasEntry) {
-    exitResult = { reason: "Completed", flowId };
+    exitResult = presentingError
+      ? { reason: "Error", flowId, outcome: response.outcome }
+      : { reason: "Completed", flowId };
   } else if (!entryRenderable) {
     exitResult = { reason: "Error", flowId };
   }
 
   return {
     flowId,
+    analyticsSessionId,
     chosenFlow,
     nodes: response.nodes,
     currentNodeId: entryRenderable ? response.entry : undefined,
@@ -86,13 +94,20 @@ function enterFragment(
     flowInputs: response.flowInputs ?? previous?.flowInputs,
     analyticsStrings: mergeAnalytics(previous?.analyticsStrings, response.analytics),
     isLoading: false,
-    exited: !entryRenderable,
+    presentingError,
+    exited: !entryRenderable && !presentingError,
     exitResult,
   };
 }
 
 export function init(response: FlowResponse): WalkerState {
-  return enterFragment(response, [], response.flowId, response.chosenFlow);
+  return enterFragment(
+    response,
+    [],
+    response.flowId,
+    response.analyticsSessionId ?? "",
+    response.chosenFlow,
+  );
 }
 
 function reduceReport(
@@ -134,6 +149,7 @@ function reduceReport(
         currentNodeId: target,
         history,
         isLoading: false,
+        presentingError: false,
         exited: false,
         exitResult: undefined,
       };
@@ -145,6 +161,7 @@ function reduceReport(
         ...state,
         history,
         isLoading: true,
+        presentingError: false,
         exited: false,
         exitResult: undefined,
       };
@@ -155,6 +172,7 @@ function reduceReport(
         ...state,
         history,
         isLoading: false,
+        presentingError: false,
         exited: true,
         exitResult: { reason: "Completed", flowId: state.flowId, outcome: action.outcome },
       };
@@ -164,8 +182,13 @@ function reduceReport(
 function reduceFragmentLoaded(state: WalkerState, response: FlowResponse): WalkerState {
   // `chosenFlow` changes when the backend crosses into another flow; both are empty only on an exit.
   const flowId = response.flowId !== "" ? response.flowId : state.flowId;
+  // Absent (server predates the field) or empty both fall back to the held id, so it survives.
+  const analyticsSessionId =
+    response.analyticsSessionId !== undefined && response.analyticsSessionId !== ""
+      ? response.analyticsSessionId
+      : state.analyticsSessionId;
   const chosenFlow = response.chosenFlow !== "" ? response.chosenFlow : state.chosenFlow;
-  return enterFragment(response, state.history, flowId, chosenFlow, state);
+  return enterFragment(response, state.history, flowId, analyticsSessionId, chosenFlow, state);
 }
 
 export function reduce(state: WalkerState, action: WalkerAction): WalkerState {
@@ -178,9 +201,12 @@ export function reduce(state: WalkerState, action: WalkerAction): WalkerState {
       return {
         ...state,
         isLoading: false,
+        presentingError: false,
         exited: true,
         exitResult: { reason: "Error", flowId: state.flowId },
       };
+    case WalkerActionType.AcknowledgeError:
+      return state.presentingError ? { ...state, presentingError: false, exited: true } : state;
     default:
       return state;
   }

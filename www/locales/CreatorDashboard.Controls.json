@@ -13,5 +13,7 @@
     "Action.Delete": "Delete",
     "Action.Remove": "Remove",
     "Action.More": "More",
-    "Action.Copy": "Copy"
+    "Action.Copy": "Copy",
+    "Action.Verify": "Verify",
+    "Action.Edit": "Edit"
 }

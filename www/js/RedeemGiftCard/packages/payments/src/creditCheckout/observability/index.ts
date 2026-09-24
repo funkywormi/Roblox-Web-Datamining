@@ -14,12 +14,12 @@ export const observabilityRegistry = {
       criticalErrors: ["Error_ReactCrash", "Error_NoRootContainer"],
       counters: [
         "Page_Viewed",
-        "GiftCard_RedeemPollStarted",
-        { name: "GiftCard_RedeemPollResolved", dimensions: ["state", "polls"] },
-        "GiftCard_RedeemPollExhausted",
-        "GiftCard_RedeemPollUnmounted",
+        { name: "GiftCard_RedeemPollStarted", dimensions: ["source"] },
+        { name: "GiftCard_RedeemPollResolved", dimensions: ["state", "polls", "source"] },
+        { name: "GiftCard_RedeemPollExhausted", dimensions: ["source"] },
+        { name: "GiftCard_RedeemPollUnmounted", dimensions: ["source"] },
       ],
-      errors: [{ name: "Error_GiftCard_RedeemPollFailed", dimensions: ["reason"] }],
+      errors: [{ name: "Error_GiftCard_RedeemPollFailed", dimensions: ["reason", "source"] }],
       flows: [
         {
           id: "gift_card_redeem",

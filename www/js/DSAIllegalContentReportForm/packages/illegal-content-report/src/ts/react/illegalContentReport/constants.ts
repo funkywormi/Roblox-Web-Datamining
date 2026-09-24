@@ -26,6 +26,7 @@ const ChildSexualExploitationSubCategoryKey = "ChildSexualExploitation";
 const IPInfringementSubCategoryKey = "IPInfringement";
 const AUOSANonComplianceOtherKey = "AuOSANonComplianceOther";
 const NCIIContentSubCategoryKey = "NCIIContent";
+const IntimateImagesSubCategoryKey = "IntimateImages";
 
 // Character limits for the US NCII (Take It Down Act) removal request form.
 // Description/Circumstances enforce the PRD 1000-char max; signature is a typed legal name.
@@ -44,6 +45,7 @@ const BrazilWomenLimits = {
 
 const IllegalTypeTranslationMap = {
   [IllegalContentSubCategoryKey]: "OTHER",
+  [IntimateImagesSubCategoryKey]: "UK_OSA_INTIMATE_IMAGE",
   [ChildSexualExploitationSubCategoryKey]: "CHILD_SEXUAL_EXPLOITATION",
   TerrorismAndViolentExtremism: "TERRORISM_AND_VIOLENT_EXTREMISM",
   [IPInfringementSubCategoryKey]: "IP_INFRINGEMENT",
@@ -119,6 +121,7 @@ export {
   IPInfringementSubCategoryKey,
   AUOSANonComplianceOtherKey,
   NCIIContentSubCategoryKey,
+  IntimateImagesSubCategoryKey,
   USNCIILimits,
   BrazilWomenLimits,
   NonEuUserInfo,

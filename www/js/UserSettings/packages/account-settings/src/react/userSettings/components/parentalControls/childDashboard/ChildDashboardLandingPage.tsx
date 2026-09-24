@@ -1,32 +1,35 @@
 import React, { useEffect } from "react";
 import { Loading } from "react-style-guide";
-import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import { useTranslation } from "react-utilities";
 import { useSnackbar } from "@rbx/user-settings";
-import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
 import LinkedParentsList from "./LinkedParentsList";
+import ParentLinkEntrypointV2 from "./ParentLinkEntrypointV2";
 import ParentLinkEntrypoint from "./ParentLinkEntrypoint";
 import SentRequestsList from "./SentRequestsList";
 import ChildWelcomeWithoutParentLinking from "./ChildWelcomeWithoutParentLinking";
+import useLinkedParentsState from "../../../hooks/useLinkedParentsState";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
 
+// Landing page for the child-side parental controls dashboard
+// Displays the linked parents list, sent requests list, or welcome screen when no parents are linked.
 export const ChildDashboardLandingPage = (): JSX.Element => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
 
-  const { data: parentInfo, status, isLoading } = useGetParentInfoQuery();
+  const { isOdpLaunchEnabled, showParentList, showAddParentUpsell, isLoading, hasError } =
+    useLinkedParentsState();
 
   useEffect(() => {
-    if (status === QueryStatus.rejected || (status === QueryStatus.fulfilled && !parentInfo)) {
+    if (hasError) {
       snackbarService.warning(translate(commonTranslationConstants.unknownError));
     }
-  }, [parentInfo, status]);
+  }, [hasError]);
 
   if (isLoading) {
     return <Loading />;
   }
 
-  if (parentInfo?.parents && parentInfo?.parents.length > 0) {
+  if (showParentList) {
     return (
       <React.Fragment>
         <LinkedParentsList />
@@ -35,8 +38,8 @@ export const ChildDashboardLandingPage = (): JSX.Element => {
     );
   }
 
-  if (parentInfo?.canAddParent) {
-    return <ParentLinkEntrypoint />;
+  if (showAddParentUpsell) {
+    return isOdpLaunchEnabled ? <ParentLinkEntrypointV2 /> : <ParentLinkEntrypoint />;
   }
 
   return <ChildWelcomeWithoutParentLinking />;

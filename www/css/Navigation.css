@@ -887,8 +887,8 @@ div.MuiDialog-root:not(:first-of-type) .MuiDialog-container {
     height: 40px
 }
 
-.max-width-\[320px\] {
-    max-width: 320px
+.max-width-\[200px\] {
+    max-width: 200px
 }
 
 .max-width-\[480px\] {
@@ -5938,6 +5938,10 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     .medium\:\!size-2200 {
         width: var(--size-2200) !important;
         height: var(--size-2200) !important
+    }
+
+    .medium\:max-width-\[320px\] {
+        max-width: 320px
     }
 
     .medium\:min-width-\[400px\] {

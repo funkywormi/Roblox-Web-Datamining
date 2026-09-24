@@ -5,9 +5,14 @@
  */
 
 import { useContext, type JSX, type ReactNode } from "react";
-import { Dialog, DialogContent, DialogTitle, Divider, IconButton } from "@rbx/foundation-ui";
+import { Dialog, DialogContent, DialogTitle, IconButton } from "@rbx/foundation-ui";
 
 import { WizardLoadingContext } from "./WizardLoadingContext";
+
+// 20px inset from `medium` (min-width 601px) up; full-width on phones. Arbitrary: margin scale stops at 16px.
+export const FULL_PAGE_CTA_INSET_CLASS = "medium:[margin-inline:20px]";
+
+const FULL_PAGE_BACK_OPTICAL_OFFSET_CLASS = "[margin-inline-start:-15px]";
 
 export type FullPageChromeProps = {
   /** Optional header title. */
@@ -40,15 +45,22 @@ export function FullPageChrome({
           data-testid="amp-v2-wizard-full-page-chrome"
           className={`margin-none padding-none [border:0] [min-width:0] [min-height:0] flex grow-1 flex-col${isLoading ? " pointer-events-none [opacity:0.5]" : ""}`}
         >
-          {/* Reserve the with-chevron header height so it doesn't collapse when there is no back chevron.
-          Set to the full row height (not the icon-button height) so it holds under border-box sizing. */}
-          <div className="gap-small padding-x-large padding-y-medium flex shrink-0 items-center [min-height:64px] [box-sizing:border-box]">
+          {/* Header and body are centered independently so the scroller below can stay full-width
+          and keep the side gutters scrollable. `scrollbar-gutter: stable both-edges` reserves
+          classic-scrollbar space on both sides, so both columns stay centered on the same axis. */}
+          <div
+            className="margin-x-auto gap-small width-full max-width-[730px] padding-x-xlarge padding-y-medium flex shrink-0 items-center [min-height:64px] [box-sizing:border-box]"
+            data-testid="amp-v2-wizard-full-page-header"
+          >
             {onBack ? (
               <IconButton
                 icon="icon-regular-chevron-large-left"
                 ariaLabel="Back"
                 variant="Utility"
                 size="Medium"
+                // The chevron sits 15px inside the button's 40px hit target, which would leave it
+                // hanging right of the body text. Pull the button out so the glyph lands on the rail.
+                className={FULL_PAGE_BACK_OPTICAL_OFFSET_CLASS}
                 onClick={onBack}
               />
             ) : null}
@@ -69,13 +81,15 @@ export function FullPageChrome({
               />
             ) : null}
           </div>
-          <Divider />
-          {/* grow-1 rather than grow on this and the fieldset above: Foundation's `grow` is
-          `flex: 1 0 auto`, and that flex-shrink: 0 keeps both at content height on a short viewport,
-          so the content overflows the dialog instead of scrolling here. The inner column keeps
-          `grow` so it stays at content height and is what scrolls. */}
-          <div className="scroll-y [min-height:0] flex grow-1 flex-col">
-            <div className="margin-x-auto width-full padding-large max-width-[480px] [box-sizing:border-box] flex grow flex-col">
+          {/* grow-1 (`flex: 1 1 0`) so this scrolls; Foundation `grow` is `1 0 auto` and overflows. */}
+          <div
+            className="scroll-y [scrollbar-gutter:stable_both-edges] [min-height:0] flex grow-1 flex-col"
+            data-testid="amp-v2-wizard-full-page-scroller"
+          >
+            <div
+              className="margin-x-auto width-full max-width-[730px] padding-x-xlarge padding-top-large [padding-bottom:64px] [box-sizing:border-box] flex grow flex-col"
+              data-testid="amp-v2-wizard-full-page-content"
+            >
               {children}
             </div>
           </div>

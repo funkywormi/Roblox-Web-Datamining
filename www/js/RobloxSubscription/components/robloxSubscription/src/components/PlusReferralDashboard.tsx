@@ -13,6 +13,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { subscriptionsV2Api } from "../clients/subscriptions";
 import { useReferralShareLink } from "../hooks/useReferralShareLink";
+import { Event } from "../utils/eventsCounter";
+import { publishMetric } from "../utils/publishMetric";
 
 import type { GetRobloxPlusUserBenefitsResponse } from "@rbx/client-roblox-subscriptions-api/v1";
 import type { SubscriptionButtonProps } from "@rbx/subscriptions-common";
@@ -283,6 +285,7 @@ const DashboardBody: FC<DashboardBodyProps> = ({
       return;
     }
     referralEventService.referrerCopyClick();
+    publishMetric(Event.REFERRAL_COPY_LINK_CLICK);
     navigator.clipboard
       .writeText(shareUrl)
       .then(() => {

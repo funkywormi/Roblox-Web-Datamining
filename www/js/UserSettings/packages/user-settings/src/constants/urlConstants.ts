@@ -28,6 +28,9 @@ export const getParentLinkSettingsUrl = (childUserId: number): string =>
   `${EnvironmentUrls.apiGatewayUrl}/parental-controls-api/v1/parental-controls/parent-link-settings/${childUserId}`;
 export const grantConsentUrl = `${EnvironmentUrls.apiGatewayUrl}/parental-controls-api/v1/parental-controls/grant-consent`;
 
+// on-device parent (authorized as the child's own session)
+export const odpChildContextUrl = `${EnvironmentUrls.apiGatewayUrl}/parental-controls-api/v1/on-device-parents/child-context`;
+
 // parental consents (answer flow)
 export const parentalControlsConsentEndpoint = `${EnvironmentUrls.apiGatewayUrl}/parental-controls-api/v1/parental-controls/consents`;
 export const cancelPendingConsentEndpoint = `${EnvironmentUrls.apiGatewayUrl}/child-requests-api/v1/cancel-consent-request`;

@@ -84,7 +84,7 @@
     "Label.UsernameEmail": "Username/Email",
     "Action.UsePhoneInstead": "Use phone instead",
     "Action.UseUsernameEmailInstead": "Use username or email instead",
-    "Label.Or": "Or",
+    "Label.Or": "OR",
     "Action.UseEmailInstead": "Use email instead",
     "Description.VerifyAgain": "Verify it’s you before recovering your 2-Step Verification enabled account. Press “Continue” to trigger the 2-step verification challenge again.",
     "Action.Continue": "Continue",

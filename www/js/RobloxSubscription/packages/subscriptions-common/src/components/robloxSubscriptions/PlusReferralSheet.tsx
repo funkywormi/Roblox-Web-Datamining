@@ -204,6 +204,7 @@ const PlusReferralSheetBody: FC<PlusReferralSheetBodyProps> = ({
   const handleSubscribeClick = useCallback(() => {
     didClickSubscribe.current = true;
     referralEventService.refereeSubscribeClick(face, referrerUserId, referralCode);
+    trackCounter("ReferralSubscribeClick", { face });
   }, [face, referrerUserId, referralCode]);
 
   const handleOpenChange = useCallback(

@@ -15,6 +15,7 @@ import PrivacySettingName from "../../../../enums/privacy/PrivacySettingName";
 import { getEventParams } from "../../constants/eventConstants";
 import birthdayUtils from "../../utils/birthdayUtils";
 import { optionToString } from "../../utils/parentalControls/parentalConsentUtils";
+import settingsJourneyService from "../journeys/settingsJourneyService";
 
 const parentalControlsChildState = (child: TChildInfo): string => {
   const age = birthdayUtils.calculateAgeFromISO(child.birthDate);
@@ -59,6 +60,7 @@ const parentalControlsEventService = {
   }),
   authButtonClickSettingsPControlsUpdateAttempt: wrapEventServiceWithTryCatch(
     (request: TUpdateUserSettingValueRequest, child: TChildInfo): void => {
+      settingsJourneyService.editAttempted("parental-controls", request.setting);
       const state = parentalControlsChildState(child);
       const params = getEventParams.authButtonClickSettingsPControlsUpdateAttempt(
         `settingName: ${request.setting} settingValue:${optionToString(request.value!)} ${state}`,

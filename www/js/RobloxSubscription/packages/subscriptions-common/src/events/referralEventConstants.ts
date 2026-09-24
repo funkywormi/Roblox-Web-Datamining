@@ -11,6 +11,14 @@ const referralEventNames = {
   refereeImpression: "plus_referral_sheet_shown",
   refereeSubscribeClick: "plus_referral_subscribe_click",
   refereeDismissed: "plus_referral_sheet_dismissed",
+  flyoutShareImpression: "plus_referral_flyout_share_shown",
+  flyoutShareClick: "plus_referral_flyout_share_click",
+  flyoutJoinImpression: "plus_referral_flyout_join_shown",
+  flyoutJoinClick: "plus_referral_flyout_join_click",
+  flyoutUpsellImpression: "plus_referral_flyout_upsell_shown",
+  flyoutUpsellClick: "plus_referral_flyout_upsell_click",
+  shareCardImpression: "plus_referral_share_card_shown",
+  shareCardInviteClick: "plus_referral_share_card_invite_click",
 } as const;
 
 const CONTEXT = "plusReferral";
@@ -71,5 +79,57 @@ export const getReferralEventParams = {
       ...(referrerId ? { referrerId } : {}),
       ...(referralCode ? { referralCode } : {}),
     },
+  }),
+  flyoutShareImpression: (): ReferralEventParams => ({
+    name: referralEventNames.flyoutShareImpression,
+    type: referralEventNames.flyoutShareImpression,
+    context: CONTEXT,
+    params: {},
+  }),
+  flyoutShareClick: (): ReferralEventParams => ({
+    name: referralEventNames.flyoutShareClick,
+    type: referralEventNames.flyoutShareClick,
+    context: CONTEXT,
+    params: {},
+  }),
+  flyoutJoinImpression: (referrerId?: string): ReferralEventParams => ({
+    name: referralEventNames.flyoutJoinImpression,
+    type: referralEventNames.flyoutJoinImpression,
+    context: CONTEXT,
+    params: {
+      ...(referrerId ? { referrerId } : {}),
+    },
+  }),
+  flyoutJoinClick: (referrerId?: string): ReferralEventParams => ({
+    name: referralEventNames.flyoutJoinClick,
+    type: referralEventNames.flyoutJoinClick,
+    context: CONTEXT,
+    params: {
+      ...(referrerId ? { referrerId } : {}),
+    },
+  }),
+  flyoutUpsellImpression: (): ReferralEventParams => ({
+    name: referralEventNames.flyoutUpsellImpression,
+    type: referralEventNames.flyoutUpsellImpression,
+    context: CONTEXT,
+    params: {},
+  }),
+  flyoutUpsellClick: (): ReferralEventParams => ({
+    name: referralEventNames.flyoutUpsellClick,
+    type: referralEventNames.flyoutUpsellClick,
+    context: CONTEXT,
+    params: {},
+  }),
+  shareCardImpression: (): ReferralEventParams => ({
+    name: referralEventNames.shareCardImpression,
+    type: referralEventNames.shareCardImpression,
+    context: CONTEXT,
+    params: {},
+  }),
+  shareCardInviteClick: (): ReferralEventParams => ({
+    name: referralEventNames.shareCardInviteClick,
+    type: referralEventNames.shareCardInviteClick,
+    context: CONTEXT,
+    params: {},
   }),
 };

@@ -5,11 +5,14 @@
  * exit rather than blanking.
  */
 
-import { useEffect, useRef, type JSX, type ReactNode } from "react";
-import { Dialog, DialogBody, DialogContent, ProgressCircle } from "@rbx/foundation-ui";
+import { useEffect, useRef, type JSX } from "react";
+import { TranslationProvider } from "@rbx/core-scripts/react";
+import { ProgressCircle } from "@rbx/foundation-ui";
 
 import { defaultRegistry, getNodeComponent } from "../componentRegistry";
 import { useWizardWalker, type WalkerEvent } from "../hooks/useWizardWalker";
+import { GenericErrorModal } from "./GenericErrorModal";
+import { Overlay } from "./Overlay";
 import { WizardLoadingContext } from "./WizardLoadingContext";
 import type {
   FlowApi,
@@ -33,46 +36,6 @@ export type WizardHostProps = {
   onEvent?: (event: WalkerEvent) => void;
 };
 
-function Overlay({
-  children,
-  onClose,
-}: {
-  children: ReactNode;
-  onClose?: () => void;
-}): JSX.Element {
-  return (
-    <Dialog
-      open
-      isModal
-      size="Medium"
-      type="Default"
-      hasCloseAffordance={onClose != null}
-      closeLabel="Close"
-      onOpenChange={isOpen => {
-        // Covers Escape and the X alike, both of which close the dialog.
-        if (!isOpen) {
-          onClose?.();
-        }
-      }}
-    >
-      <DialogContent>
-        {/* The close affordance is positioned absolutely, so a heading that runs the dialog's full
-            width renders underneath it; leave it room on the screens that draw one. The button is
-            36px wide and sits 13px in from the edge, so 2.5rem clears it with a gap to spare. */}
-        <DialogBody
-          className={
-            onClose == null
-              ? "gap-large flex flex-col"
-              : "gap-large flex flex-col [&_h2]:[padding-inline-end:2.5rem]"
-          }
-        >
-          {children}
-        </DialogBody>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 export function WizardHost(props: WizardHostProps): JSX.Element | null {
   const registry = props.registry ?? defaultRegistry;
   const config = props.config ?? {};
@@ -88,7 +51,7 @@ export function WizardHost(props: WizardHostProps): JSX.Element | null {
   });
 
   const unrenderableReportedRef = useRef(false);
-  const { currentNode, report, exited, isLoading } = walker;
+  const { currentNode, report, exited, isLoading, presentingError, acknowledgeError } = walker;
   const Component = currentNode ? getNodeComponent(registry, currentNode.type) : undefined;
 
   useEffect(() => {
@@ -101,6 +64,14 @@ export function WizardHost(props: WizardHostProps): JSX.Element | null {
 
   if (exited) {
     return null;
+  }
+
+  if (presentingError) {
+    return (
+      <TranslationProvider config={["Feature.Parents", "CommonUI.Controls"]}>
+        <GenericErrorModal onClose={acknowledgeError} />
+      </TranslationProvider>
+    );
   }
 
   // No node to render yet, or one the registry can't render (drift, being turned into an error exit
@@ -118,6 +89,7 @@ export function WizardHost(props: WizardHostProps): JSX.Element | null {
     analytics: walker.eventContext,
     logEvent: walker.logEvent,
     analyticsStrings: walker.analyticsStrings,
+    analyticsSessionId: walker.analyticsSessionId,
   };
 
   // Keep the node mounted while a Continue is in flight, dimmed and non-interactive, under a spinner.

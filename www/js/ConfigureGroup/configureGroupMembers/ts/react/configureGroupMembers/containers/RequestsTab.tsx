@@ -49,8 +49,7 @@ const RequestsTab: React.FC<RequestsTabProps> = ({ group }) => {
     onSuccess: () => {
       // eslint-disable-next-line no-void
       void queryClient.invalidateQueries({ queryKey: getJoinRequestsQueryKey(groupId) });
-      // eslint-disable-next-line no-void
-      void queryClient.invalidateQueries({ queryKey: ['group-members', groupId] });
+      queryClient.removeQueries({ queryKey: ['group-members', groupId] });
       dispatchJoinRequestsChanged(groupId);
       systemFeedbackService.success(translate('Message.AcceptAllSuccess'));
     },
@@ -73,8 +72,7 @@ const RequestsTab: React.FC<RequestsTabProps> = ({ group }) => {
     mutationFn: ({ userId }: User) => groupMembersService.acceptJoinRequest({ groupId, userId }),
     onSuccess: (_data, { userId, displayName }) => {
       removeJoinRequest(userId);
-      // eslint-disable-next-line no-void
-      void queryClient.invalidateQueries({ queryKey: ['group-members', groupId] });
+      queryClient.removeQueries({ queryKey: ['group-members', groupId] });
       dispatchJoinRequestsChanged(groupId);
       systemFeedbackService.success(
         translate('Message.AcceptJoinRequest', {

@@ -18,13 +18,15 @@ const Prologue = ({
   onHide,
   recourseParameters,
   expChildModalType,
-  featureSpecificParams
+  featureSpecificParams,
+  onVpcSelected
 }: {
   translate: TranslateFunction;
   onHide: () => void;
   recourseParameters?: Record<string, string> | null;
   expChildModalType?: ExpNewChildModal;
   featureSpecificParams?: TFeatureSpecificData;
+  onVpcSelected?: () => void;
 }): JSX.Element => {
   const dispatch = useAppDispatch();
   let [prologueModal, prologueModelService]: [JSX.Element, IModalService] = [null, null] as unknown as [JSX.Element, IModalService];
@@ -73,7 +75,8 @@ const Prologue = ({
       ) {
         [prologueModal, prologueModelService] = IdvAndVpcPrologue({
           translate,
-          onHide
+          onHide,
+          onVpcSelected
         });
       }
     }

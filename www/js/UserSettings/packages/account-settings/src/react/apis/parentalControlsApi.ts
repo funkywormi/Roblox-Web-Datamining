@@ -14,6 +14,7 @@ import {
   getTopWeeklyScreentimeByUniverseUrl,
   getWeeklyScreentimeUrl,
   grantConsentUrl,
+  odpChildContextUrl,
   parentalControlsConsentEndpoint,
   ParentalControlsErrorCode,
   parentInfoUrl,
@@ -50,6 +51,7 @@ import {
 import ApiCacheTag from "./common/cacheTagEnum";
 import { TGetChildrenInfoResponse } from "../../types/childrenInfoTypes";
 import { TGetLinkedParentsResponse } from "../../types/parentInfoTypes";
+import { TGetOdpChildContextResponse } from "../../types/odpChildContextTypes";
 import {
   TGetTopWeeklyScreentimeByUniverseResponse,
   TGetWeeklyScreentimeResponse,
@@ -500,6 +502,12 @@ export const parentalControlsApi = baseApi.injectEndpoints({
       }),
       providesTags: [ApiCacheTag.ParentInfo],
     }),
+    getOdpChildContext: builder.query<TGetOdpChildContextResponse, void>({
+      query: (): TBaseQueryArgs => ({
+        url: odpChildContextUrl,
+      }),
+      providesTags: [ApiCacheTag.OdpChildContext],
+    }),
     getChildSettings: builder.query<TUserSettingsAndOptionsBody, number>({
       query: (childUserId: number): TBaseQueryArgs => ({
         url: childSettingsUrl,
@@ -663,6 +671,7 @@ export const {
   useAnswerConsentRequestMutation,
   useGetChildrenInfoQuery,
   useGetParentInfoQuery,
+  useGetOdpChildContextQuery,
   useGetChildSettingsQuery,
   useGetChildSettingsV2Query,
   useGetChildFriendsQuery,
