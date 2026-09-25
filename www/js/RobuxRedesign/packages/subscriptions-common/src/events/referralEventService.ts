@@ -3,7 +3,7 @@ import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import { getReferralEventParams } from "./referralEventConstants";
 import { trackCounter } from "../utils/trackCounter";
 
-import type { ReferralEventParams } from "./referralEventConstants";
+import type { PlusReferralSurface, ReferralEventParams } from "./referralEventConstants";
 
 const send = (eventParams: ReferralEventParams): void => {
   sendEventWithTarget(eventParams.type, eventParams.context, eventParams.params);
@@ -29,23 +29,42 @@ const referralEventService = {
     hasReferrerId: boolean,
     referrerId?: string,
     referralCode?: string,
+    surface?: PlusReferralSurface,
   ): void => {
     try {
-      send(getReferralEventParams.refereeImpression(face, hasReferrerId, referrerId, referralCode));
+      send(
+        getReferralEventParams.refereeImpression(
+          face,
+          hasReferrerId,
+          referrerId,
+          referralCode,
+          surface,
+        ),
+      );
     } catch {
       // Event failures must not break the UI.
     }
   },
-  refereeSubscribeClick: (face: string, referrerId?: string, referralCode?: string): void => {
+  refereeSubscribeClick: (
+    face: string,
+    referrerId?: string,
+    referralCode?: string,
+    surface?: PlusReferralSurface,
+  ): void => {
     try {
-      send(getReferralEventParams.refereeSubscribeClick(face, referrerId, referralCode));
+      send(getReferralEventParams.refereeSubscribeClick(face, referrerId, referralCode, surface));
     } catch {
       // Event failures must not break the UI.
     }
   },
-  refereeDismissed: (face: string, referrerId?: string, referralCode?: string): void => {
+  refereeDismissed: (
+    face: string,
+    referrerId?: string,
+    referralCode?: string,
+    surface?: PlusReferralSurface,
+  ): void => {
     try {
-      send(getReferralEventParams.refereeDismissed(face, referrerId, referralCode));
+      send(getReferralEventParams.refereeDismissed(face, referrerId, referralCode, surface));
     } catch {
       // Event failures must not break the UI.
     }

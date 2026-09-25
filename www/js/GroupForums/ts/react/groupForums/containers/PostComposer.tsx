@@ -53,6 +53,7 @@ const PostComposer = ({
   const { systemFeedbackService } = useSystemFeedback();
   const setPostRateLimitExpiresAt = useForumStore.use.setPostRateLimitExpiresAt();
   const isEditing = !!editingPostId;
+  const activeCategory = categories.find(category => category.shortId === activeCategoryId);
 
   // Latest in-progress title/content
   const postDraftRef = useRef<{ title: string; content: string }>({ title: '', content: '' });
@@ -85,11 +86,18 @@ const PostComposer = ({
 
   const {
     supportTicketAttachment,
+    mediaAssetIds,
+    isImageUploadBlockingSubmit,
     leadingControl: attachmentLeadingControl,
-    footer: supportTicketFooter,
-    modal: supportTicketModal
+    contentFooter: attachmentFooter,
+    modal: supportTicketModal,
+    input: imageUploadInput
   } = usePostComposerAttachments({
-    activeCategoryId,
+    groupId,
+    activeCategory,
+    canCreatePostInActiveCategory: activeCategory
+      ? canCreatePostInCategory(activeCategory.id)
+      : false,
     isEditing,
     getPrefillDetails: getSupportTicketPrefillDetails
   });
@@ -140,7 +148,8 @@ const PostComposer = ({
             postCategoryId,
             title,
             content,
-            supportTicket
+            supportTicket,
+            mediaAssetIds
           );
           history.push(
             groupForumsConstants.router.getPostRoute(
@@ -191,7 +200,8 @@ const PostComposer = ({
       categories,
       categoryName,
       setPostRateLimitExpiresAt,
-      supportTicketAttachment
+      supportTicketAttachment,
+      mediaAssetIds
     ]
   );
 
@@ -252,7 +262,7 @@ const PostComposer = ({
         headerText={translate(editingPostId ? 'Action.EditPost' : 'Action.CreatePost')}
         contentPlaceholder={translate('Label.WriteSomething')}
         submitText={translate('Action.Post')}
-        submitDisabled={submitErrorKey === MODERATION_ERROR_KEY}
+        submitDisabled={submitErrorKey === MODERATION_ERROR_KEY || isImageUploadBlockingSubmit}
         customControls={
           <div className='post-composer-categories-control'>
             <h5 className='post-composer-categories-label'>{translate('Heading.Categories')}</h5>
@@ -287,9 +297,10 @@ const PostComposer = ({
         countdown={rateLimitCountdown}
         isRichTextEnabled
         contentLeadingControl={attachmentLeadingControl}
-        contentFooter={supportTicketFooter}
+        contentFooter={attachmentFooter}
       />
       {supportTicketModal}
+      {imageUploadInput}
     </div>
   );
 };

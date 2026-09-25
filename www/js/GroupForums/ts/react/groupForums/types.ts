@@ -130,6 +130,7 @@ interface PostState {
     content: MessageContent;
     parentCommentId?: string;
     mentioningReplyId?: string;
+    mediaAssetIds?: number[];
   }) => Promise<void>;
   handleEditComment: (args: {
     content: MessageContent;

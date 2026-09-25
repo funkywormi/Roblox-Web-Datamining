@@ -1,8 +1,9 @@
 import React from 'react';
 import { CurrentUser } from 'Roblox';
 import classNames from 'classnames';
-import { Link } from 'react-router-dom';
+import { Badge, Icon } from '@rbx/foundation-ui';
 import { Thumbnail2d, ThumbnailAssetsSize, ThumbnailTypes } from 'roblox-thumbnails';
+import { useTranslation } from 'react-utilities';
 import { AnnouncementModel } from '../types';
 import ContentReactions from '../../shared/components/reactions/ContentReactions';
 import { useAnnouncementPollsEnabled } from '../hooks/useAnnouncementPollsEnabled';
@@ -10,7 +11,10 @@ import Message from '../../shared/components/content/MessageContent';
 import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
 import useAnnouncementViewExposure from '../hooks/useAnnouncementViewExposure';
 import AnnouncementHeader from './AnnouncementHeader';
+import { USER_DISPLAY_AVATAR_USERNAME_LINK_CLASS } from '../../shared/components/UserDisplay';
+import ContentPreviewCard from '../../shared/components/ContentPreviewCard';
 import announcementRoutes from '../constants/announcementRoutes';
+import { ANNOUNCEMENT_MENU_CLASS } from './AnnouncementMenu';
 
 type AnnouncementArchiveCardProps = {
   announcement: AnnouncementModel;
@@ -18,6 +22,7 @@ type AnnouncementArchiveCardProps = {
   canCreateAnnouncements: boolean;
   onDelete: (announcement: AnnouncementModel) => Promise<void>;
   onEdit: (announcement: AnnouncementModel) => void;
+  onModifiedOpen: (announcementId: string) => void;
   onOpen: (announcementId: string) => void;
   onToggleReaction: (
     announcement: AnnouncementModel,
@@ -26,23 +31,46 @@ type AnnouncementArchiveCardProps = {
   ) => Promise<boolean>;
 };
 
+const ANNOUNCEMENT_NAV_BLOCK_SELECTOR = [
+  '.group-posts-preview-menu',
+  `.${ANNOUNCEMENT_MENU_CLASS}`,
+  `.${USER_DISPLAY_AVATAR_USERNAME_LINK_CLASS}`,
+  '.groups-content-reactions',
+  '.reaction-picker'
+].join(', ');
+
 const AnnouncementArchiveCard = ({
   announcement,
   groupId,
   canCreateAnnouncements,
   onDelete,
   onEdit,
+  onModifiedOpen,
   onOpen,
   onToggleReaction
 }: AnnouncementArchiveCardProps): JSX.Element => {
   const isPollsEnabled = useAnnouncementPollsEnabled();
+  const { translate } = useTranslation();
   const { features } = useCommunityProductFeatures();
-  const poll = announcement.customFormDefinition;
+  const { customFormDefinition, customFormResults, hasVoted } = announcement;
+  const responseCount = customFormResults?.totalResponses;
+  const customFormResponseLabel =
+    responseCount === undefined
+      ? undefined
+      : `${responseCount.toLocaleString()} ${translate(
+          responseCount === 1 ? 'Label.ResponseCountSingular' : 'Label.ResponseCountPlural'
+        )}`;
   const canRenderRichText = features.AnnouncementsRichTextRead && !!announcement.content.slate;
-  const cardRef = useAnnouncementViewExposure(groupId, announcement.id);
+  const cardRef = useAnnouncementViewExposure<HTMLAnchorElement>(groupId, announcement.id);
 
   return (
-    <div ref={cardRef} className='group-announcement-archive-card group-posts-preview'>
+    <ContentPreviewCard
+      ref={cardRef}
+      href={announcementRoutes.getAnnouncementUrl(groupId, announcement.id)}
+      blockedSelector={ANNOUNCEMENT_NAV_BLOCK_SELECTOR}
+      onNavigate={() => onOpen(announcement.id)}
+      onModifiedClick={() => onModifiedOpen(announcement.id)}
+      className='group-announcement-archive-card group-posts-preview'>
       <AnnouncementHeader
         announcement={announcement}
         groupId={groupId}
@@ -65,12 +93,7 @@ const AnnouncementArchiveCard = ({
         <div className='group-announcement-archive-copy'>
           <div className='group-posts-preview-title-container'>
             <h2 className='group-posts-preview-title text-emphasis text-overflow'>
-              <Link
-                to={announcementRoutes.getAnnouncementRoute(announcement.id)}
-                className='group-announcement-archive-title-link'
-                onClick={() => onOpen(announcement.id)}>
-                {announcement.title}
-              </Link>
+              {announcement.title}
             </h2>
           </div>
           <div
@@ -84,15 +107,31 @@ const AnnouncementArchiveCard = ({
               announcement.content.plainText
             )}
           </div>
+          {isPollsEnabled && customFormDefinition && (
+            <div className='group-announcement-archive-poll text-default'>
+              <span className='group-announcement-archive-poll-question'>
+                <span className='group-announcement-archive-poll-label'>
+                  <Icon name='icon-regular-chart-three-horizontal-bars' size='XSmall' />
+                  {translate('Heading.Poll')}
+                </span>
+                <span className='group-announcement-archive-poll-title text-overflow'>
+                  {customFormDefinition.title}
+                </span>
+              </span>
+              {(hasVoted || responseCount !== undefined) && (
+                <span className='group-announcement-archive-poll-metadata'>
+                  {hasVoted && <Badge variant='Neutral' label={translate('Label.Voted')} />}
+                  {responseCount !== undefined && (
+                    <span className='group-announcement-archive-poll-votes'>
+                      {customFormResponseLabel}
+                    </span>
+                  )}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
-      {isPollsEnabled && poll && (
-        <div className='group-posts-preview-meta-data text-default'>
-          <div className='group-posts-preview-meta-data-replies'>
-            <span>{poll.title}</span>
-          </div>
-        </div>
-      )}
       <ContentReactions
         initialReactions={announcement.reactions}
         onToggleReaction={(emoteId, togglingOn) =>
@@ -100,7 +139,7 @@ const AnnouncementArchiveCard = ({
         }
         viewOnly={!CurrentUser?.isAuthenticated}
       />
-    </div>
+    </ContentPreviewCard>
   );
 };
 

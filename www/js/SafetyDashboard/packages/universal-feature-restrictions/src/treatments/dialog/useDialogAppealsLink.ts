@@ -66,7 +66,7 @@ export const useDialogAppealsLink = ({
     sendAnalyticsEvent(EventType.AppealClicked, {
       timeToInteractSeconds: getTimeToInteract(mountTimeMs),
       interventionType: analytics.interventionType,
-      eventId: analytics.interventionId,
+      eventId: analytics.analyticsEventId,
       acknowledgeable: analytics.acknowledgeable,
     });
 

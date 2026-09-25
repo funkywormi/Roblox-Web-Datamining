@@ -49,14 +49,14 @@ const NotApprovedPageDialog = ({
 
   const { translate, renderSelfServiceDeactivated, shouldShowGenericFallback, readOnly } =
     useNotApprovedUIConfig();
-  const sendEvent = useSendNotApprovedPageEvent();
   const { punishmentData, isLoading, error } = useNotApprovedPagePunishment();
+  const sendEvent = useSendNotApprovedPageEvent();
 
   const isReady = !isLoading && !error && punishmentData !== undefined;
   const hasNoPunishmentData = !isLoading && !error && !punishmentData;
 
   useEffect(() => {
-    if (punishmentData) {
+    if (isReady) {
       const eventType = punishmentData.context?.SelfServiceDeactivated
         ? EventTypes.AccountReactivationPageRendered
         : EventTypes.PageRendered;
@@ -73,7 +73,7 @@ const NotApprovedPageDialog = ({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sendEvent identity should not re-trigger page render analytics
-  }, [punishmentData]);
+  }, [isReady, punishmentData]);
 
   /**
    * If there is no punishment data, let the host decide what to do

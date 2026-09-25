@@ -14,6 +14,11 @@ export const ACCOUNT_STANDING_URL = `${environmentUrls.userModerationApi}/v1/acc
  */
 export const RECOMMENDED_RULES_URL = `${environmentUrls.userModerationApi}/v1/recommended-rules`;
 
+/**
+ * User moderation API endpoint that returns the authenticated user's submitted reports.
+ */
+export const REPORTS_URL = `${environmentUrls.userModerationApi}/v1/reports`;
+
 /** Auth API endpoint used to log the user out. */
 export const LOGOUT_URL = `${environmentUrls.authApi}/v2/logout`;
 

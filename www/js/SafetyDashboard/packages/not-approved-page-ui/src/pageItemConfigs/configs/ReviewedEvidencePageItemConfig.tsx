@@ -1,6 +1,7 @@
 import { useNotApprovedTranslate } from "../../providers/NotApprovedUIProvider";
 import { NAPageItemConfigType, PageItemRenderingProps } from "../ConfigTypes";
 import { getReviewedEvidencePageItemConfigs } from "../reviewedEvidenceConfigs";
+import { useNotApprovedPagePunishment } from "../../context/NotApprovedPagePunishmentProvider";
 
 /**
  * A page item config that showcases what recent violation a user was punished for.
@@ -12,6 +13,7 @@ import { getReviewedEvidencePageItemConfigs } from "../reviewedEvidenceConfigs";
  */
 const ReviewedEvidencePageItem = ({ punishmentData }: PageItemRenderingProps): JSX.Element => {
   const translate = useNotApprovedTranslate();
+  const { isKidsTreatment } = useNotApprovedPagePunishment();
 
   const renderedPageItems = getReviewedEvidencePageItemConfigs()
     .map(config => {
@@ -23,7 +25,9 @@ const ReviewedEvidencePageItem = ({ punishmentData }: PageItemRenderingProps): J
 
   return (
     <div className="flex flex-col gap-medium" data-testid="reviewed-evidence-container">
-      <span className="text-title-large">{translate("Label.LatestActivity")}</span>
+      <span className="text-title-large">
+        {translate(isKidsTreatment ? "Heading.RecentlyChecked" : "Label.LatestActivity")}
+      </span>
 
       <div className="flex flex-col gap-xsmall">
         <div className="padding-large bg-shift-100 radius-medium">{renderedPageItems}</div>

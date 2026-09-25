@@ -1,10 +1,13 @@
 import { createContext, useContext, useMemo, ReactNode } from "react";
-import { useNotApprovedTranslate } from "../providers/NotApprovedUIProvider";
+import { useNotApprovedUIConfig } from "../providers/NotApprovedUIProvider";
 import { TPunishment, CommutationEligibility } from "../utils/types";
 import usePunishmentData from "../services/usePunishmentData";
 import isPlatformEvidenceVisibleInView from "../utils/isPlatformEvidenceVisibleInView";
 import useNotApprovedPageIxp, { IxpConfig } from "../services/useNotApprovedPageIxp";
 import useCommutationEligibility from "../services/useCommutationEligibility";
+import collectKidsTranslations from "../utils/collectKidsTranslations";
+import KIDS_CONTENT_BY_ABUSE_KEY from "../pageItemConfigs/educationalConfigs/kidsContentRegistry";
+import { AgeExperience } from "../providers/types";
 
 interface NotApprovedPagePunishmentContextValue {
   // Whether the punishement data is still loading.
@@ -25,6 +28,10 @@ interface NotApprovedPagePunishmentContextValue {
   };
   // Indefinitely cached IXP data for the user so that it can be used anywhere without multiple fetches.
   ixpData?: IxpConfig;
+  // Whether this user is assigned to the Kids Not Approved Page treatment.
+  isKidsTreatment: boolean;
+  // The moderator note selected for the current treatment.
+  moderatorNote: string;
   // Commutation eligibility data for the user to determine if they are eligible for a Second Chance pass.
   commutationEligibility?: CommutationEligibility;
 }
@@ -44,16 +51,22 @@ export const NotApprovedPagePunishmentProvider = ({
   enableIxp?: boolean;
   children: ReactNode;
 }) => {
-  const translate = useNotApprovedTranslate();
-
+  const { translate, ageExperience = AgeExperience.Default } = useNotApprovedUIConfig();
   const { data: rawPunishmentData, isLoading, error } = usePunishmentData();
+
   const {
     data: ixpData,
     isLoading: isLoadingIxp,
     isFetching: isFetchingIxp,
   } = useNotApprovedPageIxp({ enabled: enableIxp });
+
   const { data: commutationEligibility, isLoading: isLoadingCommutation } =
     useCommutationEligibility();
+
+  const isKidsTreatment =
+    ageExperience === AgeExperience.Kids &&
+    enableIxp &&
+    ixpData?.FFlagKidsNotApprovedPageTreatment2 === true;
 
   /**
    * The user-moderation API can return a 200 with a "cleared" / partially-shaped
@@ -68,26 +81,54 @@ export const NotApprovedPagePunishmentProvider = ({
   const punishmentData = rawPunishmentData?.punishedUserId ? rawPunishmentData : undefined;
 
   const violationReasons = useMemo(() => {
-    const translatedReasons = new Set<string>();
     const untranslatedReasons = new Set<string>();
 
     if (punishmentData?.violation && isPlatformEvidenceVisibleInView(punishmentData)) {
       punishmentData.violation.abuseTypeTranslationKeys.forEach(key => {
-        translatedReasons.add(translate(key));
         untranslatedReasons.add(key);
       });
     } else {
       punishmentData?.badUtterances?.forEach(utterance => {
-        translatedReasons.add(translate(utterance.labelTranslationKey));
         untranslatedReasons.add(utterance.labelTranslationKey);
       });
     }
 
+    const abuseTypeKeys = [...untranslatedReasons].filter(Boolean);
+    const translatedReasons = isKidsTreatment
+      ? collectKidsTranslations(abuseTypeKeys, translate)
+      : abuseTypeKeys.map(key => translate(key)).filter(Boolean);
+
     return {
-      translatedReasons: [...translatedReasons].filter(Boolean),
-      untranslatedReasons: [...untranslatedReasons].filter(Boolean),
+      translatedReasons,
+      untranslatedReasons: abuseTypeKeys,
     };
-  }, [punishmentData, translate]);
+  }, [isKidsTreatment, punishmentData, translate]);
+
+  /**
+   * The moderator note is the message that is displayed to the user to explain why they were punished.
+   * If the user is in the Kids treatment, we use the Kids content to get the moderator note.
+   * Otherwise, we use the standard moderator note.
+   *
+   * TODO: If we continue with age-differentiated content, this should be sourced from the backend instead
+   * of hardcoded on the frontend.
+   */
+  const moderatorNote = useMemo(() => {
+    const standardModeratorNote =
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- blank moderator notes must use the generic fallback
+      punishmentData?.messageToUser ||
+      translate("Description.Violation", { startLink: "", endLink: "" });
+
+    if (!isKidsTreatment || !punishmentData?.labelTranslationKey) {
+      return standardModeratorNote;
+    }
+
+    const kidsContent = KIDS_CONTENT_BY_ABUSE_KEY[punishmentData.labelTranslationKey];
+    if (!kidsContent) {
+      return standardModeratorNote;
+    }
+
+    return translate(kidsContent.moderatorNote) || standardModeratorNote;
+  }, [isKidsTreatment, punishmentData, translate]);
 
   /**
    * The IXP query is disabled when the host does not provide an `ixp` integration. Under
@@ -105,9 +146,20 @@ export const NotApprovedPagePunishmentProvider = ({
       punishmentData,
       violationReasons,
       ixpData,
+      isKidsTreatment,
+      moderatorNote,
       commutationEligibility,
     }),
-    [aggregatedIsLoading, error, punishmentData, violationReasons, ixpData, commutationEligibility],
+    [
+      aggregatedIsLoading,
+      error,
+      punishmentData,
+      violationReasons,
+      ixpData,
+      isKidsTreatment,
+      moderatorNote,
+      commutationEligibility,
+    ],
   );
 
   return (

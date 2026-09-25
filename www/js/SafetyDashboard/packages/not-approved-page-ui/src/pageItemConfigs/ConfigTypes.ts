@@ -43,9 +43,11 @@ export type PageConfigType = {
 export type PolicyEducationContent = {
   ruleTitle: string;
   ruleSubtitle?: string;
-  ruleDescription: string;
+  ruleDescription?: string;
   ruleDescriptionBullets?: string;
   importanceTitle: string;
-  importanceDescription: string;
+  importanceDescription?: string;
+  importanceDescriptionBullets?: string;
   policyKey: string;
+  deduplicationKey?: string;
 };

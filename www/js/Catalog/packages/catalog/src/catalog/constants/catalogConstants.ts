@@ -87,8 +87,6 @@ const catalogConstants = {
       withCredentials: true,
     },
   },
-  getResellerDataUrl: (assetId: number): string =>
-    `${EnvironmentUrls.economyApi}/v1/assets/${assetId}/resellers?limit=10`,
 
   itemTypes: {
     bundle: "Bundle",
@@ -171,8 +169,10 @@ const catalogConstants = {
   keywordSearch: {
     censoredKey: "###",
   },
-  // Users whose userId % 100 matches this value (ids ending in 00). 1% of users.
+  // Fully open while modulus is 1 (every userId % 1 === 0). Restore modulus 100
+  // to resume the 1% last-two-digit gate (ids ending in lastTwoDigits).
   marketplaceWidgetsLandingPageRollout: {
+    modulus: 1,
     lastTwoDigits: 0,
   },
 };

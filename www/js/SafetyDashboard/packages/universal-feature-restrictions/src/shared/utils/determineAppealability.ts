@@ -49,9 +49,10 @@ export function determineDurationAppealsState(
  * consumer callback and `acknowledgeable` field — this covers permanent bans
  * and nudges where no meaningful duration exists.
  *
- * Otherwise, navigation is mandatory when the duration (endDate - beginDate)
- * strictly exceeds the 30-minute threshold; shorter restrictions are appealable
- * only when the consumer supplies a callback.
+ * Otherwise, navigation is mandatory when the restriction is acknowledgeable or
+ * the duration (endDate - beginDate) strictly exceeds the 30-minute threshold;
+ * shorter non-acknowledgeable restrictions are appealable only when the consumer
+ * supplies a callback.
  */
 export function determineAppealability({
   beginDate,
@@ -77,7 +78,7 @@ export function determineAppealability({
   }
 
   const durationSeconds = (endTimestamp - beginTimestamp) / 1000;
-  const shouldOpenAppealsPortal = durationSeconds > APPEALS_THRESHOLD_SECONDS;
+  const shouldOpenAppealsPortal = acknowledgeable || durationSeconds > APPEALS_THRESHOLD_SECONDS;
 
   return {
     isAppealable: shouldOpenAppealsPortal || onAppeal !== undefined,

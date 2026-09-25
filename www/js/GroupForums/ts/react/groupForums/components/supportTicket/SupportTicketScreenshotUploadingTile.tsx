@@ -1,6 +1,5 @@
 import React from 'react';
-import classNames from 'classnames';
-import InlineProgressLoader from '../../../shared/components/InlineProgressLoader';
+import ImageUploadPreviewTile from '../../../shared/components/fileUpload/ImageUploadPreviewTile';
 
 export type SupportTicketScreenshotUploadingTileProps = {
   index: number;
@@ -17,17 +16,13 @@ const SupportTicketScreenshotUploadingTile = ({
   previewUrl,
   uploadingLabel
 }: SupportTicketScreenshotUploadingTileProps): JSX.Element => (
-  <div
-    className={classNames('support-ticket-screenshot-tile', {
-      // Without a preview behind it the tile reads as an empty slot instead.
-      'support-ticket-screenshot-tile-placeholder': !previewUrl
-    })}
-    data-testid={`support-ticket-screenshot-uploading-${index}`}>
-    {previewUrl && <img className='support-ticket-screenshot-preview' src={previewUrl} alt='' />}
-    <span className='support-ticket-screenshot-uploading-overlay'>
-      <InlineProgressLoader variant='Indeterminate' size='Small' ariaLabel={uploadingLabel} />
-    </span>
-  </div>
+  <ImageUploadPreviewTile
+    className='support-ticket-screenshot-tile'
+    testId={`support-ticket-screenshot-uploading-${index}`}
+    previewUrl={previewUrl}
+    isUploading
+    uploadingLabel={uploadingLabel}
+  />
 );
 
 SupportTicketScreenshotUploadingTile.displayName = 'SupportTicketScreenshotUploadingTile';

@@ -43,11 +43,6 @@ export const urlConfigs = {
     retryable: true,
     withCredentials: true,
   }),
-  getResellers: (itemId: number): UrlConfig => ({
-    url: `${EnvironmentUrls.economyApi}/v1/assets/${itemId}/resellers`,
-    retryable: true,
-    withCredentials: true,
-  }),
   getCollectibleResellers: (itemId: string): UrlConfig => ({
     url: `${EnvironmentUrls.apiGatewayUrl}/marketplace-sales/v1/item/${itemId}/resellers?limit=30`,
     retryable: true,

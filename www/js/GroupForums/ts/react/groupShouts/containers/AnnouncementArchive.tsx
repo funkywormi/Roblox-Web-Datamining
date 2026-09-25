@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useHistory } from 'react-router-dom';
 import { Loading, useSystemFeedback } from 'react-style-guide';
 import { Button } from '@rbx/foundation-ui';
@@ -14,6 +14,7 @@ import SectionDisclaimer from '../../shared/components/SectionDisclaimer';
 import { logGroupForumsClickEvent } from '../../shared/utils/logging';
 import { useAnnouncementTracking } from '../hooks/useAnnouncementTracking';
 import NativeFooter from '../../shared/components/NativeFooter';
+import updateReaction from '../../shared/utils/reactionUtils';
 
 const ANNOUNCEMENTS_PER_PAGE = 10;
 
@@ -29,6 +30,7 @@ const AnnouncementArchive = ({
   navigation
 }: AnnouncementArchiveProps): JSX.Element => {
   const history = useHistory();
+  const queryClient = useQueryClient();
   const { translate } = useTranslation();
   const { systemFeedbackService } = useSystemFeedback();
   const { trackReactionToggled } = useAnnouncementTracking({ groupId });
@@ -61,7 +63,7 @@ const AnnouncementArchive = ({
   const createAnnouncement = useCallback(() => {
     history.push(announcementRoutes.announcementCreateRoute);
   }, [history]);
-  const openAnnouncement = useCallback(
+  const trackAnnouncementOpen = useCallback(
     (announcementId: string) => {
       logGroupForumsClickEvent({
         groupId,
@@ -70,6 +72,13 @@ const AnnouncementArchive = ({
       });
     },
     [groupId]
+  );
+  const openAnnouncement = useCallback(
+    (announcementId: string) => {
+      trackAnnouncementOpen(announcementId);
+      history.push(announcementRoutes.getAnnouncementRoute(announcementId));
+    },
+    [history, trackAnnouncementOpen]
   );
   const editAnnouncement = useCallback(
     (announcement: AnnouncementModel) => {
@@ -123,12 +132,37 @@ const AnnouncementArchive = ({
           emoteId,
           isReactionAdded: togglingOn
         });
+        queryClient.setQueryData<InfiniteData<AnnouncementsPageResponse<AnnouncementModel>>>(
+          ['announcement-archive', groupId],
+          archiveData => {
+            if (!archiveData) {
+              return archiveData;
+            }
+
+            return {
+              ...archiveData,
+              pages: archiveData.pages.map(page => ({
+                ...page,
+                data: page.data.map(item => {
+                  if (item.id !== announcement.id) {
+                    return item;
+                  }
+
+                  return {
+                    ...item,
+                    reactions: updateReaction(item.reactions, emoteId, togglingOn)
+                  };
+                })
+              }))
+            };
+          }
+        );
         return true;
       } catch {
         return false;
       }
     },
-    [groupId, trackReactionToggled]
+    [groupId, queryClient, trackReactionToggled]
   );
   const loadNextPage = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -189,6 +223,7 @@ const AnnouncementArchive = ({
               canCreateAnnouncements={canCreateAnnouncements}
               onDelete={deleteAnnouncement}
               onEdit={editAnnouncement}
+              onModifiedOpen={trackAnnouncementOpen}
               onOpen={openAnnouncement}
               onToggleReaction={toggleReaction}
             />

@@ -24,6 +24,7 @@ import { UncheckedBadge, showUncheckedBadge } from "@rbx/identity-badges";
 import {
   PLUS_REFERRALS_PATH,
   PlusReferralSheet,
+  PlusReferralSurface,
   REFERRAL_REWARD_ROBUX,
   referralEventService,
   useIsPlusSubscriber,
@@ -386,6 +387,7 @@ const BlackbirdJoinReferralNavItem = ({ referral }: { referral: SubscriptionRefe
       <PlusReferralSheet
         invite={{ referrerId }}
         open={isInviteOpen}
+        surface={PlusReferralSurface.Flyout}
         onOpenChange={setIsInviteOpen}
       />
     </Fragment>

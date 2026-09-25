@@ -11,6 +11,7 @@ export const canViewAnnouncementArchive = (
   permissions: GroupPermissions
 ): boolean =>
   isAnnouncementArchiveFeatureEnabled(features) &&
+  !policies.isGracefulDegradationEnabled &&
   policies.displayGroupAnnouncements &&
   permissions.groupPostsPermissions.viewStatus;
 

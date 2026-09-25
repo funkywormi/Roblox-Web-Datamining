@@ -2,11 +2,11 @@ import { RefObject, useEffect, useRef } from 'react';
 import { elementVisibilityService } from 'core-roblox-utilities';
 import { useAnnouncementTracking } from './useAnnouncementTracking';
 
-const useAnnouncementViewExposure = (
+const useAnnouncementViewExposure = <T extends HTMLElement = HTMLDivElement>(
   groupId: number,
   announcementId: string
-): RefObject<HTMLDivElement> => {
-  const elementRef = useRef<HTMLDivElement>(null);
+): RefObject<T> => {
+  const elementRef = useRef<T>(null);
   const hasLoggedExposure = useRef(false);
   const { trackAnnouncementViewed } = useAnnouncementTracking({ groupId });
 

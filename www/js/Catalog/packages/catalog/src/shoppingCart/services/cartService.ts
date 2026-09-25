@@ -147,46 +147,18 @@ export async function getCollectibleResellers(
   return { itemId, collectibleItemId, resellers: items };
 }
 
-export async function fetchLimitedItemResellers(
-  itemId: number,
-): Promise<{ itemId: number; resellers: TResellerItem[] }> {
-  if (!itemId) {
-    return { itemId, resellers: [] };
-  }
-  const urlConf = {
-    url: `${economyApi}/v1/assets/${itemId}/resellers?cursor=&limit=100`,
-    withCredentials: true,
-  };
-  const res = await httpService.get<{ data: TResellerItem[] }>(urlConf);
-  if (res.status === 200 && res.data?.data) {
-    return { itemId, resellers: res.data.data || [] };
-  }
-  return { itemId, resellers: [] };
-}
-
 export async function fetchCartItemsResellers(
   cartState: TCartState,
 ): Promise<Record<string, Array<TResellerItem | TCollectibleResellerItem>>> {
   const resByItemId: Record<string, Array<TResellerItem | TCollectibleResellerItem>> = {};
-  const { items, itemDetails } = cartState;
-  const { limited1, limited2 } = extractLimiteds(cartState);
+  const { limited2 } = extractLimiteds(cartState);
 
-  if (!limited1.length && !limited2.length) return resByItemId;
+  if (!limited2.length) return resByItemId;
 
-  const limited1Resellers = limited1.length
-    ? await Promise.all(limited1.map(item => fetchLimitedItemResellers(item.itemId)))
-    : [];
-  const limited2Resellers = limited2.length
-    ? await Promise.all(
-        limited2.map(item => getCollectibleResellers(item.itemId, item.collectibleItemId)),
-      )
-    : [];
+  const limited2Resellers = await Promise.all(
+    limited2.map(item => getCollectibleResellers(item.itemId, item.collectibleItemId)),
+  );
 
-  limited1Resellers.forEach(item => {
-    if (item.itemId) {
-      resByItemId[item.itemId] = item.resellers;
-    }
-  });
   limited2Resellers.forEach(item => {
     if (item.itemId) {
       resByItemId[item.itemId] = item.resellers;

@@ -1,8 +1,9 @@
 import { TPunishment, CommutationEligibility } from "../utils/types";
 import { PageConfigType, StaticPageName } from "./ConfigTypes";
 import { PUNISHMENT_TYPE } from "../utils/constants";
-import POLICY_EDUCATION_CONTENT_REGISTRY from "./educationalConfigs/policyEducationContentRegistry";
+import resolvePolicyEducationContent from "./educationalConfigs/resolvePolicyEducationContent";
 
+import AppealsProcessPageItemConfig from "./configs/AppealsProcessPageItemConfig";
 import ChargebackStepsPageItemConfig from "./configs/ChargebackStepsPageItemConfig";
 import PreventionStepsPageItemConfig from "./configs/PreventionStepsPageItemConfig";
 import PunishmentDescriptionPageItemConfig from "./configs/PunishmentDescriptionPageItemConfig";
@@ -35,15 +36,20 @@ const getEducationalPages = (
   violationTypeKeys: string[],
   isEducationalPassEligible: boolean,
   readOnly?: boolean,
+  isKidsTreatment = false,
 ): EducationalPagesResult => {
   const educationalPages: PageConfigType[] = [];
 
   const unmappedViolationKeys = new Set<string>();
-  const addedPolicyKeys = new Set<string>();
+  const orderedDeduplicationKeys: string[] = [];
+  const policyContentByDeduplicationKey = new Map<
+    string,
+    NonNullable<ReturnType<typeof resolvePolicyEducationContent>>
+  >();
 
-  // Add educational pages for each violation type a user violated.
+  // Resolve and deduplicate policy content while preserving the first-seen policy order.
   violationTypeKeys.forEach(violationTypeKey => {
-    const policyEducationConfig = POLICY_EDUCATION_CONTENT_REGISTRY[violationTypeKey];
+    const policyEducationConfig = resolvePolicyEducationContent(violationTypeKey, isKidsTreatment);
 
     // Track violation types that don't have educational content configured
     if (!policyEducationConfig) {
@@ -51,10 +57,24 @@ const getEducationalPages = (
       return;
     }
 
-    // If the policy key has already been added, skip to avoid duplicates
-    if (addedPolicyKeys.has(policyEducationConfig.policyKey)) return;
-    addedPolicyKeys.add(policyEducationConfig.policyKey);
+    const deduplicationKey =
+      policyEducationConfig.deduplicationKey ?? policyEducationConfig.policyKey;
+    const existingPolicyContent = policyContentByDeduplicationKey.get(deduplicationKey);
 
+    if (!existingPolicyContent) {
+      orderedDeduplicationKeys.push(deduplicationKey);
+      policyContentByDeduplicationKey.set(deduplicationKey, policyEducationConfig);
+    } else if (policyEducationConfig.deduplicationKey && !existingPolicyContent.deduplicationKey) {
+      // Prefer focused Kids content when a standard fallback for the same policy appeared first.
+      policyContentByDeduplicationKey.set(deduplicationKey, policyEducationConfig);
+    }
+  });
+
+  orderedDeduplicationKeys.forEach(deduplicationKey => {
+    const policyEducationConfig = policyContentByDeduplicationKey.get(deduplicationKey);
+    if (!policyEducationConfig) {
+      return;
+    }
     const educationalCta =
       isEducationalPassEligible && !readOnly ? UnderstandContinueCta : ContinueButtonCta;
 
@@ -80,6 +100,7 @@ const getEducationalPages = (
         createPolicyEducationPageItemConfig({
           title: policyEducationConfig.importanceTitle,
           description: policyEducationConfig.importanceDescription,
+          descriptionBullets: policyEducationConfig.importanceDescriptionBullets,
           policyKey: policyEducationConfig.policyKey,
         }),
       ],
@@ -115,6 +136,7 @@ export const generatePages = (
   violationTypeKeys: string[],
   commutationEligibility?: CommutationEligibility,
   readOnly?: boolean,
+  isKidsTreatment = false,
 ): GeneratePagesResult => {
   const pages: PageConfigType[] = [];
 
@@ -128,6 +150,7 @@ export const generatePages = (
       PunishmentDescriptionPageItemConfig,
       WhatHappenedPageItemConfig,
       ReviewedEvidencePageItemConfig,
+      ...(isDeletePunishment ? [AppealsProcessPageItemConfig] : []),
     ],
     CtaComponent: isDeletePunishment ? ReportMistakeButtonCta : ContinueButtonCta,
   });
@@ -151,6 +174,7 @@ export const generatePages = (
     violationTypeKeys,
     isEducationalPassEligible,
     readOnly,
+    isKidsTreatment,
   );
   pages.push(...educationalPages);
 
@@ -167,6 +191,9 @@ export const generatePages = (
       PreventionStepsPageItemConfig,
       ChargebackStepsPageItemConfig,
       ReportMistakePageItemConfig,
+      // The disclosure is normally rendered by ReportMistakePageItemConfig, which is hidden in
+      // read-only Second Chance-eligible flows, so add it as a standalone item in that case.
+      ...(readOnly && isEducationalPassEligible ? [AppealsProcessPageItemConfig] : []),
     ],
     CtaComponent: resolutionCta,
   });

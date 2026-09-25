@@ -1,9 +1,10 @@
 import type { RegistryInput } from "@rbx/observability-framework/schema";
 import type { MakeObservabilityTypes } from "@rbx/observability-framework/types";
 import { createTrackers } from "@rbx/observability-framework/trackers";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
+import { createFireTelemetryHistogram } from "@rbx/web-telemetry/histogram";
 import { captureException } from "../../error";
 import { createWithApiMetrics, createWithApiMetricsV2 } from "../../withApiMetrics";
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
 
 export const observabilityRegistry = {
   featureName: "RedeemGiftCard",
@@ -140,6 +141,16 @@ export type DimensionsFor<N extends CounterName | ErrorName | CriticalErrorName>
   Obs["DimensionsFor"][N];
 
 export const publishMetric = createFireTelemetryCounter(observabilityRegistry.featureName);
+
+const publishDuration = createFireTelemetryHistogram(observabilityRegistry.featureName, {});
+
+// Submission-to-poll duration; exhausted and poll_error do not imply a terminal redemption.
+export const trackAsyncRedemptionDuration = (
+  durationMs: number,
+  outcome: "succeeded" | "failed" | "exhausted" | "poll_error",
+): void => {
+  publishDuration("GiftCard_AsyncRedemptionDurationMs", { outcome }, durationMs);
+};
 
 export const { trackCounter, trackError, trackCriticalError } = createTrackers(
   observabilityRegistry,

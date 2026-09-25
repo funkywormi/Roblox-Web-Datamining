@@ -82,7 +82,7 @@ const useCatalogSearch = (params: CatalagSearchParams) => {
   // The catalog landing page is the pristine, first page of results: no keyword,
   // no selected topics, no applied filters/sorts and no pagination cursor. In this
   // state, enrolled users source items from the marketplace-widgets feed instead of
-  // catalog search. Enrollment is userIds ending in 00 (see catalogConstants).
+  // catalog search. Enrollment is gated in catalogConstants.marketplaceWidgetsLandingPageRollout.
   const isLandingDefaultState =
     numberOfAppliedFilters === 0 &&
     !catalogQuery.keyword &&

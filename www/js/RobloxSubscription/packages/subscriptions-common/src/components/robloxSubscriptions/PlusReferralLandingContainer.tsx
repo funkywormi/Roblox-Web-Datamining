@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 
 import PlusReferralSheet from "./PlusReferralSheet";
+import { PlusReferralSurface } from "../../events/referralEventConstants";
 
 import type { PlusSubscribeButtonProps } from "../../hooks/usePlusSubscribeProduct";
 import type {
@@ -74,6 +75,7 @@ const PlusReferralLandingContainer: FC<PlusReferralLandingContainerProps> = ({
       subscribeFeatureConfig={subscribeFeatureConfig}
       subscribePeriodType={subscribePeriodType}
       subscribePrice={subscribePrice}
+      surface={PlusReferralSurface.DirectUrl}
       onOpenChange={setOpen}
     />
   );

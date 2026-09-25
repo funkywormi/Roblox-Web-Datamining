@@ -17,7 +17,6 @@ import {
 } from "../constants/types";
 import {
   fetchCartItemDetails,
-  fetchLimitedItemResellers,
   fetchCurrentUserBalance,
   fetchCartItemsResellers,
 } from "../services/cartService";

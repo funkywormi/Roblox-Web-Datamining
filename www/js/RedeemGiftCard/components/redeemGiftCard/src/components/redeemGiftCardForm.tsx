@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { ErrorBoundary } from "@sentry/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { AxiosResponse } from "axios";
 import { createSystemFeedback } from "react-style-guide";
 import { CurrentUser } from "Roblox";
@@ -28,6 +28,7 @@ import {
   trackCounter,
   trackCriticalError,
   trackError,
+  trackAsyncRedemptionDuration,
 } from "@rbx/payments/creditCheckout";
 import {
   useRedemptionStatusPoll,
@@ -101,6 +102,7 @@ function RedeemGiftCardForm({
   const [pinValue, setPinValue] = useState("");
   const [error, setError] = useState<GiftCardFormError>();
   const [loading, setLoading] = useState(false);
+  const redemptionSubmittedAt = useRef<number>();
   const [showTakingLonger, setShowTakingLonger] = useState(false);
   const [redeemDisabled, setRedeemDisabled] = useState(false);
   const [confirmationData, setConfirmationData] = useState<RedemptionResult>({});
@@ -370,7 +372,19 @@ function RedeemGiftCardForm({
     }
   };
 
+  const reportAsyncRedemptionDuration = (
+    outcome: Parameters<typeof trackAsyncRedemptionDuration>[1],
+  ) => {
+    if (redemptionSubmittedAt.current === undefined) {
+      return;
+    }
+    const durationMs = performance.now() - redemptionSubmittedAt.current;
+    redemptionSubmittedAt.current = undefined;
+    trackAsyncRedemptionDuration(durationMs, outcome);
+  };
+
   const handleTerminalRedemptionStatus = (response: RedemptionStatusResponse) => {
+    reportAsyncRedemptionDuration(response.state === "Succeeded" ? "succeeded" : "failed");
     if (response.state === "Succeeded") {
       handleSuccess({ redemptionResult: response.result });
       return;
@@ -390,8 +404,12 @@ function RedeemGiftCardForm({
   const { startPoll, isPolling } = useRedemptionStatusPoll({
     source: "redeem",
     onTerminal: handleTerminalRedemptionStatus,
-    onExhausted: handleRedemptionTakingLonger,
+    onExhausted: () => {
+      reportAsyncRedemptionDuration("exhausted");
+      handleRedemptionTakingLonger();
+    },
     onFailed: err => {
+      reportAsyncRedemptionDuration("poll_error");
       if (
         err.reason === REDEMPTION_STATUS_FAILURE_REASONS.Throttled ||
         err.reason === REDEMPTION_STATUS_FAILURE_REASONS.Transient
@@ -440,6 +458,8 @@ function RedeemGiftCardForm({
       return;
     }
 
+    // Each submission starts fresh, excluding time spent confirming credit conversion.
+    redemptionSubmittedAt.current = performance.now();
     (
       redeemPaymentsGateway(
         sanitizedPinValue.toUpperCase(),
@@ -456,9 +476,11 @@ function RedeemGiftCardForm({
           startPoll(res.data.redemptionWorkflowId);
           return;
         }
+        redemptionSubmittedAt.current = undefined;
         resolveRedeemResponse(res.data);
       })
       .catch(errors => {
+        redemptionSubmittedAt.current = undefined;
         handleFailure(errors);
       });
   };

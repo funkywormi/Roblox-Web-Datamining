@@ -51,6 +51,8 @@ const mapResponseToModel = (raw: AnnouncementResponse): AnnouncementModel => {
     imageAssetId: raw.message.media?.assetId,
     formId: raw.message.form?.formId,
     customFormDefinition: raw.message.form ?? undefined,
+    customFormResults: raw.message.form?.results,
+    hasVoted: raw.message.form?.userResponse != null,
     createdAt: raw.createdAt,
     createdBy: raw.createdBy,
     creatorInfo: raw.creatorInfo,

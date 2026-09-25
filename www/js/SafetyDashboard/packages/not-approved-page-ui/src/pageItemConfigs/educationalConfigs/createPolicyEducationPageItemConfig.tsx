@@ -4,7 +4,7 @@ import { NAPageItemConfigType } from "../ConfigTypes";
 export type PolicyEducationContent = {
   title: string;
   subtitle?: string;
-  description: string;
+  description?: string;
   /** Optional field that gets rendered as a list of bullets under the description. */
   descriptionBullets?: string;
   /** Unique identifier for the policy section (e.g., "swearing-rule", "bullying-importance") */
@@ -37,8 +37,8 @@ const createPolicyEducationPageItemConfig = (
     const translate = useNotApprovedTranslate();
 
     // Translate and split description by newlines
-    const translatedDescription = translate(content.description);
-    const descriptionLines = splitByNewlines(translatedDescription);
+    const translatedDescription = content.description ? translate(content.description) : undefined;
+    const descriptionLines = translatedDescription ? splitByNewlines(translatedDescription) : [];
 
     // Translate and split bullets by newlines if they exist
     const translatedBullets = content.descriptionBullets

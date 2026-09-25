@@ -111,6 +111,9 @@ export default {
       }
       return `${forumsUrlPrefix}/${groupId}/forums/${categoryId}/posts?${params.toString()}`;
     },
+    getForumImageUploadEndpoint(groupId: number, categoryId: string): string {
+      return `${forumsUrlPrefix}/${groupId}/forums/${categoryId}/image-upload`;
+    },
     getForumCommentsEndpoint(groupId: number, categoryId: string, postId: string): string {
       return `${forumsUrlPrefix}/${groupId}/forums/${categoryId}/posts/${postId}/comments`;
     },
@@ -330,9 +333,6 @@ export default {
     getPostCreateRoute(categoryId: string): string {
       return `${routerBase}/${categoryId}/post/create`;
     }
-  },
-  noOpFunctionRef: (): void => {
-    /* do nothing */
   },
   deepLinks: {
     groupForumUrl(groupId: number): string {

@@ -6,6 +6,7 @@ import ReactionPicker from './ReactionPicker';
 import ReactionEmote from './ReactionEmote';
 import { useEmotes } from '../../contexts/EmoteContext';
 import AnimatedAbbreviatedCount from '../AnimatedAbbreviatedCount';
+import updateReaction from '../../utils/reactionUtils';
 
 export type ContentReactionsProps = {
   initialReactions: Reaction[];
@@ -45,39 +46,9 @@ const ContentReactions = ({
     if (viewOnly) {
       return;
     }
-    let reactionExists = false;
-    let togglingOn = false;
-    const updatedReactions = reactions
-      .map(reaction => {
-        if (reaction.emoteId === reactionId) {
-          reactionExists = true;
-          togglingOn = !reaction.hasUserAppliedReaction;
-          const newCount = reaction.hasUserAppliedReaction
-            ? reaction.reactionCount - 1
-            : reaction.reactionCount + 1;
-
-          if (newCount === 0) {
-            return null;
-          }
-          return {
-            ...reaction,
-            hasUserAppliedReaction: !reaction.hasUserAppliedReaction,
-            reactionCount: newCount
-          };
-        }
-        return reaction;
-      })
-      .filter(reaction => reaction !== null) as Reaction[];
-
-    if (!reactionExists) {
-      togglingOn = true;
-      updatedReactions.push({
-        emoteId: reactionId,
-        reactionCount: 1,
-        hasUserAppliedReaction: true,
-        areReactionCountsVisible
-      });
-    }
+    const existingReaction = reactions.find(reaction => reaction.emoteId === reactionId);
+    const togglingOn = !existingReaction?.hasUserAppliedReaction;
+    const updatedReactions = updateReaction(reactions, reactionId, togglingOn);
 
     // Snapshot before the optimistic update so a failed server call reverts exactly to
     // the state that was visible when this toggle started, not to a stale closure.

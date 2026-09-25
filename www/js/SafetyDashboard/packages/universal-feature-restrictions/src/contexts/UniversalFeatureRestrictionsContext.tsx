@@ -7,13 +7,18 @@ import {
   type ComponentType,
   type PropsWithChildren,
 } from "react";
-import type { ShowFeatureRestrictionOptions } from "../types/runtimeOptions";
+import { createRestrictionRequestFromRealtime } from "../shared/utils/createRestrictionRequestFromRealtime";
+import type {
+  FeatureRestrictionRequest,
+  ShowFeatureRestrictionFromRealtimeOptions,
+  ShowFeatureRestrictionOptions,
+} from "../types/runtimeOptions";
 
 /**
  * Props supplied by the provider to the host-owned dialog surface.
  */
 export interface UniversalFeatureRestrictionsSurfaceProps {
-  request: ShowFeatureRestrictionOptions;
+  request: FeatureRestrictionRequest;
   open: boolean;
   onDismiss: () => void;
 }
@@ -23,6 +28,7 @@ export interface UniversalFeatureRestrictionsSurfaceProps {
  */
 export interface UniversalFeatureRestrictionsControls {
   showFeatureRestriction: (options: ShowFeatureRestrictionOptions) => void;
+  showFeatureRestrictionFromRealtime: (options: ShowFeatureRestrictionFromRealtimeOptions) => void;
   closeFeatureRestriction: () => void;
 }
 
@@ -42,8 +48,17 @@ type Props = PropsWithChildren<{
 }>;
 
 interface ActiveRestrictionState {
-  request?: ShowFeatureRestrictionOptions;
+  /** Most recent restriction request, retained while the surface is closed. */
+  request?: FeatureRestrictionRequest;
+  /** Whether the host-owned restriction surface should be open. */
   open: boolean;
+  /**
+   * Alternates the Surface's React key so request-scoped state, analytics effects, interaction
+   * timers, and cached moderation data do not carry over to a new presentation.
+   */
+  presentationToggle: boolean;
+  /** Identifies the currently open realtime intervention so duplicate deliveries do not remount. */
+  realtimeIdentity?: string;
 }
 
 /**
@@ -52,28 +67,76 @@ interface ActiveRestrictionState {
  * only after the first request.
  */
 export const UniversalFeatureRestrictionsProvider = ({ Surface, children }: Props) => {
-  const [{ request, open }, setActiveRestriction] = useState<ActiveRestrictionState>({
-    open: false,
-  });
+  const [{ request, open, presentationToggle }, setActiveRestriction] =
+    useState<ActiveRestrictionState>({
+      open: false,
+      presentationToggle: false,
+    });
 
   const showFeatureRestriction = useCallback((options: ShowFeatureRestrictionOptions) => {
-    setActiveRestriction({ request: options, open: true });
+    setActiveRestriction(current => {
+      if (current.open && current.request?.abuseVector === options.abuseVector) {
+        return current;
+      }
+      return {
+        request: options,
+        open: true,
+        presentationToggle: !current.presentationToggle,
+      };
+    });
   }, []);
+
+  const showFeatureRestrictionFromRealtime = useCallback(
+    (options: ShowFeatureRestrictionFromRealtimeOptions) => {
+      const request = createRestrictionRequestFromRealtime(options);
+
+      const { intervention } = options;
+      const realtimeIdentity = intervention.decisionEventId
+        ? `${intervention.type}:${intervention.decisionEventId}`
+        : undefined;
+
+      setActiveRestriction(current => {
+        const isDuplicate =
+          current.open && realtimeIdentity && current.realtimeIdentity === realtimeIdentity;
+
+        return {
+          request,
+          open: true,
+          presentationToggle: isDuplicate
+            ? current.presentationToggle
+            : !current.presentationToggle,
+          realtimeIdentity,
+        };
+      });
+    },
+    [],
+  );
 
   const closeFeatureRestriction = useCallback(() => {
     setActiveRestriction(current => ({ ...current, open: false }));
   }, []);
 
   const controls = useMemo<UniversalFeatureRestrictionsControls>(
-    () => ({ showFeatureRestriction, closeFeatureRestriction }),
-    [showFeatureRestriction, closeFeatureRestriction],
+    () => ({
+      showFeatureRestriction,
+      showFeatureRestrictionFromRealtime,
+      closeFeatureRestriction,
+    }),
+    [showFeatureRestriction, showFeatureRestrictionFromRealtime, closeFeatureRestriction],
   );
 
   return (
     <UniversalFeatureRestrictionsContext.Provider value={controls}>
       {children}
-      {/* Surface mounts only on first show; on Creator Hub this is where the dynamic chunk loads. */}
-      {request && <Surface request={request} open={open} onDismiss={closeFeatureRestriction} />}
+      {/* The first request loads the deferred surface; each new presentation remounts it. */}
+      {request && (
+        <Surface
+          key={presentationToggle ? 1 : 0}
+          request={request}
+          open={open}
+          onDismiss={closeFeatureRestriction}
+        />
+      )}
     </UniversalFeatureRestrictionsContext.Provider>
   );
 };

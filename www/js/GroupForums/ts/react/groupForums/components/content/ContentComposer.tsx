@@ -26,6 +26,8 @@ export type ContentComposerProps = {
   defaultContent?: MessageContent;
   errorMessage?: string;
   label?: ReactNode;
+  contentLeadingControl?: ReactNode;
+  contentFooter?: ReactNode;
   disabled?: boolean;
   submitDisabled?: boolean;
   isCollapsedInitially?: boolean;
@@ -41,6 +43,8 @@ const ContentComposer = ({
   defaultContent,
   errorMessage,
   label,
+  contentLeadingControl,
+  contentFooter,
   disabled,
   submitDisabled,
   onChange,
@@ -115,8 +119,10 @@ const ContentComposer = ({
   }, [content, onSubmit, resetForm]);
 
   const isSubmitDisabled = useMemo(() => {
-    return disabled || submitDisabled || !formStatus.isValidAndUnsaved || isRateLimited;
-  }, [formStatus, disabled, submitDisabled, isRateLimited]);
+    return (
+      disabled || submitDisabled || !formStatus.isValidAndUnsaved || isRateLimited || isSubmitting
+    );
+  }, [formStatus, disabled, submitDisabled, isRateLimited, isSubmitting]);
 
   const handleHotKey = (hotKeyPressed: HotKeyType) => {
     if (hotKeyPressed === HotKeyType.Submit && !isSubmitDisabled) {
@@ -157,6 +163,8 @@ const ContentComposer = ({
           autoFocus={autoFocus}
           isRichTextEnabled
           isCollapsedInitially={isCollapsedInitially}
+          leadingControl={contentLeadingControl}
+          footer={contentFooter}
           autoResize
         />
         <div className='content-composer-footer'>

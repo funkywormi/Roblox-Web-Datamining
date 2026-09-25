@@ -40,7 +40,6 @@ const DialogInterventionDetails = ({
     countdownText,
     violationUid,
     analytics,
-    messageToUser,
   } = view;
 
   const { href, target, onClick } = useDialogAppealsLink({
@@ -58,7 +57,7 @@ const DialogInterventionDetails = ({
     sendAnalyticsEvent(EventType.ModalAppeared, {
       evidence,
       interventionType: analytics.interventionType,
-      eventId: analytics.interventionId,
+      eventId: analytics.analyticsEventId,
       timeoutDurationSeconds: analytics.timeoutDurationSeconds,
       acknowledgeable: analytics.acknowledgeable,
     });
@@ -74,7 +73,6 @@ const DialogInterventionDetails = ({
         violationReason={violationReason}
         formattedEndDate={formattedEndDate}
         countdownText={countdownText}
-        messageToUser={messageToUser}
       />
 
       {isAppealable && (

@@ -12,9 +12,14 @@ interface ParseBadUtterancesResult {
 export const parseBadUtterances = (
   badUtterances: BadUtterance[],
   translate: (key: string) => string,
+  labelTranslationKey?: string,
 ): ParseBadUtterancesResult => {
   const textItems: string[] = [];
   const abuseTypeSet = new Set<string>();
+
+  if (labelTranslationKey) {
+    abuseTypeSet.add(translate(labelTranslationKey));
+  }
 
   badUtterances.forEach(utterance => {
     textItems.push(utterance.utteranceText);

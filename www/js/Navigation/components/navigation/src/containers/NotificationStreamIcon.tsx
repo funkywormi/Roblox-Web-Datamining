@@ -23,6 +23,7 @@ export default class NotificationStreamIcon extends React.Component {
           this.container = c;
         }}
         className="nav-robux-icon rbx-menu-item"
+        style={{ pointerEvents: "none" }}
       >
         {/* eslint-disable-next-line react/no-unknown-property */}
         <span id="notification-stream-icon-container" notification-stream-indicator="true" />

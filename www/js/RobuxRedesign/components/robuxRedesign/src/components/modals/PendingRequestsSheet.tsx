@@ -4,6 +4,7 @@ import { formatNumber } from "@rbx/core-scripts/format/number";
 import { SheetContent, SheetTitle, SheetBody, SheetRoot } from "@rbx/foundation-ui";
 import {
   PlusReferralSheet,
+  PlusReferralSurface,
   REFERRAL_REWARD_ROBUX,
   useReferrerHandle,
   type SubscriptionReferral,
@@ -105,6 +106,7 @@ function PendingReferralRow({ referral }: { referral: SubscriptionReferral }) {
       <PlusReferralSheet
         invite={{ referrerId: String(referral.senderUserId) }}
         open={isInviteOpen}
+        surface={PlusReferralSurface.BuyRobuxPage}
         onOpenChange={setIsInviteOpen}
       />
     </Fragment>

@@ -10,16 +10,19 @@ import type { DialogInterventionAnalytics } from "./useDialogRestrictionModel";
 /**
  * Acknowledges the current intervention when eligible, reports the outcome, and clears its cache.
  */
-export const useAcknowledgeIntervention = (analytics: DialogInterventionAnalytics) => {
+export const useAcknowledgeIntervention = (
+  analytics: DialogInterventionAnalytics,
+  onAcknowledgmentSuccess?: () => void,
+) => {
   const { api } = useUniversalFeatureRestrictionsConfig();
   const { readOnly, abuseVector } = useRestrictionScope();
   const sendAnalyticsEvent = useSendAnalyticsEvent();
   const queryClient = useQueryClient();
 
-  const { interventionId, interventionType, acknowledgeable } = analytics;
+  const { interventionId, analyticsEventId, interventionType, acknowledgeable } = analytics;
   const additionalAnalyticsFields: AdditionalFields = {
     interventionType,
-    eventId: interventionId,
+    eventId: analyticsEventId,
     acknowledgeable,
   };
 
@@ -28,6 +31,7 @@ export const useAcknowledgeIntervention = (analytics: DialogInterventionAnalytic
     onSuccess: () => {
       sendAnalyticsEvent(EventType.DialogInterventionDismissSuccess, additionalAnalyticsFields);
       queryClient.removeQueries({ queryKey: moderationDetailQueryKey(abuseVector) });
+      onAcknowledgmentSuccess?.();
     },
     onError: (error: Error) => {
       sendAnalyticsEvent(EventType.DialogInterventionDismissFailed, {

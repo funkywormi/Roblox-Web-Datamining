@@ -57,7 +57,8 @@ const GroupAnnouncementsDisplay = ({
   const history = useHistory();
   const { features } = useCommunityProductFeatures();
   const isAnnouncementArchiveEnabled = isAnnouncementArchiveFeatureEnabled(features);
-  const canUseAnnouncementArchive = isAnnouncementArchiveEnabled && canViewAnnouncements;
+  const canUseAnnouncementArchive =
+    isAnnouncementArchiveEnabled && !policies.isGracefulDegradationEnabled && canViewAnnouncements;
   const handleArchiveLinkClicked = useCallback(() => {
     logGroupPageClickEvent({
       groupId: group.id,

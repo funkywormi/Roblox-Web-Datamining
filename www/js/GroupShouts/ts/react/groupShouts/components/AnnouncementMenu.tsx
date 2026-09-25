@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Menu, MenuSection, Popover, PopoverContent } from '@rbx/foundation-ui';
 import { withTranslations, WithTranslationsProps } from 'react-utilities';
+import { useSystemFeedback } from 'react-style-guide';
 import '../../../../css/tailwind.css';
 import { groupAnnouncementsConfig } from '../translation.config';
 import DropdownMenuItem, {
@@ -8,6 +9,9 @@ import DropdownMenuItem, {
 } from '../../shared/components/DropdownMenuItem';
 import MenuTrigger from '../../shared/components/MenuTrigger';
 import { useAnnouncementTracking } from '../hooks/useAnnouncementTracking';
+import announcementRoutes from '../constants/announcementRoutes';
+
+export const ANNOUNCEMENT_MENU_CLASS = 'announcement-menu';
 
 export type AnnouncementMenuProps = {
   announcementId: string;
@@ -33,6 +37,7 @@ const AnnouncementMenu: React.FC<AnnouncementMenuProps> = ({
 }) => {
   const { trackOverflowMenuButtonClick } = useAnnouncementTracking({ groupId });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { systemFeedbackService } = useSystemFeedback();
 
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
   const toggleMenu = useCallback(() => setIsMenuOpen(open => !open), []);
@@ -52,12 +57,25 @@ const AnnouncementMenu: React.FC<AnnouncementMenuProps> = ({
     window.location.href = reportUrl;
   }, [reportUrl, trackOverflowMenuButtonClick, announcementId]);
 
+  const handleCopyLink = useCallback(async () => {
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(
+          announcementRoutes.getAnnouncementUrl(groupId, announcementId)
+        );
+        systemFeedbackService.success(translate('Label.LinkCopied'));
+      } catch {
+        systemFeedbackService.warning(translate('Error.CopyLink'));
+      }
+    }
+  }, [announcementId, groupId, systemFeedbackService, translate]);
+
   return (
     <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <MenuTrigger button={button} onToggle={toggleMenu} />
       <PopoverContent ariaLabel={translate('Label.OverflowMenu')} side='bottom' align='end'>
         <DropdownMenuCloseContext.Provider value={closeMenu}>
-          <Menu className='announcement-menu' size='Medium'>
+          <Menu className={ANNOUNCEMENT_MENU_CLASS} size='Medium'>
             <MenuSection>
               {canEditAnnouncement && (
                 <DropdownMenuItem translateKey='Action.EditAnnouncement' action={handleEdit} />
@@ -68,6 +86,9 @@ const AnnouncementMenu: React.FC<AnnouncementMenuProps> = ({
                   action={handleDelete}
                   testId='announcement-display-menu-delete'
                 />
+              )}
+              {navigator.clipboard && (
+                <DropdownMenuItem translateKey='Label.CopyLink' action={handleCopyLink} />
               )}
               <DropdownMenuItem translateKey='Label.ReportAbuse' action={handleReport} />
             </MenuSection>

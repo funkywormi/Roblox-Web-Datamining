@@ -16,7 +16,7 @@ type UseCommentSubmissionProps = {
 };
 
 type UseCommentSubmissionReturn = {
-  submitComment: (content: MessageContent) => Promise<boolean>;
+  submitComment: (content: MessageContent, mediaAssetIds?: number[]) => Promise<boolean>;
   commentSubmissionError: string;
   clearCommentSubmissionError: () => void;
 };
@@ -59,7 +59,7 @@ const useCommentSubmission = ({
   }, []);
 
   const submitComment = useCallback(
-    async (content: MessageContent) => {
+    async (content: MessageContent, mediaAssetIds?: number[]) => {
       try {
         if (editingCommentId) {
           await handleEditComment({
@@ -68,7 +68,12 @@ const useCommentSubmission = ({
             parentCommentId
           });
         } else {
-          await handleCreateComment({ content, parentCommentId, mentioningReplyId });
+          await handleCreateComment({
+            content,
+            parentCommentId,
+            mentioningReplyId,
+            mediaAssetIds
+          });
         }
         return true;
       } catch (error) {

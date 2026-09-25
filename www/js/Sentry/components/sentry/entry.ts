@@ -20,6 +20,7 @@ import { getOtelCollectorTracesEndpoint } from "@rbx/www-common/sentry/otelEndpo
 import environmentUrls from "@rbx/environment-urls";
 import { reportWebVitals } from "@rbx/www-common/webVitals";
 import { buildTransport } from "@rbx/www-common/sentry/buildSentryTransport";
+import type { SentryGlobal } from "@rbx/core-scripts/sentry";
 import { buildSampleRate } from "./src/utils/buildSampleRate";
 import {
   normalizeLocalePath,
@@ -29,25 +30,24 @@ import {
 import { filterSentryTransaction } from "./src/utils/filterSentryTransaction";
 import { getSelfHostedDsn } from "./src/utils/sentryEndpoint";
 
+import "@rbx/web-telemetry/page-telemetry";
+
 declare global {
   interface Window {
-    Sentry?: {
-      startSpan: typeof startSpan;
-      getActiveSpan: typeof getActiveSpan;
-      flush: typeof flush;
-      captureException: typeof captureException;
-    };
+    Sentry?: SentryGlobal;
   }
 }
 
 // Expose Sentry as a global for non-module consumers.
 if (typeof window !== "undefined") {
-  window.Sentry = {
+  const sentry: SentryGlobal = {
     startSpan,
     getActiveSpan,
     flush,
     captureException,
   };
+
+  window.Sentry = sentry;
 }
 
 const metaTag = document.querySelector<HTMLMetaElement>('meta[name="sentry-meta"]');
@@ -131,7 +131,7 @@ reportWebVitals(
   () => getPageMetaTag()?.dataset.internalPageName,
 );
 
-document.addEventListener("DOMContentLoaded", () => {
+const initPageMetaTracking = () => {
   setUser({
     id: user?.id?.toString() ?? "-1",
     username: user?.name ?? "unknown",
@@ -165,4 +165,10 @@ document.addEventListener("DOMContentLoaded", () => {
       attributeFilter: ["data-internal-page-name"],
     });
   }
-});
+};
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initPageMetaTracking);
+} else {
+  initPageMetaTracking();
+}

@@ -19,9 +19,11 @@ import {
 } from "../../shared/utils/determineAppealability";
 import { NANOSECONDS_PER_SECOND, monotonicNowMs } from "../../shared/utils/time";
 import type { Overrides } from "../../types/runtimeOptions";
+import type { ModerationDetail } from "../../types/api";
 
 export interface DialogInterventionAnalytics {
   interventionId?: string;
+  analyticsEventId?: string;
   interventionType?: string;
   acknowledgeable: boolean;
   timeoutDurationSeconds?: number;
@@ -38,7 +40,6 @@ export interface DialogRestrictionView {
   countdownText?: string;
   dsaMessage?: string;
   violationUid?: string;
-  messageToUser?: string;
   analytics: DialogInterventionAnalytics;
 }
 
@@ -50,6 +51,8 @@ export type DialogRestrictionModel =
 interface UseDialogRestrictionModelOptions {
   overrides?: Overrides;
   onAppeal?: () => void;
+  providedModerationDetail?: ModerationDetail;
+  analyticsEventId?: string;
   translationsReady: boolean;
 }
 
@@ -62,6 +65,8 @@ interface UseDialogRestrictionModelOptions {
 export const useDialogRestrictionModel = ({
   overrides,
   onAppeal,
+  providedModerationDetail,
+  analyticsEventId,
   translationsReady,
 }: UseDialogRestrictionModelOptions): DialogRestrictionModel => {
   const mountTimeMsRef = useRef<number>();
@@ -69,10 +74,15 @@ export const useDialogRestrictionModel = ({
   const sendAnalyticsEvent = useSendAnalyticsEvent();
   const { translate } = useUniversalFeatureRestrictionsConfig();
   const { abuseVector } = useRestrictionScope();
-  const { data: moderationDetail, isFetching, error } = useModerationDetail();
+  const {
+    data: moderationDetail,
+    isFetching,
+    error,
+  } = useModerationDetail(providedModerationDetail);
 
   const overrideBacked = isOverrideBackedAbuseVector(abuseVector);
-  const hasUnusableDetail = !overrideBacked && !moderationDetail?.interventionId;
+  const hasUnusableDetail =
+    providedModerationDetail === undefined && !overrideBacked && !moderationDetail?.interventionId;
 
   const endDateSource = overrideBacked
     ? overrides?.restriction?.endDate
@@ -117,7 +127,7 @@ export const useDialogRestrictionModel = ({
     duration,
     endDate,
     interventionId,
-    messageToUser,
+    labelTranslationKey,
     punishmentTypeDescription,
     violation,
   } = moderationDetail ?? {};
@@ -139,23 +149,29 @@ export const useDialogRestrictionModel = ({
   });
 
   const { textItems, abuseTypes } = moderationDetail
-    ? parseBadUtterances(badUtterances ?? [], translate)
+    ? parseBadUtterances(badUtterances ?? [], translate, labelTranslationKey)
     : { textItems: [], abuseTypes: [] };
 
   const abuseVectorLabel = resolveAbuseVectorLabel(abuseVector, translate, overrides?.label);
 
-  const titleDescriptor = resolveTitleDescriptor({
-    interventionType,
-    durationNs: resolvedDuration,
-    abuseVector,
-  });
-  const title = translate(titleDescriptor.key, {
-    ...titleDescriptor.params,
-    abuseVector: abuseVectorLabel,
-  });
+  let title = moderationDetail?.title;
+  if (!title) {
+    const titleDescriptor = resolveTitleDescriptor({
+      interventionType,
+      durationNs: resolvedDuration,
+      abuseVector,
+    });
+    title = translate(titleDescriptor.key, {
+      ...titleDescriptor.params,
+      abuseVector: abuseVectorLabel,
+    });
+  }
 
-  const bodyDescriptor = resolveBodyDescriptor({ interventionType, abuseVector });
-  const body = translate(bodyDescriptor.key);
+  let body = moderationDetail?.body;
+  if (!body) {
+    const bodyDescriptor = resolveBodyDescriptor({ interventionType, abuseVector });
+    body = translate(bodyDescriptor.key);
+  }
 
   mountTimeMsRef.current ??= monotonicNowMs();
 
@@ -172,9 +188,9 @@ export const useDialogRestrictionModel = ({
       countdownText,
       dsaMessage: consequenceTransparencyMessage,
       violationUid: violation?.uid,
-      messageToUser,
       analytics: {
         interventionId,
+        analyticsEventId: analyticsEventId ?? interventionId,
         interventionType: interventionTypeForAnalytics,
         acknowledgeable,
         // TODO: Backend should pass duration as seconds

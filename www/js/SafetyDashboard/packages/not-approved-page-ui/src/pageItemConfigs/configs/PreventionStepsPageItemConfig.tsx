@@ -10,6 +10,7 @@ import {
 import { TPunishment } from "../../utils/types";
 import useSendNotApprovedPageEvent from "../../telemetry/useSendNotApprovedPageEvent";
 import { usePageNavigation } from "../../context/PageNavigationContext";
+import { useNotApprovedPagePunishment } from "../../context/NotApprovedPagePunishmentProvider";
 
 /**
  * Shown to users if their account was not deleted (terminated). The component highlights the steps
@@ -20,8 +21,9 @@ import { usePageNavigation } from "../../context/PageNavigationContext";
  */
 const PreventionStepsPageItem = ({ punishmentData }: PageItemRenderingProps): JSX.Element => {
   const translate = useNotApprovedTranslate();
-  const sendEvent = useSendNotApprovedPageEvent();
   const { hasEducationalPages } = usePageNavigation();
+  const { isKidsTreatment } = useNotApprovedPagePunishment();
+  const sendEvent = useSendNotApprovedPageEvent();
 
   const { showUGCAvatarGuidelinesLink, context } = punishmentData;
 
@@ -40,10 +42,14 @@ const PreventionStepsPageItem = ({ punishmentData }: PageItemRenderingProps): JS
 
   return (
     <div className="flex flex-col gap-medium">
-      <span className="text-heading-medium">{translate("Label.RuleBreakingAddsUp")}</span>
+      <span className="text-heading-medium">
+        {translate(isKidsTreatment ? "Heading.WhatNext" : "Label.RuleBreakingAddsUp")}
+      </span>
 
       <div className="flex flex-col gap-medium">
-        <p className="text-body-large">{translate("Description.Foreshadow")}</p>
+        <p className="text-body-large">
+          {translate(isKidsTreatment ? "Description.Foreshadow.Kids" : "Description.Foreshadow")}
+        </p>
         {isAltInformed && (
           <p className="text-body-large">{translate("Description.LinkedAccounts")}</p>
         )}

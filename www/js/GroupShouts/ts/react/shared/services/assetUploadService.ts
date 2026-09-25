@@ -10,7 +10,10 @@ const ASSET_UPLOAD_URL = `${ASSET_UPLOAD_API_BASE}/assets`;
 const OPEN_USE_ADDITIONAL_PARAMETERS = JSON.stringify({ AssetPrivacy: 'OpenUse' });
 
 export interface AssetUploadCreationContext {
-  creator: { userId: string };
+  creator: {
+    userId?: string;
+    groupId?: string;
+  };
 }
 
 export interface AssetUploadRequestPayload {
@@ -24,11 +27,12 @@ export interface AssetUploadOperationResponse {
   path: string;
   operationId: string;
   done: boolean;
+  error?: AssetUploadErrorResponse;
   response?: {
     path: string;
     revisionId: string;
     revisionCreateTime: string;
-    assetId: string;
+    assetId: string | number;
     displayName: string;
     description: string;
     assetType: string;
@@ -40,9 +44,24 @@ export interface AssetUploadOperationResponse {
 }
 
 export interface AssetUploadErrorResponse {
-  code: string;
-  message: string;
+  code?: string | number;
+  message?: string;
 }
+
+const DEFAULT_ASSET_UPLOAD_ERROR_MESSAGE = 'Asset upload failed';
+
+const getAssetUploadErrorMessage = (error: AssetUploadErrorResponse): string => {
+  if (typeof error.message === 'string' && error.message.length > 0) {
+    return error.message;
+  }
+
+  const { code } = error;
+  if (code !== undefined && code !== null && code !== '') {
+    return String(code);
+  }
+
+  return DEFAULT_ASSET_UPLOAD_ERROR_MESSAGE;
+};
 
 const getMimeType = (file: File): string => {
   if (file.type) {
@@ -62,7 +81,31 @@ const getMimeType = (file: File): string => {
   }
 };
 
-const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
+const createAbortError = (): DOMException => new DOMException('aborted', 'AbortError');
+
+const throwIfAborted = (signal?: AbortSignal): void => {
+  if (signal?.aborted) {
+    throw createAbortError();
+  }
+};
+
+const sleep = (ms: number, signal?: AbortSignal): Promise<void> =>
+  new Promise((resolve, reject) => {
+    throwIfAborted(signal);
+
+    let timeout: ReturnType<typeof setTimeout>;
+    const handleAbort = (): void => {
+      clearTimeout(timeout);
+      reject(createAbortError());
+    };
+
+    timeout = setTimeout(() => {
+      signal?.removeEventListener('abort', handleAbort);
+      resolve();
+    }, ms);
+
+    signal?.addEventListener('abort', handleAbort, { once: true });
+  });
 
 const createAsset = async (
   file: File,
@@ -111,18 +154,53 @@ const waitForOperation = async (
   signal?: AbortSignal
 ): Promise<AssetUploadOperationResponse> => {
   for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
-    if (signal?.aborted) throw new DOMException('aborted', 'AbortError');
+    throwIfAborted(signal);
     const delay = Math.min(INITIAL_POLL_INTERVAL_MS * 2 ** attempt, MAX_POLL_INTERVAL_MS);
     // eslint-disable-next-line no-await-in-loop
-    await sleep(delay);
-    if (signal?.aborted) throw new DOMException('aborted', 'AbortError');
+    await sleep(delay, signal);
+    throwIfAborted(signal);
     // eslint-disable-next-line no-await-in-loop
     const result = await getOperation(operationId);
+    throwIfAborted(signal);
+    if (result.error) {
+      throw new Error(getAssetUploadErrorMessage(result.error));
+    }
     if (result.done) {
       return result;
     }
   }
   throw new Error('Asset upload operation timed out');
+};
+
+const getAssetId = (operation: AssetUploadOperationResponse): number => {
+  if (operation.error) {
+    throw new Error(getAssetUploadErrorMessage(operation.error));
+  }
+
+  const assetId = Number(operation.response?.assetId);
+  if (!operation.done || !Number.isSafeInteger(assetId) || assetId <= 0) {
+    throw new Error('Asset upload failed: no assetId in response');
+  }
+
+  return assetId;
+};
+
+const completeOperationAndGetAssetId = async (
+  initialOperation: AssetUploadOperationResponse,
+  signal?: AbortSignal
+): Promise<number> => {
+  throwIfAborted(signal);
+
+  if (initialOperation.done || initialOperation.error) {
+    return getAssetId(initialOperation);
+  }
+
+  if (!initialOperation.operationId) {
+    throw new Error('Asset upload failed: no operationId in response');
+  }
+
+  const result = await waitForOperation(initialOperation.operationId, signal);
+  return getAssetId(result);
 };
 
 const uploadImageAndGetAssetId = async (
@@ -132,18 +210,10 @@ const uploadImageAndGetAssetId = async (
   signal?: AbortSignal
 ): Promise<number> => {
   const createResponse = await createAsset(file, userId, displayName);
-
-  if (createResponse.done && createResponse.response?.assetId) {
-    return Number(createResponse.response.assetId);
-  }
-
-  const result = await waitForOperation(createResponse.operationId, signal);
-  if (!result.response?.assetId) {
-    throw new Error('Asset upload failed: no assetId in response');
-  }
-  return Number(result.response.assetId);
+  return completeOperationAndGetAssetId(createResponse, signal);
 };
 
 export default {
+  completeOperationAndGetAssetId,
   uploadImageAndGetAssetId
 };

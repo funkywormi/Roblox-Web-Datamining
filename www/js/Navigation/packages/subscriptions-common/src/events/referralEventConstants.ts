@@ -5,6 +5,12 @@ export type ReferralEventParams = {
   params: Record<string, string>;
 };
 
+export enum PlusReferralSurface {
+  BuyRobuxPage = "buyRobuxPage",
+  Flyout = "flyout",
+  DirectUrl = "directUrl",
+}
+
 const referralEventNames = {
   referrerImpression: "plus_referral_dashboard_shown",
   referrerCopyClick: "plus_referral_copy_link_click",
@@ -17,6 +23,10 @@ const referralEventNames = {
   flyoutJoinClick: "plus_referral_flyout_join_click",
   flyoutUpsellImpression: "plus_referral_flyout_upsell_shown",
   flyoutUpsellClick: "plus_referral_flyout_upsell_click",
+  shareCardImpression: "plus_referral_share_card_shown",
+  shareCardInviteClick: "plus_referral_share_card_invite_click",
+  buyRobuxReferralImpression: "plus_referral_buy_robux_shown",
+  buyRobuxReferralReviewClick: "plus_referral_buy_robux_review_click",
 } as const;
 
 const CONTEXT = "plusReferral";
@@ -39,6 +49,7 @@ export const getReferralEventParams = {
     hasReferrerId: boolean,
     referrerId?: string,
     referralCode?: string,
+    surface?: PlusReferralSurface,
   ): ReferralEventParams => ({
     name: referralEventNames.refereeImpression,
     type: referralEventNames.refereeImpression,
@@ -48,12 +59,14 @@ export const getReferralEventParams = {
       hasReferrerId: String(hasReferrerId),
       ...(referrerId ? { referrerId } : {}),
       ...(referralCode ? { referralCode } : {}),
+      ...(surface ? { surface } : {}),
     },
   }),
   refereeSubscribeClick: (
     face: string,
     referrerId?: string,
     referralCode?: string,
+    surface?: PlusReferralSurface,
   ): ReferralEventParams => ({
     name: referralEventNames.refereeSubscribeClick,
     type: referralEventNames.refereeSubscribeClick,
@@ -62,12 +75,14 @@ export const getReferralEventParams = {
       face,
       ...(referrerId ? { referrerId } : {}),
       ...(referralCode ? { referralCode } : {}),
+      ...(surface ? { surface } : {}),
     },
   }),
   refereeDismissed: (
     face: string,
     referrerId?: string,
     referralCode?: string,
+    surface?: PlusReferralSurface,
   ): ReferralEventParams => ({
     name: referralEventNames.refereeDismissed,
     type: referralEventNames.refereeDismissed,
@@ -76,6 +91,7 @@ export const getReferralEventParams = {
       face,
       ...(referrerId ? { referrerId } : {}),
       ...(referralCode ? { referralCode } : {}),
+      ...(surface ? { surface } : {}),
     },
   }),
   flyoutShareImpression: (): ReferralEventParams => ({
@@ -117,5 +133,35 @@ export const getReferralEventParams = {
     type: referralEventNames.flyoutUpsellClick,
     context: CONTEXT,
     params: {},
+  }),
+  shareCardImpression: (): ReferralEventParams => ({
+    name: referralEventNames.shareCardImpression,
+    type: referralEventNames.shareCardImpression,
+    context: CONTEXT,
+    params: {},
+  }),
+  shareCardInviteClick: (): ReferralEventParams => ({
+    name: referralEventNames.shareCardInviteClick,
+    type: referralEventNames.shareCardInviteClick,
+    context: CONTEXT,
+    params: {},
+  }),
+  buyRobuxReferralImpression: (referrerId?: string, referralId?: number): ReferralEventParams => ({
+    name: referralEventNames.buyRobuxReferralImpression,
+    type: referralEventNames.buyRobuxReferralImpression,
+    context: CONTEXT,
+    params: {
+      ...(referrerId ? { referrerId } : {}),
+      ...(referralId !== undefined ? { referralId: String(referralId) } : {}),
+    },
+  }),
+  buyRobuxReferralReviewClick: (referrerId?: string, referralId?: number): ReferralEventParams => ({
+    name: referralEventNames.buyRobuxReferralReviewClick,
+    type: referralEventNames.buyRobuxReferralReviewClick,
+    context: CONTEXT,
+    params: {
+      ...(referrerId ? { referrerId } : {}),
+      ...(referralId !== undefined ? { referralId: String(referralId) } : {}),
+    },
   }),
 };

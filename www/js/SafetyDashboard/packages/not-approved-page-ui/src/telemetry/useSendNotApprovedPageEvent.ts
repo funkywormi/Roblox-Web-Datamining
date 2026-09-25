@@ -2,10 +2,11 @@ import { useCallback } from "react";
 import { useNotApprovedUIConfig } from "../providers/NotApprovedUIProvider";
 import { EventTypes, type NotApprovedPageEventProperties } from "./analytics";
 import sendNotApprovedPageEvent from "./sendNotApprovedPageEvent";
+import { useNotApprovedPagePunishment } from "../context/NotApprovedPagePunishmentProvider";
 
 type AdditionalProperties = Omit<
   NotApprovedPageEventProperties,
-  "eventType" | "timestamp" | "platform"
+  "eventType" | "timestamp" | "platform" | "isKidsTreatment"
 >;
 
 /**
@@ -17,17 +18,16 @@ export default function useSendNotApprovedPageEvent(): (
   additionalProperties?: AdditionalProperties,
 ) => void {
   const { sendAnalyticsEvent, platform, readOnly } = useNotApprovedUIConfig();
+  const { isKidsTreatment, ixpData } = useNotApprovedPagePunishment();
+  const isKidsTreatmentAssigned = ixpData?.FFlagKidsNotApprovedPageTreatment2 === true;
 
   return useCallback(
     (eventType: EventTypes, additionalProperties?: AdditionalProperties) => {
-      sendNotApprovedPageEvent(
-        sendAnalyticsEvent,
-        platform,
-        eventType,
-        readOnly ?? false,
-        additionalProperties,
-      );
+      sendNotApprovedPageEvent(sendAnalyticsEvent, platform, eventType, readOnly ?? false, {
+        ...additionalProperties,
+        ...(isKidsTreatmentAssigned ? { isKidsTreatment } : {}),
+      });
     },
-    [sendAnalyticsEvent, platform, readOnly],
+    [sendAnalyticsEvent, platform, readOnly, isKidsTreatment, isKidsTreatmentAssigned],
   );
 }

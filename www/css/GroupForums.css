@@ -326,6 +326,10 @@
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M30 7a3 3 0 01-3.37 2.977l-3.47 6.94a3 3 0 11-5.127 1.64l-5.011-3.34a2.99 2.99 0 01-2.48.748l-3.387 6.948a3 3 0 11-1.79-.891l3.414-7.005a3 3 0 115.188-1.574l5.011 3.34a2.99 2.99 0 012.393-.76l3.47-6.94A3 3 0 1130 7z'/%3E%3Cpath d='M19.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 25.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM4.5 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3z'/%3E%3C/svg%3E")
 }
 
+.icon-regular-chart-three-horizontal-bars {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28.99 19.204A2 2 0 0127 21H14v6l-.01.204A2 2 0 0112 29H5l-.204-.01a2 2 0 01-1.785-1.786L3 27V5l.01-.204A2 2 0 014.797 3.01L5 3h14a2 2 0 011.99 1.796L21 5v6h6a2 2 0 011.99 1.796L29 13v6l-.01.204zM5 21v6h7v-6H5zM5 5v6h14V5H5zm0 8v6h22v-6H5z'/%3E%3C/svg%3E")
+}
+
 .icon-filled-check {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M24.06 9.94a1.5 1.5 0 00-2.12 0L13 18.878l-2.94-2.94a1.5 1.5 0 00-2.12 2.122l4 4a1.5 1.5 0 002.12 0l10-10a1.5 1.5 0 000-2.122z'/%3E%3C/svg%3E")
 }
@@ -428,6 +432,10 @@
 
 .icon-regular-guilded {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M8.18 11.547s.023 3.321 1.728 6.756c1.752 3.306 4.167 5.43 6.16 6.275 2.059-.962 4.048-2.633 5.133-4.433H15.55c-1.462-1.212-2.613-3.223-2.877-5.547h16.581c-.817 3.737-2.552 7.136-4.206 9.3A19.959 19.959 0 0116.08 30.5h-.052C10.08 28.13 6.88 24.398 4.77 20.187 3.416 17.488 2 12.588 2 6h28a39.927 39.927 0 01-.374 5.547H8.18z'/%3E%3C/svg%3E")
+}
+
+.icon-regular-image {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 13a2 2 0 100-4 2 2 0 000 4z'/%3E%3Cpath d='M2 26a2 2 0 002 2h24a2 2 0 002-2V6a2 2 0 00-2-2H4a2 2 0 00-2 2v20zM28 6v14.586L20.414 13a2 2 0 00-2.828 0L11 19.586 9.414 18a2 2 0 00-2.828 0L4 20.586V6h24zm0 20H4v-2.586l4-4L9.586 21a2 2 0 002.828 0L19 14.414l9 9V26z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-key {
@@ -1478,8 +1486,8 @@ button.btn-generic-more-gray-vertical-sm {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    background-color: #fff;
-    color: #121215;
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-1200);
     cursor: pointer;
     display: inline-block;
     font-weight: 500;
@@ -1497,7 +1505,7 @@ button.btn-generic-more-gray-vertical-sm {
 .btn-generic-more-gray-vertical-sm:link,
 a.btn-generic-more-gray-vertical-sm:link,
 button.btn-generic-more-gray-vertical-sm:link {
-    color: #121215
+    color: var(--color-extended-gray-1200)
 }
 
 .btn-generic-more-gray-vertical-sm:focus,
@@ -1506,9 +1514,9 @@ a.btn-generic-more-gray-vertical-sm:focus,
 a.btn-generic-more-gray-vertical-sm:hover,
 button.btn-generic-more-gray-vertical-sm:focus,
 button.btn-generic-more-gray-vertical-sm:hover {
-    background-color: #fff;
-    border-color: #bcbec8;
-    color: #121215;
+    background-color: var(--color-extended-white-100);
+    border-color: var(--color-extended-gray-500);
+    color: var(--color-extended-gray-1200);
     cursor: pointer
 }
 
@@ -1518,8 +1526,8 @@ a.btn-generic-more-gray-vertical-sm.active,
 a.btn-generic-more-gray-vertical-sm:active,
 button.btn-generic-more-gray-vertical-sm.active,
 button.btn-generic-more-gray-vertical-sm:active {
-    background-color: #fff;
-    color: #121215
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-1200)
 }
 
 .btn-generic-more-gray-vertical-sm.active:focus,
@@ -1534,7 +1542,7 @@ button.btn-generic-more-gray-vertical-sm:active:focus {
 .btn-generic-more-gray-vertical-sm:visited,
 a.btn-generic-more-gray-vertical-sm:visited,
 button.btn-generic-more-gray-vertical-sm:visited {
-    color: #121215
+    color: var(--color-extended-gray-1200)
 }
 
 .btn-generic-more-gray-vertical-sm:visited:focus,
@@ -1574,9 +1582,9 @@ button.btn-generic-more-gray-vertical-sm[disabled]:active,
 button.btn-generic-more-gray-vertical-sm[disabled]:focus,
 button.btn-generic-more-gray-vertical-sm[disabled]:hover {
     opacity: .5;
-    background-color: #fff;
-    border-color: #bcbec8;
-    color: #121215;
+    background-color: var(--color-extended-white-100);
+    border-color: var(--color-extended-gray-500);
+    color: var(--color-extended-gray-1200);
     cursor: not-allowed;
     pointer-events: none
 }
@@ -1622,18 +1630,18 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 .touch a.btn-generic-more-gray-vertical-sm:focus,
 .touch a.btn-generic-more-gray-vertical-sm:hover,
 .touch a.btn-generic-more-gray-vertical-sm:visited {
-    color: #121215;
-    background-color: #fff;
-    border-color: #bcbec8
+    color: var(--color-extended-gray-1200);
+    background-color: var(--color-extended-white-100);
+    border-color: var(--color-extended-gray-500)
 }
 
 .touch .btn-generic-more-gray-vertical-sm.active,
 .touch .btn-generic-more-gray-vertical-sm:active,
 .touch a.btn-generic-more-gray-vertical-sm.active,
 .touch a.btn-generic-more-gray-vertical-sm:active {
-    color: #121215;
-    background-color: #f7f7f8;
-    border-color: #bcbec8
+    color: var(--color-extended-gray-1200);
+    background-color: var(--color-extended-gray-100);
+    border-color: var(--color-extended-gray-500)
 }
 
 .light-theme .btn-generic-more-gray-vertical-sm {
@@ -1649,14 +1657,14 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 
 .light-theme .btn-generic-more-gray-vertical-sm:focus,
 .light-theme .btn-generic-more-gray-vertical-sm:hover {
-    background-color: rgba(0, 0, 0, .1);
+    background-color: var(--color-extended-black-10);
     border-color: var(--color-content-muted);
     color: var(--color-content-emphasis)
 }
 
 .light-theme .btn-generic-more-gray-vertical-sm.active,
 .light-theme .btn-generic-more-gray-vertical-sm:active {
-    background-color: rgba(0, 0, 0, .1);
+    background-color: var(--color-extended-black-10);
     color: var(--color-content-emphasis)
 }
 
@@ -1693,14 +1701,14 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 
 .dark-theme .btn-generic-more-gray-vertical-sm:focus,
 .dark-theme .btn-generic-more-gray-vertical-sm:hover {
-    background-color: hsla(0, 0%, 100%, .1);
+    background-color: var(--color-extended-white-10);
     border-color: var(--color-content-muted);
     color: var(--color-content-emphasis)
 }
 
 .dark-theme .btn-generic-more-gray-vertical-sm.active,
 .dark-theme .btn-generic-more-gray-vertical-sm:active {
-    background-color: hsla(0, 0%, 100%, .1);
+    background-color: var(--color-extended-white-10);
     color: var(--color-content-emphasis)
 }
 
@@ -1735,7 +1743,7 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 .light-theme .touch .btn-generic-more-gray-vertical-sm.active,
 .light-theme .touch .btn-generic-more-gray-vertical-sm:active {
     color: var(--color-content-muted);
-    background-color: rgba(0, 0, 0, .3);
+    background-color: var(--color-extended-black-30);
     border-color: var(--color-content-muted)
 }
 
@@ -1750,7 +1758,7 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 .dark-theme .touch .btn-generic-more-gray-vertical-sm.active,
 .dark-theme .touch .btn-generic-more-gray-vertical-sm:active {
     color: var(--color-content-muted);
-    background-color: hsla(0, 0%, 100%, .3);
+    background-color: var(--color-extended-white-30);
     border-color: var(--color-content-muted)
 }
 
@@ -1767,14 +1775,14 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 
 .light-theme a.btn-generic-more-gray-vertical-sm:focus,
 .light-theme a.btn-generic-more-gray-vertical-sm:hover {
-    background-color: rgba(0, 0, 0, .1);
+    background-color: var(--color-extended-black-10);
     border-color: var(--color-content-muted);
     color: var(--color-content-emphasis)
 }
 
 .light-theme a.btn-generic-more-gray-vertical-sm.active,
 .light-theme a.btn-generic-more-gray-vertical-sm:active {
-    background-color: rgba(0, 0, 0, .1);
+    background-color: var(--color-extended-black-10);
     color: var(--color-content-emphasis)
 }
 
@@ -1811,14 +1819,14 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 
 .dark-theme a.btn-generic-more-gray-vertical-sm:focus,
 .dark-theme a.btn-generic-more-gray-vertical-sm:hover {
-    background-color: hsla(0, 0%, 100%, .1);
+    background-color: var(--color-extended-white-10);
     border-color: var(--color-content-muted);
     color: var(--color-content-emphasis)
 }
 
 .dark-theme a.btn-generic-more-gray-vertical-sm.active,
 .dark-theme a.btn-generic-more-gray-vertical-sm:active {
-    background-color: hsla(0, 0%, 100%, .1);
+    background-color: var(--color-extended-white-10);
     color: var(--color-content-emphasis)
 }
 
@@ -1853,7 +1861,7 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 .light-theme .touch a.btn-generic-more-gray-vertical-sm.active,
 .light-theme .touch a.btn-generic-more-gray-vertical-sm:active {
     color: var(--color-content-muted);
-    background-color: rgba(0, 0, 0, .3);
+    background-color: var(--color-extended-black-30);
     border-color: var(--color-content-muted)
 }
 
@@ -1868,7 +1876,7 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 .dark-theme .touch a.btn-generic-more-gray-vertical-sm.active,
 .dark-theme .touch a.btn-generic-more-gray-vertical-sm:active {
     color: var(--color-content-muted);
-    background-color: hsla(0, 0%, 100%, .3);
+    background-color: var(--color-extended-white-30);
     border-color: var(--color-content-muted)
 }
 
@@ -2839,6 +2847,34 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
     margin-top: 4px
 }
 
+.forum-image-upload-previews {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xsmall)
+}
+
+.forum-image-upload-preview-tiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-small)
+}
+
+.forum-image-upload-preview-tile {
+    position: relative;
+    box-sizing: border-box;
+    flex: 0 0 10rem;
+    width: 10rem;
+    max-width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border-radius: var(--radius-medium)
+}
+
+.forum-image-upload-preview-tile.image-upload-preview-tile-placeholder {
+    background: transparent;
+    border: var(--stroke-standard) dashed var(--color-stroke-emphasis)
+}
+
 .post-composer-support-ticket-pill .support-ticket-attachment-chip {
     border-radius: var(--radius-circle)
 }
@@ -2885,7 +2921,6 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 }
 
 .support-ticket-sheet-content .support-ticket-screenshot-tile {
-    position: relative;
     box-sizing: border-box;
     width: 100%;
     height: auto;
@@ -2893,31 +2928,40 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
     aspect-ratio: 4/3;
     padding: 0;
     border-radius: var(--radius-medium);
-    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center
 }
 
-.support-ticket-screenshot-tile .support-ticket-screenshot-preview {
+.image-upload-preview-tile {
+    position: relative;
+    overflow: hidden
+}
+
+.image-upload-preview-tile .image-upload-preview-thumbnail {
+    width: 100%;
+    height: 100%
+}
+
+.image-upload-preview-tile .image-upload-preview-image,
+.image-upload-preview-tile .image-upload-preview-thumbnail img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover
+}
+
+.image-upload-preview-tile .image-upload-preview-image-uploading {
     opacity: .5
 }
 
-.support-ticket-screenshot-tile .support-ticket-screenshot-preview-complete {
-    opacity: 1
-}
-
-.support-ticket-screenshot-tile .support-ticket-screenshot-remove {
+.image-upload-preview-tile .image-upload-preview-remove {
     position: absolute;
     top: var(--gap-xsmall);
     right: var(--gap-xsmall);
     z-index: 2
 }
 
-.support-ticket-screenshot-tile .support-ticket-screenshot-uploading-overlay {
+.image-upload-preview-tile .image-upload-preview-uploading-overlay {
     position: absolute;
     inset: 0;
     z-index: 1;
@@ -2926,8 +2970,8 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
     justify-content: center
 }
 
-.support-ticket-sheet-content .support-ticket-add-screenshots-button.support-ticket-screenshot-tile,
-.support-ticket-sheet-content .support-ticket-screenshot-tile-placeholder {
+.support-ticket-sheet-content .image-upload-preview-tile-placeholder,
+.support-ticket-sheet-content .support-ticket-add-screenshots-button.support-ticket-screenshot-tile {
     background: transparent;
     border: var(--stroke-standard) dashed var(--color-stroke-emphasis)
 }
@@ -3154,15 +3198,15 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 }
 
 .light-theme .group-forums-comment-reactions-reaction:hover {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .light-theme .group-forums-comment-reactions-reaction.group-forums-comment-reactions-reaction-active {
-    background-color: #bcbec8
+    background-color: var(--color-extended-gray-500)
 }
 
 .light-theme .group-forums-comment-reactions-reaction.group-forums-comment-reactions-reaction-active:hover {
-    background-color: rgba(0, 0, 0, .3)
+    background-color: var(--color-extended-black-30)
 }
 
 .dark-theme .group-forums-comment-reactions-reaction {
@@ -3171,25 +3215,25 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 }
 
 .dark-theme .group-forums-comment-reactions-reaction:hover {
-    background-color: hsla(0, 0%, 100%, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .dark-theme .group-forums-comment-reactions-reaction.group-forums-comment-reactions-reaction-active {
-    background-color: #494d5a
+    background-color: var(--color-extended-gray-700)
 }
 
 .dark-theme .group-forums-comment-reactions-reaction.group-forums-comment-reactions-reaction-active:hover {
-    background-color: hsla(0, 0%, 100%, .3)
+    background-color: var(--color-extended-white-30)
 }
 
 .dark-theme .group-forums-comment-reactions-reaction.group-forums-comment-reactions-reaction-active:active,
 .dark-theme .group-forums-comment-reactions-reaction:active {
-    background-color: rgba(0, 0, 0, .3)
+    background-color: var(--color-extended-black-30)
 }
 
 .light-theme .group-forums-comment-reactions-reaction.group-forums-comment-reactions-reaction-active:active,
 .light-theme .group-forums-comment-reactions-reaction:active {
-    background-color: rgba(0, 0, 0, .5)
+    background-color: var(--color-extended-black-50)
 }
 
 .group-forums-comment-reactions-container {
@@ -3683,11 +3727,11 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 
 @media(min-width:543px) {
     .light-theme .reaction-picker .reaction-picker-item:hover {
-        background-color: rgba(0, 0, 0, .1)
+        background-color: var(--color-extended-black-10)
     }
 
     .dark-theme .reaction-picker .reaction-picker-item:hover {
-        background-color: hsla(0, 0%, 100%, .1)
+        background-color: var(--color-extended-white-10)
     }
 }
 
@@ -3704,11 +3748,11 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 }
 
 .dark-theme .reaction-picker .reaction-picker-item .reaction-picker-emote:active {
-    background-color: rgba(0, 0, 0, .3)
+    background-color: var(--color-extended-black-30)
 }
 
 .light-theme .reaction-picker .reaction-picker-item .reaction-picker-emote:active {
-    background-color: rgba(0, 0, 0, .5)
+    background-color: var(--color-extended-black-50)
 }
 
 #group-forums-reaction-picker-container {
@@ -3758,11 +3802,11 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 }
 
 .light-theme .group-forums-early-access-notice {
-    background-color: rgba(0, 0, 0, .3)
+    background-color: var(--color-extended-black-30)
 }
 
 .dark-theme .group-forums-early-access-notice {
-    background-color: hsla(0, 0%, 100%, .3)
+    background-color: var(--color-extended-white-30)
 }
 
 .group-forums-early-access-notice .group-forums-early-access-notice-icon {
@@ -3906,7 +3950,7 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 }
 
 .light-theme .group-posts-preview:active {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .group-posts-preview:hover {
@@ -3914,7 +3958,7 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 }
 
 .dark-theme .group-posts-preview:active {
-    background-color: rgba(0, 0, 0, .3)
+    background-color: var(--color-extended-black-30)
 }
 
 .group-posts-preview-header {
@@ -4156,62 +4200,62 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 }
 
 .dark-theme .group-posts-destination-pill {
-    background-color: #272930;
-    color: #bcbec8
+    background-color: var(--color-extended-gray-900);
+    color: var(--color-extended-gray-500)
 }
 
 .dark-theme .group-posts-destination-pill:hover {
-    background-color: hsla(0, 0%, 100%, .1);
-    color: #fff
+    background-color: var(--color-extended-white-10);
+    color: var(--color-extended-white-100)
 }
 
 .dark-theme .group-posts-destination-pill:active {
-    background-color: hsla(0, 0%, 100%, .3);
+    background-color: var(--color-extended-white-30);
     color: #bdbebe
 }
 
 .dark-theme .group-posts-destination-pill.active {
-    background-color: #fff;
-    color: #272930
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-900)
 }
 
 .dark-theme .group-posts-destination-pill.active:hover {
-    background-color: #bcbec8;
-    color: #202227
+    background-color: var(--color-extended-gray-500);
+    color: var(--color-extended-gray-1000)
 }
 
 .dark-theme .group-posts-destination-pill.active:active {
-    background-color: hsla(0, 0%, 100%, .5);
+    background-color: var(--color-extended-white-50);
     color: #393b3d
 }
 
 .light-theme .group-posts-destination-pill {
     background-color: var(--color-extended-black-05);
-    color: #353741
+    color: var(--color-extended-gray-800)
 }
 
 .light-theme .group-posts-destination-pill:hover {
-    background-color: rgba(0, 0, 0, .1);
-    color: #272930
+    background-color: var(--color-extended-black-10);
+    color: var(--color-extended-gray-900)
 }
 
 .light-theme .group-posts-destination-pill:active {
-    background-color: rgba(0, 0, 0, .3);
+    background-color: var(--color-extended-black-30);
     color: #393b3d
 }
 
 .light-theme .group-posts-destination-pill.active {
-    background-color: #272930;
-    color: #f7f7f8
+    background-color: var(--color-extended-gray-900);
+    color: var(--color-extended-gray-100)
 }
 
 .light-theme .group-posts-destination-pill.active:hover {
-    background-color: #353741;
-    color: #fff
+    background-color: var(--color-extended-gray-800);
+    color: var(--color-extended-white-100)
 }
 
 .light-theme .group-posts-destination-pill.active:active {
-    background-color: rgba(0, 0, 0, .5);
+    background-color: var(--color-extended-black-50);
     color: #bdbebe
 }
 
@@ -4233,10 +4277,9 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
 
 .group-posts-destinations-divider {
     align-self: center;
-    background: var(--color-content-muted);
-    border-radius: 2px;
-    flex: 0 0 3px;
-    height: 24px
+    background: var(--color-stroke-default);
+    flex: 0 0 1px;
+    height: 32px
 }
 
 .group-posts-destinations-container,

@@ -1,7 +1,7 @@
 import type { RegistryInput } from "@rbx/observability-framework/schema";
 import type { MakeObservabilityTypes } from "@rbx/observability-framework/types";
 import { createTrackers } from "@rbx/observability-framework/trackers";
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import { captureException } from "@rbx/payments/error";
 
 export const observabilityRegistry = {

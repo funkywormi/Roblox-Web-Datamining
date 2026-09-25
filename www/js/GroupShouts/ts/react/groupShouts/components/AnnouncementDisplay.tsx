@@ -211,30 +211,32 @@ const AnnouncementDisplay = ({
           </div>
         </div>
       )}
-      <h2
-        className='text-heading-medium padding-none announcement-display-title'
-        data-testid='announcement-display-heading'>
-        {title}
-      </h2>
-      <div className='announcement-display-body text-body-medium'>
-        <div
-          className={classNames(
-            'announcement-display-body-content',
-            canRenderRichText && 'richtext-base',
-            isTruncated && 'truncated'
+      <div>
+        <h2
+          className='text-heading-medium padding-none announcement-display-title'
+          data-testid='announcement-display-heading'>
+          {title}
+        </h2>
+        <div className='announcement-display-body text-body-medium'>
+          <div
+            className={classNames(
+              'announcement-display-body-content',
+              canRenderRichText && 'richtext-base',
+              isTruncated && 'truncated'
+            )}
+            data-testid='announcement-display-body'
+            ref={contentRef}
+            dangerouslySetInnerHTML={{ __html: linkifiedContent }}
+          />
+          {isTruncated && (
+            <button
+              className='announcement-display-show-more'
+              type='button'
+              onClick={toggleTruncation}>
+              {translate('Action.ShowMore')}
+            </button>
           )}
-          data-testid='announcement-display-body'
-          ref={contentRef}
-          dangerouslySetInnerHTML={{ __html: linkifiedContent }}
-        />
-        {isTruncated && (
-          <button
-            className='announcement-display-show-more'
-            type='button'
-            onClick={toggleTruncation}>
-            {translate('Action.ShowMore')}
-          </button>
-        )}
+        </div>
       </div>
       {policies.displayMarketplaceEmbed && (
         <AnnouncementEmbeds

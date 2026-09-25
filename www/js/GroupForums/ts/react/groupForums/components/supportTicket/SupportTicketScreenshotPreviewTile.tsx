@@ -1,6 +1,5 @@
 import React from 'react';
-import { IconButton } from '@rbx/foundation-ui';
-import classNames from 'classnames';
+import ImageUploadPreviewTile from '../../../shared/components/fileUpload/ImageUploadPreviewTile';
 
 export type SupportTicketScreenshotPreviewTileProps = {
   previewUrl?: string;
@@ -15,29 +14,14 @@ const SupportTicketScreenshotPreviewTile = ({
   removeLabel,
   onRemove
 }: SupportTicketScreenshotPreviewTileProps): JSX.Element => (
-  <div
-    className={classNames('support-ticket-screenshot-tile', {
-      'support-ticket-screenshot-tile-placeholder': !previewUrl
-    })}
-    data-testid={`support-ticket-screenshot-${index}`}>
-    {previewUrl && (
-      <img
-        className='support-ticket-screenshot-preview support-ticket-screenshot-preview-complete'
-        src={previewUrl}
-        alt=''
-      />
-    )}
-    <IconButton
-      className='support-ticket-screenshot-remove'
-      data-testid={`support-ticket-screenshot-remove-${index}`}
-      icon='icon-regular-x'
-      ariaLabel={removeLabel}
-      size='XSmall'
-      variant='OverMedia'
-      isCircular
-      onClick={onRemove}
-    />
-  </div>
+  <ImageUploadPreviewTile
+    className='support-ticket-screenshot-tile'
+    testId={`support-ticket-screenshot-${index}`}
+    removeTestId={`support-ticket-screenshot-remove-${index}`}
+    previewUrl={previewUrl}
+    removeLabel={removeLabel}
+    onRemove={onRemove}
+  />
 );
 
 SupportTicketScreenshotPreviewTile.displayName = 'SupportTicketScreenshotPreviewTile';

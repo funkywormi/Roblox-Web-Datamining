@@ -14,6 +14,7 @@ import {
   hasRichTextContent
 } from '../../shared/utils/messageContentUtils';
 import { logGroupForumsClickEvent } from '../../shared/utils/logging';
+import useCommentComposerAttachments from '../hooks/useCommentComposerAttachments';
 
 export type CommentComposerProps = {
   showCancelButton?: boolean;
@@ -52,12 +53,21 @@ const CommentComposer = ({
     mentioningReplyId,
     translate
   });
+  const {
+    mediaAssetIds,
+    isSubmitBlocked: isImageUploadBlockingSubmit,
+    leadingControl: attachmentLeadingControl,
+    contentFooter: imageUploadPreviews,
+    input: imageUploadInput,
+    reset: resetImageUploads
+  } = useCommentComposerAttachments(!!editingCommentId, disabled || forumsWrite.isDisabled);
 
   const handleOnClose = useCallback(() => {
     commentComposerRef?.current?.clearText();
     resetComposerState();
     clearCommentSubmissionError();
-  }, [commentComposerRef, resetComposerState, clearCommentSubmissionError]);
+    resetImageUploads();
+  }, [commentComposerRef, resetComposerState, clearCommentSubmissionError, resetImageUploads]);
 
   const handleOnSubmit = useCallback(
     async (content: MessageContent) => {
@@ -77,7 +87,7 @@ const CommentComposer = ({
         hasRichText: hasRichTextContent(content)
       });
 
-      const success = await submitComment(content);
+      const success = await submitComment(content, mediaAssetIds);
       if (success) {
         handleOnClose();
         return true;
@@ -85,7 +95,7 @@ const CommentComposer = ({
 
       return false;
     },
-    [groupId, postId, editingCommentId, submitComment, handleOnClose]
+    [groupId, postId, editingCommentId, submitComment, mediaAssetIds, handleOnClose]
   );
 
   const handleOnChange = useCallback(() => {
@@ -136,19 +146,25 @@ const CommentComposer = ({
   }, [parentCommentId, editingCommentId, replyingToUserId, translate]);
 
   return (
-    <ContentComposer
-      autoFocus={autoFocus}
-      defaultContent={defaultContent}
-      errorMessage={commentSubmissionError}
-      label={renderLabel()}
-      disabled={disabled || !!commentSubmissionError || forumsWrite.isDisabled}
-      onChange={handleOnChange}
-      onSubmit={handleOnSubmit}
-      onCancel={showCancelButton ? handleOnClose : undefined}
-      onClose={handleOnClose}
-      inputRef={commentComposerRef}
-      isCollapsedInitially={false}
-    />
+    <React.Fragment>
+      <ContentComposer
+        autoFocus={autoFocus}
+        defaultContent={defaultContent}
+        errorMessage={commentSubmissionError}
+        label={renderLabel()}
+        contentLeadingControl={attachmentLeadingControl}
+        contentFooter={imageUploadPreviews}
+        disabled={disabled || forumsWrite.isDisabled}
+        submitDisabled={!!commentSubmissionError || isImageUploadBlockingSubmit}
+        onChange={handleOnChange}
+        onSubmit={handleOnSubmit}
+        onCancel={showCancelButton ? handleOnClose : undefined}
+        onClose={handleOnClose}
+        inputRef={commentComposerRef}
+        isCollapsedInitially={false}
+      />
+      {imageUploadInput}
+    </React.Fragment>
   );
 };
 

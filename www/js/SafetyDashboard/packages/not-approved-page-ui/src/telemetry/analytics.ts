@@ -34,6 +34,7 @@ export type NotApprovedPageEventProperties = {
   platform: string;
   interventionId?: string;
   punishedUserId?: number;
+  isKidsTreatment?: boolean;
   isReactivationEligible?: boolean;
   verificationCategory?: string;
   unmappedViolationKey?: string;

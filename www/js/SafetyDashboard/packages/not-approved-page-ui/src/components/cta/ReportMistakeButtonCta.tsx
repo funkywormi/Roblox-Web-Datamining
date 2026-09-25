@@ -8,7 +8,7 @@ import useAppealsRedirect from "../../hooks/useAppealsRedirect";
  */
 const ReportMistakeButtonCta = (): JSX.Element => {
   const translate = useNotApprovedTranslate();
-  const { handleAppealsClick } = useAppealsRedirect();
+  const { handleAppealsClick } = useAppealsRedirect({ preferViolationDetail: true });
 
   return (
     <Button

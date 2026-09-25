@@ -230,8 +230,13 @@
     "Label.SubscriptionPeriodWeek": "week",
     "Label.SubscriptionPeriodWeeks": "{periodCount, plural, one {{periodCount} week} other {{periodCount} weeks}}",
     "Label.SubscriptionPeriodYears": "{periodCount, plural, one {{periodCount} year} other {{periodCount} years}}",
-    "Feature.RobloxSubscription.Label.RobloxPlusPriceRowV3": "{boldStart}{trialDuration} {trialPeriodLabel} free,{boldEnd} then {price}/{periodType}",
-    "Feature.RobloxSubscription.Label.FreeTrialDisclosureV3": "By clicking \"Try it for free,\" you agree to the {linkStart}Roblox Subscription Terms.{linkEnd} Your free trial will end in {trialDuration} {trialPeriodLabel} and you will be charged automatically each {billingPeriodLabel} and can cancel at any time.",
+    "Feature.RobloxSubscription.Label.RobloxPlusPriceRowV3": "{boldStart}{trialDuration}-{trialPeriodLabel} free,{boldEnd} then {price}/{periodType}",
+    "Feature.RobloxSubscription.Label.FreeTrialDisclosureV3": "By clicking \"Try it for free,\" you agree to the {linkStart}Roblox Subscription Terms.{linkEnd} Your free trial will end in {trialDuration}-{trialPeriodLabel} and you will be charged automatically each {billingPeriodLabel} and can cancel at any time.",
     "Feature.RobloxSubscription.Label.BlackbirdVTDiscountSecondV2": "{discountPercent}% off these items {periodIndex} {periodType} after your {trialDuration} {trialPeriodLabel}",
-    "Description.Benefit.DiscountV3": "10% off during your {trialDuration} {trialPeriodLabel} trial and the first 60 days of membership, then 20% off items and avatars"
+    "Description.Benefit.DiscountV3": "10% off during your {trialDuration}-{trialPeriodLabel} trial and the first 60 days of membership, then 20% off items and avatars",
+    "Label.PricePerMonth": "{price}/month",
+    "Label.PricePerWeek": "{price}/week",
+    "Label.PricePerYear": "{price}/year",
+    "Label.RobloxPlusPriceRowV3": "{boldStart}{trialDuration}-{trialPeriodLabel} free,{boldEnd} then {price}/{periodType}",
+    "Label.FreeTrialDisclosureV3": "By clicking \"Try it for free,\" you agree to the {linkStart}Roblox Subscription Terms.{linkEnd} Your free trial will end in {trialDuration}-{trialPeriodLabel} and you will be charged automatically each {billingPeriodLabel} and can cancel at any time."
 }

@@ -7,6 +7,7 @@ import {
   ValidationErrorType
 } from '../../shared/components/fileUpload/types';
 import { validateFile } from '../../shared/components/fileUpload/utils/validation';
+import readImagePreviewUrl from '../../shared/components/fileUpload/utils/readImagePreviewUrl';
 import { ASSET_UPLOAD_FAILED_KEY } from '../../shared/constants/assetUploadConstants';
 
 export const MAX_SCREENSHOTS = 3;
@@ -62,28 +63,6 @@ const toScreenshotError = (validationError: ValidationError): ScreenshotError =>
     default:
       return { key: ASSET_UPLOAD_FAILED_KEY };
   }
-};
-
-/**
- * Reads the picked file for a local preview. The site's CSP `img-src` allows `data:` but not
- * `blob:`, so this reads a data URL rather than calling `URL.createObjectURL` — the same approach
- * `FileUpload` takes for the emblem and cover previews.
- */
-const readPreviewUrl = (
-  file: File,
-  onLoad: (previewUrl: string) => void,
-  onError: () => void
-): void => {
-  const reader = new FileReader();
-  reader.onload = () => {
-    if (typeof reader.result === 'string') {
-      onLoad(reader.result);
-    } else {
-      onError();
-    }
-  };
-  reader.onerror = onError;
-  reader.readAsDataURL(file);
 };
 
 export type UseSupportTicketScreenshotsResult = {
@@ -189,7 +168,7 @@ export const useSupportTicketScreenshots = (
       commitScreenshots(prev => [...prev, ...accepted.map(({ screenshot }) => screenshot)]);
 
       accepted.forEach(({ screenshot, file }) => {
-        readPreviewUrl(
+        readImagePreviewUrl(
           file,
           previewUrl => {
             if (signal.aborted) return;

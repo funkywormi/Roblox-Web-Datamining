@@ -203,7 +203,7 @@
 
 .robux-gifting-verification-modal .phone-number-change-number-button,
 .robux-gifting-verification-modal .resend-text span {
-    color: #528bff
+    color: var(--color-extended-blue-600)
 }
 
 .robux-gifting-verification-modal .phone-number-change-number-button:focus-visible {
@@ -586,11 +586,11 @@
 }
 
 .light-theme .gifting-products-banner-container {
-    border: 1px solid rgba(0, 0, 0, .1)
+    border: 1px solid var(--color-extended-black-10)
 }
 
 .dark-theme .gifting-products-banner-container {
-    border: 1px solid rgba(255, 255, 255, .1)
+    border: 1px solid var(--color-extended-white-10)
 }
 
 .gifting-products-banner-container .banner-content-container {

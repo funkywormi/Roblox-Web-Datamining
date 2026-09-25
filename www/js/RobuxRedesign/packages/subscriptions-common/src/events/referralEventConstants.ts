@@ -5,6 +5,12 @@ export type ReferralEventParams = {
   params: Record<string, string>;
 };
 
+export enum PlusReferralSurface {
+  BuyRobuxPage = "buyRobuxPage",
+  Flyout = "flyout",
+  DirectUrl = "directUrl",
+}
+
 const referralEventNames = {
   referrerImpression: "plus_referral_dashboard_shown",
   referrerCopyClick: "plus_referral_copy_link_click",
@@ -43,6 +49,7 @@ export const getReferralEventParams = {
     hasReferrerId: boolean,
     referrerId?: string,
     referralCode?: string,
+    surface?: PlusReferralSurface,
   ): ReferralEventParams => ({
     name: referralEventNames.refereeImpression,
     type: referralEventNames.refereeImpression,
@@ -52,12 +59,14 @@ export const getReferralEventParams = {
       hasReferrerId: String(hasReferrerId),
       ...(referrerId ? { referrerId } : {}),
       ...(referralCode ? { referralCode } : {}),
+      ...(surface ? { surface } : {}),
     },
   }),
   refereeSubscribeClick: (
     face: string,
     referrerId?: string,
     referralCode?: string,
+    surface?: PlusReferralSurface,
   ): ReferralEventParams => ({
     name: referralEventNames.refereeSubscribeClick,
     type: referralEventNames.refereeSubscribeClick,
@@ -66,12 +75,14 @@ export const getReferralEventParams = {
       face,
       ...(referrerId ? { referrerId } : {}),
       ...(referralCode ? { referralCode } : {}),
+      ...(surface ? { surface } : {}),
     },
   }),
   refereeDismissed: (
     face: string,
     referrerId?: string,
     referralCode?: string,
+    surface?: PlusReferralSurface,
   ): ReferralEventParams => ({
     name: referralEventNames.refereeDismissed,
     type: referralEventNames.refereeDismissed,
@@ -80,6 +91,7 @@ export const getReferralEventParams = {
       face,
       ...(referrerId ? { referrerId } : {}),
       ...(referralCode ? { referralCode } : {}),
+      ...(surface ? { surface } : {}),
     },
   }),
   flyoutShareImpression: (): ReferralEventParams => ({

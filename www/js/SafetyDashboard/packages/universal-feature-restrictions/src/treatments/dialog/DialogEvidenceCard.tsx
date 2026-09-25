@@ -7,7 +7,6 @@ interface Props {
   violationReason?: string;
   formattedEndDate?: string;
   countdownText?: string;
-  messageToUser?: string;
 }
 
 /**
@@ -20,11 +19,10 @@ const DialogEvidenceCard = ({
   violationReason,
   formattedEndDate,
   countdownText,
-  messageToUser,
 }: Props) => {
   const { translate } = useUniversalFeatureRestrictionsConfig();
 
-  const hasInfoBelowEvidence = [violationReason, formattedEndDate, messageToUser].some(Boolean);
+  const hasInfoBelowEvidence = [violationReason, formattedEndDate].some(Boolean);
 
   if (!evidence && !hasInfoBelowEvidence) {
     return null;
@@ -49,16 +47,6 @@ const DialogEvidenceCard = ({
       {violationReason && (
         <div className="padding-x-medium">
           <EvidenceField fieldLabel={translate("Label.Reason")} fieldValue={violationReason} />
-        </div>
-      )}
-
-      {messageToUser && (
-        <div className="padding-x-medium">
-          <EvidenceField
-            fieldLabel={translate("Label.ModeratorNote")}
-            fieldValue={messageToUser}
-            preline
-          />
         </div>
       )}
 

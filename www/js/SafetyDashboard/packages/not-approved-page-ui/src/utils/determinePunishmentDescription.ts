@@ -19,7 +19,36 @@ function determinePunishmentDescription(
   violationType: string | undefined,
   interventionType: PUNISHMENT_TYPE,
   translate: TranslateFunction,
+  isKidsTreatment = false,
+  endDate?: string,
 ): string {
+  if (isKidsTreatment) {
+    if (interventionType === PUNISHMENT_TYPE.Warn) {
+      return translate("Description.WarningDescription.Kids");
+    }
+
+    if (interventionType === PUNISHMENT_TYPE.Delete) {
+      return translate("Description.BannedDescription.Kids");
+    }
+
+    if (endDate) {
+      const parsedEndDate = new Date(endDate);
+      if (!Number.isNaN(parsedEndDate.getTime())) {
+        return translate("Description.SuspendedUntil", {
+          date: parsedEndDate.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          time: parsedEndDate.toLocaleTimeString(undefined, {
+            hour: "numeric",
+            minute: "numeric",
+          }),
+        });
+      }
+    }
+  }
+
   if (interventionType === PUNISHMENT_TYPE.Delete) {
     return translate("Description.BrokeRulesBanned");
   }

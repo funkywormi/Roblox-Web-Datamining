@@ -9,6 +9,7 @@ import {
 import reactivateAccount from "../../services/reactivateAccount";
 import { AMPRecoursePunishmentType, ProceedAction } from "../../utils/types";
 import {
+  ACCESS_MANAGEMENT_UPSELL_ACCOUNT_MANAGEMENT_NAMESPACE,
   ACCESS_MANAGEMENT_UPSELL_CAN_LIFT_PUNISHMENT_FEATURE_NAME,
   REACTIVATION_CACHE_UPDATE_WAIT,
 } from "../../utils/constants";
@@ -108,6 +109,7 @@ const NotApprovedProceedButton = ({
         sendPageEvent(EventTypes.ParentVerificationClicked);
         await onVerifyParent?.({
           featureName: ACCESS_MANAGEMENT_UPSELL_CAN_LIFT_PUNISHMENT_FEATURE_NAME,
+          namespace: ACCESS_MANAGEMENT_UPSELL_ACCOUNT_MANAGEMENT_NAMESPACE,
           ampRecourseData: { punishmentType: AMPRecoursePunishmentType.Chargeback },
           isAsyncCall: true,
           usePrologue: false,

@@ -6,11 +6,15 @@ import DialogErrorState from "./DialogErrorState";
 import DialogInterventionDetails from "./DialogInterventionDetails";
 import DialogInterventionActions from "./DialogInterventionActions";
 import type { Overrides } from "../../types/runtimeOptions";
+import type { ModerationDetail } from "../../types/api";
 
 interface Props {
   onDismiss: () => void;
   overrides?: Overrides;
   onAppeal?: () => void;
+  onAcknowledgmentSuccess?: () => void;
+  providedModerationDetail?: ModerationDetail;
+  analyticsEventId?: string;
   showAppealSnackbar: () => void;
   translationsReady: boolean;
 }
@@ -27,10 +31,19 @@ const DialogContentView = ({
   onDismiss,
   overrides,
   onAppeal,
+  onAcknowledgmentSuccess,
+  providedModerationDetail,
+  analyticsEventId,
   showAppealSnackbar,
   translationsReady,
 }: Props) => {
-  const model = useDialogRestrictionModel({ overrides, onAppeal, translationsReady });
+  const model = useDialogRestrictionModel({
+    overrides,
+    onAppeal,
+    providedModerationDetail,
+    analyticsEventId,
+    translationsReady,
+  });
 
   if (model.status === "loading") {
     return (
@@ -69,6 +82,7 @@ const DialogContentView = ({
         <div className="shrink-0">
           <DialogInterventionActions
             onDismiss={onDismiss}
+            onAcknowledgmentSuccess={onAcknowledgmentSuccess}
             analytics={view.analytics}
             dsaMessage={view.dsaMessage}
             mountTimeMs={mountTimeMs}

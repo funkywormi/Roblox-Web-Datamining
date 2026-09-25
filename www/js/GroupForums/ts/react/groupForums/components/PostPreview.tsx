@@ -25,6 +25,7 @@ import { EventContext, EventType } from '../../shared/constants/eventConstants';
 import { hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import ScrollFlashOverlay from './ScrollFlashOverlay';
 import renderHighlightedText from '../utils/renderHighlightedText';
+import ContentPreviewCard from '../../shared/components/ContentPreviewCard';
 
 const META_DATA_SEPARATOR = ' • ';
 const POST_PREVIEW_MENU_CLASS = 'group-posts-preview-menu';
@@ -83,26 +84,7 @@ const PostPreview = ({
   const setReturnToCategoryScrollTop = useForumStore.use.setReturnToCategoryScrollTop();
   const { fetchSubscriberExperimentValues } = useForumExperiments();
 
-  const onPressPost = (event?: React.MouseEvent) => {
-    if (event && event.target instanceof Element) {
-      // Clicks on these interactive descendants own their own behavior, so bail before navigating
-      // (the bubbled event would otherwise open the post too).
-      if (event.target.closest(POST_NAV_BLOCK_SELECTOR)) {
-        return;
-      }
-      // We want to allow opening this link in a new tab
-      // cmd or ctrl key modifiers will have different behaviors that we want to support
-      if (event.metaKey || event.ctrlKey) {
-        onOpened?.();
-        return;
-      }
-    }
-
-    // suppress href native click
-    if (event) {
-      event.preventDefault();
-    }
-
+  const openPost = () => {
     setReturnToCategoryScrollTop(document.documentElement.scrollTop);
 
     // Before the navigation, so nothing has to survive it.
@@ -124,14 +106,6 @@ const PostPreview = ({
     );
 
     document.documentElement.scrollTop = 0;
-  };
-
-  // Handle keyboard interactions
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      onPressPost();
-    }
   };
 
   const handleMenuOpened = useCallback(
@@ -221,7 +195,7 @@ const PostPreview = ({
   const shouldShowCategoryName = !!showCategoryName && !!categoryName;
 
   return (
-    <a
+    <ContentPreviewCard
       ref={postPreviewRef}
       className={classNames(
         'group-posts-preview',
@@ -231,7 +205,9 @@ const PostPreview = ({
       data-is-unread={isUnread}
       data-is-pinned={isPinned}
       data-is-locked={isLocked}
-      onClick={hasRouter ? onPressPost : undefined}
+      blockedSelector={POST_NAV_BLOCK_SELECTOR}
+      onNavigate={hasRouter ? openPost : undefined}
+      onModifiedClick={hasRouter ? onOpened : undefined}
       href={groupForumsConstants.deepLinks.groupForumPostUrl(
         post.groupId,
         categoryShortId,
@@ -285,11 +261,7 @@ const PostPreview = ({
           </div>
         )}
       </div>
-      <div
-        role='button'
-        tabIndex={0}
-        className='group-posts-preview-content'
-        onKeyDown={hasRouter ? handleKeyDown : undefined}>
+      <div className='group-posts-preview-content'>
         <div className='group-posts-preview-title-container'>
           {hasStatuses && (
             <div className='group-posts-preview-statuses'>
@@ -331,7 +303,7 @@ const PostPreview = ({
       {onHighlightComplete && (
         <ScrollFlashOverlay onComplete={onHighlightComplete} enableScrollIntoView={false} />
       )}
-    </a>
+    </ContentPreviewCard>
   );
 };
 

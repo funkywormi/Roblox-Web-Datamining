@@ -42,6 +42,7 @@ export type TPunishment = {
   endDate: string;
   isForeshadowingConsequenceEnabled?: boolean;
   interventionId: string;
+  labelTranslationKey?: string;
   messageToUser: string;
   punishedUserId: number;
   punishmentId: number;

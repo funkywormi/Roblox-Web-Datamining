@@ -102,4 +102,5 @@ export interface Report {
 export interface ReportsResponse {
   inboxPageHeader: string;
   reports: Report[];
+  nextPageToken?: string;
 }

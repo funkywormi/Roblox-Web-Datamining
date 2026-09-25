@@ -338,15 +338,6 @@ class CatalogAPIService {
     const urlParams = { itemIds: [collectibleItemId] };
     return httpService.post(catalogConstants.endpoints.postMarketplaceItemDetails, urlParams);
   }
-
-  static getResellerData(assetId: number) {
-    const urlConfig = {
-      url: catalogConstants.getResellerDataUrl(assetId),
-      retryable: true,
-      withCredentials: true,
-    };
-    return httpService.get(urlConfig);
-  }
 }
 
 export default CatalogAPIService;

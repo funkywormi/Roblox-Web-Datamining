@@ -13,18 +13,28 @@ import { MessageContent } from '../../shared/types';
 import { logGroupForumsClickEvent } from '../../shared/utils/logging';
 import { hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import ForumTierGateMessage from './ForumTierGateMessage';
+import useCommentComposerAttachments from '../hooks/useCommentComposerAttachments';
 
 const DesktopPersistentComposer = ({ translate }: WithTranslationsProps): JSX.Element => {
   const groupId = useForumStore.use.groupId();
   const postId = useForumStore.use.postId();
   const inputRef = useRef<EditableContentFieldHandle>(null);
   const editorRef = useRef<RichTextEditorHandle>(null);
+  const { disabled, disabledTooltip, showTierGate } = useReplyDisabledState({ translate });
 
   const {
     submitComment,
     commentSubmissionError,
     clearCommentSubmissionError
   } = useCommentSubmission({ translate });
+  const {
+    mediaAssetIds,
+    isSubmitBlocked: isImageUploadBlockingSubmit,
+    leadingControl: attachmentLeadingControl,
+    contentFooter: imageUploadPreviews,
+    input: imageUploadInput,
+    reset: resetImageUploads
+  } = useCommentComposerAttachments(false, disabled);
 
   const handleOnSubmit = useCallback(
     async (content: MessageContent) => {
@@ -38,15 +48,16 @@ const DesktopPersistentComposer = ({ translate }: WithTranslationsProps): JSX.El
         ...logEventData
       });
 
-      const success = await submitComment(content);
+      const success = await submitComment(content, mediaAssetIds);
       if (success) {
         inputRef.current?.clearText();
         editorRef.current?.clear();
+        resetImageUploads();
         return true;
       }
       return false;
     },
-    [groupId, postId, submitComment]
+    [groupId, postId, submitComment, mediaAssetIds, resetImageUploads]
   );
 
   const handleOnChange = useCallback(() => {
@@ -54,8 +65,6 @@ const DesktopPersistentComposer = ({ translate }: WithTranslationsProps): JSX.El
       clearCommentSubmissionError();
     }
   }, [commentSubmissionError, clearCommentSubmissionError]);
-
-  const { disabled, disabledTooltip, showTierGate } = useReplyDisabledState({ translate });
 
   if (showTierGate) {
     return (
@@ -66,25 +75,30 @@ const DesktopPersistentComposer = ({ translate }: WithTranslationsProps): JSX.El
   }
 
   return (
-    <ConditionalTooltip
-      containerClassName='desktop-persistent-composer-container'
-      id='desktop-persistent-composer-tooltip'
-      position='top-center'
-      content={disabledTooltip}
-      enabled={disabled}>
-      <div className={classNames('desktop-persistent-composer', disabled && 'disabled')}>
-        <ContentComposer
-          autoFocus={false}
-          errorMessage={commentSubmissionError}
-          disabled={disabled}
-          submitDisabled={!!commentSubmissionError}
-          onChange={handleOnChange}
-          onSubmit={handleOnSubmit}
-          inputRef={inputRef}
-          editorRef={editorRef}
-        />
-      </div>
-    </ConditionalTooltip>
+    <React.Fragment>
+      <ConditionalTooltip
+        containerClassName='desktop-persistent-composer-container'
+        id='desktop-persistent-composer-tooltip'
+        position='top-center'
+        content={disabledTooltip}
+        enabled={disabled}>
+        <div className={classNames('desktop-persistent-composer', disabled && 'disabled')}>
+          <ContentComposer
+            autoFocus={false}
+            errorMessage={commentSubmissionError}
+            contentLeadingControl={attachmentLeadingControl}
+            contentFooter={imageUploadPreviews}
+            disabled={disabled}
+            submitDisabled={!!commentSubmissionError || isImageUploadBlockingSubmit}
+            onChange={handleOnChange}
+            onSubmit={handleOnSubmit}
+            inputRef={inputRef}
+            editorRef={editorRef}
+          />
+        </div>
+      </ConditionalTooltip>
+      {imageUploadInput}
+    </React.Fragment>
   );
 };
 

@@ -46,7 +46,7 @@
 }
 
 .copyright-container {
-    border-top: 1px solid #e6e7ea;
+    border-top: 1px solid var(--color-extended-gray-300);
     padding-top: 24px
 }
 
@@ -138,7 +138,7 @@
 }
 
 .light-theme .copyright-container {
-    border-color: #bcbec8
+    border-color: var(--color-extended-gray-500)
 }
 
 .light-theme .copyright-container .icon-dropdown select:hover option,
@@ -148,7 +148,7 @@
 }
 
 .dark-theme .copyright-container {
-    border-color: #494d5a
+    border-color: var(--color-extended-gray-700)
 }
 
 .dark-theme .copyright-container .icon-dropdown select:hover option,

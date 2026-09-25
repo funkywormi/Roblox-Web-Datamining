@@ -9,8 +9,8 @@ import { useNotApprovedPagePunishment } from "../../context/NotApprovedPagePunis
  */
 const PunishmentDescription = ({ punishmentData }: PageItemRenderingProps): JSX.Element => {
   const translate = useNotApprovedTranslate();
-  const { violationReasons } = useNotApprovedPagePunishment();
-  const { violation, punishmentTypeDescription } = punishmentData;
+  const { violationReasons, isKidsTreatment } = useNotApprovedPagePunishment();
+  const { violation, punishmentTypeDescription, endDate } = punishmentData;
 
   const violationType = violation?.evidence?.displayMeta?.capitalizedKey;
 
@@ -19,6 +19,8 @@ const PunishmentDescription = ({ punishmentData }: PageItemRenderingProps): JSX.
     violationType,
     punishmentTypeDescription,
     translate,
+    isKidsTreatment,
+    endDate,
   );
 
   return <span className="text-body-medium">{punishmentDescription}</span>;

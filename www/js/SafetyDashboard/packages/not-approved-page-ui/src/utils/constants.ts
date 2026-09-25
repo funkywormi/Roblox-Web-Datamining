@@ -62,6 +62,9 @@ export const UGC_GUIDELINES_URL =
 export const ACCESS_MANAGEMENT_UPSELL_CAN_LIFT_PUNISHMENT_FEATURE_NAME =
   "CanRequestPunishmentLifting";
 
+export const ACCESS_MANAGEMENT_UPSELL_ACCOUNT_MANAGEMENT_NAMESPACE =
+  "account_management/AccountManagement";
+
 export const VERIFICATION_CATEGORIES = {
   Email: "Email",
   VPC: "VPC",

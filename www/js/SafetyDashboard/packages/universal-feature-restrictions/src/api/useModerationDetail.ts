@@ -19,16 +19,21 @@ export const moderationDetailQueryKey = (abuseVector: string): [string, string] 
 ];
 
 /**
- * Fetches the moderation detail for the scoped abuse vector.
+ * Returns provided realtime moderation detail immediately, otherwise fetches it for the scoped
+ * abuse vector.
  */
-export const useModerationDetail = (): UseModerationDetailResult => {
+export const useModerationDetail = (
+  providedModerationDetail?: ModerationDetail,
+): UseModerationDetailResult => {
   const { api } = useUniversalFeatureRestrictionsConfig();
   const { abuseVector } = useRestrictionScope();
 
-  const { data, isLoading, isFetching, error } = useQuery<ModerationDetail | null, Error>({
+  const hasProvidedDetail = providedModerationDetail !== undefined;
+
+  const query = useQuery<ModerationDetail | null, Error>({
     queryKey: moderationDetailQueryKey(abuseVector),
     queryFn: () => api.fetchModerationDetail(abuseVector),
-    enabled: !isOverrideBackedAbuseVector(abuseVector),
+    enabled: !hasProvidedDetail && !isOverrideBackedAbuseVector(abuseVector),
     /**
      * We don't know if a new mount has a new punishment (e.g. a user has a nudge
      * then gets immediately timed out), so we always refetch on mount.
@@ -36,5 +41,14 @@ export const useModerationDetail = (): UseModerationDetailResult => {
     refetchOnMount: "always",
   });
 
-  return { data, isLoading, isFetching, error };
+  if (hasProvidedDetail) {
+    return {
+      data: providedModerationDetail,
+      isLoading: false,
+      isFetching: false,
+      error: null,
+    };
+  }
+
+  return query;
 };

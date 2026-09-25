@@ -220,32 +220,32 @@
 
 .light-theme .shopping-cart-btn-container .shopping-cart-btn .shopping-cart-icon-container .cart-number-container,
 .dark-theme .shopping-cart-btn-container .shopping-cart-btn .shopping-cart-icon-container .cart-number-container {
-    background-color: #335fff;
-    border: 2px solid #fff
+    border: 2px solid var(--color-extended-white-100);
+    background-color: var(--color-action-emphasis-background)
 }
 
 .shopping-cart-btn-container .shopping-cart-btn .shopping-cart-icon-container .cart-number-container .cart-number {
-    color: rgba(255, 255, 255, .9);
+    color: var(--color-extended-white-90);
     padding: 3px 8px;
     font-weight: 600
 }
 
 .light-theme .shopping-cart-btn-container .shopping-cart-btn .shopping-cart-icon g.cart-group,
 .dark-theme .shopping-cart-btn-container .shopping-cart-btn .shopping-cart-icon g.cart-group {
-    fill: #bcbec8
+    fill: var(--color-extended-gray-500)
 }
 
 .light-theme .shopping-cart-btn-container .shopping-cart-btn:hover .shopping-cart-icon g.cart-group,
 .dark-theme .shopping-cart-btn-container .shopping-cart-btn:hover .shopping-cart-icon g.cart-group {
-    fill: #fff
+    fill: var(--color-extended-white-100)
 }
 
 .mobile-panel .panel-group .panel:not(:first-child) {
-    border-top: 1px solid #e6e7ea
+    border-top: 1px solid var(--color-extended-gray-300)
 }
 
 .mobile-panel .panel ul {
-    background-color: #f7f7f8
+    background-color: var(--color-extended-gray-100)
 }
 
 .mobile-panel .panel ul.light-theme {
@@ -329,7 +329,7 @@
 }
 
 .mobile-panel .panel ul li:not(:first-child) {
-    border-top: 1px solid #e6e7ea
+    border-top: 1px solid var(--color-extended-gray-300)
 }
 
 .mobile-panel .panel ul li.radio label {
@@ -350,7 +350,7 @@
 }
 
 .mobile-panel .panel .panel-heading:not(:first-child) {
-    border-top: 1px solid #e6e7ea
+    border-top: 1px solid var(--color-extended-gray-300)
 }
 
 .mobile-panel .panel .panel-heading .selected-icon {
@@ -377,15 +377,15 @@
 
 .dark-theme .catalog-content .search-options .menu-link:hover,
 .dark-theme .catalog-content .search-options .menu-link.active {
-    color: #fff
+    color: var(--color-extended-white-100)
 }
 
 .dark-theme .mobile-search-options .text-label {
-    color: #bcbec8
+    color: var(--color-extended-gray-500)
 }
 
 .dark-theme .mobile-search-options .button-container {
-    border-bottom-color: #494d5a
+    border-bottom-color: var(--color-extended-gray-700)
 }
 
 .light-theme #catalog-react-container .search-container-categories {
@@ -398,15 +398,15 @@
 
 .light-theme .catalog-content .search-options .menu-link:hover,
 .light-theme .catalog-content .search-options .menu-link.active {
-    color: #272930
+    color: var(--color-extended-gray-900)
 }
 
 .light-theme .mobile-search-options .text-label {
-    color: #353741
+    color: var(--color-extended-gray-800)
 }
 
 .light-theme .mobile-search-options .button-container {
-    border-bottom-color: #bcbec8
+    border-bottom-color: var(--color-extended-gray-500)
 }
 
 .no-gutter-ads .content {
@@ -625,11 +625,11 @@
 }
 
 .light-theme #catalog-react-container .add-to-cart-btn-container button.btn-secondary-md.remove-from-cart {
-    background-color: rgba(255, 255, 255, .5)
+    background-color: var(--color-extended-white-50)
 }
 
 .dark-theme #catalog-react-container .add-to-cart-btn-container button.btn-secondary-md.remove-from-cart {
-    background-color: rgba(0, 0, 0, .5)
+    background-color: var(--color-extended-black-50)
 }
 
 .dark-theme #catalog-react-container .catalog-revamp .catalog-item-container .item-card-thumb-container {
@@ -689,19 +689,19 @@
 }
 
 .light-theme #catalog-react-container .catalog-revamp .filter-select .catalog-filter-dropdown-clear-button {
-    color: #fff
+    color: var(--color-extended-white-100)
 }
 
 .light-theme #catalog-react-container .catalog-revamp .filter-select.btn-secondary-md:hover {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme #catalog-react-container .catalog-revamp .filter-select .catalog-filter-dropdown-clear-button {
-    color: #272930
+    color: var(--color-extended-gray-900)
 }
 
 .dark-theme #catalog-react-container .catalog-revamp .filter-select.btn-secondary-md:hover {
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 #catalog-react-container .catalog-revamp .filter-select .filter-display-text {
@@ -755,12 +755,12 @@
 
 .light-theme #catalog-react-container .catalog-revamp .filters-modal-container {
     background-color: var(--color-surface-300);
-    border: 1px solid #bcbec8
+    border: 1px solid var(--color-extended-gray-500)
 }
 
 .dark-theme #catalog-react-container .catalog-revamp .filters-modal-container {
     background-color: var(--color-surface-300);
-    border: 1px solid #494d5a
+    border: 1px solid var(--color-extended-gray-700)
 }
 
 #catalog-react-container .catalog-revamp .filters-modal-container .header-container {
@@ -830,11 +830,11 @@
 }
 
 .light-theme #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option:hover {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option:hover {
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option.selected-option {
@@ -934,7 +934,7 @@
 }
 
 .light-theme #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option .MuiOutlinedInput-root fieldset.MuiOutlinedInput-notchedOutline {
-    border-color: #bcbec8
+    border-color: var(--color-extended-gray-500)
 }
 
 .dark-theme #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option .MuiOutlinedInput-root {
@@ -976,15 +976,15 @@
 }
 
 .dark-theme #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option .MuiOutlinedInput-root fieldset.MuiOutlinedInput-notchedOutline {
-    border-color: #494d5a
+    border-color: var(--color-extended-gray-700)
 }
 
 .light-theme #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option .MuiOutlinedInput-root.Mui-focused fieldset.MuiOutlinedInput-notchedOutline {
-    border-color: rgba(0, 0, 0, .3)
+    border-color: var(--color-extended-black-30)
 }
 
 .dark-theme #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option .MuiOutlinedInput-root.Mui-focused fieldset.MuiOutlinedInput-notchedOutline {
-    border-color: rgba(255, 255, 255, .3)
+    border-color: var(--color-extended-white-30)
 }
 
 #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option-divider {
@@ -992,11 +992,11 @@
 }
 
 .light-theme #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option-divider {
-    border-top: 1px solid #bcbec8
+    border-top: 1px solid var(--color-extended-gray-500)
 }
 
 .dark-theme #catalog-react-container .catalog-revamp .filters-modal-container .filter-options-container .filter-option-divider {
-    border-top: 1px solid #494d5a
+    border-top: 1px solid var(--color-extended-gray-700)
 }
 
 #catalog-react-container .catalog-revamp .filters-modal-container .action-buttons-container {
@@ -1014,19 +1014,19 @@
 
 .light-theme #catalog-react-container .catalog-revamp .filters-modal-container .action-buttons-container .apply-button,
 .dark-theme #catalog-react-container .catalog-revamp .filters-modal-container .action-buttons-container .apply-button {
-    color: #fff;
-    background-color: #335fff;
+    background-color: var(--color-action-emphasis-background);
+    color: var(--color-extended-white-100);
     border-color: transparent
 }
 
 .light-theme #catalog-react-container .catalog-revamp .filters-modal-container .action-buttons-container .apply-button:disabled {
-    color: #fff;
-    background-color: #272930
+    background-color: var(--color-extended-gray-900);
+    color: var(--color-extended-white-100)
 }
 
 .dark-theme #catalog-react-container .catalog-revamp .filters-modal-container .action-buttons-container .apply-button:disabled {
-    color: #272930;
-    background-color: #fff
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-900)
 }
 
 @media (max-width:991px) {
@@ -1886,10 +1886,10 @@
 }
 
 .light-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu {
+    box-shadow: 0 4px 16px 0 var(--color-extended-black-40);
     z-index: 10;
     margin-top: 4px;
-    position: absolute;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, .4)
+    position: absolute
 }
 
 .light-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu .open {
@@ -1907,7 +1907,7 @@
 }
 
 .light-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu li {
-    border-bottom: 1px solid rgba(0, 0, 0, .1)
+    border-bottom: 1px solid var(--color-extended-black-10)
 }
 
 .light-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu li a {
@@ -1915,8 +1915,8 @@
 }
 
 .light-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu .selected {
-    color: #272930;
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10);
+    color: var(--color-extended-gray-900)
 }
 
 .light-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu li:last-child {
@@ -1924,10 +1924,10 @@
 }
 
 .dark-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu {
+    box-shadow: 0 4px 16px 0 var(--color-extended-black-40);
     z-index: 10;
     margin-top: 4px;
-    position: absolute;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, .4)
+    position: absolute
 }
 
 .dark-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu .open {
@@ -1945,7 +1945,7 @@
 }
 
 .dark-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu li {
-    border-bottom: 1px solid rgba(255, 255, 255, .1)
+    border-bottom: 1px solid var(--color-extended-white-10)
 }
 
 .dark-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu li a {
@@ -1953,8 +1953,8 @@
 }
 
 .dark-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu .selected {
-    color: #fff;
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10);
+    color: var(--color-extended-white-100)
 }
 
 .dark-theme #catalog-react-container .search-container .input-group .autocomplete-dropdown-menu li:last-child {
@@ -2583,10 +2583,10 @@
 }
 
 #catalog-react-container .mobile-search-container .mobile-menu-button .mobile-menu-number-container {
+    border: 1px solid var(--color-extended-white-90);
     font-size: 11px;
     line-height: initial;
     background-color: #191b1d;
-    border: 1px solid rgba(255, 255, 255, .9);
     border-radius: 24px;
     -ms-flex-pack: center;
     justify-content: center;
@@ -2601,13 +2601,13 @@
 }
 
 #catalog-react-container .mobile-search-container .mobile-menu-button .mobile-menu-number-container .mobile-menu-number {
-    color: rgba(255, 255, 255, .9);
+    color: var(--color-extended-white-90);
     padding: 2px;
     font-weight: 600
 }
 
 .dark-theme #catalog-react-container .mobile-search-container .mobile-menu-button .mobile-menu-number-container {
-    background-color: rgba(255, 255, 255, .9);
+    background-color: var(--color-extended-white-90);
     border-color: #191b1d
 }
 
@@ -2687,7 +2687,7 @@ button.btn-generic-menu-black-md span[class^=icon-].icon-filter-menu-black {
 }
 
 .search-options .menu-vertical {
-    background: #fff;
+    background: var(--color-extended-white-100);
     margin-bottom: 13px
 }
 
@@ -3432,7 +3432,7 @@ button.btn-generic-menu-black-md span[class^=icon-].icon-filter-menu-black {
 }
 
 .mobile-search-options-container .mobile-search-options-buttons-container {
-    background-color: #e6e7ea
+    background-color: var(--color-extended-gray-300)
 }
 
 .mobile-search-options-container .mobile-search-options-buttons-container.light-theme {
@@ -3514,7 +3514,7 @@ button.btn-generic-menu-black-md span[class^=icon-].icon-filter-menu-black {
 }
 
 .mobile-search-options .section-content .top-border:not(:first-child) {
-    border-top: 1px solid #e6e7ea
+    border-top: 1px solid var(--color-extended-gray-300)
 }
 
 .mobile-search-options .text-label {
@@ -3564,7 +3564,7 @@ button.btn-generic-menu-black-md span[class^=icon-].icon-filter-menu-black {
 }
 
 .mobile-search-options .button-container {
-    border-top: 1px solid #bcbec8;
+    border-top: 1px solid var(--color-extended-gray-500);
     padding: 12px;
     position: fixed;
     bottom: 0;
@@ -3894,7 +3894,7 @@ button.btn-generic-menu-black-md span[class^=icon-].icon-filter-menu-black {
 }
 
 .catalog-content .search-options .category-section {
-    border-bottom: 1px solid #bcbec8;
+    border-bottom: 1px solid var(--color-extended-gray-500);
     padding-bottom: 12px
 }
 
@@ -3963,7 +3963,7 @@ button.btn-generic-menu-black-md span[class^=icon-].icon-filter-menu-black {
 }
 
 .catalog-content .search-options .filters-section-container.border-bottom {
-    border-bottom: 1px solid #bcbec8
+    border-bottom: 1px solid var(--color-extended-gray-500)
 }
 
 .catalog-content .search-options .panel-heading {
@@ -4374,12 +4374,12 @@ button.btn-generic-menu-black-md span[class^=icon-].icon-filter-menu-black {
 }
 
 .light-theme .topic-container .topic-carousel .topic.unselected-topic {
-    color: var(--color-content-default);
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10);
+    color: var(--color-content-default)
 }
 
 .light-theme .topic-container .topic-carousel .topic .topic-clear-button {
-    color: #fff;
+    color: var(--color-extended-white-100);
     padding: 0
 }
 
@@ -4452,12 +4452,12 @@ button.btn-generic-menu-black-md span[class^=icon-].icon-filter-menu-black {
 }
 
 .dark-theme .topic-container .topic-carousel .topic.unselected-topic {
-    color: var(--color-content-default);
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10);
+    color: var(--color-content-default)
 }
 
 .dark-theme .topic-container .topic-carousel .topic .topic-clear-button {
-    color: #272930;
+    color: var(--color-extended-gray-900);
     padding: 0
 }
 
@@ -4705,11 +4705,11 @@ button.btn-generic-menu-black-md span[class^=icon-].icon-filter-menu-black {
 }
 
 .light-theme .item-card-container .add-text-cart-tile {
-    color: #bcbec8
+    color: var(--color-extended-gray-500)
 }
 
 .dark-theme .item-card-container .add-text-cart-tile {
-    color: #494d5a
+    color: var(--color-extended-gray-700)
 }
 
 .item-card-container .add-text-cart-tile {
@@ -4767,13 +4767,15 @@ a.btn-generic-menu-black-md {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    color: #121215;
+    background-color: var(--color-extended-white-100);
+    border: 1px solid transparent;
+    border-color: var(--color-extended-gray-500);
+    color: var(--color-extended-gray-1200);
     cursor: pointer;
     font-weight: var(--font-weight-500);
     text-align: center;
     white-space: nowrap;
     vertical-align: middle;
-    background-color: #fff;
     border: none;
     border-radius: 3px;
     height: auto;
@@ -4786,7 +4788,7 @@ a.btn-generic-menu-black-md {
 .btn-generic-menu-black-md:link,
 button.btn-generic-menu-black-md:link,
 a.btn-generic-menu-black-md:link {
-    color: #121215
+    color: var(--color-extended-gray-1200)
 }
 
 .btn-generic-menu-black-md:hover,
@@ -4795,10 +4797,10 @@ button.btn-generic-menu-black-md:hover,
 button.btn-generic-menu-black-md:focus,
 a.btn-generic-menu-black-md:hover,
 a.btn-generic-menu-black-md:focus {
-    color: #121215;
-    cursor: pointer;
-    background-color: #fff;
-    border-color: #bcbec8
+    background-color: var(--color-extended-white-100);
+    border-color: var(--color-extended-gray-500);
+    color: var(--color-extended-gray-1200);
+    cursor: pointer
 }
 
 .btn-generic-menu-black-md:active,
@@ -4807,8 +4809,8 @@ button.btn-generic-menu-black-md:active,
 button.btn-generic-menu-black-md.active,
 a.btn-generic-menu-black-md:active,
 a.btn-generic-menu-black-md.active {
-    color: #121215;
-    background-color: #fff
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-1200)
 }
 
 .btn-generic-menu-black-md:active:focus,
@@ -4823,7 +4825,7 @@ a.btn-generic-menu-black-md.active:focus {
 .btn-generic-menu-black-md:visited,
 button.btn-generic-menu-black-md:visited,
 a.btn-generic-menu-black-md:visited {
-    color: #121215
+    color: var(--color-extended-gray-1200)
 }
 
 .btn-generic-menu-black-md:visited:focus,
@@ -4863,11 +4865,11 @@ a.btn-generic-menu-black-md[disabled]:focus,
 a.btn-generic-menu-black-md[disabled]:active,
 a.btn-generic-menu-black-md[disabled].active {
     opacity: .5;
-    color: #121215;
+    background-color: var(--color-extended-white-100);
+    border-color: var(--color-extended-gray-500);
+    color: var(--color-extended-gray-1200);
     cursor: not-allowed;
-    pointer-events: none;
-    background-color: #fff;
-    border-color: #bcbec8
+    pointer-events: none
 }
 
 .btn-generic-menu-black-md.disabled span[class^=icon-],
@@ -4911,18 +4913,18 @@ a.btn-generic-menu-black-md .btn-text {
 .touch a.btn-generic-menu-black-md:hover,
 .touch a.btn-generic-menu-black-md:focus,
 .touch a.btn-generic-menu-black-md:visited {
-    color: #121215;
-    background-color: #fff;
-    border-color: #bcbec8
+    color: var(--color-extended-gray-1200);
+    background-color: var(--color-extended-white-100);
+    border-color: var(--color-extended-gray-500)
 }
 
 .touch .btn-generic-menu-black-md:active,
 .touch .btn-generic-menu-black-md.active,
 .touch a.btn-generic-menu-black-md:active,
 .touch a.btn-generic-menu-black-md.active {
-    color: #121215;
-    background-color: #f7f7f8;
-    border-color: #bcbec8
+    color: var(--color-extended-gray-1200);
+    background-color: var(--color-extended-gray-100);
+    border-color: var(--color-extended-gray-500)
 }
 
 .light-theme .btn-generic-menu-black-md {
@@ -4938,15 +4940,15 @@ a.btn-generic-menu-black-md .btn-text {
 
 .light-theme .btn-generic-menu-black-md:hover,
 .light-theme .btn-generic-menu-black-md:focus {
+    background-color: var(--color-extended-black-10);
     border-color: var(--color-content-muted);
-    color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    color: var(--color-content-emphasis)
 }
 
 .light-theme .btn-generic-menu-black-md:active,
 .light-theme .btn-generic-menu-black-md.active {
-    color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10);
+    color: var(--color-content-emphasis)
 }
 
 .light-theme .btn-generic-menu-black-md:visited {
@@ -4982,15 +4984,15 @@ a.btn-generic-menu-black-md .btn-text {
 
 .dark-theme .btn-generic-menu-black-md:hover,
 .dark-theme .btn-generic-menu-black-md:focus {
+    background-color: var(--color-extended-white-10);
     border-color: var(--color-content-muted);
-    color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    color: var(--color-content-emphasis)
 }
 
 .dark-theme .btn-generic-menu-black-md:active,
 .dark-theme .btn-generic-menu-black-md.active {
-    color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10);
+    color: var(--color-content-emphasis)
 }
 
 .dark-theme .btn-generic-menu-black-md:visited {
@@ -5024,8 +5026,8 @@ a.btn-generic-menu-black-md .btn-text {
 .light-theme .touch .btn-generic-menu-black-md:active,
 .light-theme .touch .btn-generic-menu-black-md.active {
     color: var(--color-content-muted);
-    border-color: var(--color-content-muted);
-    background-color: rgba(0, 0, 0, .3)
+    background-color: var(--color-extended-black-30);
+    border-color: var(--color-content-muted)
 }
 
 .dark-theme .touch .btn-generic-menu-black-md:hover,
@@ -5039,8 +5041,8 @@ a.btn-generic-menu-black-md .btn-text {
 .dark-theme .touch .btn-generic-menu-black-md:active,
 .dark-theme .touch .btn-generic-menu-black-md.active {
     color: var(--color-content-muted);
-    border-color: var(--color-content-muted);
-    background-color: rgba(255, 255, 255, .3)
+    background-color: var(--color-extended-white-30);
+    border-color: var(--color-content-muted)
 }
 
 .light-theme a.btn-generic-menu-black-md {
@@ -5056,15 +5058,15 @@ a.btn-generic-menu-black-md .btn-text {
 
 .light-theme a.btn-generic-menu-black-md:hover,
 .light-theme a.btn-generic-menu-black-md:focus {
+    background-color: var(--color-extended-black-10);
     border-color: var(--color-content-muted);
-    color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    color: var(--color-content-emphasis)
 }
 
 .light-theme a.btn-generic-menu-black-md:active,
 .light-theme a.btn-generic-menu-black-md.active {
-    color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10);
+    color: var(--color-content-emphasis)
 }
 
 .light-theme a.btn-generic-menu-black-md:visited {
@@ -5100,15 +5102,15 @@ a.btn-generic-menu-black-md .btn-text {
 
 .dark-theme a.btn-generic-menu-black-md:hover,
 .dark-theme a.btn-generic-menu-black-md:focus {
+    background-color: var(--color-extended-white-10);
     border-color: var(--color-content-muted);
-    color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    color: var(--color-content-emphasis)
 }
 
 .dark-theme a.btn-generic-menu-black-md:active,
 .dark-theme a.btn-generic-menu-black-md.active {
-    color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10);
+    color: var(--color-content-emphasis)
 }
 
 .dark-theme a.btn-generic-menu-black-md:visited {
@@ -5142,8 +5144,8 @@ a.btn-generic-menu-black-md .btn-text {
 .light-theme .touch a.btn-generic-menu-black-md:active,
 .light-theme .touch a.btn-generic-menu-black-md.active {
     color: var(--color-content-muted);
-    border-color: var(--color-content-muted);
-    background-color: rgba(0, 0, 0, .3)
+    background-color: var(--color-extended-black-30);
+    border-color: var(--color-content-muted)
 }
 
 .dark-theme .touch a.btn-generic-menu-black-md:hover,
@@ -5157,8 +5159,8 @@ a.btn-generic-menu-black-md .btn-text {
 .dark-theme .touch a.btn-generic-menu-black-md:active,
 .dark-theme .touch a.btn-generic-menu-black-md.active {
     color: var(--color-content-muted);
-    border-color: var(--color-content-muted);
-    background-color: rgba(255, 255, 255, .3)
+    background-color: var(--color-extended-white-30);
+    border-color: var(--color-content-muted)
 }
 
 .shopping-cart-modal-container {
@@ -5173,12 +5175,9 @@ a.btn-generic-menu-black-md .btn-text {
     right: -315px
 }
 
-.light-theme .shopping-cart-modal-container .shopping-cart-modal {
-    box-shadow: 0 0 10px rgba(10, 10, 14, .5)
-}
-
+.light-theme .shopping-cart-modal-container .shopping-cart-modal,
 .dark-theme .shopping-cart-modal-container .shopping-cart-modal {
-    box-shadow: 0 0 10px rgba(10, 10, 14, .75)
+    box-shadow: 0 0 10px var(--color-common-scrim)
 }
 
 .shopping-cart-modal-container .shopping-cart-modal {
@@ -5194,11 +5193,11 @@ a.btn-generic-menu-black-md .btn-text {
 }
 
 .light-theme .shopping-cart-modal-container .shopping-cart-modal {
-    background-color: #fff
+    background-color: var(--color-extended-white-100)
 }
 
 .dark-theme .shopping-cart-modal-container .shopping-cart-modal {
-    background-color: #272930
+    background-color: var(--color-extended-gray-900)
 }
 
 .shopping-cart-modal-container .shopping-cart-modal {
@@ -5211,11 +5210,11 @@ a.btn-generic-menu-black-md .btn-text {
 }
 
 .light-theme .shopping-cart-modal-container .shopping-cart-modal .shopping-cart-title {
-    border-bottom: 1px solid rgba(0, 0, 0, .3)
+    border-bottom: 1px solid var(--color-extended-black-30)
 }
 
 .dark-theme .shopping-cart-modal-container .shopping-cart-modal .shopping-cart-title {
-    border-bottom: 1px solid rgba(255, 255, 255, .3)
+    border-bottom: 1px solid var(--color-extended-white-30)
 }
 
 .shopping-cart-modal-container .shopping-cart-modal .shopping-cart-title {
@@ -5238,11 +5237,11 @@ a.btn-generic-menu-black-md .btn-text {
 }
 
 .light-theme .shopping-cart-modal-container .shopping-cart-modal .footer-divider {
-    background-color: rgba(0, 0, 0, .3)
+    background-color: var(--color-extended-black-30)
 }
 
 .dark-theme .shopping-cart-modal-container .shopping-cart-modal .footer-divider {
-    background-color: rgba(255, 255, 255, .3)
+    background-color: var(--color-extended-white-30)
 }
 
 .shopping-cart-modal-container .cart-item-container {
@@ -5372,12 +5371,12 @@ a.btn-generic-menu-black-md .btn-text {
 
 .light-theme .shopping-cart-modal-container .cart-item-container .cart-item .item-price .offer-applied-badge {
     color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .shopping-cart-modal-container .cart-item-container .cart-item .item-price .offer-applied-badge {
     color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .shopping-cart-modal-container .cart-item-container .cart-item .item-price .offer-applied-badge-text {
@@ -5444,11 +5443,11 @@ a.btn-generic-menu-black-md .btn-text {
 }
 
 .light-theme .shopping-cart-modal-container .marketplace-offers-container {
-    border-bottom: 1px solid rgba(0, 0, 0, .3)
+    border-bottom: 1px solid var(--color-extended-black-30)
 }
 
 .dark-theme .shopping-cart-modal-container .marketplace-offers-container {
-    border-bottom: 1px solid rgba(255, 255, 255, .3)
+    border-bottom: 1px solid var(--color-extended-white-30)
 }
 
 .shopping-cart-modal-container .marketplace-offer-selection {
@@ -5468,11 +5467,11 @@ a.btn-generic-menu-black-md .btn-text {
 }
 
 .light-theme .shopping-cart-modal-container .subscribe-upsell-container {
-    border: 1px solid rgba(0, 0, 0, .3)
+    border: 1px solid var(--color-extended-black-30)
 }
 
 .dark-theme .shopping-cart-modal-container .subscribe-upsell-container {
-    border: 1px solid rgba(255, 255, 255, .3)
+    border: 1px solid var(--color-extended-white-30)
 }
 
 .shopping-cart-modal-container .subscribe-upsell-container {
@@ -5511,11 +5510,11 @@ a.btn-generic-menu-black-md .btn-text {
 }
 
 .light-theme .shopping-cart-modal-container .subscribe-upsell-header:hover {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .shopping-cart-modal-container .subscribe-upsell-header:hover {
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .shopping-cart-modal-container .subscribe-upsell-header-content {
@@ -5639,11 +5638,11 @@ a.btn-generic-menu-black-md .btn-text {
 }
 
 .light-theme .cart-item .thumbnail-2d-container.cart-item-thumb {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .cart-item .thumbnail-2d-container.cart-item-thumb {
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .batch-buy-purchase-button {
@@ -5703,13 +5702,13 @@ a.btn-generic-menu-black-md .btn-text {
 }
 
 .light-theme .shopping-cart-timed-options-toggle .timed-option-toggle-btn {
-    color: var(--color-content-default);
-    border: 1px solid #bcbec8
+    border: 1px solid var(--color-extended-gray-500);
+    color: var(--color-content-default)
 }
 
 .dark-theme .shopping-cart-timed-options-toggle .timed-option-toggle-btn {
-    color: var(--color-content-default);
-    border: 1px solid #494d5a
+    border: 1px solid var(--color-extended-gray-700);
+    color: var(--color-content-default)
 }
 
 .light-theme .shopping-cart-timed-options-toggle .timed-option-toggle-btn.selected,

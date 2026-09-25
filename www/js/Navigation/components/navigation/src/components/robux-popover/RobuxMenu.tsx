@@ -104,18 +104,20 @@ export default function RobuxMenu({
             <MenuLabel
               className={walletClassName}
               title=""
-              leading={<Icon name="icon-regular-wallet" />}
-              trailing={
-                creditError ? (
-                  layoutConstants.robuxOnEconomySystemOutage
-                ) : (
-                  // PriceTag mounts onto this selector via the price-tag:render event.
-                  <span
-                    className="dropdown-credit-balance"
-                    data-amount={creditAmount}
-                    data-currency-code={currencyCode}
-                  />
-                )
+              leading={
+                <Fragment>
+                  <Icon name="icon-regular-wallet" />
+                  {creditError ? (
+                    layoutConstants.robuxOnEconomySystemOutage
+                  ) : (
+                    // PriceTag mounts onto this selector via the price-tag:render event.
+                    <span
+                      className="dropdown-credit-balance"
+                      data-amount={creditAmount}
+                      data-currency-code={currencyCode}
+                    />
+                  )}
+                </Fragment>
               }
             />
           )}

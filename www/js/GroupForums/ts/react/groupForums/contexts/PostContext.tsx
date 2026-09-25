@@ -307,11 +307,13 @@ export function PostProvider({ children }: PostProviderProps): JSX.Element {
     async ({
       content,
       parentCommentId,
-      mentioningReplyId
+      mentioningReplyId,
+      mediaAssetIds
     }: {
       content: MessageContent;
       parentCommentId?: string;
       mentioningReplyId?: string;
+      mediaAssetIds?: number[];
     }): Promise<void> => {
       let repliesToCommentId = parentCommentId;
       if (parentCommentId === post?.firstComment.id) {
@@ -322,7 +324,8 @@ export function PostProvider({ children }: PostProviderProps): JSX.Element {
         categoryId,
         postId,
         content,
-        repliesToCommentId
+        repliesToCommentId,
+        mediaAssetIds
       );
       setActiveCommentId(response.id);
       if (repliesToCommentId) {

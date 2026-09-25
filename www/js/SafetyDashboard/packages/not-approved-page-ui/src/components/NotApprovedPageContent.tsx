@@ -9,7 +9,7 @@ import { useNotApprovedUIConfig } from "../providers/NotApprovedUIProvider";
 import { PageNavigationProvider } from "../context/PageNavigationContext";
 import { PageAnalyticsProvider } from "../context/PageAnalyticsContext";
 import { generatePages } from "../pageItemConfigs/generatePages";
-import POLICY_EDUCATION_CONTENT_REGISTRY from "../pageItemConfigs/educationalConfigs/policyEducationContentRegistry";
+import resolvePolicyEducationContent from "../pageItemConfigs/educationalConfigs/resolvePolicyEducationContent";
 
 export interface NotApprovedPageContentSlots {
   header?: React.ReactElement;
@@ -32,13 +32,20 @@ const NotApprovedPageContent = ({
   children,
 }: NotApprovedPageContentProps): React.JSX.Element | null => {
   const { readOnly } = useNotApprovedUIConfig();
-  const { punishmentData, violationReasons, isLoading, error, commutationEligibility } =
-    useNotApprovedPagePunishment();
+  const {
+    punishmentData,
+    violationReasons,
+    isLoading,
+    error,
+    commutationEligibility,
+    isKidsTreatment,
+  } = useNotApprovedPagePunishment();
 
   const untranslatedReasons = violationReasons?.untranslatedReasons;
   const hasEducationalPages = useMemo(
-    () => (untranslatedReasons ?? []).some(key => key in POLICY_EDUCATION_CONTENT_REGISTRY),
-    [untranslatedReasons],
+    () =>
+      (untranslatedReasons ?? []).some(key => resolvePolicyEducationContent(key, isKidsTreatment)),
+    [untranslatedReasons, isKidsTreatment],
   );
 
   /**
@@ -50,8 +57,14 @@ const NotApprovedPageContent = ({
   const { pages, unmappedViolationKeys } = useMemo(() => {
     return !punishmentData
       ? { pages: [], unmappedViolationKeys: [] }
-      : generatePages(punishmentData, untranslatedReasons ?? [], commutationEligibility, readOnly);
-  }, [punishmentData, untranslatedReasons, commutationEligibility, readOnly]);
+      : generatePages(
+          punishmentData,
+          untranslatedReasons ?? [],
+          commutationEligibility,
+          readOnly,
+          isKidsTreatment,
+        );
+  }, [punishmentData, untranslatedReasons, commutationEligibility, readOnly, isKidsTreatment]);
 
   if (isLoading) {
     return children({
