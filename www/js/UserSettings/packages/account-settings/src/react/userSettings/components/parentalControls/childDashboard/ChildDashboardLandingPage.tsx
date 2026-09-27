@@ -16,8 +16,14 @@ export const ChildDashboardLandingPage = (): JSX.Element => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
 
-  const { isOdpLaunchEnabled, showParentList, showAddParentUpsell, isLoading, hasError } =
-    useLinkedParentsState();
+  const {
+    isOdpLaunchEnabled,
+    showParentList,
+    showSentRequests,
+    showAddParentUpsell,
+    isLoading,
+    hasError,
+  } = useLinkedParentsState();
 
   useEffect(() => {
     if (hasError) {
@@ -33,7 +39,7 @@ export const ChildDashboardLandingPage = (): JSX.Element => {
     return (
       <React.Fragment>
         <LinkedParentsList />
-        <SentRequestsList />
+        {showSentRequests && <SentRequestsList />}
       </React.Fragment>
     );
   }

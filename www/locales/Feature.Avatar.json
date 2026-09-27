@@ -382,5 +382,6 @@
     "Label.ProfileFrame.Redcliff": "Redcliff",
     "Label.LicensingLicensed": "Licensed",
     "Label.LicensingOfficial": "Official",
-    "profile.tooltip": "Your profile"
+    "profile.tooltip": "Your profile",
+    "Label.AvatarBodyType": "Avatar body type"
 }

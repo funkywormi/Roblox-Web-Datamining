@@ -4,7 +4,7 @@ import { createTrackers } from "@rbx/observability-framework/trackers";
 import { createObsErrorBoundary } from "@rbx/observability-framework/react";
 import { captureException } from "@rbx/payments/error";
 import { createWithApiMetricsV2 } from "@rbx/payments/withApiMetrics";
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 
 export const observabilityRegistry = {
   featureName: "PaymentsPackage",

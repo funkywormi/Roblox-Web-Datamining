@@ -1,5 +1,5 @@
-import { httpService } from 'core-utilities';
-import urlConstants from '../constants/urlConstants';
+import { httpService } from "@rbx/core-scripts/legacy/core-utilities";
+import urlConstants from "../constants/urlConstants";
 
 export default {
   getOutstandingUserAgreements() {
@@ -9,8 +9,8 @@ export default {
   insertAcceptances(agreementIds) {
     const urlConfig = urlConstants.getInsertAcceptancesConfig();
     const insertAcceptancesRequests = {
-      acceptances: agreementIds.map(agreementId => ({ agreementId }))
+      acceptances: agreementIds.map(agreementId => ({ agreementId })),
     };
     return httpService.post(urlConfig, insertAcceptancesRequests);
-  }
+  },
 };

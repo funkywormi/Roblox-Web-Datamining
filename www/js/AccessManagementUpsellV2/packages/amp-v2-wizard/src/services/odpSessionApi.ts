@@ -9,7 +9,8 @@ import { START_ODP_SESSION_URL } from "../constants/urls";
 
 export type StartOdpSessionRequest = {
   requestType: string;
-  requestDetails?: Record<string, string>;
+  // requestDetails can be null for consents where parents freely pick a value
+  requestDetails?: Record<string, string | null>;
   isOdpInitiatedRequest?: boolean;
   odpProfileId?: string;
 };

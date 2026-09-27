@@ -1,3 +1,4 @@
+import { useHistory } from "react-router-dom";
 import { useTranslation } from "react-utilities";
 import {
   ListItem,
@@ -7,7 +8,7 @@ import {
   type TListItemDivider,
 } from "@rbx/foundation-ui";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
-import useManageParentPin from "../../../hooks/useManageParentPin";
+import { parentZonePages } from "../../../constants/parentalControls/parentZonePages";
 
 // List component for managing a parent PIN
 export const ParentPinManagementListItem = ({
@@ -16,7 +17,7 @@ export const ParentPinManagementListItem = ({
   divider: TListItemDivider;
 }): JSX.Element => {
   const { translate } = useTranslation();
-  const manageParentPin = useManageParentPin();
+  const history = useHistory();
 
   const { parentPinManagement } = parentalControlsTranslationConstants;
 
@@ -26,14 +27,13 @@ export const ParentPinManagementListItem = ({
       size="Medium"
       divider={divider}
       title={translate(parentPinManagement.listItemTitle)}
-      metadata={translate(parentPinManagement.listItemMetadata)}
       leading={
         <ListItemLeadingAccessorySpacer>
-          <ListItemLeadingIcon name="icon-regular-lock-closed" />
+          <ListItemLeadingIcon name="icon-regular-key" />
         </ListItemLeadingAccessorySpacer>
       }
       trailing={<ListItemChevronTrailingAccessory />}
-      onSelect={manageParentPin}
+      onSelect={() => history.push(parentZonePages.manageOnDeviceParentPage.path)}
     />
   );
 };

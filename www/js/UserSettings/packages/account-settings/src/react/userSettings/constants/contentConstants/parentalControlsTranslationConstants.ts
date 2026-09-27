@@ -21,6 +21,7 @@ export default {
     [ParentalControlsPageName.TopGames]: "Heading.TopGamesThisWeek",
     [ParentalControlsPageName.TopGameDetails]: "Heading.GameDetails",
     [ParentalControlsPageName.ActivityUpdates]: "Heading.ActivityUpdates",
+    [ParentalControlsPageName.ManageOnDeviceParent]: "Heading.ManagePin",
     [SettingCategoryPageName.ThirdPartyApplications]: "Label.ThirdPartyApplications",
 
     // Spend restrictions
@@ -257,7 +258,8 @@ export default {
   },
   parentPinManagement: {
     listItemTitle: "Label.ParentPin",
-    listItemMetadata: "Action.ManageParentPin",
+    updatePinAction: "Action.UpdateParentPin",
+    removePinAction: "Action.RemoveParentPin",
   },
   odpAccountUpgrade: {
     heading: "Heading.CreateYourOwnRobloxAccount",

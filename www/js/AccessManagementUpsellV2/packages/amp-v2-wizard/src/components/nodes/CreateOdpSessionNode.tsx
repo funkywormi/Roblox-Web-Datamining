@@ -6,13 +6,13 @@ import { useEffect, type JSX } from "react";
 import { ProgressCircle } from "@rbx/foundation-ui";
 
 import { odpSessionApi } from "../../services/odpSessionApi";
-import { asStringRecord, asText } from "../../utils/nodeDetails";
+import { asRequestDetails, asText } from "../../utils/nodeDetails";
 import type { NodeProps } from "../../types";
 
 export type CreateOdpSessionDetails = {
   odpProfileId?: string;
   requestType: string;
-  requestDetails?: Record<string, string>;
+  requestDetails?: Record<string, string | null>;
   isOdpInitiated?: boolean;
 };
 
@@ -20,7 +20,7 @@ export function CreateOdpSessionNode({ props, report }: NodeProps): JSX.Element 
   const requestType = asText(props.requestType) ?? "";
   const odpProfileId = asText(props.odpProfileId);
   const isOdpInitiated = props.isOdpInitiated === true;
-  const requestDetails = asStringRecord(props.requestDetails);
+  const requestDetails = asRequestDetails(props.requestDetails);
 
   useEffect(() => {
     let cancelled = false;

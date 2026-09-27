@@ -1,4 +1,4 @@
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import RouterPath from "../../../enums/RouterPath";
 
 const accountSettingsCounter = createFireTelemetryCounter("AccountSettings");

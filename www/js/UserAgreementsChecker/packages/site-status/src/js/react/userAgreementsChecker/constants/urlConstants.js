@@ -1,20 +1,20 @@
-import { EnvironmentUrls } from 'Roblox';
+import { EnvironmentUrls } from "@rbx/legacy-webapp-types/Roblox";
 
 const { userAgreementsServiceApi } = EnvironmentUrls;
 // Needed as part of the agreement-resolution request to UAQS
-const clientType = 'web';
+const clientType = "web";
 
 export default {
   getAgreementResolutionConfig: () => {
     return {
       withCredentials: true,
-      url: `${userAgreementsServiceApi}/v1/agreements-resolution/${clientType}`
+      url: `${userAgreementsServiceApi}/v1/agreements-resolution/${clientType}`,
     };
   },
   getInsertAcceptancesConfig: () => {
     return {
       withCredentials: true,
-      url: `${userAgreementsServiceApi}/v1/acceptances`
+      url: `${userAgreementsServiceApi}/v1/acceptances`,
     };
-  }
+  },
 };

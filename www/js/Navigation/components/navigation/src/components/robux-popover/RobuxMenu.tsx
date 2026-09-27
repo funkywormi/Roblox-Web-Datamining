@@ -137,7 +137,7 @@ export default function RobuxMenu({
               href={buyRobuxUrl.buyRobux.url}
               title={translate(buyRobuxUrl.buyRobux.label)}
               trailing={robuxBadgeStr ? translate(robuxBadgeStr) : undefined}
-              onClick={onBuyRobuxClicked}
+              onSelect={onBuyRobuxClicked}
             />
           )}
           <MenuItem

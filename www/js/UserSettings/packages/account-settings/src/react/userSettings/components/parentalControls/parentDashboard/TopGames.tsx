@@ -31,7 +31,15 @@ import screentimeUtils from "../../../utils/parentalControls/screentime/screenti
 //   for blocking/management.
 // - child's own settings (`child` undefined): rows link directly to the EDP,
 //   since the details page only adds parent-only block actions.
-const TopGames = ({ child }: { child?: TChildInfo }): JSX.Element => {
+// `isParentFacing` covers Parent Zone, which reads the signed-in child's own playtime like the
+// child's settings do but is viewed by their on-device parent, so the copy has to address a parent.
+const TopGames = ({
+  child,
+  isParentFacing = false,
+}: {
+  child?: TChildInfo;
+  isParentFacing?: boolean;
+}): JSX.Element => {
   const { translate } = useTranslation();
   const history = useHistory();
 
@@ -43,7 +51,9 @@ const TopGames = ({ child }: { child?: TChildInfo }): JSX.Element => {
     <div
       dangerouslySetInnerHTML={{
         __html: translate(
-          child ? topGames.description : perExperienceScreentime.childSideDescription,
+          child || isParentFacing
+            ? topGames.description
+            : perExperienceScreentime.childSideDescription,
           {
             linkStart: `<a href=${perExperienceScreentimeHelpPageUrl} class="text-link" target="_blank">`,
             linkEnd: "</a>",

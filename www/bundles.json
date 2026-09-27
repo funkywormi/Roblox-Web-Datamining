@@ -665,7 +665,7 @@
         },
         {
             "name": "Common.GameSorts",
-            "url": "https://js.rbxcdn.com/3463b18c75f960f230600394412059fd1b34cb81c8d944fa9b41b66715d1733a.js",
+            "url": "https://js.rbxcdn.com/102f367f365415eec3ee964e3fb3a6dfa2fd39c63f3c0f381f141c551b61bc5f.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -1096,7 +1096,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/08fe25333d52c40ac1de7f01e9fca7a83d7df7ee5bdb2bd1a4cb2f99fa574f8b.js",
+            "url": "https://js.rbxcdn.com/3ba5ab52b364667149d3027e336dd78f8f0feb32acbfdf5f8ef378d0454fa616.js",
             "sources": [
                 "ALL"
             ]
@@ -1206,7 +1206,7 @@
         },
         {
             "name": "Feature.Avatar",
-            "url": "https://js.rbxcdn.com/e1197fab6a678e5aa8aea0f57a85e2f62e0421e00195319c7fad2373a9788e76.js",
+            "url": "https://js.rbxcdn.com/2b2fff5ededeeaafd5e6a05a0f9f8dda2f53c76efc730f8b52bbe8a804c7899e.js",
             "sources": [
                 "/users/profile/edit",
                 "/my/avatar"
@@ -2845,7 +2845,7 @@
         },
         {
             "name": "Feature.ProfileBadges",
-            "url": "https://js.rbxcdn.com/ebc57f8a4aabceab9f38dda880bf11c04f2c92f441e535f0bcaa21b294736e65.js",
+            "url": "https://js.rbxcdn.com/22681959c41ec4192828cea8a1c5d5b4a02dc5373536f7a4188001ad23c616d2.js",
             "sources": [
                 "/home",
                 "/",
@@ -3189,7 +3189,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/a7a6398d2fb857655d6c754224776eee7b4f6473e2d2571571bb1c1f79bfaf8f.js",
+            "url": "https://js.rbxcdn.com/7c8e2f2fce8674a5f1807bd28c83e7a37bc70501191f6f8ef429b6c64811e359.js",
             "sources": [
                 "/home",
                 "/",
@@ -3467,7 +3467,7 @@
         },
         {
             "name": "Feature.SponsoredPages",
-            "url": "https://js.rbxcdn.com/c55f0f0233123300748d490dc6d7391964cdccc246fba290cefd7df2ff9f95e0.js",
+            "url": "https://js.rbxcdn.com/5125e1bab797d10f78127add87f7a0b2294ac7cbe2327e5e8d9d84ba97f15d36.js",
             "sources": [
                 "/shopgiftcards",
                 "/giftcards-us"
@@ -4016,7 +4016,7 @@
         },
         {
             "name": "AccessManagementUpsellV2",
-            "url": "https://js.rbxcdn.com/e958228bb207ccbbdf2a59671fc365f803b8b77113d1e2fc1390cae37d39e8e8-AccessManagementUpsellV2.js",
+            "url": "https://js.rbxcdn.com/69c96eb330be5289603d4db298c26fab82bcc5419e2d7f3776bf11a22c3efdaa-AccessManagementUpsellV2.js",
             "sources": [
                 "/home",
                 "/",
@@ -5629,7 +5629,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/9be038051bc1b55542e94d7d30e53d09c6db81ba4badb8fe95bf985cd2856380-Navigation.js",
+            "url": "https://js.rbxcdn.com/33107b61f8f5498c052c5b2f425e9c0ef20fbea5d567b3bddd264375b03ffe19-Navigation.js",
             "sources": [
                 "/home",
                 "/",
@@ -6186,7 +6186,7 @@
         },
         {
             "name": "RobloxSubscription",
-            "url": "https://js.rbxcdn.com/0fafc2410626572313b4dd71100feba1d343a0de8c6ce0ed9022b45a195d2909-RobloxSubscription.js",
+            "url": "https://js.rbxcdn.com/acf104aeb691944f218a227841d6039bda869965d11f8d62f15aaca891482377-RobloxSubscription.js",
             "sources": [
                 "/plus"
             ]
@@ -6686,7 +6686,7 @@
         },
         {
             "name": "UserAgreementsChecker",
-            "url": "https://js.rbxcdn.com/18a39f1adad50fcd69442f5ddd58c68c80ee0ff59fadc808ffda3195ceb492a8.js",
+            "url": "https://js.rbxcdn.com/8d4bc3df3b454e8386c320b7f85ea0ccb62a1a3725455b085aae8c2d19c026cd-UserAgreementsChecker.js",
             "sources": [
                 "/home",
                 "/",
@@ -6798,7 +6798,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/e51d5b261b8503dd3e19dbe59ba268556acaabf187c54f329fcaab7c6c53b3c8-UserSettings.js",
+            "url": "https://js.rbxcdn.com/be14bd65064e5e54ccda4d40270428852d594a6a9cbf4a5867fd924532e55481-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -8830,7 +8830,7 @@
         },
         {
             "name": "UserAgreementsChecker",
-            "url": "https://css.rbxcdn.com/d5a3728b78be729b693aadf79a1f45f0fa49c15fe863a0d7dd631b75f9e82207.css",
+            "url": "https://css.rbxcdn.com/f401268ebc090113a61a0cd2b4ceb4d248a780da241aec24bdce0e0a3f5c7e0a-UserAgreementsChecker.css",
             "sources": [
                 "/home",
                 "/",
@@ -8891,7 +8891,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://css.rbxcdn.com/dd121b422396d6ca0a5d9e286ddd8c9f517afdf752d0c3ba8b8acdd0ee700d53-UserSettings.css",
+            "url": "https://css.rbxcdn.com/bdc5c7f86da6f0938f38a3b45217f64d955362d047dd6b4f6cf773e4cff361f1-UserSettings.css",
             "sources": [
                 "/my/account"
             ]

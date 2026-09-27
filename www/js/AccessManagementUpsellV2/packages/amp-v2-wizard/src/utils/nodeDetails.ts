@@ -8,16 +8,22 @@ export function asText(value: unknown): string | undefined {
 }
 
 /**
- * Parses a server-authored string map (e.g. `requestDetails`). A non-object degrades to `undefined`;
- * non-string values are dropped so the result is a clean `Record<string, string>`.
+ * Parses a server-authored `requestDetails` map. A non-object degrades to `undefined`.
+ *
+ * Allow null values - requestDetails can be null for consents where parents freely pick a value,
+ * like screentime/robux transfer limit requests.
  */
-export function asStringRecord(value: unknown): Record<string, string> | undefined {
+export function asRequestDetails(value: unknown): Record<string, string | null> | undefined {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return undefined;
   }
   const entries: [string, unknown][] = Object.entries(value);
-  const record: Record<string, string> = {};
+  const record: Record<string, string | null> = {};
   for (const [key, item] of entries) {
+    if (item === null) {
+      record[key] = null;
+      continue;
+    }
     const text = asText(item);
     if (text !== undefined) {
       record[key] = text;

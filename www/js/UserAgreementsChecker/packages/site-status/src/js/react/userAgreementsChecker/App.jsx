@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { withTranslations } from 'react-utilities';
-import { translationConfig } from './translation.config';
-import userAgreementsService from './services/userAgreementsService';
-import UserAgreementsChecker from './components/UserAgreementsChecker';
-import cachedAgreementUtils from './utils/agreementCacheUtils';
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
+import { translationConfig } from "./translation.config";
+import userAgreementsService from "./services/userAgreementsService";
+import UserAgreementsChecker from "./components/UserAgreementsChecker";
+import cachedAgreementUtils from "./utils/agreementCacheUtils";
 
 const App = ({ translate }) => {
   const [userAgreements, setUserAgreements] = useState([]);
@@ -49,7 +49,7 @@ const App = ({ translate }) => {
 };
 
 App.propTypes = {
-  translate: PropTypes.func.isRequired
+  translate: PropTypes.func.isRequired,
 };
 
 // Export App separately for testing purposes

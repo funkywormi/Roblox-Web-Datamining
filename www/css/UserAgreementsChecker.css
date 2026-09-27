@@ -3,6 +3,6 @@
 }
 
 .agreement-modal-body {
-    overflow: auto;
-    max-height: 324px
+    max-height: 324px;
+    overflow: auto
 }

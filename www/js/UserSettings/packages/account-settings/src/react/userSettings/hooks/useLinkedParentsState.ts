@@ -10,6 +10,7 @@ export type TLinkedParentsState = {
   hasOnDeviceParent: boolean;
   remoteParents: TParentInfo[];
   showParentList: boolean;
+  showSentRequests: boolean;
   showAddParentUpsell: boolean;
   addParentUpsellVariant: AddParentUpsellVariant | undefined;
   canAddRemoteParent: boolean;
@@ -64,6 +65,8 @@ const useLinkedParentsState = (): TLinkedParentsState => {
       hasOnDeviceParent,
       remoteParents,
       showParentList: isReady && visibleParentCount > 0,
+      // Only show sent requests if there are linked remote parents
+      showSentRequests: isReady && remoteParents.length > 0,
       showAddParentUpsell:
         isReady && visibleParentCount === 0 && eligibleParentTypesToAdd.length > 0,
       addParentUpsellVariant: toUpsellVariant(parentInfo?.eligibleAddParentUpsellVariant),

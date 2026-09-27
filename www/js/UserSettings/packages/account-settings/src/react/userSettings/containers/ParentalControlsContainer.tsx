@@ -21,6 +21,8 @@ import commonTranslationConstants from "../constants/contentConstants/commonTran
 import ParentDashboardLandingPage from "../components/parentalControls/parentDashboard/ParentDashboardLandingPage";
 import ParentDashboardRoutes from "../components/parentalControls/routes/ParentDashboardRoutes";
 import ParentZoneLandingPage from "../components/parentalControls/parentZone/ParentZoneLandingPage";
+import ParentZoneRoutes from "../components/parentalControls/routes/ParentZoneRoutes";
+import { parentZonePageList } from "../constants/parentalControls/parentZonePages";
 import { useAppSelector } from "../../redux/hooks";
 import {
   selectAllChildPages,
@@ -39,6 +41,7 @@ export const ParentalControlsContainer = (): JSX.Element => {
   useScrollRestoration();
   const { data: childrenInfo, status: childrenInfoStatus } = useGetChildrenInfoQuery();
   const { actor, isChild, isLoading, hasError: hasActorError } = useParentalControlsActor();
+  const isOnDeviceParent = actor === ParentalControlsActor.OnDeviceParent;
 
   useEffect(() => {
     // Error handling
@@ -59,7 +62,7 @@ export const ParentalControlsContainer = (): JSX.Element => {
   // from `location.pathname` separately by `BackLink`.
   const currentPage = useMemo(
     () =>
-      allParentalControlsPages.find(p =>
+      [...allParentalControlsPages, ...parentZonePageList].find(p =>
         matchPath(pathNameNoTrailingSlash, { path: p.path, exact: true }),
       ),
     [allParentalControlsPages, pathNameNoTrailingSlash],
@@ -170,7 +173,8 @@ export const ParentalControlsContainer = (): JSX.Element => {
 
       {isCurrentlyOnParentalControlsEntryPage && getParentalControlsInnerComponent()}
       {/* Scope the wildcard redirect so it does not intercept valid parent routes. */}
-      {isChild && <ChildDashboardRoutes />}
+      {isOnDeviceParent && <ParentZoneRoutes />}
+      {isChild && !isOnDeviceParent && <ChildDashboardRoutes />}
       {!isChild && <ParentDashboardRoutes />}
     </div>
   );

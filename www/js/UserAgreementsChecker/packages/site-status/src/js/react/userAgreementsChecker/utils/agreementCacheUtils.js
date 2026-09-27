@@ -1,8 +1,8 @@
-import { DeviceMeta } from 'Roblox';
-import { localStorageService } from 'core-roblox-utilities';
-import { authenticatedUser } from 'header-scripts';
-import agreementConstants from '../constants/agreementConstants';
-import universalAppConfigurationService from '../services/universalAppConfigurationService';
+import { DeviceMeta } from "@rbx/legacy-webapp-types/Roblox";
+import { localStorageService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
+import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
+import agreementConstants from "../constants/agreementConstants";
+import universalAppConfigurationService from "../services/universalAppConfigurationService";
 
 // Agreement data is cached in the following format:
 // {
@@ -35,7 +35,7 @@ const shouldFetchAgreements = async nowDate => {
   try {
     // localStorageService.getLocalStorage does an implicit JSON.parse, which can throw an exception
     parsedCachedAgreementData = localStorageService.getLocalStorage(
-      agreementConstants.agreementLocalStorageKey
+      agreementConstants.agreementLocalStorageKey,
     );
   } catch (e) {
     // Shouldn't happen, but if the local storage data was somehow corrupted, we'll just do a fresh query
@@ -89,12 +89,12 @@ const updateDoesUserNeedToAcceptAgreements = (doesUserNeedToAcceptAgreements, no
   // If doesUserNeedToAcceptAgreements is true, then we just made a query and therefore must
   // update the cached lastFetchTimestamp
   if (doesUserNeedToAcceptAgreements && !(nowDate instanceof Date)) {
-    throw new TypeError('if doesUserNeedToAcceptAgreements is true then must provide a valid Date');
+    throw new TypeError("if doesUserNeedToAcceptAgreements is true then must provide a valid Date");
   }
 
   const dataToCache = {
     // The lastFetchTimestamp to cache is determined below
-    doesUserNeedToAcceptAgreements
+    doesUserNeedToAcceptAgreements,
   };
 
   if (!(nowDate instanceof Date)) {
@@ -103,7 +103,7 @@ const updateDoesUserNeedToAcceptAgreements = (doesUserNeedToAcceptAgreements, no
     try {
       // localStorageService.getLocalStorage does an implicit JSON.parse, which can throw an exception
       parsedCachedAgreementData = localStorageService.getLocalStorage(
-        agreementConstants.agreementLocalStorageKey
+        agreementConstants.agreementLocalStorageKey,
       );
       dataToCache.lastFetchTimestamp = parsedCachedAgreementData.lastFetchTimestamp;
     } catch (e) {
@@ -130,5 +130,5 @@ const updateDoesUserNeedToAcceptAgreements = (doesUserNeedToAcceptAgreements, no
 
 export default {
   shouldFetchAgreements,
-  updateDoesUserNeedToAcceptAgreements
+  updateDoesUserNeedToAcceptAgreements,
 };
