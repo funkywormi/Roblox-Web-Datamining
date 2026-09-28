@@ -82,7 +82,7 @@ export const getParentLinkSettingsCacheTag = (
   return { type: ApiCacheTag.ParentLinkSettings, id: childUserId };
 };
 
-const getChildFriendsCacheTag = (
+export const getChildFriendsCacheTag = (
   childUserId: number,
   findFriendsType: FindFriendsTypes,
 ): FullTagDescription<ApiCacheTag> => {

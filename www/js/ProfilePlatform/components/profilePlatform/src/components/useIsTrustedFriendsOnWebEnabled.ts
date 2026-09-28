@@ -31,16 +31,28 @@ export const isTrustedFriendActionHidden = (
   );
 };
 
+const trustedFriendsOnWebQuery = {
+  queryKey: ["web-trusted-friends"],
+  queryFn: async () => {
+    const result = await callBehaviour<TrustedFriendsOnWebEnabledResponse>("web-trusted-friends");
+    return result;
+  },
+  placeholderData: disabledResponse,
+};
+
 const useIsTrustedFriendsOnWebEnabled = (): TrustedFriendsOnWebEnabledResponse => {
-  const { data } = useQuery({
-    queryKey: ["web-trusted-friends"],
-    queryFn: async () => {
-      const result = await callBehaviour<TrustedFriendsOnWebEnabledResponse>("web-trusted-friends");
-      return result;
-    },
-    placeholderData: disabledResponse,
-  });
+  const { data } = useQuery(trustedFriendsOnWebQuery);
   return data ?? disabledResponse;
+};
+
+/**
+ * Whether the trusted friends rollout check has settled (succeeded or failed). Until then,
+ * trusted friend actions are hidden, so surfaces rendering actions can wait on this to avoid
+ * buttons popping in.
+ */
+export const useIsTrustedFriendsOnWebLoaded = (): boolean => {
+  const { isPlaceholderData } = useQuery(trustedFriendsOnWebQuery);
+  return !isPlaceholderData;
 };
 
 export default useIsTrustedFriendsOnWebEnabled;

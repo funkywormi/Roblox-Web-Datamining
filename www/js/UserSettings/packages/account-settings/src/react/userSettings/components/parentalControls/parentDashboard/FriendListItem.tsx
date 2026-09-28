@@ -1,18 +1,5 @@
-import React, { useMemo } from "react";
-import { Button, IconButton, Popover } from "react-style-guide";
-import { CurrentUser } from "Roblox";
-import VerifiedBadgeIcon, {
-  VERIFIED_BADGE_ARIA_LABEL,
-  VERIFIED_BADGE_ARIA_LABEL_KEY,
-} from "@rbx/www-common/components/verified-badge";
-import {
-  Thumbnail2d,
-  ThumbnailTypes,
-  ThumbnailAvatarHeadshotSize,
-  ThumbnailFormat,
-} from "roblox-thumbnails";
+import React from "react";
 import { ParentalControlsErrorCode, useSnackbar } from "@rbx/user-settings";
-import { useGetAbuseReportRevampPolicyQuery } from "../../../../apis/universalAppConfigurationApi";
 import { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import {
   ManagementAction,
@@ -24,16 +11,14 @@ import useSettingsModal, {
 } from "../../../../common/hooks/modals/useSettingsModal";
 import { useManageChildFriendMutation } from "../../../../apis/parentalControlsApi";
 import { TFriendResponse } from "../../../../../types/friendsTypes";
-import {
-  getProfileUrl,
-  getAbuseReportRevampUrl,
-  getReportUrl,
-} from "../../../constants/urlConstants";
+import { getProfileUrl } from "../../../constants/urlConstants";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
-import { popoverPadding } from "../../../constants/parentalControls/friendManagementConstants";
 import parentalControlsEventService from "../../../services/eventServices/parentalControlsEventService";
+import useFriendReportUrl from "../../../hooks/useFriendReportUrl";
 import { useWrappedTranslation } from "../../../hooks/useWrappedTranslation";
+import FriendManageMenu from "../shared/FriendManageMenu";
+import FriendRow from "../shared/FriendRow";
 
 export const FriendListItem = ({
   friend,
@@ -51,22 +36,7 @@ export const FriendListItem = ({
   const [manageChildFriend] = useManageChildFriendMutation();
   const { snackbarService } = useSnackbar();
   const { translate } = useWrappedTranslation();
-  const { data: abuseReportRevampPolicy } = useGetAbuseReportRevampPolicyQuery();
-
-  const getThumbnail = (): JSX.Element => {
-    const thumbnail = (
-      <Thumbnail2d
-        containerClass="friend-thumbnail"
-        type={ThumbnailTypes.avatarHeadshot}
-        size={ThumbnailAvatarHeadshotSize.size150}
-        targetId={friend.id}
-        format={ThumbnailFormat.webp}
-        imgClassName="friend-card-image"
-      />
-    );
-
-    return thumbnail;
-  };
+  const reportUrl = useFriendReportUrl(friend.id);
 
   const [maxBlockedFriendsModal, maxBlockedFriendsModalService] = useSettingsInfoModal(
     parentalControlsTranslationConstants.friendManagement.cantBlockUser,
@@ -123,133 +93,53 @@ export const FriendListItem = ({
     },
   });
 
-  const getDisplayName = (): JSX.Element => {
-    const displayNameContainer = (
-      <div className="friend-name-container">
-        <div className="display-name text-name">{displayName}</div>
-        {friend.hasVerifiedBadge && (
-          <VerifiedBadgeIcon
-            size="Medium"
-            className="verified-badge"
-            titleText={translate(
-              VERIFIED_BADGE_ARIA_LABEL_KEY,
-              undefined,
-              VERIFIED_BADGE_ARIA_LABEL,
-            )}
-          />
-        )}
-      </div>
-    );
-
-    return displayNameContainer;
-  };
-
-  const atUsername = isTrusted
-    ? `@${userName} • ${translate(parentalControlsTranslationConstants.friendManagement.trustedLabel)}`
-    : `@${userName}`;
-
-  const reportUrl = useMemo(() => {
-    if (abuseReportRevampPolicy?.EnableParentalDashboard) {
-      return getAbuseReportRevampUrl({
-        targetId: String(friend.id),
-        submitterId: CurrentUser.userId,
-        abuseVector: "userprofile",
-      });
-    }
-    return getReportUrl(friend.id);
-  }, [abuseReportRevampPolicy, friend.id]);
-
   return (
     <React.Fragment>
       {confirmBlockUserModal}
-      <li className="friend-card-list-item">
-        <a
-          className="friend-card"
-          href={getProfileUrl(friend.id)}
-          // TODO ACCMAN-2256: Integrate deep linking
-        >
-          <div className="friend-thumbnails-container">{getThumbnail()}</div>
-          <div className="friend-name-parent-container">
-            {getDisplayName()}
-            <div className="user-name">{atUsername}</div>
-          </div>
-        </a>
-
-        {child?.canParentManageChildsFriends && (
-          <Popover
-            id={`manage-friend-dropdown-${friend.id}`}
-            button={
-              <IconButton
-                className="friend-management-menu"
-                iconName="overflow-vertical"
-                size={IconButton.sizes.small}
-                onClick={() => {
-                  parentalControlsEventService.authButtonClickSettingsPControlsFriendsUserDetail(
-                    child,
-                    friend.id,
-                  );
-                }}
-                altName={translate(commonTranslationConstants.manage)}
-              />
-            }
-            trigger="click"
-            containerPadding={popoverPadding}
-            placement="bottom"
-          >
-            <ul className="dropdown-menu" role="menu">
-              {/* View profile menu item */}
-              <li>
-                <a
-                  href={getProfileUrl(friend.id)}
-                  onClick={() => {
-                    parentalControlsEventService.authButtonClickSettingsPControlsFriendsViewProfile(
-                      child,
-                      friend.id,
-                    );
-                  }}
-                >
-                  {translate(parentalControlsTranslationConstants.friendManagement.viewProfile)}
-                </a>
-              </li>
-
-              {/* Block user menu item */}
-              <li>
-                <Button
-                  variant={Button.variants.secondary}
-                  onClick={() => {
-                    parentalControlsEventService.authButtonClickSettingsPControlsFriendsBlock(
-                      child,
-                      friend.id,
-                    );
-                    parentalControlsEventService.authModalShownSettingsPControlsFriendsConfirmBlock(
-                      child,
-                      friend.id,
-                    );
-                    confirmBlockUserModalService.open();
-                  }}
-                >
-                  {translate(parentalControlsTranslationConstants.friendManagement.block)}
-                </Button>
-              </li>
-
-              {/* Report user menu item */}
-              <li>
-                <a
-                  href={reportUrl}
-                  onClick={() => {
-                    parentalControlsEventService.authButtonClickSettingsPControlsFriendsReport(
-                      child,
-                      friend.id,
-                    );
-                  }}
-                >
-                  {translate(parentalControlsTranslationConstants.friendManagement.report)}
-                </a>
-              </li>
-            </ul>
-          </Popover>
-        )}
-      </li>
+      <FriendRow
+        friend={friend}
+        displayName={displayName}
+        userName={userName}
+        isTrusted={isTrusted}
+        trailing={
+          child?.canParentManageChildsFriends && (
+            <FriendManageMenu
+              id={`manage-friend-dropdown-${friend.id}`}
+              profileUrl={getProfileUrl(friend.id)}
+              reportUrl={reportUrl}
+              onOpen={() => {
+                parentalControlsEventService.authButtonClickSettingsPControlsFriendsUserDetail(
+                  child,
+                  friend.id,
+                );
+              }}
+              onViewProfile={() => {
+                parentalControlsEventService.authButtonClickSettingsPControlsFriendsViewProfile(
+                  child,
+                  friend.id,
+                );
+              }}
+              onBlock={() => {
+                parentalControlsEventService.authButtonClickSettingsPControlsFriendsBlock(
+                  child,
+                  friend.id,
+                );
+                parentalControlsEventService.authModalShownSettingsPControlsFriendsConfirmBlock(
+                  child,
+                  friend.id,
+                );
+                confirmBlockUserModalService.open();
+              }}
+              onReport={() => {
+                parentalControlsEventService.authButtonClickSettingsPControlsFriendsReport(
+                  child,
+                  friend.id,
+                );
+              }}
+            />
+          )
+        }
+      />
       {maxBlockedFriendsModal}
     </React.Fragment>
   );

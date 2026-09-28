@@ -1,10 +1,15 @@
 import React from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { baseParentalControlsPath } from "../../../constants/parentalControls/parentalControlsConstants";
-import { parentZonePages } from "../../../constants/parentalControls/parentZonePages";
+import {
+  getParentZoneTopGameDetailsPath,
+  parentZonePages,
+} from "../../../constants/parentalControls/parentZonePages";
 import { useGetOdpChildContextQuery } from "../../../../apis/parentalControlsApi";
+import OdpTopFriendsPage from "../parentZone/OdpTopFriendsPage";
 import TopGames from "../parentDashboard/TopGames";
 import ManageOnDeviceParentPage from "../parentZone/ManageOnDeviceParentPage";
+import OdpTopGameDetails from "../parentZone/OdpTopGameDetails";
 
 // Parent Zone subpages. A page is only reachable while its flag is on, so a link to a page the
 // server has turned off redirects back to the landing page instead.
@@ -14,10 +19,21 @@ export const ParentZoneRoutes = (): JSX.Element => {
 
   return (
     <Switch>
+      {odpChildContext?.canParentViewChildFriends === true && (
+        <Route exact path={parentZonePages.friendManagementPage.path}>
+          <OdpTopFriendsPage />
+        </Route>
+      )}
+
+      {odpChildContext?.canParentManageChildsExperiences === true && (
+        <Route exact path={parentZonePages.topGameDetailsPage.path}>
+          <OdpTopGameDetails />
+        </Route>
+      )}
+
       {odpChildContext?.canParentManageChildsExperiences === true && (
         <Route exact path={parentZonePages.topGamesPage.path}>
-          {/* No child, so a row opens the experience rather than the parent's own page. */}
-          <TopGames isParentFacing />
+          <TopGames isParentFacing detailsPath={getParentZoneTopGameDetailsPath} />
         </Route>
       )}
 

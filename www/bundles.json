@@ -2443,7 +2443,7 @@
         },
         {
             "name": "Feature.Parents",
-            "url": "https://js.rbxcdn.com/dee3ec6839c60f4db8c6ae027b92bcab0b405d2f1b006ff8f78be928a0a8f58e.js",
+            "url": "https://js.rbxcdn.com/48353441e94d4d8f7342acc216cf128e39af445ea9bdc56640675b9617d25bce.js",
             "sources": [
                 "/home",
                 "/",
@@ -4016,7 +4016,7 @@
         },
         {
             "name": "AccessManagementUpsellV2",
-            "url": "https://js.rbxcdn.com/69c96eb330be5289603d4db298c26fab82bcc5419e2d7f3776bf11a22c3efdaa-AccessManagementUpsellV2.js",
+            "url": "https://js.rbxcdn.com/066248e0f90bfdc05c2df5bca2d68f3f9273460738e05100b03308e496410ddf-AccessManagementUpsellV2.js",
             "sources": [
                 "/home",
                 "/",
@@ -5939,7 +5939,7 @@
         },
         {
             "name": "ProfilePlatform",
-            "url": "https://js.rbxcdn.com/223f37b62caf59538cfa26849ba3e938ca515b9ccdc8d0c2700d684bd9ba7ec1-ProfilePlatform.js",
+            "url": "https://js.rbxcdn.com/a8e0baa54eb2b0f940a5715871d219a1ce2d7510a07bd24b81a9ccd185413e3d-ProfilePlatform.js",
             "sources": [
                 "/users/1/profile"
             ]
@@ -6118,7 +6118,7 @@
         },
         {
             "name": "RedeemGiftCard",
-            "url": "https://js.rbxcdn.com/66ad824dc9586090f43f53aacc2f204d99d9cbcb6b43d4980a1864eea2a248c5-RedeemGiftCard.js",
+            "url": "https://js.rbxcdn.com/c960530ddd431878e9fc06deed714003799a41253605682e576b5c472d270ebe-RedeemGiftCard.js",
             "sources": [
                 "/redeem"
             ]
@@ -6798,7 +6798,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/be14bd65064e5e54ccda4d40270428852d594a6a9cbf4a5867fd924532e55481-UserSettings.js",
+            "url": "https://js.rbxcdn.com/6ed7f7c6f689b09b94ca15a9be2dc2757fb70b4d356a9f22aa2fdd1471f15b15-UserSettings.js",
             "sources": [
                 "/my/account"
             ]

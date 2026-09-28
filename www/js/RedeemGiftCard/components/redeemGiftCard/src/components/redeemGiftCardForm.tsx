@@ -173,6 +173,7 @@ function RedeemGiftCardForm({
   };
 
   const handleSuccess = (data: RedeemReponse) => {
+    window.dispatchEvent(new CustomEvent("navigation-update-user-currency"));
     setNeedFirstTimeConsent(false);
     const result = data.redemptionResult ? data.redemptionResult : data;
     const isRobloxPlusRedemption = result.productNamespace === ROBLOX_PLUS_PRODUCT_NAMESPACE;

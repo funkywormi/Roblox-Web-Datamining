@@ -15,8 +15,11 @@ import { TGameData } from "../components/parentalControls/parentDashboard/GameTi
  * and individual game detail pages so they all stay in sync.
  */
 const useTopWeeklyGames = (child?: TChildInfo): { games: TGameData[]; isLoading: boolean } => {
-  const { data: screentimeData, isLoading: isScreentimeLoading } =
-    useGetTopWeeklyScreentimeByUniverseQuery(child?.userId);
+  const {
+    data: screentimeData,
+    isLoading: isScreentimeLoading,
+    isUninitialized: isScreentimeUninitialized,
+  } = useGetTopWeeklyScreentimeByUniverseQuery(child?.userId);
 
   const { data: blockedExperiencesResult } = useGetBlockedExperiencesQuery({
     targetUserId: child?.userId ?? authenticatedUser.id!,
@@ -29,7 +32,11 @@ const useTopWeeklyGames = (child?: TChildInfo): { games: TGameData[]; isLoading:
     [screentimeData],
   );
 
-  const { data: gamesDetails, isLoading: isDetailsLoading } = useGetGamesDetailsQuery(universeIds, {
+  const {
+    data: gamesDetails,
+    isLoading: isDetailsLoading,
+    isUninitialized: isDetailsUninitialized,
+  } = useGetGamesDetailsQuery(universeIds, {
     skip: universeIds.length === 0,
   });
   const { data: ageRecommendations } = useGetAgeRecommendationQuery(universeIds, {
@@ -63,7 +70,10 @@ const useTopWeeklyGames = (child?: TChildInfo): { games: TGameData[]; isLoading:
 
   return {
     games,
-    isLoading: isScreentimeLoading || (universeIds.length > 0 && isDetailsLoading),
+    isLoading:
+      isScreentimeUninitialized ||
+      isScreentimeLoading ||
+      (universeIds.length > 0 && (isDetailsUninitialized || isDetailsLoading)),
   };
 };
 

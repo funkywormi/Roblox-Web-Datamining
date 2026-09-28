@@ -13,6 +13,7 @@ enum ExperimentKey {
   IsWebUserProfileFavoritesRedesignEnabled = "isWebUserProfileFavoritesRedesignEnabled",
   IsIARCProfileRedesignEnabled = "isIARCProfileRedesignEnabled",
   IsCurrentlyPlayingCardClickableEnabled = "isCurrentlyPlayingCardClickableEnabled",
+  IsActionsV2Enabled = "isActionsV2Enabled",
   WebPlayerBadgesRedesign = "isWebPlayerBadgesRedesignEnabled",
   IsWebProfileBackgroundEnabled = "isWebProfileBackgroundEnabled",
   IsWebProfileCreationsMigrationEnabled = "isWebProfileCreationsMigrationEnabled",
@@ -180,13 +181,18 @@ type ExperimentValue = boolean | string | number | object;
 function useLayerTreatments<TSchema extends Record<string, ExperimentValue>>(
   layerName: string,
   mockValues?: Partial<TSchema>,
-): { getValue: <K extends keyof TSchema>(key: K) => TSchema[K] | null } {
+): {
+  getValue: <K extends keyof TSchema>(key: K) => TSchema[K] | null;
+  isLoaded: boolean;
+} {
   const [layerValues, setLayerValues] = useState<Partial<TSchema> | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     // If mock values are provided, use them immediately
     if (mockValues !== undefined) {
       setLayerValues(mockValues);
+      setIsLoaded(true);
       return;
     }
 
@@ -212,9 +218,12 @@ function useLayerTreatments<TSchema extends Record<string, ExperimentValue>>(
       // Type assertion is safe here as we're storing the raw IXP response which matches our schema contract
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       setLayerValues(ixpResult as Partial<TSchema>);
+      setIsLoaded(true);
     })().catch((error: unknown) => {
       console.error(error);
-      // Keep using cached values if available
+      // Keep using cached values if available, or resolve with no treatments on failure.
+      setLayerValues(currentValues => currentValues ?? {});
+      setIsLoaded(true);
     });
   }, [layerName, mockValues]);
 
@@ -224,7 +233,7 @@ function useLayerTreatments<TSchema extends Record<string, ExperimentValue>>(
     return value !== undefined ? (value as TSchema[K]) : null;
   };
 
-  return { getValue };
+  return { getValue, isLoaded };
 }
 
 export { useIsInTreatmentWithLocalCache, useLayerTreatments, ExperimentKey, ExperimentationLayer };

@@ -264,6 +264,9 @@ export default {
   odpAccountUpgrade: {
     heading: "Heading.CreateYourOwnRobloxAccount",
     description: "Description.OdpAccountUpgradeUpsell",
+    createAccountAction: "Action.CreateParentAccount",
+    createAccountDescription: "Description.CreateParentAccount",
+    updateEmailAction: "Action.UpdateParentEmail",
   },
   parentConsentsLegallySensitiveContent: {
     consentCenterAllowActionConsentName: "consentCenterAllowAction",

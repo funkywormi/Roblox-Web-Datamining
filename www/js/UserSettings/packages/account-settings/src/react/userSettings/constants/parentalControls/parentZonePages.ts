@@ -8,14 +8,18 @@ const { pageTitles } = parentalControlsTranslationConstants;
 type TParentZonePages = {
   topGamesPage: TSettingsPage;
   manageOnDeviceParentPage: TSettingsPage;
+  friendManagementPage: TSettingsPage;
+  topGameDetailsPage: TSettingsPage;
 };
 
 // Pages an on-device parent can reach from Parent Zone. There is only ever one child here, so
 // these need no child id in the path.
+const topGamesPath = `${baseParentalControlsPath}/${ParentalControlsPageName.TopGames}`;
+
 export const parentZonePages: TParentZonePages = {
   topGamesPage: {
     name: ParentalControlsPageName.TopGames,
-    path: `${baseParentalControlsPath}/${ParentalControlsPageName.TopGames}`,
+    path: topGamesPath,
     titleTranslationKey: pageTitles[ParentalControlsPageName.TopGames],
   },
   manageOnDeviceParentPage: {
@@ -23,7 +27,21 @@ export const parentZonePages: TParentZonePages = {
     path: `${baseParentalControlsPath}/${ParentalControlsPageName.ManageOnDeviceParent}`,
     titleTranslationKey: pageTitles[ParentalControlsPageName.ManageOnDeviceParent],
   },
+  friendManagementPage: {
+    name: ParentalControlsPageName.FriendManagement,
+    path: `${baseParentalControlsPath}/${ParentalControlsPageName.FriendManagement}`,
+    titleTranslationKey: pageTitles[ParentalControlsPageName.FriendManagement],
+  },
+  topGameDetailsPage: {
+    name: ParentalControlsPageName.TopGameDetails,
+    path: `${topGamesPath}/:universeId`,
+    titleTranslationKey: pageTitles[ParentalControlsPageName.TopGameDetails],
+  },
 };
+
+/** The details page for one experience, with the route parameter filled in. */
+export const getParentZoneTopGameDetailsPath = (universeId: number | string): string =>
+  `${topGamesPath}/${universeId}`;
 
 export const parentZonePageList: TSettingsPage[] = Object.values(parentZonePages);
 

@@ -1,12 +1,9 @@
 /* eslint-disable no-void */
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useInView } from "react-intersection-observer";
-import { UserProfileField } from "@rbx/user-profile-api-client";
+import React, { useEffect, useMemo, useState } from "react";
 import { Chip } from "@rbx/foundation-ui";
 import { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import {
   useGetChildFriendsCountQuery,
-  useGetChildFriendsQuery,
   useLazyGetChildFriendsQuery,
 } from "../../../../apis/parentalControlsApi";
 import {
@@ -15,11 +12,10 @@ import {
   FriendFilterType,
 } from "../../../../../types/friendsTypes";
 import FriendListItem from "./FriendListItem";
-import InformationalScreen from "../../../../common/components/InformationalScreen";
+import FriendsListSection from "../shared/FriendsListSection";
+import useChildFriendsList from "../../../hooks/useChildFriendsList";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
-import StackedUserInput from "../../../../common/components/StackedUserInput";
 import { useWrappedTranslation } from "../../../hooks/useWrappedTranslation";
-import useIncrementalUserProfiles from "../../../../apis/hooks/useIncrementalGetUserProfiles";
 import { trustedConnectionsHelpPageUrl } from "../../../constants/urlConstants";
 import {
   AddTrustedConnectionFeatureSet,
@@ -69,15 +65,7 @@ const FriendManagementSection = ({
     ];
   }, [translate, countData]);
 
-  const {
-    data: friendData,
-    isError,
-    isLoading,
-  } = useGetChildFriendsQuery({
-    userId: child.userId,
-    userSort,
-    findFriendsType,
-  });
+  const list = useChildFriendsList({ userId: child.userId, userSort, findFriendsType });
 
   // FindFriends does not return info about which friends are trusted,
   // so we need to fetch all pages of trusted friends so we can mark which friends are trusted when viewing "All"
@@ -112,60 +100,6 @@ const FriendManagementSection = ({
 
     void fetchAllTrustedFriends();
   }, [child.userId, fetchTrustedFriends]);
-
-  const [fetchNextChildFriends, { isFetching: isFetchingNextPage }] = useLazyGetChildFriendsQuery();
-
-  const friendIds: number[] = useMemo(
-    () => Object.values(friendData?.PageItems || {}).map(friend => friend.id),
-    [friendData],
-  );
-
-  const userProfileFields = [UserProfileField.Names.CombinedName, UserProfileField.Names.Username];
-  const { data: friendNames, loading: userProfilesLoading } = useIncrementalUserProfiles(
-    friendIds,
-    userProfileFields,
-  );
-
-  const fetchMoreFriends = useCallback(async () => {
-    if (!isLoading && friendData?.NextCursor) {
-      await fetchNextChildFriends({
-        userId: child.userId,
-        userSort,
-        cursor: friendData?.NextCursor,
-        findFriendsType,
-      });
-    }
-  }, [friendData, fetchNextChildFriends, isLoading, child.userId, userSort, findFriendsType]);
-
-  const { ref, inView } = useInView(); // This hook fires when the object comes into view.
-
-  useEffect(() => {
-    // We add ref to the bottom of the list, so we know to paginate the list if ref is in view (and the current list is loaded).
-    if (inView && friendData?.NextCursor && !isFetchingNextPage && !userProfilesLoading) {
-      void fetchMoreFriends();
-    }
-  }, [inView, friendData, isFetchingNextPage, userProfilesLoading, fetchMoreFriends]);
-
-  const getFriendItems = (): JSX.Element | undefined => {
-    const listItems: JSX.Element[] = [];
-    Object.values(friendData?.PageItems || {}).forEach(friend => {
-      if (!friend) return;
-
-      const displayName = friendNames?.[friend.id]?.names?.combinedName ?? "";
-      const userName = friendNames?.[friend.id]?.names?.username ?? "";
-      listItems.push(
-        <FriendListItem
-          key={friend.id}
-          child={child}
-          friend={friend}
-          displayName={displayName}
-          userName={userName}
-          isTrusted={trustedFriendIds.has(friend.id)}
-        />,
-      );
-    });
-    return <React.Fragment>{listItems}</React.Fragment>;
-  };
 
   const getChips = (): JSX.Element | null => {
     if (!showChips) {
@@ -230,55 +164,29 @@ const FriendManagementSection = ({
     return <div className="text-body-medium" dangerouslySetInnerHTML={{ __html: combinedHtml }} />;
   };
 
-  const getSectionContent = (): JSX.Element | null => {
-    // 1. Handle loading state
-    if (isLoading) {
-      return null;
-    }
-
-    // 2. Handle error state now that we know the request is complete
-    if (isError) {
-      return (
-        <div className="friend-management-section">
-          <InformationalScreen
-            descriptionTranslationKey={parentalControlsTranslationConstants.errorLoadingList}
-          />
-        </div>
-      );
-    }
-
-    // 3. Handle the empty/zero-data state
-    if (!friendData?.PageItems || Object.keys(friendData.PageItems).length === 0) {
-      const zeroStateKey: string =
-        activeFilter === FriendFilterType.Trusted
-          ? parentalControlsTranslationConstants.friendManagement.noTrustedConnections
-          : parentalControlsTranslationConstants.friendManagement.carousel.noFriends;
-
-      return (
-        <div className="friend-management-section">
-          <InformationalScreen descriptionTranslationKey={zeroStateKey} />
-        </div>
-      );
-    }
-
-    // Default/success state: render the list of friends
-    return (
-      <div className="friend-management-section">
-        <StackedUserInput inputId="show-friend-list">
-          <div className="friend-list">
-            {getFriendItems()}
-            {friendData?.NextCursor && <div ref={ref} />}
-          </div>
-        </StackedUserInput>
-      </div>
-    );
-  };
+  const zeroStateKey: string =
+    activeFilter === FriendFilterType.Trusted
+      ? parentalControlsTranslationConstants.friendManagement.noTrustedConnections
+      : parentalControlsTranslationConstants.friendManagement.carousel.noFriends;
 
   return (
     <div className="friend-list-container">
       {getDisclaimer()}
       {getChips()}
-      {getSectionContent()}
+      <FriendsListSection
+        list={list}
+        emptyDescriptionTranslationKey={zeroStateKey}
+        renderRow={(friend, displayName, userName) => (
+          <FriendListItem
+            key={friend.id}
+            child={child}
+            friend={friend}
+            displayName={displayName}
+            userName={userName}
+            isTrusted={trustedFriendIds.has(friend.id)}
+          />
+        )}
+      />
     </div>
   );
 };

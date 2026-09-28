@@ -10,10 +10,16 @@ type ExperimentsSchema = {
   [ExperimentKey.IsIARCProfileRedesignEnabled]: boolean;
   [ExperimentKey.IsWebProfileBackgroundEnabled]: boolean;
   [ExperimentKey.IsCurrentlyPlayingCardClickableEnabled]: boolean;
+  [ExperimentKey.IsActionsV2Enabled]: boolean;
   [ExperimentKey.IsWebProfileCreationsMigrationEnabled]: boolean;
 };
 
 interface ExperimentsContextValue {
+  /**
+   * Whether the experiment layer has finished loading.
+   */
+  isLoaded: boolean;
+
   /**
    * Get a typed experiment value by key.
    * @param key - The experiment key from ExperimentKey
@@ -48,7 +54,10 @@ export const ExperimentsProvider = ({
     [],
   );
 
-  const { getValue: baseGetValue } = useLayerTreatments<ExperimentsSchema>(layer, mockLayerValues);
+  const { getValue: baseGetValue, isLoaded } = useLayerTreatments<ExperimentsSchema>(
+    layer,
+    mockLayerValues,
+  );
 
   const getValue = useMemo(
     () =>
@@ -69,7 +78,10 @@ export const ExperimentsProvider = ({
     [getValue],
   );
 
-  const value = useMemo(() => ({ getValue, isInTreatment }), [getValue, isInTreatment]);
+  const value = useMemo(
+    () => ({ getValue, isInTreatment, isLoaded }),
+    [getValue, isInTreatment, isLoaded],
+  );
 
   return <ExperimentsContext.Provider value={value}>{children}</ExperimentsContext.Provider>;
 };

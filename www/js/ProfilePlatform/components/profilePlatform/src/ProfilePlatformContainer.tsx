@@ -24,13 +24,14 @@ const ProfilePlatformContainer = () => {
     profileType,
     profileSessionId,
     refreshProfilePlatform,
+    isActionsLoaded,
   } = useProfilePlatformContext();
   const { SystemFeedbackComponent } = useSystemFeedback();
   const firedPageLoadEvent = useRef(false);
   const gracefulDegradationEnabled = profileData?.gracefulDegradationEnabled ?? false;
 
   useEffect(() => {
-    if (isLoading || hasError || !profileData || firedPageLoadEvent.current) {
+    if (isLoading || hasError || !profileData || !isActionsLoaded || firedPageLoadEvent.current) {
       return;
     }
     firedPageLoadEvent.current = true;
@@ -46,7 +47,16 @@ const ProfilePlatformContainer = () => {
         authedUser?.id?.toString() === profileId,
       ),
     });
-  }, [isLoading, hasError, profileData, profileId, profileType, profileSessionId, authedUser?.id]);
+  }, [
+    isLoading,
+    hasError,
+    profileData,
+    isActionsLoaded,
+    profileId,
+    profileType,
+    profileSessionId,
+    authedUser?.id,
+  ]);
 
   useEffect(() => {
     if (!isAuthenticated) {

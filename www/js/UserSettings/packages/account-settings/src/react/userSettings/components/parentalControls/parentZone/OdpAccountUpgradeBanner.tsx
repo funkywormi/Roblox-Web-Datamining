@@ -2,7 +2,7 @@ import { useTranslation } from "react-utilities";
 import { Banner, Button } from "@rbx/foundation-ui";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
-import useOdpAccountUpgrade from "../../../hooks/useOdpAccountUpgrade";
+import useOdpAccountUpgrade, { OdpAccountUpgradeAction } from "../../../hooks/useOdpAccountUpgrade";
 
 // Upsell prompting user to upgrade their ODP to a remote parent
 export const OdpAccountUpgradeBanner = (): JSX.Element => {
@@ -18,7 +18,11 @@ export const OdpAccountUpgradeBanner = (): JSX.Element => {
       title={translate(odpAccountUpgrade.heading)}
       description={translate(odpAccountUpgrade.description)}
       actions={
-        <Button variant="Emphasis" size="Small" onClick={startAccountUpgrade}>
+        <Button
+          variant="Emphasis"
+          size="Small"
+          onClick={() => startAccountUpgrade(OdpAccountUpgradeAction.Create)}
+        >
           {translate(commonTranslationConstants.continue)}
         </Button>
       }

@@ -1,8 +1,10 @@
 export const OdpEventContext = {
+  Handoff: "odpHandoff",
   VerifyMethod: "odpVerifyMethod",
 } as const;
 
 export const OdpEventName = {
+  Pageload: "authPageload",
   ButtonClick: "authButtonClick",
   FormInteraction: "authFormInteraction",
   ModalShown: "authModalShown",
@@ -13,6 +15,8 @@ export const OdpEventField = {
 } as const;
 
 export const OdpEventButton = {
+  ContinueAsParent: "continueAsParent",
+  Back: "back",
   Continue: "continue",
 } as const;
 

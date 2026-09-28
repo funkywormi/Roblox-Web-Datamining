@@ -5,23 +5,31 @@ import { useAppDispatch } from "../../redux/hooks";
 
 const odpFlowName = "ODP";
 const odpUpgradeRequestType = "ManageODPUpgrade";
-const odpUpgradeActionType = "Create";
 const surface = "ParentalControlsSettings";
+
+export const OdpAccountUpgradeAction = {
+  Create: "Create",
+  Update: "Update",
+} as const;
+
+export type TOdpAccountUpgradeAction =
+  (typeof OdpAccountUpgradeAction)[keyof typeof OdpAccountUpgradeAction];
 
 /**
  * Starts the flow to upgrade an on-device parent to a fully remote parent account. The wizard mints
  * the ODP session, verifies the parent PIN, then redirects to the email step in parental requests.
+ * Create opens a new upgrade request, Update changes the email on the request already pending.
  */
-const useOdpAccountUpgrade = (): (() => void) => {
+const useOdpAccountUpgrade = (): ((action: TOdpAccountUpgradeAction) => void) => {
   const dispatch = useAppDispatch();
 
-  return () => {
+  return (action: TOdpAccountUpgradeAction) => {
     startWizard({
       flow: {
         name: odpFlowName,
         props: {
           requestType: odpUpgradeRequestType,
-          requestDetails: { actionType: odpUpgradeActionType },
+          requestDetails: { actionType: action },
           isOdpInitiated: true,
         },
       },

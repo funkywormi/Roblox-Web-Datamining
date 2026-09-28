@@ -3,11 +3,12 @@
  * sibling ToS node (UserAgreementNode) minus the bullets and legal copy. Copy arrives pre-translated.
  */
 
-import { useCallback, type JSX } from "react";
+import { useCallback, useEffect, useRef, type JSX } from "react";
 import { Button } from "@rbx/foundation-ui";
 
 import { FullPageChrome, FULL_PAGE_CTA_INSET_CLASS } from "../FullPageChrome";
 import { ODPTiltedCardsArt } from "../ODPTiltedCardsArt";
+import { useOdpAnalytics } from "../../analytics/odpAnalytics";
 import { asText } from "../../utils/nodeDetails";
 import type { NodeComponent, NodeProps } from "../../types";
 
@@ -20,6 +21,7 @@ export type OdpHandoffDetails = {
 
 export const OdpHandoffNode: NodeComponent = ({
   props,
+  ctx,
   report,
   transitions,
 }: NodeProps): JSX.Element => {
@@ -27,12 +29,25 @@ export const OdpHandoffNode: NodeComponent = ({
   const title = asText(props.title) ?? "";
   const description = asText(props.description);
   const continueLabel = asText(props.continueLabel) ?? "";
+  const odpAnalytics = useOdpAnalytics(ctx);
+  const { analyticsSessionId } = ctx;
+  const hasReportedPageload = useRef(false);
+
+  useEffect(() => {
+    if (!hasReportedPageload.current) {
+      hasReportedPageload.current = true;
+      odpAnalytics.handoffShown(analyticsSessionId);
+    }
+  }, [odpAnalytics, analyticsSessionId]);
+
   const onContinue = useCallback(() => {
+    odpAnalytics.handoffContinue(analyticsSessionId);
     report("Continue");
-  }, [report]);
+  }, [odpAnalytics, analyticsSessionId, report]);
   const onBack = useCallback(() => {
+    odpAnalytics.handoffBack(analyticsSessionId);
     report("Back");
-  }, [report]);
+  }, [odpAnalytics, analyticsSessionId, report]);
   const onCancel = useCallback(() => {
     report("Cancel");
   }, [report]);

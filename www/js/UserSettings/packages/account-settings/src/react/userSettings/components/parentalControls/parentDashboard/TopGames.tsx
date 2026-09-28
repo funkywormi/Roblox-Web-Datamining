@@ -33,12 +33,16 @@ import screentimeUtils from "../../../utils/parentalControls/screentime/screenti
 //   since the details page only adds parent-only block actions.
 // `isParentFacing` covers Parent Zone, which reads the signed-in child's own playtime like the
 // child's settings do but is viewed by their on-device parent, so the copy has to address a parent.
+// `detailsPath` sends rows to the Parent Zone details page, which carries the block control, rather
+// than straight out to the experience.
 const TopGames = ({
   child,
   isParentFacing = false,
+  detailsPath,
 }: {
   child?: TChildInfo;
   isParentFacing?: boolean;
+  detailsPath?: (universeId: number) => string;
 }): JSX.Element => {
   const { translate } = useTranslation();
   const history = useHistory();
@@ -116,6 +120,10 @@ const TopGames = ({
               </div>
             }
             onSelect={() => {
+              if (detailsPath) {
+                history.push(detailsPath(game.universeId));
+                return;
+              }
               if (child) {
                 parentalControlsEventService.authButtonClickSettingsPControlsTopExperiencesExperienceDetail(
                   child,
