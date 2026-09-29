@@ -23,6 +23,9 @@ export type GameServerOwnerResponse = {
   hasVerifiedBadge: boolean;
 };
 
+/** @see games-api / public-server-browser-service: PingSignalLevel */
+export type PingSignalLevel = "Low" | "Medium" | "High";
+
 /** @see games-api: Roblox.Web.Responses.Games.GameServerResponse */
 export type GameServerResponse = {
   id?: string;
@@ -30,8 +33,10 @@ export type GameServerResponse = {
   playing?: number;
   playerTokens?: string[];
   players?: GameServerPlayerResponse[];
-  fps?: number;
-  ping?: number;
+  ping?: number | null;
+  languageMatchCount?: number | null;
+  pingSignalLevel?: PingSignalLevel | null;
+  friendCount?: number | null;
   name?: string;
   vipServerId?: number;
   accessCode?: string;
@@ -94,6 +99,7 @@ type AccountSettingsGuacPolicy = {
 const {
   getGameServersUrl,
   getPublicGameServersV2Url,
+  getFriendsGameServersV2Url,
   getPrivateGameServersUrl,
   getShutdownGameInstanceUrl,
   getVipServerUrl,
@@ -129,6 +135,20 @@ export default {
   ) => {
     const urlConfig = {
       url: getGameServersUrl(placeId, serverListTypes.friend.value),
+      retryable: false,
+      withCredentials: true,
+    };
+
+    const params = { cursor, ...paramsArg };
+    return http.get<GameServerListResponse>(urlConfig, params);
+  },
+  getFriendsGameInstancesV2: (
+    placeId: number,
+    cursor: string,
+    paramsArg: GameInstanceQueryParams = {},
+  ) => {
+    const urlConfig = {
+      url: getFriendsGameServersV2Url(placeId),
       retryable: false,
       withCredentials: true,
     };

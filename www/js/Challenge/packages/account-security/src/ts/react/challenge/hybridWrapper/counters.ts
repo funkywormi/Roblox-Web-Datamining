@@ -1,4 +1,4 @@
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import * as NewChallengeTypes from "@rbx/generic-challenge-types";
 import { ChallengeType } from "../generic/interface";
 import { HybridTarget } from "./interface";

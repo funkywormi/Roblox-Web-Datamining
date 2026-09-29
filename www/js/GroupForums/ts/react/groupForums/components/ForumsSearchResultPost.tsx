@@ -8,6 +8,7 @@ export type ForumsSearchResultPostProps = {
   highlights?: SearchHighlights;
   categoryName: string;
   categoryShortId: string;
+  isCategoryArchived: boolean;
   showCategoryName: boolean;
   onResultClick: () => void;
 };
@@ -17,6 +18,7 @@ const ForumsSearchResultPost = ({
   highlights,
   categoryName,
   categoryShortId,
+  isCategoryArchived,
   showCategoryName,
   onResultClick
 }: ForumsSearchResultPostProps): JSX.Element => (
@@ -27,6 +29,7 @@ const ForumsSearchResultPost = ({
       post={post}
       categoryName={categoryName}
       categoryShortId={categoryShortId}
+      isCategoryArchived={isCategoryArchived}
       showCategoryName={showCategoryName}
       highlightedTitle={highlights?.title}
       highlightedBody={highlights?.body}

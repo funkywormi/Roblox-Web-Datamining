@@ -488,12 +488,12 @@ configure-group-payouts .rbx-tab {
 }
 
 .light-theme .group-banner {
-    border-color: #bcbec8;
+    border-color: var(--color-extended-gray-500);
     background-color: var(--color-surface-100)
 }
 
 .dark-theme .group-banner {
-    border-color: #494d5a;
+    border-color: var(--color-extended-gray-700);
     background-color: var(--color-surface-100)
 }
 
@@ -987,7 +987,7 @@ configure-group-payouts .rbx-tab {
 
 .light-theme .preview-overlay {
     background-color: var(--color-surface-0);
-    background-color: rgba(var(--color-surface-0), .6)
+    background-color: color-mix(in srgb, var(--color-surface-0) 60%, transparent)
 }
 
 .light-theme .preview-overlay .preview-text {
@@ -996,7 +996,7 @@ configure-group-payouts .rbx-tab {
 
 .dark-theme .preview-overlay {
     background-color: var(--color-surface-0);
-    background-color: rgba(var(--color-surface-0), .6)
+    background-color: color-mix(in srgb, var(--color-surface-0) 60%, transparent)
 }
 
 .dark-theme .preview-overlay .preview-text {
@@ -1004,15 +1004,15 @@ configure-group-payouts .rbx-tab {
 }
 
 .file-upload-content {
-    border: 2px dashed #e6e7ea
+    border: 2px dashed var(--color-extended-gray-300)
 }
 
 .light-theme .file-upload-content {
-    border-color: #bcbec8
+    border-color: var(--color-extended-gray-500)
 }
 
 .dark-theme .file-upload-content {
-    border-color: #494d5a
+    border-color: var(--color-extended-gray-700)
 }
 
 .file-upload-container {
@@ -1105,7 +1105,7 @@ configure-group-payouts .rbx-tab {
 .dark-theme .file-upload-container .file-upload-content .file-upload-remove-button,
 .light-theme .file-upload-container .file-upload-content .file-upload-remove-button {
     background-color: var(--color-surface-0);
-    background-color: rgba(var(--color-surface-0), .75);
+    background-color: color-mix(in srgb, var(--color-surface-0) 75%, transparent);
     color: var(--color-content-emphasis)
 }
 
@@ -1114,7 +1114,7 @@ configure-group-payouts .rbx-tab {
 .light-theme .file-upload-container .file-upload-content .file-upload-remove-button:focus-visible,
 .light-theme .file-upload-container .file-upload-content .file-upload-remove-button:hover {
     background-color: var(--color-surface-0);
-    background-color: rgba(var(--color-surface-0), 1)
+    background-color: color-mix(in srgb, var(--color-surface-0) 100%, transparent)
 }
 
 .file-upload-container .file-upload-content .file-upload-progress-overlay {
@@ -3194,6 +3194,10 @@ ul.hlist.game-cards {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M30 7a3 3 0 01-3.37 2.977l-3.47 6.94a3 3 0 11-5.127 1.64l-5.011-3.34a2.99 2.99 0 01-2.48.748l-3.387 6.948a3 3 0 11-1.79-.891l3.414-7.005a3 3 0 115.188-1.574l5.011 3.34a2.99 2.99 0 012.393-.76l3.47-6.94A3 3 0 1130 7z'/%3E%3Cpath d='M19.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 25.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM4.5 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3z'/%3E%3C/svg%3E")
 }
 
+.icon-regular-chart-three-horizontal-bars {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28.99 19.204A2 2 0 0127 21H14v6l-.01.204A2 2 0 0112 29H5l-.204-.01a2 2 0 01-1.785-1.786L3 27V5l.01-.204A2 2 0 014.797 3.01L5 3h14a2 2 0 011.99 1.796L21 5v6h6a2 2 0 011.99 1.796L29 13v6l-.01.204zM5 21v6h7v-6H5zM5 5v6h14V5H5zm0 8v6h22v-6H5z'/%3E%3C/svg%3E")
+}
+
 .icon-filled-check {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M24.06 9.94a1.5 1.5 0 00-2.12 0L13 18.878l-2.94-2.94a1.5 1.5 0 00-2.12 2.122l4 4a1.5 1.5 0 002.12 0l10-10a1.5 1.5 0 000-2.122z'/%3E%3C/svg%3E")
 }
@@ -3296,6 +3300,10 @@ ul.hlist.game-cards {
 
 .icon-regular-guilded {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M8.18 11.547s.023 3.321 1.728 6.756c1.752 3.306 4.167 5.43 6.16 6.275 2.059-.962 4.048-2.633 5.133-4.433H15.55c-1.462-1.212-2.613-3.223-2.877-5.547h16.581c-.817 3.737-2.552 7.136-4.206 9.3A19.959 19.959 0 0116.08 30.5h-.052C10.08 28.13 6.88 24.398 4.77 20.187 3.416 17.488 2 12.588 2 6h28a39.927 39.927 0 01-.374 5.547H8.18z'/%3E%3C/svg%3E")
+}
+
+.icon-regular-image {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 13a2 2 0 100-4 2 2 0 000 4z'/%3E%3Cpath d='M2 26a2 2 0 002 2h24a2 2 0 002-2V6a2 2 0 00-2-2H4a2 2 0 00-2 2v20zM28 6v14.586L20.414 13a2 2 0 00-2.828 0L11 19.586 9.414 18a2 2 0 00-2.828 0L4 20.586V6h24zm0 20H4v-2.586l4-4L9.586 21a2 2 0 002.828 0L19 14.414l9 9V26z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-key {
@@ -4138,12 +4146,12 @@ ul.hlist.game-cards {
 
 .light-theme .group-public-servers-container .server-player-count-gauge {
     background-color: var(--color-surface-0);
-    border-color: #bcbec8
+    border-color: var(--color-extended-gray-500)
 }
 
 .dark-theme .group-public-servers-container .server-player-count-gauge {
     background-color: var(--color-surface-0);
-    border-color: #494d5a
+    border-color: var(--color-extended-gray-700)
 }
 
 .group-public-servers-container .server-player-count-gauge .gauge-inner-bar {
@@ -4152,13 +4160,15 @@ ul.hlist.game-cards {
 }
 
 .light-theme .group-public-servers-container .server-player-count-gauge .gauge-inner-bar {
-    background-color: #bcbec8;
-    border-color: #bcbec8 rgba(0, 0, 0, .3) #bcbec8 #bcbec8
+    background-color: var(--color-extended-gray-500);
+    border-right-color: var(--color-extended-gray-500);
+    border-color: var(--color-extended-gray-500) var(--color-extended-black-30) var(--color-extended-gray-500) var(--color-extended-gray-500)
 }
 
 .dark-theme .group-public-servers-container .server-player-count-gauge .gauge-inner-bar {
-    background-color: #bcbec8;
-    border-color: #bcbec8 hsla(0, 0%, 100%, .3) #bcbec8 #bcbec8
+    background-color: var(--color-extended-gray-500);
+    border-right-color: var(--color-extended-gray-500);
+    border-color: var(--color-extended-gray-500) var(--color-extended-white-30) var(--color-extended-gray-500) var(--color-extended-gray-500)
 }
 
 .group-public-servers-container .rbx-public-game-server-join:focus-visible {
@@ -4595,6 +4605,10 @@ ul.hlist.game-cards {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M30 7a3 3 0 01-3.37 2.977l-3.47 6.94a3 3 0 11-5.127 1.64l-5.011-3.34a2.99 2.99 0 01-2.48.748l-3.387 6.948a3 3 0 11-1.79-.891l3.414-7.005a3 3 0 115.188-1.574l5.011 3.34a2.99 2.99 0 012.393-.76l3.47-6.94A3 3 0 1130 7z'/%3E%3Cpath d='M19.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 25.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM4.5 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3z'/%3E%3C/svg%3E")
 }
 
+.icon-regular-chart-three-horizontal-bars {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28.99 19.204A2 2 0 0127 21H14v6l-.01.204A2 2 0 0112 29H5l-.204-.01a2 2 0 01-1.785-1.786L3 27V5l.01-.204A2 2 0 014.797 3.01L5 3h14a2 2 0 011.99 1.796L21 5v6h6a2 2 0 011.99 1.796L29 13v6l-.01.204zM5 21v6h7v-6H5zM5 5v6h14V5H5zm0 8v6h22v-6H5z'/%3E%3C/svg%3E")
+}
+
 .icon-filled-check {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M24.06 9.94a1.5 1.5 0 00-2.12 0L13 18.878l-2.94-2.94a1.5 1.5 0 00-2.12 2.122l4 4a1.5 1.5 0 002.12 0l10-10a1.5 1.5 0 000-2.122z'/%3E%3C/svg%3E")
 }
@@ -4697,6 +4711,10 @@ ul.hlist.game-cards {
 
 .icon-regular-guilded {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M8.18 11.547s.023 3.321 1.728 6.756c1.752 3.306 4.167 5.43 6.16 6.275 2.059-.962 4.048-2.633 5.133-4.433H15.55c-1.462-1.212-2.613-3.223-2.877-5.547h16.581c-.817 3.737-2.552 7.136-4.206 9.3A19.959 19.959 0 0116.08 30.5h-.052C10.08 28.13 6.88 24.398 4.77 20.187 3.416 17.488 2 12.588 2 6h28a39.927 39.927 0 01-.374 5.547H8.18z'/%3E%3C/svg%3E")
+}
+
+.icon-regular-image {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 13a2 2 0 100-4 2 2 0 000 4z'/%3E%3Cpath d='M2 26a2 2 0 002 2h24a2 2 0 002-2V6a2 2 0 00-2-2H4a2 2 0 00-2 2v20zM28 6v14.586L20.414 13a2 2 0 00-2.828 0L11 19.586 9.414 18a2 2 0 00-2.828 0L4 20.586V6h24zm0 20H4v-2.586l4-4L9.586 21a2 2 0 002.828 0L19 14.414l9 9V26z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-key {
@@ -5913,6 +5931,10 @@ ul.hlist.game-cards {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M30 7a3 3 0 01-3.37 2.977l-3.47 6.94a3 3 0 11-5.127 1.64l-5.011-3.34a2.99 2.99 0 01-2.48.748l-3.387 6.948a3 3 0 11-1.79-.891l3.414-7.005a3 3 0 115.188-1.574l5.011 3.34a2.99 2.99 0 012.393-.76l3.47-6.94A3 3 0 1130 7z'/%3E%3Cpath d='M19.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 25.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM4.5 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3z'/%3E%3C/svg%3E")
 }
 
+.icon-regular-chart-three-horizontal-bars {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28.99 19.204A2 2 0 0127 21H14v6l-.01.204A2 2 0 0112 29H5l-.204-.01a2 2 0 01-1.785-1.786L3 27V5l.01-.204A2 2 0 014.797 3.01L5 3h14a2 2 0 011.99 1.796L21 5v6h6a2 2 0 011.99 1.796L29 13v6l-.01.204zM5 21v6h7v-6H5zM5 5v6h14V5H5zm0 8v6h22v-6H5z'/%3E%3C/svg%3E")
+}
+
 .icon-filled-check {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M24.06 9.94a1.5 1.5 0 00-2.12 0L13 18.878l-2.94-2.94a1.5 1.5 0 00-2.12 2.122l4 4a1.5 1.5 0 002.12 0l10-10a1.5 1.5 0 000-2.122z'/%3E%3C/svg%3E")
 }
@@ -6015,6 +6037,10 @@ ul.hlist.game-cards {
 
 .icon-regular-guilded {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M8.18 11.547s.023 3.321 1.728 6.756c1.752 3.306 4.167 5.43 6.16 6.275 2.059-.962 4.048-2.633 5.133-4.433H15.55c-1.462-1.212-2.613-3.223-2.877-5.547h16.581c-.817 3.737-2.552 7.136-4.206 9.3A19.959 19.959 0 0116.08 30.5h-.052C10.08 28.13 6.88 24.398 4.77 20.187 3.416 17.488 2 12.588 2 6h28a39.927 39.927 0 01-.374 5.547H8.18z'/%3E%3C/svg%3E")
+}
+
+.icon-regular-image {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 13a2 2 0 100-4 2 2 0 000 4z'/%3E%3Cpath d='M2 26a2 2 0 002 2h24a2 2 0 002-2V6a2 2 0 00-2-2H4a2 2 0 00-2 2v20zM28 6v14.586L20.414 13a2 2 0 00-2.828 0L11 19.586 9.414 18a2 2 0 00-2.828 0L4 20.586V6h24zm0 20H4v-2.586l4-4L9.586 21a2 2 0 002.828 0L19 14.414l9 9V26z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-key {
@@ -7285,6 +7311,10 @@ ul.hlist.game-cards {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M30 7a3 3 0 01-3.37 2.977l-3.47 6.94a3 3 0 11-5.127 1.64l-5.011-3.34a2.99 2.99 0 01-2.48.748l-3.387 6.948a3 3 0 11-1.79-.891l3.414-7.005a3 3 0 115.188-1.574l5.011 3.34a2.99 2.99 0 012.393-.76l3.47-6.94A3 3 0 1130 7z'/%3E%3Cpath d='M19.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 25.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM4.5 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3z'/%3E%3C/svg%3E")
 }
 
+.icon-regular-chart-three-horizontal-bars {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28.99 19.204A2 2 0 0127 21H14v6l-.01.204A2 2 0 0112 29H5l-.204-.01a2 2 0 01-1.785-1.786L3 27V5l.01-.204A2 2 0 014.797 3.01L5 3h14a2 2 0 011.99 1.796L21 5v6h6a2 2 0 011.99 1.796L29 13v6l-.01.204zM5 21v6h7v-6H5zM5 5v6h14V5H5zm0 8v6h22v-6H5z'/%3E%3C/svg%3E")
+}
+
 .icon-filled-check {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M24.06 9.94a1.5 1.5 0 00-2.12 0L13 18.878l-2.94-2.94a1.5 1.5 0 00-2.12 2.122l4 4a1.5 1.5 0 002.12 0l10-10a1.5 1.5 0 000-2.122z'/%3E%3C/svg%3E")
 }
@@ -7387,6 +7417,10 @@ ul.hlist.game-cards {
 
 .icon-regular-guilded {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M8.18 11.547s.023 3.321 1.728 6.756c1.752 3.306 4.167 5.43 6.16 6.275 2.059-.962 4.048-2.633 5.133-4.433H15.55c-1.462-1.212-2.613-3.223-2.877-5.547h16.581c-.817 3.737-2.552 7.136-4.206 9.3A19.959 19.959 0 0116.08 30.5h-.052C10.08 28.13 6.88 24.398 4.77 20.187 3.416 17.488 2 12.588 2 6h28a39.927 39.927 0 01-.374 5.547H8.18z'/%3E%3C/svg%3E")
+}
+
+.icon-regular-image {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M10 13a2 2 0 100-4 2 2 0 000 4z'/%3E%3Cpath d='M2 26a2 2 0 002 2h24a2 2 0 002-2V6a2 2 0 00-2-2H4a2 2 0 00-2 2v20zM28 6v14.586L20.414 13a2 2 0 00-2.828 0L11 19.586 9.414 18a2 2 0 00-2.828 0L4 20.586V6h24zm0 20H4v-2.586l4-4L9.586 21a2 2 0 002.828 0L19 14.414l9 9V26z'/%3E%3C/svg%3E")
 }
 
 .icon-regular-key {

@@ -7,6 +7,7 @@ export type ReactionEmoteProps = {
   emoteId: string;
   size?: number;
   onClick?: () => void;
+  ariaLabel?: string;
 };
 
 const getEmoteStyle = ({ emoteUrl, size }: { emoteUrl: string; size?: number }) => {
@@ -21,13 +22,15 @@ const ReactionEmote = ({
   emoteUrl,
   emoteId,
   size,
-  onClick
+  onClick,
+  ariaLabel = 'reaction'
 }: ReactionEmoteProps): JSX.Element => {
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       if (!onClick) return;
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
+        event.stopPropagation();
         onClick();
       }
     },
@@ -40,11 +43,12 @@ const ReactionEmote = ({
         ? {
             onClick,
             onKeyDown: handleKeyDown,
-            ariaLabel: 'reaction',
+            'aria-label': ariaLabel,
+            tabIndex: 0,
             role: 'button'
           }
         : {},
-    [onClick, handleKeyDown]
+    [onClick, handleKeyDown, ariaLabel]
   );
 
   return (

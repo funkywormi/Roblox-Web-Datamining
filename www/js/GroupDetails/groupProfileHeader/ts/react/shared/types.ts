@@ -420,6 +420,7 @@ interface CommunityProductFeatures {
   IsOwnerRolesetDeprecated: boolean;
   ForumsAttachmentsCreate: boolean;
   ForumsAttachmentsView: boolean;
+  ForumsImages?: boolean;
   IsUnifiedUIEnabled: boolean;
   /** Gates the Community Tier tab on the configure community page. */
   CommunityTiers: boolean;

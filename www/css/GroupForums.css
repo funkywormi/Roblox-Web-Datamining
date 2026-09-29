@@ -2814,6 +2814,69 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
     }
 }
 
+.post-preview-inline-reactions {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden
+}
+
+.post-preview-inline-reactions .group-forums-comment-reactions {
+    min-width: 0
+}
+
+.post-preview-inline-reactions .group-forums-comment-reactions-container {
+    flex-wrap: nowrap;
+    overflow: hidden;
+    min-width: 0;
+    flex: 1
+}
+
+.group-forums-post-preview-reply-button {
+    gap: 4px
+}
+
+.group-forums-inline-reaction-picker {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    transition: opacity .15s linear
+}
+
+.group-forums-inline-reaction-picker[data-state=closed] {
+    opacity: 0
+}
+
+.post-preview-inline-reactions-mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1050
+}
+
+.post-preview-inline-reactions-mobile-sheet {
+    position: fixed;
+    bottom: -100px;
+    left: 0;
+    width: 100%;
+    padding-bottom: 100px;
+    border-radius: 12px 12px 0 0
+}
+
+.dark-theme .post-preview-inline-reactions-mobile-sheet,
+.light-theme .post-preview-inline-reactions-mobile-sheet {
+    background-color: var(--color-surface-100)
+}
+
+:root {
+    --inline-reaction-picker-layout: dropdown
+}
+
+@media(max-width:543px) {
+    :root {
+        --inline-reaction-picker-layout: sheet
+    }
+}
+
 .post-composer {
     display: flex;
     flex-direction: column
@@ -3927,6 +3990,14 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
     overflow: hidden
 }
 
+@media(hover:none)and (pointer:coarse) {
+    .group-posts-preview[data-inline-reactions=true] {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none
+    }
+}
+
 .group-posts-preview:not(:first-child):before {
     display: block;
     content: "";
@@ -3949,7 +4020,7 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
     background-color: var(--color-surface-300)
 }
 
-.light-theme .group-posts-preview:active {
+.light-theme .group-posts-preview:active:not(:has(.post-preview-inline-reactions:active, .group-posts-preview-menu:active, .group-forums-post-preview-reply-button:active)) {
     background-color: var(--color-extended-black-10)
 }
 
@@ -3957,7 +4028,7 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
     background-color: var(--color-surface-300)
 }
 
-.dark-theme .group-posts-preview:active {
+.dark-theme .group-posts-preview:active:not(:has(.post-preview-inline-reactions:active, .group-posts-preview-menu:active, .group-forums-post-preview-reply-button:active)) {
     background-color: var(--color-extended-black-30)
 }
 

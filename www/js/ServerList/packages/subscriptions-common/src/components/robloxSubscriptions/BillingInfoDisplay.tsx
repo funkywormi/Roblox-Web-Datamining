@@ -3,7 +3,7 @@ import { useTranslation } from "@rbx/core-scripts/react";
 
 import useLocalizedMoney from "../../hooks/useLocalizedMoney";
 
-import type { Money, PeriodType, SubscriptionOffer } from "@rbx/client-subscriptions-api/v1";
+import type { Money, PeriodType, SubscriptionOffer } from "@rbx/client-subscriptions-api/v2";
 import type { FC } from "react";
 
 export type BillingInfoDisplayProps = {

@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { Modal } from "@rbx/core-ui";
+import { Dialog, DialogBody, DialogContent, DialogTitle } from "@rbx/foundation-ui";
 import { ModalContext } from "../contexts/ModalContext";
 
 export function LoginRedirectErrorModal() {
@@ -11,18 +11,20 @@ export function LoginRedirectErrorModal() {
   } = useContext(ModalContext);
 
   return (
-    <Modal
-      className="login-redirect-failure-modal"
-      show={isOpen}
-      onHide={closeModal}
-      size="sm"
-      centered
-      scrollable={false}
+    <Dialog
+      open={isOpen}
+      onOpenChange={closeModal}
+      size="Medium"
+      isModal
+      hasCloseAffordance
+      closeLabel={translate("Action.Close")}
     >
-      <Modal.Header title={translate("Message.SomethingWentWrong")} onClose={closeModal} />
-      <Modal.Body>
-        <div className="text-body-large">{translate("Message.PleaseTryAgain")}</div>
-      </Modal.Body>
-    </Modal>
+      <DialogContent>
+        <DialogBody>
+          <DialogTitle>{translate("Message.SomethingWentWrong")}</DialogTitle>
+          <div className="text-body-large">{translate("Message.PleaseTryAgain")}</div>
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
   );
 }

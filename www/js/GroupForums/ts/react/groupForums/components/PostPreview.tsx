@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { withTranslations, WithTranslationsProps } from 'react-utilities';
 import { useHistory } from 'react-router-dom';
@@ -9,6 +9,9 @@ import UserDisplay, {
   USER_DISPLAY_AVATAR_USERNAME_LINK_CLASS
 } from '../../shared/components/UserDisplay';
 import PostPreviewReactions from './PostPreviewReactions';
+import PostPreviewInlineReactions, {
+  REACTION_PICKER_POPOVER_CLASS
+} from './PostPreviewInlineReactions';
 import AnimatedAbbreviatedCount from '../../shared/components/AnimatedAbbreviatedCount';
 import groupForumsConstants from '../constants/groupForumsConstants';
 import PostMenu, { POST_MENU_CLASS } from './PostMenu';
@@ -24,11 +27,15 @@ import { logGroupForumsClickEvent, logGroupPageExposureEvent } from '../../share
 import { EventContext, EventType } from '../../shared/constants/eventConstants';
 import { hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import ScrollFlashOverlay from './ScrollFlashOverlay';
+import useLongPress from '../hooks/useLongPress';
 import renderHighlightedText from '../utils/renderHighlightedText';
 import ContentPreviewCard from '../../shared/components/ContentPreviewCard';
 
 const META_DATA_SEPARATOR = ' • ';
+const POST_EXPOSURE_THRESHOLD = 0.75;
 const POST_PREVIEW_MENU_CLASS = 'group-posts-preview-menu';
+const POST_PREVIEW_INLINE_REACTIONS_CLASS = 'post-preview-inline-reactions';
+const POST_PREVIEW_MOBILE_OVERLAY_CLASS = 'post-preview-inline-reactions-mobile-overlay';
 
 // Module-scope so the optional callbacks' defaults keep a stable identity across renders.
 const NOOP = (): void => undefined;
@@ -39,7 +46,10 @@ const POST_NAV_BLOCK_SELECTOR = [
   `.${POST_PREVIEW_MENU_CLASS}`,
   `.${POST_MENU_CLASS}`,
   `.${USER_DISPLAY_AVATAR_USERNAME_LINK_CLASS}`,
-  `.${POST_PREVIEW_TICKET_STATUS_CLASS}`
+  `.${POST_PREVIEW_TICKET_STATUS_CLASS}`,
+  `.${POST_PREVIEW_INLINE_REACTIONS_CLASS}`,
+  `.${POST_PREVIEW_MOBILE_OVERLAY_CLASS}`,
+  `.${REACTION_PICKER_POPOVER_CLASS}`
 ].join(', ');
 
 export type PostPreviewProps = {
@@ -49,6 +59,7 @@ export type PostPreviewProps = {
   onHighlightComplete?: () => void;
   categoryName: string;
   categoryShortId: string;
+  isCategoryArchived?: boolean;
   showCategoryName?: boolean;
   post: ForumPost;
   // Only reached through the overflow menu, so `hasMenu={false}` callers can leave these out.
@@ -68,6 +79,7 @@ const PostPreview = ({
   hasRouter = true,
   categoryName,
   categoryShortId,
+  isCategoryArchived = false,
   showCategoryName,
   showPinned,
   refetchPosts = NOOP,
@@ -82,7 +94,15 @@ const PostPreview = ({
   const history = useHistory();
   const blockedUserList = useForumStore.use.blockedUserList();
   const setReturnToCategoryScrollTop = useForumStore.use.setReturnToCategoryScrollTop();
-  const { fetchSubscriberExperimentValues } = useForumExperiments();
+  const {
+    fetchSubscriberExperimentValues,
+    inlineEngagementExperimentConfig,
+    logInlineEngagementExposure
+  } = useForumExperiments();
+  // A null config means the assignment has not arrived. Treating it as off would render the old
+  // row and then swap it, so the row holds its space and waits instead.
+  const isExperimentResolved = inlineEngagementExperimentConfig != null;
+  const showInlineReactions = inlineEngagementExperimentConfig?.isReactionsEnabled === true;
 
   const openPost = () => {
     setReturnToCategoryScrollTop(document.documentElement.scrollTop);
@@ -135,6 +155,16 @@ const PostPreview = ({
     return post.commentCount - 1; // We don't count the first comment as a reply
   }, [post.commentCount]);
 
+  const [isCardPickerOpen, setIsCardPickerOpen] = useState(false);
+
+  const { consumeLongPressClick, ...cardLongPressHandlers } = useLongPress({
+    onLongPress: () => {
+      if (showInlineReactions) {
+        setIsCardPickerOpen(true);
+      }
+    }
+  });
+
   const postPreviewRef = useRef<HTMLAnchorElement>(null);
   const hasLoggedExposure = useRef(false);
 
@@ -144,7 +174,7 @@ const PostPreview = ({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.intersectionRatio >= 0.75 && !hasLoggedExposure.current) {
+        if (entry.intersectionRatio >= POST_EXPOSURE_THRESHOLD && !hasLoggedExposure.current) {
           hasLoggedExposure.current = true;
           logGroupPageExposureEvent({
             groupId: post.groupId,
@@ -152,14 +182,15 @@ const PostPreview = ({
             exposureType: EventType.GroupForumPostExposureEvent,
             exposureId: post.id
           });
+          logInlineEngagementExposure();
         }
       },
-      { threshold: 0.75 }
+      { threshold: POST_EXPOSURE_THRESHOLD }
     );
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [post.groupId, post.id]);
+  }, [post.groupId, post.id, logInlineEngagementExposure]);
 
   if (blockedUserList.length > 0 && blockedUserList.includes(post.createdBy)) {
     return null;
@@ -184,6 +215,47 @@ const PostPreview = ({
 
   const hasReactions = reactions.length > 0;
   const hasStatuses = isUnread || (showPinned && isPinned) || isLocked;
+  const renderReplyCount = () => (
+    <div className='group-posts-preview-meta-data-replies text-default flex-shrink-0'>
+      <span className='group-posts-preview-replies-icon' />
+      <AnimatedAbbreviatedCount variant='reply' value={replyCount} />{' '}
+      {replyCount === 1 ? translate('Label.Reply') : translate('Label.Replies')}
+    </div>
+  );
+
+  const renderMetaData = () => {
+    if (!isExperimentResolved) {
+      return <div className='group-posts-preview-meta-data' />;
+    }
+
+    if (showInlineReactions) {
+      return (
+        <div className='group-posts-preview-meta-data'>
+          <PostPreviewInlineReactions
+            post={post}
+            isCategoryArchived={isCategoryArchived}
+            isOpenRequested={isCardPickerOpen}
+            onOpenRequestHandled={() => setIsCardPickerOpen(false)}
+          />
+          {renderReplyCount()}
+        </div>
+      );
+    }
+
+    return (
+      <div className='group-posts-preview-meta-data'>
+        {hasReactions && (
+          <React.Fragment>
+            <div className='group-forums-post-preview-meta-data-reactions text-default'>
+              <PostPreviewReactions reactions={reactions} />
+            </div>
+            <div className='group-posts-preview-meta-data-separator'>{META_DATA_SEPARATOR}</div>
+          </React.Fragment>
+        )}
+        {renderReplyCount()}
+      </div>
+    );
+  };
 
   const ticketStatus = renderPostAuthorTicketStatus(
     supportTicket,
@@ -205,6 +277,15 @@ const PostPreview = ({
       data-is-unread={isUnread}
       data-is-pinned={isPinned}
       data-is-locked={isLocked}
+      data-inline-reactions={showInlineReactions}
+      onClickCapture={e => {
+        if (consumeLongPressClick()) {
+          // Consume the release click before ContentPreviewCard handles navigation.
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      {...(showInlineReactions ? cardLongPressHandlers : {})}
       blockedSelector={POST_NAV_BLOCK_SELECTOR}
       onNavigate={hasRouter ? openPost : undefined}
       onModifiedClick={hasRouter ? onOpened : undefined}
@@ -284,21 +365,7 @@ const PostPreview = ({
           )}>
           {highlightedBody ? renderHighlightedText(highlightedBody) : <Message content={content} />}
         </div>
-        <div className='group-posts-preview-meta-data'>
-          {hasReactions && (
-            <React.Fragment>
-              <div className='group-forums-post-preview-meta-data-reactions text-default'>
-                <PostPreviewReactions reactions={reactions} />
-              </div>
-              <div className='group-posts-preview-meta-data-separator'>{META_DATA_SEPARATOR}</div>
-            </React.Fragment>
-          )}
-          <div className='group-posts-preview-meta-data-replies text-default'>
-            <span className='group-posts-preview-replies-icon' />
-            <AnimatedAbbreviatedCount variant='reply' value={replyCount} />{' '}
-            {replyCount === 1 ? translate('Label.Reply') : translate('Label.Replies')}
-          </div>
-        </div>
+        {renderMetaData()}
       </div>
       {onHighlightComplete && (
         <ScrollFlashOverlay onComplete={onHighlightComplete} enableScrollIntoView={false} />

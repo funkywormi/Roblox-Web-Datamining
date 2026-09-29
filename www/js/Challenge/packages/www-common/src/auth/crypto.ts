@@ -1,3 +1,6 @@
+import { base64ToBytes, bytesToBase64 } from "@rbx/core-lib/string";
+import { downcast } from "@rbx/core-lib/types";
+
 /**
  * A namespace containing sensible-default abstractions around JS crypto functions (e.g. by
  * specifying algorithms and formats to use).
@@ -44,14 +47,8 @@ export const stringToArrayBuffer = (rawString: string): ArrayBuffer => {
  * @param {ArrayBuffer} arrayBuffer
  * @returns A base-64-encoded string.
  */
-export const arrayBufferToBase64String = (arrayBuffer: ArrayBuffer): string => {
-  let rawString = "";
-  const bytes = new Uint8Array(arrayBuffer);
-  for (const byte of bytes) {
-    rawString += String.fromCharCode(byte);
-  }
-  return btoa(rawString);
-};
+export const arrayBufferToBase64String = (arrayBuffer: ArrayBuffer): string =>
+  bytesToBase64(new Uint8Array(arrayBuffer));
 
 /**
  * Converts the passed base-64-encoded string to an array buffer.
@@ -59,10 +56,8 @@ export const arrayBufferToBase64String = (arrayBuffer: ArrayBuffer): string => {
  * @param {string} base64String
  * @returns An array buffer.
  */
-export const base64StringToArrayBuffer = (base64String: string): ArrayBuffer => {
-  const rawString = atob(base64String);
-  return stringToArrayBuffer(rawString);
-};
+export const base64StringToArrayBuffer = (base64String: string): ArrayBuffer =>
+  new Uint8Array(base64ToBytes(downcast(base64String))).buffer;
 
 /**
  * Generates a key pair for signing messages.

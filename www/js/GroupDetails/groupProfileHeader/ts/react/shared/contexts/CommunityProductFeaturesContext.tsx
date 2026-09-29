@@ -23,6 +23,7 @@ export const defaultCommunityProductFeatures: CommunityProductFeatures = {
   IsOwnerRolesetDeprecated: false,
   ForumsAttachmentsCreate: false,
   ForumsAttachmentsView: false,
+  ForumsImages: false,
   CommunityTiers: false,
   CommunityTiersDisclosureBanner: false,
   AnnouncementAnalytics: false,

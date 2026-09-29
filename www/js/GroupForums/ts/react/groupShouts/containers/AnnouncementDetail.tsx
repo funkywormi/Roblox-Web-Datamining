@@ -81,6 +81,7 @@ const AnnouncementDetail = ({
             announcement: selectedAnnouncement
           })
         }
+        locationTab='posts'
       />
     );
   }

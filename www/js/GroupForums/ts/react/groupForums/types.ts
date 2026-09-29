@@ -197,9 +197,16 @@ interface ForumNotificationsExperimentConfig {
   throttleTimeMs: number;
 }
 
+interface InlineEngagementExperimentConfig {
+  isReactionsEnabled: boolean;
+  isCommentsEnabled: boolean;
+}
+
 interface ForumExperimentsState {
   subscriberNotificationsExperimentConfig: ForumNotificationsExperimentConfig | null;
   fetchSubscriberExperimentValues: () => void;
+  inlineEngagementExperimentConfig: InlineEngagementExperimentConfig | null;
+  logInlineEngagementExposure: () => void;
 }
 
 interface ForumsError {
@@ -236,6 +243,7 @@ export {
   NotificationPreference,
   NotificationPreferenceType,
   ForumNotificationsExperimentConfig,
+  InlineEngagementExperimentConfig,
   ForumExperimentsState,
   ForumsError,
   ForumsErrorResponse,

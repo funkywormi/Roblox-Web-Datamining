@@ -78,7 +78,7 @@ const AnnouncementRoutes = ({
   const canCreateAnnouncements =
     policies.displayGroupAnnouncementPublishing && permissions.groupPostsPermissions.postToStatus;
 
-  if (canViewAnnouncements === undefined) return null;
+  if (canViewAnnouncements === undefined) return <PostSkeleton />;
   if (!canViewAnnouncements) {
     return (
       <SectionDisclaimer

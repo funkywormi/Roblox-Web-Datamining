@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
-import { ProductType } from "@rbx/client-subscriptions-api/v1";
+import { ProductType } from "@rbx/client-subscriptions-api/v2";
 import { useSubscriptionMembershipQuery } from "./useSubscriptionMembershipQuery";
 
 const DEFAULT_PRODUCT_TYPE = ProductType.Blackbird;

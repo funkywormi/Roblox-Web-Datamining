@@ -116,7 +116,7 @@ export function usePurchase(
       isBonus: boolean,
       sectionType?: BuyRobuxPageSectionType,
     ): Promise<void> => {
-      trackCounter(isQuickPay ? "StartQuickPay" : "StartPurchase");
+      trackCounter("StartPurchase", { isQuickPay: isQuickPay ? "true" : "false" });
       trackPurchase(product, isSub, sectionType);
       const url = getPurchaseUrl(product, isSub);
       setPurchaseUrl(url);

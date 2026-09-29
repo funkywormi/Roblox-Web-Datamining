@@ -26,6 +26,9 @@ import queryKeys from '../utils/queryKeys';
 import { useGroupMembershipChangedListener } from '../../shared/hooks/useGroupMembershipChangedListener';
 import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
 import announcementRoutes from '../constants/announcementRoutes';
+import { useAnnouncementTracking } from '../hooks/useAnnouncementTracking';
+import useAnnouncementSeeMoreExposure from '../hooks/useAnnouncementSeeMoreExposure';
+import useAnnouncementArchiveExperiment from '../hooks/useAnnouncementArchiveExperiment';
 
 export type GroupAnnouncementsDisplayProps = {
   group: Group;
@@ -57,15 +60,29 @@ const GroupAnnouncementsDisplay = ({
   const history = useHistory();
   const { features } = useCommunityProductFeatures();
   const isAnnouncementArchiveEnabled = isAnnouncementArchiveFeatureEnabled(features);
+  const isAnnouncementArchiveExperimentEnabled = useAnnouncementArchiveExperiment(
+    isAnnouncementArchiveEnabled
+  );
   const canUseAnnouncementArchive =
-    isAnnouncementArchiveEnabled && !policies.isGracefulDegradationEnabled && canViewAnnouncements;
+    isAnnouncementArchiveEnabled &&
+    isAnnouncementArchiveExperimentEnabled === true &&
+    !policies.isGracefulDegradationEnabled &&
+    canViewAnnouncements;
+  const { trackAnnouncementSeeMoreButtonClick } = useAnnouncementTracking({
+    groupId: group.id,
+    locationTab: 'home'
+  });
   const handleArchiveLinkClicked = useCallback(() => {
+    if (announcementsData?.id) {
+      trackAnnouncementSeeMoreButtonClick({ announcementId: announcementsData.id });
+    }
+
     logGroupPageClickEvent({
       groupId: group.id,
       clickTargetType: 'seeMorePosts',
       context: SharedEventContext.GroupHomepage
     });
-  }, [group.id]);
+  }, [announcementsData?.id, group.id, trackAnnouncementSeeMoreButtonClick]);
 
   const [isNotificationsUpsellDismissed, setIsNotificationsUpsellDismissed] = useState(
     getHasUserDismissedNotificationsUpsell(group.id)
@@ -105,6 +122,11 @@ const GroupAnnouncementsDisplay = ({
       return announcementsService.getAnnouncementById(group.id, announcementsData.id);
     }
   });
+  const seeMoreRef = useAnnouncementSeeMoreExposure(
+    group.id,
+    announcementsData?.id,
+    canUseAnnouncementArchive && !!announcement
+  );
 
   useEffect(() => {
     if (announcement) {
@@ -291,6 +313,7 @@ const GroupAnnouncementsDisplay = ({
           </div>
           {canUseAnnouncementArchive && (
             <a
+              ref={seeMoreRef}
               className='group-announcements-see-more-posts'
               href={`#!${announcementRoutes.announcementsRoute}`}
               onClick={handleArchiveLinkClicked}>

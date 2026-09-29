@@ -1,6 +1,5 @@
 const serverListConstants = {
   playerTruncationSize: 5, // will not truncate if set to -1
-  slowGameFpsThreshold: 15,
   serverNameMaxLength: 50,
   numGameInstancesPerRow: 4,
   serverListTypes: {
@@ -100,7 +99,6 @@ const serverListConstants = {
     shutdownServerError: "Message.ShutdownServerError",
     shutdownServerSuccess: "Message.ShutdownServerSuccess",
     shutdownServerText: "Label.ShutDownServer",
-    slowGameWarning: "Label.SlowGame",
     startRenewingPrivateServerPrice: "Label.StartRenewingPrivateServerPrice",
     closeText: "Action.Close",
     subscribeText: "Action.Subscribe",
@@ -140,6 +138,12 @@ const serverListConstants = {
     playerHostedEventSubtitle: "Label.PlayerHostedEventSubtitle",
     createPlayerHostedEventCardTitle: "Label.CreateAPlayerHostedEvent",
     createPlayerHostedEventCardSubtitle: "Label.HostAScheduledEventForYourFriends",
+    // Feature.ServerList — server card metadata badges
+    pingSignalLowTooltip: "Label.PingSignalLow",
+    pingSignalMediumTooltip: "Label.PingSignalMedium",
+    pingSignalHighTooltip: "Label.PingSignalHigh",
+    languageMatchTooltip: "Label.PlayersWithLanguageMatch",
+    friendsInServerTooltip: "Label.FriendsInGame",
     // Feature.ServerList — private server revamp
     joinYourFriendsTitle: "Heading.JoinYourFriends",
     joinFriendsSubtitle: "Description.JoinFriendsSubtitle",

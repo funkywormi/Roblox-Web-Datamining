@@ -237,7 +237,8 @@ function useForumsSearch({
             positionOnPage,
             positionInList: rows.length,
             categoryName: category?.name ?? '',
-            categoryShortId: category?.shortId ?? ''
+            categoryShortId: category?.shortId ?? '',
+            isCategoryArchived: !!category?.archivedAt
           });
         });
     });

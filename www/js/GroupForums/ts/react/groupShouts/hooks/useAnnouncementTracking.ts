@@ -5,13 +5,14 @@ import CommunityEventStream, {
   getImpressionId
 } from '../../shared/utils/eventStream';
 
-const LOCATION_TAB = 'announcements';
+export type AnnouncementLocationTab = 'home' | 'posts' | 'announcements';
 
 export type AnnouncementCreateButton = 'post' | 'save' | 'cancel';
 export type AnnouncementOverflowButton = 'edit' | 'delete' | 'report';
 
 export type UseAnnouncementTrackingOptions = {
   groupId: number;
+  locationTab?: AnnouncementLocationTab;
 };
 
 export type UseAnnouncementTrackingResult = {
@@ -32,21 +33,26 @@ export type UseAnnouncementTrackingResult = {
     isReactionAdded: boolean;
   }) => void;
   trackAnnouncementViewed: (input: { announcementId: string }) => void;
+  trackAnnouncementClicked: (input: { announcementId: string }) => void;
+  trackAnnouncementArchiveAnnouncementViewed: (input: { announcementId: string }) => void;
+  trackAnnouncementSeeMoreButtonShown: (input: { announcementId: string }) => void;
+  trackAnnouncementSeeMoreButtonClick: (input: { announcementId: string }) => void;
 };
 
 export const useAnnouncementTracking = ({
-  groupId
+  groupId,
+  locationTab = 'announcements'
 }: UseAnnouncementTrackingOptions): UseAnnouncementTrackingResult => {
   const { pathname } = useLocation();
 
   const common = useMemo(
     () => ({
       pageRoute: pathname,
-      locationTab: LOCATION_TAB,
+      locationTab,
       groupId,
       sessionId: getImpressionId()
     }),
-    [pathname, groupId]
+    [pathname, locationTab, groupId]
   );
 
   const trackCreatePageShown = useCallback<UseAnnouncementTrackingResult['trackCreatePageShown']>(
@@ -148,6 +154,62 @@ export const useAnnouncementTracking = ({
     [common]
   );
 
+  const trackAnnouncementClicked = useCallback<
+    UseAnnouncementTrackingResult['trackAnnouncementClicked']
+  >(
+    ({ announcementId }) => {
+      CommunityEventStream.sendEvent(
+        CommunityMetric.AnnouncementClicked({
+          ...common,
+          announcementId
+        })
+      );
+    },
+    [common]
+  );
+
+  const trackAnnouncementArchiveAnnouncementViewed = useCallback<
+    UseAnnouncementTrackingResult['trackAnnouncementArchiveAnnouncementViewed']
+  >(
+    ({ announcementId }) => {
+      CommunityEventStream.sendEvent(
+        CommunityMetric.AnnouncementArchiveAnnouncementViewed({
+          ...common,
+          announcementId
+        })
+      );
+    },
+    [common]
+  );
+
+  const trackAnnouncementSeeMoreButtonShown = useCallback<
+    UseAnnouncementTrackingResult['trackAnnouncementSeeMoreButtonShown']
+  >(
+    ({ announcementId }) => {
+      CommunityEventStream.sendEvent(
+        CommunityMetric.AnnouncementSeeMoreButtonShown({
+          ...common,
+          announcementId
+        })
+      );
+    },
+    [common]
+  );
+
+  const trackAnnouncementSeeMoreButtonClick = useCallback<
+    UseAnnouncementTrackingResult['trackAnnouncementSeeMoreButtonClick']
+  >(
+    ({ announcementId }) => {
+      CommunityEventStream.sendEvent(
+        CommunityMetric.AnnouncementSeeMoreButtonClick({
+          ...common,
+          announcementId
+        })
+      );
+    },
+    [common]
+  );
+
   return {
     trackCreatePageShown,
     trackCreatePageButtonClick,
@@ -155,7 +217,11 @@ export const useAnnouncementTracking = ({
     trackDeleteBannerShown,
     trackOverflowMenuButtonClick,
     trackReactionToggled,
-    trackAnnouncementViewed
+    trackAnnouncementViewed,
+    trackAnnouncementClicked,
+    trackAnnouncementArchiveAnnouncementViewed,
+    trackAnnouncementSeeMoreButtonShown,
+    trackAnnouncementSeeMoreButtonClick
   };
 };
 

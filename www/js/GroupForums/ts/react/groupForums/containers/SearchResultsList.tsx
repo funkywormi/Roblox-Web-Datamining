@@ -108,6 +108,7 @@ const SearchResultsList = (): JSX.Element => {
               highlights={result.highlights}
               categoryName={result.categoryName}
               categoryShortId={result.categoryShortId}
+              isCategoryArchived={result.isCategoryArchived}
               showCategoryName={showCategoryName}
               onResultClick={() => logResultClick(result)}
             />

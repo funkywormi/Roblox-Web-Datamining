@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { TranslationProvider } from "@rbx/core-scripts/react";
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 
 const trackError = createFireTelemetryCounter("PaymentsTranslationProvider");
 

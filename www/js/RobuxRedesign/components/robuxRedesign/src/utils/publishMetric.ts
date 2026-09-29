@@ -1,6 +1,6 @@
 import { createWithApiMetrics } from "@rbx/payments/withApiMetrics";
 import { createWithTtiMetrics } from "@rbx/payments/withTtiMetrics";
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 
 export const { reportInteractive } = createWithTtiMetrics("BuyRobux_WebView_TTI");
 export const publishMetric = createFireTelemetryCounter("BuyRobuxRedesign");

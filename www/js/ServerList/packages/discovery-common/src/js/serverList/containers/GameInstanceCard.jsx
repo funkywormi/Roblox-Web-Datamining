@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState, useContext } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import { Button, Link } from "@rbx/core-ui";
@@ -12,6 +12,7 @@ import RenewPrivateGame from "../components/RenewPrivateGame";
 import PrivateServerOwner from "../components/PrivateServerOwner";
 import urlConstants from "../constants/urlConstants";
 import FriendsInServerLabel from "../components/FriendsInServerLabel";
+import ServerMetaIcons from "../util/ServerMetaIcons";
 
 const { getUserProfileUrl } = urlConstants;
 const { resources, playerTruncationSize, serverListTypes } = serverListConstants;
@@ -62,9 +63,14 @@ function GameInstanceCard({
   vipServerId,
   vipServerSubscription,
   accessCode,
-  showSlowGameMessage,
   owner,
   players,
+  pingSignalLevel,
+  languageMatchCount,
+  friendCount,
+  isServerCardPingIconEnabled,
+  isServerCardLanguageIconEnabled,
+  isServerCardFriendsIconEnabled,
   onShutdownServerSuccess,
   systemFeedbackService,
   isLoading,
@@ -193,14 +199,22 @@ function GameInstanceCard({
             {gameServerStatus}
           </div>
           <ServerSizeGauge maxPlayerCount={maxPlayers} currentPlayerCount={currentPlayersCount} />
+          {!isPrivateServer &&
+            (isServerCardPingIconEnabled ||
+              isServerCardLanguageIconEnabled ||
+              isServerCardFriendsIconEnabled) && (
+              <ServerMetaIcons
+                pingSignalLevel={pingSignalLevel}
+                languageMatchCount={languageMatchCount}
+                friendCount={friendCount}
+                showPing={isServerCardPingIconEnabled}
+                showLanguage={isServerCardLanguageIconEnabled}
+                showFriends={isServerCardFriendsIconEnabled}
+                translate={translate}
+              />
+            )}
           {serverListType === serverListTypes.friend.key && (
             <FriendsInServerLabel {...{ translate, players }} />
-          )}
-          {showSlowGameMessage && (
-            <div className={`rbx-${cssKey}game-server-alert`}>
-              <span className="icon-remove" />
-              {translate(resources.slowGameWarning)}
-            </div>
           )}
           {isPrivateServer && (
             <RenewPrivateGame
@@ -257,10 +271,15 @@ GameInstanceCard.defaultProps = {
   name: "",
   vipServerId: 0,
   accessCode: "",
-  showSlowGameMessage: false,
   owner: undefined,
   vipServerSubscription: undefined,
   players: [],
+  pingSignalLevel: null,
+  languageMatchCount: null,
+  friendCount: null,
+  isServerCardPingIconEnabled: false,
+  isServerCardLanguageIconEnabled: false,
+  isServerCardFriendsIconEnabled: false,
   maxPlayers: 0,
   currentPlayersCount: 0,
   privateServerNewJoinsDisallowed: false,
@@ -286,7 +305,6 @@ GameInstanceCard.propTypes = {
   accessCode: PropTypes.string,
   gameServerStatus: PropTypes.string.isRequired,
   canManagePlace: PropTypes.bool,
-  showSlowGameMessage: PropTypes.bool,
   owner: {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
@@ -294,6 +312,12 @@ GameInstanceCard.propTypes = {
     hasVerifiedBadge: PropTypes.bool.isRequired,
   },
   players: PropTypes.arrayOf(PropTypes.any),
+  pingSignalLevel: PropTypes.oneOf(["Low", "Medium", "High", null]),
+  languageMatchCount: PropTypes.number,
+  friendCount: PropTypes.number,
+  isServerCardPingIconEnabled: PropTypes.bool,
+  isServerCardLanguageIconEnabled: PropTypes.bool,
+  isServerCardFriendsIconEnabled: PropTypes.bool,
   onShutdownServerSuccess: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
   setIsLoading: PropTypes.func.isRequired,

@@ -33,7 +33,10 @@ const AnnouncementArchive = ({
   const queryClient = useQueryClient();
   const { translate } = useTranslation();
   const { systemFeedbackService } = useSystemFeedback();
-  const { trackReactionToggled } = useAnnouncementTracking({ groupId });
+  const { trackAnnouncementClicked, trackReactionToggled } = useAnnouncementTracking({
+    groupId,
+    locationTab: 'posts'
+  });
   const {
     data,
     error,
@@ -65,13 +68,14 @@ const AnnouncementArchive = ({
   }, [history]);
   const trackAnnouncementOpen = useCallback(
     (announcementId: string) => {
+      trackAnnouncementClicked({ announcementId });
       logGroupForumsClickEvent({
         groupId,
         clickTargetType: 'openAnnouncement',
         clickTargetId: announcementId
       });
     },
-    [groupId]
+    [groupId, trackAnnouncementClicked]
   );
   const openAnnouncement = useCallback(
     (announcementId: string) => {

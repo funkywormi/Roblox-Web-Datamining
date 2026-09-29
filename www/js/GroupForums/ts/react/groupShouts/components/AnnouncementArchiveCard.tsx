@@ -61,7 +61,12 @@ const AnnouncementArchiveCard = ({
           responseCount === 1 ? 'Label.ResponseCountSingular' : 'Label.ResponseCountPlural'
         )}`;
   const canRenderRichText = features.AnnouncementsRichTextRead && !!announcement.content.slate;
-  const cardRef = useAnnouncementViewExposure<HTMLAnchorElement>(groupId, announcement.id);
+  const cardRef = useAnnouncementViewExposure<HTMLAnchorElement>(
+    groupId,
+    announcement.id,
+    'posts',
+    'archiveAnnouncement'
+  );
 
   return (
     <ContentPreviewCard

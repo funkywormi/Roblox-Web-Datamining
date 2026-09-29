@@ -46,6 +46,8 @@ export type RobloxSubscriptionWidgetProps = {
    */
   learnMoreHref?: string;
   paymentSessionId?: string;
+  /** When set, the subscribe CTA calls this instead of navigating to checkout. */
+  onSubscribeOverride?: () => void;
 };
 
 const RobloxSubscriptionWidget: FC<RobloxSubscriptionWidgetProps> = ({
@@ -57,6 +59,7 @@ const RobloxSubscriptionWidget: FC<RobloxSubscriptionWidgetProps> = ({
   onLearnMoreClick,
   learnMoreHref,
   paymentSessionId,
+  onSubscribeOverride,
 }) => {
   const { translate } = useTranslation();
 
@@ -151,19 +154,30 @@ const RobloxSubscriptionWidget: FC<RobloxSubscriptionWidgetProps> = ({
       </div>
 
       <div className="gap-x-small medium:gap-x-xlarge width-full flex flex-row">
-        <SubscriptionButton
-          className="width-full text-label-medium"
-          deviceMeta={deviceMeta}
-          loadingStateDisabled
-          paymentSessionId={paymentSessionId}
-          productId={primaryProduct.subscriptionProductId}
-          productType={apiProductType}
-          size="Medium"
-          trackSubscriptionButtonClick={onSubscriptionSubscribeClick}
-          variant={isPrimary ? "Emphasis" : "Standard"}
-        >
-          {buttonLabel}
-        </SubscriptionButton>
+        {onSubscribeOverride ? (
+          <Button
+            className="width-full text-label-medium"
+            size="Medium"
+            variant={isPrimary ? "Emphasis" : "Standard"}
+            onClick={onSubscribeOverride}
+          >
+            {buttonLabel}
+          </Button>
+        ) : (
+          <SubscriptionButton
+            className="width-full text-label-medium"
+            deviceMeta={deviceMeta}
+            loadingStateDisabled
+            paymentSessionId={paymentSessionId}
+            productId={primaryProduct.subscriptionProductId}
+            productType={apiProductType}
+            size="Medium"
+            trackSubscriptionButtonClick={onSubscriptionSubscribeClick}
+            variant={isPrimary ? "Emphasis" : "Standard"}
+          >
+            {buttonLabel}
+          </SubscriptionButton>
+        )}
         {learnMoreHref != null ? (
           // Desktop / mobile web: keep link semantics so middle-click,
           // open-in-new-tab, and share all keep working.

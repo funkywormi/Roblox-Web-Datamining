@@ -8,8 +8,10 @@ export const isAnnouncementArchiveFeatureEnabled = (features: CommunityProductFe
 export const canViewAnnouncementArchive = (
   features: CommunityProductFeatures,
   policies: GroupDetailsPolicies,
-  permissions: GroupPermissions
-): boolean =>
+  permissions: GroupPermissions,
+  isExperimentEnabled: boolean | undefined
+): boolean | undefined =>
+  isExperimentEnabled &&
   isAnnouncementArchiveFeatureEnabled(features) &&
   !policies.isGracefulDegradationEnabled &&
   policies.displayGroupAnnouncements &&

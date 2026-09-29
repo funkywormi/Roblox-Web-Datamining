@@ -20,7 +20,7 @@ import Message from '../../shared/components/content/MessageContent';
 import ContentReactions from '../../shared/components/reactions/ContentReactions';
 import AnnouncementEmbeds from './AnnouncementEmbeds';
 import groupAnnouncementsConsts from '../constants/groupAnnouncementsConstants';
-import { useAnnouncementTracking } from '../hooks/useAnnouncementTracking';
+import { AnnouncementLocationTab, useAnnouncementTracking } from '../hooks/useAnnouncementTracking';
 import PollVoter from '../../customForms/components/PollVoter';
 import { useAnnouncementPollsEnabled } from '../hooks/useAnnouncementPollsEnabled';
 import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
@@ -40,6 +40,7 @@ export type AnnouncementDisplayProps = {
   truncateContent?: boolean;
   onRefetchAnnouncement?: () => void;
   onEditAnnouncement?: (announcement: AnnouncementModel) => void;
+  locationTab?: AnnouncementLocationTab;
 } & WithTranslationsProps;
 
 type StringWithEscapeHTML = string & { escapeHTML: () => string };
@@ -54,7 +55,8 @@ const AnnouncementDisplay = ({
   truncateContent = true,
   onRefetchAnnouncement,
   onEditAnnouncement,
-  translate
+  translate,
+  locationTab = 'home'
 }: AnnouncementDisplayProps): JSX.Element => {
   const { id, messageId, title, content, reactions, imageAssetId, formId } = announcement;
 
@@ -72,7 +74,7 @@ const AnnouncementDisplay = ({
   const history = useHistory();
   const { systemFeedbackService } = useSystemFeedback();
   const { trackReactionToggled, trackDeleteBannerShown } = useAnnouncementTracking({ groupId });
-  const announcementViewRef = useAnnouncementViewExposure(groupId, announcement.id);
+  const announcementViewRef = useAnnouncementViewExposure(groupId, announcement.id, locationTab);
 
   useEffect(() => {
     if (

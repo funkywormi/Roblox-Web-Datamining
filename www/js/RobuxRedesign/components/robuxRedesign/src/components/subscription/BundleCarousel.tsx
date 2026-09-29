@@ -16,6 +16,8 @@ type BundleCarouselProps = {
   isPrimary: boolean;
   onSubscriptionSectionViewShown: () => void;
   onSubscriptionSubscribeClick: (args: TrackSubscriptionV2SubscribeClickArgs) => void;
+  baseProductId?: string;
+  onBaseProductSubscribe?: () => void;
   paymentSessionId?: string;
   redirect?: UseRedirectResult;
 };
@@ -26,6 +28,8 @@ export function BundleCarousel({
   isPrimary,
   onSubscriptionSectionViewShown,
   onSubscriptionSubscribeClick,
+  baseProductId,
+  onBaseProductSubscribe,
   paymentSessionId,
   redirect,
 }: BundleCarouselProps) {
@@ -66,6 +70,9 @@ export function BundleCarousel({
               isEmphasized={isPrimary && index === 0}
               isPrimary={isPrimary}
               onSubscribeClick={onSubscriptionSubscribeClick}
+              onSubscribeOverride={
+                product.subscriptionProductId === baseProductId ? onBaseProductSubscribe : undefined
+              }
               paymentSessionId={paymentSessionId}
               product={product}
               redirect={redirect}

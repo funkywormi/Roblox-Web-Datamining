@@ -33,7 +33,8 @@ export function Header({
   const { trackRobuxGiftClick } = useContext(TrackingContext);
 
   const { translate } = useTranslation();
-  const { pendingReferrals } = usePendingPlusReferrals();
+  const { pendingReferrals: allPendingReferrals } = usePendingPlusReferrals();
+  const pendingReferrals = isInApp ? [] : allPendingReferrals;
 
   const transfers = transfersSection?.transfers;
   const robuxGift = robuxGiftSection?.robuxGift;

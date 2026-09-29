@@ -1,10 +1,25 @@
 /* eslint-disable no-void */
 import { useState, useContext, useCallback, useMemo, Fragment, useEffect } from "react";
 import { PaymentIntentResult } from "@stripe/stripe-js";
-import { Modal, Button, Loading, Popover } from "@rbx/core-ui/legacy/react-style-guide";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { formatNumber } from "@rbx/core-scripts/format/number";
-import { Badge } from "@rbx/foundation-ui";
+import {
+  Badge,
+  Button,
+  EducationalTooltip,
+  EducationalTooltipBody,
+  EducationalTooltipContent,
+  EducationalTooltipDescription,
+  EducationalTooltipTrigger,
+  IconButton,
+  ProgressCircle,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogFooter,
+  DialogBody,
+  Divider,
+} from "@rbx/foundation-ui";
 import { FullScreenLoading } from "@rbx/payments/components";
 import { isIconVariant } from "../../utils/iconVariants";
 import { resolveBonusRobuxTagLabelKey } from "../../utils/bonusRobuxTag";
@@ -69,6 +84,7 @@ function QuickPayModal({
   );
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isTaxTooltipOpen, setIsTaxTooltipOpen] = useState(false);
   const [quickPayError, setQuickPayError] = useState("");
 
   const handleProcessPayment = useCallback(
@@ -161,209 +177,229 @@ function QuickPayModal({
   }
 
   return (
-    <Modal
-      show={isQuickPayModalOpen}
-      onHide={handleClose}
-      size="lg"
-      centered
-      scrollable={false}
-      dialogClassName="quick-pay-modal"
+    <Dialog
+      open={isQuickPayModalOpen}
+      onOpenChange={open => {
+        if (!open) {
+          handleClose();
+        }
+      }}
+      size="Large"
+      hasCloseAffordance
+      closeLabel={translate("Button.OneClickPay.Cancel")}
+      isModal
     >
-      <Modal.Header
-        title={translate("Message.OneClickPay.Title")}
-        showCloseButton
-        onClose={handleClose}
-      />
-      <Modal.Body>
-        <div className="product">
-          <div className="icon-wrapper">
-            <div className="icon-robux-redesign" />
-            <div className="product-detail">
-              <div className="product-name">
-                {translate("Label.RobuxQuantity", {
-                  quantity: formatNumber(Number(selectedProduct.robuxAmount)),
-                })}
-              </div>
-              <span
-                className="product-price quick-pay-price-tag"
-                data-amount={formatAmount(selectedProduct.price.amount)}
-                data-currency-code={selectedProduct.price.amount.currencyCode}
-              />
-            </div>
-            {selectedProduct.bonusRobuxAmount &&
-              selectedProduct.bonusRobuxTagIcon &&
-              isIconVariant(selectedProduct.bonusRobuxTagIcon) && (
-                <div className="margin-top-[14px] margin-left-[6px] self-start">
-                  <Badge
-                    variant="Contrast"
-                    icon={selectedProduct.bonusRobuxTagIcon}
-                    label={translate(
-                      resolveBonusRobuxTagLabelKey(selectedProduct.bonusRobuxTagTranslationKey),
-                      { amount: formatNumber(Number(selectedProduct.bonusRobuxAmount)) },
-                    )}
-                    className="text-overflow"
-                    size="XSmall"
-                  />
+      <DialogContent>
+        <DialogBody>
+          <DialogTitle className="text-heading-medium content-emphasis">
+            <div>{translate("Message.OneClickPay.Title")}</div>
+          </DialogTitle>
+          <Divider className="margin-y-small" />
+          <div className="product">
+            <div className="icon-wrapper">
+              <div className="icon-robux-redesign" />
+              <div className="product-detail">
+                <div className="product-name">
+                  {translate("Label.RobuxQuantity", {
+                    quantity: formatNumber(Number(selectedProduct.robuxAmount)),
+                  })}
                 </div>
-              )}
-          </div>
-          {shouldShowPersonalizedBonusItems && (
-            <Fragment>
-              <span className="icon-plus" />
-              <div className="bonus-item-card-small">
-                {ltbItemMetadata ? (
-                  <img
-                    src={ltbItemMetadata.image2dUrl}
-                    alt="bonus item"
-                    className="height-[60px] width-auto max-width-full object-contain shrink-0"
-                  />
-                ) : bonusItemImageUrl ? (
-                  <div className="icon-upsell-item-small-preview thumbnail-2d-container">
-                    <img
-                      src={bonusItemImageUrl}
-                      alt="bonus item"
-                      className="width-full height-full"
+                <span
+                  className="product-price quick-pay-price-tag"
+                  data-amount={formatAmount(selectedProduct.price.amount)}
+                  data-currency-code={selectedProduct.price.amount.currencyCode}
+                />
+              </div>
+              {selectedProduct.bonusRobuxAmount &&
+                selectedProduct.bonusRobuxTagIcon &&
+                isIconVariant(selectedProduct.bonusRobuxTagIcon) && (
+                  <div className="margin-top-[14px] margin-left-[6px] self-start">
+                    <Badge
+                      variant="Contrast"
+                      icon={selectedProduct.bonusRobuxTagIcon}
+                      label={translate(
+                        resolveBonusRobuxTagLabelKey(selectedProduct.bonusRobuxTagTranslationKey),
+                        { amount: formatNumber(Number(selectedProduct.bonusRobuxAmount)) },
+                      )}
+                      className="text-overflow"
+                      size="XSmall"
                     />
                   </div>
-                ) : collectibleBonusItemMetadata ? (
-                  <img
-                    src={collectibleBonusItemMetadata.image2dUrl}
-                    alt="bonus item"
-                    className="width-[60px] height-[60px]"
-                  />
-                ) : null}
-                <div className="description-container">
-                  <div className="description-title">
-                    {ltbItemMetadata
-                      ? translate(ltbItemMetadata.translationKey) || "Bonus Item"
-                      : (bonusItemDisplayName ??
-                        translate(collectibleBonusItemMetadata?.translationKey ?? ""))}
-                  </div>
-                  <div className="description-subtitle">
-                    {ltbItemMetadata?.creatorDisplayName ? (
-                      <div className="flex flex-row gap-xsmall self-stretch items-center justify-start margin-top-[8px]">
-                        <div className="text-label-small medium:text-label-medium content-default">
-                          {ltbItemMetadata.creatorDisplayName}
+                )}
+            </div>
+            {shouldShowPersonalizedBonusItems && (
+              <Fragment>
+                <span className="icon-plus" />
+                <div className="bonus-item-card-small">
+                  {ltbItemMetadata ? (
+                    <img
+                      src={ltbItemMetadata.image2dUrl}
+                      alt="bonus item"
+                      className="height-[60px] width-auto max-width-full object-contain shrink-0"
+                    />
+                  ) : bonusItemImageUrl ? (
+                    <div className="icon-upsell-item-small-preview thumbnail-2d-container">
+                      <img
+                        src={bonusItemImageUrl}
+                        alt="bonus item"
+                        className="width-full height-full"
+                      />
+                    </div>
+                  ) : collectibleBonusItemMetadata ? (
+                    <img
+                      src={collectibleBonusItemMetadata.image2dUrl}
+                      alt="bonus item"
+                      className="width-[60px] height-[60px]"
+                    />
+                  ) : null}
+                  <div className="description-container">
+                    <div className="description-title">
+                      {ltbItemMetadata
+                        ? translate(ltbItemMetadata.translationKey) || "Bonus Item"
+                        : (bonusItemDisplayName ??
+                          translate(collectibleBonusItemMetadata?.translationKey ?? ""))}
+                    </div>
+                    <div className="description-subtitle">
+                      {ltbItemMetadata?.creatorDisplayName ? (
+                        <div className="flex flex-row gap-xsmall self-stretch items-center justify-start margin-top-[8px]">
+                          <div className="text-label-small medium:text-label-medium content-default">
+                            {ltbItemMetadata.creatorDisplayName}
+                          </div>
+                          {ltbItemMetadata.creatorIsVerified && <BlueCheckIcon size={12} />}
                         </div>
-                        {ltbItemMetadata.creatorIsVerified && <BlueCheckIcon size={12} />}
-                      </div>
-                    ) : bonusItemImageUrl ? (
-                      translate("Message.OneClickPay.BonusVirtualItem")
-                    ) : collectibleBonusItemMetadata ? (
-                      <div className="flex flex-row gap-xsmall self-stretch items-center justify-start margin-top-[8px]">
-                        <div className="text-label-small medium:text-label-medium content-default">
-                          {translate("Label.ByRoblox")}
+                      ) : bonusItemImageUrl ? (
+                        translate("Message.OneClickPay.BonusVirtualItem")
+                      ) : collectibleBonusItemMetadata ? (
+                        <div className="flex flex-row gap-xsmall self-stretch items-center justify-start margin-top-[8px]">
+                          <div className="text-label-small medium:text-label-medium content-default">
+                            {translate("Label.ByRoblox")}
+                          </div>
+                          <BlueCheckIcon size={12} />
                         </div>
-                        <BlueCheckIcon size={12} />
-                      </div>
-                    ) : null}
+                      ) : null}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Fragment>
-          )}
-        </div>
-
-        <div className="price-info space-between-container">
-          <div className="subtotal">{translate("Message.OneClickPay.Subtotal")}</div>
-          <span
-            className="subtotal-price quick-pay-price-tag"
-            data-amount={formatAmount(selectedProduct.price.amount)}
-            data-currency-code={selectedProduct.price.amount.currencyCode}
-          />
-        </div>
-        <div className="tax-info space-between-container">
-          <div className="tax">
-            {preparePaymentProviderPayload ? (
-              <Fragment>
-                <span className="tax-text">{translate(taxTranslationKey)}</span>
-                <Popover
-                  id="tax-popover"
-                  placement="right"
-                  trigger="click"
-                  button={<span className="icon-moreinfo-16x16" />}
-                >
-                  {translate("Message.OneClickPay.TaxTooltip")}
-                </Popover>
               </Fragment>
+            )}
+          </div>
+
+          <div className="price-info space-between-container">
+            <div className="subtotal">{translate("Message.OneClickPay.Subtotal")}</div>
+            <span
+              className="subtotal-price quick-pay-price-tag"
+              data-amount={formatAmount(selectedProduct.price.amount)}
+              data-currency-code={selectedProduct.price.amount.currencyCode}
+            />
+          </div>
+          <div className="tax-info space-between-container">
+            <div className="tax">
+              {preparePaymentProviderPayload ? (
+                <Fragment>
+                  <span className="tax-text">{translate(taxTranslationKey)}</span>
+                  <EducationalTooltip open={isTaxTooltipOpen} onOpenChange={setIsTaxTooltipOpen}>
+                    <EducationalTooltipTrigger asChild>
+                      <IconButton
+                        icon="icon-regular-circle-question"
+                        size="XSmall"
+                        variant="Utility"
+                        ariaLabel={translate("Message.OneClickPay.TaxTooltip")}
+                      />
+                    </EducationalTooltipTrigger>
+                    <EducationalTooltipContent
+                      position="right-center"
+                      hasCloseAffordance
+                      closeLabel={translate("Action.Close")}
+                    >
+                      <EducationalTooltipBody>
+                        <EducationalTooltipDescription>
+                          {translate("Message.OneClickPay.TaxTooltip")}
+                        </EducationalTooltipDescription>
+                      </EducationalTooltipBody>
+                    </EducationalTooltipContent>
+                  </EducationalTooltip>
+                </Fragment>
+              ) : (
+                loadingAnimation
+              )}
+            </div>
+            {preparePaymentProviderPayload ? (
+              <span
+                className="tax-price quick-pay-price-tag"
+                data-amount={taxAmountExclusive}
+                data-currency-code={selectedProduct.price.amount.currencyCode}
+              />
             ) : (
               loadingAnimation
             )}
           </div>
-          {preparePaymentProviderPayload ? (
-            <span
-              className="tax-price quick-pay-price-tag"
-              data-amount={taxAmountExclusive}
-              data-currency-code={selectedProduct.price.amount.currencyCode}
-            />
-          ) : (
-            loadingAnimation
-          )}
-        </div>
-        <div className="divider" />
-        <div className="space-between-container">
-          <div className="total-due">{translate("Message.OneClickPay.TotalDue")}</div>
-          {preparePaymentProviderPayload ? (
-            <span
-              className="total-due-price quick-pay-price-tag"
-              data-amount={amountTotal}
-              data-currency-code={selectedProduct.price.amount.currencyCode}
-            />
-          ) : (
-            loadingAnimation
-          )}
-        </div>
-        <div className="payment-method-info">
-          {translate("Message.OneClickPay.AmountChargedTo")}
-          <QuickPaySelectCardDropdown
-            error={quickPayError}
-            onSelectPaymentProfile={selectPaymentProfile}
-            paymentProfiles={paymentProfiles}
-            selectedPaymentProfile={selectedPaymentProfile}
-          />
-        </div>
-        <div className="use-a-different-payment-method">
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-          <div role="button" tabIndex={0} onClick={handleUseDifferentPaymentMethodClick}>
-            {translate("Message.OneClickPay.RedirectToOldFlow")}
+          <div className="divider" />
+          <div className="space-between-container">
+            <div className="total-due">{translate("Message.OneClickPay.TotalDue")}</div>
+            {preparePaymentProviderPayload ? (
+              <span
+                className="total-due-price quick-pay-price-tag"
+                data-amount={amountTotal}
+                data-currency-code={selectedProduct.price.amount.currencyCode}
+              />
+            ) : (
+              loadingAnimation
+            )}
           </div>
-        </div>
-        <div className="divider" />
-        <div className="margin-top-small">
-          <QuickPayLegalDisclosure translationKey={legalDisclosureTranslationKey} />
-        </div>
-      </Modal.Body>
-      <Modal.Footer>
-        <div className="loading">{isLoading && <Loading />}</div>
-        {!isLoading && (
-          <div className="modal-buttons">
-            <Button
-              isDisabled={!preparePaymentProviderPayload}
-              className="modal-button"
-              variant={Button.variants.growth}
-              width={Button.widths.min}
-              size={Button.sizes.medium}
-              onClick={() => {
-                if (preparePaymentProviderPayload) {
-                  void handleProcessPayment(preparePaymentProviderPayload);
-                }
-              }}
-            >
-              {translate("Button.OneClickPay.PayNow")}
-            </Button>
-            <Button
-              className="modal-button"
-              variant={Button.variants.control}
-              width={Button.widths.min}
-              size={Button.sizes.medium}
-              onClick={handleClose}
-            >
-              {translate("Button.OneClickPay.Cancel")}
-            </Button>
+          <div className="payment-method-info">
+            {translate("Message.OneClickPay.AmountChargedTo")}
+            <QuickPaySelectCardDropdown
+              error={quickPayError}
+              onSelectPaymentProfile={selectPaymentProfile}
+              paymentProfiles={paymentProfiles}
+              selectedPaymentProfile={selectedPaymentProfile}
+            />
           </div>
-        )}
-      </Modal.Footer>
-    </Modal>
+          <div className="use-a-different-payment-method">
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+            <div role="button" tabIndex={0} onClick={handleUseDifferentPaymentMethodClick}>
+              {translate("Message.OneClickPay.RedirectToOldFlow")}
+            </div>
+          </div>
+          <div className="divider" />
+          <div className="margin-top-small">
+            <QuickPayLegalDisclosure translationKey={legalDisclosureTranslationKey} />
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <div className="loading">
+            {isLoading && (
+              <ProgressCircle variant="Indeterminate" ariaLabel={translate("Label.Loading")} />
+            )}
+          </div>
+          {!isLoading && (
+            <div className="flex flex-row gap-small justify-center">
+              <Button
+                isDisabled={!preparePaymentProviderPayload}
+                variant="Emphasis"
+                className="min-width-[90px]"
+                size="Medium"
+                onClick={() => {
+                  if (preparePaymentProviderPayload) {
+                    void handleProcessPayment(preparePaymentProviderPayload);
+                  }
+                }}
+              >
+                {translate("Button.OneClickPay.PayNow")}
+              </Button>
+              <Button
+                variant="Standard"
+                onClick={handleClose}
+                className="min-width-[90px]"
+                size="Medium"
+              >
+                {translate("Button.OneClickPay.Cancel")}
+              </Button>
+            </div>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

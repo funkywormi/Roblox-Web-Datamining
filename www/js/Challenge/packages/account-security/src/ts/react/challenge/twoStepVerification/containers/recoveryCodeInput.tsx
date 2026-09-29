@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import { Modal } from "react-style-guide";
 import * as TwoStepVerification from "../../../../common/request/types/twoStepVerification";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
-import { InlineChallengeFooter } from "../../../common/inlineChallengeFooter";
 import InputControl, { validateTrue } from "../../../common/inputControl";
-import { FooterButtonConfig, FragmentModalFooter } from "../../../common/modalFooter";
 import RememberDeviceCheckBox from "../components/rememberDeviceCheckBox";
+import VerificationFooter, { VerificationFooterButton } from "../components/verificationFooter";
 import SupportHelp from "../components/supportHelp";
 import { RECOVERY_CODE_LENGTH, REGEX_RECOVERY_CODE } from "../constants/patterns";
 import {
@@ -115,20 +114,14 @@ const RecoveryCodeInput: React.FC<Props> = ({
 
   const codeValid = codeError === null && code.length === RECOVERY_CODE_LENGTH;
 
-  const positiveButton: FooterButtonConfig = {
-    // Show a spinner as the button content when a request is in flight.
-    content: requestInFlight ? (
-      <span className="spinner spinner-xs spinner-no-margin" />
-    ) : (
-      resources.Action.Verify
-    ),
+  const positiveButton: VerificationFooterButton = {
     label: resources.Action.Verify,
     enabled: !requestInFlight && codeValid,
+    loading: requestInFlight,
     action: verifyCode,
   };
 
   const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
-  const FooterElement = renderInline ? InlineChallengeFooter : FragmentModalFooter;
   const lockIconClassName = renderInline
     ? "inline-challenge-protection-shield-icon"
     : "modal-protection-shield-icon";
@@ -179,13 +172,12 @@ const RecoveryCodeInput: React.FC<Props> = ({
             className={marginBottomXLargeClassName}
           />
         )}
-
-        {children}
       </BodyElement>
-      <FooterElement positiveButton={positiveButton} negativeButton={null}>
+      <VerificationFooter positiveButton={positiveButton}>
+        {children}
         <SupportHelp className={marginBottomClassName} />
         <p className="text-footer">{resources.Description.SecurityWarningShortBackupCodes}</p>
-      </FooterElement>
+      </VerificationFooter>
     </React.Fragment>
   );
 };

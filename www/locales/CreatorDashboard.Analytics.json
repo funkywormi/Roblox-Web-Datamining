@@ -1066,7 +1066,7 @@
     "Description.CubeLatencyP99": "P99 latency in seconds for AI API requests (3D generation and LLM requests) for your experience, broken down by the type of generation.",
     "Description.CubeOutcomes": "Outcome breakdown (Succeeded, Failed, Moderated) for AI API requests (3D generation and LLM requests) for your experience, broken down by the type of generation and outcome.",
     "Description.CubeTotalRequests": "Total AI API requests (3D generation and LLM requests) for your experience over the selected time range, broken down by the type of generation.",
-    "Heading.Cube": "Cube",
+    "Heading.Cube": "Generation service",
     "Label.Dimension.Outcome": "Outcome",
     "Label.Dimension.WorkflowType": "Generation Type",
     "Label.Metric.CubeDailyRequests": "Daily Requests",

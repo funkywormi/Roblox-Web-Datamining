@@ -5,3 +5,16 @@ export const playerHostedEventsExperimentLayer = "Discovery.EDP.PlayerHostedEven
 
 // Parameter (within the layer above) that enables the player-hosted-events entry point.
 export const isPlayerHostedEventsEnabledParam = "IsPlayerHostedEventsEnabled";
+
+// IXP layer gating the server-card ping/language/friends badges. Each badge
+// has its own parameter below so any subset can be enabled independently.
+export const serverCardMetaExperimentLayer = "Discovery.EDP.ServerCardMeta";
+
+export const isServerCardPingIconEnabledParam = "IsServerCardPingIconEnabled";
+
+export const isServerCardLanguageIconEnabledParam = "IsServerCardLanguageIconEnabled";
+
+export const isServerCardFriendsIconEnabledParam = "IsServerCardFriendsIconEnabled";
+
+// Selects the V2 friends server-list URL; independent of the icon badges.
+export const isFriendsServerListV2EnabledParam = "IsFriendsServerListV2Enabled";

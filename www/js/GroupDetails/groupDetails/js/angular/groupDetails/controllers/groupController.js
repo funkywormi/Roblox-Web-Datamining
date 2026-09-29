@@ -34,17 +34,33 @@ function groupController(
 
   const postsTabs = createTabConfiguration(groupDetailsConstants.tabs, {
     about: { translationKey: 'Heading.Home' },
-    forums: { translationKey: 'Heading.Posts' }
+    forums: { translationKey: 'Heading.Posts', state: 'announcements' }
   });
-  const announcementOnlyPostsTabs = createTabConfiguration(postsTabs, {
-    forums: { state: 'announcements' }
-  });
+  let hasExposedAnnouncementArchiveExperiment = false;
+  const canViewAnnouncementArchive = () => {
+    const isEligible =
+      $scope.isAnnouncementArchiveEnabled &&
+      !$scope.policies?.isGracefulDegradationEnabled &&
+      $scope.policies?.displayGroupAnnouncements &&
+      $scope.library.currentGroup.permissions?.groupPostsPermissions?.viewStatus;
+
+    if (
+      isEligible &&
+      $scope.isAnnouncementArchiveExperimentLoaded &&
+      !hasExposedAnnouncementArchiveExperiment
+    ) {
+      hasExposedAnnouncementArchiveExperiment = true;
+      groupExperimentsService.exposeAnnouncementArchiveExperiment();
+    }
+
+    return isEligible && $scope.isAnnouncementArchiveExperimentEnabled;
+  };
   const getBaseGroupDetailsTabs = () => {
-    if (!$scope.isAnnouncementArchiveEnabled) {
+    if (!canViewAnnouncementArchive()) {
       return groupDetailsConstants.tabs;
     }
 
-    return $scope.canViewForums() ? postsTabs : announcementOnlyPostsTabs;
+    return postsTabs;
   };
 
   function loadGroupData() {
@@ -82,6 +98,18 @@ function groupController(
   let hasHandledAboutTabExposure = false;
   const getTabKeyForState = state => {
     return groupDetailsConstants.stateToTab[state?.name] ?? state?.name;
+  };
+  const redirectFromDegradedPosts = state => {
+    if (
+      !$scope.policiesLoaded ||
+      getTabKeyForState(state) !== groupDetailsConstants.tabs.forums.key ||
+      !$scope.policies?.isGracefulDegradationEnabled
+    ) {
+      return false;
+    }
+
+    $state.go(groupDetailsConstants.tabs.about.state, { success: true }, { reload: true });
+    return true;
   };
   const tryExposeAboutTabExperiment = state => {
     if (hasHandledAboutTabExposure) {
@@ -492,6 +520,9 @@ function groupController(
 
   $scope.$on('$stateChangeSuccess', (event, toState) => {
     const tabKey = getTabKeyForState(toState);
+    if (redirectFromDegradedPosts(toState)) {
+      return;
+    }
     // Redirect to about tab if user doesn't have access to forums from policy
     // Only redirect if the policy is loaded
     if ($scope.policiesLoaded && $state.includes(groupDetailsConstants.tabs.forums.state)) {
@@ -532,6 +563,8 @@ function groupController(
         $scope.library.currentGroup.forumsEnabled = result.data.length > 0;
       })
       .finally(() => {
+        $scope.isGroupForumsLoaded = true;
+
         // If we are trying to access the forums tab but forums are not enabled, then redirect to about tab
         if (
           $state.includes(groupDetailsConstants.tabs.forums.state) &&
@@ -840,7 +873,11 @@ function groupController(
   };
 
   $scope.canViewCommunityTabs = () => {
-    if ($scope.isAnnouncementArchiveEnabled) {
+    if (!$scope.isGroupForumsLoaded || !$scope.isAnnouncementArchiveConfigurationLoaded) {
+      return false;
+    }
+
+    if (canViewAnnouncementArchive()) {
       return true;
     }
     return !($scope.isHidingEmptyCommunityTabsEnabled && $scope.groupDetailsNumTabs() <= 1);
@@ -851,7 +888,7 @@ function groupController(
     if (!$scope.canViewEvents()) {
       delete tabs.events;
     }
-    if (!$scope.isAnnouncementArchiveEnabled && !$scope.canViewForums()) {
+    if (!canViewAnnouncementArchive() && !$scope.canViewForums()) {
       delete tabs.forums;
     }
     if (!$scope.canViewStore()) {
@@ -863,7 +900,7 @@ function groupController(
 
     if ($scope.availableProfilePlatformTabs !== undefined) {
       Object.keys(tabs).forEach(key => {
-        const isPostsTab = key === 'forums' && $scope.isAnnouncementArchiveEnabled;
+        const isPostsTab = key === 'forums' && canViewAnnouncementArchive();
         if (!isPostsTab && !$scope.availableProfilePlatformTabs.has(key)) {
           delete tabs[key];
         }
@@ -993,6 +1030,16 @@ function groupController(
     });
   };
 
+  $scope.loadAnnouncementArchiveExperiment = () => {
+    return $q
+      .when(groupExperimentsService.isAnnouncementArchiveExperimentEnabled())
+      .then(isEnabled => {
+        $scope.isAnnouncementArchiveExperimentEnabled = isEnabled === true;
+        $scope.isAnnouncementArchiveExperimentLoaded = isEnabled !== undefined;
+        $scope.isAnnouncementArchiveConfigurationLoaded = true;
+      });
+  };
+
   // Resolve the React-vs-legacy affiliates decision from product features,
   // independent of the guac policy load. Kept off the policies object since
   // the guac response replaces it wholesale.
@@ -1003,11 +1050,17 @@ function groupController(
         $scope.reactAffiliatesFlagLoaded = true;
         $scope.isAnnouncementArchiveEnabled =
           features?.AnnouncementArchive === true && features?.AnnouncementsUsingCommsPlat === true;
+        if ($scope.isAnnouncementArchiveEnabled) {
+          $scope.loadAnnouncementArchiveExperiment();
+        } else {
+          $scope.isAnnouncementArchiveConfigurationLoaded = true;
+        }
       },
       () => {
         $scope.isReactAffiliatesEnabled = false;
         $scope.reactAffiliatesFlagLoaded = true;
         $scope.isAnnouncementArchiveEnabled = false;
+        $scope.isAnnouncementArchiveConfigurationLoaded = true;
       }
     );
   };
@@ -1028,10 +1081,22 @@ function groupController(
             $scope.verifyGroupOrigin();
           }
 
-          if ($scope.policies.displayGroupForums) {
+          const redirectedFromDegradedPosts = redirectFromDegradedPosts($state.current);
+          if (!$scope.policies.isGracefulDegradationEnabled && $scope.policies.displayGroupForums) {
             $scope.loadGroupForums(groupId);
-          } else if ($state.includes(groupDetailsConstants.tabs.forums.state)) {
-            $state.go(groupDetailsConstants.tabs.about.state, { success: true }, { reload: true });
+          } else {
+            $scope.isGroupForumsLoaded = true;
+
+            if (
+              !redirectedFromDegradedPosts &&
+              $state.includes(groupDetailsConstants.tabs.forums.state)
+            ) {
+              $state.go(
+                groupDetailsConstants.tabs.about.state,
+                { success: true },
+                { reload: true }
+              );
+            }
           }
 
           $scope.loadGroupEvents(groupId);
@@ -1040,6 +1105,7 @@ function groupController(
         },
         () => {
           $log.debug('--loadGroupDetailPolicies-error---');
+          $scope.isGroupForumsLoaded = true;
           // Still load profile platform even if policies fail, with defaults
           $scope.loadProfilePlatform(groupId);
         }
@@ -1048,6 +1114,7 @@ function groupController(
       Object.keys(groupDetailsConstants.policies).forEach(item => {
         $scope.policies[item] = true;
       });
+      $scope.isGroupForumsLoaded = true;
       $scope.loadProfilePlatform(groupId);
     }
   };
@@ -1213,8 +1280,10 @@ function groupController(
     $scope.groupDetailsConstants = groupDetailsConstants;
     $scope.policies = $scope.groupDetailsConstants.policies;
     $scope.policiesLoaded = false;
+    $scope.isGroupForumsLoaded = false;
     $scope.isReactAffiliatesEnabled = false;
     $scope.reactAffiliatesFlagLoaded = false;
+    $scope.isAnnouncementArchiveConfigurationLoaded = false;
     $scope.isAuthenticatedUser = CurrentUser.isAuthenticated;
 
     $scope.groupAnnouncement = {};

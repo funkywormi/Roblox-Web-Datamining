@@ -140,6 +140,34 @@ function groupExperimentsService(groupsConstants) {
       }
     },
 
+    isAnnouncementArchiveExperimentEnabled: async () => {
+      if (!CurrentUser.isAuthenticated) {
+        return undefined;
+      }
+
+      try {
+        const experimentConfig = await getExperimentLayer(
+          groupsConstants.announcementArchiveExperimentLayer
+        );
+
+        if (
+          experimentConfig != null &&
+          Object.prototype.hasOwnProperty.call(experimentConfig, 'isAnnouncementArchiveEnabled')
+        ) {
+          return experimentConfig.isAnnouncementArchiveEnabled === true;
+        }
+      } catch (e) {
+        // no-op, return no assignment
+      }
+      return undefined;
+    },
+
+    exposeAnnouncementArchiveExperiment: () => {
+      if (CurrentUser.isAuthenticated) {
+        ExperimentationService.logLayerExposure(groupsConstants.announcementArchiveExperimentLayer);
+      }
+    },
+
     getCommunityStoreSortOrderExperimentVariant: async () => {
       if (!CurrentUser.isAuthenticated) {
         return 'Updated';

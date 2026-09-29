@@ -16,6 +16,7 @@ const ReactionPicker = ({ onSelect, emotes }: ReactionPickerProps): JSX.Element 
             emoteId={emote.id}
             className='reaction-picker-emote'
             emoteUrl={emote.url}
+            ariaLabel={emote.name}
             onClick={() => onSelect(emote.id)}
           />
         </div>

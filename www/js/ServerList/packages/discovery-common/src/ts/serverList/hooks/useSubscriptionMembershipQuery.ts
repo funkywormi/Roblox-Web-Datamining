@@ -1,5 +1,5 @@
 import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
-import { ProductType } from "@rbx/client-subscriptions-api/v1";
+import { ProductType } from "@rbx/client-subscriptions-api/v2";
 import { subscriptionsV2Api } from "../clients/subscriptions";
 
 const DEFAULT_PRODUCT_TYPE = ProductType.Blackbird;

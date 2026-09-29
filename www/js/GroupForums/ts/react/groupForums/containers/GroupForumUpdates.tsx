@@ -15,7 +15,7 @@ const LIMIT = 5;
 const noop = (): null => null;
 
 const GroupForumUpdates: FC<Props> = ({ translate, groupId }: Props) => {
-  const { systemFeedbackService } = useSystemFeedback();
+  const { systemFeedbackService, SystemFeedbackComponent } = useSystemFeedback();
   const { isLoading, data: posts } = useQuery({
     queryFn: async () => {
       const response = await forumsService.getGroupForumUpdates(groupId, LIMIT);
@@ -76,6 +76,7 @@ const GroupForumUpdates: FC<Props> = ({ translate, groupId }: Props) => {
           })}
         </div>
       </div>
+      <SystemFeedbackComponent />
     </div>
   );
 };

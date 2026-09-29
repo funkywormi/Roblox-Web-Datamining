@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import * as http from "@rbx/core-scripts/http";
 import environmentUrls from "@rbx/environment-urls";
-import { ProductType } from "@rbx/client-subscriptions-api/v1";
+import { ProductType } from "@rbx/client-subscriptions-api/v2";
 
 export type SubscriptionProductMoney = {
   currencyCode: string;

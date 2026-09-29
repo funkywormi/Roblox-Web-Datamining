@@ -59,6 +59,7 @@ export interface ForumSearchRow extends ForumSearchResult {
 export interface ForumSearchResultView extends ForumSearchRow {
   categoryName: string;
   categoryShortId: string;
+  isCategoryArchived: boolean;
 }
 
 export interface ForumSearchResponse {

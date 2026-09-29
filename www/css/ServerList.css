@@ -2624,7 +2624,16 @@ a.btn-games-share-game-to-chat-md .btn-text {
 }
 
 .stack .card-list {
-    margin-bottom: 12px
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.stack .card-list>li {
+    display: -ms-flexbox;
+    display: flex
 }
 
 .stack .card-list .rbx-private-game-server-item {
@@ -2654,11 +2663,11 @@ a.btn-games-share-game-to-chat-md .btn-text {
 }
 
 .light-theme .stack .card-list .rbx-private-game-server-item .card-item .game-server-details {
-    border-right: 1px solid #bcbec8
+    border-right: 1px solid var(--color-extended-gray-500)
 }
 
 .dark-theme .stack .card-list .rbx-private-game-server-item .card-item .game-server-details {
-    border-right: 1px solid #494d5a
+    border-right: 1px solid var(--color-extended-gray-700)
 }
 
 .stack .card-list .rbx-private-game-server-item .card-item .game-server-details .text-info.rbx-game-status {
@@ -2674,6 +2683,8 @@ a.btn-games-share-game-to-chat-md .btn-text {
 .stack .card-list .card-item {
     -ms-flex-direction: column;
     flex-direction: column;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
     -ms-flex-pack: justify;
     justify-content: space-between;
     min-height: 240px;
@@ -2712,8 +2723,30 @@ a.btn-games-share-game-to-chat-md .btn-text {
     margin-bottom: 6px
 }
 
+.stack .card-list .card-item .server-meta-icons {
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.stack .card-list .card-item .server-meta-icons .server-meta-badge-tip {
+    display: -ms-inline-flexbox;
+    display: inline-flex
+}
+
 .stack .card-list .card-item button.game-server-join-btn {
     margin: 12px auto 0
+}
+
+.stack .card-list .card-item .server-meta-icons+span button.game-server-join-btn {
+    margin-top: 0
 }
 
 .stack .card-list .card-item .text-info.rbx-game-status {
@@ -2739,11 +2772,11 @@ a.btn-games-share-game-to-chat-md .btn-text {
 }
 
 .light-theme .stack .card-list .player-thumbnails-container .player-avatar.hidden-players-placeholder {
-    background-color: rgba(230, 231, 234, .9)
+    background-color: color-mix(in srgb, var(--color-extended-gray-300)90%, transparent)
 }
 
 .dark-theme .stack .card-list .player-thumbnails-container .player-avatar.hidden-players-placeholder {
-    background-color: #6a6f81
+    background-color: var(--color-extended-gray-600)
 }
 
 .stack .server-list-section {
@@ -2760,12 +2793,12 @@ a.btn-games-share-game-to-chat-md .btn-text {
 
 .light-theme .stack .server-player-count-gauge {
     background-color: var(--color-surface-0);
-    border-color: #bcbec8
+    border-color: var(--color-extended-gray-500)
 }
 
 .dark-theme .stack .server-player-count-gauge {
     background-color: var(--color-surface-0);
-    border-color: #494d5a
+    border-color: var(--color-extended-gray-700)
 }
 
 .stack .server-player-count-gauge .gauge-inner-bar {
@@ -2774,13 +2807,15 @@ a.btn-games-share-game-to-chat-md .btn-text {
 }
 
 .light-theme .stack .server-player-count-gauge .gauge-inner-bar {
-    background-color: #bcbec8;
-    border-color: #bcbec8 rgba(0, 0, 0, .3) #bcbec8 #bcbec8
+    background-color: var(--color-extended-gray-500);
+    border-color: var(--color-extended-gray-500);
+    border-right-color: var(--color-extended-black-30)
 }
 
 .dark-theme .stack .server-player-count-gauge .gauge-inner-bar {
-    background-color: #bcbec8;
-    border-color: #bcbec8 rgba(255, 255, 255, .3) #bcbec8 #bcbec8
+    background-color: var(--color-extended-gray-500);
+    border-color: var(--color-extended-gray-500);
+    border-right-color: var(--color-extended-white-30)
 }
 
 @media (max-width:468px) {
@@ -2878,6 +2913,10 @@ a.btn-games-share-game-to-chat-md .btn-text {
     gap: 2px
 }
 
+.gap-\[var\(--size-150\)\] {
+    gap: var(--size-150)
+}
+
 .size-\[1em\] {
     width: 1em;
     height: 1em
@@ -2945,6 +2984,28 @@ a.btn-games-share-game-to-chat-md .btn-text {
     width: 72px
 }
 
+.width-\[fit-content\] {
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content
+}
+
+.content-\[var\(--dark-mode-content-emphasis\)\] {
+    color: var(--dark-mode-content-emphasis)
+}
+
+.bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
+    background-color: rgb(from var(--color-system-alert)r g b/.2)
+}
+
+.bg-\[rgb\(from_var\(--color-system-success\)_r_g_b_\/_0\.2\)\] {
+    background-color: rgb(from var(--color-system-success)r g b/.2)
+}
+
+.bg-\[rgb\(from_var\(--color-system-warning\)_r_g_b_\/_0\.2\)\] {
+    background-color: rgb(from var(--color-system-warning)r g b/.2)
+}
+
 .opacity-\[0\.5\] {
     opacity: .5
 }
@@ -2971,6 +3032,10 @@ a.btn-games-share-game-to-chat-md .btn-text {
 
 .icon-regular-hand-two-arrows-horizontal {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M22.2929 4.70711C21.9024 4.31658 21.9024 3.68342 22.2929 3.29289C22.6834 2.90237 23.3166 2.90237 23.7071 3.29289L26.7071 6.29289C27.0976 6.68342 27.0976 7.31658 26.7071 7.70711L23.7071 10.7071C23.3166 11.0976 22.6834 11.0976 22.2929 10.7071C21.9024 10.3166 21.9024 9.68342 22.2929 9.29289L23.5858 8H14C13.4477 8 13 7.55228 13 7C13 6.44772 13.4477 6 14 6H23.5858L22.2929 4.70711Z' fill='black'/%3E %3Cpath d='M9.70711 7.29289C10.0976 7.68342 10.0976 8.31658 9.70711 8.70711L8.41421 10H18C18.5523 10 19 10.4477 19 11C19 11.5523 18.5523 12 18 12H8.41421L9.70711 13.2929C10.0976 13.6834 10.0976 14.3166 9.70711 14.7071C9.31658 15.0976 8.68342 15.0976 8.29289 14.7071L5.29289 11.7071C4.90237 11.3166 4.90237 10.6834 5.29289 10.2929L8.29289 7.29289C8.68342 6.90237 9.31658 6.90237 9.70711 7.29289Z' fill='black'/%3E %3Cpath d='M21.994 19.1918C21.998 19.1284 22 19.0644 22 19C22 17.3431 20.6569 16 19 16H12.3693C12.0423 16 11.7165 16.0401 11.3992 16.1194L8.11575 16.9403C7.95711 16.9799 7.79421 17 7.63068 17H4C2.89543 17 2 17.8954 2 19V24C2 25.1046 2.89543 26 4 26H8.72949C8.84947 26 8.96921 26.0108 9.08726 26.0323L18.6287 27.7671C19.6486 27.9525 20.7006 27.7348 21.5631 27.1598L28.7109 22.3946C29.5163 21.8577 30 20.9538 30 19.9859C30 17.8639 27.7925 16.463 25.8725 17.3666L21.994 19.1918ZM12.3693 18H19C19.5523 18 20 18.4477 20 19C20 19.5523 19.5523 20 19 20H17C16.4477 20 16 20.4477 16 21C16 21.5523 16.4477 22 17 22H19.8294C20.4182 22 20.9998 21.87 21.5326 21.6193L26.7241 19.1762C27.3176 18.8969 28 19.3299 28 19.9859C28 20.2851 27.8505 20.5645 27.6015 20.7305L20.4537 25.4957C20.0224 25.7832 19.4964 25.892 18.9865 25.7993L9.44503 24.0645C9.20894 24.0216 8.96946 24 8.72949 24H4V19H7.63068C7.95773 19 8.28354 18.9599 8.60083 18.8806L11.8842 18.0597C12.0429 18.0201 12.2058 18 12.3693 18Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-filled-language-characters {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M22 13.5C22.8489 13.5 23.6209 13.976 24.0049 14.7227L24.0762 14.876L29.3818 27.416L29.4336 27.5596C29.6578 28.2862 29.2994 29.0792 28.584 29.3818C27.8689 29.6841 27.0509 29.3891 26.6855 28.7227L26.6182 28.584L25.3135 25.5H18.6865L17.3818 28.584C17.0591 29.3468 16.1788 29.7042 15.416 29.3818C14.6532 29.0591 14.2958 28.1788 14.6182 27.416L19.9238 14.876L19.9951 14.7227C20.3791 13.976 21.1511 13.5 22 13.5ZM19.9561 22.5H24.0439L22 17.667L19.9561 22.5ZM12 2.5C12.8284 2.5 13.5 3.17157 13.5 4V5.5H20L20.1533 5.50781C20.9097 5.58461 21.5 6.22334 21.5 7C21.5 7.77666 20.9097 8.41539 20.1533 8.49219L20 8.5H19.1328C18.1517 11.6334 16.4709 14.4801 14.2412 16.8379C14.7132 17.1936 15.2037 17.5285 15.7119 17.8398L15.7832 17.8838L15.9102 17.9707C16.5148 18.4313 16.6849 19.2841 16.2793 19.9463C15.8737 20.6083 15.0366 20.8449 14.3516 20.5156L14.2168 20.4414L14.1455 20.3984C13.3965 19.9396 12.6817 19.4356 12.001 18.8945C11.32 19.4358 10.6038 19.9385 9.85449 20.3975L6.7832 22.2793C6.07681 22.7116 5.15331 22.4895 4.7207 21.7832C4.28834 21.0769 4.51061 20.1534 5.2168 19.7207L8.28809 17.8398C8.79613 17.5287 9.28602 17.1935 9.75781 16.8379C8.48564 15.4922 7.39149 13.9879 6.50488 12.3613L6.15918 11.7002L6.09668 11.5596C5.8267 10.849 6.13397 10.0354 6.82812 9.6875C7.52248 9.33976 8.35819 9.5809 8.76562 10.2227L8.84082 10.3564L9.13867 10.9258C9.9162 12.3522 10.8793 13.6692 12.001 14.8438C13.7336 13.0287 15.0848 10.8712 15.9629 8.5H4C3.17157 8.5 2.5 7.82843 2.5 7C2.5 6.17157 3.17157 5.5 4 5.5H10.5V4C10.5 3.17157 11.1716 2.5 12 2.5Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-regular-moon {
@@ -3000,6 +3065,22 @@ a.btn-games-share-game-to-chat-md .btn-text {
 
 .icon-regular-tag {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M23.4998 7C24.328 7.00022 24.9998 7.67172 24.9998 8.5C24.9998 9.32829 24.328 9.99978 23.4998 10C22.6713 10 21.9998 9.32843 21.9998 8.5C21.9998 7.67158 22.6714 7 23.4998 7Z' fill='black'/%3E %3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M26.9998 3C28.1042 3.00017 28.9998 3.89553 28.9998 5V15.5859C28.9997 16.1162 28.7888 16.625 28.4138 17L15.9138 29.5C15.1328 30.2809 13.8668 30.2808 13.0857 29.5L2.49978 18.9141C1.71882 18.133 1.71882 16.867 2.49978 16.0859L14.9998 3.58594C15.3748 3.21101 15.8835 3.00004 16.4138 3H26.9998ZM3.91384 17.5L14.4998 28.0859L26.9998 15.5859V5H16.4138L3.91384 17.5Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-filled-two-people {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M8.93167 3.01786C7.86474 2.73198 6.76806 3.36514 6.48218 4.43208L5.18808 9.26171C4.9022 10.3286 5.53536 11.4253 6.6023 11.7112L11.4319 13.0053C12.4989 13.2912 13.5955 12.658 13.8814 11.5911L15.1755 6.76145C15.4614 5.69452 14.8282 4.59784 13.7613 4.31196L8.93167 3.01786Z' fill='black'/%3E %3Cpath d='M21.9998 13.0002C24.7612 13.0002 26.9998 10.7617 26.9998 8.00024C26.9998 5.23882 24.7612 3.00024 21.9998 3.00024C19.2383 3.00024 16.9998 5.23882 16.9998 8.00024C16.9998 10.7617 19.2383 13.0002 21.9998 13.0002Z' fill='black'/%3E %3Cpath d='M19.1946 28.3454C20.0404 28.4415 21.0099 28.5002 22.116 28.5002C26.1127 28.5002 28.325 27.7332 29.3646 27.2124C30.1994 26.7942 30.4515 25.8943 30.2817 25.1663L28.9915 19.6369C28.3578 16.9213 25.9369 15.0002 23.1484 15.0002H21.0837C19.7656 15.0002 18.5296 15.4295 17.5256 16.169C18.1877 17.0423 18.6776 18.0616 18.9391 19.1824L20.2293 24.7119C20.4952 25.8511 20.251 27.3295 19.1946 28.3454Z' fill='black'/%3E %3Cpath d='M16.116 17.6343C15.0246 16.0245 13.1845 15.0002 11.1484 15.0002H9.08369C6.29521 15.0002 3.87427 16.9213 3.24064 19.6369L1.95044 25.1663C1.78056 25.8943 2.03267 26.7942 2.8675 27.2124C3.90705 27.7332 6.11937 28.5002 10.116 28.5002C12.9287 28.5002 14.8577 28.1203 16.1161 27.7137C16.6458 27.5426 17.0566 27.3667 17.3646 27.2124C18.1994 26.7942 18.4515 25.8943 18.2817 25.1663L16.9915 19.6369C16.8205 18.9041 16.5194 18.2293 16.116 17.6343Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-filled-wifi-signal-fair {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M15.9995 23.5C17.1041 23.5 17.9995 24.3954 17.9995 25.5C17.9995 26.6046 17.1041 27.5 15.9995 27.5C14.8951 27.4999 13.9995 26.6045 13.9995 25.5C13.9995 24.3955 14.8951 23.5001 15.9995 23.5Z' fill='black'/%3E %3Cpath d='M15.9995 17.5078C18.1939 17.5078 20.3239 18.2494 22.0445 19.6113C22.694 20.1255 22.8037 21.0682 22.2896 21.7178C21.7754 22.3671 20.8326 22.477 20.1831 21.9629C18.9925 21.0205 17.518 20.5078 15.9995 20.5078C14.4811 20.5079 13.0065 21.0204 11.8159 21.9629C11.1664 22.4768 10.2236 22.3672 9.7095 21.7178C9.19563 21.0683 9.30541 20.1255 9.95462 19.6113C11.6751 18.2494 13.8052 17.5079 15.9995 17.5078Z' fill='black'/%3E %3Cpath d='M15.9995 11.4941C19.6044 11.4941 23.1037 12.7119 25.9302 14.9492C26.5797 15.4634 26.6895 16.4071 26.1753 17.0566C25.6611 17.7056 24.7182 17.8154 24.0689 17.3018C21.7723 15.4838 18.9285 14.4941 15.9995 14.4941C13.0706 14.4942 10.2267 15.4838 7.9302 17.3018C7.28079 17.8153 6.33784 17.7057 5.82376 17.0566C5.30981 16.4072 5.41963 15.4634 6.06887 14.9492C8.89529 12.7118 12.3947 11.4942 15.9995 11.4941Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-filled-wifi-signal-good {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M16 23.5C17.1046 23.5 18 24.3954 18 25.5C18 26.6046 17.1046 27.5 16 27.5C14.8956 27.4999 14 26.6045 14 25.5C14 24.3955 14.8956 23.5001 16 23.5Z' fill='black'/%3E %3Cpath d='M16 17.5078C18.1944 17.5078 20.3244 18.2494 22.0449 19.6113C22.6944 20.1255 22.8042 21.0682 22.29 21.7178C21.7758 22.3671 20.8331 22.477 20.1836 21.9629C18.993 21.0205 17.5184 20.5078 16 20.5078C14.4816 20.5079 13.0069 21.0204 11.8164 21.9629C11.1669 22.4768 10.2241 22.3672 9.70997 21.7178C9.1961 21.0683 9.30588 20.1255 9.95509 19.6113C11.6756 18.2494 13.8057 17.5079 16 17.5078Z' fill='black'/%3E %3Cpath d='M16 11.4941C19.6049 11.4941 23.1042 12.7119 25.9307 14.9492C26.5802 15.4634 26.69 16.4071 26.1758 17.0566C25.6616 17.7056 24.7187 17.8154 24.0693 17.3018C21.7728 15.4838 18.929 14.4941 16 14.4941C13.071 14.4942 10.2271 15.4838 7.93067 17.3018C7.28126 17.8153 6.33831 17.7057 5.82423 17.0566C5.31028 16.4072 5.4201 15.4634 6.06934 14.9492C8.89576 12.7118 12.3952 11.4942 16 11.4941Z' fill='black'/%3E %3Cpath d='M16 5.5C21.0873 5.5 26.0176 7.26329 29.9512 10.4893C30.5917 11.0146 30.6855 11.96 30.1602 12.6006C29.6348 13.2409 28.6893 13.3339 28.0488 12.8086C24.6517 10.0226 20.3935 8.5 16 8.5C11.6066 8.50011 7.34828 10.0225 3.95118 12.8086C3.31063 13.3337 2.36513 13.241 1.83985 12.6006C1.31479 11.9601 1.40859 11.0146 2.04884 10.4893C5.98236 7.26323 10.9128 5.50011 16 5.5Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-filled-wifi-signal-poor {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M16.0005 23.5C17.105 23.5 18.0005 24.3954 18.0005 25.5C18.0005 26.6046 17.105 27.5 16.0005 27.5C14.896 27.4999 14.0005 26.6045 14.0005 25.5C14.0005 24.3955 14.896 23.5001 16.0005 23.5Z' fill='black'/%3E %3Cpath d='M16.0005 17.5078C18.1948 17.5078 20.3248 18.2494 22.0454 19.6113C22.6949 20.1255 22.8046 21.0682 22.2905 21.7178C21.7763 22.3671 20.8335 22.477 20.1841 21.9629C18.9935 21.0205 17.5189 20.5078 16.0005 20.5078C14.4821 20.5079 13.0074 21.0204 11.8169 21.9629C11.1674 22.4768 10.2245 22.3672 9.71043 21.7178C9.19656 21.0683 9.30634 20.1255 9.95555 19.6113C11.676 18.2494 13.8062 17.5079 16.0005 17.5078Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-regular-x {

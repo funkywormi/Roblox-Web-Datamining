@@ -1,5 +1,6 @@
 import { EnvironmentUrls } from "@rbx/environment-urls";
 import { APICall, HTTPVerb, withApiEvents } from "../utils/apiEventsCounter";
+import { withApiEventsV2 } from "../observability";
 
 export enum PurchaseWarningAction {
   U13PaymentModal = "U13PaymentModal",
@@ -34,15 +35,17 @@ export const getPurchaseWarning = async (
 
 export const acknowledgePurchaseWarning = async (
   action: string,
-): Promise<AcknowledgePurchaseWarningResponse | undefined> =>
-  withApiEvents<AcknowledgePurchaseWarningResponse>(
-    HTTPVerb.POST,
-    APICall.ACKNOWLEDGE_PURCHASE_WARNING,
-    {
-      url: `${EnvironmentUrls.apiGatewayUrl}/purchase-warning/v1/purchase-warnings/acknowledge`,
-      withCredentials: true,
-    },
-    {
+): Promise<AcknowledgePurchaseWarningResponse> =>
+  withApiEventsV2<AcknowledgePurchaseWarningResponse>({
+    method: "POST",
+    url: `${EnvironmentUrls.apiGatewayUrl}/purchase-warning/v1/purchase-warnings/acknowledge`,
+    data: {
       acknowledgement: `Confirmed${action}`,
     },
-  );
+    config: {
+      withCredentials: true,
+    },
+    eventCounterProps: {
+      call: "AcknowledgePurchaseWarning",
+    },
+  });

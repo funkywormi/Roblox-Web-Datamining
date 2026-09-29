@@ -22,6 +22,7 @@ import { MessageContent } from '../../shared/types';
 import { createMessageContentFragment } from '../../shared/utils/messageContentUtils';
 import { CreateSupportTicketRequest } from '../types/supportTicket';
 import { ForumSearchRequest, ForumSearchResponse } from '../types/search';
+import type { AssetUploadOperationResponse } from '../../shared/services/assetUploadService';
 
 // Extract and attach retry-after seconds to a 429 error and return the same error
 const enrichRateLimitInfo = (error: Error): Error => {
@@ -256,7 +257,8 @@ export default {
     categoryId: string,
     title: string,
     content: MessageContent,
-    supportTicket?: CreateSupportTicketRequest
+    supportTicket?: CreateSupportTicketRequest,
+    mediaAssetIds?: number[]
   ): Promise<ForumPost> => {
     const urlConfig = {
       url: groupForumsConstants.urls.getForumPostsEndpoint(groupId, categoryId, false),
@@ -266,7 +268,8 @@ export default {
     const data = {
       title,
       ...createMessageContentFragment(content),
-      ...(supportTicket && { supportTicket })
+      ...(supportTicket && { supportTicket }),
+      ...(mediaAssetIds && mediaAssetIds.length > 0 && { mediaAssetIds })
     };
 
     try {
@@ -274,6 +277,48 @@ export default {
       return response.data;
     } catch (error) {
       throw enrichRateLimitInfo(error as Error);
+    }
+  },
+  uploadForumImage: async (
+    groupId: number,
+    categoryId: string,
+    file: File,
+    signal?: AbortSignal
+  ): Promise<AssetUploadOperationResponse> => {
+    const formData = new FormData();
+    formData.append('request', JSON.stringify({ context: 'EnterpriseForums' }));
+    formData.append('fileContent', file, file.name);
+
+    const cancelTokenSource = httpService.createCancelToken();
+    const onAbort = (): void => {
+      cancelTokenSource.cancel();
+    };
+
+    if (signal) {
+      if (signal.aborted) {
+        cancelTokenSource.cancel();
+      } else {
+        signal.addEventListener('abort', onAbort);
+      }
+    }
+
+    try {
+      const response = await httpService.post<AssetUploadOperationResponse>(
+        {
+          url: groupForumsConstants.urls.getForumImageUploadEndpoint(groupId, categoryId),
+          withCredentials: true,
+          cancelToken: cancelTokenSource.token
+        },
+        formData
+      );
+      return response.data;
+    } catch (error) {
+      if (signal?.aborted) {
+        throw new DOMException('aborted', 'AbortError');
+      }
+      throw error;
+    } finally {
+      signal?.removeEventListener('abort', onAbort);
     }
   },
   updateGroupForumComment: async (
@@ -349,7 +394,8 @@ export default {
     categoryId: string,
     postId: string,
     content: MessageContent,
-    repliesToPostCommentId?: string
+    repliesToPostCommentId?: string,
+    mediaAssetIds?: number[]
   ): Promise<ForumComment> => {
     const urlConfig = {
       url: groupForumsConstants.urls.getForumCommentsEndpoint(groupId, categoryId, postId),
@@ -358,7 +404,8 @@ export default {
 
     const data = {
       repliesToPostCommentId,
-      ...createMessageContentFragment(content)
+      ...createMessageContentFragment(content),
+      ...(mediaAssetIds && mediaAssetIds.length > 0 && { mediaAssetIds })
     };
 
     try {

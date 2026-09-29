@@ -11,7 +11,8 @@ function groupForumsDiscovery() {
       permissions: '<',
       channelsPermissions: '<',
       isGroupMember: '<',
-      isEnabled: '<'
+      isEnabled: '<',
+      isOwner: '<'
     },
     link(scope, element) {
       const renderForumsDiscovery = () => {
@@ -24,7 +25,8 @@ function groupForumsDiscovery() {
           permissions: scope.permissions,
           channelsPermissions: scope.channelsPermissions,
           isGroupMember: scope.isGroupMember,
-          isEnabled: scope.isEnabled
+          isEnabled: scope.isEnabled,
+          isOwner: scope.isOwner
         });
       };
 
@@ -40,7 +42,8 @@ function groupForumsDiscovery() {
           permissions: scope.permissions,
           channelsPermissions: scope.channelsPermissions,
           isGroupMember: scope.isGroupMember,
-          isEnabled: scope.isEnabled
+          isEnabled: scope.isEnabled,
+          isOwner: scope.isOwner
         }),
         (newVal, oldVal) => {
           // Don't rerender until we have both group and permissions
@@ -55,7 +58,8 @@ function groupForumsDiscovery() {
             JSON.stringify(newVal.permissions) !== JSON.stringify(oldVal.permissions) ||
             JSON.stringify(newVal.channelsPermissions) !==
               JSON.stringify(oldVal.channelsPermissions) ||
-            newVal.isGroupMember !== oldVal.isGroupMember
+            newVal.isGroupMember !== oldVal.isGroupMember ||
+            newVal.isOwner !== oldVal.isOwner
           ) {
             renderForumsDiscovery();
           }

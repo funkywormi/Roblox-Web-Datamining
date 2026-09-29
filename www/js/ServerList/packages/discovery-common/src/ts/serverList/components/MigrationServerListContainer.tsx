@@ -1,11 +1,14 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ElementType } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Button } from "@rbx/foundation-ui";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
+import ExperimentationService from "@rbx/experimentation";
 import useServerListMetadata from "../hooks/useServerListMetadata";
 import useIsPlayerHostedEventsEnabled from "../hooks/useIsPlayerHostedEventsEnabled";
+import useServerCardMetaExperiment from "../hooks/useServerCardMetaExperiment";
+import { serverCardMetaExperimentLayer } from "../constants/experimentConstants";
 import serverListService from "../../../js/serverList/services/serverListService";
 import serverListConstants from "../../../js/serverList/constants/serverListConstants";
 // @ts-expect-error legacy JS module without type declarations
@@ -43,6 +46,26 @@ const MigrationServerListContainer = ({
   const { isPlayerHostedEventsEnabled } = useIsPlayerHostedEventsEnabled(
     serverListMetadata?.universeId,
   );
+
+  const { isLoading: isServerCardMetaLoading } = useServerCardMetaExperiment();
+
+  const hasLoggedExposure = useRef(false);
+  useEffect(() => {
+    if (
+      !hasLoggedExposure.current &&
+      !isServerCardMetaLoading &&
+      !isLoading &&
+      !hasError &&
+      !!serverListMetadata
+    ) {
+      hasLoggedExposure.current = true;
+      try {
+        ExperimentationService.logLayerExposure(serverCardMetaExperimentLayer);
+      } catch {
+        // Exposure logging is best-effort and must never block rendering.
+      }
+    }
+  }, [isServerCardMetaLoading, isLoading, hasError, serverListMetadata]);
 
   if (isLoading) {
     return (

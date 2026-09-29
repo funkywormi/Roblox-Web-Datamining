@@ -11,7 +11,7 @@ import {
   TCheckboxCheckState,
 } from "@rbx/foundation-ui";
 import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
-import type { FireTelemetryCounterFn } from "@rbx/web-telemetry/fire";
+import type { FireTelemetryCounterFn } from "@rbx/web-telemetry/v2/fire";
 
 type TriggeringContext = Parameters<
   typeof paymentFlowAnalyticsService.sendUserPurchaseFlowEvent

@@ -22,6 +22,8 @@ const urlConstants = {
   accountsSettingsPageUrl: () => getAbsoluteUrl("/my/account#!/privacy"),
   getPublicGameServersV2Url: (placeId: number) =>
     getAbsoluteUrl(`${gamesApi}/v2/games/${placeId}/servers/Public`),
+  getFriendsGameServersV2Url: (placeId: number) =>
+    getAbsoluteUrl(`${gamesApi}/v2/games/${placeId}/servers/Friend`),
   getCurrentUserBalance: (userId: number) => `${economyApi}/v1/users/${userId}/currency`,
 } as const;
 

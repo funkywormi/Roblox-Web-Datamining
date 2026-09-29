@@ -171,6 +171,47 @@ const getHostname = () => {
   return EnvironmentUrls.domain.includes("sitetest") ? "robloxlabs.com" : "roblox.com";
 };
 
+// The parent's full origin, including port. `ancestorOrigins` is Chromium/WebKit only, so fall
+// back to the referrer, which for an iframe load is the parent document's URL.
+const getParentReportedOrigin = (): string | undefined => {
+  const { ancestorOrigins } = window.location;
+  if (ancestorOrigins && ancestorOrigins.length > 0) {
+    return ancestorOrigins[0];
+  }
+  return document.referrer || undefined;
+};
+
+/**
+ * Builds the `targetOrigin` for the `window.postMessage` back to the embedding page. The
+ * `origin` query parameter holds only the parent's subdomain labels, so its port is taken from
+ * the origin the browser reports for the parent, which we accept only when its scheme and
+ * hostname match the origin we reconstruct, leaving the port as the sole difference.
+ */
+export const resolveTargetOrigin = (subdomain: string): string => {
+  if (!EnvironmentUrls.domain) {
+    return "URL_NOT_FOUND";
+  }
+
+  // The subdomain parameter is the entire subdomain string therefore any existing subdomains
+  // on our environment urls need to be removed.
+  const expectedOrigin = `https://${subdomain}.${getHostname()}`;
+  const reportedOrigin = getParentReportedOrigin();
+  if (!reportedOrigin) {
+    return expectedOrigin;
+  }
+
+  try {
+    // An opaque parent origin surfaces as the literal string "null", which throws here.
+    const parsed = new URL(reportedOrigin);
+    const expected = new URL(expectedOrigin);
+    return parsed.protocol === expected.protocol && parsed.hostname === expected.hostname
+      ? parsed.origin
+      : expectedOrigin;
+  } catch {
+    return expectedOrigin;
+  }
+};
+
 // Small helper function for firing post messages to the parent window.
 const dispatchPostMessageEvent = (
   type: HybridTarget,
@@ -178,11 +219,7 @@ const dispatchPostMessageEvent = (
   origin: string,
 ) => {
   if (window.parent) {
-    // The origin parameter is the entire subdomain string therefore any existing subdomains
-    // on our environment urls need to be removed.
-    const targetOrigin = EnvironmentUrls.domain
-      ? `https://${origin}.${getHostname()}`
-      : "URL_NOT_FOUND";
+    const targetOrigin = resolveTargetOrigin(origin);
     window.parent.postMessage(
       {
         genericChallengeResponse: {

@@ -5,9 +5,13 @@ import GroupForums from '../../groupForums/containers/GroupForums';
 import useHydrateForumStore from '../../groupForums/hooks/useHydrateForumStore';
 import AnnouncementRoutes from '../../groupShouts/containers/AnnouncementRoutes';
 import announcementRoutes from '../../groupShouts/constants/announcementRoutes';
-import { canViewAnnouncementArchive } from '../../groupShouts/constants/groupAnnouncementsConstants';
+import {
+  canViewAnnouncementArchive,
+  isAnnouncementArchiveFeatureEnabled
+} from '../../groupShouts/constants/groupAnnouncementsConstants';
 import { useCommunityFeatureFreezes } from '../../shared/contexts/CommunityFeatureFreezesContext';
 import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
+import useAnnouncementArchiveExperiment from '../../groupShouts/hooks/useAnnouncementArchiveExperiment';
 import AnnouncementNavigation from '../components/AnnouncementNavigation';
 import ForumNavigation from '../components/ForumNavigation';
 import type { GroupPostsProps } from './GroupPosts';
@@ -28,10 +32,18 @@ const GroupPostsContent = ({
 }: GroupPostsContentProps): JSX.Element => {
   const { SystemFeedbackComponent } = useSystemFeedback();
   const { features, isLoading: areProductFeaturesLoading } = useCommunityProductFeatures();
+  const isAnnouncementArchiveExperimentEnabled = useAnnouncementArchiveExperiment(
+    !areProductFeaturesLoading && isAnnouncementArchiveFeatureEnabled(features)
+  );
   const { isLoading: areFeatureFreezesLoading, forumsRead } = useCommunityFeatureFreezes();
   const canViewAnnouncements = areProductFeaturesLoading
     ? undefined
-    : canViewAnnouncementArchive(features, policies, permissions);
+    : canViewAnnouncementArchive(
+        features,
+        policies,
+        permissions,
+        isAnnouncementArchiveExperimentEnabled
+      );
   const canViewForums =
     !policies.isGracefulDegradationEnabled && forumsEnabled && policies.displayGroupForums;
   const showForumCategories =

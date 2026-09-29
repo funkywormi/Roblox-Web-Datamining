@@ -27,6 +27,7 @@ const PostPreviewList = ({ translate }: PostPreviewListProps): JSX.Element => {
   const categoryId = useForumStore.use.categoryId()!;
   const categoryName = useForumStore.use.categoryName()!;
   const categoryShortId = useForumStore.use.categoryShortId()!;
+  const isCategoryArchived = useForumStore.use.isCategoryArchived();
   const returnToCategoryScrollTop = useForumStore.use.returnToCategoryScrollTop();
   const setReturnToCategoryScrollTop = useForumStore.use.setReturnToCategoryScrollTop();
   const blockedUserList = useForumStore.use.blockedUserList();
@@ -289,6 +290,7 @@ const PostPreviewList = ({ translate }: PostPreviewListProps): JSX.Element => {
       post={post}
       categoryName={categoryName}
       categoryShortId={categoryShortId}
+      isCategoryArchived={isCategoryArchived}
       refetchPosts={refetchAllPosts}
       togglePostNotifications={() => togglePostNotifications(post)}
       isConcealedAndShown={isConcealedAndShown}
@@ -322,6 +324,7 @@ const PostPreviewList = ({ translate }: PostPreviewListProps): JSX.Element => {
             post={post}
             categoryName={categoryName}
             categoryShortId={categoryShortId}
+            isCategoryArchived={isCategoryArchived}
             refetchPosts={refetchAllPosts}
             togglePostNotifications={() => togglePostNotifications(post)}
           />

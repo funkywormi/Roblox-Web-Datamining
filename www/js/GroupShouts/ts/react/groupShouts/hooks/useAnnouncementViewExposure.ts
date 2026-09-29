@@ -1,28 +1,28 @@
-import { RefObject, useEffect, useRef } from 'react';
-import { elementVisibilityService } from 'core-roblox-utilities';
-import { useAnnouncementTracking } from './useAnnouncementTracking';
+import { RefCallback, useCallback } from 'react';
+import { AnnouncementLocationTab, useAnnouncementTracking } from './useAnnouncementTracking';
+import useVisibilityExposure from './useVisibilityExposure';
+
+export type AnnouncementViewEvent = 'announcement' | 'archiveAnnouncement';
 
 const useAnnouncementViewExposure = <T extends HTMLElement = HTMLDivElement>(
   groupId: number,
-  announcementId: string
-): RefObject<T> => {
-  const elementRef = useRef<T>(null);
-  const hasLoggedExposure = useRef(false);
-  const { trackAnnouncementViewed } = useAnnouncementTracking({ groupId });
+  announcementId: string,
+  locationTab: AnnouncementLocationTab = 'home',
+  viewEvent: AnnouncementViewEvent = 'announcement'
+): RefCallback<T> => {
+  const {
+    trackAnnouncementViewed,
+    trackAnnouncementArchiveAnnouncementViewed
+  } = useAnnouncementTracking({ groupId, locationTab });
+  const trackExposure = useCallback(
+    () =>
+      viewEvent === 'archiveAnnouncement'
+        ? trackAnnouncementArchiveAnnouncementViewed({ announcementId })
+        : trackAnnouncementViewed({ announcementId }),
+    [announcementId, trackAnnouncementArchiveAnnouncementViewed, trackAnnouncementViewed, viewEvent]
+  );
 
-  useEffect(() => {
-    const element = elementRef.current;
-    if (!element) return undefined;
-
-    return elementVisibilityService.observeVisibility({ element, threshold: 0.75 }, visible => {
-      if (visible && !hasLoggedExposure.current) {
-        hasLoggedExposure.current = true;
-        trackAnnouncementViewed({ announcementId });
-      }
-    });
-  }, [announcementId, trackAnnouncementViewed]);
-
-  return elementRef;
+  return useVisibilityExposure<T>(true, announcementId, trackExposure);
 };
 
 export default useAnnouncementViewExposure;
