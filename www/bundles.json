@@ -6193,7 +6193,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/8b4135db0d71c0fdded421454241b8712d889a8f9ea81b7893cae90ba9e3ed4f-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/494b733d17e1f2975b46d655fc2f665bea0a7df4145ca11b68ccb8c0ab5b0999-RobuxRedesign.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -8544,7 +8544,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://css.rbxcdn.com/0c359a832224141958cf1aec01c8c99c1e85e2b6ef0ba53fc36ada4a4911c168-RobuxRedesign.css",
+            "url": "https://css.rbxcdn.com/6cf99c0942fdb000a4df1638ea4d97df74840d63c8dedbc158c47799b0476a96-RobuxRedesign.css",
             "sources": [
                 "/upgrades/robux"
             ]

@@ -1027,105 +1027,6 @@
     }
 }
 
-.personalized-bonus-items__banner-container {
-    border-top-left-radius: var(--radius-large);
-    border-top-right-radius: var(--radius-large);
-    -ms-flex-pack: start;
-    justify-content: start;
-    min-height: 112px;
-    display: -ms-flexbox;
-    display: flex;
-    position: relative;
-    overflow: hidden
-}
-
-.personalized-bonus-items__banner-container .thumbnail-2d-container {
-    z-index: 1;
-    background-color: transparent;
-    -ms-flex-negative: 0;
-    flex-shrink: 0;
-    padding-top: 0
-}
-
-.personalized-bonus-items__banner-container.buy-robux-page .thumbnail-2d-container {
-    width: 80px;
-    height: 80px;
-    margin: auto 16px
-}
-
-.personalized-bonus-items__banner,
-.personalized-bonus-items__banner-gradient,
-.personalized-bonus-items__banner-background {
-    -ms-flex-positive: 0;
-    flex-grow: 0;
-    -ms-flex-negative: 0;
-    flex-shrink: 0;
-    width: 100%;
-    height: 100%;
-    position: absolute
-}
-
-.personalized-bonus-items__banner {
-    opacity: .4;
-    background-position: 50% 44%;
-    background-size: 852px
-}
-
-.personalized-bonus-items__banner-gradient {
-    background-image: linear-gradient(90deg, #121215, rgba(18, 18, 21, 0))
-}
-
-.personalized-bonus-items__banner-background {
-    background-color: #121215
-}
-
-.personalized-bonus-items__item-description-container {
-    z-index: 1;
-    margin: auto auto auto 0;
-    padding: 21px 16px 21px 0
-}
-
-.xsolla-page .personalized-bonus-items__item-description-container {
-    padding: 10px 0 0
-}
-
-.personalized-bonus-items__item-name-container {
-    margin-bottom: 4px;
-    display: -ms-flexbox;
-    display: flex
-}
-
-p.personalized-bonus-items__report-popover {
-    color: #202227;
-    background-color: #fff;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 140%
-}
-
-.robux-head-icon-button {
-    background: 0 0;
-    border: none;
-    -ms-flex-align: center;
-    align-items: center;
-    margin: 0;
-    padding: 0 0 0 4px;
-    display: -ms-inline-flexbox;
-    display: inline-flex
-}
-
-.robux-head-icon-button .icon-moreinfo-i {
-    width: 16px;
-    height: 16px;
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0ibm9uZSIgdmlld0JveD0iMCAwIDE2IDE2Ij48ZyBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuNSI+PHBhdGggZD0iTTguOTcgNS40NEg3VjRoMS45N3pNOC45NDMgMTJoLTEuODlWNi4zOGgxLjg5eiIvPjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTggMTZBOCA4IDAgMSAwIDggMGE4IDggMCAwIDAgMCAxNm0wLTEuNWE2LjUgNi41IDAgMSAwIDAtMTMgNi41IDYuNSAwIDAgMCAwIDEzIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiLz48L2c+PC9zdmc+) !important
-}
-
-#personalized-bonus-items__report-popover .arrow:after {
-    border-bottom-color: #fff
-}
-
 .light-theme .collectible-item-bonus-item-banner {
     background-color: var(--color-shift-200)
 }
@@ -1255,6 +1156,14 @@ p.personalized-bonus-items__report-popover {
     max-width: 296px
 }
 
+.max-width-\[calc\(var\(--size-100\)\*50\)\] {
+    max-width: calc(var(--size-100)*50)
+}
+
+.min-height-\[112px\] {
+    min-height: 112px
+}
+
 .min-height-\[120px\] {
     min-height: 120px
 }
@@ -1316,6 +1225,10 @@ p.personalized-bonus-items__report-popover {
 
 .content-\[var\(--inverse-content-emphasis\)\] {
     color: var(--inverse-content-emphasis)
+}
+
+.content-\[var\(--inverse-surface-0\)\] {
+    color: var(--inverse-surface-0)
 }
 
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
