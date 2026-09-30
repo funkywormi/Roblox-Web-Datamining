@@ -1,16 +1,11 @@
 import {
-  TGetChildTransferLimitResponse,
+  TRobuxTransferLimitCeilings,
   TRobuxTransferLimitsInput,
   TRobuxTransferLimitsValue,
   TRobuxTransferLimitWindow,
   TRobuxTransferWindowPair,
 } from "../types/robuxTransferLimitsTypes";
 import { TUserSettingsAndOptionsV2 } from "../types/userSettingsTypes";
-
-type TTierLimits = Pick<
-  TGetChildTransferLimitResponse,
-  "tierDailyTransferLimit" | "tierMonthlyTransferLimit"
->;
 
 const toWindow = (cap: number | null): TRobuxTransferLimitWindow =>
   cap === null ? { unset: {} } : { value: cap };
@@ -86,7 +81,7 @@ export const isRobuxTransferLimitParentBound = (
  */
 export const toEffectiveRobuxTransferLimits = (
   stored: TRobuxTransferLimitsInput,
-  tierLimits: TTierLimits | undefined,
+  tierLimits: TRobuxTransferLimitCeilings | undefined,
 ): TRobuxTransferWindowPair | undefined => {
   if (tierLimits === undefined) {
     return undefined;
@@ -136,7 +131,7 @@ export const isRobuxTransferLimitOutOfRange = (cap: number | null, tierCap: numb
  */
 export const isRobuxTransferLimitOrderingInvalid = (
   input: TRobuxTransferLimitsInput,
-  tierLimits: TTierLimits,
+  tierLimits: TRobuxTransferLimitCeilings,
 ): boolean => {
   const daily = resolveAgainstTier(input.daily, tierLimits.tierDailyTransferLimit);
   const monthly = resolveAgainstTier(input.monthly, tierLimits.tierMonthlyTransferLimit);

@@ -1,6 +1,6 @@
 /** The ODP parent-mode agreement screen. */
 
-import { useCallback, type ComponentProps, type JSX } from "react";
+import { useCallback, useEffect, type ComponentProps, type JSX } from "react";
 import {
   Button,
   List,
@@ -10,6 +10,7 @@ import {
 } from "@rbx/foundation-ui";
 
 import { FullPageChrome, FULL_PAGE_CTA_INSET_CLASS } from "../FullPageChrome";
+import { useOdpAnalytics } from "../../analytics/odpAnalytics";
 import { renderAnchoredCopy } from "../../utils/anchoredCopy";
 import { asText } from "../../utils/nodeDetails";
 import type { NodeComponent, NodeProps } from "../../types";
@@ -23,7 +24,11 @@ type AgreementBullet = {
 const BUILDER_ICONS: Record<string, ComponentProps<typeof ListItemLeadingIcon>["name"]> = {
   Tilt: "icon-regular-tilt",
   ShieldCheck: "icon-regular-shield-check",
+  PersonWithSmallerPerson: "icon-regular-person-with-smaller-person",
 };
+
+const TERMS_URL = "https://www.roblox.com/info/terms";
+const PRIVACY_URL = "https://www.roblox.com/info/privacy";
 
 function asBullets(input: unknown): AgreementBullet[] {
   if (!Array.isArray(input)) {
@@ -83,6 +88,7 @@ function Bullet({ bullet }: { bullet: AgreementBullet }): JSX.Element {
 
 export const UserAgreementNode: NodeComponent = ({
   props,
+  ctx,
   report,
   transitions,
 }: NodeProps): JSX.Element => {
@@ -91,13 +97,36 @@ export const UserAgreementNode: NodeComponent = ({
   const description = asText(props.description);
   const continueLabel = asText(props.continueLabel) ?? "";
   const legalText = asText(props.legalText);
+  const copyVariant = asText(props.copyVariant);
+  const termsUrl = asText(props.termsUrl) ?? TERMS_URL;
+  const privacyUrl = asText(props.privacyUrl) ?? PRIVACY_URL;
+  const odpAnalytics = useOdpAnalytics(ctx);
   const bullets = asBullets(props.bullets);
+
+  useEffect(() => {
+    odpAnalytics.agreementShown(copyVariant);
+    // A rendered agreement is one page view; server re-serving it is a new page view.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
+
   const onContinue = useCallback(() => {
+    odpAnalytics.agreementContinue(copyVariant);
     report("Continue");
-  }, [report]);
+  }, [copyVariant, odpAnalytics, report]);
   const onBack = useCallback(() => {
+    odpAnalytics.agreementBack(copyVariant);
     report("Back");
-  }, [report]);
+  }, [copyVariant, odpAnalytics, report]);
+  const onLegalLinkClick = useCallback(
+    (href: string) => {
+      if (href === termsUrl) {
+        odpAnalytics.agreementTerms(copyVariant);
+      } else if (href === privacyUrl) {
+        odpAnalytics.agreementPrivacy(copyVariant);
+      }
+    },
+    [copyVariant, odpAnalytics, privacyUrl, termsUrl],
+  );
 
   // Back is transition-driven: the server declares a `Back` transition only when there is an earlier
   // screen to return to, so the header chevron appears exactly then.
@@ -136,7 +165,7 @@ export const UserAgreementNode: NodeComponent = ({
               className="text-body-small content-default margin-none"
               data-testid="amp-v2-wizard-agreement-legal-text"
             >
-              {renderAnchoredCopy(legalText)}
+              {renderAnchoredCopy(legalText, onLegalLinkClick)}
             </p>
           ) : null}
         </div>

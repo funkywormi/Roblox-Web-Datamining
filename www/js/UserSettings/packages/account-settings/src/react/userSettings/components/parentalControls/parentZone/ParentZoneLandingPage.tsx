@@ -2,6 +2,7 @@ import React from "react";
 import ChildDashboardLandingPage from "../childDashboard/ChildDashboardLandingPage";
 import OdpAccountUpgradeBanner from "./OdpAccountUpgradeBanner";
 import OdpParentInsights from "./OdpParentInsights";
+import OdpRobuxSection from "./OdpRobuxSection";
 import { useGetOdpChildContextQuery } from "../../../../apis/parentalControlsApi";
 
 // Main landing page for when ODP is launched
@@ -14,6 +15,7 @@ export const ParentZoneLandingPage = (): JSX.Element => {
     <React.Fragment>
       {odpChildContext?.eligibleForAccountUpgradeUpsell === true && <OdpAccountUpgradeBanner />}
       <ChildDashboardLandingPage />
+      <OdpRobuxSection />
       <OdpParentInsights />
 
       {/* TODO FAMEX-174: Add settings you manage */}

@@ -14,6 +14,8 @@ export const getParentalSpendControlsUrl = `${EnvironmentUrls.billingApi}/v1/par
 
 // transfer-api (parent load of a linked child's Robux transfer limits)
 export const getChildTransferLimitUrl = `${EnvironmentUrls.apiGatewayUrl}/transfer/v1/robux-transfer/child-transfer-limit`;
+// used to fetch tier ceilings for the authenticated user, used for on-device parents
+export const getUserTransferLimitUrl = `${EnvironmentUrls.apiGatewayUrl}/transfer/v1/robux-transfer/user-transfer-limit`;
 
 // parental-controls-api
 export const childrenInfoUrl = `${EnvironmentUrls.apiGatewayUrl}/parental-controls-api/v1/parental-controls/children-info`;

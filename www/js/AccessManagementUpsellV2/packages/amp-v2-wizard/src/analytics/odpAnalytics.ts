@@ -8,11 +8,13 @@ import { userId } from "@rbx/core-scripts/meta/user";
 
 import {
   AgeGroupKey,
+  DefaultOdpIntroCopyVariant,
   OdpAssociatedText,
   OdpEventButton,
   OdpEventContext,
   OdpEventField,
   OdpEventName,
+  OdpIntroCopyVariantKey,
 } from "./odpAnalyticsConstants";
 import type { FlowAnalyticsStrings, NodeContext } from "../types";
 
@@ -21,6 +23,11 @@ export type OdpAnalytics = {
   handoffShown: () => void;
   handoffContinue: () => void;
   handoffBack: () => void;
+  agreementShown: (copyVariant?: string) => void;
+  agreementContinue: (copyVariant?: string) => void;
+  agreementBack: (copyVariant?: string) => void;
+  agreementTerms: (copyVariant?: string) => void;
+  agreementPrivacy: (copyVariant?: string) => void;
   verificationMethodSelectorShown: (preselectedMethod?: string) => void;
   verificationMethodSelected: (methodId: string) => void;
   verificationMethodContinue: (methodId: string) => void;
@@ -43,6 +50,13 @@ export function createOdpAnalytics(
   analyticsSessionId?: string,
 ): OdpAnalytics {
   const ageGroup = strings?.[AgeGroupKey];
+  const configuredCopyVariant = strings?.[OdpIntroCopyVariantKey];
+  const agreementState = (copyVariant?: string): string =>
+    buildState(
+      analyticsSessionId,
+      ageGroup,
+      copyVariant ?? configuredCopyVariant ?? DefaultOdpIntroCopyVariant,
+    );
 
   return {
     handoffShown: () => {
@@ -60,6 +74,40 @@ export function createOdpAnalytics(
       sendEventWithTarget(OdpEventName.ButtonClick, OdpEventContext.Handoff, {
         btn: OdpEventButton.Back,
         state: buildState(analyticsSessionId, ageGroup),
+      });
+    },
+    agreementShown: copyVariant => {
+      sendEventWithTarget(OdpEventName.Pageload, OdpEventContext.Intro, {
+        state: agreementState(copyVariant),
+        associatedText: OdpAssociatedText.AgreementScreen,
+      });
+    },
+    agreementContinue: copyVariant => {
+      sendEventWithTarget(OdpEventName.ButtonClick, OdpEventContext.Intro, {
+        btn: OdpEventButton.Continue,
+        state: agreementState(copyVariant),
+        associatedText: OdpAssociatedText.AgreementContinue,
+      });
+    },
+    agreementBack: copyVariant => {
+      sendEventWithTarget(OdpEventName.ButtonClick, OdpEventContext.Intro, {
+        btn: OdpEventButton.Back,
+        state: agreementState(copyVariant),
+        associatedText: OdpAssociatedText.AgreementBack,
+      });
+    },
+    agreementTerms: copyVariant => {
+      sendEventWithTarget(OdpEventName.ButtonClick, OdpEventContext.Intro, {
+        btn: OdpEventButton.Terms,
+        state: agreementState(copyVariant),
+        associatedText: OdpAssociatedText.AgreementTerms,
+      });
+    },
+    agreementPrivacy: copyVariant => {
+      sendEventWithTarget(OdpEventName.ButtonClick, OdpEventContext.Intro, {
+        btn: OdpEventButton.Privacy,
+        state: agreementState(copyVariant),
+        associatedText: OdpAssociatedText.AgreementPrivacy,
       });
     },
     verificationMethodSelectorShown: preselectedMethod => {

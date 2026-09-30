@@ -1,27 +1,17 @@
 import React, { useCallback, useState } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { Button, Icon } from "@rbx/foundation-ui";
-import { formatNumber } from "@rbx/core-scripts/format/number";
-import PreviewCardComponent from "../../../../common/components/routing/PreviewCard";
+import { Button } from "@rbx/foundation-ui";
 import type { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
 import { selectChildPagesForChildUserId } from "../../../../apis/slices/childPagesSlice";
 import { useAppSelector } from "../../../../redux/hooks";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
-import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import { trackError } from "../../../giftRobux/observability";
+import RobuxBalanceCard from "../shared/RobuxBalanceCard";
 import GiftRobuxErrorBoundary from "./GiftRobuxErrorBoundary";
 import GiftRobuxSheet from "./GiftRobuxSheet";
 
 const tryAgainTranslationKey = "Action.TryAgain";
-
-const formatRobuxBalance = (robuxBalance: TChildInfo["robuxBalance"]): string => {
-  if (robuxBalance === undefined) {
-    return "";
-  }
-
-  return formatNumber(robuxBalance);
-};
 
 type GiftRobuxActionFallbackProps = {
   onRetry: () => void;
@@ -45,8 +35,6 @@ const GiftRobuxActionFallback = ({ onRetry }: GiftRobuxActionFallbackProps): Rea
 const RobuxBalanceSection = ({ child }: { child: TChildInfo }): React.JSX.Element => {
   const [giftActionKey, setGiftActionKey] = useState(0);
   const { translate } = useTranslation();
-  const robuxBalance = formatRobuxBalance(child.robuxBalance);
-  const { giftRobux } = parentalControlsTranslationConstants;
 
   // An absent balance means the balance read failed, so the card renders it blank
   // rather than as a number. Offering a purchase against a balance we could not
@@ -67,24 +55,14 @@ const RobuxBalanceSection = ({ child }: { child: TChildInfo }): React.JSX.Elemen
   }, []);
 
   return (
-    <PreviewCardComponent
-      title={translate(giftRobux.heading)}
+    <RobuxBalanceCard
+      robuxBalance={child.robuxBalance}
       linkText={
         robuxSettingsPath === undefined ? undefined : translate(commonTranslationConstants.manage)
       }
       linkPath={robuxSettingsPath}
-    >
-      <div className="robux-balance-card padding-large flex items-center justify-between gap-medium">
-        <div className="flex flex-col gap-xsmall">
-          <div className="flex items-center gap-xsmall">
-            <Icon name="icon-filled-robux" size="Medium" />
-            <span className="text-heading-small content-emphasis">{robuxBalance}</span>
-          </div>
-          <span className="text-label-medium content-muted">
-            {translate(giftRobux.balanceLabel)}
-          </span>
-        </div>
-        {canAddRobux && (
+      action={
+        canAddRobux && (
           <div className="shrink-0">
             <GiftRobuxErrorBoundary
               key={giftActionKey}
@@ -94,9 +72,9 @@ const RobuxBalanceSection = ({ child }: { child: TChildInfo }): React.JSX.Elemen
               <GiftRobuxSheet child={child} />
             </GiftRobuxErrorBoundary>
           </div>
-        )}
-      </div>
-    </PreviewCardComponent>
+        )
+      }
+    />
   );
 };
 

@@ -28,7 +28,10 @@ function decodeEntities(value: string): string {
   return textarea.value;
 }
 
-export function renderAnchoredCopy(text: string): ReactNode[] {
+export function renderAnchoredCopy(
+  text: string,
+  onLinkClick?: (href: string) => void,
+): ReactNode[] {
   const content: ReactNode[] = [];
   let index = 0;
   let lastIndex = 0;
@@ -52,6 +55,7 @@ export function renderAnchoredCopy(text: string): ReactNode[] {
           variant="Inline"
           underline="always"
           isExternal={false}
+          onClick={() => onLinkClick?.(href)}
         >
           {linkLabel}
         </Link>

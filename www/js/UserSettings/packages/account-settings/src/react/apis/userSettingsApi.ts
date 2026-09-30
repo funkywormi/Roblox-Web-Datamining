@@ -310,6 +310,8 @@ const userSettingsApi = baseApi.injectEndpoints({
   }),
 });
 
+export { userSettingsApi };
+
 export const {
   useGetSettingsMetadataQuery,
   useGetUserSettingsQuery,

@@ -51,6 +51,7 @@ import { initializeTheme } from "@rbx/core-scripts/theme/internal";
 import { initializeBoundAuthTokensForJQuery } from "./src/boundAuthTokenHeaderInjector";
 import { initializeGamepadNavigation } from "./src/directional-navigation";
 import heartbeatInit from "./src/pageHeartbeat";
+import { initReportingObserver } from "./src/reportingObserver";
 
 addExternal(["Roblox", "core-lib", "index"], coreLib);
 addExternal(["Roblox", "core-lib", "url", "index"], coreUrl);
@@ -174,6 +175,12 @@ addLegacyExternal(["Roblox", "DeepLinkService"], {
 });
 addLegacyExternal(["Roblox", "ShareLinks"], deepLink.ShareLinks);
 addLegacyExternal(["Roblox", "ShareLinksType"], deepLink.ShareLinksType);
+
+try {
+  initReportingObserver();
+} catch {
+  // do nothing for now
+}
 
 try {
   heartbeatInit();

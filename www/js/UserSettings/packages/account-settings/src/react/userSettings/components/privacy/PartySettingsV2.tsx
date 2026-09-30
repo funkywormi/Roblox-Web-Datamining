@@ -221,35 +221,50 @@ export const PartySettingsV2 = ({ child }: { child?: TChildInfo }): JSX.Element 
       requiredActions?.includes(RequirementType.FacialAgeEstimation) ||
       requiredActions?.includes(RequirementType.VpcForFae);
 
+    const commitPartySetting = async () => {
+      const updateBody: TUpdateUserSettingValueRequest = {
+        childUserId: child?.userId,
+        setting,
+        value,
+        usePrologue: true,
+        useRequirementsMapV2: true,
+        auditHeader: getAuditHeader(setting),
+      };
+      try {
+        const result = await updateSettingValue(updateBody).unwrap();
+        const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
+        if (successMessageKey) {
+          snackbarService.success(translate(successMessageKey));
+        }
+      } catch (error) {
+        const errorKey = handleChildSettingsUpdateError(error, child?.userId);
+        if (errorKey) {
+          snackbarService.warning(translate(errorKey));
+        }
+      }
+    };
+
     if (requiredActions && requiredActions.length > 0) {
       if (!child?.userId) {
-        await handleAgeCheckUpsells({ settingName: setting, optionValue: value, requiredActions });
+        const ageCheckUpsellTriggered = await handleAgeCheckUpsells({
+          settingName: setting,
+          optionValue: value,
+          requiredActions,
+          onComplete: commitPartySetting,
+        });
+        // When an upsell was shown, the setting update (and its parental-consent prologue)
+        // runs from onComplete only if the user completed FAE. If they cancel/exit, we close
+        // the upsells here instead of prompting for parent permission.
+        if (ageCheckUpsellTriggered) {
+          return;
+        }
       } else if (requiresFae) {
         ageCheckRequiredModalService.open();
         return;
       }
     }
 
-    const updateBody: TUpdateUserSettingValueRequest = {
-      childUserId: child?.userId,
-      setting,
-      value,
-      usePrologue: true,
-      useRequirementsMapV2: true,
-      auditHeader: getAuditHeader(setting),
-    };
-    try {
-      const result = await updateSettingValue(updateBody).unwrap();
-      const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
-      if (successMessageKey) {
-        snackbarService.success(translate(successMessageKey));
-      }
-    } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, child?.userId);
-      if (errorKey) {
-        snackbarService.warning(translate(errorKey));
-      }
-    }
+    await commitPartySetting();
   };
 
   const autoUpdateReady = !!settingsAndOptions && !child?.userId;
