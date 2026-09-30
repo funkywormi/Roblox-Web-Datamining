@@ -1,5 +1,5 @@
-import { AxiosPromise, httpService } from 'core-utilities';
-import urlConfigs from '../constants/urlConfigs';
+import { AxiosPromise, httpService } from "core-utilities";
+import urlConfigs from "../constants/urlConfigs";
 import {
   TItemDetailRequestEntry,
   TDetailResult,
@@ -10,8 +10,9 @@ import {
   retriesForHydration,
   retriesForCollectiblesHydration,
   TCollectibleDetailEntry,
-  TAwaitedHydratedCollectibleDetails
-} from '../constants/itemDetailsHydrationConstants';
+  TAwaitedHydratedCollectibleDetails,
+} from "../constants/itemDetailsHydrationConstants";
+import { trackError } from "../../observability";
 import {
   getItemDetail,
   createItemDetailHydrationEntry,
@@ -19,33 +20,36 @@ import {
   setItemDetailHydrationEntry,
   cleanLocalStorage,
   getPurchaseInfo,
-  getTimedOptions
-} from '../utils/itemDetailsHydrationServiceUtils';
+  getTimedOptions,
+} from "../utils/itemDetailsHydrationServiceUtils";
 
 export const postItemDetails = (
-  items: Array<TItemDetailRequestEntry>
+  items: Array<TItemDetailRequestEntry>,
 ): AxiosPromise<TDetailResult> => {
   const params = {
-    items
+    items,
   };
   return httpService.post(urlConfigs.postItemDetails, params);
 };
 
 export const postCollectibleItemDetails = (
-  itemIds: Array<string>
+  itemIds: Array<string>,
 ): AxiosPromise<Array<TCollectibleDetailEntry>> => {
   const requestBody = {
-    itemIds
+    itemIds,
   };
   return httpService.post(urlConfigs.postCollectibleItemDetails, requestBody);
 };
 
 export const postItemDetailsWithRetries = async (
   items: Array<TItemDetailRequestEntry>,
-  retriesRemaining: number
+  retriesRemaining: number,
 ): Promise<Array<TDetailEntry> | undefined> => {
   try {
     if (retriesRemaining <= 0 || items.length <= 0) {
+      if (retriesRemaining <= 0 && items.length > 0) {
+        trackError("ItemDetailsHydrationExhausted");
+      }
       return undefined;
     }
     const resultArray = new Array<TDetailEntry>();
@@ -55,7 +59,7 @@ export const postItemDetailsWithRetries = async (
         ...item,
         purchaseInfo:
           item.collectibleItemId === undefined ? getPurchaseInfo(item, undefined) : undefined,
-        timedOptions: getTimedOptions(item)
+        timedOptions: getTimedOptions(item),
       });
     });
     if (resultArray.length === items.length) {
@@ -70,7 +74,7 @@ export const postItemDetailsWithRetries = async (
 
 export const awaitHydrationForItems = async (
   itemsAwaitingHydration: Array<TItemDetailRequestEntry>,
-  retriesRemaining: number
+  retriesRemaining: number,
 ): Promise<TAwaitedHyrdatedItemDetails> => {
   const hydratedItemDetails = new Array<TDetailEntry>();
   const newItemsAwaitingHydration = new Array<TItemDetailRequestEntry>();
@@ -91,18 +95,18 @@ export const awaitHydrationForItems = async (
 
     const nextHydratedItemDetails = await awaitHydrationForItems(
       newItemsAwaitingHydration,
-      retriesRemaining - 1
+      retriesRemaining - 1,
     );
 
     nextHydratedItemDetails.hydratedItemDetails = hydratedItemDetails.concat(
-      nextHydratedItemDetails.hydratedItemDetails
+      nextHydratedItemDetails.hydratedItemDetails,
     );
 
     return nextHydratedItemDetails;
   }
   const awaitedHydratedItemDetails = {
     hydratedItemDetails,
-    nonHydratedItemDetails: newItemsAwaitingHydration
+    nonHydratedItemDetails: newItemsAwaitingHydration,
   } as TAwaitedHyrdatedItemDetails;
   return awaitedHydratedItemDetails;
 };
@@ -110,13 +114,13 @@ export const awaitHydrationForItems = async (
 export const awaitHydrationForCollectibleDetails = async (
   hydratedItemDetails: Array<TDetailEntry>,
   collectibleItemIds: Array<string>,
-  retriesRemaining: number
+  retriesRemaining: number,
 ): Promise<void> => {
   const newItemsAwaitingHydration = new Array<string>();
   for (let i = 0; i < collectibleItemIds.length; i++) {
     const collectibleItemId = collectibleItemIds[i];
     const itemDetailEntry = hydratedItemDetails.find(
-      item => item.collectibleItemId === collectibleItemId
+      item => item.collectibleItemId === collectibleItemId,
     );
     if (itemDetailEntry) {
       const hydratedItemDetail = getItemDetail(itemDetailEntry.id, itemDetailEntry.itemType);
@@ -132,7 +136,7 @@ export const awaitHydrationForCollectibleDetails = async (
     await awaitHydrationForCollectibleDetails(
       hydratedItemDetails,
       newItemsAwaitingHydration,
-      retriesRemaining - 1
+      retriesRemaining - 1,
     );
   }
 };
@@ -140,7 +144,7 @@ export const awaitHydrationForCollectibleDetails = async (
 export const getItemDetails = async (
   items: Array<TItemDetailRequestEntry>,
   cacheDetails?: boolean,
-  hydrateCollectibleDetails?: boolean
+  hydrateCollectibleDetails?: boolean,
 ): Promise<Array<TDetailEntry>> => {
   const blockCache = cacheDetails ?? false;
   cleanLocalStorage();
@@ -180,7 +184,7 @@ export const getItemDetails = async (
 
   if (itemsRequiringHydration.length > 0) {
     const hydratedItemsResult = await Promise.resolve(
-      postItemDetailsWithRetries(itemsRequiringHydration, retriesForHydration)
+      postItemDetailsWithRetries(itemsRequiringHydration, retriesForHydration),
     );
     if (hydratedItemsResult !== undefined) {
       hydratedItemsResult.forEach(item => {
@@ -192,7 +196,7 @@ export const getItemDetails = async (
 
   const awaitedHydratedItemDetails = await awaitHydrationForItems(
     itemsAwaitingHydration,
-    retriesForHydration
+    retriesForHydration,
   );
   awaitedHydratedItemDetails.hydratedItemDetails.forEach(item => {
     hydratedItemDetails.push(item);
@@ -200,7 +204,7 @@ export const getItemDetails = async (
 
   if (awaitedHydratedItemDetails.nonHydratedItemDetails.length > 0) {
     const rehydratedItemsResult = await Promise.resolve(
-      postItemDetailsWithRetries(itemsAwaitingHydration, retriesForHydration)
+      postItemDetailsWithRetries(itemsAwaitingHydration, retriesForHydration),
     );
     if (rehydratedItemsResult !== undefined) {
       rehydratedItemsResult.forEach(item => {
@@ -227,24 +231,24 @@ export const getItemDetails = async (
   });
   if (loadingCollectibleItemIds.length > 0 && hydrateCollectibleDetails) {
     const collectibleItemDetailsList = await Promise.resolve(
-      postCollectibleItemDetails(loadingCollectibleItemIds)
+      postCollectibleItemDetails(loadingCollectibleItemIds),
     );
     for (let i = 0; i < collectibleItemDetailsList.data.length; i++) {
       const collectibleItemDetails = collectibleItemDetailsList.data[i]!;
       const itemDetailEntry = hydratedItemDetails.find(
-        item => item.collectibleItemId === collectibleItemDetails.collectibleItemId
+        item => item.collectibleItemId === collectibleItemDetails.collectibleItemId,
       );
       if (itemDetailEntry !== undefined) {
         collectibleItemDetails.purchaseInfo = getPurchaseInfo(
           itemDetailEntry,
-          collectibleItemDetails
+          collectibleItemDetails,
         );
         itemDetailEntry.collectibleItemDetails = collectibleItemDetails!;
         setItemDetailHydrationEntry(
           itemDetailEntry.id,
           itemDetailEntry.itemType,
           itemDetailEntry,
-          blockCache
+          blockCache,
         );
       }
     }
@@ -252,7 +256,7 @@ export const getItemDetails = async (
   await awaitHydrationForCollectibleDetails(
     hydratedItemDetails,
     awaitingCollectibleItemIds,
-    retriesForCollectiblesHydration
+    retriesForCollectiblesHydration,
   );
 
   for (let i = 0; i < hydratedItemDetails.length; i++) {
@@ -267,5 +271,5 @@ export const getItemDetails = async (
 };
 
 export default {
-  getItemDetails
+  getItemDetails,
 };

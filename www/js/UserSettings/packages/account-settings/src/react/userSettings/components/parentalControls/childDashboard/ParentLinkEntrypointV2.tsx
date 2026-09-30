@@ -1,9 +1,9 @@
 import { useTranslation } from "react-utilities";
 import { Button } from "@rbx/foundation-ui";
 import OdpTiltedCardsArt from "../shared/OdpTiltedCardsArt";
-import useHandleParentLinking from "../../../hooks/useHandleParentLinking";
 import useLinkedParentsState from "../../../hooks/useLinkedParentsState";
 import useStartOnDeviceParentLinking from "../../../hooks/useStartOnDeviceParentLinking";
+import useStartRemoteParentLinking from "../../../hooks/useStartRemoteParentLinking";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 
 /**
@@ -13,7 +13,7 @@ import parentalControlsTranslationConstants from "../../../constants/contentCons
 export const ParentLinkEntrypointV2 = (): JSX.Element => {
   const { translate } = useTranslation();
 
-  const handleParentLinking = useHandleParentLinking();
+  const handleParentLinking = useStartRemoteParentLinking();
   const startOnDeviceParentLinking = useStartOnDeviceParentLinking();
   const { addParentUpsellVariant, canAddOnDeviceParent, canAddRemoteParent } =
     useLinkedParentsState();

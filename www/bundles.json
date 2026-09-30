@@ -513,7 +513,7 @@
         },
         {
             "name": "Authentication.SignUp",
-            "url": "https://js.rbxcdn.com/6dc36b0b25f1a0b26d2674ed14aeff8b19674976250b1a10bbf61e88791ea1d9.js",
+            "url": "https://js.rbxcdn.com/e7ab92f0c4d6a53d760629e18d5b86ec3a12de9a77d7aa9a60db281f0adab17c.js",
             "sources": [
                 "/home",
                 "/",
@@ -3189,7 +3189,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/306edb2e62cec5e8386724992169dd8dcd8af92590055386a22f8b4049c64a29.js",
+            "url": "https://js.rbxcdn.com/87cb027de97d176738d0a573edc9a2330dbe9c2a4178b183cd2dc7aecb2d1e57.js",
             "sources": [
                 "/home",
                 "/",
@@ -3482,7 +3482,7 @@
         },
         {
             "name": "Feature.Support",
-            "url": "https://js.rbxcdn.com/71e2542455da2df5a223fe4d318339b30b9ae222eac949c1761f0646caf95501.js",
+            "url": "https://js.rbxcdn.com/1098f81562d3a2b96a089c15a6c8a6fdee3947d0b78584d3b09014a9b41fc586.js",
             "sources": [
                 "/support"
             ]
@@ -4016,7 +4016,7 @@
         },
         {
             "name": "AccessManagementUpsellV2",
-            "url": "https://js.rbxcdn.com/ae5283633663fdfae4827a626f9306790b9169c62dbb2bbcaac4507950c5485c-AccessManagementUpsellV2.js",
+            "url": "https://js.rbxcdn.com/218a2b32aefaa6cd6ce5869f5a66449b28a0d797c3dc0c29c38b2e734f4bc2cf-AccessManagementUpsellV2.js",
             "sources": [
                 "/home",
                 "/",
@@ -4434,14 +4434,14 @@
         },
         {
             "name": "Catalog",
-            "url": "https://js.rbxcdn.com/077c292515e51931c5ed1642034dfb02227e160187d0976438f2bbfcbec0962e-Catalog.js",
+            "url": "https://js.rbxcdn.com/7cf51cd2accbfd9df9e930c64d423547e0663ed89f895e03411eeda001480065-Catalog.js",
             "sources": [
                 "/catalog"
             ]
         },
         {
             "name": "Challenge",
-            "url": "https://js.rbxcdn.com/5e3ec4846c94381745507c7ef40fb7c22ea922973c3426579659dcaf4ca5a8f6-Challenge.js",
+            "url": "https://js.rbxcdn.com/a8283e17ada558a49b009d71549f520e2d70988f75f8b43dd0c0ac6c39006d09-Challenge.js",
             "sources": [
                 "/home",
                 "/",
@@ -4639,7 +4639,7 @@
         },
         {
             "name": "CoreUtilities",
-            "url": "https://js.rbxcdn.com/026c374923ca09f5344ac241eb72e2ca55e557e84b083a1a0c5d8ed55366930b-CoreUtilities.js",
+            "url": "https://js.rbxcdn.com/136c3bd2ffdb203ccffa4cd36f6c4034e387e3622bce061d59be26d4f74a2512-CoreUtilities.js",
             "sources": [
                 "ALL"
             ]
@@ -4735,15 +4735,12 @@
                 "/trades",
                 "/users/inventory",
                 "/users/1/favorites",
-                "/my/avatar",
                 "/search/communities",
                 "/search/users",
                 "/communities/1",
                 "/communities/configure",
                 "/games/1818",
-                "/badges/176685910",
-                "/catalog/3360689775",
-                "/bundles/591"
+                "/badges/176685910"
             ]
         },
         {
@@ -5335,7 +5332,7 @@
         },
         {
             "name": "ItemDetails",
-            "url": "https://js.rbxcdn.com/60f31de628012c32607b8f4b1488288a98bf9fc5b57251e59209e4df5fdc68ca-ItemDetails.js",
+            "url": "https://js.rbxcdn.com/e403a033c2466836b3d212af1f4389c1a2fe25c7a27f8fd0a9969ba916d266d2-ItemDetails.js",
             "sources": [
                 "/catalog/3360689775",
                 "/bundles/591"
@@ -5343,7 +5340,7 @@
         },
         {
             "name": "ItemDetailsHydrationService",
-            "url": "https://js.rbxcdn.com/c8ac397606b8d4dfab9ea0d9af928273fcc51341a741b50ee831308aaed3517b-ItemDetailsHydrationService.js",
+            "url": "https://js.rbxcdn.com/af8d1d57ffe1296b4c17a0d5a9b71b913188784c4db8f4170a5818772e7a358f-ItemDetailsHydrationService.js",
             "sources": [
                 "/home",
                 "/",
@@ -5397,7 +5394,7 @@
         },
         {
             "name": "ItemDetailsInfo",
-            "url": "https://js.rbxcdn.com/dc0d4e2e88c5c5243b15a96cef7a9db4fad22e8bc7e9b0c1db7de985c77eafd7-ItemDetailsInfo.js",
+            "url": "https://js.rbxcdn.com/92150e7725b2e1c61f7a6e6e5e3d49238722b5cda37e4a5e92c4bfe54c1c924f-ItemDetailsInfo.js",
             "sources": [
                 "/catalog/3360689775",
                 "/bundles/591"
@@ -5405,7 +5402,7 @@
         },
         {
             "name": "ItemDetailsLimitedInventory",
-            "url": "https://js.rbxcdn.com/74c2de7ba8a227ab30eeaa11b37066e1ab1dfb6428c4b17b76b0246915febc4a-ItemDetailsLimitedInventory.js",
+            "url": "https://js.rbxcdn.com/2f01a3c960a2d561bd165ef721af1c53f7d071ce750194fc64cfdb5533f7694e-ItemDetailsLimitedInventory.js",
             "sources": [
                 "/users/inventory",
                 "/users/1/favorites",
@@ -5541,7 +5538,7 @@
         },
         {
             "name": "ItemResale",
-            "url": "https://js.rbxcdn.com/06634b3c3964df9c01f2a9f15d624d3cb75b04c2cd6068d57e77df3befd410b5-ItemResale.js",
+            "url": "https://js.rbxcdn.com/da8c5cb42f85396b310d85c681c47e425f5fd22c99fd102e80b8ebd97110e9e7-ItemResale.js",
             "sources": [
                 "/users/inventory",
                 "/users/1/favorites",
@@ -5629,7 +5626,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/33107b61f8f5498c052c5b2f425e9c0ef20fbea5d567b3bddd264375b03ffe19-Navigation.js",
+            "url": "https://js.rbxcdn.com/28e63a167671c1307c47534c0ca3965d1202e7ca3ec1c88f27db84711276fdb1-Navigation.js",
             "sources": [
                 "/home",
                 "/",
@@ -6108,7 +6105,7 @@
         },
         {
             "name": "Recommendations",
-            "url": "https://js.rbxcdn.com/af1135f13c05984718027ea8a9eb35f03b369778bb719261bee36ae88ec3d7bc-Recommendations.js",
+            "url": "https://js.rbxcdn.com/fa91bcda027c80b60f210ba5373673e2a8e5ecd3de019dba1d9925e5d22916eb-Recommendations.js",
             "sources": [
                 "/users/inventory",
                 "/users/1/favorites",
@@ -6193,7 +6190,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/494b733d17e1f2975b46d655fc2f665bea0a7df4145ca11b68ccb8c0ab5b0999-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/2cc91f477f7963d7068b0f41f53ee372338fb9c1b63edc44179f0bad5a2c6a51-RobuxRedesign.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -6798,7 +6795,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/837e21fff94760fdea1c77b92c74a9a4b761885240a772f66a8823a27c663034-UserSettings.js",
+            "url": "https://js.rbxcdn.com/6e9d1e65698c5b29de196f32db5a2be03a90da7ae18f8cacfc7692a373494a66-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -7618,7 +7615,7 @@
         },
         {
             "name": "FoundationCss",
-            "url": "https://css.rbxcdn.com/15c7c4b110a555cbc9ed5d8c82f5074843c4dbd876bebdaa3ff6c4dd4b4927b4-FoundationCss.css",
+            "url": "https://css.rbxcdn.com/55280c7812e72016172462bfabdb6806238abfd0f279b87783e71ac52d440a72-FoundationCss.css",
             "sources": [
                 "ALL"
             ]
@@ -7891,7 +7888,7 @@
         },
         {
             "name": "ItemDetails",
-            "url": "https://css.rbxcdn.com/96f4134e1841a411c7fb8285afa76bc8192325a98d97f99a1730e36838c4b22f-ItemDetails.css",
+            "url": "https://css.rbxcdn.com/009e0559c2392df2f702da663e2ef818c4a83b020659f0e7fcf8e15a82dbfafd-ItemDetails.css",
             "sources": [
                 "/catalog/3360689775",
                 "/bundles/591"
@@ -7899,7 +7896,7 @@
         },
         {
             "name": "ItemDetailsInfo",
-            "url": "https://css.rbxcdn.com/f5516c8514ac4ba25378464b5f0ccc332ed4ca6c2c6d236c69b0a93cc550993e-ItemDetailsInfo.css",
+            "url": "https://css.rbxcdn.com/3ad4ecc3883887dc869e5b36b83d85e386c04493efa4894fb42ea5f1a7267e51-ItemDetailsInfo.css",
             "sources": [
                 "/catalog/3360689775",
                 "/bundles/591"
@@ -7907,7 +7904,7 @@
         },
         {
             "name": "ItemDetailsLimitedInventory",
-            "url": "https://css.rbxcdn.com/2019f1bca71a6a4f4748278adc8ffb230926889f8af9d503ad465d9cf29dfd48-ItemDetailsLimitedInventory.css",
+            "url": "https://css.rbxcdn.com/2058f19493637e403f9c1cb94e40535ba2d095545b1e6eabb37c1a89c702a7c6-ItemDetailsLimitedInventory.css",
             "sources": [
                 "/users/inventory",
                 "/users/1/favorites",
@@ -8043,7 +8040,7 @@
         },
         {
             "name": "ItemResale",
-            "url": "https://css.rbxcdn.com/a809315c6b065fe8c0194bd0058a08240c8988e2e5d752d0eca37301fee3df15-ItemResale.css",
+            "url": "https://css.rbxcdn.com/28b15e1a84160347852088c17de2cbcf2bb9f486b53f71ed4f36ffaa6f382525-ItemResale.css",
             "sources": [
                 "/users/inventory",
                 "/users/1/favorites",
@@ -8412,7 +8409,7 @@
         },
         {
             "name": "Recommendations",
-            "url": "https://css.rbxcdn.com/c335d5d3a7a900dea0f85286f56c0f27c8e64f8a23c5ff142cc1e4665af9f19f-Recommendations.css",
+            "url": "https://css.rbxcdn.com/7f884d17e814d3638edeb99ea7382ed83b63a49013ddf9bbbc07f02b852d6f16-Recommendations.css",
             "sources": [
                 "/users/inventory",
                 "/users/1/favorites",

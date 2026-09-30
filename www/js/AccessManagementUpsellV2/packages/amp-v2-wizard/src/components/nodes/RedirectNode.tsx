@@ -15,8 +15,14 @@ export const INVALID_REDIRECT_OUTCOME = "__invalidRedirect__";
 /** Param the redirect destintion reads to send the user back to the initial entrypoint where the wizard launched. */
 export const RETURN_PARAM = "redirectUrl";
 
-export function RedirectNode({ props, report }: NodeProps): JSX.Element {
+/**
+ * Analytics session id passed as query param to redirect destination, for event tracking
+ */
+export const ANALYTICS_SESSION_PARAM = "analyticsSessionId";
+
+export function RedirectNode({ props, ctx, report }: NodeProps): JSX.Element {
   const url = asText(props.url);
+  const { analyticsSessionId } = ctx;
   // The host keeps this instance across fragments, so a re-render must not navigate a second time.
   const handedOffTo = useRef<string | undefined>(undefined);
 
@@ -29,6 +35,10 @@ export function RedirectNode({ props, report }: NodeProps): JSX.Element {
 
     if (!destination.searchParams.has(RETURN_PARAM)) {
       destination.searchParams.set(RETURN_PARAM, window.location.href);
+    }
+
+    if (analyticsSessionId && !destination.searchParams.has(ANALYTICS_SESSION_PARAM)) {
+      destination.searchParams.set(ANALYTICS_SESSION_PARAM, analyticsSessionId);
     }
 
     if (handedOffTo.current === destination.href) {
@@ -46,7 +56,7 @@ export function RedirectNode({ props, report }: NodeProps): JSX.Element {
 
     // Don't report any outcome on success, which would be reported as an exit and tear the amp wizard down while the
     // browser is still on the initial entrypoint page.
-  }, [url, report]);
+  }, [url, analyticsSessionId, report]);
 
   return (
     <div className="flex justify-center">

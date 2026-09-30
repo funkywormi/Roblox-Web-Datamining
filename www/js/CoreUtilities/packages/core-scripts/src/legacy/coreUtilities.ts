@@ -1,4 +1,4 @@
-import { uuidService as coreUuidService } from "@rbx/core";
+import { uuidService as coreUuidService } from "@rbx/core-legacy";
 import * as fmtNumber from "../format/number";
 import * as fmtString from "../format/string";
 import { createKeyboardEventHandler } from "../util/accessibility";
@@ -22,7 +22,7 @@ export { default as BatchRequestFactory } from "../util/batch-request/batchReque
 export const batchRequestFactory = new BatchRequest(); // deprecated remove after rollout
 // export const clipboard = ; // deleted, could not find any references/usages
 export const concatTexts = { connectors: fmtString.connectors, concat: fmtString.concat };
-export { CursorPager as CoreCursorPager, PagerError, regex, SortOrder } from "@rbx/core";
+export { CursorPager as CoreCursorPager, PagerError, regex, SortOrder } from "@rbx/core-legacy";
 export { PaginationCache, CursorPager, cursorPaginationConstants } from "../util/cursor-pagination";
 export type { PageResponse, PagingParameters } from "../util/cursor-pagination";
 export const dateService = {

@@ -12,7 +12,7 @@ export type TBundledItem = {
   type: string;
 };
 
-export type TItemDetailsCreatorType = 'Group' | 'User';
+export type TItemDetailsCreatorType = "Group" | "User";
 
 export type TPremiumPricing = {
   premiumDiscountPercentage?: number;
@@ -108,7 +108,7 @@ export type THydratedMarketplacePurchaseInfo = {
 export enum ItemDetailsHydrationStatus {
   DETAILS_NOT_HYDRATED = 0,
   DETAILS_LOADING = 1,
-  DETAILS_HYDRATED = 2
+  DETAILS_HYDRATED = 2,
 }
 
 export type TCachedItemDetailsHydratedEntry = {
@@ -126,12 +126,12 @@ export const itemDetailsHydrationServiceTimings = {
   ITEM_DETAIL_LOAD_TIME_TO_LIVE: 1000,
   ITEM_DETAIL_CACHE_CLEAR_TIME_TO_LIVE: 10000,
   ITEM_DETAIL_LOAD_MAX_WAIT_TIME: 5000,
-  ITEM_DETAIL_LOAD_SLEEP_INTERVAL: 500
+  ITEM_DETAIL_LOAD_SLEEP_INTERVAL: 500,
 };
 
 export const itemTypes = {
-  asset: 'asset',
-  bundle: 'bundle'
+  asset: "asset",
+  bundle: "bundle",
 };
 
 export type TAwaitedHyrdatedItemDetails = {

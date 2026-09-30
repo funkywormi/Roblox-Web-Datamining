@@ -6,8 +6,8 @@ import { InlineChallengeFooter } from "../../../common/inlineChallengeFooter";
 import { FooterButtonConfig, FragmentModalFooter } from "../../../common/modalFooter";
 import { FragmentModalHeader, HeaderButtonType } from "../../../common/modalHeader";
 import { ACCOUNT_SETTINGS_SECURITY_PATH } from "../app.config";
+import useCloseModal from "../hooks/useCloseModal";
 import useForceActionRedirectContext from "../hooks/useForceActionRedirectContext";
-import { ForceActionRedirectActionType } from "../store/action";
 
 export const buttonAction = (redirectURLSignifier: string, closeModal: () => void) => {
   // blocksession is a unique case where we currently don't have a redirect- the modal is purely informative.
@@ -32,38 +32,14 @@ export const buttonAction = (redirectURLSignifier: string, closeModal: () => voi
  */
 const ForceActionRedirect: React.FC = () => {
   const {
-    state: {
-      renderInline,
-      redirectURLSignifier,
-      resources,
-      onModalChallengeAbandoned,
-      onChallengeAbandoned,
-      isModalVisible,
-    },
-    dispatch,
+    state: { renderInline, redirectURLSignifier, resources, isModalVisible },
   } = useForceActionRedirectContext();
 
   /*
    * Event Handlers
    */
 
-  const closeModal = () => {
-    dispatch({
-      type: ForceActionRedirectActionType.HIDE_MODAL_CHALLENGE,
-    });
-    if (onModalChallengeAbandoned !== null) {
-      onModalChallengeAbandoned(() =>
-        dispatch({
-          type: ForceActionRedirectActionType.SHOW_MODAL_CHALLENGE,
-        }),
-      );
-    }
-
-    // In-line webview abandon support.
-    if (onChallengeAbandoned !== null) {
-      onChallengeAbandoned();
-    }
-  };
+  const closeModal = useCloseModal();
 
   /*
    * Render Properties

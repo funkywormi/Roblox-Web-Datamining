@@ -1,4 +1,4 @@
-import { localStorageService } from 'core-roblox-utilities';
+import { localStorageService } from "core-roblox-utilities";
 import {
   TCachedItemDetailsHydratedEntry,
   TDetailEntry,
@@ -8,8 +8,8 @@ import {
   TCollectibleDetailEntry,
   THydratedMarketplacePurchaseInfo,
   TTimedOption,
-  TDiscountInformation
-} from '../constants/itemDetailsHydrationConstants';
+  TDiscountInformation,
+} from "../constants/itemDetailsHydrationConstants";
 
 const getLocalStorageKey = (id: number, itemType: string): string => {
   return `ITEM_DETAILS_HYDRATION_${itemType.toUpperCase()}_${id}`;
@@ -23,7 +23,7 @@ const createItemDetailsTrackingList = (itemType: string): Array<number> => {
   const newItemDetailsTrackingList = new Array<number>();
   localStorageService.setLocalStorage(
     getLocalStorageItemTrackingKey(itemType),
-    newItemDetailsTrackingList
+    newItemDetailsTrackingList,
   );
 
   return newItemDetailsTrackingList;
@@ -47,13 +47,13 @@ const addItemToLocalStorageItemTrackList = (itemType: string, id: number): void 
   itemDetailsTrackingList.push(id);
   localStorageService.setLocalStorage(
     getLocalStorageItemTrackingKey(itemType),
-    itemDetailsTrackingList
+    itemDetailsTrackingList,
   );
 };
 
 export const getItemDetail = (
   id: number,
-  itemType: string
+  itemType: string,
 ): TCachedItemDetailsHydratedEntry | undefined => {
   try {
     return localStorageService.getLocalStorage(getLocalStorageKey(id, itemType)) as
@@ -67,7 +67,7 @@ export const getItemDetail = (
 export const createItemDetailHydrationEntry = (
   id: number,
   itemType: string,
-  blockCache?: boolean
+  blockCache?: boolean,
 ): void => {
   if (blockCache) {
     return;
@@ -84,7 +84,7 @@ export const setItemDetailHydrationEntry = (
   id: number,
   itemType: string,
   itemDetails: TDetailEntry,
-  blockCache?: boolean
+  blockCache?: boolean,
 ): void => {
   if (blockCache) {
     return;
@@ -129,14 +129,14 @@ export const sleep = (milliseconds: number): Promise<void> =>
 
 export const getItemPurchasable = (
   itemDetail: TDetailEntry,
-  collectibleItemDetail?: TCollectibleDetailEntry
+  collectibleItemDetail?: TCollectibleDetailEntry,
 ): boolean => {
   if (itemDetail.isOffSale) {
     return false;
   }
   if (
-    itemDetail.itemRestrictions.includes('Limited') ||
-    itemDetail.itemRestrictions.includes('LimitedUnique')
+    itemDetail.itemRestrictions.includes("Limited") ||
+    itemDetail.itemRestrictions.includes("LimitedUnique")
   ) {
     if (itemDetail.hasResellers !== true) {
       return false;
@@ -149,20 +149,20 @@ export const getItemPurchasable = (
     if (
       collectibleItemDetail.unitsAvailableForConsumption === 0 &&
       collectibleItemDetail.hasResellers === false &&
-      itemDetail.itemRestrictions.includes('Collectible')
+      itemDetail.itemRestrictions.includes("Collectible")
     ) {
       return false;
     }
     const useLowestReseller =
       itemDetail.collectibleItemId !== undefined &&
-      itemDetail.itemRestrictions.includes('Collectible') &&
+      itemDetail.itemRestrictions.includes("Collectible") &&
       collectibleItemDetail.hasResellers === true &&
       (collectibleItemDetail.unitsAvailableForConsumption === 0 ||
         (collectibleItemDetail.lowestResalePrice &&
           collectibleItemDetail.lowestResalePrice !== 0 &&
           collectibleItemDetail.lowestResalePrice < collectibleItemDetail.price) ||
-        collectibleItemDetail.saleLocationType === 'ExperiencesDevApiOnly');
-    if (!useLowestReseller && collectibleItemDetail.saleLocationType === 'ExperiencesDevApiOnly') {
+        collectibleItemDetail.saleLocationType === "ExperiencesDevApiOnly");
+    if (!useLowestReseller && collectibleItemDetail.saleLocationType === "ExperiencesDevApiOnly") {
       return false;
     }
   }
@@ -175,16 +175,16 @@ export const getItemPurchasable = (
 
 export const getOwnershipLimit = (
   itemDetail: TDetailEntry,
-  collectibleItemDetail?: TCollectibleDetailEntry
+  collectibleItemDetail?: TCollectibleDetailEntry,
 ): number | undefined => {
   if (
-    itemDetail.itemRestrictions.includes('Limited') ||
-    itemDetail.itemRestrictions.includes('LimitedUnique')
+    itemDetail.itemRestrictions.includes("Limited") ||
+    itemDetail.itemRestrictions.includes("LimitedUnique")
   ) {
     return undefined;
   }
   if (itemDetail.collectibleItemId && collectibleItemDetail) {
-    if (itemDetail.itemRestrictions.includes('Collectible')) {
+    if (itemDetail.itemRestrictions.includes("Collectible")) {
       if (
         collectibleItemDetail.unitsAvailableForConsumption === 0 ||
         collectibleItemDetail.quantityLimitPerUser === 0
@@ -200,7 +200,7 @@ export const getOwnershipLimit = (
 
 const getDiscountedPrice = (
   price: number | undefined,
-  discountInformation?: TDiscountInformation
+  discountInformation?: TDiscountInformation,
 ): number | undefined => {
   if (price === undefined) {
     return undefined;
@@ -213,27 +213,27 @@ const getDiscountedPrice = (
 
 export const getPurchasePrice = (
   itemDetail: TDetailEntry,
-  collectibleItemDetail?: TCollectibleDetailEntry
+  collectibleItemDetail?: TCollectibleDetailEntry,
 ): number | undefined => {
   if (itemDetail.isOffSale) {
     return undefined;
   }
   if (
-    itemDetail.itemRestrictions.includes('Limited') ||
-    itemDetail.itemRestrictions.includes('LimitedUnique')
+    itemDetail.itemRestrictions.includes("Limited") ||
+    itemDetail.itemRestrictions.includes("LimitedUnique")
   ) {
     return undefined;
   }
   if (itemDetail.collectibleItemId && collectibleItemDetail) {
-    if (itemDetail.itemRestrictions.includes('Collectible')) {
+    if (itemDetail.itemRestrictions.includes("Collectible")) {
       const useLowestReseller =
         itemDetail.collectibleItemId !== undefined &&
-        itemDetail.itemRestrictions.includes('Collectible') &&
+        itemDetail.itemRestrictions.includes("Collectible") &&
         (collectibleItemDetail.unitsAvailableForConsumption === 0 ||
           (collectibleItemDetail.lowestResalePrice &&
             collectibleItemDetail.lowestResalePrice !== 0 &&
             collectibleItemDetail.lowestResalePrice < collectibleItemDetail.price) ||
-          collectibleItemDetail.saleLocationType === 'ExperiencesDevApiOnly');
+          collectibleItemDetail.saleLocationType === "ExperiencesDevApiOnly");
       if (useLowestReseller) {
         if (collectibleItemDetail.lowestResalePrice === 0) {
           return undefined;
@@ -242,7 +242,7 @@ export const getPurchasePrice = (
       }
       return collectibleItemDetail.price;
     }
-    if (collectibleItemDetail.saleLocationType === 'ExperiencesDevApiOnly') {
+    if (collectibleItemDetail.saleLocationType === "ExperiencesDevApiOnly") {
       return undefined;
     }
     return collectibleItemDetail.price;
@@ -252,24 +252,24 @@ export const getPurchasePrice = (
 
 export const getPurchaseFromReseller = (
   itemDetail: TDetailEntry,
-  collectibleItemDetail?: TCollectibleDetailEntry
+  collectibleItemDetail?: TCollectibleDetailEntry,
 ): boolean => {
   if (
-    itemDetail.itemRestrictions.includes('Limited') ||
-    itemDetail.itemRestrictions.includes('LimitedUnique')
+    itemDetail.itemRestrictions.includes("Limited") ||
+    itemDetail.itemRestrictions.includes("LimitedUnique")
   ) {
     return true;
   }
   if (itemDetail.collectibleItemId && collectibleItemDetail) {
     const useLowestReseller =
       itemDetail.collectibleItemId !== undefined &&
-      itemDetail.itemRestrictions.includes('Collectible') &&
+      itemDetail.itemRestrictions.includes("Collectible") &&
       collectibleItemDetail.hasResellers === true &&
       (collectibleItemDetail.unitsAvailableForConsumption === 0 ||
         (collectibleItemDetail.lowestResalePrice !== 0 &&
           collectibleItemDetail.lowestResalePrice &&
           collectibleItemDetail.lowestResalePrice < collectibleItemDetail.price) ||
-        collectibleItemDetail.saleLocationType === 'ExperiencesDevApiOnly');
+        collectibleItemDetail.saleLocationType === "ExperiencesDevApiOnly");
 
     return useLowestReseller;
   }
@@ -278,13 +278,13 @@ export const getPurchaseFromReseller = (
 
 export const getPurchaseInfo = (
   itemDetail: TDetailEntry,
-  collectibleItemDetail?: TCollectibleDetailEntry
+  collectibleItemDetail?: TCollectibleDetailEntry,
 ): THydratedMarketplacePurchaseInfo => {
   return {
     purchasable: getItemPurchasable(itemDetail, collectibleItemDetail),
     ownershipLimit: getOwnershipLimit(itemDetail, collectibleItemDetail),
     purchasePrice: getPurchasePrice(itemDetail, collectibleItemDetail),
-    purchaseFromReseller: getPurchaseFromReseller(itemDetail, collectibleItemDetail)
+    purchaseFromReseller: getPurchaseFromReseller(itemDetail, collectibleItemDetail),
   } as THydratedMarketplacePurchaseInfo;
 };
 
@@ -301,7 +301,7 @@ export const getTimedOptions = (itemDetail: TDetailEntry): Array<TTimedOption> |
   const permanentOption: TTimedOption = {
     days: 0,
     price: itemDetail.price ?? 0,
-    selected: !timedOptionSelected
+    selected: !timedOptionSelected,
   };
   if (discountInformation) {
     permanentOption.discountInformation = discountInformation;
@@ -320,5 +320,5 @@ export default {
   getOwnershipLimit,
   getPurchasePrice,
   getPurchaseInfo,
-  getTimedOptions
+  getTimedOptions,
 };

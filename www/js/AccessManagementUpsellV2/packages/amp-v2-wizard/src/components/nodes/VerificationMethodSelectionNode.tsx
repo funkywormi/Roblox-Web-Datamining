@@ -25,7 +25,6 @@ export type VerificationMethodSelectionDetails = {
   optionsLabel: string;
   continueLabel: string;
   methods: VerificationMethodOption[];
-  sessionId?: string;
   recovery?: boolean;
 };
 
@@ -48,13 +47,12 @@ export function VerificationMethodSelectionNode({
   const continueLabel = asText(props.continueLabel) ?? "";
   const methods = asMethodOptions(props.methods) ?? [];
 
-  const sessionId = asText(props.sessionId);
   const odpAnalytics = useOdpAnalytics(ctx);
   const [selected, setSelected] = useState(methods[0]?.id);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    odpAnalytics.verificationMethodSelectorShown(sessionId, methods[0]?.id);
+    odpAnalytics.verificationMethodSelectorShown(methods[0]?.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -74,6 +72,7 @@ export function VerificationMethodSelectionNode({
       onBack={
         hasBack
           ? () => {
+              odpAnalytics.verificationMethodBack();
               setIsSubmitting(true);
               report("Back");
             }
@@ -103,7 +102,7 @@ export function VerificationMethodSelectionNode({
                   icon={METHOD_ICONS[method.id]}
                   isSelected={selected === method.id}
                   onSelect={() => {
-                    odpAnalytics.verificationMethodSelected(sessionId, method.id);
+                    odpAnalytics.verificationMethodSelected(method.id);
                     setSelected(method.id);
                   }}
                 />
@@ -122,7 +121,7 @@ export function VerificationMethodSelectionNode({
               size="Medium"
               className="width-full"
               onClick={() => {
-                odpAnalytics.verificationMethodContinue(sessionId, selected);
+                odpAnalytics.verificationMethodContinue(selected);
                 setIsSubmitting(true);
                 report(selected);
               }}

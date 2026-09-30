@@ -209,13 +209,14 @@ const PlusReferralSheetBody: FC<PlusReferralSheetBodyProps> = ({
   const handleSubscribeClick = useCallback(() => {
     didClickSubscribe.current = true;
     referralEventService.refereeSubscribeClick(face, referrerUserId, referralCode, surface);
-    trackCounter("ReferralSubscribeClick", { face });
+    trackCounter("ReferralSubscribeClick", { face, ...(surface ? { surface } : {}) });
   }, [face, referrerUserId, referralCode, surface]);
 
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
       if (!nextOpen && !didClickSubscribe.current) {
         referralEventService.refereeDismissed(face, referrerUserId, referralCode, surface);
+        trackCounter("ReferralDismissed", { face, ...(surface ? { surface } : {}) });
       }
       onOpenChange(nextOpen);
     },
@@ -381,6 +382,7 @@ const PlusReferralSheetImpression: FC<{
     trackCounter("PlusReferralSheetShown", {
       face,
       hasReferrerId: String(hasReferrerId),
+      ...(surface ? { surface } : {}),
     });
     referralEventService.refereeImpression(face, hasReferrerId, referrerId, referralCode, surface);
   }, [face, hasReferrerId, referrerId, referralCode, surface, open]);

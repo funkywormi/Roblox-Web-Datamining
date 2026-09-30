@@ -6477,8 +6477,7 @@ html body[data-scroll-locked] {
     --dark-mode-action-alert-background: var(--color-shift-300)
 }
 
-.age-kids-theme,
-.age-kids-variant1-theme {
+.age-kids-theme {
     --light-mode-surface-0: var(--color-extended-blue-200);
     --light-mode-surface-100: #b9cfff;
     --light-mode-surface-200: var(--color-extended-blue-200);
@@ -6551,17 +6550,6 @@ html body[data-scroll-locked] {
     --dark-mode-selection-end: #fff;
     --light-mode-state-idle: transparent;
     --dark-mode-state-idle: rgba(255, 255, 255, 0)
-}
-
-.age-kids-variant1-theme {
-    --dark-mode-surface-0: #000c3d;
-    --dark-mode-surface-100: #001157;
-    --dark-mode-surface-200: #01186b;
-    --dark-mode-surface-300: #021d7e;
-    --dark-mode-over-media-0: rgba(0, 12, 61, .92);
-    --dark-mode-over-media-100: rgba(0, 17, 87, .92);
-    --dark-mode-over-media-200: rgba(1, 24, 107, .92);
-    --dark-mode-over-media-300: rgba(2, 29, 126, .92)
 }
 
 .classic-theme {

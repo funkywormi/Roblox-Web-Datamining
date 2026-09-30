@@ -30,24 +30,23 @@ export const OdpHandoffNode: NodeComponent = ({
   const description = asText(props.description);
   const continueLabel = asText(props.continueLabel) ?? "";
   const odpAnalytics = useOdpAnalytics(ctx);
-  const { analyticsSessionId } = ctx;
   const hasReportedPageload = useRef(false);
 
   useEffect(() => {
     if (!hasReportedPageload.current) {
       hasReportedPageload.current = true;
-      odpAnalytics.handoffShown(analyticsSessionId);
+      odpAnalytics.handoffShown();
     }
-  }, [odpAnalytics, analyticsSessionId]);
+  }, [odpAnalytics]);
 
   const onContinue = useCallback(() => {
-    odpAnalytics.handoffContinue(analyticsSessionId);
+    odpAnalytics.handoffContinue();
     report("Continue");
-  }, [odpAnalytics, analyticsSessionId, report]);
+  }, [odpAnalytics, report]);
   const onBack = useCallback(() => {
-    odpAnalytics.handoffBack(analyticsSessionId);
+    odpAnalytics.handoffBack();
     report("Back");
-  }, [odpAnalytics, analyticsSessionId, report]);
+  }, [odpAnalytics, report]);
   const onCancel = useCallback(() => {
     report("Cancel");
   }, [report]);

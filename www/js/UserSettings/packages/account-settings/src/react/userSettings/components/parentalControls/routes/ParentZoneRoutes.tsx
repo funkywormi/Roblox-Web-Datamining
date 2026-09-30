@@ -10,6 +10,7 @@ import OdpTopFriendsPage from "../parentZone/OdpTopFriendsPage";
 import TopGames from "../parentDashboard/TopGames";
 import ManageOnDeviceParentPage from "../parentZone/ManageOnDeviceParentPage";
 import OdpTopGameDetails from "../parentZone/OdpTopGameDetails";
+import OdpScreentimeLimitPage from "../parentZone/OdpScreentimeLimitPage";
 
 // Parent Zone subpages. A page is only reachable while its flag is on, so a link to a page the
 // server has turned off redirects back to the landing page instead.
@@ -19,6 +20,12 @@ export const ParentZoneRoutes = (): JSX.Element => {
 
   return (
     <Switch>
+      {odpChildContext?.canParentManageChildsScreentime === true && (
+        <Route exact path={parentZonePages.screentimeManagementPage.path}>
+          <OdpScreentimeLimitPage />
+        </Route>
+      )}
+
       {odpChildContext?.canParentViewChildFriends === true && (
         <Route exact path={parentZonePages.friendManagementPage.path}>
           <OdpTopFriendsPage />

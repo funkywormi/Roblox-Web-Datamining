@@ -1,5 +1,5 @@
 import "../global";
-import { uuidService } from "@rbx/core";
+import { uuidService } from "@rbx/core-legacy";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import environmentUrls from "@rbx/environment-urls";
 import PaymentFlowContext from "./paymentFlowContext";

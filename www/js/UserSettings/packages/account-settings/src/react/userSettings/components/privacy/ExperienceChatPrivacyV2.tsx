@@ -84,37 +84,50 @@ export const ExperienceChatPrivacyV2 = ({ child }: { child?: TChildInfo }): JSX.
     const requiresFae =
       requiredActions?.includes(RequirementType.FacialAgeEstimation) ||
       requiredActions?.includes(RequirementType.VpcForFae);
+
+    const commitExperienceChatPrivacy = async () => {
+      const updateBody: TUpdateUserSettingValueRequest = {
+        childUserId: child?.userId,
+        setting: UserSetting.whoCanChatWithMeInExperiences,
+        value: newPrivacyLevel,
+        usePrologue: true,
+        useRequirementsMapV2: true,
+      };
+      try {
+        const result = await updateSettingValue(updateBody).unwrap();
+        const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
+        if (successMessageKey) {
+          snackbarService.success(translate(successMessageKey));
+        }
+      } catch (error) {
+        const errorKey = handleChildSettingsUpdateError(error, child?.userId);
+        if (errorKey) {
+          snackbarService.warning(translate(errorKey));
+        }
+      }
+    };
+
     if (requiredActions && requiredActions.length > 0) {
       if (!child?.userId) {
-        await handleAgeCheckUpsells({
+        const ageCheckUpsellTriggered = await handleAgeCheckUpsells({
           settingName: UserSetting.whoCanChatWithMeInExperiences,
           optionValue: newPrivacyLevel,
           requiredActions,
+          onComplete: commitExperienceChatPrivacy,
         });
+        // When an upsell was shown, the setting update (and its parental-consent prologue)
+        // runs from onComplete only if the user completed FAE. If they cancel/exit, we close
+        // the upsells here instead of prompting for parent permission.
+        if (ageCheckUpsellTriggered) {
+          return;
+        }
       } else if (requiresFae) {
         ageCheckRequiredModalService.open();
         return;
       }
     }
-    const updateBody: TUpdateUserSettingValueRequest = {
-      childUserId: child?.userId,
-      setting: UserSetting.whoCanChatWithMeInExperiences,
-      value: newPrivacyLevel,
-      usePrologue: true,
-      useRequirementsMapV2: true,
-    };
-    try {
-      const result = await updateSettingValue(updateBody).unwrap();
-      const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
-      if (successMessageKey) {
-        snackbarService.success(translate(successMessageKey));
-      }
-    } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, child?.userId);
-      if (errorKey) {
-        snackbarService.warning(translate(errorKey));
-      }
-    }
+
+    await commitExperienceChatPrivacy();
   };
 
   const updateExperienceDirectChatPrivacy = async (newPrivacyLevel: UserPrivacyLevel) => {
@@ -123,37 +136,50 @@ export const ExperienceChatPrivacyV2 = ({ child }: { child?: TChildInfo }): JSX.
       newPrivacyLevel,
     );
     const requiresFae = requiredActions?.includes(RequirementType.FacialAgeEstimation);
+
+    const commitExperienceDirectChatPrivacy = async () => {
+      const updateBody: TUpdateUserSettingValueRequest = {
+        childUserId: child?.userId,
+        setting: UserSetting.whoCanWhisperChatWithMeInExperiences,
+        value: newPrivacyLevel,
+        usePrologue: true,
+        useRequirementsMapV2: true,
+      };
+      try {
+        const result = await updateSettingValue(updateBody).unwrap();
+        const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
+        if (successMessageKey) {
+          snackbarService.success(translate(successMessageKey));
+        }
+      } catch (error) {
+        const errorKey = handleChildSettingsUpdateError(error, child?.userId);
+        if (errorKey) {
+          snackbarService.warning(translate(errorKey));
+        }
+      }
+    };
+
     if (requiredActions && requiredActions.length > 0) {
       if (!child?.userId) {
-        await handleAgeCheckUpsells({
+        const ageCheckUpsellTriggered = await handleAgeCheckUpsells({
           settingName: UserSetting.whoCanWhisperChatWithMeInExperiences,
           optionValue: newPrivacyLevel,
           requiredActions,
+          onComplete: commitExperienceDirectChatPrivacy,
         });
+        // When an upsell was shown, the setting update (and its parental-consent prologue)
+        // runs from onComplete only if the user completed FAE. If they cancel/exit, we close
+        // the upsells here instead of prompting for parent permission.
+        if (ageCheckUpsellTriggered) {
+          return;
+        }
       } else if (requiresFae) {
         ageCheckRequiredModalService.open();
         return;
       }
     }
-    const updateBody: TUpdateUserSettingValueRequest = {
-      childUserId: child?.userId,
-      setting: UserSetting.whoCanWhisperChatWithMeInExperiences,
-      value: newPrivacyLevel,
-      usePrologue: true,
-      useRequirementsMapV2: true,
-    };
-    try {
-      const result = await updateSettingValue(updateBody).unwrap();
-      const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
-      if (successMessageKey) {
-        snackbarService.success(translate(successMessageKey));
-      }
-    } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, child?.userId);
-      if (errorKey) {
-        snackbarService.warning(translate(errorKey));
-      }
-    }
+
+    await commitExperienceDirectChatPrivacy();
   };
 
   // Readiness is per setting: a deep link names the setting to update, and a setting omitted

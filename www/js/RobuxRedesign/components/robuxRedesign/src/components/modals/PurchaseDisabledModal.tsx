@@ -1,6 +1,13 @@
-import { useCallback, useContext, useEffect, useMemo } from "react";
-import { createModal } from "@rbx/core-ui/legacy/react-style-guide";
+import { useCallback, useContext, useMemo } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
+import {
+  Button,
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "@rbx/foundation-ui";
 import { ModalContext } from "../../contexts/ModalContext";
 import { TrackingContext } from "../../contexts/TrackingContext";
 
@@ -12,8 +19,6 @@ export function PurchaseDisabledModal() {
     useContext(TrackingContext);
 
   const { translate } = useTranslation();
-
-  const [Modal, modalService] = createModal();
 
   const [title, body] = useMemo(() => {
     if (showVPCOptimization && !hasUserDisabledPurchases) {
@@ -36,28 +41,46 @@ export function PurchaseDisabledModal() {
     window.location.href = "/my/account#!/billing";
   }, [trackPurchaseDisabledConfirm, showVPCOptimization]);
 
-  const onNeutral = useCallback(() => {
+  const handleClose = useCallback(() => {
     trackPurchaseDisabledNeutral(showVPCOptimization);
-    modalService.close();
     closeModal();
-  }, [trackPurchaseDisabledNeutral, showVPCOptimization, modalService, closeModal]);
-
-  useEffect(() => {
-    if (isOpen) {
-      modalService.open();
-    }
-  }, [isOpen, modalService]);
+  }, [trackPurchaseDisabledNeutral, showVPCOptimization, closeModal]);
 
   return (
-    <Modal
-      actionButtonShow
-      title={title}
-      body={<div>{body}</div>}
-      actionButtonText={translate("Action.GoToSettings")}
-      neutralButtonText={translate("Action.Close")}
-      onAction={onPurchaseVPCCheckModalConfirm}
-      onNeutral={onNeutral}
-      size="md"
-    />
+    <Dialog
+      open={isOpen}
+      onOpenChange={open => {
+        if (!open) {
+          handleClose();
+        }
+      }}
+      size="Medium"
+      isModal
+      hasCloseAffordance
+      closeLabel={translate("Action.Close")}
+    >
+      <DialogContent>
+        <DialogBody>
+          <DialogTitle>
+            <div>{title}</div>
+          </DialogTitle>
+          <div className="text-body-large">{body}</div>
+        </DialogBody>
+        <DialogFooter>
+          <div className="flex flex-row gap-small">
+            <Button
+              onClick={onPurchaseVPCCheckModalConfirm}
+              variant="Emphasis"
+              className="width-full"
+            >
+              {translate("Action.GoToSettings")}
+            </Button>
+            <Button onClick={handleClose} variant="Standard" className="width-full">
+              {translate("Action.Close")}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

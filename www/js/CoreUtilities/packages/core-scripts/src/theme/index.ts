@@ -14,7 +14,7 @@ const kids = (() => {
     return false;
   }
   const { classList } = document.body;
-  return classList.contains("age-kids-variant1-theme") || classList.contains("age-kids-theme");
+  return classList.contains("age-kids-theme");
 })();
 
 // TODO: remove this logic once classic theme is plus only

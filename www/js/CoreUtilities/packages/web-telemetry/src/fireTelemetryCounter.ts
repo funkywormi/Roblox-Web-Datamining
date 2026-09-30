@@ -73,6 +73,10 @@ function isValidPayload(name: string, attributes?: Attributes): boolean {
   return true;
 }
 
+/**
+ * @deprecated Use `createFireTelemetryCounter` from `@rbx/web-telemetry/v2/fire` instead.
+ * This EventStreamClient path is kept only for already-deployed bundles and will be removed.
+ */
 export function createFireTelemetryCounter(
   featureName: string,
   options?: CreateFireTelemetryCounterOptions,

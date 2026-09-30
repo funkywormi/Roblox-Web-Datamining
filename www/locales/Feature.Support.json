@@ -260,5 +260,8 @@
     "Chat.Description.FeedbackPrompt": "How did we do?",
     "Chat.Label.FeedbackRatingGroup": "Rate this chat",
     "Chat.Label.FeedbackStarRating": "Rate {rating} out of 5 stars",
-    "Chat.Response.FeedbackSaved": "Thanks for your feedback!"
+    "Chat.Response.FeedbackSaved": "Thanks for your feedback!",
+    "Label.QualityReducedExposure": "Quality reduced exposure",
+    "Label.VideoQuality": "Video quality",
+    "Label.DiscoveryContentQualityCategory": "Discovery Content Quality"
 }

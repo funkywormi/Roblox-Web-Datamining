@@ -1,56 +1,70 @@
 .glide {
-    position: relative;
+    box-sizing: border-box;
     width: 100%;
-    box-sizing: border-box
+    position: relative
 }
 
 .glide * {
     box-sizing: inherit
 }
 
-.glide__slides,
 .glide__track {
     overflow: hidden
 }
 
 .glide__slides {
-    position: relative;
-    width: 100%;
-    list-style: none;
+    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    width: 100%;
     transform-style: preserve-3d;
     touch-action: pan-Y;
-    padding: 0;
     white-space: nowrap;
-    display: flex;
+    will-change: transform;
+    -ms-flex-wrap: nowrap;
     flex-wrap: nowrap;
-    will-change: transform
+    padding: 0;
+    list-style: none;
+    display: -ms-flexbox;
+    display: flex;
+    position: relative;
+    overflow: hidden
 }
 
-.glide__slide,
 .glide__slides--dragging {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none
 }
 
 .glide__slide {
-    width: 100%;
-    height: 100%;
-    flex-shrink: 0;
     white-space: normal;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+    -webkit-tap-highlight-color: transparent;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    width: 100%;
+    height: 100%
 }
 
 .glide__slide a {
-    user-select: none;
-    -webkit-user-drag: none;
+    -webkit-user-select: none;
     -moz-user-select: none;
-    -ms-user-select: none
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none
 }
 
 .glide__arrows,
 .glide__bullets {
     -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none
 }
 
@@ -62,19 +76,19 @@
     width: 136px
 }
 
-@media(max-width:991px) {
+@media (max-width:991px) {
     .glide-carousel .item-card-container {
         width: 100%
     }
 }
 
 .glide-carousel .item-card-thumb-container {
-    height: 136px;
     width: 136px;
+    height: 136px;
     margin-bottom: 12px
 }
 
-@media(max-width:991px) {
+@media (max-width:991px) {
     .glide-carousel .item-card-thumb-container {
         width: 100%;
         height: auto
@@ -86,10 +100,10 @@
 }
 
 .glide-carousel .icon-placeholder-asset {
-    background-size: 100% auto;
+    background-position: 0 -28px;
+    background-size: 100%;
     width: 136px;
-    height: 136px;
-    background-position: 0 -28px
+    height: 136px
 }
 
 .verified-badge-icon,
@@ -98,9 +112,9 @@
 }
 
 .badgeSizeCaptionheader,
-.badgeSizeFooter,
-.badgeSizeHeader,
 .badgeSizeSubheader,
+.badgeSizeHeader,
+.badgeSizeFooter,
 .badgeSizeTitle {
     position: relative;
     overflow: hidden
@@ -116,17 +130,19 @@
     height: 12px
 }
 
-.badgeSizeCaptionheader,
 .badgeSizeHeader,
-.badgeSizeSubheader {
+.badgeSizeSubheader,
+.badgeSizeCaptionheader {
     width: 16px;
     height: 16px
 }
 
 .hz-centered-badge-container {
+    -ms-flex-pack: center;
+    justify-content: center;
     margin: 5px 0;
-    display: flex;
-    justify-content: center
+    display: -ms-flexbox;
+    display: flex
 }
 
 .recommendations-placeholder {
@@ -137,7 +153,7 @@
     margin: 106px auto
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
     .recommendations-container {
         width: 100%
     }
@@ -148,18 +164,18 @@
 }
 
 .recommendations-container .recommended-items-slider {
-    overflow: hidden;
-    width: 100%
+    width: 100%;
+    overflow: hidden
 }
 
 .recommendations-container .recommended-items-slider .item-card-price {
     height: 21px
 }
 
-@media(max-width:991px) {
+@media (max-width:991px) {
     .recommendations-container .recommended-items-slider .item-cards {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch
+        -webkit-overflow-scrolling: touch;
+        overflow-x: auto
     }
 
     .recommendations-container .recommended-items-slider .single-row {
@@ -185,11 +201,11 @@
 }
 
 .recommendations-container .item-card-thumb-container span[thumbnail-type] {
+    width: 100%;
+    height: 100%;
     position: relative;
     bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%
+    left: 0
 }
 
 .recommendations-container .restriction-icon {
@@ -207,11 +223,11 @@
     margin: 24px auto
 }
 
-@media(max-width:991px) {
+@media (max-width:991px) {
     .item-list .recommended-items-slider .item-cards {
-        overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        white-space: nowrap
+        white-space: nowrap;
+        overflow-x: auto
     }
 
     .item-list .recommended-items-slider .item-card {
@@ -221,14 +237,17 @@
 }
 
 .recommended-creator-container {
-    display: flex;
+    -ms-flex-direction: row;
     flex-direction: row;
-    align-items: center
+    -ms-flex-align: center;
+    align-items: center;
+    display: -ms-flexbox;
+    display: flex
 }
 
 .verified-badge-icon-item-recommendations {
-    display: none;
-    visibility: hidden
+    visibility: hidden;
+    display: none
 }
 
 .verified-badge-icon-item-recommendations-rendered {
@@ -242,18 +261,14 @@
 }
 
 .light-theme .plus-icon {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE2IDMyYTIuNDI0IDIuNDI0IDAgMDEtMi40MjQtMi40MjRWMTguMTk1SDIuMTk1YTIuMTk1IDIuMTk1IDAgMDEwLTQuMzloMTEuMzhWMi40MjVhMi40MjQgMi40MjQgMCAxMTQuODUgMHYxMS4zOGgxMS4zOGEyLjE5NSAyLjE5NSAwIDExMCA0LjM5aC0xMS4zOHYxMS4zOEEyLjQyNCAyLjQyNCAwIDAxMTYgMzJ6IiBmaWxsPSIjMDAwIiBmaWxsLW9wYWNpdHk9Ii4zIi8+PC9zdmc+)
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBmaWxsPSIjMDAwIiBmaWxsLW9wYWNpdHk9Ii4zIiBkPSJNMTYgMzJhMi40MjQgMi40MjQgMCAwIDEtMi40MjQtMi40MjRWMTguMTk1SDIuMTk1YTIuMTk1IDIuMTk1IDAgMCAxIDAtNC4zOWgxMS4zOFYyLjQyNWEyLjQyNCAyLjQyNCAwIDEgMSA0Ljg1IDB2MTEuMzhoMTEuMzhhMi4xOTUgMi4xOTUgMCAxIDEgMCA0LjM5aC0xMS4zOHYxMS4zOEEyLjQyNCAyLjQyNCAwIDAgMSAxNiAzMiIvPjwvc3ZnPg==)
 }
 
 .dark-theme .plus-icon {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE2IDMyYTIuNDI0IDIuNDI0IDAgMDEtMi40MjQtMi40MjRWMTguMTk1SDIuMTk1YTIuMTk1IDIuMTk1IDAgMDEwLTQuMzloMTEuMzhWMi40MjVhMi40MjQgMi40MjQgMCAxMTQuODUgMHYxMS4zOGgxMS4zOGEyLjE5NSAyLjE5NSAwIDExMCA0LjM5aC0xMS4zOHYxMS4zOEEyLjQyNCAyLjQyNCAwIDAxMTYgMzJ6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4zIi8+PC9zdmc+)
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4zIiBkPSJNMTYgMzJhMi40MjQgMi40MjQgMCAwIDEtMi40MjQtMi40MjRWMTguMTk1SDIuMTk1YTIuMTk1IDIuMTk1IDAgMCAxIDAtNC4zOWgxMS4zOFYyLjQyNWEyLjQyNCAyLjQyNCAwIDEgMSA0Ljg1IDB2MTEuMzhoMTEuMzhhMi4xOTUgMi4xOTUgMCAxIDEgMCA0LjM5aC0xMS4zOHYxMS4zOEEyLjQyNCAyLjQyNCAwIDAgMSAxNiAzMiIvPjwvc3ZnPg==)
 }
 
-.complimentary-items-recommendations-container {
-    padding: 12px
-}
-
-@media(min-width:767px) {
+@media (min-width:767px) {
     .complimentary-items-recommendations-container .item-card .item-card {
         width: 100%
     }
@@ -264,52 +279,65 @@
     margin-right: 4px
 }
 
-@media(min-width:991px) {
+@media (min-width:991px) {
     .complimentary-items-recommendations-container .item-card .item-card-container {
         width: 100%;
         margin: 0 auto
     }
 }
 
-@media(min-width:767px) {
+@media (min-width:767px) {
     .complimentary-items-recommendations-container .item-card .item-card-thumb-container {
         float: none;
+        width: 100%;
         height: 0;
-        padding-bottom: 100%;
         padding-top: 0;
-        width: 100%
+        padding-bottom: 100%
     }
 
     .complimentary-items-recommendations-container .item-card .item-card-thumb-container .icon-placeholder-asset {
-        background-size: 100% auto;
+        background-position: 0 -126px;
+        background-size: 100%;
         width: 126px;
-        height: 126px;
-        background-position: 0 -126px
+        height: 126px
     }
 }
 
+.complimentary-items-recommendations-container {
+    padding: 12px
+}
+
 .complimentary-items-recommendations-container .complimentary-items-carousel-title {
-    align-items: center;
-    display: flex;
+    -ms-flex-pack: justify;
     justify-content: space-between;
-    margin-bottom: 12px
+    -ms-flex-align: center;
+    align-items: center;
+    margin-bottom: 12px;
+    display: -ms-flexbox;
+    display: flex
 }
 
 .complimentary-items-recommendations-container .complimentary-items-carousel {
-    display: flex;
+    -ms-flex-direction: row;
     flex-direction: row;
+    display: -ms-flexbox;
+    display: flex;
     overflow-x: auto;
     overflow-y: hidden
 }
 
 .complimentary-items-recommendations-container .complimentary-items-carousel .grid-item-container {
-    align-items: center;
-    display: flex;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -ms-flex: none;
+    flex: none;
+    -ms-flex-align: center;
+    align-items: center;
+    width: 135px;
     height: auto;
-    flex: 0 0 auto;
     margin: 0 6px 0 0;
-    width: 135px
+    display: -ms-flexbox;
+    display: flex
 }
 
 .complimentary-items-recommendations-container .complimentary-items-carousel .restriction-icon {
@@ -318,7 +346,7 @@
     left: -2px
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
 
     .complimentary-items-recommendations-container .complimentary-items-carousel>.grid-item-container,
     .complimentary-items-recommendations-container .complimentary-items-carousel>.grid-item-container .item-card-link {
@@ -326,7 +354,7 @@
     }
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
 
     .complimentary-items-recommendations-container .complimentary-items-carousel>.grid-item-container,
     .complimentary-items-recommendations-container .complimentary-items-carousel>.grid-item-container .item-card-link {
@@ -335,6 +363,7 @@
 }
 
 .complimentary-items-recommendations-container .item-card-loading {
+    -ms-flex-align: start;
     align-items: flex-start
 }
 
@@ -343,7 +372,7 @@
 }
 
 .complimentary-items-recommendations-container .item-card-loading .item-card-thumb-container:before {
-    background: none
+    background: 0 0
 }
 
 .complimentary-items-recommendations-container .item-card-loading .item-card-thumb-container {
@@ -351,13 +380,13 @@
 }
 
 .complimentary-items-recommendations-container .item-card-loading .item-card-name.shimmer {
+    width: 100%;
     height: 22px;
-    margin: 0 0 5px;
-    width: 100%
+    margin: 0 0 5px
 }
 
-.dark-theme .complimentary-items-recommendations-container .item-card-loading .item-card-name.shimmer,
-.light-theme .complimentary-items-recommendations-container .item-card-loading .item-card-name.shimmer {
+.light-theme .complimentary-items-recommendations-container .item-card-loading .item-card-name.shimmer,
+.dark-theme .complimentary-items-recommendations-container .item-card-loading .item-card-name.shimmer {
     background-color: var(--color-common-shimmer)
 }
 
@@ -366,17 +395,18 @@
 }
 
 .complimentary-items-recommendations-container .plus-icon-container .plus-icon {
+    vertical-align: middle;
     background-repeat: no-repeat;
     background-size: contain;
+    -ms-flex: none;
+    flex: none;
     width: 32px;
     height: 32px;
-    display: inline-block;
-    vertical-align: middle;
     margin-top: 50px;
     margin-left: 24px;
-    flex: 0 0 auto;
     padding-left: 20px;
-    padding-right: 40px
+    padding-right: 40px;
+    display: inline-block
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card {
@@ -384,19 +414,19 @@
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card .purchase-checkbox-container {
-    position: absolute;
-    margin-left: 100px;
-    margin-top: 12px;
     z-index: 1;
+    border-radius: 6px;
     width: 20px;
     height: 20px;
-    border-radius: 6px
+    margin-top: 12px;
+    margin-left: 100px;
+    position: absolute
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card .purchase-checkbox-container input[type=checkbox] {
+    border-radius: 6px;
     width: 20px;
-    height: 20px;
-    border-radius: 6px
+    height: 20px
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card .item-card .item-card-container .thumbnail-2d-container {
@@ -404,26 +434,27 @@
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card .item-owned-icon {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE3IDlBOCA4IDAgMTExIDlhOCA4IDAgMDExNiAweiIgZmlsbD0iIzAwQjQ2RCIvPjxwYXRoIGQ9Ik02IDEwbDIgMk04IDEybDUtNSIgc3Ryb2tlPSIjMjMyNTI3IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+);
+    vertical-align: middle;
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgZmlsbD0ibm9uZSIgdmlld0JveD0iMCAwIDE4IDE4Ij48cGF0aCBmaWxsPSIjMDBiNDZkIiBkPSJNMTcgOUE4IDggMCAxIDEgMSA5YTggOCAwIDAgMSAxNiAwIi8+PHBhdGggc3Ryb2tlPSIjMjMyNTI3IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iMS41IiBkPSJtNiAxMCAyIDJNOCAxMmw1LTUiLz48L3N2Zz4=);
     background-repeat: no-repeat;
     background-size: contain;
+    -ms-flex: none;
+    flex: none;
     width: 18px;
     height: 18px;
-    display: inline-block;
-    vertical-align: middle;
-    flex: 0 0 auto
+    display: inline-block
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card .item-owned-text {
-    font-size: 12px;
     margin-left: 6px;
+    font-size: 12px;
     font-weight: 500
 }
 
 .complimentary-items-recommendations-container .purchase-container {
+    height: 50px;
     margin-top: 10px;
-    position: relative;
-    height: 50px
+    position: relative
 }
 
 .complimentary-items-recommendations-container .purchase-container .purchase-element {
@@ -435,8 +466,8 @@
 }
 
 .complimentary-items-recommendations-container .purchase-container .purchase-element .batch-buy-purchase-button {
-    height: 40px;
-    width: 130px
+    width: 130px;
+    height: 40px
 }
 
 .complimentary-items-recommendations-container .purchase-container .purchase-element .action-button {
@@ -444,8 +475,8 @@
 }
 
 .complimentary-items-recommendations-container .purchase-container .price-total {
-    margin-left: 10px;
-    margin-top: 10px
+    margin-top: 10px;
+    margin-left: 10px
 }
 
 .complimentary-items-recommendations-container .purchase-container .price-total .total-price-label {
@@ -453,11 +484,13 @@
 }
 
 .complimentary-items-recommendations-container .purchase-container-right {
-    margin-top: 10px;
-    position: relative;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
     height: 50px;
+    margin-top: 10px;
+    display: -ms-flexbox;
     display: flex;
-    justify-content: flex-end
+    position: relative
 }
 
 .complimentary-items-recommendations-container .purchase-container-right .purchase-element {
@@ -469,8 +502,8 @@
 }
 
 .complimentary-items-recommendations-container .purchase-container-right .purchase-element .batch-buy-purchase-button {
-    height: 40px;
-    width: 130px
+    width: 130px;
+    height: 40px
 }
 
 .complimentary-items-recommendations-container .purchase-container-right .purchase-element .action-button {
@@ -478,8 +511,8 @@
 }
 
 .complimentary-items-recommendations-container .purchase-container-right .price-total {
-    margin-right: 10px;
-    margin-top: 10px
+    margin-top: 10px;
+    margin-right: 10px
 }
 
 .complimentary-items-recommendations-container .purchase-container-right .price-total .total-price-label {

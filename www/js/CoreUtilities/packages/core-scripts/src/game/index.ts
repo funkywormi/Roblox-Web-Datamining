@@ -1,5 +1,5 @@
 import "../global";
-import { uuidService } from "@rbx/core";
+import { uuidService } from "@rbx/core-legacy";
 import { sendEventWithTarget, sendGamePlayEvent } from "../event-stream";
 
 // TODO: this should not be part of core-scripts

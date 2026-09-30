@@ -6,6 +6,7 @@ import parentalControlsTranslationConstants from "../contentConstants/parentalCo
 const { pageTitles } = parentalControlsTranslationConstants;
 
 type TParentZonePages = {
+  screentimeManagementPage: TSettingsPage;
   topGamesPage: TSettingsPage;
   manageOnDeviceParentPage: TSettingsPage;
   friendManagementPage: TSettingsPage;
@@ -17,6 +18,11 @@ type TParentZonePages = {
 const topGamesPath = `${baseParentalControlsPath}/${ParentalControlsPageName.TopGames}`;
 
 export const parentZonePages: TParentZonePages = {
+  screentimeManagementPage: {
+    name: ParentalControlsPageName.ScreentimeManagement,
+    path: `${baseParentalControlsPath}/${ParentalControlsPageName.ScreentimeManagement}`,
+    titleTranslationKey: pageTitles[ParentalControlsPageName.ScreentimeManagement],
+  },
   topGamesPage: {
     name: ParentalControlsPageName.TopGames,
     path: topGamesPath,

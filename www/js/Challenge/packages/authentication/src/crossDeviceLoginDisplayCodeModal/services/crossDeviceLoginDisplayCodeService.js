@@ -7,6 +7,7 @@ import {
   getAuthTokenServiceMetadataUrlConfig,
   XDLDisplayCodeExperimentParameters,
 } from "../constants/urlConstants";
+import { isCreatedCode } from "../utils/isCreatedCode";
 
 export const createNewCode = () => {
   const urlConfig = createCodeUrlConfig();
@@ -38,20 +39,25 @@ export const cancelCrossDeviceLoginCode = formData => {
     .catch(e => console.debug(e));
 };
 
-export const openModal = () => {
-  // create a new code
-  createNewCode().then(({ data }) => {
-    if (data?.status === "Created") {
-      const event = new CustomEvent("OpenCrossDeviceLoginDisplayCodeModal", {
-        detail: {
-          code: data.code,
-          privateKey: data.privateKey,
-          imagePath: data.imagePath,
-        },
-      });
-      window.dispatchEvent(event);
-    }
-  });
+export const CODE_MODAL_OPEN_EVENT = "OpenCrossDeviceLoginDisplayCodeModal";
+export const CODE_MODAL_CLOSE_EVENT = "CloseCrossDeviceLoginDisplayCodeModal";
+
+/** Opens the code modal with a new code, resolving whether it opened. */
+export const openModal = async () => {
+  const data = (await createNewCode())?.data;
+  if (!isCreatedCode(data)) {
+    return false;
+  }
+  window.dispatchEvent(
+    new CustomEvent(CODE_MODAL_OPEN_EVENT, {
+      detail: {
+        code: data.code,
+        privateKey: data.privateKey,
+        imagePath: data.imagePath,
+      },
+    }),
+  );
+  return true;
 };
 
 export const getExperimentEnrollments = () => {

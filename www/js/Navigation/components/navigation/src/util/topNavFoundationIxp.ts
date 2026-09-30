@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import ExperimentationService from "@rbx/experimentation";
 
-const LAYER_NAME = "Website.Navigation";
+const LAYER_NAME = "Website.TopNavigation";
 const META_NAME = "top-nav-migration-data";
 
 const dataset = (): DOMStringMap | undefined =>
@@ -17,8 +17,8 @@ export const useIsTopNavFoundation = (): boolean =>
 
 const isEnrolled = (): boolean => dataset()?.foundationExperimentEnabled === "True";
 
-// logLayerExposure is layer-scoped, and Website.Navigation carries three other params, so this is
-// gated on the server's per-experiment enrollment hint.
+// logLayerExposure is layer-scoped, so this is gated on the server's per-experiment enrollment hint
+// rather than on the parameter being present.
 export const logTopNavFoundationExposureIfEnrolled = (): void => {
   if (!isEnrolled()) {
     return;

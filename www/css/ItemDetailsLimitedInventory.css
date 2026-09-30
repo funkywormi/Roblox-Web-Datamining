@@ -1,9 +1,9 @@
 .light-theme .plus-icon {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE2IDMyYTIuNDI0IDIuNDI0IDAgMDEtMi40MjQtMi40MjRWMTguMTk1SDIuMTk1YTIuMTk1IDIuMTk1IDAgMDEwLTQuMzloMTEuMzhWMi40MjVhMi40MjQgMi40MjQgMCAxMTQuODUgMHYxMS4zOGgxMS4zOGEyLjE5NSAyLjE5NSAwIDExMCA0LjM5aC0xMS4zOHYxMS4zOEEyLjQyNCAyLjQyNCAwIDAxMTYgMzJ6IiBmaWxsPSIjMDAwIiBmaWxsLW9wYWNpdHk9Ii4zIi8+PC9zdmc+)
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBmaWxsPSIjMDAwIiBmaWxsLW9wYWNpdHk9Ii4zIiBkPSJNMTYgMzJhMi40MjQgMi40MjQgMCAwIDEtMi40MjQtMi40MjRWMTguMTk1SDIuMTk1YTIuMTk1IDIuMTk1IDAgMCAxIDAtNC4zOWgxMS4zOFYyLjQyNWEyLjQyNCAyLjQyNCAwIDEgMSA0Ljg1IDB2MTEuMzhoMTEuMzhhMi4xOTUgMi4xOTUgMCAxIDEgMCA0LjM5aC0xMS4zOHYxMS4zOEEyLjQyNCAyLjQyNCAwIDAgMSAxNiAzMiIvPjwvc3ZnPg==)
 }
 
 .dark-theme .plus-icon {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE2IDMyYTIuNDI0IDIuNDI0IDAgMDEtMi40MjQtMi40MjRWMTguMTk1SDIuMTk1YTIuMTk1IDIuMTk1IDAgMDEwLTQuMzloMTEuMzhWMi40MjVhMi40MjQgMi40MjQgMCAxMTQuODUgMHYxMS4zOGgxMS4zOGEyLjE5NSAyLjE5NSAwIDExMCA0LjM5aC0xMS4zOHYxMS4zOEEyLjQyNCAyLjQyNCAwIDAxMTYgMzJ6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4zIi8+PC9zdmc+)
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4zIiBkPSJNMTYgMzJhMi40MjQgMi40MjQgMCAwIDEtMi40MjQtMi40MjRWMTguMTk1SDIuMTk1YTIuMTk1IDIuMTk1IDAgMCAxIDAtNC4zOWgxMS4zOFYyLjQyNWEyLjQyNCAyLjQyNCAwIDEgMSA0Ljg1IDB2MTEuMzhoMTEuMzhhMi4xOTUgMi4xOTUgMCAxIDEgMCA0LjM5aC0xMS4zOHYxMS4zOEEyLjQyNCAyLjQyNCAwIDAgMSAxNiAzMiIvPjwvc3ZnPg==)
 }
 
 .modal-dialog {
@@ -18,18 +18,23 @@
     margin-right: 6px
 }
 
-.place-on-sale-modal-body .on-sale-tag {
-    border-radius: 14px;
-    font-size: 10px;
-    font-weight: 500;
-    padding: 6px;
-    min-width: 18px
-}
-
-.dark-theme .place-on-sale-modal-body .on-sale-tag,
-.light-theme .place-on-sale-modal-body .on-sale-tag {
+.light-theme .place-on-sale-modal-body .on-sale-tag,
+.dark-theme .place-on-sale-modal-body .on-sale-tag {
     color: var(--color-content-default);
     background-color: var(--color-stroke-default)
+}
+
+.place-on-sale-modal-body .on-sale-tag {
+    border-radius: 14px;
+    min-width: 18px;
+    padding: 6px;
+    font-size: 10px;
+    font-weight: 500
+}
+
+.light-theme .place-on-sale-modal-body .below-average-price-warning,
+.dark-theme .place-on-sale-modal-body .below-average-price-warning {
+    color: var(--color-system-alert)
 }
 
 .holding-tooltip-body {
@@ -56,20 +61,20 @@
     margin-bottom: 20px
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
     .item-details-limited-inventory {
         padding: 12px
     }
 }
 
 .item-details-limited-inventory .item-details-limited-inventory-empty-text {
-    display: block;
-    padding-top: 16px
+    padding-top: 16px;
+    display: block
 }
 
 .item-details-limited-inventory .premium-only-tooltip {
-    height: 0;
-    float: right
+    float: right;
+    height: 0
 }
 
 .item-details-limited-inventory .premium-only-tooltip span {
@@ -86,7 +91,6 @@
     margin: 0;
     position: absolute;
     top: 50%;
-    -ms-transform: translateY(-50%);
     transform: translateY(-50%)
 }
 
@@ -99,9 +103,9 @@
 }
 
 .item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag-divider-container {
-    display: inline-block;
     margin-left: 10px;
-    margin-right: 10px
+    margin-right: 10px;
+    display: inline-block
 }
 
 .item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag-divider-container .on-sale-tag-divider {
@@ -109,27 +113,28 @@
     height: 10px
 }
 
-.dark-theme .item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag-divider-container .on-sale-tag-divider,
-.light-theme .item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag-divider-container .on-sale-tag-divider {
+.light-theme .item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag-divider-container .on-sale-tag-divider,
+.dark-theme .item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag-divider-container .on-sale-tag-divider {
     background-color: var(--color-content-default)
 }
 
-.item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag {
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 500;
-    padding: 1px 6px;
-    min-width: 18px
-}
-
-.dark-theme .item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag,
-.light-theme .item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag {
+.light-theme .item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag,
+.dark-theme .item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag {
     color: var(--color-content-default);
     background-color: var(--color-stroke-default)
 }
 
+.item-details-limited-inventory .item-details-limited-inventory-row .item-info .on-sale-tag {
+    border-radius: 8px;
+    min-width: 18px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 500
+}
+
 .item-details-limited-inventory .item-details-limited-inventory-row .sale-status {
     float: right;
+    display: -ms-flexbox;
     display: flex
 }
 
@@ -143,32 +148,28 @@
 }
 
 .item-details-limited-inventory .item-details-limited-inventory-row .sale-status .resale-button .btn-buy-md {
-    margin-top: 12px;
-    height: 48px
-}
-
-.item-details-limited-inventory .item-details-limited-inventory-row .dividing-line {
-    position: absolute;
-    width: 100%
+    height: 48px;
+    margin-top: 12px
 }
 
 .light-theme .item-details-limited-inventory .item-details-limited-inventory-row .dividing-line {
-    border-top: 1px solid rgba(0, 0, 0, .5)
+    border-top: 1px solid var(--color-extended-black-50)
 }
 
 .dark-theme .item-details-limited-inventory .item-details-limited-inventory-row .dividing-line {
-    border-top: 1px solid hsla(0, 0%, 100%, .7)
+    border-top: 1px solid var(--color-extended-white-70)
+}
+
+.item-details-limited-inventory .item-details-limited-inventory-row .dividing-line {
+    width: 100%;
+    position: absolute
 }
 
 .item-details-limited-inventory .see-more-resellers {
     width: 100%
 }
 
-.complimentary-items-recommendations-container {
-    padding: 12px
-}
-
-@media(min-width:767px) {
+@media (min-width:767px) {
     .complimentary-items-recommendations-container .item-card .item-card {
         width: 100%
     }
@@ -179,52 +180,65 @@
     margin-right: 4px
 }
 
-@media(min-width:991px) {
+@media (min-width:991px) {
     .complimentary-items-recommendations-container .item-card .item-card-container {
         width: 100%;
         margin: 0 auto
     }
 }
 
-@media(min-width:767px) {
+@media (min-width:767px) {
     .complimentary-items-recommendations-container .item-card .item-card-thumb-container {
         float: none;
+        width: 100%;
         height: 0;
-        padding-bottom: 100%;
         padding-top: 0;
-        width: 100%
+        padding-bottom: 100%
     }
 
     .complimentary-items-recommendations-container .item-card .item-card-thumb-container .icon-placeholder-asset {
-        background-size: 100% auto;
+        background-position: 0 -126px;
+        background-size: 100%;
         width: 126px;
-        height: 126px;
-        background-position: 0 -126px
+        height: 126px
     }
 }
 
+.complimentary-items-recommendations-container {
+    padding: 12px
+}
+
 .complimentary-items-recommendations-container .complimentary-items-carousel-title {
-    align-items: center;
-    display: flex;
+    -ms-flex-pack: justify;
     justify-content: space-between;
-    margin-bottom: 12px
+    -ms-flex-align: center;
+    align-items: center;
+    margin-bottom: 12px;
+    display: -ms-flexbox;
+    display: flex
 }
 
 .complimentary-items-recommendations-container .complimentary-items-carousel {
-    display: flex;
+    -ms-flex-direction: row;
     flex-direction: row;
+    display: -ms-flexbox;
+    display: flex;
     overflow-x: auto;
     overflow-y: hidden
 }
 
 .complimentary-items-recommendations-container .complimentary-items-carousel .grid-item-container {
-    align-items: center;
-    display: flex;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -ms-flex: none;
+    flex: none;
+    -ms-flex-align: center;
+    align-items: center;
+    width: 135px;
     height: auto;
-    flex: 0 0 auto;
     margin: 0 6px 0 0;
-    width: 135px
+    display: -ms-flexbox;
+    display: flex
 }
 
 .complimentary-items-recommendations-container .complimentary-items-carousel .restriction-icon {
@@ -233,7 +247,7 @@
     left: -2px
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
 
     .complimentary-items-recommendations-container .complimentary-items-carousel>.grid-item-container,
     .complimentary-items-recommendations-container .complimentary-items-carousel>.grid-item-container .item-card-link {
@@ -241,7 +255,7 @@
     }
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
 
     .complimentary-items-recommendations-container .complimentary-items-carousel>.grid-item-container,
     .complimentary-items-recommendations-container .complimentary-items-carousel>.grid-item-container .item-card-link {
@@ -250,6 +264,7 @@
 }
 
 .complimentary-items-recommendations-container .item-card-loading {
+    -ms-flex-align: start;
     align-items: flex-start
 }
 
@@ -258,7 +273,7 @@
 }
 
 .complimentary-items-recommendations-container .item-card-loading .item-card-thumb-container:before {
-    background: none
+    background: 0 0
 }
 
 .complimentary-items-recommendations-container .item-card-loading .item-card-thumb-container {
@@ -266,13 +281,13 @@
 }
 
 .complimentary-items-recommendations-container .item-card-loading .item-card-name.shimmer {
+    width: 100%;
     height: 22px;
-    margin: 0 0 5px;
-    width: 100%
+    margin: 0 0 5px
 }
 
-.dark-theme .complimentary-items-recommendations-container .item-card-loading .item-card-name.shimmer,
-.light-theme .complimentary-items-recommendations-container .item-card-loading .item-card-name.shimmer {
+.light-theme .complimentary-items-recommendations-container .item-card-loading .item-card-name.shimmer,
+.dark-theme .complimentary-items-recommendations-container .item-card-loading .item-card-name.shimmer {
     background-color: var(--color-common-shimmer)
 }
 
@@ -281,17 +296,18 @@
 }
 
 .complimentary-items-recommendations-container .plus-icon-container .plus-icon {
+    vertical-align: middle;
     background-repeat: no-repeat;
     background-size: contain;
+    -ms-flex: none;
+    flex: none;
     width: 32px;
     height: 32px;
-    display: inline-block;
-    vertical-align: middle;
     margin-top: 50px;
     margin-left: 24px;
-    flex: 0 0 auto;
     padding-left: 20px;
-    padding-right: 40px
+    padding-right: 40px;
+    display: inline-block
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card {
@@ -299,19 +315,19 @@
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card .purchase-checkbox-container {
-    position: absolute;
-    margin-left: 100px;
-    margin-top: 12px;
     z-index: 1;
+    border-radius: 6px;
     width: 20px;
     height: 20px;
-    border-radius: 6px
+    margin-top: 12px;
+    margin-left: 100px;
+    position: absolute
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card .purchase-checkbox-container input[type=checkbox] {
+    border-radius: 6px;
     width: 20px;
-    height: 20px;
-    border-radius: 6px
+    height: 20px
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card .item-card .item-card-container .thumbnail-2d-container {
@@ -319,26 +335,27 @@
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card .item-owned-icon {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE3IDlBOCA4IDAgMTExIDlhOCA4IDAgMDExNiAweiIgZmlsbD0iIzAwQjQ2RCIvPjxwYXRoIGQ9Ik02IDEwbDIgMk04IDEybDUtNSIgc3Ryb2tlPSIjMjMyNTI3IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+);
+    vertical-align: middle;
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgZmlsbD0ibm9uZSIgdmlld0JveD0iMCAwIDE4IDE4Ij48cGF0aCBmaWxsPSIjMDBiNDZkIiBkPSJNMTcgOUE4IDggMCAxIDEgMSA5YTggOCAwIDAgMSAxNiAwIi8+PHBhdGggc3Ryb2tlPSIjMjMyNTI3IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iMS41IiBkPSJtNiAxMCAyIDJNOCAxMmw1LTUiLz48L3N2Zz4=);
     background-repeat: no-repeat;
     background-size: contain;
+    -ms-flex: none;
+    flex: none;
     width: 18px;
     height: 18px;
-    display: inline-block;
-    vertical-align: middle;
-    flex: 0 0 auto
+    display: inline-block
 }
 
 .complimentary-items-recommendations-container .complimentary-item-recommendations-item-card .item-owned-text {
-    font-size: 12px;
     margin-left: 6px;
+    font-size: 12px;
     font-weight: 500
 }
 
 .complimentary-items-recommendations-container .purchase-container {
+    height: 50px;
     margin-top: 10px;
-    position: relative;
-    height: 50px
+    position: relative
 }
 
 .complimentary-items-recommendations-container .purchase-container .purchase-element {
@@ -350,8 +367,8 @@
 }
 
 .complimentary-items-recommendations-container .purchase-container .purchase-element .batch-buy-purchase-button {
-    height: 40px;
-    width: 130px
+    width: 130px;
+    height: 40px
 }
 
 .complimentary-items-recommendations-container .purchase-container .purchase-element .action-button {
@@ -359,8 +376,8 @@
 }
 
 .complimentary-items-recommendations-container .purchase-container .price-total {
-    margin-left: 10px;
-    margin-top: 10px
+    margin-top: 10px;
+    margin-left: 10px
 }
 
 .complimentary-items-recommendations-container .purchase-container .price-total .total-price-label {
@@ -368,11 +385,13 @@
 }
 
 .complimentary-items-recommendations-container .purchase-container-right {
-    margin-top: 10px;
-    position: relative;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
     height: 50px;
+    margin-top: 10px;
+    display: -ms-flexbox;
     display: flex;
-    justify-content: flex-end
+    position: relative
 }
 
 .complimentary-items-recommendations-container .purchase-container-right .purchase-element {
@@ -384,8 +403,8 @@
 }
 
 .complimentary-items-recommendations-container .purchase-container-right .purchase-element .batch-buy-purchase-button {
-    height: 40px;
-    width: 130px
+    width: 130px;
+    height: 40px
 }
 
 .complimentary-items-recommendations-container .purchase-container-right .purchase-element .action-button {
@@ -393,8 +412,8 @@
 }
 
 .complimentary-items-recommendations-container .purchase-container-right .price-total {
-    margin-right: 10px;
-    margin-top: 10px
+    margin-top: 10px;
+    margin-right: 10px
 }
 
 .complimentary-items-recommendations-container .purchase-container-right .price-total .total-price-label {

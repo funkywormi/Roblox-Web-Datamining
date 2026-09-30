@@ -1,5 +1,5 @@
 import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 
 export const fireTelemetryCounter = createFireTelemetryCounter("Download");
 
