@@ -1,8 +1,7 @@
 // TODO: old, migrated code
 /* eslint-disable no-invalid-this */
 import options from "../constants/options";
-
-const Hybrid = window.Roblox?.Hybrid;
+import { getRealtimeGlobals } from "../lib/realtimeConfig";
 
 /**
  * Hybrid source for mobile web views with native bridge.
@@ -12,6 +11,8 @@ const Hybrid = window.Roblox?.Hybrid;
  * @param {Function} logger - Logging function
  */
 const hybridSource = function (_settings, logger) {
+  // Resolved at instantiation (not import) so Init(config) applies; absent on Next → source no-ops.
+  const { Hybrid } = getRealtimeGlobals();
   let onSourceExpiredHandler;
   let onNotificationHandler;
   let onConnectionEventHandler;

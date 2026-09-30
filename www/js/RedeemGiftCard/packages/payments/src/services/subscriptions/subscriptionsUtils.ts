@@ -35,6 +35,26 @@ const RENEWAL_PERIOD_TRANSLATION_KEY_MAP: Record<string, string> = {
   [PeriodType.Year]: "Label.DurationTitleYearly",
 };
 
+type SubscriptionPeriodType = "Week" | "Month" | "Year";
+
+const SUBSCRIPTION_PERIOD_TRANSLATION_KEY_MAP: Record<
+  SubscriptionPeriodType,
+  { singular: string; plural: string }
+> = {
+  [PeriodType.Week]: {
+    singular: "Label.SubscriptionPeriodWeek",
+    plural: "Label.SubscriptionPeriodWeeks",
+  },
+  [PeriodType.Month]: {
+    singular: "Label.SubscriptionPeriodMonth",
+    plural: "Label.SubscriptionPeriodMonths",
+  },
+  [PeriodType.Year]: {
+    singular: "Label.SubscriptionPeriodYear",
+    plural: "Label.SubscriptionPeriodYears",
+  },
+};
+
 const PAYMENT_METHOD_MAP: Record<string, PaymentMethod> = {
   [PaymentMethod.CreditAndDebitCard.toLowerCase()]: PaymentMethod.CreditAndDebitCard,
   [PaymentMethod.Paypal.toLowerCase()]: PaymentMethod.Paypal,
@@ -115,6 +135,16 @@ export function getRenewalPeriodType(periodType: PeriodType): string | undefined
  */
 export function getRenewalPeriodTranslationKey(periodType: PeriodType): string {
   return RENEWAL_PERIOD_TRANSLATION_KEY_MAP[periodType] ?? "";
+}
+
+export function getSubscriptionPeriodTranslationKey(
+  periodType: string,
+  periodCount: number,
+): string {
+  const keys =
+    SUBSCRIPTION_PERIOD_TRANSLATION_KEY_MAP[periodType as SubscriptionPeriodType] ??
+    SUBSCRIPTION_PERIOD_TRANSLATION_KEY_MAP.Month;
+  return periodCount === 1 ? keys.singular : keys.plural;
 }
 
 /**

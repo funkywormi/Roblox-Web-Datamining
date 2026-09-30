@@ -1,6 +1,6 @@
 import { httpService } from "@rbx/core-scripts/legacy/core-utilities";
 import type { AxiosError, UrlConfig } from "@rbx/core-scripts/http";
-import type { FireTelemetryCounterFn } from "@rbx/web-telemetry/fire";
+import type { FireTelemetryCounterFn } from "@rbx/web-telemetry/v2/fire";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isAxiosError(error: any): error is AxiosError {

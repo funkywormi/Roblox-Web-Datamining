@@ -79,6 +79,8 @@ export default {
     requestPending: "Description.ContentMaturityRequestPending",
     description: "Description.ContentMaturity",
     parentSideDescription: "Description.ParentSide.ContentMaturity",
+    privatePlaytestDisclaimer: "Disclaimer.PrivatePlaytestOnContentMaturitySetting",
+    parentSidePrivatePlaytestDisclaimer: "Disclaimer.PrivatePlaytestOnContentMaturityConsent",
     contentMaturityAgeRating: "Description.ContentMaturityAgeRating",
     contentRestricted: "Heading.ContentRestricted",
     contentAgeLimitV2: "Description.RestrictedContentAgeLimitV2",

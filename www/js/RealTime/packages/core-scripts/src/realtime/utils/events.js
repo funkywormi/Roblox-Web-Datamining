@@ -1,6 +1,7 @@
-const { EventStream } = window.Roblox ?? {};
+import { getRealtimeGlobals } from "../lib/realtimeConfig";
 
 export const maybeSendEventToDataLake = (namespaceId, details, payloadSize) => {
+  const { EventStream } = getRealtimeGlobals();
   if (!EventStream) {
     return;
   }
@@ -36,6 +37,7 @@ export const sendConnectionEventToDataLake = (
   connectionId,
   subscriptionStatus,
 ) => {
+  const { EventStream } = getRealtimeGlobals();
   if (!EventStream) {
     return;
   }

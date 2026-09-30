@@ -4,6 +4,7 @@
  */
 
 import { AgreementConsentsNode } from "./components/nodes/AgreementConsentsNode";
+import { DeeplinkRedirectNode } from "./components/nodes/DeeplinkRedirectNode";
 import { CreateOdpSessionNode } from "./components/nodes/CreateOdpSessionNode";
 import { OdpAgeEstimationNode } from "./components/nodes/OdpAgeEstimationNode";
 import { OdpGovernmentIdNode } from "./components/nodes/OdpGovernmentIdNode";
@@ -21,6 +22,7 @@ import type { NodeComponent, Registry } from "./types";
 export const defaultRegistry: Registry = {
   AgreementConsents: AgreementConsentsNode,
   CreateOdpSession: CreateOdpSessionNode,
+  DeeplinkRedirect: DeeplinkRedirectNode,
   OdpAgeEstimation: OdpAgeEstimationNode,
   OdpGovernmentId: OdpGovernmentIdNode,
   OdpHandoff: OdpHandoffNode,

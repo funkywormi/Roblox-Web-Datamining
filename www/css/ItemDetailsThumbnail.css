@@ -1,48 +1,44 @@
 .item-details-thumbnail-container {
+    float: left;
     width: 420px;
     height: 420px;
-    float: left;
     position: relative
 }
 
-@media(min-width:768px)and (max-width:970px) {
+@media (min-width:768px) and (max-width:970px) {
     .item-details-thumbnail-container {
         width: 300px;
         height: 300px
     }
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
     .item-details-thumbnail-container {
         float: none;
         margin: 0 auto
     }
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .item-details-thumbnail-container {
         width: 200px;
         height: 200px
     }
 }
 
-.item-details-thumbnail-container .thumbnail-loading {
-    width: 100%;
-    height: 100%
-}
-
-.dark-theme .item-details-thumbnail-container .thumbnail-loading,
-.light-theme .item-details-thumbnail-container .thumbnail-loading {
+.light-theme .item-details-thumbnail-container .thumbnail-loading,
+.dark-theme .item-details-thumbnail-container .thumbnail-loading {
     background-color: var(--color-common-shimmer)
 }
 
+.item-details-thumbnail-container .thumbnail-loading,
 .item-details-thumbnail-container .thumbnail-holder {
     width: 100%;
     height: 100%
 }
 
-.dark-theme .item-details-thumbnail-container .thumbnail-holder,
-.light-theme .item-details-thumbnail-container .thumbnail-holder {
+.light-theme .item-details-thumbnail-container .thumbnail-holder,
+.dark-theme .item-details-thumbnail-container .thumbnail-holder {
     background-color: var(--color-shift-200)
 }
 
@@ -55,14 +51,14 @@
     height: 420px
 }
 
-@media(min-width:768px)and (max-width:970px) {
+@media (min-width:768px) and (max-width:970px) {
     .item-details-thumbnail-container .thumbnail-placeholder {
         width: 300px;
         height: 300px
     }
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .item-details-thumbnail-container .thumbnail-placeholder {
         width: 200px;
         height: 200px
@@ -70,34 +66,38 @@
 }
 
 .item-details-thumbnail-container .thumbnail-ui-container .inner-thumbnail-ui-container {
-    position: absolute;
-    left: 0;
-    display: flex;
+    -ms-flex-pack: justify;
     justify-content: space-between;
     width: 420px;
-    height: auto
+    height: auto;
+    display: -ms-flexbox;
+    display: flex;
+    position: absolute;
+    left: 0
 }
 
-@media(max-width:970px)and (min-width:768px) {
+@media (max-width:970px) and (min-width:768px) {
     .item-details-thumbnail-container .thumbnail-ui-container .inner-thumbnail-ui-container {
         width: 300px
     }
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .item-details-thumbnail-container .thumbnail-ui-container .inner-thumbnail-ui-container {
         width: 200px
     }
 }
 
 .item-details-thumbnail-container .thumbnail-ui-container .top-align-container {
-    top: 0;
-    align-items: flex-start
+    -ms-flex-align: start;
+    align-items: flex-start;
+    top: 0
 }
 
 .item-details-thumbnail-container .thumbnail-ui-container .bottom-align-container {
-    bottom: 0;
-    align-items: flex-end
+    -ms-flex-align: end;
+    align-items: flex-end;
+    bottom: 0
 }
 
 .item-details-thumbnail-container .thumbnail-ui-container .left-align-container .restriction-icon {
@@ -105,22 +105,24 @@
 }
 
 .item-details-thumbnail-container .thumbnail-ui-container .left-align-container .bundle-animation-btn-container {
-    position: relative;
-    margin-left: 4px;
     margin-bottom: 0;
+    margin-left: 4px;
+    position: relative;
     top: 0
 }
 
 .item-details-thumbnail-container .thumbnail-ui-container .right-align-container .thumbnail-button-container {
-    display: flex;
+    -ms-flex-wrap: wrap;
     flex-wrap: wrap;
+    -ms-flex-pack: end;
     justify-content: flex-end;
-    row-gap: 5px;
-    column-gap: 10px;
-    padding: 0 10px 10px 0
+    gap: 5px 10px;
+    padding: 0 10px 10px 0;
+    display: -ms-flexbox;
+    display: flex
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .item-details-thumbnail-container .thumbnail-ui-container .right-align-container .thumbnail-button-container {
         padding: 0 5px 5px 0
     }
@@ -131,19 +133,21 @@
 }
 
 .item-details-thumbnail-container .thumbnail-ui-container .asset-status-icon {
-    display: flex;
+    -ms-flex-wrap: wrap;
     flex-wrap: wrap;
+    -ms-flex-pack: end;
     justify-content: flex-end;
-    row-gap: 5px;
-    column-gap: 10px;
-    padding: 10px 10px 0 0
+    gap: 5px 10px;
+    padding: 10px 10px 0 0;
+    display: -ms-flexbox;
+    display: flex
 }
 
 .item-details-thumbnail-container .thumbnail-ui-container .asset-status-icon .asset-status-text {
     font-size: 16px
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .item-details-thumbnail-container .thumbnail-ui-container .asset-status-icon {
         padding: 5px 5px 0 0
     }
@@ -154,53 +158,53 @@
 }
 
 .item-details-thumbnail-container .thumbnail-ui-container .icon-default-dynamichead {
-    margin-left: 10px;
-    margin-bottom: 10px;
     width: 28px;
-    height: 28px
+    height: 28px;
+    margin-bottom: 10px;
+    margin-left: 10px
 }
 
 .form-inline {
     position: static
 }
 
-.icon-animation-climb,
-.icon-animation-fall,
-.icon-animation-idle,
-.icon-animation-jump,
+.icon-default-animation,
 .icon-animation-run,
-.icon-animation-swim,
 .icon-animation-walk,
-.icon-default-animation {
-    background-image: url(https://images.rbxcdn.com/75dc7020bfa2beafdf8731bcc21af271-icon_animation.svg);
+.icon-animation-fall,
+.icon-animation-jump,
+.icon-animation-swim,
+.icon-animation-climb,
+.icon-animation-idle {
+    vertical-align: middle;
+    background-image: url(https://images.rbxcdn.com/9fa217abcb507eac.svg);
     background-repeat: no-repeat;
-    background-size: auto auto;
+    background-size: auto;
     width: 28px;
     height: 28px;
-    display: inline-block;
-    vertical-align: middle
+    display: inline-block
 }
 
-.dark-theme .icon-animation-climb,
-.dark-theme .icon-animation-fall,
-.dark-theme .icon-animation-idle,
-.dark-theme .icon-animation-jump,
+.dark-theme .icon-default-animation,
 .dark-theme .icon-animation-run,
-.dark-theme .icon-animation-swim,
 .dark-theme .icon-animation-walk,
-.dark-theme .icon-default-animation {
-    background-image: url(https://images.rbxcdn.com/712974c1476f791b1ce9e8842d629e05-animation_dark_09282018.svg)
+.dark-theme .icon-animation-fall,
+.dark-theme .icon-animation-jump,
+.dark-theme .icon-animation-swim,
+.dark-theme .icon-animation-climb,
+.dark-theme .icon-animation-idle {
+    background-image: url(https://images.rbxcdn.com/d55a8e47f89fbf68.svg)
 }
 
-.light-theme .icon-animation-climb,
-.light-theme .icon-animation-fall,
-.light-theme .icon-animation-idle,
-.light-theme .icon-animation-jump,
+.light-theme .icon-default-animation,
 .light-theme .icon-animation-run,
-.light-theme .icon-animation-swim,
 .light-theme .icon-animation-walk,
-.light-theme .icon-default-animation {
-    background-image: url(https://images.rbxcdn.com/bc4d8f217bcf9d3fc13cbdbab4c913c3-animation_light_05162019.svg)
+.light-theme .icon-animation-fall,
+.light-theme .icon-animation-jump,
+.light-theme .icon-animation-swim,
+.light-theme .icon-animation-climb,
+.light-theme .icon-animation-idle {
+    background-image: url(https://images.rbxcdn.com/d54a1343154a8d07.svg)
 }
 
 .icon-animation-run {
@@ -232,26 +236,26 @@
 }
 
 .thumbnail-holder {
-    position: relative;
+    width: 420px;
     height: 420px;
-    width: 420px
+    position: relative
 }
 
-@media(max-width:970px) {
+@media (max-width:970px) {
     .thumbnail-holder {
-        height: 300px;
-        width: 300px
+        width: 300px;
+        height: 300px
     }
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
     .thumbnail-holder {
         width: 420px;
         height: 420px
     }
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .thumbnail-holder {
         width: 200px;
         height: 200px
@@ -259,10 +263,10 @@
 }
 
 .thumbnail-holder .thumbnail-span {
-    display: inline-block;
+    text-align: center;
     width: 100%;
     height: 100%;
-    text-align: center
+    display: inline-block
 }
 
 .thumbnail-holder .thumbnail-span>img {
@@ -271,56 +275,56 @@
 }
 
 .thumbnail-holder.thumbnail-Small .thumbnail-span>img {
-    height: 150px;
     width: 150px;
+    height: 150px;
     margin-top: 104px
 }
 
-@media(max-width:970px) {
+@media (max-width:970px) {
     .thumbnail-holder.thumbnail-Small .thumbnail-span>img {
         margin-top: 44px
     }
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
     .thumbnail-holder.thumbnail-Small .thumbnail-span>img {
         margin-top: 135px
     }
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .thumbnail-holder.thumbnail-Small .thumbnail-span>img {
         margin-top: 25px
     }
 }
 
 .thumbnail-holder.thumbnail-Medium .thumbnail-span>img {
-    height: 256px;
     width: 256px;
+    height: 256px;
     margin-top: 82px
 }
 
-@media(max-width:970px) {
+@media (max-width:970px) {
     .thumbnail-holder.thumbnail-Medium .thumbnail-span>img {
         margin-top: 22px
     }
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
     .thumbnail-holder.thumbnail-Medium .thumbnail-span>img {
         margin-top: 82px
     }
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .thumbnail-holder.thumbnail-Medium .thumbnail-span>img {
-        margin-top: 0;
+        width: 200px;
         height: 200px;
-        width: 200px
+        margin-top: 0
     }
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
     .thumbnail-holder.has-related-info {
         margin-bottom: 50px
     }
@@ -333,36 +337,36 @@
 }
 
 .thumbnail-holder .enable-three-dee {
+    border: 1px solid;
+    border-radius: 3px;
+    min-width: 28px;
+    min-height: 28px;
+    margin: 12px 12px 12px 5px;
     padding: 9px;
     font-size: 18px;
     line-height: 100%;
-    border-radius: 3px;
-    border: 1px solid;
     bottom: 0;
-    right: 0;
-    min-width: 28px;
-    min-height: 28px;
-    margin: 12px 12px 12px 5px
+    right: 0
 }
 
 .thumbnail-holder .try-it-on {
+    border: 1px solid #b8b8b8;
+    border-radius: 3px;
+    margin: 10px 5px 10px 10px;
     padding: 9px;
     font-size: 18px;
-    line-height: 100%;
-    border-radius: 3px;
-    border: 1px solid #b8b8b8;
-    margin: 10px 5px 10px 10px
+    line-height: 100%
 }
 
 .thumbnail-holder .three-dee-static {
-    margin: 10px;
-    height: 38px
+    height: 38px;
+    margin: 10px
 }
 
 .thumbnail-holder .three-dee-animated {
-    margin: 4px;
-    height: 28px;
     width: 48px;
+    height: 28px;
+    margin: 4px;
     padding: 0
 }
 
@@ -370,7 +374,7 @@
     padding: 7px
 }
 
-@media(max-width:970px) {
+@media (max-width:970px) {
     .thumbnail-holder .enable-three-dee.three-dee-animated-icon {
         padding: 4px
     }
@@ -383,10 +387,10 @@
 }
 
 .thumbnail-holder .asset-status-icon {
+    margin: 10px;
     position: absolute;
     top: 0;
-    right: 0;
-    margin: 10px
+    right: 0
 }
 
 .thumbnail-holder .related-game-container {
@@ -394,27 +398,25 @@
 }
 
 .thumbnail-holder .MediaPlayerIcon {
+    cursor: pointer;
+    margin: 6px;
     position: absolute;
     bottom: 0;
-    right: 0;
-    margin: 6px;
-    cursor: pointer
+    right: 0
 }
 
 .thumbnail-holder .icon-play {
-    background-position: 0 -528px
-}
-
-.thumbnail-holder .icon-pause,
-.thumbnail-holder .icon-play {
-    background-size: 100% auto;
-    background-size: 96px auto;
-    height: 48px;
-    width: 48px
+    background-position: 0 -528px;
+    background-size: 96px;
+    width: 48px;
+    height: 48px
 }
 
 .thumbnail-holder .icon-pause {
-    background-position: 0 -576px
+    background-position: 0 -576px;
+    background-size: 96px;
+    width: 48px;
+    height: 48px
 }
 
 .thumb-interactive-btn {
@@ -434,15 +436,15 @@
 }
 
 #current-animation-name {
-    margin: 0 12px 12px;
-    line-height: 1em;
     float: left;
+    margin: 0 12px 12px;
+    font-size: 18px;
+    line-height: 1em;
     position: absolute;
-    bottom: 50px;
-    font-size: 18px
+    bottom: 50px
 }
 
-@media(max-width:991px) {
+@media (max-width:991px) {
     #current-animation-name {
         bottom: 0
     }
@@ -450,33 +452,33 @@
 
 .bundle-animation-btn-container {
     float: left;
+    margin-left: 5px;
     position: absolute;
-    bottom: 36px;
-    margin-left: 5px
+    bottom: 36px
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
     .bundle-animation-btn-container {
         float: none;
-        position: relative;
-        bottom: 0;
+        max-width: 320px;
         margin: 0 auto;
-        max-width: 320px
+        position: relative;
+        bottom: 0
     }
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .bundle-animation-btn-container {
         max-width: 270px
     }
 }
 
-@media(min-width:767px)and (max-width:991px) {
+@media (min-width:767px) and (max-width:991px) {
     .bundle-animation-btn-container {
         float: none;
+        margin: 0 auto;
         position: relative;
-        bottom: 0;
-        margin: 0 auto
+        bottom: 0
     }
 }
 
@@ -484,34 +486,34 @@
     width: 38px;
     height: 38px;
     margin: 0 0 12px 7px;
-    transition: .05s linear .05s
+    transition: all 50ms linear 50ms
 }
 
 .bundle-animation-btn-container .bundle-animation-btn.selected .animation-icon {
     background-position-x: -28px
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .bundle-animation-btn-container .bundle-animation-btn {
-        margin-bottom: 0;
-        padding: 0;
+        width: 32px;
         height: 32px;
-        width: 32px
+        margin-bottom: 0;
+        padding: 0
     }
 }
 
 .bundle-animation-btn-container .animation-icon {
-    background-repeat: no-repeat;
-    background-size: 200% auto;
-    display: inline-block;
-    height: 28px;
-    width: 28px;
     vertical-align: middle;
+    background-repeat: no-repeat;
+    background-size: 200%;
+    width: 28px;
+    height: 28px;
+    margin-top: -2px;
     margin-left: -2px;
-    margin-top: -2px
+    display: inline-block
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .bundle-animation-btn-container .animation-icon {
         transform: scale(.8)
     }

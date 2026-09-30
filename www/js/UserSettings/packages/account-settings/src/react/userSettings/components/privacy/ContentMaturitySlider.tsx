@@ -538,6 +538,13 @@ export const ContentMaturitySlider = ({ childUserId }: { childUserId?: number })
               })}
             </div>
           )}
+          <div className="small text">
+            {translate(
+              childUserId
+                ? contentMaturity.parentSidePrivatePlaytestDisclaimer
+                : contentMaturity.privatePlaytestDisclaimer,
+            )}
+          </div>
         </React.Fragment>
       </SettingsSection>
       {idVerificationPromptModal}

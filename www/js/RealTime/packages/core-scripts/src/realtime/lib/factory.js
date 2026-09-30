@@ -1,8 +1,10 @@
+import { getRealtimeGlobals } from "./realtimeConfig";
+
 let settings = null;
 const getSettings = () => {
   if (settings === null) {
     settings = {};
-    const { RealTimeSettings, CurrentUser } = window.Roblox;
+    const { RealTimeSettings, CurrentUser } = getRealtimeGlobals();
     if (RealTimeSettings) {
       settings.notificationsUrl = RealTimeSettings.NotificationsEndpoint;
       settings.maxConnectionTimeInMs = parseInt(RealTimeSettings.MaxConnectionTime, 10); // six hours
@@ -61,7 +63,7 @@ const getMaximumConnectionTime = () => getSettings().maxConnectionTimeInMs;
 const isEventPublishingEnabled = () => getSettings().isEventPublishingEnabled;
 
 const isLocalStorageEnabled = () => {
-  const { LocalStorage } = window.Roblox;
+  const { LocalStorage } = getRealtimeGlobals();
   if (LocalStorage) {
     return LocalStorage.isAvailable() && getSettings().isLocalStorageEnabled;
   }

@@ -93,6 +93,13 @@ export function useWizardWalker(options: UseWizardWalkerOptions): WizardWalker {
   // Set synchronously when a Continue starts, before `isLoading` commits, to block a same-tick
   // double report (e.g. a rapid double-tap) from firing /continue twice.
   const continueInFlightRef = useRef(false);
+  const unmountedRef = useRef(false);
+  useEffect(() => {
+    unmountedRef.current = false;
+    return () => {
+      unmountedRef.current = true;
+    };
+  }, []);
 
   const currentNode: FlowNode | undefined = state.currentNodeId
     ? state.nodes[state.currentNodeId]
@@ -191,6 +198,7 @@ export function useWizardWalker(options: UseWizardWalkerOptions): WizardWalker {
 
         api
           .continue({
+            surface,
             flowId: current.flowId,
             state: current.flowState,
             // Sent alongside `state` until the backend that reads it is deployed.
@@ -202,10 +210,13 @@ export function useWizardWalker(options: UseWizardWalkerOptions): WizardWalker {
           })
           .then(response => {
             continueInFlightRef.current = false;
-            dispatch({ type: WalkerActionType.FragmentLoaded, response });
+            if (!unmountedRef.current) {
+              dispatch({ type: WalkerActionType.FragmentLoaded, response });
+            }
           })
           .catch((err: unknown) => {
             continueInFlightRef.current = false;
+            if (unmountedRef.current) return;
             sendEvent(WizardEventName.ContinueFailed, { ...base, errorMessage: String(err) });
             dispatch({ type: WalkerActionType.ContinueFailed, message: String(err) });
           });

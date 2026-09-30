@@ -10,5 +10,7 @@ import "./debugs/debugger";
 import "./debugs/startDebugger";
 import "./handlers/authenticationNotificationsHandler";
 import factory from "./lib/factory";
+import { initRealtimeConfig } from "./lib/realtimeConfig";
 
-export default { GetClient: getClient, ...factory };
+// Init(config) supplies the globals on a host without window.Roblox (Next.js), before first GetClient.
+export default { GetClient: getClient, Init: initRealtimeConfig, ...factory };

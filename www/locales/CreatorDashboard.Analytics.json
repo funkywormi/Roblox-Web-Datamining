@@ -1218,5 +1218,8 @@
     "Label.Dimension.PlacementType.OnDemandAd": "Custom Rewarded",
     "Label.Dimension.PlacementType.Unknown": "Unknown",
     "Label.Dimension.AcquisitionSource.Moments": "Moments",
-    "Description.Dimension.AcquisitionSource.Moments": "Includes joins from the Moments video feed"
+    "Description.Dimension.AcquisitionSource.Moments": "Includes joins from the Moments video feed",
+    "Label.Dimension.MetricResultType": "Result type",
+    "Label.Dimension.MetricResultType.CIUpper": "CI upper bound",
+    "Label.Dimension.MetricResultType.Mean": "Mean"
 }

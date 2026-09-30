@@ -27,7 +27,11 @@ import {
   getCreditBucket,
   redeemFunnelMetadata,
 } from "@rbx/payments/creditCheckout";
-import { preparePurchaseV2, getPrice } from "@rbx/payments/services/subscriptions";
+import {
+  preparePurchaseV2,
+  getPrice,
+  getSubscriptionPeriodTranslationKey,
+} from "@rbx/payments/services/subscriptions";
 import { usePaymentSession } from "@rbx/payments/services/paymentSession";
 import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
 import { PriceTag } from "@rbx/payments/priceTag";
@@ -225,10 +229,12 @@ const GetPlusModal = ({
   const toPlusPackage = (product: SubscriptionProductInfo): TPlusPackage => ({
     id: product.productKey.id,
     tier: getTier(product),
-    duration: translate("Label.SubscriptionDuration", {
-      periodType: product.periodType,
-      periodCount: product.periodCount,
-    }),
+    duration: translate(
+      getSubscriptionPeriodTranslationKey(product.periodType, product.periodCount),
+      {
+        periodCount: product.periodCount,
+      },
+    ),
     price: product.localizedPriceDisplayString ?? "",
     originalPrice: product.localizedStrikethroughPriceDisplayString ?? "",
     isDisabled: !canAfford(product, creditBalance),

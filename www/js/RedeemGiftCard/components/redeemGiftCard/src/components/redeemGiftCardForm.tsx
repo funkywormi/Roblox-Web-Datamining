@@ -165,11 +165,7 @@ function RedeemGiftCardForm({
     }
 
     const normalizedPin = normalizePin(pinValue).toLowerCase();
-    return (
-      normalizedPin.startsWith(promoCodeMarker) ||
-      normalizedPin.endsWith(promoCodeMarker) ||
-      legacyPromoCodes.includes(normalizedPin)
-    );
+    return normalizedPin.startsWith(promoCodeMarker) || legacyPromoCodes.includes(normalizedPin);
   };
 
   const handleSuccess = (data: RedeemReponse) => {

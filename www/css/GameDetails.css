@@ -358,11 +358,11 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .light-theme .game-card-container.grid-item-container .game-tile-hidden-placeholder {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .game-card-container.grid-item-container .game-tile-hidden-placeholder {
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .game-card-container.grid-item-container .game-tile-hidden-placeholder .game-tile-hidden-placeholder-contents {
@@ -2627,7 +2627,7 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-count-container .avatar-card-image,
 .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-count-container .avatar-count {
     object-fit: cover;
-    background-color: #353741;
+    background-color: var(--color-extended-gray-800);
     width: 20px;
     height: 20px;
     transition: border .2s cubic-bezier(0, 0, 0, 1)
@@ -2698,16 +2698,16 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 .hover-game-tile.interest-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-count-container .avatar-count,
 .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-headshot-xs .avatar-count,
 .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-count-container .avatar-count {
-    color: #fff;
     width: -webkit-fit-content;
     width: -moz-fit-content;
+    width: fit-content;
+    min-width: 20px;
+    color: var(--color-extended-white-100);
     border-radius: 24px;
     -ms-flex-pack: center;
     justify-content: center;
     -ms-flex-align: center;
     align-items: center;
-    width: fit-content;
-    min-width: 20px;
     padding: 0 4px;
     display: -ms-flexbox;
     display: flex
@@ -2756,7 +2756,7 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 .dark-theme .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card.avatar-card-online .avatar-headshot-xs .avatar-count,
 .dark-theme .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card.avatar-card-online .avatar-count-container .avatar-card-image,
 .dark-theme .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card.avatar-card-online .avatar-count-container .avatar-count {
-    box-shadow: 0 0 0 1px #39c582
+    box-shadow: 0 0 0 1px var(--color-extended-green-500)
 }
 
 .hover-game-tile.grid-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card:first-child,
@@ -3286,14 +3286,14 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 .light-theme .hover-game-tile.event-tile.image-overlay .play-button-container .play-button.notification-button,
 .light-theme .hover-game-tile.interest-tile.image-overlay .play-button-container .play-button.notification-button,
 .light-theme .hover-game-tile.experience-events-tile.image-overlay .play-button-container .play-button.notification-button {
-    background-color: #bcbec8
+    background-color: var(--color-extended-gray-500)
 }
 
 .dark-theme .hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.notification-button,
 .dark-theme .hover-game-tile.event-tile.image-overlay .play-button-container .play-button.notification-button,
 .dark-theme .hover-game-tile.interest-tile.image-overlay .play-button-container .play-button.notification-button,
 .dark-theme .hover-game-tile.experience-events-tile.image-overlay .play-button-container .play-button.notification-button {
-    background-color: #494d5a
+    background-color: var(--color-extended-gray-700)
 }
 
 .light-theme .hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.notification-button.notification-on,
@@ -3413,7 +3413,7 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 
 .game-sort-mural-loaded .container-header,
 .game-sort-mural-loaded .font-sort-subtitle {
-    color: #fff
+    color: var(--color-extended-white-100)
 }
 
 .hover-game-tile.interest-tile .featured-game-container .tile-interest-button {
@@ -3434,8 +3434,8 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .light-theme .hover-game-tile.interest-tile .featured-game-container .tile-interest-button {
+    background-color: var(--color-extended-black-10);
     color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1);
     border-color: transparent
 }
 
@@ -3444,8 +3444,8 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .dark-theme .hover-game-tile.interest-tile .featured-game-container .tile-interest-button {
+    background-color: var(--color-extended-white-10);
     color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1);
     border-color: transparent
 }
 
@@ -5083,9 +5083,11 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 .light-theme .shimmer,
 .light-theme .shimmer-lines .shimmer-line,
 .shimmer-lines .light-theme .shimmer-line {
+    background-image: -webkit-linear-gradient(left, transparent, var(--color-extended-black-30)50%, transparent);
+    background-image: -o-linear-gradient(left, transparent, var(--color-extended-black-30)50%, transparent);
+    background-image: linear-gradient(to right, transparent, var(--color-extended-black-30)50%, transparent);
     -webkit-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00000000", endColorstr="#00000000", GradientType=1);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00000000", endColorstr="#00000000", GradientType=1);
-    background-image: linear-gradient(90deg, transparent, rgba(0, 0, 0, .3) 50%, transparent);
     background-repeat: no-repeat;
     background-size: 100% 100%;
     animation: 1.7s linear infinite forwards placeholderShimmer
@@ -5094,9 +5096,11 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 .dark-theme .shimmer,
 .dark-theme .shimmer-lines .shimmer-line,
 .shimmer-lines .dark-theme .shimmer-line {
+    background-image: -webkit-linear-gradient(left, transparent, var(--color-extended-white-30)50%, transparent);
+    background-image: -o-linear-gradient(left, transparent, var(--color-extended-white-30)50%, transparent);
+    background-image: linear-gradient(to right, transparent, var(--color-extended-white-30)50%, transparent);
     -webkit-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00000000", endColorstr="#00000000", GradientType=1);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00000000", endColorstr="#00000000", GradientType=1);
-    background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, .3) 50%, transparent);
     background-repeat: no-repeat;
     background-size: 100% 100%;
     animation: 1.7s linear infinite forwards placeholderShimmer
@@ -5309,7 +5313,9 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 #game-details-play-button-container .btn-common-play-game-unplayable-lg,
 #game-details-play-button-container .game-details-download-button {
     min-height: 60px;
-    margin: 0 auto
+    margin: 0 auto;
+    padding-top: 0;
+    padding-bottom: 0
 }
 
 @media (max-width:991px) {
@@ -5359,7 +5365,9 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 #game-details-play-button-container .stacked-play-buttons-container .btn-control-lg {
     width: 100%;
     min-height: 60px;
-    margin: 0
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0
 }
 
 #game-details-play-button-container .stacked-play-buttons-container .demo-play-button {

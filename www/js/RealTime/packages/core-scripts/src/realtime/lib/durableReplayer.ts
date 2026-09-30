@@ -1,5 +1,5 @@
 import environmentUrls from "@rbx/environment-urls";
-import { get, post } from "../../http";
+import httpTransport from "./httpTransport";
 import { sendDurableReplayEvent } from "../utils/events";
 
 const REPLAY_CONFIG_URL = `${environmentUrls.apiGatewayUrl}/realtime-replay-api/v1/config`;
@@ -228,9 +228,12 @@ const createDurableReplayer = ({
         body.namespaceTargetSequenceNumbers = namespaceTargetSequenceNumbers;
       }
 
-      const response = await post<ReplayResponse>({ url: REPLAY_URL, withCredentials: true }, body);
+      const response = await httpTransport.post<ReplayResponse>(
+        { url: REPLAY_URL, withCredentials: true },
+        body,
+      );
 
-      const { replayed, gapNamespaces } = processReplayResponse(response.data);
+      const { replayed, gapNamespaces } = processReplayResponse(response);
       sendDurableReplayEvent("RequestSuccess");
 
       if (isPollingActive) {
@@ -353,11 +356,11 @@ const createDurableReplayer = ({
 
   const fetchConfig = async (): Promise<void> => {
     try {
-      const response = await get<ReplayConfigResponse>({
+      const response = await httpTransport.get<ReplayConfigResponse>({
         url: REPLAY_CONFIG_URL,
         withCredentials: true,
       });
-      const { namespaces } = response.data;
+      const { namespaces } = response;
       if (namespaces) {
         durableNamespaceConfig = namespaces;
         sendDurableReplayEvent("ConfigFetchSuccess");

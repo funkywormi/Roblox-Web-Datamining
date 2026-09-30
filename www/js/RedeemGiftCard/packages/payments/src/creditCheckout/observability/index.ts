@@ -2,7 +2,7 @@ import type { RegistryInput } from "@rbx/observability-framework/schema";
 import type { MakeObservabilityTypes } from "@rbx/observability-framework/types";
 import { createTrackers } from "@rbx/observability-framework/trackers";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
-import { createFireTelemetryHistogram } from "@rbx/web-telemetry/histogram";
+import { createFireTelemetryHistogram } from "@rbx/web-telemetry/v2/histogram";
 import { captureException } from "../../error";
 import { createWithApiMetrics, createWithApiMetricsV2 } from "../../withApiMetrics";
 

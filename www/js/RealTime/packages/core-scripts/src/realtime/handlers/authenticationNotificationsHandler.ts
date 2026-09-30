@@ -1,7 +1,7 @@
 import environmentUrls from "@rbx/environment-urls";
 import { pubSub as pubSubUntyped } from "@rbx/core-scripts/util/cross-tab-communication";
 import ready from "../../util/ready";
-import { get } from "../../http";
+import httpTransport, { getErrorStatus } from "../lib/httpTransport";
 import { getClient } from "../lib/client";
 
 interface RealtimeClient {
@@ -22,13 +22,8 @@ if (typeof document !== "undefined") {
     getRealtimeClient().Subscribe("AuthenticationNotifications", data => {
       if (data.Type === "SignOut") {
         const url = `${environmentUrls.usersApi}/v1/users/authenticated`;
-        get({ url, withCredentials: true }).catch((error: unknown) => {
-          if (
-            typeof error === "object" &&
-            error !== null &&
-            "status" in error &&
-            error.status === 401
-          ) {
+        httpTransport.get({ url, withCredentials: true }).catch((error: unknown) => {
+          if (getErrorStatus(error) === 401) {
             window.location.reload();
           }
         });

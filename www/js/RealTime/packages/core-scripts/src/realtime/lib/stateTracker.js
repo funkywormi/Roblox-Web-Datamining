@@ -1,6 +1,7 @@
 // TODO: old, migrated code
 /* eslint-disable no-invalid-this */
 import realtimeFactory from "./factory";
+import { getRealtimeGlobals } from "./realtimeConfig";
 
 const realtimeStateTracker = function (
   localStoragePersistenceEnabled,
@@ -76,7 +77,7 @@ const realtimeStateTracker = function (
 
   const pushToEventStream = (eventName, eventContext, properties) => {
     try {
-      const { EventStream } = window.Roblox;
+      const { EventStream } = getRealtimeGlobals();
       if (eventPublishingEnabled && EventStream) {
         if (typeof properties !== "object") {
           // TODO: old, migrated code

@@ -961,6 +961,10 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
     // Pass through roblox:// unchanged for protocol / in-app handling.
     // roblox://navigation/plus_upsell
     urlTarget = target.url;
+  } else if (navigateSubPath === PathPart.PlusReferralDashboard) {
+    // Pass through roblox:// unchanged for protocol / in-app handling.
+    // roblox://navigation/plus_referral_dashboard
+    urlTarget = target.url;
   }
 
   if (urlTarget) {

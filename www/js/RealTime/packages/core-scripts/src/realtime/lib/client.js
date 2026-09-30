@@ -9,6 +9,7 @@ import { realtimeEvents } from "../constants/events";
 import signalRSource from "../sources/signalRSource";
 import hybridSource from "../sources/hybridSource";
 import crossTabReplicatedSource from "../sources/crossTabReplicatedSource";
+import { getRealtimeGlobals } from "./realtimeConfig";
 
 const RealtimeClient = function (sourceConstructors) {
   let currentSource = null;
@@ -310,7 +311,7 @@ const RealtimeClient = function (sourceConstructors) {
           : isDataReloadRequired !== stateTracker.RefreshRequiredEnum.NOT_REQUIRED;
 
         connectionStatus.hasEverBeenConnected = true;
-        const { Performance } = window.Roblox;
+        const { Performance } = getRealtimeGlobals();
         if (Performance) {
           const performanceLabel = `signalR_${currentSource.Name}_connected`;
           Performance.logSinglePerformanceMark(performanceLabel);
@@ -471,7 +472,7 @@ const RealtimeClient = function (sourceConstructors) {
 
     refreshSource();
 
-    const { Performance } = window.Roblox;
+    const { Performance } = getRealtimeGlobals();
     if (Performance) {
       Performance.setPerformanceMark("signalR_initialized");
     }
@@ -594,7 +595,7 @@ let client = null;
 const initialiseSingletonClient = () => {
   const sources = [];
   if (hybridSource) {
-    const { DeviceMeta } = window.Roblox;
+    const { DeviceMeta } = getRealtimeGlobals();
     const deviceType = DeviceMeta && new DeviceMeta();
     const isAndroidApp = deviceType ? deviceType.isAndroidApp : false;
     const isIosApp = deviceType ? deviceType.isIosApp : false;

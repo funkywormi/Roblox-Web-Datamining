@@ -1,4 +1,5 @@
 import * as signalR from "@microsoft/signalr";
+import { getRealtimeGlobals } from "./realtimeConfig";
 
 const coreSignalRConnectionWrapper = function (
   settings,
@@ -20,7 +21,7 @@ const coreSignalRConnectionWrapper = function (
   let isConnected = false;
 
   const getExponentialBackoff = () => {
-    const { Utilities } = window.Roblox;
+    const { Utilities } = getRealtimeGlobals();
     if (!Utilities) {
       return false;
     }
