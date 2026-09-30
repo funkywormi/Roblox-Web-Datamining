@@ -251,5 +251,6 @@
     "Label.PlusBundleName": "Plus {robuxAmount}",
     "Label.IncludesAllPlusBenefits": "Includes all Plus benefits",
     "Label.RobuxEveryMonth": "{robuxAmount} Robux every month",
-    "Label.TotalValue": "{price} total value"
+    "Label.TotalValue": "{price} total value",
+    "Description.ReferralRecipientInvite": "{username} invited you to join Plus. You'll both get {amount} Robux when you purchase Plus."
 }
