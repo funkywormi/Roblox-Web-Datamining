@@ -1,7 +1,7 @@
 export const formatNumber = (
   value: number,
   locale?: string,
-  style?: keyof Intl.NumberFormatOptions["style"],
+  style?: Intl.NumberFormatOptions["style"],
   currency?: string,
 ): string => {
   try {
