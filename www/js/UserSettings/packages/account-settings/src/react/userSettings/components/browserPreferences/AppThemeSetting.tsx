@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import * as localStorage from "@rbx/core-lib/local-storage";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import {
   getTheme as getThemeGlobal,
   setTheme as setThemeGlobal,
@@ -26,7 +24,6 @@ import {
   appThemeDefs,
   defaultTheme,
   AppThemeDef,
-  classicTheme,
 } from "../../constants/appThemes";
 import appThemeEventService from "../../services/eventServices/appThemeEventService";
 import AppThemeCard from "./AppThemeCard";
@@ -62,28 +59,20 @@ const ThemeGrid = ({
 const AppThemeSettingSection = ({
   isPlus,
   isEligible,
-  classicEnabled,
-  classicEnabledPlus,
 }: {
   isPlus: boolean;
   isEligible: boolean;
-  classicEnabled: boolean;
-  classicEnabledPlus: boolean;
 }) => {
-  const classicIsPlusOnly = !classicEnabled && classicEnabledPlus;
   const { translate } = useTranslation();
   const [updateSettingValue, { isLoading }] = useUpdateUserSettingValueMutation();
   const [theme, setTheme] = useState(appThemesByKey.get(getThemeGlobal()) ?? null);
-  const [category, setCategory] = useState<AppThemeCategoryId>(
-    // TODO: special logic here can be removed once classic theme's category is set to special
-    classicIsPlusOnly && theme?.key === "classic" ? "special" : (theme?.category ?? "dynamic"),
-  );
+  const [category, setCategory] = useState<AppThemeCategoryId>(theme?.category ?? "dynamic");
   const [upsellOpen, setUpsellOpen] = useState(false);
 
   useEffect(() => clearPreviewTheme, []);
 
   useEffect(() => {
-    if (!isPlus && !classicEnabled) {
+    if (!isPlus) {
       return;
     }
     return subscribeToThemeChange(theme => {
@@ -92,15 +81,11 @@ const AppThemeSettingSection = ({
         return;
       }
       setTheme(def);
-      if (def.category == null) {
-        if (classicIsPlusOnly && def.key === "classic") {
-          setCategory("special");
-        }
-      } else {
+      if (def.category) {
         setCategory(def.category);
       }
     });
-  }, [classicEnabled, classicIsPlusOnly, isPlus]);
+  }, [isPlus]);
 
   const hasFiredExitRef = useRef(false);
   const sawUpsell = useRef(false);
@@ -125,12 +110,8 @@ const AppThemeSettingSection = ({
   }, []);
 
   const themesInCategory = useMemo(
-    () =>
-      // TODO: special logic here can be removed once classic theme's category is set to special
-      category === "special" && classicIsPlusOnly
-        ? [classicTheme]
-        : appThemeDefs.filter(t => t.category === category),
-    [category, classicIsPlusOnly],
+    () => appThemeDefs.filter(t => t.category === category),
+    [category],
   );
 
   const onSelect = (newTheme: AppThemeDef) => {
@@ -138,28 +119,8 @@ const AppThemeSettingSection = ({
       return;
     }
     if (!isPlus) {
-      // This code is kind of cursed and will be removed in a few weeks
-      const classicUsers = localStorage.getItem("classic-theme") ?? { version: 0, data: [] };
-      const id = authenticatedUser()?.id?.toString();
       if (newTheme.key === "default") {
-        if (
-          classicEnabled &&
-          id != null &&
-          classicUsers.version === 0 &&
-          classicUsers.data.includes(id)
-        ) {
-          const users = classicUsers.data.filter(x => x !== id);
-          localStorage.setItem("classic-theme", { version: 0, data: users });
-        }
         clearPreviewTheme();
-        setThemeGlobal("default");
-      } else if (newTheme.key === "classic" && classicEnabled) {
-        if (id != null && classicUsers.version === 0 && !classicUsers.data.includes(id)) {
-          classicUsers.data.push(id);
-          localStorage.setItem("classic-theme", classicUsers);
-        }
-        clearPreviewTheme();
-        setThemeGlobal("classic");
       } else {
         setPreviewTheme(newTheme.key);
       }
@@ -203,12 +164,7 @@ const AppThemeSettingSection = ({
         </p>
       </div>
       <ThemeGrid
-        themes={
-          // TODO: special logic here can be removed once classic theme is plus only
-          classicEnabled && (!isPlus || classicEnabledPlus)
-            ? [defaultTheme, classicTheme]
-            : [defaultTheme]
-        }
+        themes={[defaultTheme]}
         selectedTheme={theme}
         disabled={isLoading}
         onSelect={onSelect}
@@ -240,14 +196,7 @@ const AppThemeSettingSection = ({
             </div>
           )}
           <div className="flex wrap gap-small" role="group" aria-label={translate(appThemeLabel)}>
-            {(classicIsPlusOnly
-              ? // TODO: special logic here can be removed once classic theme is plus only
-                [
-                  ...appThemeCategories,
-                  { id: "special", labelKey: "AppTheme.CategorySpecial" } as const,
-                ]
-              : appThemeCategories
-            ).map(c => (
+            {appThemeCategories.map(c => (
               <Chip
                 key={c.id}
                 size="Medium"
@@ -274,18 +223,8 @@ export default function AppThemeSetting() {
   const { data: settingsUiPolicy } = useGetSettingsUiPolicyQuery();
   const isPlus = settingsUiPolicy?.appThemesAccess === AppThemesAccess.Enabled;
   const isEligible = settingsUiPolicy?.appThemesAccess === AppThemesAccess.Eligible;
-  const metaTag = document.querySelector<HTMLMetaElement>(`meta[name="classic-theme-data"]`);
-  const classicEnabled = metaTag?.dataset.enabled === "True";
-  const classicEnabledPlus = metaTag?.dataset.enabledPlus === "True";
-  if (settingsUiPolicy == null || (!isPlus && !isEligible && !classicEnabled)) {
+  if (settingsUiPolicy == null || (!isPlus && !isEligible)) {
     return null;
   }
-  return (
-    <AppThemeSettingSection
-      isPlus={isPlus}
-      isEligible={isEligible}
-      classicEnabled={classicEnabled}
-      classicEnabledPlus={classicEnabledPlus}
-    />
-  );
+  return <AppThemeSettingSection isPlus={isPlus} isEligible={isEligible} />;
 }

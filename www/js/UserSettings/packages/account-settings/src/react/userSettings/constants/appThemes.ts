@@ -19,6 +19,7 @@ export type AppThemeDef = {
 export const appThemeCategories: { id: AppThemeCategoryId; labelKey: string }[] = [
   { id: "dynamic", labelKey: "AppTheme.CategoryDynamic" },
   { id: "calm", labelKey: "AppTheme.CategoryCalm" },
+  { id: "special", labelKey: "AppTheme.CategorySpecial" },
 ];
 
 export const defaultTheme: AppThemeDef = {
@@ -29,17 +30,6 @@ export const defaultTheme: AppThemeDef = {
   swatch: {
     light: "#ffffff",
     dark: "#121215",
-  },
-};
-
-export const classicTheme: AppThemeDef = {
-  key: "classic",
-  accountTheme: AccountTheme.Classic,
-  labelKey: "AppTheme.Classic",
-  category: null,
-  swatch: {
-    light: "#e42727",
-    dark: "#e42727",
   },
 };
 
@@ -143,7 +133,16 @@ export const appThemeDefs: AppThemeDef[] = [
     category: "calm",
     swatch: { light: "#fbc8f8", dark: "#5d0e5d" },
   },
-  classicTheme,
+  {
+    key: "classic",
+    accountTheme: AccountTheme.Classic,
+    labelKey: "AppTheme.Classic",
+    category: "special",
+    swatch: {
+      light: "#e42727",
+      dark: "#e42727",
+    },
+  },
 ];
 
 export const appThemesByKey = new Map<string, AppThemeDef>(appThemeDefs.map(def => [def.key, def]));
