@@ -1,5 +1,5 @@
-import { UrlConfig } from "core-utilities";
-import { EnvironmentUrls } from "Roblox";
+import { UrlConfig } from "@rbx/core-scripts/http";
+import EnvironmentUrls from "@rbx/environment-urls";
 
 export enum UserSettingsApiError {
   UNKNOWN = 0,

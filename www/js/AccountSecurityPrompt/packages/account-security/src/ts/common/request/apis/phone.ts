@@ -1,11 +1,11 @@
-import { httpService } from "core-utilities";
+import * as http from "@rbx/core-scripts/http";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as Phone from "../types/phone";
 
 export const getPhoneConfiguration = async (): Promise<
   Result<Phone.GetPhoneConfigurationReturnType, Phone.PhoneError | null>
-> => toResult(httpService.get(Phone.GET_PHONE_CONFIG, {}), Phone.PhoneError);
+> => toResult(http.get(Phone.GET_PHONE_CONFIG, {}), Phone.PhoneError);
 
 export const prioritizeDefaultPrefix = (
   getPhonePrefixListResult: Phone.GetPhonePrefixesListReturnType,
@@ -31,7 +31,7 @@ export const getPhonePrefixList = async (): Promise<
   Result<Phone.GetPhonePrefixesListReturnType, Phone.PhoneError | null>
 > => {
   return toResult(
-    httpService.get(Phone.GET_PHONE_PREFIXES_LIST_CONFIG, {}),
+    http.get(Phone.GET_PHONE_PREFIXES_LIST_CONFIG, {}),
     Phone.PhoneError,
     prioritizeDefaultPrefix,
   );
@@ -40,17 +40,17 @@ export const getPhonePrefixList = async (): Promise<
 export const updatePhone = async (
   value: Phone.UpdatePhoneParameters,
 ): Promise<Result<Phone.UpdatePhoneReturnType, Phone.UpdatePhoneError | null>> => {
-  return toResult(httpService.post(Phone.POST_PHONE_CONFIG, value), Phone.UpdatePhoneError);
+  return toResult(http.post(Phone.POST_PHONE_CONFIG, value), Phone.UpdatePhoneError);
 };
 
 export const verifyCode = async (
   value: Phone.VerifyCodeParameters,
 ): Promise<Result<Phone.VerifyCodeReturnType, Phone.VerifyCodeError | null>> => {
-  return toResult(httpService.post(Phone.VERIFY_CODE_CONFIG, value), Phone.VerifyCodeError);
+  return toResult(http.post(Phone.VERIFY_CODE_CONFIG, value), Phone.VerifyCodeError);
 };
 
 export const resendCode = async (
   value: Phone.ResendCodeParameters,
 ): Promise<Result<Phone.ResendCodeReturnType, Phone.ResendCodeError | null>> => {
-  return toResult(httpService.post(Phone.RESEND_CODE_CONFIG, value), Phone.ResendCodeError);
+  return toResult(http.post(Phone.RESEND_CODE_CONFIG, value), Phone.ResendCodeError);
 };

@@ -856,7 +856,7 @@
         },
         {
             "name": "CommonUI.Features",
-            "url": "https://js.rbxcdn.com/2689daed263e0cf27738d119c8961311698e53a60c783e4c6dab4eaab3ddcfce.js",
+            "url": "https://js.rbxcdn.com/99576d9213cd5a69c4543f9051c87d2b4c881729eb931fbf961e3442ff2c8da1.js",
             "sources": [
                 "/home",
                 "/",
@@ -3189,7 +3189,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/2f2230262c6d7f1b1fa851f600b8036894307a69d5938324fc1ffa76a50bc019.js",
+            "url": "https://js.rbxcdn.com/6503967a3700e974270d3baca4645615e20f7e4ace557344d07dc54097efc9b1.js",
             "sources": [
                 "/home",
                 "/",
@@ -3301,7 +3301,7 @@
         },
         {
             "name": "Feature.SafetyDashboard",
-            "url": "https://js.rbxcdn.com/df9c36f8dae8857c4576a07a5e476ff6022ef28e401a08006fe0cc131743bb03.js",
+            "url": "https://js.rbxcdn.com/6cb815c14864fa277d29ee20273835d12d7902cd66e1ebf6c92b1141e4ca1fcc.js",
             "sources": [
                 "/help-safety",
                 "/safety-dashboard"
@@ -3836,7 +3836,7 @@
         },
         {
             "name": "Purchasing.RedeemGameCard",
-            "url": "https://js.rbxcdn.com/d3b821219ca935c708f781ace0c619de2a5844c4b8373127d128eddc2fbfa536.js",
+            "url": "https://js.rbxcdn.com/78fa168d8370a5d68981080c0a4bd8462d1cf176710385ecf945ec6a71467be7.js",
             "sources": [
                 "/home",
                 "/",
@@ -4087,7 +4087,7 @@
         },
         {
             "name": "AccountSecurityPrompt",
-            "url": "https://js.rbxcdn.com/3785b70727707e3c121cc98a9ecbf6c2348c20b41050f8bec9b15a5997fe978d-AccountSecurityPrompt.js",
+            "url": "https://js.rbxcdn.com/2a8d14f3245d1e58d61bf91845b5e6f510f24d00f1d63d2aa9619b4d7c881224-AccountSecurityPrompt.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -4535,7 +4535,6 @@
                 "/login",
                 "/CreateAccount",
                 "/charts",
-                "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
                 "/giftcards-us",
@@ -4550,10 +4549,9 @@
                 "/users/friends",
                 "/users/inventory",
                 "/users/1/profile",
-                "/users/1/inventory",
                 "/users/1/favorites",
-                "/users/1/friends",
                 "/users/profile/edit",
+                "/my/messages",
                 "/my/avatar",
                 "/my/account",
                 "/search/communities",
@@ -5625,7 +5623,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/28e63a167671c1307c47534c0ca3965d1202e7ca3ec1c88f27db84711276fdb1-Navigation.js",
+            "url": "https://js.rbxcdn.com/d0a72d79e1e3af203ff7af3e3dbc392bcfeb65246ae17f03ea6fe128bdc723b1-Navigation.js",
             "sources": [
                 "/home",
                 "/",
@@ -5967,7 +5965,7 @@
         },
         {
             "name": "ReactChat",
-            "url": "https://js.rbxcdn.com/b2cd74c36c8019e21d1c60ba326de6fa76d614114e31b454e6dc426a37602f28-ReactChat.js",
+            "url": "https://js.rbxcdn.com/f656e4710c79c84e96db19aa95d8afba82667e645f6ce380fd4c7dfefa1f3745-ReactChat.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -6182,7 +6180,7 @@
         },
         {
             "name": "RobloxSubscription",
-            "url": "https://js.rbxcdn.com/acf104aeb691944f218a227841d6039bda869965d11f8d62f15aaca891482377-RobloxSubscription.js",
+            "url": "https://js.rbxcdn.com/ecd06cdfdcb1b8a5470f435fa12227912b153c3f8660593c03f255aa8ce2f301-RobloxSubscription.js",
             "sources": [
                 "/plus"
             ]
@@ -6287,7 +6285,7 @@
         },
         {
             "name": "SendrNotificationStream",
-            "url": "https://js.rbxcdn.com/91116d6daa22f7db09f84de902b86c6bcaee1e12900980808d33e3ce8f7c757e-SendrNotificationStream.js",
+            "url": "https://js.rbxcdn.com/7e32eae2352ac3e60403e8f743f423f934f2c71409e88e80844c46e46bd26f60-SendrNotificationStream.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -6794,7 +6792,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/26e0bb9f9b3482d45e1f375e198321057cc268d24dc94ee6e188d1f33d5a6aa8-UserSettings.js",
+            "url": "https://js.rbxcdn.com/1cea31f5ad74b59d2cf0e5353a91e876b0839e35d8b60000907d7d586806fd7f-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -7055,7 +7053,7 @@
         },
         {
             "name": "AccountSecurityPrompt",
-            "url": "https://css.rbxcdn.com/aea0cd2ab8a0c382ece4f323f2e89df290c9a87eff4f07f3057b1eda5a10d8b1-AccountSecurityPrompt.css",
+            "url": "https://css.rbxcdn.com/66428aa5f5dc6a12371d849c4351587c19578a8872aaced39277d594a2a02f38-AccountSecurityPrompt.css",
             "sources": [
                 "/home",
                 "/charts",
@@ -8286,7 +8284,7 @@
         },
         {
             "name": "ReactChat",
-            "url": "https://css.rbxcdn.com/41a7e5b3a7fa414abcac8d1f7502f5debcf0f9c67c3902f76136480e9ea8d8d8-ReactChat.css",
+            "url": "https://css.rbxcdn.com/e6675628a8065398c8dca9deba4dcc722ba81d7e694fd78ad78564efaffa9e21-ReactChat.css",
             "sources": [
                 "/home",
                 "/charts",
@@ -8479,7 +8477,7 @@
         },
         {
             "name": "RobloxSubscription",
-            "url": "https://css.rbxcdn.com/80b3daa9a32daecaab0fa4049362da261b2af0589cc56516aba4df68a9b9b3dc-RobloxSubscription.css",
+            "url": "https://css.rbxcdn.com/8106d305035b2b5905daa01e4398154a198c6a0ccc211f59ece4a778495d916a-RobloxSubscription.css",
             "sources": [
                 "/plus"
             ]
@@ -8627,7 +8625,7 @@
         },
         {
             "name": "SendrNotificationStream",
-            "url": "https://css.rbxcdn.com/84d252a8fcdf831bdd658a79b4f404c6e7aed3829aad63232f31d908e1fd227d-SendrNotificationStream.css",
+            "url": "https://css.rbxcdn.com/f214ccaad8cd40aa45a0eafa3c1aa7ae5aaee1a22a7b96266bcc9014eb474077-SendrNotificationStream.css",
             "sources": [
                 "/home",
                 "/charts",

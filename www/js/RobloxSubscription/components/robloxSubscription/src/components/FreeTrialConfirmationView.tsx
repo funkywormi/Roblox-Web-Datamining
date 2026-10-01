@@ -44,7 +44,7 @@ const FreeTrialConfirmationView: FC<FreeTrialConfirmationViewProps> = ({
     <Fragment>
       <BackdropTexture />
       <div className="flex flex-col items-center">
-        <div className="padding-x-xlarge content-emphasis gap-y-xxlarge width-full large:max-width-[730px] flex flex-col">
+        <div className="padding-x-xlarge content-emphasis gap-y-xxlarge width-full large:max-width-[792px] flex flex-col">
           <div className="gap-y-small large:items-center flex flex-col items-start">
             <div className="gap-x-small flex items-center">
               <Icon className="!size-600" name="icon-regular-roblox-plus" />

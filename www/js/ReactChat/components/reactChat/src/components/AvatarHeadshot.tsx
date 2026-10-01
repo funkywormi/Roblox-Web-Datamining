@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { Thumbnail2d, ThumbnailFormat, ThumbnailTypes } from "@rbx/thumbnails";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 
 type TAvatarHeadshotProps = {
   userId: number;
@@ -23,14 +23,16 @@ const AvatarHeadshot = ({
   >
     <Thumbnail2d
       altName={displayName}
-      containerClass="block height-full width-full"
-      format={ThumbnailFormat.webp}
+      containerClassName="block height-full width-full"
+      format="webp"
       imgClassName={imageClassName}
       targetId={userId}
-      type={ThumbnailTypes.avatarHeadshot}
+      type="AvatarHeadShot"
       includeProfileFrame
-      // Seed from the resolved-URL cache so avatars don't re-shimmer when chat screens remount them.
-      seedFromCache
+      // The AvatarExperience.Backgrounds.Thumbnails IXP is launched at 100%, so the headshot
+      // background is the default. Legacy @rbx/thumbnails applied it via the experiment resolver;
+      // set it explicitly here (www-common has no experiment hook) to keep parity.
+      includeBackground
     />
   </span>
 );

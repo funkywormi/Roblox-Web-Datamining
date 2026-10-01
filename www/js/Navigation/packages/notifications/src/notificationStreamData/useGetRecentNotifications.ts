@@ -1,7 +1,12 @@
-import { useEffect, useRef } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useCallback, useEffect, useRef } from "react";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { httpService } from "core-utilities";
-import { StreamNotification, getRecentUrlConfig, PAGE_SIZE } from "./notificationStreamApi";
+import {
+  StreamNotification,
+  StreamNotificationPage,
+  getRecentUrlConfig,
+  PAGE_SIZE,
+} from "./notificationStreamApi";
 import { reportNotificationStreamError } from "./notificationStreamObservability";
 import { sendBundleCreated, sendNotificationRetrieved } from "./notificationStreamEvents";
 
@@ -14,8 +19,6 @@ const byEventDateDesc = (a: StreamNotification, b: StreamNotification): number =
 // (the React port of the Angular controller's buildNotificationsList/createSendrBundle).
 // The bundle takes the position/id of its newest member; the card router renders a
 // collapsible SendrNotificationsBundle when it holds more than one notification.
-const loggedBundleSignatures = new Set<string>();
-
 export const groupSendrBundles = (items: StreamNotification[]): StreamNotification[] => {
   const bundleByKey = new Map<string, StreamNotification>();
   const rows: StreamNotification[] = [];
@@ -41,46 +44,63 @@ export const groupSendrBundles = (items: StreamNotification[]): StreamNotificati
     }
     bundle.notifications?.push(notification);
   });
-  bundleByKey.forEach((bundle, bundleKey) => {
-    const members = bundle.notifications ?? [];
-    // groupSendrBundles re-runs on every render; log once per bundle membership.
-    const signature = `${bundleKey}:${members.map(member => member.id).join(",")}`;
-    if (members.length > 1 && !loggedBundleSignatures.has(signature)) {
-      loggedBundleSignatures.add(signature);
-      sendBundleCreated(
-        bundleKey,
-        bundle.bundleId ?? bundle.id,
-        members.map(member => member.id),
-        members[0]?.content?.clientEventsPayload as Record<string, string> | undefined,
-      );
-    }
-  });
   return rows;
 };
 
-const fetchPage = (startIndex: number): Promise<StreamNotification[]> =>
+const isGameUpdate = (notification: StreamNotification): boolean =>
+  notification.notificationSourceType === "GameUpdate";
+
+const sendPageBundles = (notifications: StreamNotification[]): void => {
+  groupSendrBundles(notifications.filter(n => !isGameUpdate(n))).forEach(row => {
+    if (row.notificationSourceType !== "SendrBundle") {
+      return;
+    }
+    const members = row.notifications ?? [];
+    sendBundleCreated(
+      row.bundleKey ?? "",
+      row.bundleId ?? row.id,
+      members.map(member => member.id),
+      members[0]?.content?.clientEventsPayload as Record<string, string> | undefined,
+    );
+  });
+};
+
+const registerRetrieved = (notifications: StreamNotification[]): StreamNotification[] => {
+  notifications.forEach(sendNotificationRetrieved);
+  return notifications;
+};
+
+const rowCountPage = (
+  startIndex: number,
+  notifications: StreamNotification[],
+): StreamNotificationPage => {
+  return {
+    notifications,
+    // The server filters within the window, so a short page is not the end of the stream.
+    nextStartIndex: notifications.length > 0 ? startIndex + PAGE_SIZE : null,
+  };
+};
+
+const fetchPage = (startIndex: number): Promise<StreamNotificationPage> =>
   httpService.get<StreamNotification[]>(getRecentUrlConfig(startIndex)).then(({ data }) => {
-    const notifications = data ?? [];
-    notifications.forEach(sendNotificationRetrieved);
-    return notifications;
+    const notifications = registerRetrieved(data ?? []);
+    sendPageBundles(notifications);
+    return rowCountPage(startIndex, notifications);
   });
 
 export const useGetRecentNotifications = (): ReturnType<
-  typeof useInfiniteQuery<StreamNotification[]>
+  typeof useInfiniteQuery<StreamNotificationPage>
 > & {
   notifications: StreamNotification[];
   gameUpdates: StreamNotification[];
+  reload: () => Promise<void>;
 } => {
-  const query = useInfiniteQuery<StreamNotification[]>({
+  const queryClient = useQueryClient();
+  const query = useInfiniteQuery<StreamNotificationPage>({
     queryKey: GET_RECENT_QUERY_KEY,
     queryFn: ({ pageParam = 0 }) => fetchPage(pageParam as number),
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length < PAGE_SIZE ? undefined : allPages.length * PAGE_SIZE,
+    getNextPageParam: lastPage => lastPage.nextStartIndex ?? undefined,
     staleTime: Infinity,
-    // The shell unmounts when the popover closes; the global queryClient default is
-    // refetchOnMount:false, so without this a reopen would serve the permanently-cached
-    // (staleTime:Infinity) first page and miss notifications that arrived while closed.
-    refetchOnMount: "always",
     onError: error => reportNotificationStreamError("getRecent", error),
   });
 
@@ -94,15 +114,32 @@ export const useGetRecentNotifications = (): ReturnType<
     }
   }, [pageCount, hasNextPage, fetchNextPage]);
 
-  const all = (query.data?.pages ?? []).flat();
-  const gameUpdates = all
-    .filter(n => n.notificationSourceType === "GameUpdate")
-    .sort(byEventDateDesc);
-  const notifications = groupSendrBundles(
-    all.filter(n => n.notificationSourceType !== "GameUpdate").sort(byEventDateDesc),
+  // The shell unmounts on close, so each open starts again from window 0.
+  useEffect(
+    () => () => {
+      queryClient.removeQueries(GET_RECENT_QUERY_KEY);
+    },
+    [queryClient],
   );
 
-  return { ...query, notifications, gameUpdates };
+  const reload = useCallback(() => {
+    prefetchedRef.current = false;
+    return queryClient.resetQueries(GET_RECENT_QUERY_KEY);
+  }, [queryClient]);
+
+  const pages = query.data?.pages ?? [];
+  const gameUpdates = pages
+    .flatMap(page => page.notifications)
+    .filter(isGameUpdate)
+    .sort(byEventDateDesc);
+  // notificationStreamController.js buildNotificationsList bundles each fetched page on its own.
+  const notifications = pages
+    .flatMap(page =>
+      groupSendrBundles(page.notifications.filter(n => !isGameUpdate(n)).sort(byEventDateDesc)),
+    )
+    .sort(byEventDateDesc);
+
+  return { ...query, notifications, gameUpdates, reload };
 };
 
 export default useGetRecentNotifications;

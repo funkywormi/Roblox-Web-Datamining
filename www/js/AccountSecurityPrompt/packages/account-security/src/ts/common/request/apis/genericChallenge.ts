@@ -1,4 +1,4 @@
-import { httpService } from "core-utilities";
+import * as http from "@rbx/core-scripts/http";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as GenericChallenge from "../types/genericChallenge";
@@ -14,7 +14,7 @@ export const continueChallenge = async (
   >
 > =>
   toResult(
-    httpService.post(GenericChallenge.CONTINUE_CHALLENGE_CONFIG, {
+    http.post(GenericChallenge.CONTINUE_CHALLENGE_CONFIG, {
       challengeId,
       challengeType,
       challengeMetadata,

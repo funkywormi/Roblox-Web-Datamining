@@ -17,6 +17,7 @@ export enum Event {
   BUNDLE_PICKER_ROW_MISSING_ROBUX_ALLOWANCE = "BundlePickerRowMissingRobuxAllowance",
   BUNDLE_PICKER_ROW_MISSING_STRIKETHROUGH_PRICE = "BundlePickerRowMissingStrikethroughPrice",
   MISSING_FEATURE_CONFIG = "MissingFeatureConfig",
+  UNSUPPORTED_PRODUCT_SKIPPED = "UnsupportedProductSkipped",
   REFERRAL_LANDING_DETECTED = "ReferralLandingDetected",
   REFERRAL_COPY_LINK_CLICK = "ReferralCopyLinkClick",
   SHARE_CARD_SHOWN = "ShareCardShown",

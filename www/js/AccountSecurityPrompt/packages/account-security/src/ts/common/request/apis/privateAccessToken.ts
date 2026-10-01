@@ -1,4 +1,4 @@
-import { httpService } from "core-utilities";
+import * as http from "@rbx/core-scripts/http";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as PrivateAccessToken from "../types/privateAccessToken";
@@ -12,6 +12,6 @@ export const getPatToken = async (
   >
 > =>
   toResult(
-    httpService.post(PrivateAccessToken.GET_PAT_TOKEN_CONFIG, { challengeId }),
+    http.post(PrivateAccessToken.GET_PAT_TOKEN_CONFIG, { challengeId }),
     PrivateAccessToken.PrivateAccessTokenError,
   );

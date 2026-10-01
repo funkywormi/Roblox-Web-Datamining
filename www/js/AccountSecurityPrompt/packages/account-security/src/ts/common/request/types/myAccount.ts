@@ -2,7 +2,7 @@
  * My Account
  */
 
-import { UrlConfig } from "core-utilities";
+import { UrlConfig } from "@rbx/core-scripts/http";
 
 const mySettingsUrl = "/my/settings/json";
 

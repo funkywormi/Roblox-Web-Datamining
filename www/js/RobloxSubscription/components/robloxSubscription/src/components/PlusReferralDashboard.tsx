@@ -60,7 +60,7 @@ const REFERRAL_TERMS_LINK = [
  * surfaces — widen at breakpoints rather than stretching edge-to-edge.
  */
 const CONTENT_COLUMN_CLASS =
-  "padding-x-xlarge margin-x-auto width-full medium:max-width-[600px] large:max-width-[730px] xlarge:max-width-[840px]";
+  "padding-x-xlarge margin-x-auto width-full medium:max-width-[600px] large:max-width-[792px] xlarge:max-width-[840px]";
 
 /**
  * Fixed 200px so the button does not resize between "Copy link" and "Link copied". `shrink-0`

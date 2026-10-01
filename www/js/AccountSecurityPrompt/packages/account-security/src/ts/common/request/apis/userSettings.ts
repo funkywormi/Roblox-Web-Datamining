@@ -1,4 +1,4 @@
-import { httpService } from "core-utilities";
+import * as http from "@rbx/core-scripts/http";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import {
@@ -10,7 +10,7 @@ import {
 
 export const userSettings = (): Promise<
   Result<UserSettingsReturnType, UserSettingsApiError | null>
-> => toResult(httpService.get(USER_SETTINGS_URL_CONFIG), UserSettingsApiError);
+> => toResult(http.get(USER_SETTINGS_URL_CONFIG), UserSettingsApiError);
 
 export const changeEppStatus = (
   status: EppEnrollmentStatus,
@@ -27,7 +27,7 @@ export const changeEppStatus = (
   }
 
   return toResult(
-    httpService.post(USER_SETTINGS_URL_CONFIG, {
+    http.post(USER_SETTINGS_URL_CONFIG, {
       eppEnrollmentStatus: status,
     }),
     UserSettingsApiError,

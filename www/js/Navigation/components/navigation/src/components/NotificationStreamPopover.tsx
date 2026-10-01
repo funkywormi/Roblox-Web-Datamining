@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import { formatNumber } from "@rbx/core-scripts/format/number";
@@ -29,6 +29,22 @@ export default function NotificationStreamPopover() {
   // Flag-on only: React owns clear-unread-on-open, since the Angular indicator
   // directive that used to do it isn't bootstrapped when the React bell renders.
   const handleReactBellStreamOpen = useClearUnreadOnOpen(unreadCount);
+
+  // The stream fires this on a reload, as notificationStreamIndicatorDirective.js expects.
+  const clearUnreadRef = useRef(handleReactBellStreamOpen);
+  clearUnreadRef.current = handleReactBellStreamOpen;
+  useEffect(() => {
+    if (!isReactBell) {
+      return undefined;
+    }
+    const onClearUnread = () => clearUnreadRef.current();
+    document.addEventListener("Roblox.NotificationStream.ClearUnreadNotifications", onClearUnread);
+    return () =>
+      document.removeEventListener(
+        "Roblox.NotificationStream.ClearUnreadNotifications",
+        onClearUnread,
+      );
+  }, [isReactBell]);
 
   const handleStreamOpen = useCallback(() => {
     logNotificationStreamExposureIfEnabled();

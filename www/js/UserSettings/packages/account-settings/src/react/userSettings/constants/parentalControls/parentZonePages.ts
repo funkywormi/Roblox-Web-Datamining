@@ -1,4 +1,6 @@
 import ParentalControlsPageName from "../../../../enums/parentalControls/ParentalControlsPageName";
+import RobuxSettingName from "../../../../enums/RobuxSettingName";
+import SettingCategoryPageName from "../../../../enums/SettingCategoryPageName";
 import { TSettingsPage } from "../../../../types/commonTypes";
 import { baseParentalControlsPath } from "./parentalControlsConstants";
 import parentalControlsTranslationConstants from "../contentConstants/parentalControlsTranslationConstants";
@@ -11,11 +13,14 @@ type TParentZonePages = {
   manageOnDeviceParentPage: TSettingsPage;
   friendManagementPage: TSettingsPage;
   topGameDetailsPage: TSettingsPage;
+  robuxPage: TSettingsPage;
+  robuxTransferLimitsPage: TSettingsPage;
 };
 
 // Pages an on-device parent can reach from Parent Zone. There is only ever one child here, so
 // these need no child id in the path.
 const topGamesPath = `${baseParentalControlsPath}/${ParentalControlsPageName.TopGames}`;
+const robuxPath = `${baseParentalControlsPath}/${SettingCategoryPageName.Robux}`;
 
 export const parentZonePages: TParentZonePages = {
   screentimeManagementPage: {
@@ -42,6 +47,16 @@ export const parentZonePages: TParentZonePages = {
     name: ParentalControlsPageName.TopGameDetails,
     path: `${topGamesPath}/:universeId`,
     titleTranslationKey: pageTitles[ParentalControlsPageName.TopGameDetails],
+  },
+  robuxPage: {
+    name: SettingCategoryPageName.Robux,
+    path: robuxPath,
+    titleTranslationKey: pageTitles[SettingCategoryPageName.Robux],
+  },
+  robuxTransferLimitsPage: {
+    name: RobuxSettingName.TransferLimits,
+    path: `${robuxPath}/${RobuxSettingName.TransferLimits}`,
+    titleTranslationKey: pageTitles[RobuxSettingName.TransferLimits],
   },
 };
 

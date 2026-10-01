@@ -2,8 +2,8 @@
  * Users API
  */
 
-import { EnvironmentUrls } from "Roblox";
-import { UrlConfig } from "core-utilities";
+import EnvironmentUrls from "@rbx/environment-urls";
+import { UrlConfig } from "@rbx/core-scripts/http";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 

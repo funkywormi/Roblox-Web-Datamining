@@ -1,5 +1,11 @@
 import { FullTagDescription } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
-import { getChildTransferLimitUrl, TGetChildTransferLimitResponse } from "@rbx/user-settings";
+import {
+  getChildTransferLimitUrl,
+  getUserTransferLimitUrl,
+  TGetChildTransferLimitResponse,
+  TGetUserTransferLimitResponse,
+  TRobuxTransferLimitCeilings,
+} from "@rbx/user-settings";
 import baseApi from "./common/baseApi";
 import { TBaseQueryArgs } from "./common/httpServiceBaseQueryFn";
 import ApiCacheTag from "./common/cacheTagEnum";
@@ -22,7 +28,17 @@ export const transferLimitsApi = baseApi.injectEndpoints({
       }),
       providesTags: (_result, _error, childUserId) => [getChildTransferLimitCacheTag(childUserId)],
     }),
+
+    // The same ceilings for the signed-in user. Used for on-device parent zone
+    getCurrentUserTransferLimitCeilings: builder.query<TRobuxTransferLimitCeilings, void>({
+      query: (): TBaseQueryArgs => ({ url: getUserTransferLimitUrl }),
+      transformResponse: (result: TGetUserTransferLimitResponse): TRobuxTransferLimitCeilings => ({
+        tierDailyTransferLimit: result.dailyLimit,
+        tierMonthlyTransferLimit: result.monthlyLimit,
+      }),
+    }),
   }),
 });
 
-export const { useGetChildTransferLimitQuery } = transferLimitsApi;
+export const { useGetChildTransferLimitQuery, useGetCurrentUserTransferLimitCeilingsQuery } =
+  transferLimitsApi;

@@ -1,61 +1,58 @@
 import { RefObject, useEffect, useRef } from "react";
 
+// lazyLoadingDirective.js onTotalScrollOffset
+const BOTTOM_OFFSET_PX = 100;
+
 export type UseInfiniteScrollOptions = {
-  /** Whether there are more pages to load. When false, no observer is attached. */
+  /** Whether there are more pages to load. */
   hasMore: boolean;
-  /** Whether a page is currently loading. While true, no observer is attached so a
-   * single scroll-to-end cannot trigger overlapping loads. */
+  /** Whether a page is currently loading. A scroll that reaches the bottom meanwhile loads nothing. */
   isLoading: boolean;
-  /** Called once each time the sentinel scrolls into view (and hasMore && !isLoading). */
+  /** Called when a scroll brings the bottom of the list within reach. */
   onLoadMore: () => void;
-  /** The scroll container the sentinel is measured against (the IntersectionObserver
-   * root). Pass a ref to the scrolling element; null falls back to the viewport. */
+  /** The scroll container. */
   rootRef: RefObject<HTMLElement | null>;
-  /** Pre-fetch distance before the sentinel is actually visible. Defaults to '120px'. */
-  rootMargin?: string;
+  /** Rows currently rendered. The root mounts late, so the listener re-attaches when this changes. */
+  itemCount?: number;
 };
 
-/**
- * Infinite-scroll primitive replacing the legacy `lazyLoadingDirective.js`
- * (mCustomScrollbar). Item-agnostic: it only observes a sentinel element and calls
- * `onLoadMore` when that sentinel enters the scroll container — it knows nothing about
- * what the list renders. Attach the returned ref to a sentinel placed after the last
- * row (render it only while `hasMore`).
- */
+/** Calls `onLoadMore` once each time a user scroll arrives within 100px of the bottom. */
 export const useInfiniteScroll = ({
   hasMore,
   isLoading,
   onLoadMore,
   rootRef,
-  rootMargin = "120px",
-}: UseInfiniteScrollOptions): RefObject<HTMLDivElement> => {
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  // Hold the latest callback so a changing onLoadMore identity does not tear down and
-  // re-create the observer on every render.
+  itemCount = 0,
+}: UseInfiniteScrollOptions): void => {
   const onLoadMoreRef = useRef(onLoadMore);
   onLoadMoreRef.current = onLoadMore;
+  const hasMoreRef = useRef(hasMore);
+  hasMoreRef.current = hasMore;
+  const isLoadingRef = useRef(isLoading);
+  isLoadingRef.current = isLoading;
+  const atBottomRef = useRef(false);
+  const measuredRootRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel || !hasMore || isLoading) {
+    const root = rootRef.current;
+    if (!root) {
       return undefined;
     }
-    if (typeof IntersectionObserver === "undefined") {
-      return undefined;
+    if (root !== measuredRootRef.current) {
+      measuredRootRef.current = root;
+      atBottomRef.current = false;
     }
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries.some(entry => entry.isIntersecting)) {
-          onLoadMoreRef.current();
-        }
-      },
-      { root: rootRef.current ?? null, rootMargin },
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [hasMore, isLoading, rootRef, rootMargin]);
-
-  return sentinelRef;
+    const onScroll = () => {
+      const atBottom = root.scrollHeight - root.scrollTop - root.clientHeight <= BOTTOM_OFFSET_PX;
+      const arrived = atBottom && !atBottomRef.current;
+      atBottomRef.current = atBottom;
+      if (arrived && hasMoreRef.current && !isLoadingRef.current) {
+        onLoadMoreRef.current();
+      }
+    };
+    root.addEventListener("scroll", onScroll, { passive: true });
+    return () => root.removeEventListener("scroll", onScroll);
+  }, [rootRef, itemCount]);
 };
 
 export default useInfiniteScroll;

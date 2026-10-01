@@ -342,7 +342,7 @@
 }
 
 .meta-actions-list-base .meta-actions-overlay {
-    background-color: #e6e7ea
+    background-color: var(--color-extended-gray-300)
 }
 
 .meta-actions-list-base .meta-actions-overlay.light-theme {
@@ -436,17 +436,17 @@
 }
 
 .light-theme .experience-join-failure-modal .join-failure-modal-button {
-    color: rgba(0, 0, 0, .5);
+    border-color: var(--color-extended-black-50);
+    color: var(--color-extended-black-50);
     text-transform: none;
-    border-color: rgba(0, 0, 0, .5);
     border-radius: 5px;
     min-width: 90px;
     font-size: 16px
 }
 
 .light-theme .experience-join-failure-modal .join-failure-modal-button:hover {
-    color: #272930;
-    border-color: #272930;
+    border-color: var(--color-extended-gray-900);
+    color: var(--color-extended-gray-900);
     transition: none
 }
 
@@ -476,17 +476,17 @@
 }
 
 .dark-theme .experience-join-failure-modal .join-failure-modal-button {
-    color: rgba(255, 255, 255, .7);
+    border-color: var(--color-extended-white-70);
+    color: var(--color-extended-white-70);
     text-transform: none;
-    border-color: rgba(255, 255, 255, .7);
     border-radius: 5px;
     min-width: 90px;
     font-size: 16px
 }
 
 .dark-theme .experience-join-failure-modal .join-failure-modal-button:hover {
-    color: #fff;
-    border-color: #fff;
+    border-color: var(--color-extended-white-100);
+    color: var(--color-extended-white-100);
     transition: none
 }
 
@@ -512,12 +512,12 @@
 }
 
 .report-notification-modal .report-eu-dsa-text .text-link {
-    color: #70a0ff
+    color: var(--color-extended-blue-500)
 }
 
 #notifications-bell-badge.bell-red-badge {
-    color: #fff;
-    background-color: #df281f
+    background-color: var(--color-extended-red-800);
+    color: var(--color-extended-white-100)
 }
 
 @keyframes hideItems {
@@ -577,15 +577,15 @@
 }
 
 .light-theme .notification-bundle.closed.multiple-shadows .sendr-notification-visible:first-of-type {
+    box-shadow: 0 3px 4px -2px var(--color-extended-black-10), 0 10px 0 -4px var(--color-extended-gray-200), 0px 16px 0px -5.5px color-mix(in srgb, var(--color-extended-gray-300)90%, transparent), 0 16px 10px -8px var(--color-extended-black-10);
     z-index: 1;
-    transition: box-shadow .3s .5s;
-    box-shadow: 0 3px 4px -2px rgba(0, 0, 0, .1), 0 10px 0 -4px #eeeff1, 0 16px 0 -5.5px rgba(230, 231, 234, .9), 0 16px 10px -8px rgba(0, 0, 0, .1)
+    transition: box-shadow .3s .5s
 }
 
 .dark-theme .notification-bundle.closed.multiple-shadows .sendr-notification-visible:first-of-type {
+    box-shadow: 0 3px 4px -2px color-mix(in srgb, var(--color-extended-gray-1200)80%, transparent), 0 10px 0 -4px color-mix(in srgb, var(--color-extended-gray-900)90%, transparent), 0px 16px 0px -5.5px var(--color-extended-gray-600), 0 16px 10px -8px color-mix(in srgb, var(--color-extended-gray-1200)80%, transparent);
     z-index: 1;
-    transition: box-shadow .3s .5s;
-    box-shadow: 0 3px 4px -2px rgba(18, 18, 21, .8), 0 10px 0 -4px rgba(39, 41, 48, .9), 0 16px 0 -5.5px #6a6f81, 0 16px 10px -8px rgba(18, 18, 21, .8)
+    transition: box-shadow .3s .5s
 }
 
 .notification-bundle.closed.multiple-shadows .sendr-notification-visible:not(:first-of-type) {
@@ -593,15 +593,15 @@
 }
 
 .light-theme .notification-bundle.closed.single-shadow .sendr-notification-visible:first-of-type {
+    box-shadow: 0 3px 4px -2px var(--color-extended-black-10), 0 10px 0 -4px color-mix(in srgb, var(--color-extended-gray-300)90%, transparent), 0 16px 10px -8px var(--color-extended-black-10);
     z-index: 1;
-    transition: box-shadow .3s .5s;
-    box-shadow: 0 3px 4px -2px rgba(0, 0, 0, .1), 0 10px 0 -4px rgba(230, 231, 234, .9), 0 16px 10px -8px rgba(0, 0, 0, .1)
+    transition: box-shadow .3s .5s
 }
 
 .dark-theme .notification-bundle.closed.single-shadow .sendr-notification-visible:first-of-type {
+    box-shadow: 0 3px 4px -2px color-mix(in srgb, var(--color-extended-gray-1200)80%, transparent), 0 10px 0 -4px var(--color-extended-gray-600), 0 16px 10px -8px color-mix(in srgb, var(--color-extended-gray-1200)80%, transparent);
     z-index: 1;
-    transition: box-shadow .3s .5s;
-    box-shadow: 0 3px 4px -2px rgba(18, 18, 21, .8), 0 10px 0 -4px #6a6f81, 0 16px 10px -8px rgba(18, 18, 21, .8)
+    transition: box-shadow .3s .5s
 }
 
 .notification-bundle.closed.single-shadow .sendr-notification-visible:not(:first-of-type) {
@@ -636,11 +636,11 @@
 }
 
 .light-theme .bundle-button {
-    background-color: rgba(230, 231, 234, .9)
+    background-color: color-mix(in srgb, var(--color-extended-gray-300)90%, transparent)
 }
 
 .dark-theme .bundle-button {
-    background-color: #6a6f81
+    background-color: var(--color-extended-gray-600)
 }
 
 .bundle-button.closed {
@@ -741,6 +741,10 @@ button.sendr-notification-button--alert {
     height: 3rem;
     position: relative;
     overflow: hidden
+}
+
+.trusted-friend-social-avatar-circle:has(>.thumbnail-2d-container>img[src*=-ProfileFrame]) {
+    overflow: visible
 }
 
 .trusted-friend-social-avatar-circle .thumbnail-2d-container.shimmer {
@@ -1034,7 +1038,7 @@ div.MuiDialog-root:not(:first-of-type) .MuiDialog-container {
 }
 
 .light-theme .styled-input-root fieldset.MuiOutlinedInput-notchedOutline {
-    border: 1px solid rgba(0, 0, 0, .3)
+    border: 1px solid var(--color-extended-black-30)
 }
 
 .dark-theme .styled-input-root {
@@ -1093,7 +1097,7 @@ div.MuiDialog-root:not(:first-of-type) .MuiDialog-container {
 }
 
 .dark-theme .styled-input-root fieldset.MuiOutlinedInput-notchedOutline {
-    border: 1px solid rgba(255, 255, 255, .3)
+    border: 1px solid var(--color-extended-white-30)
 }
 
 .light-theme .Mui-error.MuiInputBase-root.styled-input-root fieldset.MuiOutlinedInput-notchedOutline,
@@ -1102,7 +1106,7 @@ div.MuiDialog-root:not(:first-of-type) .MuiDialog-container {
 }
 
 .light-theme .Mui-focused.MuiInputBase-root.styled-input-root fieldset.MuiOutlinedInput-notchedOutline {
-    border-color: rgba(0, 0, 0, .5)
+    border-color: var(--color-extended-black-50)
 }
 
 .light-theme .Mui-focused.MuiInputBase-root.styled-input-root textarea {
@@ -1110,7 +1114,7 @@ div.MuiDialog-root:not(:first-of-type) .MuiDialog-container {
 }
 
 .dark-theme .Mui-focused.MuiInputBase-root.styled-input-root fieldset.MuiOutlinedInput-notchedOutline {
-    border-color: rgba(255, 255, 255, .7)
+    border-color: var(--color-extended-white-70)
 }
 
 .dark-theme .Mui-focused.MuiInputBase-root.styled-input-root textarea {

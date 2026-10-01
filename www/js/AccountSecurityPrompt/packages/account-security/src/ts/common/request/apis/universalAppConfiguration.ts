@@ -1,4 +1,4 @@
-import { Guac } from "Roblox";
+import { callBehaviour } from "@rbx/core-scripts/guac";
 import { Result } from "../../result";
 import * as UniversalAppConfiguration from "../types/universalAppConfiguration";
 
@@ -10,7 +10,7 @@ export const getSettingsUiPolicy = async (): Promise<
 > => {
   try {
     const data =
-      await Guac.callBehaviour<UniversalAppConfiguration.GetSettingsUIPolicyReturnType>(
+      await callBehaviour<UniversalAppConfiguration.GetSettingsUIPolicyReturnType>(
         "account-settings-ui",
       );
     return { isError: false, value: data };

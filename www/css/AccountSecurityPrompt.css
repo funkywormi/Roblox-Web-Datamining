@@ -1,3 +1,7 @@
+.\!relative {
+    position: relative !important
+}
+
 .security-banner .banner-button {
     background-color: initial
 }
@@ -69,7 +73,7 @@
 }
 
 .modal-modern.modal-modern-security-prompt .modal-dialog .modal-content .modal-body .form-control-label.bottom-label .bottom-label-link {
-    color: #70a0ff
+    color: var(--color-extended-blue-500)
 }
 
 .modal-modern.modal-modern-security-prompt .modal-dialog .modal-content .modal-body .form-control-label.bottom-label .shield-check-icon {
@@ -193,9 +197,9 @@
 }
 
 .security-banner {
-    color: #353741;
-    background-color: #fff;
-    border: 1px solid rgba(39, 41, 48, .2);
+    border: 1px solid color-mix(in srgb, var(--color-extended-gray-900)20%, transparent);
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-800);
     border-radius: 6px;
     -ms-flex-wrap: nowrap;
     flex-wrap: nowrap;
@@ -225,7 +229,7 @@
 }
 
 .security-banner .banner-start .banner-icon {
-    background-color: #e75750;
+    background-color: var(--color-extended-red-700);
     border-radius: 6px;
     -ms-flex-pack: center;
     justify-content: center;
@@ -275,12 +279,12 @@
 }
 
 .security-banner .banner-start .banner-content .banner-header {
-    color: #272930;
+    color: var(--color-extended-gray-900);
     padding-top: 0
 }
 
 .security-banner .banner-start .banner-content .banner-description .text-link {
-    color: #70a0ff
+    color: var(--color-extended-blue-500)
 }
 
 .security-banner .banner-start .banner-close {
@@ -351,13 +355,13 @@
 }
 
 .dark-theme .security-banner {
-    color: #bcbec8;
-    background-color: #272930;
-    border-color: rgba(255, 255, 255, .2)
+    border-color: var(--color-extended-white-20);
+    background-color: var(--color-extended-gray-900);
+    color: var(--color-extended-gray-500)
 }
 
 .dark-theme .security-banner .banner-start .banner-header {
-    color: #fff
+    color: var(--color-extended-white-100)
 }
 
 .security-banner {
@@ -797,7 +801,7 @@ input[type=button].btn-block {
 
 .modal-modern .modal-dialog .modal-content .modal-header {
     grid-gap: 48px;
-    border-bottom-color: rgba(39, 41, 48, .2);
+    border-bottom-color: color-mix(in srgb, var(--color-extended-gray-900)20%, transparent);
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     -ms-flex-align: center;
     align-items: center;
@@ -865,7 +869,7 @@ input[type=button].btn-block {
 }
 
 .modal-modern .modal-dialog .modal-content .modal-body .modal-text-danger {
-    color: #e75750
+    color: var(--color-extended-red-700)
 }
 
 .modal-modern .modal-dialog .modal-content .modal-body .modal-lock-icon {
@@ -889,7 +893,7 @@ input[type=button].btn-block {
 }
 
 .modal-modern .modal-dialog .modal-content .modal-body .modal-body-button-link {
-    color: #121215;
+    color: var(--color-extended-gray-1200);
     background: 0 0;
     border: none;
     margin-left: auto;
@@ -902,6 +906,12 @@ input[type=button].btn-block {
 .modal-modern .modal-dialog .modal-content .modal-body .modal-action-button {
     width: 100%;
     display: block
+}
+
+.modal-modern .modal-dialog .modal-content .modal-body .challenge-action-button {
+    width: 100%;
+    display: -ms-flexbox;
+    display: flex
 }
 
 .modal-modern .modal-dialog .modal-content .modal-footer {
@@ -953,12 +963,18 @@ input[type=button].btn-block {
     margin-bottom: 18px
 }
 
+.modal-modern .modal-dialog .modal-content .modal-footer .challenge-action-button {
+    width: 100%;
+    display: -ms-flexbox;
+    display: flex
+}
+
 .dark-theme .modal-modern .modal-dialog .modal-content .modal-header {
-    border-bottom-color: rgba(255, 255, 255, .2)
+    border-bottom-color: var(--color-extended-white-20)
 }
 
 .dark-theme .modal-modern .modal-dialog .modal-content .modal-body .modal-body-button-link {
-    color: #f7f7f8
+    color: var(--color-extended-gray-100)
 }
 
 .dark-theme .modal-modern .modal-dialog .modal-content .modal-body .modal-protection-shield-icon {
@@ -1006,9 +1022,9 @@ input[type=button].btn-block {
 .spinner-circle:before {
     visibility: visible;
     box-sizing: border-box;
-    content: "";
     border: .2em solid rgba(0, 0, 0, .25);
-    border-top-color: #272930;
+    border-top-color: var(--color-extended-gray-900);
+    content: "";
     border-radius: 50%;
     width: 75%;
     height: 75%;

@@ -120,8 +120,8 @@ const Content = () => {
   });
 
   // Product info is sourced from the user's active subscription when subscribed; otherwise it
-  // comes from the available-products list (bundles included so the picker has all tiers).
-  // This avoids a redundant GetSubscriptionProductInfo call for subscribed users.
+  // comes from the available-products list (extended terms and bundles included so the page
+  // has every plan). This avoids a redundant GetSubscriptionProductInfo call for subscribed users.
   const robloxAvailableProductsQuery = useQuery({
     queryKey: ["list-roblox-subscription-available-products"],
     queryFn: async () => {
@@ -130,6 +130,7 @@ const Content = () => {
           productType: ProductType.Blackbird,
           includePurchased: true,
           includeBundles: true,
+          includeExtendedTermProducts: true,
           skipEligibilityCheck: true,
         });
       if (products.length === 0) {

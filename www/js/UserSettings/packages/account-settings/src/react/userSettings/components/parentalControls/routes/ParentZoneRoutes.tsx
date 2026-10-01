@@ -10,6 +10,8 @@ import OdpTopFriendsPage from "../parentZone/OdpTopFriendsPage";
 import TopGames from "../parentDashboard/TopGames";
 import ManageOnDeviceParentPage from "../parentZone/ManageOnDeviceParentPage";
 import OdpTopGameDetails from "../parentZone/OdpTopGameDetails";
+import OdpRobuxPage from "../parentZone/OdpRobuxPage";
+import OdpRobuxTransferLimits from "../parentZone/OdpRobuxTransferLimits";
 import OdpScreentimeLimitPage from "../parentZone/OdpScreentimeLimitPage";
 
 // Parent Zone subpages. A page is only reachable while its flag is on, so a link to a page the
@@ -41,6 +43,18 @@ export const ParentZoneRoutes = (): JSX.Element => {
       {odpChildContext?.canParentManageChildsExperiences === true && (
         <Route exact path={parentZonePages.topGamesPage.path}>
           <TopGames isParentFacing detailsPath={getParentZoneTopGameDetailsPath} />
+        </Route>
+      )}
+
+      {odpChildContext?.canParentManageChildRobuxTransferLimits === true && (
+        <Route exact path={parentZonePages.robuxTransferLimitsPage.path}>
+          <OdpRobuxTransferLimits />
+        </Route>
+      )}
+
+      {odpChildContext?.canParentManageChildRobuxTransferLimits === true && (
+        <Route exact path={parentZonePages.robuxPage.path}>
+          <OdpRobuxPage />
         </Route>
       )}
 

@@ -9,11 +9,11 @@ export type NotificationStreamListProps<T> = {
   renderItem: (item: T, index: number) => ReactNode;
   /** Stable React key for a row. */
   getKey: (item: T, index: number) => string | number;
-  /** Whether more pages can be loaded (drives the infinite-scroll sentinel). */
+  /** Whether more pages can be loaded. */
   hasMore: boolean;
   /** Whether a page is currently loading. */
   isLoading: boolean;
-  /** Called when the sentinel scrolls into view and more can be loaded. */
+  /** Called when a scroll reaches the bottom and more can be loaded. */
   onLoadMore: () => void;
   /** Shown below the list while `isLoading`. */
   loadingIndicator?: ReactNode;
@@ -48,7 +48,13 @@ export const NotificationStreamList = <T,>({
   ariaLabel,
 }: NotificationStreamListProps<T>): JSX.Element => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const sentinelRef = useInfiniteScroll({ hasMore, isLoading, onLoadMore, rootRef: scrollRef });
+  useInfiniteScroll({
+    hasMore,
+    isLoading,
+    onLoadMore,
+    rootRef: scrollRef,
+    itemCount: items.length,
+  });
 
   if (items.length === 0 && (isLoading || emptyState !== undefined)) {
     return (
@@ -67,7 +73,6 @@ export const NotificationStreamList = <T,>({
         }
       >
         {isLoading ? loadingIndicator : emptyState}
-        {hasMore && <div ref={sentinelRef} aria-hidden="true" />}
       </div>
     );
   }
@@ -87,7 +92,6 @@ export const NotificationStreamList = <T,>({
           <li key={getKey(item, index)}>{renderItem(item, index)}</li>
         ))}
       </List>
-      {hasMore && <div ref={sentinelRef} aria-hidden="true" />}
       {isLoading && loadingIndicator}
     </div>
   );

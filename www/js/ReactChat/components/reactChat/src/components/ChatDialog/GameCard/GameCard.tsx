@@ -1,11 +1,6 @@
 import classNames from "classnames";
 import { useEffect, useRef } from "react";
-import {
-  Thumbnail2d,
-  ThumbnailFormat,
-  ThumbnailGameIconSize,
-  ThumbnailTypes,
-} from "@rbx/thumbnails";
+import { Thumbnail2d, ThumbnailGameIconSize } from "@rbx/www-common/components/thumbnail";
 import { DefaultPlayButton, usePlayabilityStatus } from "@rbx/game-play-button";
 import { useGamePlaceDetails } from "../../../hooks/useGamePlaceDetails";
 import {
@@ -113,12 +108,12 @@ const GameCard = ({ placeId, url, conversationId, privateServerLinkCode }: TGame
         <span className="react-chat-game-card-thumb shrink-0 bg-shift-300">
           <Thumbnail2d
             altName={place.name ?? ""}
-            containerClass="block height-full width-full"
-            format={ThumbnailFormat.webp}
+            containerClassName="block height-full width-full"
+            format="webp"
             imgClassName="height-full width-full object-cover"
             size={ThumbnailGameIconSize.size50}
             targetId={universeId}
-            type={ThumbnailTypes.gameIcon}
+            type="GameIcon"
           />
         </span>
         <span className="min-width-0 flex grow-1 flex-col gap-xxsmall">

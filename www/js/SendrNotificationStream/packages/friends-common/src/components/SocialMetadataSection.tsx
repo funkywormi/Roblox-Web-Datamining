@@ -253,12 +253,14 @@ const SocialMetadataSection = ({ userId }: SocialMetadataSectionProps): React.JS
     <div className="radius-large bg-shift-100 padding-large flex flex-col gap-large">
       <div className="flex flex-row items-center gap-medium">
         <div className="trusted-friend-social-avatar-circle bg-shift-200">
+          {/* Ungated: only the friends carousel is behind the profile-frame IXP gate. */}
           <Thumbnail2d
             containerClass="trusted-friend-social-avatar-thumb radius-circle"
             type={ThumbnailTypes.avatarHeadshot}
             size={ThumbnailAvatarHeadshotSize.size48}
             targetId={userId}
             format={ThumbnailFormat.webp}
+            includeProfileFrame
           />
           <div className="trusted-friend-social-avatar-loading-overlay" aria-hidden />
         </div>

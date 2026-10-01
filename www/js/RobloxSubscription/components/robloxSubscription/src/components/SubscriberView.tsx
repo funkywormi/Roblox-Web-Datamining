@@ -97,7 +97,7 @@ const SubscriberView: FC<SubscriberViewProps> = ({
 
   return (
     <div className="flex flex-col items-center">
-      <div className="margin-top-[48px] padding-x-xlarge content-emphasis gap-y-xxlarge width-full large:max-width-[730px] flex flex-col">
+      <div className="margin-top-[48px] padding-x-xlarge content-emphasis gap-y-xxlarge width-full large:max-width-[792px] flex flex-col">
         {SUBSCRIBER_GIFT_BANNER_CONFIG.enabled && ownsGiftItem === true && (
           <RobloxPlusGiftItemUpsellBanner
             body={translate("Description.BannerBodyUnboxed")}

@@ -37,5 +37,7 @@
     "Heading.AccountStatus.Upper": "Account Status",
     "Description.NoRecentViolations": "You don’t have any recent violations to show. To appeal something you don’t see, visit {linkStart}Support.{linkEnd}",
     "Heading.AccountStatus.V2": "Account status, violations, and appeals",
-    "Label.LoadingReportsError": "Something went wrong loading more reports"
+    "Label.LoadingReportsError": "Something went wrong loading more reports",
+    "Heading.ReportHistory": "Report history",
+    "Description.ReportHistory": "Check reports you've sent"
 }

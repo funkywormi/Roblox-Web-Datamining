@@ -69,6 +69,63 @@ export const verifyCode = (
     AccountRecovery.AccountRecoveryError,
   );
 
+export const getRecoveryIntentStatus = (
+  recoverySessionId: string,
+): Promise<
+  Result<
+    AccountRecovery.GetRecoveryIntentStatusReturnType,
+    AccountRecovery.AccountRecoveryError | null
+  >
+> =>
+  toResult(
+    httpService.get(AccountRecovery.GET_RECOVERY_INTENT_STATUS_CONFIG, {
+      recoveryId: recoverySessionId,
+    }),
+    AccountRecovery.AccountRecoveryError,
+  );
+
+// These endpoints are part of the account-recovery service even though the UI
+// presents them alongside linked accounts. Keeping them here preserves the
+// request layer's service ownership boundary.
+export const getRecoveryIntents = (): Promise<
+  Result<AccountRecovery.GetRecoveryIntentsResponse, AccountRecovery.AccountRecoveryError | null>
+> =>
+  toResult(
+    httpService.get(AccountRecovery.GET_RECOVERY_INTENTS_CONFIG),
+    AccountRecovery.AccountRecoveryError,
+  );
+
+export const approveRecoveryIntent = (
+  request: AccountRecovery.RecoveryIntentRequest,
+): Promise<Result<void, AccountRecovery.AccountRecoveryError | null>> =>
+  toResult(
+    httpService.post(AccountRecovery.APPROVE_RECOVERY_INTENT_CONFIG, request),
+    AccountRecovery.AccountRecoveryError,
+  );
+
+export const denyRecoveryIntent = (
+  request: AccountRecovery.RecoveryIntentRequest,
+): Promise<Result<void, AccountRecovery.AccountRecoveryError | null>> =>
+  toResult(
+    httpService.post(AccountRecovery.DENY_RECOVERY_INTENT_CONFIG, request),
+    AccountRecovery.AccountRecoveryError,
+  );
+
+export const verifyRecoveryIntent = (
+  recoverySessionId: string,
+): Promise<
+  Result<
+    AccountRecovery.VerifyRecoveryIntentReturnType,
+    AccountRecovery.AccountRecoveryError | null
+  >
+> =>
+  toResult(
+    httpService.post(AccountRecovery.VERIFY_RECOVERY_INTENT_CONFIG, {
+      recoverySessionId,
+    }),
+    AccountRecovery.AccountRecoveryError,
+  );
+
 export const verifyBackupCode = (
   recoverySessionId: string,
   backupCode: string,
@@ -158,6 +215,38 @@ export const disableTwoStepMethod = (
     httpService.post(AccountRecovery.DISABLE_TWO_STEP_METHOD_CONFIG, {
       recoverySessionId,
       twoStepMethod,
+    }),
+    AccountRecovery.AccountRecoveryError,
+  );
+
+export const getCredentialsToInvalidate = (
+  recoverySessionId: string,
+): Promise<
+  Result<
+    AccountRecovery.GetCredentialsToInvalidateReturnType,
+    AccountRecovery.AccountRecoveryError | null
+  >
+> =>
+  toResult(
+    httpService.get(AccountRecovery.GET_CREDENTIALS_TO_INVALIDATE_CONFIG, {
+      recoverySessionId,
+    }),
+    AccountRecovery.AccountRecoveryError,
+  );
+
+export const invalidateCredentials = (
+  recoverySessionId: string,
+  shouldInvalidateCredentials: boolean,
+): Promise<
+  Result<
+    AccountRecovery.InvalidateCredentialsReturnType,
+    AccountRecovery.AccountRecoveryError | null
+  >
+> =>
+  toResult(
+    httpService.post(AccountRecovery.INVALIDATE_CREDENTIALS_CONFIG, {
+      recoverySessionId,
+      shouldInvalidateCredentials,
     }),
     AccountRecovery.AccountRecoveryError,
   );

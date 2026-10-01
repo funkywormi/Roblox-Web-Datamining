@@ -62,7 +62,7 @@ const WelcomeView: FC<WelcomeViewProps> = ({
     <Fragment>
       <BackdropTexture />
       <div className="width-full min-width-0 large:items-center flex flex-col items-start">
-        <div className="margin-top-[48px] width-full min-width-0 content-emphasis large:max-width-[730px] large:gap-y-[60px] large:self-auto large:padding-x-xlarge flex flex-col gap-y-[var(--size-1200)] self-stretch">
+        <div className="margin-top-[48px] width-full min-width-0 content-emphasis large:max-width-[792px] large:gap-y-[60px] large:self-auto large:padding-x-xlarge flex flex-col gap-y-[var(--size-1200)] self-stretch">
           <div className="width-full min-width-0 gap-y-xxlarge padding-x-xxlarge text-align-x-start large:gap-y-[24px] large:items-center large:padding-x-none large:text-align-x-center flex flex-col items-start">
             <div className="gap-y-xsmall large:items-center flex flex-col items-start">
               <Icon className="!size-1800 margin-bottom-medium" name="icon-regular-roblox-plus" />

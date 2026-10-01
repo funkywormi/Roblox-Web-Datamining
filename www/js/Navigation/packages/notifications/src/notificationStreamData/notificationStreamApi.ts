@@ -30,6 +30,11 @@ export const getRecentUrlConfig = (
   retryable: true,
 });
 
+export type StreamNotificationPage = {
+  notifications: StreamNotification[];
+  nextStartIndex: number | null;
+};
+
 export const markInteractedUrlConfig: { url: string; withCredentials: boolean } = {
   url: `${notificationApi}/v2/stream-notifications/mark-interacted`,
   withCredentials: true,

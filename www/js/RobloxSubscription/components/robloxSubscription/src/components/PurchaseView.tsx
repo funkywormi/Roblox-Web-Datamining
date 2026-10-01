@@ -4,6 +4,7 @@ import { Button } from "@rbx/foundation-ui";
 import { usePaymentSession } from "@rbx/payments/services/paymentSession";
 import {
   BillingInfoDisplay,
+  BillingPeriodSheet,
   PlusReferralLandingContainer,
   readPlusReferralLanding,
   RobloxPlusHeading,
@@ -17,13 +18,20 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "rea
 
 import BackdropTexture from "./BackdropTexture";
 import BenefitDetailDialog from "./BenefitDetailDialog";
-import BundlePickerSheet from "./BundlePickerSheet";
+import PlusBundleCards from "./PlusBundleCards";
 import Divider from "./ui/Divider";
+import useLocalizedMoney from "../hooks/useLocalizedMoney";
 import { Event } from "../utils/eventsCounter";
 import { GIFT_ITEM, navigateToGiftItemDetails } from "../utils/giftItemNavigation";
 import { publishMetric } from "../utils/publishMetric";
-import { getFeatureConfig } from "../utils/subscriptionProductInfo";
+import {
+  getFeatureConfig,
+  groupPlusProducts,
+  isFreeTrialEligible,
+  toBillingPeriodOption,
+} from "../utils/subscriptionProductInfo";
 
+import type { BundleButtonProps } from "./PlusBundleCards";
 import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v2";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
 import type { FC, ReactNode } from "react";
@@ -53,7 +61,6 @@ const PurchaseView: FC<PurchaseViewProps> = ({
   const referrerId = landing.kind === "invite" ? landing.referrerId : undefined;
 
   const baselineProduct = robloxSubscriptionProducts[0];
-  const isMultiProduct = robloxSubscriptionProducts.length > 1;
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const localizedArrivedGiftDate = useMemo(
     () =>
@@ -70,6 +77,14 @@ const PurchaseView: FC<PurchaseViewProps> = ({
     // this guard keeps the rest of the file free of `| undefined` noise.
     throw new Error("PurchaseView requires at least one subscription product");
   }
+
+  const { plusTerms, bundles, unsupported } = useMemo(
+    () => groupPlusProducts(robloxSubscriptionProducts),
+    [robloxSubscriptionProducts],
+  );
+  const billingPeriodOptions = useMemo(() => plusTerms.map(toBillingPeriodOption), [plusTerms]);
+  const hasBundles = bundles.length > 0;
+  const opensBillingPeriodSheet = billingPeriodOptions.length > 1;
 
   const { id: productId, type: productType } = baselineProduct.productKey;
 
@@ -145,18 +160,26 @@ const PurchaseView: FC<PurchaseViewProps> = ({
       paymentSessionId ? { paymentSessionId } : {},
     );
     publishMetric(Event.PURCHASE_VIEW_SHOWN, {
-      variant: isMultiProduct ? "multi" : "single",
-      tierCount: String(robloxSubscriptionProducts.length),
+      variant: hasBundles ? "multi" : "single",
+      tierCount: String(bundles.length + 1),
+      opensBillingPeriodSheet: String(opensBillingPeriodSheet),
       isFreeTrial: String(isFreeTrial),
       referralLanding: landing.kind,
     });
   }, [
     paymentSessionId,
     isFreeTrial,
-    isMultiProduct,
-    robloxSubscriptionProducts.length,
+    hasBundles,
+    bundles.length,
+    opensBillingPeriodSheet,
     landing.kind,
   ]);
+
+  useEffect(() => {
+    unsupported.forEach(product => {
+      publishMetric(Event.UNSUPPORTED_PRODUCT_SKIPPED, { productId: product.productKey.id });
+    });
+  }, [unsupported]);
 
   const hasFiredReferralLanding = useRef(false);
   useEffect(() => {
@@ -176,33 +199,66 @@ const PurchaseView: FC<PurchaseViewProps> = ({
     null,
   );
 
-  const trackSubscribeClick = useCallback(() => {
-    const viewMessage = isFreeTrial
-      ? paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.ROBLOX_PLUS_FREE_TRIAL
-      : paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.ROBLOX_PLUS_SUBSCRIBE;
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBLOX_PLUS_PURCHASE,
-      false,
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_PLUS_LANDING,
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-      viewMessage,
-      paymentSessionId ? { paymentSessionId } : {},
-    );
-  }, [isFreeTrial, paymentSessionId]);
+  const trackSubscribeClick = useCallback(
+    (product: SubscriptionProductInfo) => {
+      const isProductFreeTrial = isFreeTrialEligible(product);
+      const viewMessage = isProductFreeTrial
+        ? paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.ROBLOX_PLUS_FREE_TRIAL
+        : paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.ROBLOX_PLUS_SUBSCRIBE;
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
+        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBLOX_PLUS_PURCHASE,
+        false,
+        paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_PLUS_LANDING,
+        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+        viewMessage,
+        {
+          product_id: product.productKey.id,
+          ...(paymentSessionId ? { paymentSessionId } : {}),
+        },
+      );
+    },
+    [paymentSessionId],
+  );
+
+  const trackBundleSubscribeClick = useCallback(
+    (product: SubscriptionProductInfo) => {
+      trackSubscribeClick(product);
+      publishMetric(Event.BUNDLE_PICKER_SUBSCRIBE_CLICK, {
+        productId: product.productKey.id,
+        isFreeTrial: String(isFreeTrialEligible(product)),
+      });
+    },
+    [trackSubscribeClick],
+  );
+
+  const billingPeriodAnalyticsContext = useMemo(
+    () => ({
+      triggeringContext:
+        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBLOX_PLUS_PURCHASE,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_PLUS_LANDING,
+    }),
+    [],
+  );
 
   const subscribeLabel = isFreeTrial
     ? translate("Action.TryItForFree")
     : translate("Action.Subscribe");
 
-  const subscribeButtonProps = {
-    productId,
-    productType,
+  const sharedButtonProps: BundleButtonProps = {
     deviceMeta,
     isDisabled: isEntrypointDisabled,
     paymentSessionId,
     referrerId,
-    trackSubscriptionButtonClick: trackSubscribeClick,
     onSubscribeClick: isMobileInApp ? onMobilePurchaseInitiated : undefined,
+  };
+
+  const subscribeButtonProps = {
+    ...sharedButtonProps,
+    productId,
+    productType,
+    trackSubscriptionButtonClick: () => {
+      trackSubscribeClick(baselineProduct);
+    },
   };
 
   // The referral popup is its own surface, so a subscribe from it is not a landing-CTA click.
@@ -232,6 +288,7 @@ const PurchaseView: FC<PurchaseViewProps> = ({
     </Button>
   );
 
+  const baselinePrice = useLocalizedMoney(baselineProduct.localizedPrice);
   const withBundlesSubtitle = translateHtml(
     translate,
     "Label.PlusLandingPage.Subtitle.V3",
@@ -243,7 +300,7 @@ const PurchaseView: FC<PurchaseViewProps> = ({
       },
     ],
     {
-      price: baselineProduct.localizedPriceDisplayString ?? "",
+      price: baselinePrice,
       periodType: baselineProduct.periodType,
     },
   );
@@ -257,7 +314,7 @@ const PurchaseView: FC<PurchaseViewProps> = ({
     >
       <Divider />
       <div className="width-full gap-y-medium padding-b-[env(safe-area-inset-bottom\,0px)] padding-x-xxlarge flex flex-col items-stretch">
-        {isMultiProduct ? (
+        {opensBillingPeriodSheet ? (
           renderSheetTriggerButton("min-width-0 width-full")
         ) : (
           <SubscriptionButton
@@ -279,7 +336,7 @@ const PurchaseView: FC<PurchaseViewProps> = ({
     <Fragment>
       <BackdropTexture />
       <div className="width-full min-width-0 large:items-center flex flex-col items-start">
-        <div className="margin-top-[48px] width-full min-width-0 content-emphasis large:max-width-[730px] large:gap-y-[32px] large:self-auto large:padding-x-xlarge flex flex-col gap-y-[32px] self-stretch">
+        <div className="margin-top-[48px] width-full min-width-0 content-emphasis large:max-width-[792px] large:gap-y-[32px] large:self-auto large:padding-x-xlarge flex flex-col gap-y-[32px] self-stretch">
           {PURCHASE_GIFT_BANNER_CONFIG.enabled && (
             <div className="width-full min-width-0 padding-x-xxlarge large:padding-x-none">
               <RobloxPlusGiftItemUpsellBanner
@@ -307,7 +364,7 @@ const PurchaseView: FC<PurchaseViewProps> = ({
               </h1>
             </div>
             <div className="gap-y-xsmall width-full min-width-0 large:text-align-x-center flex flex-col">
-              {isMultiProduct ? (
+              {hasBundles ? (
                 <span className="text-body-large content-emphasis">{withBundlesSubtitle}</span>
               ) : (
                 <BillingInfoDisplay
@@ -318,7 +375,7 @@ const PurchaseView: FC<PurchaseViewProps> = ({
               )}
               <div className="width-full gap-y-medium padding-t-none large:margin-x-auto large:margin-top-[24px] large:flex large:max-width-[min(440px,100%)] large:width-full large:flex-col large:items-center hidden items-start">
                 <div className="width-full gap-x-small flex shrink-0 flex-row items-start justify-center">
-                  {isMultiProduct ? (
+                  {opensBillingPeriodSheet ? (
                     renderSheetTriggerButton("width-full large:width-[230px] shrink-0", "Medium")
                   ) : (
                     <SubscriptionButton
@@ -346,6 +403,15 @@ const PurchaseView: FC<PurchaseViewProps> = ({
                 }}
               />
             </div>
+            {hasBundles && (
+              <div className="padding-b-xlarge large:padding-b-none">
+                <PlusBundleCards
+                  bundles={bundles}
+                  buttonProps={sharedButtonProps}
+                  trackSubscribeClick={trackBundleSubscribeClick}
+                />
+              </div>
+            )}
             <p
               className="text-caption-small content-muted padding-x-xsmall text-align-x-start large:block large:padding-x-none hidden"
               data-testid="purchase-legal-footer"
@@ -367,13 +433,14 @@ const PurchaseView: FC<PurchaseViewProps> = ({
           }
         }}
       />
-      {isMultiProduct && (
-        <BundlePickerSheet
+      {opensBillingPeriodSheet && (
+        <BillingPeriodSheet
+          analyticsContext={billingPeriodAnalyticsContext}
           deviceMeta={deviceMeta}
-          isEntrypointDisabled={isEntrypointDisabled}
+          isDisabled={isEntrypointDisabled}
           isOpen={isSheetOpen}
+          options={billingPeriodOptions}
           paymentSessionId={paymentSessionId}
-          products={robloxSubscriptionProducts}
           referrerId={referrerId}
           onMobilePurchaseInitiated={onMobilePurchaseInitiated}
           onOpenChange={setIsSheetOpen}
