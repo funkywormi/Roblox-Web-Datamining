@@ -82,13 +82,39 @@ function configureGroupService(
     );
   }
 
+  function getCanConfigureGroupProfile(groupId, isUnifiedUIEnabled) {
+    if (!isUnifiedUIEnabled) {
+      return $q.when(false);
+    }
+    const config = {
+      url: $filter('formatString')(configureGroupConstants.urls.getResolvedGroupPermissionsUrl, {
+        groupId
+      })
+    };
+    return httpService
+      .httpGet({ url: `${EnvironmentUrls.groupsApi}/v1/groups/${groupId}/migration` })
+      .then(migrationStatus => {
+        if (migrationStatus.status !== 'Migrated') {
+          return false;
+        }
+        return httpService
+          .httpGet(config)
+          .then(response => response?.permissions?.canConfigureGroupProfile === true);
+      })
+      .catch(error => {
+        $log.error('[ConfigureGroup] profile permission check failed', { groupId, error });
+        return false;
+      });
+  }
+
   function canViewMenuOption(
     menuOption,
     isOwner,
     permissions,
     policies,
     channelsPermissions,
-    canManageRolePermissions
+    canManageRolePermissions,
+    canConfigureGroupProfile
   ) {
     if (
       menuOption.name === configureGroupConstants.menuOptionNames.socialLinks &&
@@ -163,6 +189,12 @@ function configureGroupService(
       return true;
     }
 
+    if (
+      menuOption.name === configureGroupConstants.menuOptionNames.information ||
+      menuOption.name === configureGroupConstants.menuOptionNames.socialLinks
+    ) {
+      return canConfigureGroupProfile;
+    }
     if (menuOption.name === configureGroupConstants.menuOptionNames.settings) {
       if (permissions.groupManagementPermissions.manageRelationships) {
         return true;
@@ -312,6 +344,9 @@ function configureGroupService(
         const canManageRolePermissionsPromise = productFeaturesPromise.then(productFeatures =>
           getCanManageRolePermissions(groupId, productFeatures?.IsUnifiedUIEnabled === true)
         );
+        const canConfigureGroupProfilePromise = productFeaturesPromise.then(productFeatures =>
+          getCanConfigureGroupProfile(groupId, productFeatures?.IsUnifiedUIEnabled === true)
+        );
 
         const menuOptions = [];
         const menuOptionNameValidity = {};
@@ -326,7 +361,8 @@ function configureGroupService(
           pendingJoinRequestsPromise,
           groupPromise,
           productFeaturesPromise,
-          canManageRolePermissionsPromise
+          canManageRolePermissionsPromise,
+          canConfigureGroupProfilePromise
         ]).then(
           function (responses) {
             const { role } = responses[0].userRole;
@@ -341,6 +377,7 @@ function configureGroupService(
             const group = responses[6];
             const productFeatures = responses[7];
             const canManageRolePermissions = responses[8];
+            const canConfigureGroupProfile = responses[9];
 
             const currentUserId = Number(CurrentUser.userId);
             const isOwnerRolesetDeprecated = productFeatures?.IsOwnerRolesetDeprecated === true;
@@ -361,7 +398,8 @@ function configureGroupService(
                   permissions,
                   policies,
                   channelPermissions,
-                  canManageRolePermissions
+                  canManageRolePermissions,
+                  canConfigureGroupProfile
                 )
               ) {
                 const submenuOptions = [];

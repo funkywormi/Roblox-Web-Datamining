@@ -2,7 +2,7 @@ import type { FunctionComponent } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { TextArea, TextInput, Button, Icon, Radio, RadioGroup } from '@rbx/foundation-ui';
 import { useTranslation } from '@rbx/intl';
-import { Grid, DialogTemplate, useDialog, useTheme } from '@rbx/ui';
+import { Alert, Grid, DialogTemplate, useDialog, useTheme } from '@rbx/ui';
 import type { GroupRoleColorType } from '../../clients/groups';
 import type { GroupRoleMetadata } from '../../clients/groups';
 import TranslationNamespace from '../../constants/TranslationNamespace';
@@ -24,7 +24,6 @@ import {
   RoleVisibility,
 } from '../../utils/constants';
 import { OrganizationsEventName, logOrganizationsEvent } from '../../utils/eventUtils';
-import { canEditRoleMetadata } from '../../utils/groupPermissions';
 import RoleIdCopyRow from './RoleIdCopyRow';
 
 export type RoleSettingsProps = {
@@ -32,7 +31,9 @@ export type RoleSettingsProps = {
   onSave: (role: GroupRoleMetadata) => Promise<void>;
   onDelete: (role: GroupRoleMetadata) => void;
   saving?: boolean;
+  deleting?: boolean;
   disabled?: boolean;
+  showDescription?: boolean;
 };
 
 const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>> = ({
@@ -40,12 +41,13 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
   onSave,
   onDelete,
   saving = false,
+  deleting = false,
   disabled = false,
+  showDescription = true,
 }) => {
   const { translate, translateWithNamespace } = useTranslation();
   const { palette } = useTheme();
-  const { group, isOwner, organization, permissions, rolePermissions, unifiedLogger } =
-    useCurrentGroup();
+  const { group, isOwner, organization, permissions, unifiedLogger } = useCurrentGroup();
   const { configure: configureDialog, open: openDialog, close: closeDialog } = useDialog();
 
   const { data: configMetadata } = useGetGroupConfigurationMetadata();
@@ -55,7 +57,9 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
   // Hidden until product features load so it never flashes in then out when the flag is on;
   // it pops in only once we know HideRoleDescription is off.
   const showRoleDescription =
-    !isProductFeaturesLoading && !(productFeatures?.hideRoleDescription ?? false);
+    showDescription &&
+    !isProductFeaturesLoading &&
+    !(productFeatures?.hideRoleDescription ?? false);
   const roleConfig = configMetadata?.roleConfiguration;
   const nameMaxLength = roleConfig?.nameMaxLength ?? DefaultRoleNameMaxLength;
   const descriptionMaxLength = roleConfig?.descriptionMaxLength ?? DefaultRoleDescriptionMaxLength;
@@ -63,6 +67,7 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
   const maxRank = roleConfig?.maxRank ?? DefaultRoleMaxRank;
 
   const isBaseMemberRole = role.id === DefaultMemberRoleIdNumber;
+  const isBusy = saving || deleting;
 
   const [name, setName] = useState<string>(role?.name ?? '');
   const [rank, setRank] = useState<number>(role?.rank ?? minRank);
@@ -146,12 +151,12 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
 
   const handleSelectColor = useCallback(
     (newColor: GroupRoleColorType) => {
-      if (disabled || saving) {
+      if (disabled || isBusy) {
         return;
       }
       setColor(newColor);
     },
-    [setColor, disabled, saving],
+    [setColor, disabled, isBusy],
   );
 
   const onNameChanged = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -195,7 +200,7 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
           ? translateWithNamespace(
               TranslationNamespace.GroupManagement,
               'Message.RoleWithUsersAllowDeletion',
-              { numUsers: memberCount.toString(), role: role.name ?? '' },
+              { numUsers: new Intl.NumberFormat().format(memberCount), role: role.name ?? '' },
             )
           : translateWithNamespace(TranslationNamespace.Groups, 'Message.DeleteRoleset', {
               role: role.name ?? '',
@@ -225,11 +230,7 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
   const showDeleteRole =
     (isOwner === true || permissions?.canDeleteRoles === true) && !isBaseMemberRole;
 
-  const permissionsForRole =
-    role.id === undefined ? undefined : rolePermissions?.[role.id.toString()];
-  const canEditVisibility = canEditRoleMetadata(permissionsForRole);
-
-  const showVisibility = canEditVisibility && !isBaseMemberRole;
+  const showVisibility = !isBaseMemberRole;
 
   return (
     <Grid
@@ -239,16 +240,35 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
       wrap='wrap'
       className='padding-top-large padding-bottom-large'
       gap={3}>
+      {disabled && (
+        <Grid item XSmall={12} data-testid='role-settings-read-only-notice'>
+          <Alert
+            severity='info'
+            variant='standard'
+            icon={
+              <span data-testid='role-settings-read-only-lock-icon'>
+                <Icon name='icon-filled-lock-closed' size='Medium' />
+              </span>
+            }>
+            <div className='flex flex-col gap-xsmall'>
+              <strong>{translate('Description.AccessDenied')}</strong>
+              <span>{translate('Label.AccessDenied')}</span>
+            </div>
+          </Alert>
+        </Grid>
+      )}
       <Grid container item XSmall={12}>
         <div className={`width-full${showRoleDescription ? ' padding-bottom-large' : ''}`}>
           <TextInput
             label={translateWithNamespace(TranslationNamespace.GroupManagement, 'Label.RoleName')}
             maxLength={nameMaxLength}
             value={name}
-            isDisabled={disabled || saving}
+            isDisabled={disabled || isBusy}
             onChange={onNameChanged}
           />
-          <span className='block text-caption-medium text-align-x-end'>
+          <span
+            className='block text-caption-medium text-align-x-end'
+            style={{ opacity: disabled ? 0.5 : undefined }}>
             {name.length}/{nameMaxLength}
           </span>
         </div>
@@ -259,10 +279,12 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
               textareaStyle={{ resize: 'vertical', minHeight: '150px' }}
               maxLength={descriptionMaxLength}
               value={description}
-              isDisabled={disabled || saving}
+              isDisabled={disabled || isBusy}
               onChange={onDescriptionChanged}
             />
-            <span className='block text-caption-medium text-align-x-end'>
+            <span
+              className='block text-caption-medium text-align-x-end'
+              style={{ opacity: disabled ? 0.5 : undefined }}>
               {description.length}/{descriptionMaxLength}
             </span>
           </div>
@@ -270,7 +292,9 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
       </Grid>
       {!isBaseMemberRole && (
         <Grid container item XSmall={12} wrap='wrap'>
-          <div className='block text-title-large padding-bottom-small'>
+          <div
+            className='block text-title-large padding-bottom-small'
+            style={{ opacity: disabled ? 0.5 : undefined }}>
             {translateWithNamespace(TranslationNamespace.GroupManagement, 'Label.RoleColor')}
           </div>
           <Grid container item XSmall={12} wrap='wrap'>
@@ -287,29 +311,65 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
                     key={roleColorType}
                     type='button'
                     data-role-color={roleColorType}
-                    className={`flex radius-circle outline-none padding-none${!disabled && !saving ? ' cursor-pointer' : ''}`}
+                    className={`flex radius-circle outline-none padding-none${!disabled && !isBusy ? ' cursor-pointer' : ''}`}
                     style={{
                       width: 32,
                       height: 32,
+                      position: 'relative',
                       border: 'none',
-                      background: `var(--${bgToken})`,
+                      background: 'transparent',
                     }}
                     aria-label={colorName}
                     title={colorName}
+                    disabled={disabled || isBusy}
                     onClick={() => handleSelectColor(roleColorType)}>
+                    <span
+                      aria-hidden
+                      data-testid={`role-color-swatch-${roleColorType}`}
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        borderRadius: '50%',
+                        background: `var(--${bgToken})`,
+                        filter: disabled ? 'grayscale(100%)' : undefined,
+                        opacity: disabled ? 0.45 : undefined,
+                      }}
+                    />
                     {color === roleColorType && roleColorType !== DefaultRoleColor && (
-                      <Icon
-                        name='icon-filled-check'
-                        size='Medium'
-                        className='margin-auto content-emphasis'
-                      />
+                      <span
+                        aria-hidden
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          zIndex: 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <Icon name='icon-filled-check' size='Medium' className='content-emphasis' />
+                      </span>
                     )}
                     {roleColorType === DefaultRoleColor && (
-                      <Icon
-                        name='icon-filled-circle-slash'
-                        size='Medium'
-                        className={`margin-auto ${color === roleColorType ? 'content-action-sub-emphasis' : 'content-emphasis'}`}
-                      />
+                      <span
+                        aria-hidden
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          zIndex: 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <Icon
+                          name='icon-filled-circle-slash'
+                          size='Medium'
+                          className={
+                            color === roleColorType
+                              ? 'content-action-sub-emphasis'
+                              : 'content-emphasis'
+                          }
+                        />
+                      </span>
                     )}
                   </button>
                 );
@@ -325,7 +385,7 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
           min={minRank}
           max={maxRank}
           value={rank.toString()}
-          isDisabled={disabled || saving || isBaseMemberRole}
+          isDisabled={disabled || isBusy || isBaseMemberRole}
           hasError={rankHasError}
           onChange={onRankChanged}
           helperText={
@@ -336,13 +396,15 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
       </div>
       {showVisibility && (
         <div className='width-full'>
-          <div className='block text-title-large padding-bottom-small'>
+          <div
+            className='block text-title-large padding-bottom-small'
+            style={{ opacity: disabled ? 0.5 : undefined }}>
             {translateWithNamespace(TranslationNamespace.GroupManagement, 'Label.Visibility')}
           </div>
           <RadioGroup
             size='Medium'
             value={isPrivate ? RoleVisibility.Private : RoleVisibility.Public}
-            isDisabled={disabled || saving}
+            isDisabled={disabled || isBusy}
             onValueChange={onVisibilityChanged}>
             <Radio
               value={RoleVisibility.Public}
@@ -374,7 +436,7 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
           <Button
             variant='Emphasis'
             size='Medium'
-            isDisabled={isSaveButtonDisabled}
+            isDisabled={isSaveButtonDisabled || deleting}
             onClick={handleSave}
             isLoading={saving}>
             {translateWithNamespace(TranslationNamespace.GroupManagement, 'Action.Save')}
@@ -383,7 +445,7 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
             variant='Standard'
             size='Medium'
             onClick={handleCancel}
-            isDisabled={saving || !hasUnsavedChanges}>
+            isDisabled={isBusy || !hasUnsavedChanges}>
             {translateWithNamespace(TranslationNamespace.GroupManagement, 'Action.Cancel')}
           </Button>
           {showDeleteRole && (
@@ -391,7 +453,9 @@ const RoleSettings: FunctionComponent<React.PropsWithChildren<RoleSettingsProps>
               variant='Alert'
               size='Medium'
               aria-label='delete-role'
-              isDisabled={disabled || saving}
+              aria-busy={deleting}
+              isDisabled={disabled || isBusy}
+              isLoading={deleting}
               onClick={handleOpenDialog}>
               {translateWithNamespace(TranslationNamespace.GroupManagement, 'Action.DeleteRole')}
             </Button>

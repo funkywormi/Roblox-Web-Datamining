@@ -1,9 +1,9 @@
 /* eslint-disable no-void */
 import { useCallback, useContext, useEffect, useState } from "react";
-import { useSystemFeedback } from "@rbx/core-ui";
 import { CurrentUser } from "@rbx/core-scripts/legacy/Roblox";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { RequirementType } from "@rbx/user-settings";
+import { useToast } from "@rbx/payments/components";
 import {
   checkUserPurchaseSetting,
   UserPurchaseSettingFailureReason,
@@ -53,12 +53,12 @@ function getViolationLabel(violation: UserPurchaseSettingFailureReason) {
 export function usePurchaseEligibility(): {
   isUserEligibleForPurchase: () => Promise<boolean>;
 } {
+  const { toastService } = useToast();
   const {
     purchaseDisabled: { openModal: openPurchaseDisabledModal },
   } = useContext(ModalContext);
   const { trackEconomicRestrictionErrorShown } = useContext(TrackingContext);
 
-  const { systemFeedbackService } = useSystemFeedback();
   const { translate } = useTranslation();
 
   const [vpcOptimizationEnabled, setVPCOptimizationEnabled] = useState<boolean | undefined>();
@@ -123,7 +123,7 @@ export function usePurchaseEligibility(): {
     const userPurchaseSetting = await checkUserPurchaseSetting();
     if (!userPurchaseSetting) {
       trackCounter("PurchaseEligibilityFailedToFetch");
-      systemFeedbackService.warning(translate("Heading.GeneralError"));
+      toastService.warning(translate("Heading.GeneralError"));
       return false;
     }
 
@@ -131,8 +131,8 @@ export function usePurchaseEligibility(): {
       trackEconomicRestrictionErrorShown();
 
       const timeoutInHours = Math.ceil(userPurchaseSetting.expirationTimeInMinutes / 60);
-      const violation = getViolationLabel(userPurchaseSetting.failureReason);
-      systemFeedbackService.warning(
+      const violation = translate(getViolationLabel(userPurchaseSetting.failureReason));
+      toastService.warning(
         timeoutInHours > 24
           ? translate("Text.EconomicRestrictionsDays", {
               day: Math.ceil(timeoutInHours / 24),
@@ -189,11 +189,11 @@ export function usePurchaseEligibility(): {
     trackCounter("PurchaseEligibility", {
       failureReason: userPurchaseSetting.failureReason,
     });
-    systemFeedbackService.warning(translate("Heading.GeneralError"));
+    toastService.warning(translate("Heading.GeneralError"));
     return false;
   }, [
     trackEconomicRestrictionErrorShown,
-    systemFeedbackService,
+    toastService,
     translate,
     fetchParentalConsentRequiredForSettingUpdate,
     fetchPurchasingDisabledBySelf,

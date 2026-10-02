@@ -11,7 +11,7 @@ import {
   SupportTicketAttachmentDraft,
   SUPPORT_TICKET_ICON_REGULAR_BUG
 } from '../types/supportTicket';
-import { ForumCategory } from '../types';
+import { ForumCategory, ForumComment } from '../types';
 import useForumImageAttachments from './useForumImageAttachments';
 
 const SUPPORT_TICKET_EDUCATION_TOOLTIP_KEY =
@@ -22,6 +22,7 @@ type UsePostComposerAttachmentsParams = {
   activeCategory?: ForumCategory;
   canCreatePostInActiveCategory: boolean;
   isEditing: boolean;
+  editingComment?: ForumComment;
   // Read at open time to seed the (first) bug report's details from the in-progress post.
   getPrefillDetails?: () => string;
 };
@@ -29,8 +30,11 @@ type UsePostComposerAttachmentsParams = {
 type UsePostComposerAttachmentsResult = {
   // The attached draft, if any, so the composer can include it in the create-post request.
   supportTicketAttachment: SupportTicketAttachmentDraft | null;
-  // Ordered, completed image assets for the create-post request.
-  mediaAssetIds: number[];
+  // Ordered, completed image assets for the request. Undefined for an edit that leaves the saved
+  // images unchanged.
+  mediaAssetIds?: number[];
+  // Whether an edit changed its images, which makes it submittable without a text change.
+  hasUnsavedImageChanges: boolean;
   // Publishing is blocked until every selected image has uploaded successfully.
   isImageUploadBlockingSubmit: boolean;
   // Rendered into the editor's leadingControls slot (the (+) menu, optionally with education).
@@ -50,6 +54,7 @@ const usePostComposerAttachments = ({
   activeCategory,
   canCreatePostInActiveCategory,
   isEditing,
+  editingComment,
   getPrefillDetails
 }: UsePostComposerAttachmentsParams): UsePostComposerAttachmentsResult => {
   const { translate } = useTranslation();
@@ -69,6 +74,7 @@ const usePostComposerAttachments = ({
 
   const {
     mediaAssetIds,
+    hasUnsavedImageChanges,
     isSubmitBlocked: isImageUploadBlockingSubmit,
     menuItem: imageMenuItem,
     contentFooter: imageUploadPreviews,
@@ -77,7 +83,8 @@ const usePostComposerAttachments = ({
     groupId,
     activeCategory,
     canCreateInActiveCategory: canCreatePostInActiveCategory,
-    isEditing
+    isEditing,
+    editingComment
   });
 
   // Snapshot the in-progress post into the details field only when starting a fresh report; editing
@@ -163,6 +170,7 @@ const usePostComposerAttachments = ({
   return {
     supportTicketAttachment,
     mediaAssetIds,
+    hasUnsavedImageChanges,
     isImageUploadBlockingSubmit,
     leadingControl,
     contentFooter,

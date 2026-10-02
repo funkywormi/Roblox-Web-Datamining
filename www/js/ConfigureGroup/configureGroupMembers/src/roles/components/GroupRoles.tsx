@@ -1,4 +1,4 @@
-import type { FunctionComponent } from 'react';
+import type { FunctionComponent, ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Icon } from '@rbx/foundation-ui';
 import { useTranslation, withTranslation } from '@rbx/intl';
@@ -22,6 +22,7 @@ import type {
   GroupRolePermissions,
 } from '../../clients/groups';
 import ErrorState from '../../components/ErrorState';
+import PermissionDeniedState from '../../components/PermissionDeniedState';
 import TranslationNamespace from '../../constants/TranslationNamespace';
 import useCurrentGroup from '../../hooks/useCurrentGroup';
 import { PermissionsContainer } from '../../permissions/containers/PermissionsContainer';
@@ -42,7 +43,6 @@ import {
 import { OrganizationsEventName, logOrganizationsEvent } from '../../utils/eventUtils';
 import {
   canEditRolePermissions,
-  canViewAnyRoleTab,
   canViewRoleMembersTab,
   canViewRolePermissionsTab,
   canViewRoleSettingsTab,
@@ -50,6 +50,7 @@ import {
 import { getRandomRoleColorType, getRoleIconName, getRoleStyle } from '../../utils/groupUtils';
 import { ConfigureRoleTab } from '../../utils/types';
 import type { RoleCreationMetadata, RoleMetadataForNewRole } from '../../utils/types';
+import { deleteRoleAndWaitForCompletion } from '../utils/roleDeletion';
 import CreateRoleModal from './CreateRoleModal';
 import RoleIdCopyRow from './RoleIdCopyRow';
 import RoleMembers from './RoleMembers';
@@ -61,6 +62,22 @@ const CONFIGURE_ROLE_TABS: ConfigureRoleTab[] = [
   ConfigureRoleTab.Members,
   ConfigureRoleTab.Settings,
 ];
+
+const getDisplayedConfigureRoleTabs = (
+  roleId: number | undefined,
+  roleRank: number | undefined,
+): ConfigureRoleTab[] => {
+  if (roleRank === GuestRoleRank) {
+    return [ConfigureRoleTab.Permissions];
+  }
+
+  return roleId === DefaultMemberRoleIdNumber
+    ? CONFIGURE_ROLE_TABS.filter((tab) => tab !== ConfigureRoleTab.Members)
+    : CONFIGURE_ROLE_TABS;
+};
+
+const getDefaultConfigureRoleTab = (roleRank: number | undefined): ConfigureRoleTab =>
+  roleRank === GuestRoleRank ? ConfigureRoleTab.Permissions : ConfigureRoleTab.Settings;
 
 export const getSelectedConfigureRoleTab = (
   currentTab: ConfigureRoleTab | undefined,
@@ -201,10 +218,12 @@ const useGroupRolesStyles = makeStyles()((theme) => ({
 
 export type GroupRolesProps = {
   disabled?: boolean;
+  permissionDeniedContent?: ReactNode;
 };
 
 const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = ({
   disabled = false,
+  permissionDeniedContent,
 }) => {
   const { translate, translateWithNamespace } = useTranslation();
   const { palette } = useTheme();
@@ -242,6 +261,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
   const [selectedRole, setSelectedRole] = useState<RoleCreationMetadata>();
   const [selectedTab, setSelectedTab] = useState<ConfigureRoleTab>();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+  const [deletingRoleId, setDeletingRoleId] = useState<number>();
 
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('Medium'));
 
@@ -254,7 +274,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
 
   const { mutateAsync: updateRoleMetadataAsync } = useUpdateRoleMetadata();
   const { mutateAsync: createRoleAsync } = useCreateRole();
-  const { mutate: deleteRole } = useDeleteRole();
+  const { mutateAsync: deleteRoleAsync } = useDeleteRole();
 
   const [prevFetchedRoles, setPrevFetchedRoles] = useState<typeof fetchedRoles | null>(null);
   if (fetchedRoles !== prevFetchedRoles) {
@@ -271,64 +291,47 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
   }, [isErrorFetchingRoles, showToast, translate]);
 
   const [prevLocalRolesForAutoSelect, setPrevLocalRolesForAutoSelect] = useState(localRoles);
-  const accessibleRoleIds = useMemo(
-    () =>
-      (localRoles ?? []).flatMap((role) => {
-        const candidateRoleId = role.metadata?.id;
-        if (
-          candidateRoleId === undefined ||
-          !canViewAnyRoleTab(
-            rolePermissions?.[candidateRoleId.toString()],
-            candidateRoleId === DefaultMemberRoleIdNumber,
-            role.metadata?.rank === GuestRoleRank,
-            isOwner,
-          )
-        ) {
-          return [];
-        }
-        return [candidateRoleId.toString()];
-      }),
-    [isOwner, localRoles, rolePermissions],
+  const areRolePermissionsResolved = rolePermissions !== undefined;
+  const [previousAreRolePermissionsResolved, setPreviousAreRolePermissionsResolved] = useState(
+    areRolePermissionsResolved,
   );
-  const selectableRoleIds = rolePermissions === undefined ? undefined : accessibleRoleIds;
-  const [prevSelectableRoleIds, setPrevSelectableRoleIds] = useState(selectableRoleIds);
   const [pendingNavigationId, setPendingNavigationId] = useState<string | undefined>(undefined);
 
   const autoSelectInputsChanged =
-    prevLocalRolesForAutoSelect !== localRoles || prevSelectableRoleIds !== selectableRoleIds;
+    prevLocalRolesForAutoSelect !== localRoles ||
+    previousAreRolePermissionsResolved !== areRolePermissionsResolved;
 
   if (
     !isMobile &&
     !selectedRole &&
     localRoles !== undefined &&
-    selectableRoleIds !== undefined &&
+    areRolePermissionsResolved &&
     autoSelectInputsChanged
   ) {
     setPrevLocalRolesForAutoSelect(localRoles);
-    setPrevSelectableRoleIds(selectableRoleIds);
+    setPreviousAreRolePermissionsResolved(areRolePermissionsResolved);
 
-    const accessibleRoles = localRoles.filter(
-      (role) =>
-        role.metadata?.id !== undefined && selectableRoleIds.includes(role.metadata.id.toString()),
-    );
     const role = roleId
-      ? accessibleRoles.find((accessibleRole) => accessibleRole.metadata?.id === roleId)
+      ? localRoles.find((candidateRole) => candidateRole.metadata?.id === roleId)
       : undefined;
-    const fallback = accessibleRoles[accessibleRoles.length - 1];
+    const fallback = localRoles[localRoles.length - 1];
     const nextSelectedRole = role ?? fallback;
     if (!role && fallback?.metadata?.id !== undefined) {
       setPendingNavigationId(fallback.metadata.id.toString());
     }
     setSelectedRole(nextSelectedRole);
     setSelectedTab(
-      getConfigureRoleTabs(
-        nextSelectedRole?.metadata?.id,
-        nextSelectedRole?.metadata?.rank,
-        nextSelectedRole?.isNewRole,
-        permissions,
-        rolePermissions,
-        isOwner,
-      )[0],
+      getSelectedConfigureRoleTab(
+        undefined,
+        getConfigureRoleTabs(
+          nextSelectedRole?.metadata?.id,
+          nextSelectedRole?.metadata?.rank,
+          nextSelectedRole?.isNewRole,
+          permissions,
+          rolePermissions,
+          isOwner,
+        ),
+      ) ?? getDefaultConfigureRoleTab(nextSelectedRole?.metadata?.rank),
     );
   }
 
@@ -336,7 +339,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
     if (pendingNavigationId !== undefined) {
       navigation?.navigateToRole?.(pendingNavigationId);
       // Reset to prevent a loop when `navigation` changes.
-      // oxlint-disable-next-line react/react-compiler -- one-shot navigation trigger reset
+      // oxlint-disable-next-line react/set-state-in-effect -- one-shot navigation trigger reset
       setPendingNavigationId(undefined);
     }
   }, [navigation, pendingNavigationId]);
@@ -462,45 +465,60 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
   );
 
   const handleDeleteRole = useCallback(
-    (role: GroupRoleMetadata) => {
+    async (role: GroupRoleMetadata) => {
       if (!organization?.id || role.id === undefined) {
         return;
       }
 
-      setIsRoleSaving(true);
-
-      deleteRole(
-        {
-          groupId: Number.parseInt(organization.groupId, 10),
-          rolesetId: role.id,
+      const roleIdToDelete = role.id;
+      setDeletingRoleId(roleIdToDelete);
+      const roleWasDeleted = await deleteRoleAndWaitForCompletion({
+        roleId: roleIdToDelete,
+        deleteRole: () =>
+          deleteRoleAsync({
+            groupId: Number.parseInt(organization.groupId, 10),
+            rolesetId: roleIdToDelete,
+          }),
+        getRoles: async () => {
+          const result = await refetchRoles();
+          if (result.error) {
+            throw result.error;
+          }
+          return result.data;
         },
-        {
-          onError: () => {
-            showToast(
-              translateWithNamespace(TranslationNamespace.Organization, 'Error.DeletingRole'),
-              true,
-            );
-          },
-          onSuccess: () => {
-            if (isMobile) {
-              setSelectedTab(undefined);
-              setSelectedRole(undefined);
-            }
+      });
 
-            logOrganizationsEvent(unifiedLogger, OrganizationsEventName.ClickOrgsDeleteRole, {
-              group_id: organization.groupId ?? '',
-              role_id: role.id?.toString() ?? '',
-            });
-            setLocalRoles((prev) => prev?.filter((r) => r.metadata?.id !== role.id));
-            setSelectedRole(undefined);
-          },
-          onSettled: () => {
-            setIsRoleSaving(false);
-          },
-        },
-      );
+      if (roleWasDeleted) {
+        if (isMobile) {
+          setSelectedTab(undefined);
+          setSelectedRole(undefined);
+        }
+
+        logOrganizationsEvent(unifiedLogger, OrganizationsEventName.ClickOrgsDeleteRole, {
+          group_id: organization.groupId ?? '',
+          role_id: roleIdToDelete.toString(),
+        });
+        setLocalRoles((prev) => prev?.filter((r) => r.metadata?.id !== roleIdToDelete));
+        setSelectedRole(undefined);
+        showToast(translateWithNamespace(TranslationNamespace.Groups, 'Message.RoleDeleteSuccess'));
+      } else {
+        showToast(
+          translateWithNamespace(TranslationNamespace.Organization, 'Error.DeletingRole'),
+          true,
+        );
+      }
+
+      setDeletingRoleId(undefined);
     },
-    [organization, unifiedLogger, isMobile, showToast, translateWithNamespace, deleteRole],
+    [
+      organization,
+      deleteRoleAsync,
+      refetchRoles,
+      isMobile,
+      unifiedLogger,
+      showToast,
+      translateWithNamespace,
+    ],
   );
 
   const handleSelectRole = useCallback(
@@ -517,7 +535,11 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             rolePermissions,
             isOwner,
           );
-          setSelectedTab((currentTab) => getSelectedConfigureRoleTab(currentTab, availableTabs));
+          setSelectedTab(
+            (currentTab) =>
+              getSelectedConfigureRoleTab(currentTab, availableTabs) ??
+              getDefaultConfigureRoleTab(role.rank),
+          );
         }
       } else {
         setIsCreateModalOpen(true);
@@ -580,6 +602,11 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             showConfirmationOnSave: isDefaultMemberRole,
           }}
         />
+        {selectedRoleId !== undefined && selectedRole?.isNewRole !== true && (
+          <Grid item XSmall={12} style={{ paddingTop: 24 }}>
+            <RoleIdCopyRow roleId={selectedRoleId} />
+          </Grid>
+        )}
       </Grid>
     );
   }, [
@@ -592,6 +619,11 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
     selectedRole?.metadata?.name,
     selectedRole?.metadata?.rank,
   ]);
+
+  const permissionDeniedState = useMemo(
+    () => permissionDeniedContent ?? <PermissionDeniedState />,
+    [permissionDeniedContent],
+  );
 
   const roleMembersTabContent = useMemo(() => {
     if (!selectedRole?.metadata) {
@@ -620,11 +652,17 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             <CircularProgress />
           </Grid>
         ) : (
-          <>{canViewRoleMembers && <RoleMembers role={selectedRole.metadata} />}</>
+          <>
+            {canViewRoleMembers ? (
+              <RoleMembers role={selectedRole.metadata} />
+            ) : (
+              permissionDeniedState
+            )}
+          </>
         )}
       </>
     );
-  }, [isOwner, permissions, rolePermissions, selectedRole]);
+  }, [isOwner, permissions, permissionDeniedState, rolePermissions, selectedRole]);
 
   const roleSettingsTabContent = useMemo(() => {
     if (!selectedRole?.metadata) {
@@ -652,49 +690,52 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             <CircularProgress />
           </Grid>
         ) : (
-          <>
-            {canViewRoleSettings && (
-              <RoleSettings
-                key={selectedRole.metadata?.id}
-                role={selectedRole.metadata}
-                disabled={!canViewRoleSettings}
-                onSave={handleUpdateRoleSettings}
-                onDelete={handleDeleteRole}
-                saving={isRoleSaving}
-              />
-            )}
-          </>
+          <RoleSettings
+            key={selectedRole.metadata?.id}
+            role={selectedRole.metadata}
+            disabled={!canViewRoleSettings}
+            showDescription={selectedRole.metadata.description !== undefined}
+            onSave={handleUpdateRoleSettings}
+            onDelete={handleDeleteRole}
+            saving={isRoleSaving}
+            deleting={deletingRoleId === selectedRole.metadata.id}
+          />
         )}
       </>
     );
   }, [
     handleDeleteRole,
     handleUpdateRoleSettings,
+    deletingRoleId,
     isRoleSaving,
     isOwner,
     permissions,
     rolePermissions,
     selectedRole,
   ]);
-  const visibleRoleTabs = useMemo(
-    () =>
-      getConfigureRoleTabs(
-        selectedRole?.metadata?.id,
-        selectedRole?.metadata?.rank,
-        selectedRole?.isNewRole,
-        permissions,
-        rolePermissions,
-        isOwner,
-      ),
-    [
-      isOwner,
-      permissions,
-      rolePermissions,
-      selectedRole?.isNewRole,
-      selectedRole?.metadata?.id,
-      selectedRole?.metadata?.rank,
-    ],
+
+  const selectedRolePermissions =
+    selectedRole?.metadata?.id === undefined
+      ? undefined
+      : rolePermissions?.[selectedRole.metadata.id.toString()];
+  const canViewSelectedRolePermissions =
+    selectedRole?.isNewRole === true && (isOwner || permissions?.canCreateRoles === true)
+      ? true
+      : canViewRolePermissionsTab(selectedRolePermissions, isOwner);
+  const displayedRoleTabs = getDisplayedConfigureRoleTabs(
+    selectedRole?.metadata?.id,
+    selectedRole?.metadata?.rank,
   );
+  const rolePermissionsTabContent =
+    permissions === undefined ? (
+      <Grid container justifyContent='center'>
+        <CircularProgress />
+      </Grid>
+    ) : canViewSelectedRolePermissions ? (
+      newRolePermissionsTabContent
+    ) : (
+      permissionDeniedState
+    );
 
   if (isErrorFetchingRoles) {
     return <ErrorState onRetry={refetchRoles} />;
@@ -712,7 +753,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
                 selectedRole={selectedRole}
                 onSelectedRole={handleSelectRole}
                 loading={isLoading}
-                disabled={disabled}
+                disabled={disabled || deletingRoleId !== undefined}
                 isMobile={isMobile}
               />
             </Grid>
@@ -750,14 +791,9 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
           <Grid item XSmall={12} style={{ padding: '0px 12px 32px' }}>
             <Divider className={horizontalDivider} />
           </Grid>
-          {visibleRoleTabs.map((tab) => (
+          {displayedRoleTabs.map((tab) => (
             <Grid item XSmall={12} key={tab}>
               <Button
-                disabled={
-                  tab === ConfigureRoleTab.Members &&
-                  (selectedRole?.metadata?.id === DefaultMemberRoleIdNumber ||
-                    selectedRole?.metadata?.rank === 0)
-                }
                 onClick={() => setSelectedTab(tab)}
                 fullWidth
                 color='primary'
@@ -786,7 +822,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             {renderRoleHeaderLabel(selectedRole.metadata, palette.mode)}
           </Button>
           <Grid container className={container}>
-            {newRolePermissionsTabContent}
+            {rolePermissionsTabContent}
           </Grid>
         </Grid>
       );
@@ -802,7 +838,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             {renderRoleHeaderLabel(selectedRole.metadata, palette.mode)}
           </Button>
           <Grid container className={container}>
-            {roleMembersTabContent}
+            {roleMembersTabContent ?? permissionDeniedState}
           </Grid>
         </Grid>
       );
@@ -835,7 +871,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             selectedRole={selectedRole}
             onSelectedRole={handleSelectRole}
             loading={isLoading}
-            disabled={disabled}
+            disabled={disabled || deletingRoleId !== undefined}
             isMobile={isMobile}
           />
         </Grid>
@@ -850,7 +886,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
                   variant='fullWidth'
                   className='width-full'
                   style={{ borderBottom: '1px solid var(--color-stroke-default)' }}>
-                  {visibleRoleTabs.map((tab) => (
+                  {displayedRoleTabs.map((tab) => (
                     <Tab
                       key={tab}
                       label={translateWithNamespace(
@@ -858,11 +894,6 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
                         `Label.${tab}`,
                       )}
                       value={tab}
-                      disabled={
-                        tab === ConfigureRoleTab.Members &&
-                        (selectedRole?.metadata?.id === DefaultMemberRoleIdNumber ||
-                          selectedRole?.metadata?.rank === 0)
-                      }
                       onClick={() => setSelectedTab(tab)}
                     />
                   ))}
@@ -881,17 +912,12 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
                   style={{
                     display: selectedTab !== ConfigureRoleTab.Permissions ? 'none' : 'block',
                   }}>
-                  {newRolePermissionsTabContent}
-                  {selectedRole.metadata?.id != null && (
-                    <Grid item XSmall={12} style={{ paddingTop: 24 }}>
-                      <RoleIdCopyRow roleId={selectedRole.metadata.id} />
-                    </Grid>
-                  )}
+                  {selectedTab === ConfigureRoleTab.Permissions && rolePermissionsTabContent}
                 </Grid>
               )}
 
               {selectedRole && selectedTab === ConfigureRoleTab.Members && (
-                <>{roleMembersTabContent}</>
+                <>{roleMembersTabContent ?? permissionDeniedState}</>
               )}
 
               {selectedRole && selectedTab === ConfigureRoleTab.Settings && (
@@ -913,6 +939,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
 };
 
 export default withTranslation(GroupRoles, [
+  TranslationNamespace.Error,
   TranslationNamespace.Groups,
   TranslationNamespace.Organization,
   TranslationNamespace.Permissions,

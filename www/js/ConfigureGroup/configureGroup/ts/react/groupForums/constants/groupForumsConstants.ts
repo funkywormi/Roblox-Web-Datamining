@@ -334,9 +334,6 @@ export default {
       return `${routerBase}/${categoryId}/post/create`;
     }
   },
-  noOpFunctionRef: (): void => {
-    /* do nothing */
-  },
   deepLinks: {
     groupForumUrl(groupId: number): string {
       return `${deepLinkBaseUrl(groupId)}/`;

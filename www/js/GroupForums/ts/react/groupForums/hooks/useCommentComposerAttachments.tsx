@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useForumPermissions } from '../contexts/ForumPermissionsContext';
 import PostComposerAttachmentMenu from '../components/content/PostComposerAttachmentMenu';
+import { ForumComment } from '../types';
 import useForumStore from './useForumStore';
 import useForumImageAttachments, {
   UseForumImageAttachmentsResult
@@ -12,7 +13,8 @@ type UseCommentComposerAttachmentsResult = Omit<UseForumImageAttachmentsResult, 
 
 const useCommentComposerAttachments = (
   isEditing: boolean,
-  disabled = false
+  disabled = false,
+  editingComment?: ForumComment
 ): UseCommentComposerAttachmentsResult => {
   const groupId = useForumStore.use.groupId();
   const categoryId = useForumStore.use.categoryId();
@@ -27,7 +29,8 @@ const useCommentComposerAttachments = (
     groupId,
     activeCategory,
     canCreateInActiveCategory: canCreateComment && !disabled,
-    isEditing
+    isEditing,
+    editingComment
   });
 
   return {

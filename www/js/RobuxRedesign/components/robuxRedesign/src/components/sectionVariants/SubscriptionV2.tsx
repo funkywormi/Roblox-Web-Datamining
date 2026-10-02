@@ -100,6 +100,10 @@ export function SubscriptionV2({ isPrimary, sectionBase, subscriptionV2 }: Subsc
     setIsBillingPeriodSheetOpen(true);
   }, [logExposure]);
 
+  const closeBillingPeriodSheet = useCallback(() => {
+    setIsBillingPeriodSheetOpen(false);
+  }, []);
+
   const handleTileSubscribeClick = useCallback(
     (args: TrackSubscriptionV2SubscribeClickArgs) => {
       if (args.productId === baseProductId) {
@@ -248,6 +252,7 @@ export function SubscriptionV2({ isPrimary, sectionBase, subscriptionV2 }: Subsc
           isOpen={isBillingPeriodSheetOpen}
           options={billingPeriodOptions}
           paymentSessionId={paymentSession?.id}
+          onMobilePurchaseInitiated={closeBillingPeriodSheet}
           onOpenChange={setIsBillingPeriodSheetOpen}
           onSubscribeClick={handleBillingPeriodSubscribeClick}
         />

@@ -1,4 +1,5 @@
 import React, { AnchorHTMLAttributes, forwardRef, PropsWithChildren } from 'react';
+import isEventOutsideCurrentTarget from '../utils/isEventOutsideCurrentTarget';
 
 type ContentPreviewCardProps = PropsWithChildren<
   {
@@ -12,6 +13,10 @@ type ContentPreviewCardProps = PropsWithChildren<
 const ContentPreviewCard = forwardRef<HTMLAnchorElement, ContentPreviewCardProps>(
   ({ href, blockedSelector, onNavigate, onModifiedClick, children, ...anchorProps }, ref) => {
     const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+      if (isEventOutsideCurrentTarget(event)) {
+        return;
+      }
+
       if (event.target instanceof Element && event.target.closest(blockedSelector)) {
         if (event.target.closest('a[href]') === event.currentTarget) {
           event.preventDefault();

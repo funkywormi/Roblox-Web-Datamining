@@ -29,7 +29,7 @@ const Xdl = (): null => {
       backToLogin(); // TODO: error message
     } else {
       // TODO: cross device login needs a callback for when it is cancelled.
-      CrossDeviceLoginDisplayCodeService.openModal();
+      CrossDeviceLoginDisplayCodeService.openModal().catch(e => console.warn(e));
       backToLogin();
     }
   }, []);

@@ -4,13 +4,14 @@ import { subscriptionsV2Api } from "@rbx/payments/services/subscriptions";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
+import { getEntitledRobux } from "../utils/getEntitledRobux";
+
 import type { SubscriptionButtonProps } from "../components/shared/SubscriptionButton";
 import type {
   Money,
   PeriodType,
   RobloxSubscriptionProductFeatureConfig,
   SubscriptionOffer,
-  SubscriptionProductInfo,
 } from "@rbx/client-subscriptions-api/v2";
 
 /** What the referral sheets need to hand `SubscriptionButton`; the rest is styling they own. */
@@ -18,13 +19,6 @@ export type PlusSubscribeButtonProps = Omit<
   SubscriptionButtonProps,
   "variant" | "size" | "className" | "children"
 >;
-
-/** Entitled Robux decides the tier order. API returns micros (1e6 units = 1 Robux). */
-const getEntitledRobux = (product: SubscriptionProductInfo): number =>
-  Math.floor(
-    (product.productTypeDetails.robloxSubscriptionProductDetails?.featureConfig
-      .currencySubscriptionConfig?.entitledAmountMicros ?? 0) / 1_000_000,
-  );
 
 export type UsePlusSubscribeProductResult = {
   /** `undefined` until the lookup lands, or for good if it fails. */

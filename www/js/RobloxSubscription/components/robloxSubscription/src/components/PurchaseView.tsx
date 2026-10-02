@@ -336,7 +336,7 @@ const PurchaseView: FC<PurchaseViewProps> = ({
     <Fragment>
       <BackdropTexture />
       <div className="width-full min-width-0 large:items-center flex flex-col items-start">
-        <div className="margin-top-[48px] width-full min-width-0 content-emphasis large:max-width-[792px] large:gap-y-[32px] large:self-auto large:padding-x-xlarge flex flex-col gap-y-[32px] self-stretch">
+        <div className="margin-top-[48px] width-full min-width-0 content-emphasis large:max-width-[792px] large:self-auto large:padding-x-xlarge gap-y-xxlarge flex flex-col self-stretch">
           {PURCHASE_GIFT_BANNER_CONFIG.enabled && (
             <div className="width-full min-width-0 padding-x-xxlarge large:padding-x-none">
               <RobloxPlusGiftItemUpsellBanner
@@ -391,10 +391,10 @@ const PurchaseView: FC<PurchaseViewProps> = ({
             </div>
           </div>
           <div className="width-full min-width-0 gap-y-xxlarge padding-x-xxlarge large:padding-x-none flex flex-col">
-            <span className="text-heading-small">
-              {translate("Title.Benefits", { productShort: translate("Label.BlackbirdShort") })}
-            </span>
-            <div className="width-full padding-b-xlarge large:padding-b-none">
+            <div className="width-full gap-y-large flex flex-col">
+              <span className="text-heading-small">
+                {translate("Title.Benefits", { productShort: translate("Label.BlackbirdShort") })}
+              </span>
               <ProductFeaturesList
                 featureConfig={getFeatureConfig(baselineProduct)}
                 periodType={baselineProduct.periodType}
@@ -404,13 +404,11 @@ const PurchaseView: FC<PurchaseViewProps> = ({
               />
             </div>
             {hasBundles && (
-              <div className="padding-b-xlarge large:padding-b-none">
-                <PlusBundleCards
-                  bundles={bundles}
-                  buttonProps={sharedButtonProps}
-                  trackSubscribeClick={trackBundleSubscribeClick}
-                />
-              </div>
+              <PlusBundleCards
+                bundles={bundles}
+                buttonProps={sharedButtonProps}
+                trackSubscribeClick={trackBundleSubscribeClick}
+              />
             )}
             <p
               className="text-caption-small content-muted padding-x-xsmall text-align-x-start large:block large:padding-x-none hidden"

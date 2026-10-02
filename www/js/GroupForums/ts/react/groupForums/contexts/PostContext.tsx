@@ -395,11 +395,13 @@ export function PostProvider({ children }: PostProviderProps): JSX.Element {
     async ({
       content,
       commentId,
-      parentCommentId
+      parentCommentId,
+      mediaAssetIds
     }: {
       content: MessageContent;
       commentId: string;
       parentCommentId?: string;
+      mediaAssetIds?: number[];
     }): Promise<void> => {
       const threadId = parentCommentId ? getComment(parentCommentId)?.threadId : undefined;
       const channelId = threadId ?? postId;
@@ -408,7 +410,8 @@ export function PostProvider({ children }: PostProviderProps): JSX.Element {
         categoryId,
         channelId,
         commentId,
-        content
+        content,
+        mediaAssetIds
       );
       if (parentCommentId) {
         editReply(response, parentCommentId);

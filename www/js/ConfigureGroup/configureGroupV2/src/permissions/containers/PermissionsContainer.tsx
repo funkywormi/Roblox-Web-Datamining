@@ -2,8 +2,11 @@ import type { FunctionComponent } from 'react';
 import React, { useCallback, useState } from 'react';
 import creatorsDark from '@rbx/foundation-images/pictograms/two_people_dark.svg';
 import creatorsLight from '@rbx/foundation-images/pictograms/two_people_light.svg';
-import { NavigateBeforeIcon, Button, Grid } from '@rbx/ui';
+import { NavigateBeforeIcon, Button, CircularProgress, Grid } from '@rbx/ui';
 import EmptyState from '../../components/EmptyState';
+import ErrorState from '../../components/ErrorState';
+import PermissionDeniedState from '../../components/PermissionDeniedState';
+import useCanAccessRolePermissions from '../../hooks/useCanAccessRolePermissions';
 import RoleIcon from '../../members/components/common/RoleIcon';
 import { DefaultMemberRoleIdNumber } from '../../utils/constants';
 import { CreatorGroupList } from '../components/CreatorGroupList';
@@ -144,6 +147,7 @@ const PermissionsContainer: FunctionComponent<PermissionsContainerProps> = ({
   creatorFilter,
   uiConfig,
 }) => {
+  const { canAccess, isError, isLoading, retry } = useCanAccessRolePermissions();
   const [userSelectedCreator, setUserSelectedCreator] = useState<
     CreatorDetails | null | undefined
   >();
@@ -155,6 +159,22 @@ const PermissionsContainer: FunctionComponent<PermissionsContainerProps> = ({
     uiConfig?.singleCreatorExperience && firstCreator && typeof firstCreator !== 'string'
       ? firstCreator
       : userSelectedCreator;
+
+  if (isLoading) {
+    return (
+      <Grid container justifyContent='center'>
+        <CircularProgress />
+      </Grid>
+    );
+  }
+
+  if (isError) {
+    return <ErrorState onRetry={retry} />;
+  }
+
+  if (!canAccess) {
+    return <PermissionDeniedState />;
+  }
 
   return (
     <PermissionsTranslationProvider entity={entity} selectedCreator={selectedCreator ?? undefined}>

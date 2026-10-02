@@ -168,6 +168,7 @@ const Post = ({ translate }: WithTranslationsProps): JSX.Element => {
         updatedAt={post.firstComment.updatedAt}
         creatorInfo={post.firstComment.creatorInfo}
         content={post.firstComment.content}
+        mediaAttachments={post.firstComment.mediaAttachments}
         threadId={null}
         channelId={post.firstComment.parentId}
         reactions={post.firstComment.reactions}

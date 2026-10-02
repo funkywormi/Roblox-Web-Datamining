@@ -124,11 +124,14 @@ const PlusBundleCards: FC<PlusBundleCardsProps> = ({
         <div className={inverseThemeClass}>
           <Carousel.PrevButton ariaLabel="Previous bundle" className="medium:flex hidden" />
         </div>
-        <Carousel.Track className="padding-x-xxlarge large:padding-x-none large:[scroll-padding-inline:0] [scroll-padding-inline:var(--padding-xxlarge)]">
+        <Carousel.Track
+          className="padding-x-xxlarge large:padding-x-none large:[scroll-padding-inline:0] [scroll-padding-inline:var(--padding-xxlarge)]"
+          gap="large"
+        >
           {bundles.map(bundle => (
             <Carousel.Item
               key={bundle.productKey.id}
-              className="width-[313px] medium:width-[242px] flex flex-col"
+              className="width-[313px] medium:width-[240px] flex flex-col"
             >
               <BundleCard
                 buttonProps={buttonProps}

@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import isEventOutsideCurrentTarget from '../../shared/utils/isEventOutsideCurrentTarget';
 
 const LONG_PRESS_DURATION_MS = 500;
 
@@ -26,8 +27,10 @@ const useLongPress = ({ onLongPress }: UseLongPressOptions): UseLongPressResult 
     }
   }, []);
 
+  // Presses inside a portaled dialog belong to the dialog, not the element this hook is on.
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
+      if (isEventOutsideCurrentTarget(e)) return;
       isTouchPress.current = e.pointerType === 'touch';
       if (e.pointerType !== 'touch') return;
       e.preventDefault();
@@ -43,7 +46,7 @@ const useLongPress = ({ onLongPress }: UseLongPressOptions): UseLongPressResult 
 
   const onPointerUp = useCallback(
     (e: React.PointerEvent) => {
-      if (e.pointerType !== 'touch') return;
+      if (e.pointerType !== 'touch' || isEventOutsideCurrentTarget(e)) return;
       e.preventDefault();
       e.stopPropagation();
       clear();
@@ -62,7 +65,7 @@ const useLongPress = ({ onLongPress }: UseLongPressOptions): UseLongPressResult 
   // A touch hold raises the platform menu, which competes with this gesture. A right click raises
   // the same event and carries the link actions, so it keeps them.
   const onContextMenu = useCallback((e: React.MouseEvent) => {
-    if (isTouchPress.current) e.preventDefault();
+    if (isTouchPress.current && !isEventOutsideCurrentTarget(e)) e.preventDefault();
   }, []);
 
   return {

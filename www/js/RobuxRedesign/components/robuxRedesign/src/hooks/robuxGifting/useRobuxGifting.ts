@@ -2,8 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { toDataURL } from "qrcode";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
-import { captureException } from "@rbx/payments/error";
-import { trackError } from "../../observability";
+import { trackCounter, trackError } from "../../observability";
 
 type RobuxGifting = {
   handleCopyUrl: () => void;
@@ -24,6 +23,7 @@ export function useRobuxGifting(giftingUrl: string): RobuxGifting {
             width: 306,
           }),
         );
+        trackCounter("RobuxGiftingQrGenerated");
       } catch (e) {
         trackError("QRCodeGenerationFailed", null, e);
       }
@@ -39,7 +39,9 @@ export function useRobuxGifting(giftingUrl: string): RobuxGifting {
       return;
     }
 
-    void navigator.clipboard.writeText(giftingUrl);
+    void navigator.clipboard.writeText(giftingUrl).catch((err: unknown) => {
+      trackError("RobuxGiftingCopyFailed", null, err);
+    });
   }, [giftingUrl]);
 
   const handleShareLink = useCallback(() => {
@@ -49,14 +51,18 @@ export function useRobuxGifting(giftingUrl: string): RobuxGifting {
 
     const deviceMeta = getDeviceMeta();
     if (deviceMeta?.isIosDevice || deviceMeta?.isAndroidDevice || deviceMeta?.isUniversalApp) {
+      trackCounter("RobuxGiftingShare", { method: "native" });
       navigator.share({ url: giftingUrl }).catch((err: unknown) => {
-        if (!(err instanceof DOMException && err.name === "AbortError")) {
-          captureException(err);
+        if (err instanceof DOMException && err.name === "AbortError") {
+          trackCounter("RobuxGiftingShareDismissed");
+          return;
         }
+        trackError("RobuxGiftingShareFailed", null, err);
       });
       return;
     }
 
+    trackCounter("RobuxGiftingShare", { method: "mailto" });
     window.location.href = `mailto:?body=${encodeURIComponent(giftingUrl)}`;
   }, [giftingUrl]);
 

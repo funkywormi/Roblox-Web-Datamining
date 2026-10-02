@@ -34,7 +34,7 @@ import {
   urlConstants,
 } from "../constants/loginConstants";
 import { sendLogoutAllAccountsOnLoginEvent } from "../services/eventService";
-import { stripMagicLinkTokenFromUrl } from "../revamp/magicLinkLoginUtils";
+import { stripMagicLinkTokenFromUrl } from "./magicLinkLoginUtils";
 import { env, getEnvironment, getSafeReturnUrlFromQueryString } from "./urlUtils";
 
 const { composeQueryString } = urlService;

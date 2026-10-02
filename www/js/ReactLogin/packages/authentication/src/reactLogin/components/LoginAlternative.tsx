@@ -28,7 +28,7 @@ export const LoginAlternative = ({
 }): JSX.Element => {
   const handleCrossDeviceLoginClick = () => {
     sendXdlButtonClickEvent();
-    CrossDeviceLoginDisplayCodeService.openModal();
+    CrossDeviceLoginDisplayCodeService.openModal().catch(e => console.warn(e));
   };
 
   const handlePasskeyLoginClick = () => {

@@ -155,7 +155,7 @@ const ProductFeaturesList: FC<ProductFeaturesListProps> = ({
         <ProductFeaturesDisplayRow
           expandedPrimary={translate("Description.Benefit.AvatarBackground")}
           expandedSecondary={translate("Description.Benefit.AvatarBackgroundSubtitle")}
-          iconName={overrideIconName ?? "icon-regular-image"}
+          iconName={overrideIconName ?? "icon-regular-image-person"}
           primary={translate("Description.Benefit.AvatarBackground")}
           secondary={translate("Description.Benefit.AvatarBackgroundSubtitle")}
           onTileClick={onTileClick}
@@ -175,7 +175,7 @@ const ProductFeaturesList: FC<ProductFeaturesListProps> = ({
         <ProductFeaturesDisplayRow
           expandedPrimary={translate("Description.Benefit.ProfileFrames")}
           expandedSecondary={translate("Description.Benefit.ProfileFramesSubtitle")}
-          iconName={overrideIconName ?? "icon-regular-frame-expanded"}
+          iconName={overrideIconName ?? "icon-regular-circle-dashed-person"}
           primary={translate("Description.Benefit.ProfileFrames")}
           secondary={translate("Description.Benefit.ProfileFramesSubtitle")}
           onTileClick={onTileClick}

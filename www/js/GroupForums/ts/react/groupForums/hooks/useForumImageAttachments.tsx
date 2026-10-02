@@ -1,20 +1,23 @@
-import React, { ChangeEvent, useRef } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-utilities';
 import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
 import ForumImageUploadPreviews from '../components/content/ForumImageUploadPreviews';
 import type { AttachmentMenuItem } from '../components/content/PostComposerAttachmentMenu';
-import { ChannelModerationType, ForumCategory } from '../types';
-import { useForumImageUploads } from './useForumImageUploads';
+import { ChannelModerationType, ForumCategory, ForumComment } from '../types';
+import { ForumImageUpload, useForumImageUploads } from './useForumImageUploads';
 
 type UseForumImageAttachmentsParams = {
   groupId: number;
   activeCategory?: ForumCategory;
   canCreateInActiveCategory: boolean;
   isEditing: boolean;
+  editingComment?: ForumComment;
 };
 
 export type UseForumImageAttachmentsResult = {
-  mediaAssetIds: number[];
+  // Undefined for an edit that leaves the saved images unchanged.
+  mediaAssetIds?: number[];
+  hasUnsavedImageChanges: boolean;
   isSubmitBlocked: boolean;
   menuItem?: AttachmentMenuItem;
   contentFooter: React.ReactNode;
@@ -26,18 +29,22 @@ const useForumImageAttachments = ({
   groupId,
   activeCategory,
   canCreateInActiveCategory,
-  isEditing
+  isEditing,
+  editingComment
 }: UseForumImageAttachmentsParams): UseForumImageAttachmentsResult => {
   const { translate } = useTranslation();
   const { features } = useCommunityProductFeatures();
   const imageInputRef = useRef<HTMLInputElement>(null);
 
+  const isForumsImagesEnabled = features.ForumsImages === true;
+  // groups-api rejects edits that add images, so edits can only remove saved ones for now.
   const canAttachImages =
     !isEditing &&
     canCreateInActiveCategory &&
-    features.ForumsImages === true &&
+    isForumsImagesEnabled &&
     activeCategory?.isRestricted === true &&
     activeCategory.moderationType === ChannelModerationType.Unrestricted;
+  const canRemoveSavedImages = isEditing && isForumsImagesEnabled;
 
   const {
     images,
@@ -49,12 +56,41 @@ const useForumImageAttachments = ({
     validation,
     addFiles,
     removeByKey,
-    reset
+    reset: resetUploads
   } = useForumImageUploads({
     groupId,
     categoryId: activeCategory?.id,
     enabled: canAttachImages
   });
+
+  const [removedAssetIds, setRemovedAssetIds] = useState<number[]>([]);
+  useEffect(() => {
+    setRemovedAssetIds([]);
+  }, [editingComment?.id]);
+
+  const savedAssetIds = canRemoveSavedImages
+    ? (editingComment?.mediaAttachments ?? []).map(({ assetId }) => assetId)
+    : [];
+  const keptAssetIds = savedAssetIds.filter(assetId => !removedAssetIds.includes(assetId));
+  const savedImages: ForumImageUpload[] = keptAssetIds.map(assetId => ({
+    key: assetId,
+    assetId,
+    status: 'uploaded'
+  }));
+  const removeSavedImage = (assetId: number) =>
+    setRemovedAssetIds(previous => [...previous, assetId]);
+
+  const hasUnsavedImageChanges =
+    isEditing && (keptAssetIds.length < savedAssetIds.length || assetIds.length > 0);
+  let mediaAssetIds: number[] | undefined = assetIds;
+  if (isEditing) {
+    mediaAssetIds = hasUnsavedImageChanges ? [...keptAssetIds, ...assetIds] : undefined;
+  }
+
+  const reset = useCallback(() => {
+    resetUploads();
+    setRemovedAssetIds([]);
+  }, [resetUploads]);
 
   const handleImageSelection = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
@@ -74,18 +110,26 @@ const useForumImageAttachments = ({
       }
     : undefined;
 
+  const previewImages = isEditing ? savedImages : images;
+  const removePreviewImage = isEditing ? removeSavedImage : removeByKey;
+  // The rich-text editor shrinks its reserved rows for any footer, so pass one only when it
+  // renders something.
+  const hasPreviews = previewImages.length > 0 || errorKey !== null;
+
   return {
-    mediaAssetIds: assetIds,
+    mediaAssetIds,
+    hasUnsavedImageChanges,
     isSubmitBlocked,
     menuItem,
-    contentFooter: canAttachImages ? (
-      <ForumImageUploadPreviews
-        images={images}
-        errorKey={errorKey}
-        errorMeta={errorMeta}
-        onRemove={removeByKey}
-      />
-    ) : null,
+    contentFooter:
+      (canAttachImages || canRemoveSavedImages) && hasPreviews ? (
+        <ForumImageUploadPreviews
+          images={previewImages}
+          errorKey={errorKey}
+          errorMeta={errorMeta}
+          onRemove={removePreviewImage}
+        />
+      ) : null,
     input: canAttachImages ? (
       <input
         ref={imageInputRef}

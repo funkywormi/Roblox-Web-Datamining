@@ -8,6 +8,7 @@ import { Limit, Urls } from "./constants";
 import { sendReport } from "./services";
 import type { SendReportResponse, SubmitModal } from "./types";
 import useGetMetadata from "./useGetMetadata";
+import useEmailVerificationChallenge from "./hooks/useEmailVerificationChallenge";
 import { getSampleRobloxUrl } from "../util/urls";
 import {
   BrazilAdsAdType,
@@ -59,6 +60,8 @@ const BrazilAdsForm: React.FC<BrazilAdsFormProps> = ({ defaultContentURL, onBack
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [submittedModalInfo, setSubmittedModalInfo] = useState<SubmitModal | null>(null);
+  const { isVerificationRequired, handleResponse, withVerification, dismissVerification } =
+    useEmailVerificationChallenge();
 
   const clearAllInputs = useCallback(() => {
     setAdLocation("");
@@ -73,6 +76,8 @@ const BrazilAdsForm: React.FC<BrazilAdsFormProps> = ({ defaultContentURL, onBack
 
   const mutation = useMutation(sendReport, {
     onSuccess: (response: SendReportResponse) => {
+      if (handleResponse(response)) return;
+
       if (response.success) {
         setSubmittedModalInfo({
           title: translate("Title.Modal.ReportSuccess"),
@@ -197,20 +202,30 @@ const BrazilAdsForm: React.FC<BrazilAdsFormProps> = ({ defaultContentURL, onBack
     );
   };
 
-  const handleSubmit = () => {
+  const submitReport = (otpSessionToken?: string) => {
     if (!adType || !reporterType || mutation.isLoading) return;
 
     mutation.mutate(
-      buildBrazilAdsRequest({
-        contentLocation: adLocation,
-        description,
-        adType,
-        reporterType,
-        authorityReferenceNumber,
-        name,
-        email,
-      }),
+      withVerification(
+        buildBrazilAdsRequest({
+          contentLocation: adLocation,
+          description,
+          adType,
+          reporterType,
+          authorityReferenceNumber,
+          name,
+          email,
+        }),
+        otpSessionToken,
+      ),
     );
+  };
+
+  const handleSubmit = () => submitReport();
+
+  const handleOtpVerified = (otpSessionToken: string) => {
+    dismissVerification();
+    submitReport(otpSessionToken);
   };
 
   const handleSubmittedModalClose = () => {
@@ -309,6 +324,9 @@ const BrazilAdsForm: React.FC<BrazilAdsFormProps> = ({ defaultContentURL, onBack
           onNameChange={setName}
           onEmailChange={setEmail}
           nameLabel={translate("Label.FullLegalName")}
+          openOtpModal={isVerificationRequired}
+          onOtpVerified={handleOtpVerified}
+          onOtpModalClosedWithoutVerify={dismissVerification}
         />
 
         <div
@@ -378,7 +396,7 @@ const BrazilAdsForm: React.FC<BrazilAdsFormProps> = ({ defaultContentURL, onBack
             <button
               type="button"
               className="btn-primary-md btn-full-width"
-              disabled={!canSubmit()}
+              disabled={!canSubmit() || isVerificationRequired}
               onClick={handleSubmit}
             >
               {translate("Action.Submit")}

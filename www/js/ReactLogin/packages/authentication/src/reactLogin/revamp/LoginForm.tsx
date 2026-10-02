@@ -28,8 +28,8 @@ import { useLoginMutation } from "./common";
 import {
   getMagicLinkTokenFromQueryString,
   removeMagicLinkTokenFromLoginUrl,
-} from "./magicLinkLoginUtils";
-import MagicLinkLoginErrorModal from "./MagicLinkLoginErrorModal";
+} from "../utils/magicLinkLoginUtils";
+import MagicLinkLoginErrorModal from "../components/MagicLinkLoginErrorModal";
 import Login2sv from "./steps/2sv";
 import Login from "./steps/Login";
 import Otp from "./steps/Otp";

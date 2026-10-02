@@ -179,6 +179,7 @@ const CommentsSection = ({ translate }: WithTranslationsProps): JSX.Element => {
       createdAt={comment.createdAt}
       updatedAt={comment.updatedAt}
       content={comment.content}
+      mediaAttachments={comment.mediaAttachments}
       threadId={comment.threadId}
       channelId={comment.parentId}
       variant={CommentVariants.Comment}

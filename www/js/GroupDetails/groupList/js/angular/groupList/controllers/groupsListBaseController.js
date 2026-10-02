@@ -8,28 +8,11 @@ function groupsListBaseController(
   groupsService,
   $log,
   groupsListConstants,
-  groupsConstants,
   groupExperimentsService,
   groupEventLoggingService,
   eventConstants
 ) {
   'ngInject';
-
-  $scope.data = {
-    moreGroupsUrl: groupsConstants.absoluteUrls.moreGroups
-  };
-
-  $scope.createGroupUrl = function () {
-    return groupsConstants.absoluteUrls.createGroup;
-  };
-
-  $scope.handleCreateGroupClick = () => {
-    groupEventLoggingService.logGroupPageClickEvent({
-      clickTargetType: 'createGroup',
-      context: eventConstants.EventContext.MyGroups
-    });
-    window.location.href = $scope.createGroupUrl();
-  };
 
   $scope.canCreateGroup = function () {
     return !$scope.groups || $scope.metadata.currentGroupCount < $scope.metadata.groupLimit;
@@ -98,11 +81,6 @@ function groupsListBaseController(
     });
   };
 
-  $scope.loadGroupsListRedesignExperiment = async () => {
-    const isEnabled = await groupExperimentsService.isGroupsListRedesignExperimentEnabled();
-    $scope.isGroupsListRedesignEnabled = Boolean(isEnabled);
-  };
-
   $scope.loadGroupsList = function () {
     initVariables();
     $scope.layout.isLoading = true;
@@ -110,14 +88,8 @@ function groupsListBaseController(
     const metadataPromise = $scope.loadGroupMetadata();
     const groupsPromise = $scope.loadGroups();
     const fetchAndExposeExperimentPromise = $scope.fetchAndExposeExperiment();
-    const loadGroupsListRedesignExperimentPromise = $scope.loadGroupsListRedesignExperiment();
 
-    $q.all([
-      metadataPromise,
-      groupsPromise,
-      fetchAndExposeExperimentPromise,
-      loadGroupsListRedesignExperimentPromise
-    ])
+    $q.all([metadataPromise, groupsPromise, fetchAndExposeExperimentPromise])
       .then(
         function () {
           $scope.logPageExposure();

@@ -1,8 +1,7 @@
 /* eslint-disable no-void */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useEffect, useState, useRef } from "react";
-import { useTranslation, WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
-import { Loading, createModal } from "@rbx/core-ui/legacy/react-style-guide";
+import { useTranslation } from "@rbx/core-scripts/legacy/react-utilities";
 import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
 import {
   AccountIntegrityChallengeService,
@@ -15,7 +14,6 @@ import {
   cryptoUtil,
   TSecureAuthIntent,
 } from "@rbx/core-scripts/legacy/core-roblox-utilities";
-import { confirmationModalOrigins } from "../../accountSwitcher/constants/accountSwitcherConstants";
 // constants
 import { FeatureLoginPage } from "@rbx/authentication-common/constants/translationConstants";
 import {
@@ -31,7 +29,6 @@ import {
   attemptSetPasskeyUpgradeFlag,
   SilentPasskeyUpgradeVariant,
 } from "../utils/loginPasskeyUpgrade";
-import { loginTranslationConfig } from "../translation.config";
 import {
   TCaptchaInputParams,
   TOnCaptchaChallengeCompletedData,
@@ -92,12 +89,21 @@ import {
   isAuthorizeRobloxOAuthReturnUrl,
   getCredentialType,
   mapErrorCodeToEphemeralEvent,
-  buildAccountSelectorHelpText,
   buildLoginFormHeaderText,
   signPasskeyCredential,
   handleEmptyAccountSwitchBlobRequiredForLogin,
   shouldOpenSwitchAccountFromQueryString,
 } from "../utils/loginUtils";
+import {
+  getLoginTelemetryFailureReason,
+  getLoginTelemetryMethod,
+  legacyLoginTelemetry,
+} from "../utils/loginTelemetry";
+import {
+  authFailureReason,
+  authNextStep,
+  type AuthMethod,
+} from "../../shared/telemetry/authFlowTelemetry";
 import { parseErrorCode } from "@rbx/authentication-common/utils/requestUtils";
 import {
   parseCaptchaData,
@@ -105,22 +111,8 @@ import {
   parseUsersData,
 } from "@rbx/authentication-common/utils/errorParsingUtils";
 
-// components
-import LoginForm from "../components/LoginForm";
-import CaptchaComponent from "@rbx/authentication-common/components/CaptchaComponent";
-import Login2sv from "../components/Login2sv";
-import LoginAlternative from "../components/LoginAlternative";
-import LoginIdVerification from "../components/LoginIdVerification";
-import LoginSecurityQuestions from "../components/LoginSecurityQuestions";
-import SignupLink from "../components/SignupLink";
-import StudioLegalLinks from "../components/StudioLegalLinks";
-import ForgotCredentialLink from "../components/ForgotCredentialLink";
-import AccountSelectorComponent from "@rbx/authentication-common/components/AccountSelectorComponent";
 import { EmailVerifyCodeModalParams } from "../../emailVerifyCodeModal/interface";
 import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
-import LoginAccountSwitcher from "../components/LoginAccountSwitcher";
-import AccountSwitcherRestrictionComponent from "../../shared/AccountSwitcherRestrictionComponent";
-import { accountSwitcherConfirmationModalContainer } from "../../reactLanding/constants/signupConstants";
 import useLoggedInUsers from "@rbx/authentication-common/hooks/useLoggedInUsers";
 import useRedirectHomeIf from "@rbx/authentication-common/hooks/useRedirectHomeIf";
 import useCheckParentUrl from "@rbx/authentication-common/hooks/useCheckParentUrl";
@@ -130,19 +122,15 @@ import {
   getLinkType,
 } from "../../reactLanding/utils/affiliateLinksUtils";
 import { qualifiedLogin } from "../../reactLanding/services/affiliateLinksService";
-import SecurityNotificationModal from "../components/SecurityNotificationModal";
 import useLoginBackground from "../hooks/useLoginBackground";
-import CountryRatingLogos from "../../reactLanding/components/CountryRatingLogos";
-import {
-  urlConstants as landingUrlConstants,
-  landingPageStrings,
-} from "../../reactLanding/constants/landingConstants";
 import useContentRatingLogos from "../hooks/useContentRatingLogos";
 import {
   getMagicLinkTokenFromQueryString,
   removeMagicLinkTokenFromLoginUrl,
-} from "../revamp/magicLinkLoginUtils";
-import MagicLinkLoginErrorModal from "../revamp/MagicLinkLoginErrorModal";
+} from "../utils/magicLinkLoginUtils";
+import LoginPresentationRouter from "../components/LoginPresentationRouter";
+import type { LoginControllerViewModel } from "../types/loginControllerTypes";
+import { resolveLoginExperiments } from "../utils/loginExperimentUtils";
 
 type StudioEmbeddedWindow = Window & {
   rbx?: {
@@ -153,7 +141,11 @@ type StudioEmbeddedWindow = Window & {
 const isStudioEmbeddedWebView = (): boolean =>
   typeof (window as StudioEmbeddedWindow).rbx?.postMessage === "function";
 
-export const LoginBase = (): JSX.Element => {
+export type LoginControllerProps = {
+  render: (viewModel: LoginControllerViewModel) => React.JSX.Element;
+};
+
+export const LoginController = ({ render }: LoginControllerProps): React.JSX.Element => {
   const { translate } = useTranslation();
   // page state
   const [isNavigating, setIsNavigating] = useState(false);
@@ -184,6 +176,7 @@ export const LoginBase = (): JSX.Element => {
   const [credentialType, setCredentialType] = useState(CredentialType.Username);
   const [password, setPassword] = useState("");
   const passwordAutofillRef = useRef(false);
+  const hasReportedFormReadyRef = useRef(false);
   // The single-use magic-link token is held in a mutable ref so it can be
   // cleared once the redemption fails terminally (see handleLoginError).
   // `isMagicLinkLogin` captures the initial presence of the token for
@@ -330,6 +323,7 @@ export const LoginBase = (): JSX.Element => {
       if (shouldTriggerIdVerification(result)) {
         triggerIdVerification(result);
       } else {
+        legacyLoginTelemetry.flowCompleted(getLoginTelemetryMethod(credentialType));
         AccountSwitcherService?.storeAccountSwitcherBlob(
           result.accountBlob ? result.accountBlob : "",
         );
@@ -458,7 +452,7 @@ export const LoginBase = (): JSX.Element => {
     passwordAutofillRef.current = method === InputMethod.Autofilled;
   };
 
-  const handlePostLogin = (result: TLoginResponse) => {
+  const handlePostLogin = (result: TLoginResponse, method: AuthMethod) => {
     // TODO: get blob for 2sv account
     if (shouldTrigger2sv(result)) {
       trigger2sv(result);
@@ -467,6 +461,7 @@ export const LoginBase = (): JSX.Element => {
       // returns from 2sv endpoint as well, it should be checked after 2sv.
       triggerIdVerification(result);
     } else {
+      legacyLoginTelemetry.flowCompleted(method);
       try {
         AccountSwitcherService?.storeAccountSwitcherBlob(
           result.accountBlob ? result.accountBlob : "",
@@ -811,7 +806,9 @@ export const LoginBase = (): JSX.Element => {
     return params;
   };
 
-  const loginWithParams = async (params: TLoginParams) => {
+  const loginWithParams = async (params: TLoginParams, isUserInitiated: boolean) => {
+    const method = getLoginTelemetryMethod(params.ctype);
+    legacyLoginTelemetry.requestStarted(method, isUserInitiated);
     try {
       const secureAuthenticationIntent = await cryptoUtil.generateSecureAuthIntentV2();
       const authParams = { ...params, secureAuthenticationIntent };
@@ -823,8 +820,21 @@ export const LoginBase = (): JSX.Element => {
         incrementEphemeralCounter(eventCounters.successWithGameIntent);
       }
       incrementEphemeralCounter(eventCounters.success);
-      handlePostLogin(result);
+      const nextStep = shouldTrigger2sv(result)
+        ? authNextStep.twoStep
+        : shouldTriggerIdVerification(result)
+          ? authNextStep.identityVerification
+          : authNextStep.complete;
+      legacyLoginTelemetry.requestSucceeded(method, nextStep);
+      handlePostLogin(result, method);
     } catch (error) {
+      const errorCode = parseErrorCode(error);
+      legacyLoginTelemetry.requestFailed(
+        method,
+        AccountIntegrityChallengeService.Generic.ChallengeError.match(error)
+          ? authFailureReason.challenge
+          : getLoginTelemetryFailureReason(errorCode, error, params.ctype),
+      );
       handleLoginError(error, params.ctype);
     }
   };
@@ -848,7 +858,10 @@ export const LoginBase = (): JSX.Element => {
       params.userId = selectedUserId;
     }
     if (isFromLoginButtonClick) {
+      const method = getLoginTelemetryMethod(params.ctype);
+      legacyLoginTelemetry.primaryActionClicked(method);
       if (!credentialValue || !password) {
+        legacyLoginTelemetry.submissionBlocked(method, authFailureReason.clientValidation);
         setErrorMsg(translate(FeatureLoginPage.MessageUsernameAndPasswordRequired));
         return;
       }
@@ -861,7 +874,7 @@ export const LoginBase = (): JSX.Element => {
     }
     setIsLoading(true);
     // eslint-disable-next-line no-void
-    void loginWithParams(params);
+    void loginWithParams(params, isFromLoginButtonClick);
   };
 
   const handleAccountLimitConfirmation = () => {
@@ -919,6 +932,7 @@ export const LoginBase = (): JSX.Element => {
 
   useEffect(() => {
     sendAuthPageLoadEvent(EVENT_CONSTANTS.context.loginPage);
+    legacyLoginTelemetry.pageMounted();
   }, []);
 
   useEffect(() => {
@@ -1079,13 +1093,36 @@ export const LoginBase = (): JSX.Element => {
   const shouldShowAccountLimitModal =
     (loggedInUsers?.isAccountLimitReached ?? false) &&
     (authenticatedUser.isAuthenticated || !shouldShowAccountSwitcher);
+  const experiments = resolveLoginExperiments(loginExperiments, {
+    isMagicLinkLogin,
+    isAuthenticated: authenticatedUser.isAuthenticated,
+    isAccountSwitcherVisible: shouldShowAccountSwitcher,
+    isAccountLimitReached: loggedInUsers?.isAccountLimitReached ?? false,
+  });
+
+  useEffect(() => {
+    if (
+      !hasReportedFormReadyRef.current &&
+      !isGettingLoggedInUsers &&
+      !isNavigating &&
+      shouldShowLoginForm
+    ) {
+      hasReportedFormReadyRef.current = true;
+      legacyLoginTelemetry.formReady(!(loggedInUsers?.isAccountLimitReached ?? false));
+    }
+  }, [
+    isGettingLoggedInUsers,
+    isNavigating,
+    loggedInUsers?.isAccountLimitReached,
+    shouldShowLoginForm,
+  ]);
 
   const shouldShowPasskeyLoginButton = false;
   // TODO: Debug why passkey doesn't work on studio before re-enabling
   // isPasskeyLoginEnabled() && isPasskeyLoginSupported && !isConditionalMediationSupported;
 
   if (isGettingLoggedInUsers || isNavigating) {
-    return <Loading />;
+    return render({ status: "loading" });
   }
 
   const isStudioWebView = isStudioEmbeddedWebView();
@@ -1093,167 +1130,121 @@ export const LoginBase = (): JSX.Element => {
     isStudioWebView ? " studio-embedded-auth" : ""
   }`;
 
-  const loginBase = (
-    <div id="login-base" className={loginBaseContainerClass}>
-      {/* only shows account switcher when logged out or opened by an authenticated deep link */}
-      {shouldShowAccountSwitcher && (
-        <LoginAccountSwitcher
-          containerId={containerConstants.reactLoginAccountSwitcherContainer}
-          titleText={translate(FeatureLoginPage.HeadingYouHaveLoggedOut)}
-          helpText={translate(FeatureLoginPage.LabelChooseAccountToUse)}
-          onAccountSwitched={navigatePostAccountSwitch}
-          handleAddAccount={() => {
-            if (authenticatedUser.isAuthenticated) {
-              const redirectUrl = getRedirectUrl();
-              if (isAuthorizeRobloxOAuthReturnUrl(redirectUrl)) {
-                navigateToLogin();
-              } else {
-                navigateToPage("/login");
-              }
-            } else if (!loggedInUsers?.isAccountLimitReached) {
-              setIsAccountSwitcherOpen(false);
-            }
-          }}
-          suppressAddAccountRow={loggedInUsers?.isAccountLimitReached ?? false}
-          removeInvalidActiveUser={!authenticatedUser.isAuthenticated}
-          isModal={authenticatedUser.isAuthenticated}
-          translate={translate}
-          loggedInUsers={authenticatedUser.isAuthenticated ? undefined : loggedInUsers}
-        />
-      )}
-      {shouldShowLoginForm && (
-        <div className="section-content login-section">
-          <h1 className="login-header">
-            {buildLoginFormHeaderText(
-              authenticatedUser.isAuthenticated,
-              translate,
-              !!loggedInUsers?.usersAvailableForSwitching?.length,
-            )}
-          </h1>
-          <LoginForm
-            captchaId={captchaId}
-            captchaToken={captchaToken}
-            credentialValue={credentialValue}
-            password={password}
-            isLoading={isLoading}
-            errorMsg={errorMsg}
-            translate={translate}
-            onFormSubmit={handleSubmit}
-            onCredentialValueChange={handleCredentialValueChange}
-            onPasswordChange={handlePasswordChange}
-            isLoginFormDisabled={loggedInUsers?.isAccountLimitReached ?? false}
-          />
-          <ForgotCredentialLink credentialValue={credentialValue} translate={translate} />
-          <LoginAlternative
-            onCrossDeviceLoginCodeValidated={handleCrossDeviceLoginCodeValidated}
-            isOtpLoginEnabled={isOtpLoginEnabled}
-            openOtpLoginModal={openOtpLoginModal}
-            showPasskeyLoginButton={shouldShowPasskeyLoginButton}
-            openPasskeyLoginFlow={attemptPasskeyLogin}
-            isOneTimeCodeDesignUpdated={isOneTimeCodeDesignUpdated}
-            translate={translate}
-          />
-          <div id="crossDeviceLoginDisplayCodeModal-container" />
-          <div id={containerConstants.otpLoginContainer} />
-          <div id={accountSwitcherConfirmationModalContainer} />
-          {showSecurityNotificationModal && (
-            <SecurityNotificationModal credentialValue={credentialValue} translate={translate} />
-          )}
-          <MagicLinkLoginErrorModal
-            isOpen={isMagicLinkLoginErrorModalOpen}
-            onClose={() => setIsMagicLinkLoginErrorModalOpen(false)}
-            translate={translate}
-          />
-          <SignupLink />
-          {isStudioWebView && <StudioLegalLinks />}
-        </div>
-      )}
-      {unifiedCaptchaId && dataExchange && (
-        <CaptchaComponent
-          containerId={containerConstants.reactCaptchaContainer}
-          actionType={AccountIntegrityChallengeService.Captcha.ActionType.Login}
-          unifiedCaptchaId={unifiedCaptchaId}
-          dataExchange={dataExchange}
-          onCaptchaChallengeCompleted={handleCaptchaChallengeCompleted}
-          onCaptchaChallengeInvalidated={handleCaptchaChallengeInvalidated}
-          onCaptchaChallengeAbandoned={handleCaptchaChallengeAbandoned}
-          onUnknownError={handleUnknownError}
-        />
-      )}
-      {userId && securityQuestionsSessionId && (
-        <LoginSecurityQuestions
-          userId={userId}
-          sessionId={securityQuestionsSessionId}
-          onSecurityQuestionsChallengeCompleted={handleSecurityQuestionsChallengeCompleted}
-          onSecurityQuestionsChallengeInvalidated={handleSecurityQuestionsChallengeInvalidated}
-          onSecurityQuestionsChallengeAbandoned={handleSecurityQuestionsChallengeAbandoned}
-          onUnknownError={handleUnknownError}
-        />
-      )}
-      {userId && challengeId && (
-        <Login2sv
-          userId={userId}
-          challengeId={challengeId}
-          on2svChallengeCompleted={handle2svChallengeCompleted}
-          on2svChallengeInvalidated={handle2svChallengeInvalidated}
-          on2svChallengeAbandoned={handle2svChallengeAbandoned}
-          onUnknownError={handleUnknownError}
-        />
-      )}
-      <LoginIdVerification
-        identityVerificationLoginTicket={identityVerificationLoginTicket}
-        translate={translate}
-      />
-      {multipleUsersPerCredentialData.users.length > 0 && (
-        <AccountSelectorComponent
-          containerId={containerConstants.reactAccountSelectorContainer}
-          users={multipleUsersPerCredentialData.users}
-          // since we are not allowing u13 users to login with otp for now,
-          // there will not be invalid users
-          invalidUsers={[]}
-          onAccountSelection={handleAccountSelection}
-          onAccountSelectorAbandoned={handleAccountSelectorAbandoned}
-          titleText={translate(FeatureLoginPage.LabelAccountSelector)}
-          helpText={buildAccountSelectorHelpText(credentialType, translate)}
-          translate={translate}
-        />
-      )}
-      <AccountSwitcherRestrictionComponent
-        origin={confirmationModalOrigins.LoginAccountLimit}
-        containerId={containerConstants.reactAccountLimitErrorContainer}
-        handleRedirectHome={handleAccountLimitConfirmation}
-        hasMaxLoggedInAccountsSignupError={hasMaxLoggedInAccountsLoginError}
-        isAccountLimitReached={shouldShowAccountLimitModal}
-        isParentUser={isParentUserUrl}
-      />
-    </div>
-  );
+  const handleAddAccount = (): void => {
+    if (authenticatedUser.isAuthenticated) {
+      const redirectUrl = getRedirectUrl();
+      if (isAuthorizeRobloxOAuthReturnUrl(redirectUrl)) {
+        navigateToLogin();
+      } else {
+        navigateToPage("/login");
+      }
+    } else if (!loggedInUsers?.isAccountLimitReached) {
+      setIsAccountSwitcherOpen(false);
+    }
+  };
 
-  const countryRatingLogos = (
-    <div>
-      <CountryRatingLogos
-        shouldDisplayBrazilRatingLogo={shouldDisplayBrazilRatingLogo}
-        shouldDisplayItalyRatingLogo={false}
-        translate={translate}
-      />
-    </div>
-  );
+  return render({
+    status: "ready",
+    experiments,
+    loginBaseContainerClass,
+    accountSwitcherProps: shouldShowAccountSwitcher
+      ? {
+          containerId: containerConstants.reactLoginAccountSwitcherContainer,
+          titleText: translate(FeatureLoginPage.HeadingYouHaveLoggedOut),
+          helpText: translate(FeatureLoginPage.LabelChooseAccountToUse),
+          onAccountSwitched: navigatePostAccountSwitch,
+          handleAddAccount,
+          suppressAddAccountRow: loggedInUsers?.isAccountLimitReached ?? false,
+          removeInvalidActiveUser: !authenticatedUser.isAuthenticated,
+          isModal: authenticatedUser.isAuthenticated,
+          translate,
+          loggedInUsers: authenticatedUser.isAuthenticated ? undefined : loggedInUsers,
+        }
+      : null,
+    loginForm: shouldShowLoginForm
+      ? {
+          headerText: buildLoginFormHeaderText(
+            authenticatedUser.isAuthenticated,
+            translate,
+            !!loggedInUsers?.usersAvailableForSwitching?.length,
+          ),
+          formProps: {
+            captchaId,
+            captchaToken,
+            credentialValue,
+            password,
+            isLoading,
+            errorMsg,
+            translate,
+            onFormSubmit: handleSubmit,
+            onCredentialValueChange: handleCredentialValueChange,
+            onPasswordChange: handlePasswordChange,
+            isLoginFormDisabled: loggedInUsers?.isAccountLimitReached ?? false,
+          },
+          forgotCredentialValue: credentialValue,
+          alternativeProps: {
+            onCrossDeviceLoginCodeValidated: handleCrossDeviceLoginCodeValidated,
+            isOtpLoginEnabled,
+            openOtpLoginModal,
+            showPasskeyLoginButton: shouldShowPasskeyLoginButton,
+            openPasskeyLoginFlow: attemptPasskeyLogin,
+            isOneTimeCodeDesignUpdated,
+            translate,
+          },
+          showSecurityNotificationModal,
+          isMagicLinkLoginErrorModalOpen,
+          onMagicLinkLoginErrorModalClose: () => setIsMagicLinkLoginErrorModalOpen(false),
+        }
+      : null,
+    challengeOverlaysProps: {
+      unifiedCaptchaId,
+      dataExchange,
+      onCaptchaChallengeCompleted: handleCaptchaChallengeCompleted,
+      onCaptchaChallengeInvalidated: handleCaptchaChallengeInvalidated,
+      onCaptchaChallengeAbandoned: handleCaptchaChallengeAbandoned,
+      onUnknownError: handleUnknownError,
+      userId,
+      securityQuestionsSessionId,
+      onSecurityQuestionsChallengeCompleted: handleSecurityQuestionsChallengeCompleted,
+      onSecurityQuestionsChallengeInvalidated: handleSecurityQuestionsChallengeInvalidated,
+      onSecurityQuestionsChallengeAbandoned: handleSecurityQuestionsChallengeAbandoned,
+      challengeId,
+      on2svChallengeCompleted: handle2svChallengeCompleted,
+      on2svChallengeInvalidated: handle2svChallengeInvalidated,
+      on2svChallengeAbandoned: handle2svChallengeAbandoned,
+      identityVerificationLoginTicket,
+      multipleUsersPerCredentialData,
+      onAccountSelection: handleAccountSelection,
+      onAccountSelectorAbandoned: handleAccountSelectorAbandoned,
+      credentialType,
+      hasMaxLoggedInAccountsLoginError,
+      shouldShowAccountLimitModal,
+      isParentUser: isParentUserUrl,
+      onAccountLimitConfirmation: handleAccountLimitConfirmation,
+      translate,
+    },
+    isStudioWebView,
+    isLoginBackgroundImageEnabled,
+    loginBackgroundClass,
+    shouldDisplayBrazilRatingLogo,
+    translate,
+  });
+};
 
-  if (isLoginBackgroundImageEnabled && loginBackgroundClass) {
-    return (
-      <div id="background-image" className={`background-image ${loginBackgroundClass}`}>
-        <div className="login-content-wrapper">
-          {loginBase}
-          {countryRatingLogos}
-        </div>
-      </div>
-    );
-  }
+export const LoginBase = (): React.JSX.Element => {
   return (
-    <React.Fragment>
-      {loginBase}
-      {countryRatingLogos}
-    </React.Fragment>
+    <LoginController
+      // TODO(AA-7602): This gate location and render contract are provisional and may change
+      // once the experiment approach is finalized.
+      render={viewModel => (
+        <LoginPresentationRouter
+          viewModel={viewModel}
+          isLoginRefreshEnabled={
+            viewModel.status === "ready" && viewModel.experiments.isLoginRefreshEnabled
+          }
+        />
+      )}
+    />
   );
 };
 

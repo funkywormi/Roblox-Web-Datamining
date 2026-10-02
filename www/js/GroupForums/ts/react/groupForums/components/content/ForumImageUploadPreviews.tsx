@@ -35,6 +35,7 @@ const ForumImageUploadPreviews = ({
               className='forum-image-upload-preview-tile'
               testId={`forum-image-upload-preview-${index}`}
               previewUrl={image.previewUrl}
+              assetId={image.assetId}
               isUploading={image.status === 'uploading'}
               isFailed={image.status === 'failed'}
               uploadingLabel={uploadingLabel}

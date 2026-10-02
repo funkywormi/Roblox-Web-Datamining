@@ -58,6 +58,10 @@ interface ToggleReactionMetadata {
   isPostComment: boolean;
 }
 
+interface MediaAttachment {
+  assetId: number;
+}
+
 interface ForumComment {
   id: string;
   parentId: string;
@@ -74,6 +78,7 @@ interface ForumComment {
   threadComments: ForumThreadCommentsResponse | null;
   threadCommentCount: number | null;
   isConcealed?: boolean;
+  mediaAttachments?: MediaAttachment[];
 }
 interface ForumPost extends Channel {
   categoryId: string;
@@ -136,6 +141,7 @@ interface PostState {
     content: MessageContent;
     parentCommentId?: string;
     commentId: string;
+    mediaAssetIds?: number[];
   }) => Promise<void>;
   isLoadingComments: boolean;
   hasNextComments: boolean;
@@ -234,6 +240,7 @@ export {
   ForumPost,
   ToggleReactionMetadata,
   ForumAncestry,
+  MediaAttachment,
   ForumComment,
   CommentCreatorInfo,
   ForumCommentsResponse,

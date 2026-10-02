@@ -8,8 +8,9 @@ export default function findFirstCreator(
   }
 
   for (const group of creatorData) {
-    if (group.creatorsList && group.creatorsList.length) {
-      return group.creatorsList[0];
+    const creator = group.creatorsList.find(({ disabled }) => !disabled);
+    if (creator) {
+      return creator;
     }
   }
   return null;

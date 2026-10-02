@@ -30,6 +30,7 @@ export type ContentComposerProps = {
   contentFooter?: ReactNode;
   disabled?: boolean;
   submitDisabled?: boolean;
+  hasUnsavedAttachmentChanges?: boolean;
   isCollapsedInitially?: boolean;
   onChange?: (value: MessageContent) => void;
   onSubmit: (value: MessageContent) => Promise<boolean>;
@@ -47,6 +48,7 @@ const ContentComposer = ({
   contentFooter,
   disabled,
   submitDisabled,
+  hasUnsavedAttachmentChanges,
   onChange,
   onSubmit,
   onCancel,
@@ -106,23 +108,31 @@ const ContentComposer = ({
   }, [inputRef, editorRef, resetForm, onCancel]);
 
   const onSubmitClicked = useCallback(async () => {
-    if (!content) {
+    const submittedContent = formStatus.isDirty ? content : defaultContent ?? content;
+    if (!submittedContent) {
       return;
     }
 
     setIsSubmitting(true);
-    const isSaved = await onSubmit(content);
+    const isSaved = await onSubmit(submittedContent);
     if (isSaved) {
       resetForm();
     }
     setIsSubmitting(false);
-  }, [content, onSubmit, resetForm]);
+  }, [content, defaultContent, formStatus.isDirty, onSubmit, resetForm]);
 
   const isSubmitDisabled = useMemo(() => {
-    return (
-      disabled || submitDisabled || !formStatus.isValidAndUnsaved || isRateLimited || isSubmitting
-    );
-  }, [formStatus, disabled, submitDisabled, isRateLimited, isSubmitting]);
+    const hasSubmittableChanges =
+      formStatus.isValidAndUnsaved || (!!hasUnsavedAttachmentChanges && !formStatus.isInvalid);
+    return disabled || submitDisabled || !hasSubmittableChanges || isRateLimited || isSubmitting;
+  }, [
+    formStatus,
+    hasUnsavedAttachmentChanges,
+    disabled,
+    submitDisabled,
+    isRateLimited,
+    isSubmitting
+  ]);
 
   const handleHotKey = (hotKeyPressed: HotKeyType) => {
     if (hotKeyPressed === HotKeyType.Submit && !isSubmitDisabled) {

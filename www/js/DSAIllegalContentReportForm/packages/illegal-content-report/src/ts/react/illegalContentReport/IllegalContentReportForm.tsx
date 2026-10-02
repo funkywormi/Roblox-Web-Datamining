@@ -335,10 +335,11 @@ const IllegalContentReportForm = ({
     ((issueType !== IllegalContentSubCategoryKey && issueType !== UKCHCROtherSubCategoryKey) ||
       !!otherIssue) &&
     // CSE allows anonymous submission (empty email); a provided email must still be a
-    // valid format so the verification modal can open. Other categories require name + email.
+    // valid format so the verification modal can open. DSA allows empty name; other
+    // non-CSE categories still require name + email.
     (issueType === ChildSexualExploitationSubCategoryKey
       ? !email.trim() || EmailValidator.validate(email)
-      : !!name && EmailValidator.validate(email)) &&
+      : EmailValidator.validate(email) && (reportType === ReportType.DSA || !!name)) &&
     isUKOSAIntimateImageIntakeValid &&
     // AU_OSA doesn't require confirmation checkbox
     (reportType === ReportType.AU_OSA || isConfirmed);
@@ -488,6 +489,7 @@ const IllegalContentReportForm = ({
           onNameChange={setName}
           onEmailChange={setEmail}
           openOtpModal={needsVerificationFromBackend}
+          nameOptional={reportType === ReportType.DSA}
           optional={issueType === ChildSexualExploitationSubCategoryKey}
           onOtpVerified={handleOtpVerified}
           onOtpModalClosedWithoutVerify={() => setNeedsVerificationFromBackend(false)}

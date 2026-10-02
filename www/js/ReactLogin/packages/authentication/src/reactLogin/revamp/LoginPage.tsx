@@ -19,7 +19,7 @@ import { AUTH_ERROR_MODAL_CONTAINER_ID } from "../../reactLanding/revamp/utils/a
 import { startLogin, startSwitchAccount, useLogin } from "./loginState";
 import SwitchAccount from "./steps/SwitchAccount";
 import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
-import { getMagicLinkTokenFromQueryString } from "./magicLinkLoginUtils";
+import { getMagicLinkTokenFromQueryString } from "../utils/magicLinkLoginUtils";
 
 const { lrLoginForm } = EVENT_CONSTANTS.context;
 

@@ -87,6 +87,7 @@ const PostComposer = ({
   const {
     supportTicketAttachment,
     mediaAssetIds,
+    hasUnsavedImageChanges,
     isImageUploadBlockingSubmit,
     leadingControl: attachmentLeadingControl,
     contentFooter: attachmentFooter,
@@ -99,6 +100,7 @@ const PostComposer = ({
       ? canCreatePostInCategory(activeCategory.id)
       : false,
     isEditing,
+    editingComment: forumPost?.firstComment,
     getPrefillDetails: getSupportTicketPrefillDetails
   });
 
@@ -121,7 +123,8 @@ const PostComposer = ({
             postCategoryId,
             editingPostId,
             forumPost.firstComment.id,
-            content
+            content,
+            mediaAssetIds
           );
           history.push(
             groupForumsConstants.router.getPostRoute(
@@ -263,6 +266,7 @@ const PostComposer = ({
         contentPlaceholder={translate('Label.WriteSomething')}
         submitText={translate('Action.Post')}
         submitDisabled={submitErrorKey === MODERATION_ERROR_KEY || isImageUploadBlockingSubmit}
+        hasUnsavedAttachmentChanges={hasUnsavedImageChanges}
         customControls={
           <div className='post-composer-categories-control'>
             <h5 className='post-composer-categories-label'>{translate('Heading.Categories')}</h5>

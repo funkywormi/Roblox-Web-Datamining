@@ -149,7 +149,7 @@ const GroupManagementProvider: FunctionComponent<GroupManagementProviderProps> =
   );
 
   useEffect(() => {
-    // oxlint-disable-next-line react/react-compiler -- initial fetch sets the loading state before starting its asynchronous request
+    // oxlint-disable-next-line react/set-state-in-effect -- initial fetch sets the loading state before starting its asynchronous request
     void getOrganization();
   }, [getOrganization]);
 

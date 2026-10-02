@@ -5,8 +5,6 @@ import { buttonClasses, Grid, makeStyles } from '@rbx/ui';
 import type { GroupRoleColorType } from '../../clients/groups';
 import useCurrentGroup from '../../hooks/useCurrentGroup';
 import RoleIcon from '../../members/components/common/RoleIcon';
-import { DefaultMemberRoleId, GuestRoleRank } from '../../utils/constants';
-import { canViewAnyRoleTab } from '../../utils/groupPermissions';
 
 const useRolesSidebarStyles = makeStyles()((theme) => ({
   roleButtonContainer: {
@@ -78,7 +76,6 @@ type TRolesListRoleProps = {
 
 const RolesListRole: React.FC<TRolesListRoleProps> = ({
   roleId,
-  roleRank,
   roleName,
   roleColor,
   isPrivate = false,
@@ -101,18 +98,8 @@ const RolesListRole: React.FC<TRolesListRoleProps> = ({
     },
     cx,
   } = useRolesSidebarStyles();
-  const { isOwner, permissions, rolePermissions } = useCurrentGroup();
+  const { isOwner, permissions } = useCurrentGroup();
   const [isHovered, setIsHovered] = useState(false);
-
-  const permissionsForRole = rolePermissions?.[roleId];
-  const isDefaultMemberRole = roleId === DefaultMemberRoleId;
-  const canViewAnyTab = canViewAnyRoleTab(
-    permissionsForRole,
-    isDefaultMemberRole,
-    roleRank === GuestRoleRank,
-    isOwner,
-  );
-  const isExistingRoleDisabled = !isNewRole && !canViewAnyTab;
 
   const canCreateRoles = isOwner === true || permissions?.canCreateRoles === true;
   const isNewRoleDisabled = isNewRole && !canCreateRoles;
@@ -126,7 +113,7 @@ const RolesListRole: React.FC<TRolesListRoleProps> = ({
       size='Small'
       color='primary'
       variant={isSelected ? 'Standard' : 'Utility'}
-      isDisabled={disabled || isNewRoleDisabled || isExistingRoleDisabled}
+      isDisabled={disabled || isNewRoleDisabled}
       onClick={onClickRole}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -135,7 +122,7 @@ const RolesListRole: React.FC<TRolesListRoleProps> = ({
         {
           [selectedButton]: isSelected,
         },
-        (disabled || isNewRoleDisabled || isExistingRoleDisabled) && disabledButton,
+        (disabled || isNewRoleDisabled) && disabledButton,
       )}>
       <Grid container className={buttonContentContainer}>
         <div className='flex grow-1 flex-row items-center width-full'>

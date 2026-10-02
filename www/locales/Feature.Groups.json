@@ -1350,5 +1350,6 @@
     "Label.Voted": "Voted",
     "Label.ResponseCountSingular": "response",
     "Label.ResponseCountPlural": "responses",
-    "Action.React": "React"
+    "Action.React": "React",
+    "Action.RemoveAffiliate": "Remove"
 }

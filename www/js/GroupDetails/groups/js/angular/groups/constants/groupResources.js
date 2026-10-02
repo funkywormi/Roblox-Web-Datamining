@@ -3,7 +3,6 @@ import groupsModule from '../groupsModule';
 const groupResources = {
   templates: {
     groupsListBaseTemplate: 'groups-list-base',
-    groupsListTemplate: 'groups-list',
     groupAboutTemplate: 'group-about',
     groupBaseTemplate: 'group-base',
     groupGamesTemplate: 'group-games',

@@ -30,6 +30,9 @@ import ScrollFlashOverlay from './ScrollFlashOverlay';
 import useLongPress from '../hooks/useLongPress';
 import renderHighlightedText from '../utils/renderHighlightedText';
 import ContentPreviewCard from '../../shared/components/ContentPreviewCard';
+import ForumMediaAttachments, {
+  FORUM_MEDIA_ATTACHMENT_CLASS
+} from './content/ForumMediaAttachments';
 
 const META_DATA_SEPARATOR = ' • ';
 const POST_EXPOSURE_THRESHOLD = 0.75;
@@ -49,7 +52,8 @@ const POST_NAV_BLOCK_SELECTOR = [
   `.${POST_PREVIEW_TICKET_STATUS_CLASS}`,
   `.${POST_PREVIEW_INLINE_REACTIONS_CLASS}`,
   `.${POST_PREVIEW_MOBILE_OVERLAY_CLASS}`,
-  `.${REACTION_PICKER_POPOVER_CLASS}`
+  `.${REACTION_PICKER_POPOVER_CLASS}`,
+  `.${FORUM_MEDIA_ATTACHMENT_CLASS}`
 ].join(', ');
 
 export type PostPreviewProps = {
@@ -210,7 +214,8 @@ const PostPreview = ({
   const {
     creatorInfo: { displayName, hasVerifiedBadge, groupRoleName },
     content,
-    reactions
+    reactions,
+    mediaAttachments
   } = firstComment;
 
   const hasReactions = reactions.length > 0;
@@ -365,6 +370,7 @@ const PostPreview = ({
           )}>
           {highlightedBody ? renderHighlightedText(highlightedBody) : <Message content={content} />}
         </div>
+        <ForumMediaAttachments attachments={mediaAttachments} />
         {renderMetaData()}
       </div>
       {onHighlightComplete && (

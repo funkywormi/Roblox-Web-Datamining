@@ -19,6 +19,7 @@ export type TextContentEditorProps = {
   contentPlaceholder: string;
   submitText: string;
   submitDisabled?: boolean;
+  hasUnsavedAttachmentChanges?: boolean;
   customControls?: JSX.Element;
   titleMaxLength?: number;
   contentMaxLength: number;
@@ -61,6 +62,7 @@ const TextContentEditor = ({
   contentPlaceholder,
   submitText,
   submitDisabled,
+  hasUnsavedAttachmentChanges,
   customControls,
   titleMaxLength,
   contentMaxLength,
@@ -109,7 +111,16 @@ const TextContentEditor = ({
     });
   }
 
-  const { resetForm, updateFormItem, formStatus } = useStatefulForm(fields);
+  const { resetForm, updateFormItem, formStatus: textFormStatus } = useStatefulForm(fields);
+  const formStatus = useMemo(
+    () => ({
+      ...textFormStatus,
+      isValidAndUnsaved:
+        textFormStatus.isValidAndUnsaved ||
+        (!!hasUnsavedAttachmentChanges && !textFormStatus.isInvalid)
+    }),
+    [textFormStatus, hasUnsavedAttachmentChanges]
+  );
 
   const contentValidationError = useValidationError(
     content,
@@ -126,13 +137,14 @@ const TextContentEditor = ({
   );
 
   const onSubmitClicked = useCallback(async () => {
+    const submittedContent = textFormStatus.isDirty ? content : defaultContent ?? content;
     setIsSubmitting(true);
-    const isSaved = await onSubmit({ title: title.plainText || '', content });
+    const isSaved = await onSubmit({ title: title.plainText || '', content: submittedContent });
     if (isSaved) {
       resetForm();
     }
     setIsSubmitting(false);
-  }, [title, content, onSubmit, resetForm]);
+  }, [title, content, defaultContent, textFormStatus.isDirty, onSubmit, resetForm]);
 
   const onTitleChanged = useCallback(
     (value: MessageContent) => {

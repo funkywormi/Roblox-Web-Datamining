@@ -11,7 +11,8 @@ import {
   CommentCreatorInfo,
   ForumCommentsResponse,
   ForumThreadCommentsResponse,
-  ForumComment
+  ForumComment,
+  MediaAttachment
 } from '../types';
 import { groupsConfig } from '../translation.config';
 import UserDisplay from '../../shared/components/UserDisplay';
@@ -41,6 +42,7 @@ import { logGroupForumsClickEvent } from '../../shared/utils/logging';
 import AgeCheckWrapper from './AgeCheckWrapper';
 import { EventTriggerReason } from '../../shared/constants/eventConstants';
 import { hasRichTextContent } from '../../shared/utils/messageContentUtils';
+import ForumMediaAttachments from './content/ForumMediaAttachments';
 
 const RailWrapper: FC<{ hasRail: boolean; children: React.ReactNode }> = ({ children, hasRail }) =>
   hasRail ? (
@@ -64,6 +66,7 @@ export type CommentProps = {
   reactions: Reaction[];
   parentCommentId?: string;
   initialThreadComments?: ForumThreadCommentsResponse | null;
+  mediaAttachments?: MediaAttachment[];
   onHidePost?: () => void;
   isConcealedAndShown?: boolean;
 } & WithTranslationsProps;
@@ -83,6 +86,7 @@ const Comment = ({
   reactions,
   creatorInfo,
   initialThreadComments,
+  mediaAttachments,
   translate,
   onHidePost,
   isConcealedAndShown
@@ -413,6 +417,7 @@ const Comment = ({
             </span>
           )}
         </div>
+        <ForumMediaAttachments attachments={mediaAttachments} />
         <div className='groups-forums-comment-metadata-section'>
           <div className='groups-forums-comment-metadata-reaction-section'>
             <CommentReactions

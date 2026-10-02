@@ -55,6 +55,8 @@ export interface ContactFieldsProps {
   nameLabel?: string;
   /** Whether fields are optional (removes asterisk, adds "(Optional)" label) */
   optional?: boolean;
+  /** Whether only the name field is optional (email remains required unless `optional` is set) */
+  nameOptional?: boolean;
   /** When true open the OTP modal */
   openOtpModal?: boolean;
   /** Callback when OTP is successfully verified, returns the session token */
@@ -77,6 +79,7 @@ const ContactFields: React.FC<ContactFieldsProps> = ({
   onEmailChange,
   nameLabel,
   optional = false,
+  nameOptional = false,
   openOtpModal = false,
   onOtpVerified,
   onVerificationStatusChange,
@@ -171,7 +174,7 @@ const ContactFields: React.FC<ContactFieldsProps> = ({
         <FieldTitle
           id="reporter-info-name-label"
           label={nameLabel ?? translate("Label.Name")}
-          optional={optional}
+          optional={optional || nameOptional}
         />
         <input
           id="reporter-info-name-input"

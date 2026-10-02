@@ -12,6 +12,10 @@ import UrlInput from "./components/UrlInput";
 import { sendReport } from "./services";
 import useGetMetadata from "./useGetMetadata";
 import {
+  getStoredVerificationToken,
+  setStoredVerificationToken,
+} from "./util/verificationTokenStorage";
+import {
   isValidRobloxUrl,
   tooManyUrls,
   MAX_NUMBER_OF_CONTENTS,
@@ -53,6 +57,7 @@ const BrazilECAForm = ({ defaultContentURL, onBack }: Props): ReactElement => {
   const [email, setEmail] = useState<string>("");
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
   const [submittedModalInfo, setSubmittedModalInfo] = useState<SubmitModal | null>(null);
+  const [needsVerificationFromBackend, setNeedsVerificationFromBackend] = useState<boolean>(false);
 
   useEffect(() => {
     setName(data?.name ?? "");
@@ -85,7 +90,18 @@ const BrazilECAForm = ({ defaultContentURL, onBack }: Props): ReactElement => {
 
   useEffect(() => {
     if (mutation.isSuccess) {
-      const submitModal: SubmitModal = mutation.data?.success
+      const response = mutation.data;
+      if (
+        response?.success === false &&
+        response?.message?.includes("Email Verification Required")
+      ) {
+        setNeedsVerificationFromBackend(true);
+        return;
+      }
+      if (response?.verificationToken) {
+        setStoredVerificationToken(response.verificationToken);
+      }
+      const submitModal: SubmitModal = response?.success
         ? {
             title: translate("Title.Modal.ReportSuccess"),
             content: translate("Message.Modal.ReportSuccess"),
@@ -93,7 +109,7 @@ const BrazilECAForm = ({ defaultContentURL, onBack }: Props): ReactElement => {
           }
         : {
             title: translate("Title.Modal.ReportFailure"),
-            content: mutation?.data?.message || "Error",
+            content: response?.message || "Error",
             buttonText: translate("Action.Modal.Ok"),
           };
 
@@ -161,22 +177,47 @@ const BrazilECAForm = ({ defaultContentURL, onBack }: Props): ReactElement => {
     }
   };
 
+  const buildRequestBody = useCallback(
+    (opts?: {
+      otpSessionToken?: string;
+      includeVerificationToken?: boolean;
+    }): SubmitRequestBody => {
+      const body: SubmitRequestBody = {
+        IllegalType: issueType,
+        OtherViolation: otherIssue,
+        IllegalContentUrl: urlStr,
+        Reason: description,
+        Country: BRAZIL_COUNTRY_NAME,
+        Name: name,
+        Email: email,
+        IsAppeal: false,
+        ReportType: reportTypeToString(reportType),
+        OptOutCommunication: false,
+        Custom: { Role: role },
+      };
+      if (opts?.otpSessionToken) {
+        body.OtpSessionToken = opts.otpSessionToken;
+      }
+      if (opts?.includeVerificationToken !== false) {
+        const stored = getStoredVerificationToken();
+        if (stored) body.VerificationToken = stored;
+      }
+      return body;
+    },
+    [issueType, otherIssue, urlStr, description, name, email, reportType, role],
+  );
+
   const submitReport = () => {
-    const requestBody: SubmitRequestBody = {
-      IllegalType: issueType,
-      OtherViolation: otherIssue,
-      IllegalContentUrl: urlStr,
-      Reason: description,
-      Country: BRAZIL_COUNTRY_NAME,
-      Name: name,
-      Email: email,
-      IsAppeal: false,
-      ReportType: reportTypeToString(reportType),
-      OptOutCommunication: false,
-      Custom: { Role: role },
-    };
-    mutation.mutate(requestBody);
+    mutation.mutate(buildRequestBody());
   };
+
+  const handleOtpVerified = useCallback(
+    (otpSessionToken: string) => {
+      setNeedsVerificationFromBackend(false);
+      mutation.mutate(buildRequestBody({ otpSessionToken, includeVerificationToken: false }));
+    },
+    [buildRequestBody, mutation],
+  );
 
   const onRadioClick = (event: React.FormEvent<HTMLInputElement>): void => {
     const { target } = event;
@@ -306,7 +347,15 @@ const BrazilECAForm = ({ defaultContentURL, onBack }: Props): ReactElement => {
           showRequiredStar
         />
 
-        <ContactFields name={name} email={email} onNameChange={setName} onEmailChange={setEmail} />
+        <ContactFields
+          name={name}
+          email={email}
+          onNameChange={setName}
+          onEmailChange={setEmail}
+          openOtpModal={needsVerificationFromBackend}
+          onOtpVerified={handleOtpVerified}
+          onOtpModalClosedWithoutVerify={() => setNeedsVerificationFromBackend(false)}
+        />
 
         {/* Role Selection - Brazil ECA specific (under Contact Information) */}
         <div id="role-selection" className="section">
@@ -350,7 +399,7 @@ const BrazilECAForm = ({ defaultContentURL, onBack }: Props): ReactElement => {
             <button
               type="button"
               className="btn-primary-md btn-full-width"
-              disabled={!canSubmit}
+              disabled={!canSubmit || needsVerificationFromBackend}
               onClick={submitReport}
             >
               <span>{translate("Action.Submit")}</span>

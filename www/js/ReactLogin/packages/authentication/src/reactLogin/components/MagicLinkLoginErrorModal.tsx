@@ -9,7 +9,7 @@ import {
 } from "@rbx/foundation-ui";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import { FeatureLoginPage } from "@rbx/authentication-common/constants/translationConstants";
-import { isParentalRequestsMagicLink } from "./magicLinkLoginUtils";
+import { isParentalRequestsMagicLink } from "../utils/magicLinkLoginUtils";
 
 type MagicLinkLoginErrorModalProps = {
   isOpen: boolean;

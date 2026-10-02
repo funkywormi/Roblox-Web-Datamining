@@ -53,14 +53,24 @@ const CommentComposer = ({
     mentioningReplyId,
     translate
   });
+  const editingComment = useMemo(
+    () =>
+      editingCommentId ? getComment(editingCommentId, parentCommentId) ?? undefined : undefined,
+    [editingCommentId, parentCommentId, getComment]
+  );
   const {
     mediaAssetIds,
+    hasUnsavedImageChanges,
     isSubmitBlocked: isImageUploadBlockingSubmit,
     leadingControl: attachmentLeadingControl,
     contentFooter: imageUploadPreviews,
     input: imageUploadInput,
     reset: resetImageUploads
-  } = useCommentComposerAttachments(!!editingCommentId, disabled || forumsWrite.isDisabled);
+  } = useCommentComposerAttachments(
+    !!editingCommentId,
+    disabled || forumsWrite.isDisabled,
+    editingComment
+  );
 
   const handleOnClose = useCallback(() => {
     commentComposerRef?.current?.clearText();
@@ -116,14 +126,13 @@ const CommentComposer = ({
 
   const defaultContent = useMemo(() => {
     if (editingCommentId) {
-      const comment = getComment(editingCommentId, parentCommentId);
-      return comment?.content;
+      return editingComment?.content;
     }
     if (replyMentionName) {
       return createSimpleSlateContent(`@${replyMentionName} `);
     }
     return undefined;
-  }, [editingCommentId, parentCommentId, replyMentionName, getComment]);
+  }, [editingCommentId, editingComment, replyMentionName]);
 
   const replyingToUserId = useMemo(() => {
     if (replyingToCommentId && replyingToCommentId !== post?.firstComment.id) {
@@ -156,6 +165,7 @@ const CommentComposer = ({
         contentFooter={imageUploadPreviews}
         disabled={disabled || forumsWrite.isDisabled}
         submitDisabled={!!commentSubmissionError || isImageUploadBlockingSubmit}
+        hasUnsavedAttachmentChanges={hasUnsavedImageChanges}
         onChange={handleOnChange}
         onSubmit={handleOnSubmit}
         onCancel={showCancelButton ? handleOnClose : undefined}

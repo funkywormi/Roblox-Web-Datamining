@@ -67,7 +67,7 @@ const useUserOptionsForOrgRoles: UserOptionsHook = (roleId: string) => {
 
   useEffect(() => {
     if (allInvitedUsersAndMembers) {
-      // oxlint-disable-next-line react/react-compiler -- filtering externally loaded memberships updates the hook's result state
+      // oxlint-disable-next-line react/set-state-in-effect -- filtering externally loaded memberships updates the hook's result state
       void filterAndUpdateUserStatus(allInvitedUsersAndMembers);
     }
   }, [allInvitedUsersAndMembers, filterAndUpdateUserStatus]);

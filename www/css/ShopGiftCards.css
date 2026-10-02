@@ -90,7 +90,7 @@
 }
 
 #SponsoredPageContent .text-mainbutton {
-    color: #f7f7f8;
+    color: var(--color-action-emphasis-foreground);
     font-size: 16px;
     font-weight: 600
 }
@@ -375,8 +375,8 @@ button.text-button.selected {
 }
 
 .nav-header-content hr {
-    border-width: 0 thin 2px 0;
-    border-color: #bcbec8
+    border-color: var(--color-extended-gray-500);
+    border-width: 0 thin 2px 0
 }
 
 .nav-footer {

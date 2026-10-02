@@ -65,7 +65,8 @@ const useCommentSubmission = ({
           await handleEditComment({
             content,
             commentId: editingCommentId,
-            parentCommentId
+            parentCommentId,
+            mediaAssetIds
           });
         } else {
           await handleCreateComment({

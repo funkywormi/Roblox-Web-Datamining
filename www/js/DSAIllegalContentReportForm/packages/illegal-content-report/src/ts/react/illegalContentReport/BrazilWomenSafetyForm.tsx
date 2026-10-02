@@ -13,6 +13,7 @@ import { BrazilWomenLimits, Limit, Urls } from "./constants";
 import { sendReport } from "./services";
 import type { SendReportResponse, SubmitModal } from "./types";
 import useGetMetadata from "./useGetMetadata";
+import useEmailVerificationChallenge from "./hooks/useEmailVerificationChallenge";
 import { getSampleRobloxUrl } from "../util/urls";
 import { BrazilWomenSafetyStanding, buildBrazilWomenSafetyRequest } from "./brazilSubmission";
 
@@ -45,6 +46,8 @@ const BrazilWomenSafetyForm: React.FC<BrazilWomenSafetyFormProps> = ({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [submittedModalInfo, setSubmittedModalInfo] = useState<SubmitModal | null>(null);
+  const { isVerificationRequired, handleResponse, withVerification, dismissVerification } =
+    useEmailVerificationChallenge();
 
   const clearAllInputs = useCallback(() => {
     setContentLocation("");
@@ -57,6 +60,8 @@ const BrazilWomenSafetyForm: React.FC<BrazilWomenSafetyFormProps> = ({
 
   const mutation = useMutation(sendReport, {
     onSuccess: (response: SendReportResponse) => {
+      if (handleResponse(response)) return;
+
       if (response.success) {
         setSubmittedModalInfo({
           title: translate("Title.Modal.ReportSuccess"),
@@ -126,18 +131,28 @@ const BrazilWomenSafetyForm: React.FC<BrazilWomenSafetyFormProps> = ({
     );
   };
 
-  const handleSubmit = () => {
+  const submitReport = (otpSessionToken?: string) => {
     if (!standing || mutation.isLoading) return;
 
     mutation.mutate(
-      buildBrazilWomenSafetyRequest({
-        contentLocation,
-        description,
-        standing,
-        name,
-        email,
-      }),
+      withVerification(
+        buildBrazilWomenSafetyRequest({
+          contentLocation,
+          description,
+          standing,
+          name,
+          email,
+        }),
+        otpSessionToken,
+      ),
     );
+  };
+
+  const handleSubmit = () => submitReport();
+
+  const handleOtpVerified = (otpSessionToken: string) => {
+    dismissVerification();
+    submitReport(otpSessionToken);
   };
 
   const handleSubmittedModalClose = () => {
@@ -207,6 +222,9 @@ const BrazilWomenSafetyForm: React.FC<BrazilWomenSafetyFormProps> = ({
           onNameChange={setName}
           onEmailChange={setEmail}
           nameLabel={translate("Label.FullLegalName")}
+          openOtpModal={isVerificationRequired}
+          onOtpVerified={handleOtpVerified}
+          onOtpModalClosedWithoutVerify={dismissVerification}
         />
 
         <div id="brazil-women-safety-standing" className="section">
@@ -257,7 +275,7 @@ const BrazilWomenSafetyForm: React.FC<BrazilWomenSafetyFormProps> = ({
             <button
               type="button"
               className="btn-primary-md btn-full-width"
-              disabled={!canSubmit()}
+              disabled={!canSubmit() || isVerificationRequired}
               onClick={handleSubmit}
             >
               {translate("Action.Submit")}

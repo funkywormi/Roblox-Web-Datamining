@@ -123,28 +123,6 @@ function groupsListService(
     return httpService.httpPost(config, request);
   };
 
-  const buildScrollbar = className => {
-    const scrollbarElm = angular.element(document.querySelector(className));
-    if (scrollbarElm && scrollbarElm.length > 0) {
-      // Reset the height to be the max height, before the scrollbar is re-created
-      const scrollbarChild = scrollbarElm[0].firstElementChild;
-      if (scrollbarChild) {
-        scrollbarChild.style['max-height'] = '700px';
-      }
-
-      scrollbarElm.mCustomScrollbar({
-        autoExpandScrollbar: false,
-        scrollInertia: 500,
-        contentTouchScroll: 1,
-        mouseWheel: {
-          preventDefault: true,
-          scrollAmount: 208,
-          deltaFactor: 208
-        }
-      });
-    }
-  };
-
   const lazyImageRefresh = () => {
     $timeout(() => {
       $rootScope.$emit('lazyImg:refresh');
@@ -154,7 +132,6 @@ function groupsListService(
   return {
     getGroups,
     getPrimaryGroup,
-    buildScrollbar,
     lazyImageRefresh
   };
 }

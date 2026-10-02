@@ -20,6 +20,26 @@ export const observabilityRegistry = {
     },
     RobuxBalance: {
       counters: [{ name: "RobuxBalance_UpdatedOnRefetch" }],
+      apiCalls: ["GetRobuxBalance"],
+    },
+    PaymentSession: {
+      apiCalls: [
+        "CreatePaymentSession",
+        "GetPaymentSession",
+        "GetPaymentSessionByCheckoutSessionId",
+      ],
+    },
+    Metadata: {
+      apiCalls: ["GetMetadata"],
+    },
+    PersonalizedBonusItem: {
+      apiCalls: [
+        "CreateOrGetBonusSessionByPaymentSessionId",
+        "GetDisplayableBonusForProduct",
+        "GetBonusSessionByCheckoutSessionId",
+        "GetThumbnails",
+        "HandleGameJoinEvent",
+      ],
     },
   },
 } as const satisfies RegistryInput;

@@ -208,7 +208,7 @@ export const translationKeys = {
     modifiedTitle: "Description.GetBonusRobux",
     footer: "Description.GetMoreRobuxWithGiftCards",
     promoTitle: "Description.LimitedTimeOffer",
-    promoSubtitle: "Description.September2026Promo",
+    promoSubtitle: "Description.October2026Promo",
   },
 
   form: {

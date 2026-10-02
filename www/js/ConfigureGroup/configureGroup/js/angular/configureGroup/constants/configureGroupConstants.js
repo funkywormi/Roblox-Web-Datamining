@@ -28,7 +28,8 @@ const configureGroupConstants = {
     getOrganizationUrl: `${EnvironmentUrls.apiGatewayUrl}/orgs/v1/organizations`,
     getUserOrgRolesUrl: `${EnvironmentUrls.apiGatewayUrl}/orgs/v1/organizations/{organizationId}/users/{userId}/roles`,
     getRolePermissionsUrl: `${EnvironmentUrls.apiGatewayUrl}/orgs/v2/organizations/{organizationId}/roles/{roleId}/permissions`,
-    getGroupConfigurationUrl: `${EnvironmentUrls.groupsApi}/v1/groups/{groupId}/configuration`
+    getGroupConfigurationUrl: `${EnvironmentUrls.groupsApi}/v1/groups/{groupId}/configuration`,
+    getResolvedGroupPermissionsUrl: `${EnvironmentUrls.groupsApi}/v2/groups/{groupId}/permissions/resolved`
   },
 
   translations: {

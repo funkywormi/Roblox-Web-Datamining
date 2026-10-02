@@ -119,6 +119,7 @@ const CommentReplies = ({
         createdAt={reply.createdAt}
         updatedAt={reply.updatedAt}
         content={reply.content}
+        mediaAttachments={reply.mediaAttachments}
         threadId={null}
         channelId={reply.parentId}
         parentCommentId={parentId}

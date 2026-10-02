@@ -326,14 +326,19 @@ export default {
     categoryId: string,
     postId: string,
     commentId: string,
-    content: MessageContent
+    content: MessageContent,
+    // Omit to keep the saved images; an empty list removes them all.
+    mediaAssetIds?: number[]
   ): Promise<ForumComment> => {
     const urlConfig = {
       url: groupForumsConstants.urls.forumCommentEndpoint(groupId, categoryId, postId, commentId),
       withCredentials: true
     };
 
-    const data = createMessageContentFragment(content);
+    const data = {
+      ...createMessageContentFragment(content),
+      ...(mediaAssetIds && { mediaAssetIds })
+    };
 
     try {
       const response = await httpService.patch<ForumComment>(urlConfig, data);

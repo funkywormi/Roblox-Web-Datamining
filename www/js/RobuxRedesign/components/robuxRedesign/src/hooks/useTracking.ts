@@ -10,7 +10,8 @@ export type Tracking = {
     viewName: VIEW_NAME,
     eventType: PURCHASE_EVENT_TYPE,
     viewMessage?: VIEW_MESSAGE,
-    eventMetadata?: object,
+    // Values must be strings: the warehouse drops all metadata on an event if any value is not.
+    eventMetadata?: Record<string, string>,
   ) => void;
   trackStatus: (viewName: VIEW_NAME, status: PURCHASE_EVENT_STATUS, viewMessage?: string) => void;
 };
@@ -74,7 +75,7 @@ export function useTracking(): Tracking {
       viewName: VIEW_NAME,
       eventType: PURCHASE_EVENT_TYPE,
       viewMessage?: VIEW_MESSAGE,
-      eventMetadata?: object,
+      eventMetadata?: Record<string, string>,
     ) => {
       pfas.sendUserPurchaseFlowEvent(
         getTriggerContext(viewName === PREMIUM_PURCHASE),

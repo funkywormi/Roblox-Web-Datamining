@@ -984,12 +984,6 @@ function groupController(
     );
   };
 
-  $scope.loadGroupsListRedesignExperiment = () => {
-    groupExperimentsService.isGroupsListRedesignExperimentEnabled().then(isEnabled => {
-      $scope.isGroupsListRedesignEnabled = isEnabled;
-    });
-  };
-
   $scope.profilePageUrl = userId => {
     return groupDetailsService.profilePageUrl(userId);
   };
@@ -1293,8 +1287,6 @@ function groupController(
 
     $scope.library = {};
 
-    $scope.library.moreGroupsUrl = groupsConstants.absoluteUrls.moreGroups;
-
     $scope.library.currentUser = {
       id: parseInt(CurrentUser.userId),
       groupCount: null,
@@ -1329,7 +1321,6 @@ function groupController(
 
     $scope.loadGroupsList();
     $scope.loadHidingEmptyCommunityTabsExperiment();
-    $scope.loadGroupsListRedesignExperiment();
     $scope.loadGroupExperienceServersExperiment();
     $scope.updateCommunitiesLayoutVisibility();
 

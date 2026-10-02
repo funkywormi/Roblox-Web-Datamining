@@ -488,12 +488,12 @@ configure-group-payouts .rbx-tab {
 }
 
 .light-theme .group-banner {
-    border-color: #bcbec8;
+    border-color: var(--color-extended-gray-500);
     background-color: var(--color-surface-100)
 }
 
 .dark-theme .group-banner {
-    border-color: #494d5a;
+    border-color: var(--color-extended-gray-700);
     background-color: var(--color-surface-100)
 }
 
@@ -987,7 +987,7 @@ configure-group-payouts .rbx-tab {
 
 .light-theme .preview-overlay {
     background-color: var(--color-surface-0);
-    background-color: rgba(var(--color-surface-0), .6)
+    background-color: color-mix(in srgb, var(--color-surface-0) 60%, transparent)
 }
 
 .light-theme .preview-overlay .preview-text {
@@ -996,7 +996,7 @@ configure-group-payouts .rbx-tab {
 
 .dark-theme .preview-overlay {
     background-color: var(--color-surface-0);
-    background-color: rgba(var(--color-surface-0), .6)
+    background-color: color-mix(in srgb, var(--color-surface-0) 60%, transparent)
 }
 
 .dark-theme .preview-overlay .preview-text {
@@ -1004,15 +1004,15 @@ configure-group-payouts .rbx-tab {
 }
 
 .file-upload-content {
-    border: 2px dashed #e6e7ea
+    border: 2px dashed var(--color-extended-gray-300)
 }
 
 .light-theme .file-upload-content {
-    border-color: #bcbec8
+    border-color: var(--color-extended-gray-500)
 }
 
 .dark-theme .file-upload-content {
-    border-color: #494d5a
+    border-color: var(--color-extended-gray-700)
 }
 
 .file-upload-container {
@@ -1105,7 +1105,7 @@ configure-group-payouts .rbx-tab {
 .dark-theme .file-upload-container .file-upload-content .file-upload-remove-button,
 .light-theme .file-upload-container .file-upload-content .file-upload-remove-button {
     background-color: var(--color-surface-0);
-    background-color: rgba(var(--color-surface-0), .75);
+    background-color: color-mix(in srgb, var(--color-surface-0) 75%, transparent);
     color: var(--color-content-emphasis)
 }
 
@@ -1114,7 +1114,7 @@ configure-group-payouts .rbx-tab {
 .light-theme .file-upload-container .file-upload-content .file-upload-remove-button:focus-visible,
 .light-theme .file-upload-container .file-upload-content .file-upload-remove-button:hover {
     background-color: var(--color-surface-0);
-    background-color: rgba(var(--color-surface-0), 1)
+    background-color: color-mix(in srgb, var(--color-surface-0) 100%, transparent)
 }
 
 .file-upload-container .file-upload-content .file-upload-progress-overlay {
@@ -1435,6 +1435,40 @@ fieldset[disabled] .file-upload-container {
 .container-header .pager-holder {
     float: right;
     justify-content: flex-end
+}
+
+.image-viewer-dialog {
+    width: 100%;
+    overflow: hidden
+}
+
+.image-viewer-dialog-frame {
+    position: relative;
+    width: 100%;
+    max-height: 80vh;
+    aspect-ratio: 4/3
+}
+
+.image-viewer-dialog-thumbnail.thumbnail-2d-container {
+    position: absolute;
+    inset: 0;
+    float: none;
+    width: 100%;
+    height: 100%
+}
+
+.image-viewer-dialog-thumbnail.thumbnail-2d-container[class*=icon-] {
+    padding-top: 0;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: contain
+}
+
+.image-viewer-dialog-thumbnail.thumbnail-2d-container img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain
 }
 
 .configure-group-details {
@@ -1772,26 +1806,6 @@ ul.hlist.game-cards {
 
 .group-name-with-verified-badge-container .group-name.text-overflow {
     white-space: nowrap
-}
-
-.verified-badge-icon-group-name-in-group-list {
-    display: none;
-    visibility: hidden
-}
-
-.verified-badge-icon-group-name-in-group-list-rendered {
-    width: 12px;
-    height: 12px;
-    margin-left: 4px;
-    pointer-events: none
-}
-
-.verified-badge-icon-group-name-in-group-list-container-rendered {
-    pointer-events: none
-}
-
-.groups-list .group-cards .list-item .group-card .group-card-name.group-card-name-with-verified-badge {
-    width: min-content
 }
 
 #change-name .modal-body .group-name-change-terms ul.group-name-change-verified-badge-warning {

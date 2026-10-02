@@ -145,7 +145,8 @@ const groupsConstants = {
   experimentLayer: 'UserCommunities.Groups.Discovery',
   socialCommunityExperimentLayer: 'Social.CommunityPage',
   storeExperimentLayer: 'Social.Store',
-  aboutTabWithExperienceExperimentLayer: 'UserCommunities.Groups.AboutTabWithExperience'
+  aboutTabWithExperienceExperimentLayer: 'UserCommunities.Groups.AboutTabWithExperience',
+  announcementArchiveExperimentLayer: 'UserCommunities.Groups.AnnouncementArchive'
 };
 
 groupsModule.constant('groupsConstants', groupsConstants);

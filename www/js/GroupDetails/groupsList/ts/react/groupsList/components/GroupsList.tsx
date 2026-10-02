@@ -76,8 +76,7 @@ const GroupsList = ({
     translate
   ]);
 
-  // this is a workaround because CSS :has selector only has ~95% global browser coverage
-  // we can remove this once the sidebar is rolled out to all users
+  // Reserve page space only while the sidebar is mounted, including across route changes.
   // eslint-disable-next-line consistent-return
   useEffect(() => {
     if (isSidebar) {

@@ -31,9 +31,7 @@ const groupsListConstants = {
     maxRows: 12,
     isLoading: false,
     loadFailure: false
-  },
-
-  groupsListSelector: '#groups-list'
+  }
 };
 
 groupListModule.constant('groupsListConstants', groupsListConstants);

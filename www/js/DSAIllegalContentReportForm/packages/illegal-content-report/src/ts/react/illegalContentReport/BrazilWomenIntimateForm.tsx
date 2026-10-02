@@ -13,6 +13,7 @@ import { BrazilWomenLimits, Limit, Urls } from "./constants";
 import { sendReport } from "./services";
 import type { SendReportResponse, SubmitModal } from "./types";
 import useGetMetadata from "./useGetMetadata";
+import useEmailVerificationChallenge from "./hooks/useEmailVerificationChallenge";
 import { getSampleRobloxUrl } from "../util/urls";
 import { BrazilWomenIntimateStanding, buildBrazilWomenIntimateRequest } from "./brazilSubmission";
 
@@ -51,6 +52,8 @@ const BrazilWomenIntimateForm: React.FC<BrazilWomenIntimateFormProps> = ({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [submittedModalInfo, setSubmittedModalInfo] = useState<SubmitModal | null>(null);
+  const { isVerificationRequired, handleResponse, withVerification, dismissVerification } =
+    useEmailVerificationChallenge();
 
   const clearAllInputs = useCallback(() => {
     setContentLocation("");
@@ -65,6 +68,8 @@ const BrazilWomenIntimateForm: React.FC<BrazilWomenIntimateFormProps> = ({
 
   const mutation = useMutation(sendReport, {
     onSuccess: (response: SendReportResponse) => {
+      if (handleResponse(response)) return;
+
       if (response.success) {
         setSubmittedModalInfo({
           title: translate("Title.Modal.ReportSuccess"),
@@ -137,21 +142,31 @@ const BrazilWomenIntimateForm: React.FC<BrazilWomenIntimateFormProps> = ({
     );
   };
 
-  const handleSubmit = () => {
+  const submitReport = (otpSessionToken?: string) => {
     if (!standing || mutation.isLoading) return;
 
     mutation.mutate(
-      buildBrazilWomenIntimateRequest({
-        contentLocation,
-        description,
-        circumstances,
-        signature,
-        signatureTimestamp: new Date().toISOString(),
-        standing,
-        name,
-        email,
-      }),
+      withVerification(
+        buildBrazilWomenIntimateRequest({
+          contentLocation,
+          description,
+          circumstances,
+          signature,
+          signatureTimestamp: new Date().toISOString(),
+          standing,
+          name,
+          email,
+        }),
+        otpSessionToken,
+      ),
     );
+  };
+
+  const handleSubmit = () => submitReport();
+
+  const handleOtpVerified = (otpSessionToken: string) => {
+    dismissVerification();
+    submitReport(otpSessionToken);
   };
 
   const handleSubmittedModalClose = () => {
@@ -241,6 +256,9 @@ const BrazilWomenIntimateForm: React.FC<BrazilWomenIntimateFormProps> = ({
           onNameChange={setName}
           onEmailChange={setEmail}
           nameLabel={translate("Label.FullLegalName")}
+          openOtpModal={isVerificationRequired}
+          onOtpVerified={handleOtpVerified}
+          onOtpModalClosedWithoutVerify={dismissVerification}
         />
 
         <div id="brazil-women-intimate-standing" className="section">
@@ -307,7 +325,7 @@ const BrazilWomenIntimateForm: React.FC<BrazilWomenIntimateFormProps> = ({
             <button
               type="button"
               className="btn-primary-md btn-full-width"
-              disabled={!canSubmit()}
+              disabled={!canSubmit() || isVerificationRequired}
               onClick={handleSubmit}
             >
               {translate("Action.Submit")}

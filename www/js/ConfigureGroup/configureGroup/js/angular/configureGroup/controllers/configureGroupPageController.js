@@ -47,7 +47,8 @@ function configureGroupPageController(
           ctrl.group.memberCount = result.memberCount;
           ctrl.group.name = result.name;
           ctrl.group.owner = result.owner;
-          if (CurrentUser.isAuthenticated && result.owner?.userId === Number(CurrentUser.userId)) {
+          ctrl.group.isOwner = result.owner?.userId === Number(CurrentUser.userId);
+          if (CurrentUser.isAuthenticated && ctrl.group.isOwner) {
             ConfigureGroupV2Service?.initializeUnificationOptInModal(ctrl.group.id);
           }
           ctrl.detailsPageUrl = configureGroupUtilityService.groupDetailsPageUrl(

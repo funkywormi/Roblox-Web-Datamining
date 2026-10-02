@@ -14,7 +14,7 @@ export type MessageContentFragment = {
 export const createMessageContentFragment = (content: MessageContent): MessageContentFragment => {
   if (content.slate) {
     return {
-      slate: JSON.stringify(content.slate)
+      slate: typeof content.slate === 'string' ? content.slate : JSON.stringify(content.slate)
     };
   }
 

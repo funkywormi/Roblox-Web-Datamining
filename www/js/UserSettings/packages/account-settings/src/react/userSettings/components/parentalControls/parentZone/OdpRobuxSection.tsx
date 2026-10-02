@@ -1,12 +1,14 @@
 import React from "react";
 import { useTranslation } from "react-utilities";
+import { Button } from "@rbx/foundation-ui";
 import { useGetOdpChildContextQuery } from "../../../../apis/parentalControlsApi";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
+import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import { parentZonePages } from "../../../constants/parentalControls/parentZonePages";
+import { buyRobuxUrl } from "../../../constants/urlConstants";
 import RobuxBalanceCard from "../shared/RobuxBalanceCard";
 
 // Robux balance for on-device parent zone.
-// TODO FAMEX-235: confirm with product whether ODP can gift robux
 export const OdpRobuxSection = (): React.JSX.Element | null => {
   const { translate } = useTranslation();
   const { data: odpChildContext } = useGetOdpChildContextQuery();
@@ -17,8 +19,9 @@ export const OdpRobuxSection = (): React.JSX.Element | null => {
       ? parentZonePages.robuxPage.path
       : undefined;
 
-  // An absent balance means the balance read failed, which the card renders blank. With no balance
-  // and no settings to reach, the card would hold nothing, so the section hides instead.
+  const canAddRobux =
+    odpChildContext?.canParentGiftChildRobux === true && robuxBalance !== undefined;
+
   if (robuxBalance === undefined && robuxSettingsPath === undefined) {
     return null;
   }
@@ -32,6 +35,13 @@ export const OdpRobuxSection = (): React.JSX.Element | null => {
           robuxSettingsPath === undefined ? undefined : translate(commonTranslationConstants.manage)
         }
         linkPath={robuxSettingsPath}
+        action={
+          canAddRobux && (
+            <Button as="a" href={buyRobuxUrl} variant="Standard" size="Medium" className="shrink-0">
+              {translate(parentalControlsTranslationConstants.giftRobux.addRobuxAction)}
+            </Button>
+          )
+        }
       />
     </React.Fragment>
   );

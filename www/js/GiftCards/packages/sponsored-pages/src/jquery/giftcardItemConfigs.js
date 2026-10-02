@@ -1,15 +1,15 @@
 // ═══════════════════════════════ ITEM IDs ═══════════════════════════════════
 export const ITEM_IDS = {
   // Standard CashStar Item (appears on all pages with items)
-  CASHSTAR_ITEM: 139683119466435,
+  CASHSTAR_ITEM: 111233368930573,
 
   // CashStar Bonus Item (appears on /giftcards page for cashstar countries)
-  CASHSTAR_BONUS: 122550426347379,
+  CASHSTAR_BONUS: 106083349330631,
 
   // Amazon-specific items (appear on /giftcards-retailers for select countries)
-  AMAZON_ITEM_1: 124297952377057,
-  AMAZON_ITEM_2: 126078884649537,
-  AMAZON_ITEM_3: 111999727936653
+  AMAZON_ITEM_1: 120292901257041,
+  AMAZON_ITEM_2: 107852641683177,
+  AMAZON_ITEM_3: 114107141682643
 };
 
 // ══════════════════════ COUNTRY CONFIGURATIONS ══════════════════════════════

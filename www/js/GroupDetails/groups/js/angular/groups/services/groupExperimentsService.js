@@ -61,23 +61,6 @@ function groupExperimentsService(groupsConstants) {
       return false;
     },
 
-    isGroupsListRedesignExperimentEnabled: async () => {
-      if (!CurrentUser.isAuthenticated) {
-        return false;
-      }
-
-      try {
-        const experimentConfig = await getExperimentLayer(
-          groupsConstants.socialCommunityExperimentLayer
-        );
-
-        return experimentConfig?.showGroupsListRedesign ?? true;
-      } catch (e) {
-        // no-op, return control
-      }
-      return false;
-    },
-
     isGroupExperiencesRedesignExperimentEnabled: async () => {
       if (!CurrentUser.isAuthenticated) {
         return false;
