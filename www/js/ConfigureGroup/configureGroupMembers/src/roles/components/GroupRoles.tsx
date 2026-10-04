@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Icon } from '@rbx/foundation-ui';
 import { useTranslation, withTranslation } from '@rbx/intl';
 import {
+  Alert,
   Typography,
   Grid,
   makeStyles,
@@ -50,6 +51,7 @@ import {
 import { getRandomRoleColorType, getRoleIconName, getRoleStyle } from '../../utils/groupUtils';
 import { ConfigureRoleTab } from '../../utils/types';
 import type { RoleCreationMetadata, RoleMetadataForNewRole } from '../../utils/types';
+import { translateLowestRoleCopy } from '../utils/lowestRoleCopy';
 import { deleteRoleAndWaitForCompletion } from '../utils/roleDeletion';
 import CreateRoleModal from './CreateRoleModal';
 import RoleIdCopyRow from './RoleIdCopyRow';
@@ -219,11 +221,13 @@ const useGroupRolesStyles = makeStyles()((theme) => ({
 export type GroupRolesProps = {
   disabled?: boolean;
   permissionDeniedContent?: ReactNode;
+  showLowestRoleWarning?: boolean;
 };
 
 const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = ({
   disabled = false,
   permissionDeniedContent,
+  showLowestRoleWarning = false,
 }) => {
   const { translate, translateWithNamespace } = useTranslation();
   const { palette } = useTheme();
@@ -275,6 +279,11 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
   const { mutateAsync: updateRoleMetadataAsync } = useUpdateRoleMetadata();
   const { mutateAsync: createRoleAsync } = useCreateRole();
   const { mutateAsync: deleteRoleAsync } = useDeleteRole();
+  // Roles are returned in ascending hierarchy order; the base and guest roles cannot be reordered.
+  const lowestRoleId = localRoles?.find(
+    (role) =>
+      role.metadata?.id !== DefaultMemberRoleIdNumber && role.metadata?.rank !== GuestRoleRank,
+  )?.metadata?.id;
 
   const [prevFetchedRoles, setPrevFetchedRoles] = useState<typeof fetchedRoles | null>(null);
   if (fetchedRoles !== prevFetchedRoles) {
@@ -322,7 +331,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
     setSelectedRole(nextSelectedRole);
     setSelectedTab(
       getSelectedConfigureRoleTab(
-        undefined,
+        selectedTab,
         getConfigureRoleTabs(
           nextSelectedRole?.metadata?.id,
           nextSelectedRole?.metadata?.rank,
@@ -367,17 +376,25 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
         };
 
         setLocalRoles((prevRoles) => {
-          if (!prevRoles) {
-            return prevRoles;
-          }
-          const memberIndex = prevRoles.findIndex(
-            (r) => r.metadata?.id === DefaultMemberRoleIdNumber,
+          // A fast refetch may already contain the created role; keep exactly one entry.
+          const roles = (prevRoles ?? []).filter(
+            (existingRole) => existingRole.metadata?.id !== createRoleResponse.id,
           );
-          const insertIndex = memberIndex >= 0 ? memberIndex + 1 : prevRoles.length;
+          const lowestRoleIndex = roles.findIndex(
+            (existingRole) =>
+              existingRole.metadata?.id !== DefaultMemberRoleIdNumber &&
+              existingRole.metadata?.rank !== GuestRoleRank,
+          );
+          // The host resolves this flag from group-settings.hasLegacyAutoAssignRole.
+          // Roles are ascending: preserve the auto-assigned lowest role, or insert above base.
+          const insertionIndex =
+            lowestRoleIndex === -1
+              ? roles.length
+              : lowestRoleIndex + (showLowestRoleWarning ? 1 : 0);
           return [
-            ...prevRoles.slice(0, insertIndex),
+            ...roles.slice(0, insertionIndex),
             roleCreationMetadata,
-            ...prevRoles.slice(insertIndex),
+            ...roles.slice(insertionIndex),
           ];
         });
         setSelectedRole(roleCreationMetadata);
@@ -394,7 +411,14 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
         setIsRoleSaving(false);
       }
     },
-    [organization, refreshPermission, showToast, translateWithNamespace, createRoleAsync],
+    [
+      organization,
+      refreshPermission,
+      showToast,
+      translateWithNamespace,
+      createRoleAsync,
+      showLowestRoleWarning,
+    ],
   );
 
   const handleUpdateRoleSettings = useCallback(
@@ -594,6 +618,16 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
     } satisfies EntityDetails;
     return (
       <Grid container>
+        {showLowestRoleWarning && selectedRoleId === lowestRoleId && (
+          <Grid item XSmall={12} className='padding-bottom-large'>
+            <Alert severity='warning' variant='standard'>
+              {translateLowestRoleCopy(
+                translateWithNamespace,
+                'Message.LowestRoleAutoGrantWarning',
+              )}
+            </Alert>
+          </Grid>
+        )}
         <PermissionsContainer
           creatorFilter={creatorFilter}
           entity={entity}
@@ -611,6 +645,9 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
     );
   }, [
     isOwner,
+    lowestRoleId,
+    showLowestRoleWarning,
+    translateWithNamespace,
     organization?.groupId,
     permissions?.canCreateRoles,
     rolePermissions,
@@ -754,6 +791,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
                 onSelectedRole={handleSelectRole}
                 loading={isLoading}
                 disabled={disabled || deletingRoleId !== undefined}
+                showLowestRoleWarning={showLowestRoleWarning}
                 isMobile={isMobile}
               />
             </Grid>
@@ -764,6 +802,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             onConfirm={handleCreateRoleSubmit}
             saving={isRoleSaving}
             canSetVisibility={permissions?.canCreateRoles === true}
+            showLowestRoleWarning={showLowestRoleWarning}
           />
         </>
       );
@@ -872,6 +911,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             onSelectedRole={handleSelectRole}
             loading={isLoading}
             disabled={disabled || deletingRoleId !== undefined}
+            showLowestRoleWarning={showLowestRoleWarning}
             isMobile={isMobile}
           />
         </Grid>
@@ -933,6 +973,7 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
         onConfirm={handleCreateRoleSubmit}
         saving={isRoleSaving}
         canSetVisibility={permissions?.canCreateRoles === true}
+        showLowestRoleWarning={showLowestRoleWarning}
       />
     </Grid>
   );
@@ -944,4 +985,5 @@ export default withTranslation(GroupRoles, [
   TranslationNamespace.Organization,
   TranslationNamespace.Permissions,
   TranslationNamespace.GroupManagement,
+  TranslationNamespace.StudioManageCollaborators,
 ]);

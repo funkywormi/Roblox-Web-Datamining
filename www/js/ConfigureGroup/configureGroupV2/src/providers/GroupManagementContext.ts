@@ -26,6 +26,9 @@ export interface GroupManagementContextValue {
   isOrganizationLoading: boolean;
   studio?: GroupManagementStudio;
   unifiedLogger?: GroupManagementLogger;
+  isOwnerAgeVerified?: boolean | null;
+  isOwnerAgeVerifiedError?: boolean;
+  retryOwnerAgeVerification?: () => void;
 }
 
 const GroupManagementContext = createContext<GroupManagementContextValue | null>(null);

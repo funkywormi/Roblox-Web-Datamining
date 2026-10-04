@@ -8,10 +8,15 @@ import {
   MenuSection,
   MenuSeparator,
   TextInput,
+  Tooltip,
+  TooltipTrigger,
 } from '@rbx/foundation-ui';
 import { useTranslation } from '@rbx/intl';
 import type { GroupRoleMetadata } from '../../../clients/groups';
+import useCurrentGroup from '../../../hooks/useCurrentGroup';
+import { useEarlyTesterRolesAtCapacity } from '../../../queries/earlyTestersQueries';
 import type { MemberRole } from '../../../utils/constants';
+import { MAX_EARLY_TESTERS } from '../../../utils/constants';
 import { isManageableRole } from '../../../utils/groupUtils';
 import RoleIcon from '../common/RoleIcon';
 
@@ -35,6 +40,7 @@ const RolesList: FunctionComponent<RolesListProps> = ({
   onRemoveRole,
 }) => {
   const { translate } = useTranslation();
+  const { group } = useCurrentGroup();
   const [searchTerm, setSearchTerm] = useState('');
 
   // Keyed off every assignable role so the box doesn't appear and disappear as roles are added.
@@ -64,6 +70,7 @@ const RolesList: FunctionComponent<RolesListProps> = ({
       hasAddableRoles: unassignedRoles.length > 0,
     };
   }, [assignableRoles, memberRoles, searchTerm]);
+  const rolesAtCapacity = useEarlyTesterRolesAtCapacity(group.id, addableRoles);
 
   return (
     <div className='flex flex-col gap-small [width:240px]'>
@@ -113,18 +120,44 @@ const RolesList: FunctionComponent<RolesListProps> = ({
               )}
               {addableRoles.length > 0 ? (
                 <MenuSection>
-                  {addableRoles.map((role) => (
-                    <MenuItem
-                      key={role.id}
-                      value={`add-${role.id ?? ''}`}
-                      title={role.name ?? ''}
-                      leading={
-                        <RoleIcon roleId={role.id} color={role.color} isPrivate={role.isPrivate} />
-                      }
-                      trailing={<Icon name='icon-filled-plus-small' size='Small' />}
-                      onSelect={() => onAddRole(role)}
-                    />
-                  ))}
+                  {addableRoles.map((role) => {
+                    const isAtCapacity = role.id != null && rolesAtCapacity.has(role.id);
+                    const menuItem = (
+                      <MenuItem
+                        key={isAtCapacity ? undefined : role.id}
+                        value={`add-${role.id ?? ''}`}
+                        title={role.name ?? ''}
+                        leading={
+                          <RoleIcon
+                            roleId={role.id}
+                            color={role.color}
+                            isPrivate={role.isPrivate}
+                          />
+                        }
+                        trailing={<Icon name='icon-filled-plus-small' size='Small' />}
+                        disabled={isAtCapacity}
+                        className={isAtCapacity ? 'pointer-events-none opacity-[0.5]' : undefined}
+                        onSelect={isAtCapacity ? undefined : () => onAddRole(role)}
+                      />
+                    );
+
+                    if (!isAtCapacity) {
+                      return menuItem;
+                    }
+
+                    return (
+                      <Tooltip
+                        key={role.id}
+                        position='top-center'
+                        title={translate('Error.ReachedEarlyTesterLimit', {
+                          maxEarlyTesters: String(MAX_EARLY_TESTERS),
+                        })}>
+                        <TooltipTrigger asChild>
+                          <span className='block width-full cursor-not-allowed'>{menuItem}</span>
+                        </TooltipTrigger>
+                      </Tooltip>
+                    );
+                  })}
                 </MenuSection>
               ) : (
                 <div className='padding-medium text-align-x-center text-body-small content-muted'>

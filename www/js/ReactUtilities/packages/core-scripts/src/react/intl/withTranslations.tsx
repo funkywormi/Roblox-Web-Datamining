@@ -10,7 +10,11 @@ import { TranslationConfig, WithTranslationsProps } from "../intl";
 
 type State = { languageResources: TranslationResource };
 
-/** @deprecated Please use the `useTranslation` hook instead. */
+/**
+ * @deprecated Use `useTranslations` from `@rbx/www-common/i18n` instead.
+ * This HOC overwrites any injected `translate`, so wrapped components render
+ * blank strings on Next.js (`apps/www`). See docs/translation-net-to-nextjs.md.
+ */
 const withTranslations = <P,>(
   WrappedComponent: React.FC<P & WithTranslationsProps>,
   translationConfig: TranslationConfig,

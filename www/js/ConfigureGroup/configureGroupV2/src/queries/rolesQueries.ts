@@ -1,14 +1,21 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import type {
   RobloxGroupsApiModelsRequestCreateRoleSetRequest,
   RobloxGroupsApiModelsRequestUpdateRoleSetRequest,
 } from '@rbx/client-groups/v1';
-import type {
-  RobloxGroupsApiModelsRequestUpdateRoleSetPositionRequest,
+import type { RobloxGroupsApiModelsRequestUpdateRoleSetPositionRequest } from '@rbx/client-groups/v2';
+import {
   V2GroupsGroupIdUsersGetLimitEnum,
+  V2GroupsGroupIdUsersGetSortOrderEnum,
 } from '@rbx/client-groups/v2';
-import { V2GroupsGroupIdUsersGetSortOrderEnum } from '@rbx/client-groups/v2';
+import type { GroupUserWithRoles } from '../clients/groups';
 import groupsClient from '../clients/groups';
 import type { Invitation } from '../clients/organizationApi';
 import organizationApiClient from '../clients/organizationApi';
@@ -75,8 +82,67 @@ export const useGetGroupUsersWithRoles = (
         limit,
         includePrivate: true,
         cursor: cursor ?? undefined,
-        ...(roleId === null && { sortOrder: V2GroupsGroupIdUsersGetSortOrderEnum.Desc }),
+        sortOrder: V2GroupsGroupIdUsersGetSortOrderEnum.Desc,
       });
+    },
+  });
+};
+
+/** Fetch the full role membership before computing an early-tester save diff. */
+export const useGetAllGroupUsersWithRole = (groupId: string, roleId?: number | null) =>
+  useQuery({
+    enabled: !!groupId && roleId != null,
+    placeholderData: keepPreviousData,
+    queryKey: [`${GROUPS_ROLES_KEY_PREFIX}usersWithRole`, groupId, String(roleId), 'all'],
+    queryFn: async () => {
+      if (roleId == null) {
+        throw new Error('Tried to fetch all role members without a role id');
+      }
+      const data: GroupUserWithRoles[] = [];
+      let cursor: string | undefined;
+      do {
+        const page = await groupsClient.getGroupUsersWithRoles({
+          groupId: Number(groupId),
+          roleSetId: roleId,
+          userIds: [],
+          limit: V2GroupsGroupIdUsersGetLimitEnum.NUMBER_100,
+          includePrivate: true,
+          cursor,
+        });
+        data.push(...(page.data ?? []));
+        cursor = page.nextPageCursor ?? undefined;
+      } while (cursor);
+      return { data };
+    },
+  });
+
+/**
+ * Pages through every member of a group. Each page is concatenated by the caller; pass the
+ * previous page's cursor back through `getNextPageParam`.
+ */
+export const useGetGroupMembersInfinite = (
+  groupId: string,
+  limit: V2GroupsGroupIdUsersGetLimitEnum,
+  enabled = true,
+) => {
+  return useInfiniteQuery({
+    queryKey: [`${GROUPS_ROLES_KEY_PREFIX}allMembers`, groupId, limit],
+    enabled: enabled && groupId !== '',
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam }) =>
+      groupsClient.getGroupUsersWithRoles({
+        groupId: Number(groupId),
+        userIds: [],
+        limit,
+        includePrivate: true,
+        cursor: pageParam,
+        sortOrder: V2GroupsGroupIdUsersGetSortOrderEnum.Desc,
+      }),
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.nextPageCursor || (lastPage.data?.length ?? 0) < limit) {
+        return undefined;
+      }
+      return lastPage.nextPageCursor;
     },
   });
 };
@@ -228,6 +294,9 @@ export const invalidateMemberQueries = (
       );
     },
   });
+  void queryClient.invalidateQueries({
+    queryKey: [`${GROUPS_ROLES_KEY_PREFIX}all`, groupId],
+  });
 };
 
 type TUseUpdateRoleMetadataProps = {
@@ -291,7 +360,7 @@ export function useReorderRole() {
     onSettled: (...args) => {
       const mutationVariables = args[2];
       const { groupId } = mutationVariables;
-      void queryClient.invalidateQueries({
+      return queryClient.invalidateQueries({
         queryKey: [`${GROUPS_ROLES_KEY_PREFIX}all`, String(groupId)],
       });
     },

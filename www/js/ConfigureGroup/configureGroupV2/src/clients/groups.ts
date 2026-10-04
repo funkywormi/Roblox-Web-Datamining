@@ -31,6 +31,8 @@ import type {
   RobloxGroupsApiRolePermissionsForEntityResponse,
   RobloxWebWebAPIModelsApiPageResponseRobloxGroupsApiModelsResponseResolvedPermissionsForEntityPageItemResponse,
   RobloxGroupsApiModelsRequestUpdateRolePermissionsForEntityRequest,
+  RobloxGroupsApiEarlyTesterAssignmentResponse,
+  RobloxGroupsApiModelsResponseApiSearchPageResponseRobloxGroupsApiUserGroupRolesResponse,
 } from '@rbx/client-groups/v2';
 import {
   MembershipV2Api,
@@ -75,6 +77,9 @@ export type GroupRolePermissionsPage =
 export type GroupMigrationStatusResponse = RobloxGroupsApiGroupMigrationStatusResponse;
 export type GroupMigrationBreakingChangesResponse =
   RobloxGroupsApiGroupMigrationBreakingChangesResponse;
+export type EarlyTesterAssignmentResponse = RobloxGroupsApiEarlyTesterAssignmentResponse;
+export type GroupMembersSearchResponse =
+  RobloxGroupsApiModelsResponseApiSearchPageResponseRobloxGroupsApiUserGroupRolesResponse;
 
 interface GroupsClient {
   getGroupInfo(groupId: number): Promise<RobloxGroupsApiGroupDetailResponse>;
@@ -136,6 +141,16 @@ interface GroupsClient {
   ): Promise<RobloxGroupsApiGroupMigrationBreakingChangesResponse>;
   migrateGroup(groupId: number): Promise<void>;
   getGroupProductFeatures(groupId: number): Promise<CommunityProductFeatures>;
+  getUniverseEarlyTester(
+    groupId: number,
+    universeId: string,
+  ): Promise<EarlyTesterAssignmentResponse>;
+  getRoleEarlyTester(groupId: number, roleId: number): Promise<EarlyTesterAssignmentResponse>;
+  searchGroupMembers(
+    groupId: number,
+    query: string,
+    cursor?: string,
+  ): Promise<GroupMembersSearchResponse>;
 }
 
 const groupsClient: GroupsClient = {
@@ -272,6 +287,29 @@ const groupsClient: GroupsClient = {
   },
   getGroupProductFeatures(groupId: number) {
     return groupApi.v1GroupsGroupIdProductFeaturesGet({ groupId });
+  },
+  getUniverseEarlyTester(groupId: number, universeId: string) {
+    return permissionsV2Api.v2GroupsGroupIdEntityTypeEntityIdEarlyTesterGet({
+      groupId,
+      entityType: 'universes',
+      entityId: universeId,
+    });
+  },
+  getRoleEarlyTester(groupId: number, roleId: number) {
+    return permissionsV2Api.v2GroupsGroupIdEntityTypeEntityIdEarlyTesterGet({
+      groupId,
+      entityType: 'roles',
+      entityId: roleId.toString(),
+    });
+  },
+  searchGroupMembers(groupId: number, query: string, cursor?: string) {
+    return membershipV2Api.v2GroupsGroupIdUsersSearchGet({
+      groupId,
+      query,
+      limit: 20,
+      cursor: cursor ?? '',
+      includePrivate: true,
+    });
   },
 };
 

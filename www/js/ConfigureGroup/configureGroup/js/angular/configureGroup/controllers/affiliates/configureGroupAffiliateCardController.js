@@ -19,7 +19,7 @@ function configureGroupAffiliateCardController($log, groupsConstants, configureG
             bodyText: bodyText,
             actionButtonShow: true,
             actionButtonId: actionButtonId,
-            actionButtonText: languageResource.get('Action.Remove'),
+            actionButtonText: languageResource.get('Action.RemoveAffiliate'),
             neutralButtonText: languageResource.get(configureGroupConstants.translations.cancelAction)
         });
     };

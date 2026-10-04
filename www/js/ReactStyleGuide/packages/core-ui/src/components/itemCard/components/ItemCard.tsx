@@ -26,6 +26,7 @@ export type Props = {
   containerClassName?: string;
   enableThumbnailPrice?: boolean;
   timedOptions?: TTimedOption[] | undefined;
+  licenseType?: "FirstParty" | "ThirdParty";
 };
 
 export function ItemCard({
@@ -49,6 +50,7 @@ export function ItemCard({
   containerClassName,
   enableThumbnailPrice,
   timedOptions,
+  licenseType,
 }: Props & WithTranslationsProps): JSX.Element {
   const [isHovered, setIsHovered] = useState(false);
   return (
@@ -81,6 +83,7 @@ export function ItemCard({
             premiumPricing={premiumPricing ?? undefined}
             enableThumbnailPrice={enableThumbnailPrice}
             timedOptions={timedOptions}
+            licenseType={licenseType}
           />
           <ItemCardCaption
             name={name}

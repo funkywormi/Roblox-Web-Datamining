@@ -13,9 +13,15 @@ import {
 import type { GroupRoleMetadata } from '../../../clients/groups';
 import type { User } from '../../../clients/users';
 import useCurrentGroup from '../../../hooks/useCurrentGroup';
+import {
+  isEarlyTesterRole,
+  useRoleEarlyTesterAssignment,
+} from '../../../queries/earlyTestersQueries';
+import { useGetGroupsRoles } from '../../../queries/rolesQueries';
 import { useAddInvitedToRole, useAddUserToRole } from '../../../queries/usersQueries';
 import { UserSelect, useUserOptionsForOrgRoles } from '../../../userSelect';
 import type { UserCategory } from '../../../userSelect';
+import { MAX_EARLY_TESTERS } from '../../../utils/constants';
 import { logOrganizationsEvent, OrganizationsEventName } from '../../../utils/eventUtils';
 import { SelectedUserList } from './SelectedUserList';
 
@@ -59,10 +65,21 @@ export const AddUserToRoleDialog: FunctionComponent<
   const { mutateAsync: addInvitedToRole } = useAddInvitedToRole();
   const userSelectParams = useUserOptionsForOrgRoles(role.id?.toString());
   const {
+    data: earlyTesterAssignment,
+    isLoading,
+    isError,
+  } = useRoleEarlyTesterAssignment(group.id, role.id);
+  const { data: roles } = useGetGroupsRoles(organization?.groupId);
+  const {
     classes: { responsiveFullScreen },
   } = useStyles();
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const invitationStatus = useRef<Set<number>>(new Set());
+  const isEarlyTester = !isLoading && !isError && isEarlyTesterRole(earlyTesterAssignment, role.id);
+  const memberCount =
+    roles?.find((candidate) => candidate.id === role.id)?.memberCount ?? role.memberCount ?? 0;
+  const remainingCapacity = MAX_EARLY_TESTERS - memberCount;
+  const isAtLimit = isEarlyTester && selectedUsers.length >= remainingCapacity;
 
   const closeDialog = () => {
     setSelectedUsers([]);
@@ -70,7 +87,7 @@ export const AddUserToRoleDialog: FunctionComponent<
   };
 
   const addUserToRoleDraft = (user: User, userStatus: UserCategory | 'unknown') => {
-    if (selectedUsers.some((existingUser) => existingUser.id === user.id)) {
+    if (isAtLimit || selectedUsers.some((existingUser) => existingUser.id === user.id)) {
       return;
     }
     const newUser = { ...user };
@@ -91,7 +108,7 @@ export const AddUserToRoleDialog: FunctionComponent<
     if (!organizationId) {
       return;
     }
-    if (!selectedUsers.length) {
+    if (!selectedUsers.length || (isEarlyTester && selectedUsers.length > remainingCapacity)) {
       return;
     }
     try {
@@ -156,8 +173,15 @@ export const AddUserToRoleDialog: FunctionComponent<
         </Grid>
         <>
           <Grid container mb={2}>
-            <UserSelect onSelect={addUserToRoleDraft} {...userSelectParams} />
+            <UserSelect onSelect={addUserToRoleDraft} {...userSelectParams} disabled={isAtLimit} />
           </Grid>
+          {isAtLimit && (
+            <Grid container mb={2}>
+              <span className='text-caption-medium content-system-alert'>
+                {translate('Error.EarlyTesterLimit')}
+              </span>
+            </Grid>
+          )}
           <SelectedUserList selectedUsers={selectedUsers} removeUser={removeDraftUserFromRole} />
         </>
       </DialogContent>
@@ -182,7 +206,9 @@ export const AddUserToRoleDialog: FunctionComponent<
               color='primaryBrand'
               size='large'
               onClick={addUsersToRole}
-              disabled={!selectedUsers.length}>
+              disabled={
+                !selectedUsers.length || (isEarlyTester && selectedUsers.length > remainingCapacity)
+              }>
               {translate('Label.Add')}
             </Button>
           </Grid>

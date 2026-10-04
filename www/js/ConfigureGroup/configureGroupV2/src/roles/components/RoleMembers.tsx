@@ -1,19 +1,48 @@
 import type { FunctionComponent } from 'react';
 import React, { useCallback, useState } from 'react';
-import { Chip } from '@rbx/foundation-ui';
+import { Chip, FeedbackBanner } from '@rbx/foundation-ui';
 import { useTranslation } from '@rbx/intl';
 import { Grid } from '@rbx/ui';
 import type { GroupRoleMetadata } from '../../clients/groups';
 import useCurrentGroup from '../../hooks/useCurrentGroup';
 import GroupMembersTable from '../../members/components/GroupMembersTable';
+import { isEarlyTesterRole, useRoleEarlyTesterAssignment } from '../../queries/earlyTestersQueries';
 import { useGetInvitationsWithRole } from '../../queries/rolesQueries';
 import {
   DefaultMemberRoleIdNumber,
   GroupMembersMenuState,
+  MAX_EARLY_TESTERS,
   MembersPageSize,
 } from '../../utils/constants';
 import { canAssignRole } from '../../utils/groupPermissions';
 import AddUserToRoleButton from './actions/AddUserToRoleButton';
+
+type EarlyTesterRoleBannerProps = {
+  roleId: number;
+};
+
+const EarlyTesterRoleBanner: FunctionComponent<EarlyTesterRoleBannerProps> = ({ roleId }) => {
+  const { translate } = useTranslation();
+  const { group } = useCurrentGroup();
+  const { data, isLoading, isError } = useRoleEarlyTesterAssignment(group.id, roleId);
+
+  if (isLoading || isError || !isEarlyTesterRole(data, roleId)) {
+    return null;
+  }
+
+  return (
+    <Grid container item>
+      <FeedbackBanner
+        className='width-full'
+        layout='Stacked'
+        severity='Info'
+        title={translate('Description.EarlyTesterRoleBanner', {
+          maxEarlyTesters: String(MAX_EARLY_TESTERS),
+        })}
+      />
+    </Grid>
+  );
+};
 
 export type RoleMembersProps = {
   role: GroupRoleMetadata;
@@ -44,6 +73,7 @@ const RoleMembers: FunctionComponent<RoleMembersProps> = ({ role }) => {
 
   return (
     <Grid container gap={2} paddingTop={2}>
+      {role.id !== undefined && <EarlyTesterRoleBanner roleId={role.id} />}
       <Grid container item alignItems='center' justifyContent='space-between'>
         <Grid container item gap={1} alignItems='center' style={{ flex: '1 0 0' }}>
           {invitationRoles && invitationRoles.length > 0 && (

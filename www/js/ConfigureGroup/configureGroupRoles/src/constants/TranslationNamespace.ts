@@ -6,6 +6,7 @@ enum TranslationNamespace {
   Permissions = 'CreatorDashboard.Permissions',
   GroupManagement = 'Feature.GroupManagement',
   Groups = 'Feature.Groups',
+  StudioManageCollaborators = 'Studio.ManageCollaborators',
 }
 
 export default TranslationNamespace;

@@ -351,4 +351,5 @@ export default withTranslation(GroupMembersTable, [
   TranslationNamespace.Groups,
   TranslationNamespace.Organization,
   TranslationNamespace.GroupManagement,
+  TranslationNamespace.StudioManageCollaborators,
 ]);

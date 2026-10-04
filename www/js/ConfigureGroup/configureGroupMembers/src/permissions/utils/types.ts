@@ -22,6 +22,7 @@ export enum CreatorFilterChipTypes {
   ALL = 'All',
   USER = 'User',
   ROLE = 'Role',
+  EARLY_TESTERS = 'EarlyTesters',
 }
 
 export type PermissionResponse = APIPermissionResponse & {
@@ -85,4 +86,5 @@ export type PermissionsUIConfig = {
   singleCreatorExperience?: boolean;
   showConfirmationOnSave?: boolean;
   showUniverseTicketReviewerPermission?: boolean;
+  showEarlyTestersTab?: boolean;
 };

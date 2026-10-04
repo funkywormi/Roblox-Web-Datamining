@@ -67,7 +67,9 @@ const GroupDetailsUiResponseDefaults = {
   eligibleForWritingTwoWayCommunications: 'Ineligible' as EligibleForWritingTwoWayCommunications,
   eligibleForRestrictedCommunications: 'Ineligible' as EligibleForRestrictedCommunications,
   displayOptionalAnnouncementNotificationsCheckbox: false as boolean,
-  displayRoleColor: false as boolean
+  displayRoleColor: false as boolean,
+  displayLegacyAutoAssignRoleBanner: false as boolean,
+  legacyAutoAssignRoleCutoffDate: '' as string
 };
 export type GroupDetailsUiResponse = Partial<typeof GroupDetailsUiResponseDefaults>;
 

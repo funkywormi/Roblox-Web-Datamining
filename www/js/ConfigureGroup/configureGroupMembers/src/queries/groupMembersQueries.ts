@@ -70,3 +70,17 @@ export const useGetUsersGroupRole = (userId: number, groupId?: string) => {
     },
   });
 };
+
+export function useSearchGroupMembers(groupId: number | undefined, query: string) {
+  return useQuery({
+    enabled: groupId !== undefined && query.trim().length > 0,
+    placeholderData: keepPreviousData,
+    queryKey: [`${GROUPS_MEMBERS_KEY_PREFIX}search`, groupId, query],
+    queryFn: () => {
+      if (!groupId) {
+        return null;
+      }
+      return groupsClient.searchGroupMembers(groupId, query);
+    },
+  });
+}

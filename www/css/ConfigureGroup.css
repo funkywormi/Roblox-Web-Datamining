@@ -1437,8 +1437,9 @@ fieldset[disabled] .file-upload-container {
     justify-content: flex-end
 }
 
-.image-viewer-dialog {
+.image-viewer-dialog.foundation-web-dialog-content[data-size] {
     width: 100%;
+    max-width: calc(var(--size-100)*250);
     overflow: hidden
 }
 

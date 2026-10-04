@@ -2,13 +2,8 @@ import { useContext } from "react";
 import { WithTranslationsProps } from "../../intl";
 import { TranslationContext } from "../components/TranslationProvider";
 
-/**
- * To be used along side ./components/TranslationProvider, this hook gives
- * convenient access to translation props configured by the closest
- * TranslationProvider ancestor in a React tree.
- *
- * @returns WithTranslationsProps
- */
+// Legacy .NET translation hook — use `useTranslations` from `@rbx/www-common/i18n` instead.
+// See docs/translation-net-to-nextjs.md.
 const useTranslation: () => WithTranslationsProps = () => {
   const translationProps = useContext(TranslationContext);
 

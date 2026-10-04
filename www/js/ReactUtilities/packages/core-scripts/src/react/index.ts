@@ -1,15 +1,29 @@
 import { QueryClient } from "@tanstack/react-query";
 
-// alternative to `withTranslation` Function. Use `TranslationProvider` to wrap your
-// component and access translationPros via `useTranslation` hook.
+// Translations: legacy .NET stack. For new code and Next.js migrations, use
+// `useTranslations` from `@rbx/www-common/i18n` instead.
+// See docs/translation-net-to-nextjs.md.
 export type {
   TranslateFunction,
   TranslationConfig,
   WithTranslations,
   WithTranslationsProps,
 } from "./intl";
+/**
+ * @deprecated Use `useTranslations` from `@rbx/www-common/i18n` instead.
+ * See docs/translation-net-to-nextjs.md.
+ */
 export { default as useTranslation } from "./intl/hooks/useTranslation";
+/**
+ * @deprecated Use `TranslationProviderSCC` from `@rbx/www-common/i18n/scc` (for SCCs)
+ * or `TranslationProvider` from `@rbx/www-nextjs/i18n/server` (for Next.js).
+ * See docs/translation-net-to-nextjs.md.
+ */
 export { TranslationProvider } from "./intl/components/TranslationProvider";
+/**
+ * @deprecated Use `useTranslations` from `@rbx/www-common/i18n` instead.
+ * See docs/translation-net-to-nextjs.md.
+ */
 export { default as withTranslations } from "./intl/withTranslations";
 export { default as withComponentStatus } from "./componentStatus/withComponentStatus";
 export { default as makeActionCreator } from "./redux/makeActionCreator";

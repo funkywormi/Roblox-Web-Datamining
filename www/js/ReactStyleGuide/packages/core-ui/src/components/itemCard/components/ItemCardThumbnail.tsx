@@ -28,6 +28,7 @@ export type ItemCardThumbnailProps = {
   unitsAvailableForConsumption?: number;
   enableThumbnailPrice?: boolean;
   timedOptions?: TTimedOption[] | undefined;
+  licenseType?: "FirstParty" | "ThirdParty";
 };
 
 function ItemCardThumbnail({
@@ -48,6 +49,7 @@ function ItemCardThumbnail({
   priceStatus,
   unitsAvailableForConsumption,
   timedOptions,
+  licenseType,
 }: ItemCardThumbnailProps): JSX.Element {
   let shoppingCartButtons: JSX.Element | null = null;
   // Items that require Facial Age Estimation can't be added to the cart —
@@ -97,24 +99,37 @@ function ItemCardThumbnail({
   }
 
   const selectedTimedOption = timedOptions?.find(option => option.selected);
+  const licenseLabel =
+    licenseType === "ThirdParty"
+      ? translate("Label.LicensingLicensed")
+      : licenseType === "FirstParty"
+        ? translate("Label.LicensingOfficial")
+        : undefined;
+  // Licensed third-party items get the muted treatment; only first-party
+  // Roblox items get the high-contrast badge. Neutral's background is a
+  // translucent shift overlay, which is the intended look over thumbnails.
+  const licenseVariant = licenseType === "ThirdParty" ? "Neutral" : "Contrast";
 
   return (
     <div className="item-card-link">
       <div className="item-card-thumb-container">
-        {timedOptions && timedOptions.length > 0 && (
-          <div className="timed-options-container">
-            <Badge
-              variant="Neutral"
-              icon="icon-regular-clock"
-              className="bg-surface-0"
-              label={
-                selectedTimedOption?.days
-                  ? translate("Label.TimedOptionDaysAbbreviation", {
-                      days: selectedTimedOption.days,
-                    })
-                  : ""
-              }
-            />
+        {(licenseLabel !== undefined || (timedOptions && timedOptions.length > 0)) && (
+          <div className="thumbnail-badges-container">
+            {licenseLabel && <Badge variant={licenseVariant} label={licenseLabel} />}
+            {timedOptions && timedOptions.length > 0 && (
+              <Badge
+                variant="Neutral"
+                icon="icon-regular-clock"
+                className="bg-surface-0"
+                label={
+                  selectedTimedOption?.days
+                    ? translate("Label.TimedOptionDaysAbbreviation", {
+                        days: selectedTimedOption.days,
+                      })
+                    : ""
+                }
+              />
+            )}
           </div>
         )}
         {enableThumbnailPrice && (

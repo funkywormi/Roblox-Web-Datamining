@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
-import { createSystemFeedback } from 'react-style-guide';
+import { createSystemFeedback, Loading } from 'react-style-guide';
+import { useQuery } from '@tanstack/react-query';
 import {
   GroupManagementRootProviders,
   GroupManagementSurface,
@@ -9,6 +10,7 @@ import { NativeName, Locale } from '@rbx/intl';
 import { queryClient, useTheme } from 'react-utilities';
 import RobloxIntlTranslationProvider from '../providers/RobloxIntlTranslationProvider';
 import { CommunityProductFeaturesContextProvider } from '../../shared/contexts/CommunityProductFeaturesContext';
+import groupSettingsService from '../../configureGroupSettings/services/groupSettingsService';
 
 // @hello-pangea/dnd (peer dependency of @rbx/group-management) calls React.useId,
 // which was added in React 18. This WebApp runs on React 17, so we polyfill it here.
@@ -37,6 +39,24 @@ export type GroupRolesContainerProps = {
   groupId: number;
   userId: number;
 };
+
+function GroupRolesWithSettings({ groupId }: { groupId: number }): JSX.Element {
+  const { data: settings, isLoading, isError } = useQuery({
+    queryKey: ['groupSettings', groupId],
+    queryFn: () => groupSettingsService.getGroupSettings(groupId),
+    retry: false,
+    refetchOnWindowFocus: false
+  });
+
+  // Resolve eligibility before allowing role creation or reordering.
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  return (
+    <GroupRoles showLowestRoleWarning={!isError && settings?.hasLegacyAutoAssignRole === true} />
+  );
+}
 
 function GroupRolesInner({ groupId, userId }: GroupRolesContainerProps): JSX.Element {
   const theme = useTheme();
@@ -69,7 +89,7 @@ function GroupRolesInner({ groupId, userId }: GroupRolesContainerProps): JSX.Ele
       translationProvider={translationResourceProvider}
       queryClient={queryClient}
       showToast={showToast}>
-      <GroupRoles />
+      <GroupRolesWithSettings groupId={groupId} />
     </GroupManagementRootProviders>
   );
 }

@@ -34,11 +34,8 @@ const createTranslationContext = (
 
 export const TranslationContext = createContext<WithTranslationsProps | undefined>(undefined);
 
-/**
- * Wraps the ReactNode with `WithTranslationProps. Also see
- * ./hooks/useTranslation on how to conveniently access the context provided
- * here.
- */
+// Legacy .NET translation provider — use TranslationProviderSCC from
+// @rbx/www-common/i18n/scc (SCCs) or @rbx/www-nextjs/i18n/server (Next.js).
 export function TranslationProvider({
   config,
   children,

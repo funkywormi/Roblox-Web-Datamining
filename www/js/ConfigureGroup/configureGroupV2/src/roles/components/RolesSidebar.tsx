@@ -1,10 +1,17 @@
 import type { Dispatch, FunctionComponent, SetStateAction } from 'react';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import type { OnDragEndResponder, OnDragStartResponder } from '@hello-pangea/dnd';
 import { Draggable } from '@hello-pangea/dnd';
-import { Button } from '@rbx/foundation-ui';
+import {
+  Button,
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from '@rbx/foundation-ui';
 import { useTranslation } from '@rbx/intl';
-import { Grid, makeStyles, CircularProgress } from '@rbx/ui';
+import { Grid, keyframes, makeStyles, CircularProgress } from '@rbx/ui';
 import type { GroupRoleMetadata } from '../../clients/groups';
 import TranslationNamespace from '../../constants/TranslationNamespace';
 import useCurrentGroup from '../../hooks/useCurrentGroup';
@@ -18,11 +25,24 @@ import {
 import { OrganizationsEventName, logOrganizationsEvent } from '../../utils/eventUtils';
 import { canUpdateRolePosition } from '../../utils/groupPermissions';
 import type { RoleCreationMetadata } from '../../utils/types';
+import { translateLowestRoleCopy } from '../utils/lowestRoleCopy';
 import RolesListDraggableContainer from './RolesListDraggableContainer';
 import RolesListRole from './RolesListRole';
 
 const isOrderableRole = (role: RoleCreationMetadata) =>
   role.metadata?.id !== DefaultMemberRoleIdNumber && role.metadata?.rank !== GuestRoleRank;
+
+export const isLowestRoleChanging = (
+  currentRoles: RoleCreationMetadata[],
+  reorderedRoles: RoleCreationMetadata[],
+): boolean =>
+  currentRoles.find(isOrderableRole)?.metadata?.id !==
+  reorderedRoles.find(isOrderableRole)?.metadata?.id;
+
+const shimmerSweep = keyframes({
+  '0%': { backgroundPosition: '200% 0' },
+  '100%': { backgroundPosition: '-200% 0' },
+});
 
 const useRolesSidebarStyles = makeStyles()((theme) => ({
   container: {
@@ -41,6 +61,38 @@ const useRolesSidebarStyles = makeStyles()((theme) => ({
     width: '100%',
     maxWidth: '100%',
   },
+  rolesSavingWrapper: {
+    position: 'relative',
+    width: '100%',
+  },
+  rolesDimmed: {
+    opacity: 0.5,
+    pointerEvents: 'none',
+  },
+  shimmerOverlay: {
+    position: 'absolute',
+    inset: 0,
+    pointerEvents: 'none',
+    backgroundImage: `linear-gradient(90deg, transparent 20%, ${theme.palette.states.hover} 50%, transparent 80%)`,
+    backgroundSize: '200% 100%',
+    backgroundRepeat: 'no-repeat',
+    animation: `${shimmerSweep} 1.5s ease-in-out infinite`,
+  },
+  spinnerOverlay: {
+    position: 'absolute',
+    inset: 0,
+    zIndex: 2,
+    pointerEvents: 'none',
+  },
+  spinnerSticky: {
+    position: 'sticky',
+    top: 0,
+    height: '100vh',
+    maxHeight: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 }));
 
 export type RolesSidebarProps = {
@@ -51,6 +103,7 @@ export type RolesSidebarProps = {
   loading?: boolean;
   disabled?: boolean;
   isMobile?: boolean;
+  showLowestRoleWarning?: boolean;
 };
 
 const RolesSidebar: FunctionComponent<React.PropsWithChildren<RolesSidebarProps>> = ({
@@ -61,10 +114,18 @@ const RolesSidebar: FunctionComponent<React.PropsWithChildren<RolesSidebarProps>
   loading = false,
   disabled = false,
   isMobile = false,
+  showLowestRoleWarning = false,
 }) => {
   const [activeDragRoleId, setActiveDragRoleId] = useState<string | null>(null);
+  const [pendingReorder, setPendingReorder] = useState<{
+    newRoles: RoleCreationMetadata[];
+    movedRoleId: number;
+    originalRoles: RoleCreationMetadata[];
+  } | null>(null);
   const { translateWithNamespace } = useTranslation();
-  const { isOwner, organization, permissions, rolePermissions, unifiedLogger } = useCurrentGroup();
+  const { isOwner, organization, permissions, rolePermissions, unifiedLogger, showToast } =
+    useCurrentGroup();
+  const reorderInFlight = useRef(false);
   const displayedRoles = useMemo(() => (roles ?? []).toReversed(), [roles]);
   const orderableDisplayedRoles = useMemo(
     () => displayedRoles.filter(isOrderableRole),
@@ -76,10 +137,21 @@ const RolesSidebar: FunctionComponent<React.PropsWithChildren<RolesSidebarProps>
   );
 
   const {
-    classes: { container, buttonContainer, draggableContainer, draggableTooltipWrapper },
+    classes: {
+      container,
+      buttonContainer,
+      draggableContainer,
+      draggableTooltipWrapper,
+      rolesSavingWrapper,
+      spinnerSticky,
+      rolesDimmed,
+      shimmerOverlay,
+      spinnerOverlay,
+    },
+    cx,
   } = useRolesSidebarStyles();
 
-  const { mutate: reorderRole } = useReorderRole();
+  const { mutateAsync: reorderRole, isPending: isReorderPending } = useReorderRole();
 
   const handleSelectRole = useCallback(
     (role: GroupRoleMetadata | null) => {
@@ -88,10 +160,53 @@ const RolesSidebar: FunctionComponent<React.PropsWithChildren<RolesSidebarProps>
     [onSelectedRole, isMobile],
   );
 
+  const persistReorder = useCallback(
+    async ({
+      newRoles,
+      movedRoleId,
+      originalRoles,
+    }: {
+      newRoles: RoleCreationMetadata[];
+      movedRoleId: number;
+      originalRoles: RoleCreationMetadata[];
+    }) => {
+      if (!organization?.id || reorderInFlight.current) {
+        return;
+      }
+      reorderInFlight.current = true;
+      setRoles(newRoles);
+
+      const movedItemIndex = newRoles.findIndex((role) => role.metadata?.id === movedRoleId);
+      const previousRoleId = newRoles[movedItemIndex + 1]?.metadata?.id;
+      const nextRoleId = newRoles[movedItemIndex - 1]?.metadata?.id;
+
+      try {
+        await reorderRole({
+          groupId: Number(organization.groupId),
+          roleId: movedRoleId,
+          previousRoleId,
+          nextRoleId: nextRoleId === DefaultMemberRoleIdNumber ? undefined : nextRoleId,
+        });
+      } catch {
+        setRoles(originalRoles);
+        showToast(
+          translateWithNamespace(TranslationNamespace.Organization, 'Error.ReorderRole'),
+          true,
+        );
+      } finally {
+        reorderInFlight.current = false;
+      }
+    },
+    [organization, reorderRole, setRoles, showToast, translateWithNamespace],
+  );
+
   const onDragEnd: OnDragEndResponder = useCallback(
     (result) => {
       setActiveDragRoleId(null);
       if (
+        reorderInFlight.current ||
+        pendingReorder !== null ||
+        disabled ||
         !result.destination ||
         roles === undefined ||
         result.destination.index === result.source.index
@@ -110,26 +225,41 @@ const RolesSidebar: FunctionComponent<React.PropsWithChildren<RolesSidebarProps>
       const nonOrderableRoles = roles.filter((r) => !isOrderableRole(r));
       const newRoles = [...nonOrderableRoles, ...reorderedOrderableRoles.toReversed()];
 
-      const originalRoles = roles;
-      setRoles(newRoles);
-
-      const movedItemIndex = newRoles.findIndex(
-        (role) => role.metadata?.id === movedItem.metadata?.id,
-      );
-      const previousRoleId = newRoles[movedItemIndex + 1]?.metadata?.id;
-      const nextRoleId = newRoles[movedItemIndex - 1]?.metadata?.id;
-
-      reorderRole(
-        {
-          groupId: Number(organization.groupId),
-          roleId: movedItem.metadata?.id,
-          previousRoleId,
-          nextRoleId: nextRoleId === DefaultMemberRoleIdNumber ? undefined : nextRoleId,
-        },
-        { onError: () => setRoles(originalRoles) },
-      );
+      const reorder = { newRoles, movedRoleId: movedItem.metadata.id, originalRoles: roles };
+      if (showLowestRoleWarning && isLowestRoleChanging(roles, newRoles)) {
+        setPendingReorder(reorder);
+      } else {
+        void persistReorder(reorder);
+      }
     },
-    [roles, orderableDisplayedRoles, setRoles, organization, reorderRole],
+    [
+      roles,
+      orderableDisplayedRoles,
+      organization,
+      pendingReorder,
+      disabled,
+      showLowestRoleWarning,
+      persistReorder,
+    ],
+  );
+
+  const confirmReorder = useCallback(() => {
+    if (pendingReorder) {
+      const reorder = pendingReorder;
+      setPendingReorder(null);
+      void persistReorder(reorder);
+    }
+  }, [pendingReorder, persistReorder]);
+
+  const cancelReorder = useCallback(() => setPendingReorder(null), []);
+
+  const handleDialogOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        cancelReorder();
+      }
+    },
+    [cancelReorder],
   );
 
   const onDragStart: OnDragStartResponder = useCallback((start) => {
@@ -150,89 +280,109 @@ const RolesSidebar: FunctionComponent<React.PropsWithChildren<RolesSidebarProps>
       ) : (
         <Grid container className={buttonContainer} gap={1}>
           <div className='width-full'>
-            <span className={draggableTooltipWrapper}>
-              <RolesListDraggableContainer
-                droppableId='rolesList'
-                onDragEnd={onDragEnd}
-                onDragStart={onDragStart}>
-                {orderableDisplayedRoles.map((role, index) => {
-                  const { metadata: roleMetadata, isNewRole } = role;
-                  if (!roleMetadata?.name || !roleMetadata.id || isNewRole === undefined) {
+            <div className={rolesSavingWrapper}>
+              {isReorderPending && (
+                <div className={spinnerOverlay}>
+                  <div className={spinnerSticky}>
+                    <CircularProgress size={32} />
+                  </div>
+                </div>
+              )}
+              <span
+                className={cx(draggableTooltipWrapper, isReorderPending && rolesDimmed)}
+                aria-busy={isReorderPending}
+                data-testid='roles-list'>
+                <RolesListDraggableContainer
+                  droppableId='rolesList'
+                  onDragEnd={onDragEnd}
+                  onDragStart={onDragStart}>
+                  {orderableDisplayedRoles.map((role, index) => {
+                    const { metadata: roleMetadata, isNewRole } = role;
+                    if (!roleMetadata?.name || !roleMetadata.id || isNewRole === undefined) {
+                      return null;
+                    }
+
+                    const canReorderRole =
+                      (isOwner === true ||
+                        canUpdateRolePosition(rolePermissions?.[roleMetadata.id.toString()])) &&
+                      !isReorderPending &&
+                      pendingReorder === null &&
+                      !disabled;
+
+                    return !canReorderRole ? (
+                      <RolesListRole
+                        key={roleMetadata.id}
+                        roleId={roleMetadata.id?.toString() ?? ''}
+                        roleRank={roleMetadata.rank}
+                        roleName={roleMetadata.name ?? ''}
+                        roleColor={roleMetadata.color ?? DefaultRoleColor}
+                        isPrivate={roleMetadata.isPrivate}
+                        isNewRole={isNewRole}
+                        disabled={disabled}
+                        isSelected={selectedRole?.metadata?.id === roleMetadata.id}
+                        isMobile={isMobile}
+                        onClickRole={() => handleSelectRole(roleMetadata)}
+                      />
+                    ) : (
+                      <Draggable
+                        key={roleMetadata.id}
+                        draggableId={roleMetadata.id.toString()}
+                        index={index}
+                        disableInteractiveElementBlocking>
+                        {(provided, snapshot) => (
+                          <div
+                            className={draggableContainer}
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}>
+                            <RolesListRole
+                              key={roleMetadata.id}
+                              roleId={roleMetadata.id?.toString() ?? ''}
+                              roleRank={roleMetadata.rank}
+                              roleName={roleMetadata.name ?? ''}
+                              roleColor={roleMetadata.color ?? DefaultRoleColor}
+                              isPrivate={roleMetadata.isPrivate}
+                              isNewRole={isNewRole}
+                              disabled={disabled}
+                              isSelected={selectedRole?.metadata?.id === roleMetadata.id}
+                              isMobile={isMobile}
+                              isDragging={snapshot.isDragging}
+                              isAnyRoleDragging={activeDragRoleId !== null}
+                              onClickRole={() => handleSelectRole(roleMetadata)}
+                              dragHandleProps={provided.dragHandleProps}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                </RolesListDraggableContainer>
+              </span>
+
+              <div className={cx(isReorderPending && rolesDimmed)}>
+                {nonOrderableDisplayedRoles.map(({ metadata: role, isNewRole }) => {
+                  if (!role?.name || !role.id || isNewRole === undefined) {
                     return null;
                   }
 
-                  return !(
-                    isOwner || canUpdateRolePosition(rolePermissions?.[roleMetadata.id.toString()])
-                  ) ? (
+                  return (
                     <RolesListRole
-                      key={roleMetadata.id}
-                      roleId={roleMetadata.id?.toString() ?? ''}
-                      roleRank={roleMetadata.rank}
-                      roleName={roleMetadata.name ?? ''}
-                      roleColor={roleMetadata.color ?? DefaultRoleColor}
-                      isPrivate={roleMetadata.isPrivate}
+                      key={role.id}
+                      roleId={role.id?.toString() ?? ''}
+                      roleRank={role.rank}
+                      roleName={role.name}
+                      roleColor={role.color ?? DefaultRoleColor}
+                      isPrivate={role.isPrivate}
                       isNewRole={isNewRole}
                       disabled={disabled}
-                      isSelected={selectedRole?.metadata?.id === roleMetadata.id}
+                      isSelected={selectedRole?.metadata?.id === role.id}
                       isMobile={isMobile}
-                      onClickRole={() => handleSelectRole(roleMetadata)}
+                      onClickRole={() => handleSelectRole(role)}
                     />
-                  ) : (
-                    <Draggable
-                      key={roleMetadata.id}
-                      draggableId={roleMetadata.id.toString()}
-                      index={index}
-                      disableInteractiveElementBlocking>
-                      {(provided, snapshot) => (
-                        <div
-                          className={draggableContainer}
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}>
-                          <RolesListRole
-                            key={roleMetadata.id}
-                            roleId={roleMetadata.id?.toString() ?? ''}
-                            roleRank={roleMetadata.rank}
-                            roleName={roleMetadata.name ?? ''}
-                            roleColor={roleMetadata.color ?? DefaultRoleColor}
-                            isPrivate={roleMetadata.isPrivate}
-                            isNewRole={isNewRole}
-                            disabled={disabled}
-                            isSelected={selectedRole?.metadata?.id === roleMetadata.id}
-                            isMobile={isMobile}
-                            isDragging={snapshot.isDragging}
-                            isAnyRoleDragging={activeDragRoleId !== null}
-                            onClickRole={() => handleSelectRole(roleMetadata)}
-                            dragHandleProps={provided.dragHandleProps}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
                   );
                 })}
-              </RolesListDraggableContainer>
-            </span>
-
-            {nonOrderableDisplayedRoles.map(({ metadata: role, isNewRole }) => {
-              if (!role?.name || !role.id || isNewRole === undefined) {
-                return null;
-              }
-
-              return (
-                <RolesListRole
-                  key={role.id}
-                  roleId={role.id?.toString() ?? ''}
-                  roleRank={role.rank}
-                  roleName={role.name}
-                  roleColor={role.color ?? DefaultRoleColor}
-                  isPrivate={role.isPrivate}
-                  isNewRole={isNewRole}
-                  disabled={disabled}
-                  isSelected={selectedRole?.metadata?.id === role.id}
-                  isMobile={isMobile}
-                  onClickRole={() => handleSelectRole(role)}
-                />
-              );
-            })}
+              </div>
+              {isReorderPending && <div className={shimmerOverlay} aria-hidden='true' />}
+            </div>
           </div>
 
           {(isOwner === true || permissions?.canCreateRoles === true) && (
@@ -252,6 +402,31 @@ const RolesSidebar: FunctionComponent<React.PropsWithChildren<RolesSidebarProps>
           )}
         </Grid>
       )}
+      <Dialog
+        open={pendingReorder !== null}
+        onOpenChange={handleDialogOpenChange}
+        isModal
+        size='Small'
+        hasCloseAffordance={false}>
+        <DialogContent data-testid='lowest-role-reorder-dialog'>
+          <DialogBody className='flex flex-col gap-medium'>
+            <DialogTitle className='text-heading-small margin-none'>
+              {translateLowestRoleCopy(translateWithNamespace, 'Heading.ConfirmLowestRoleReorder')}
+            </DialogTitle>
+            <div className='text-body-medium content-default'>
+              {translateLowestRoleCopy(translateWithNamespace, 'Message.ConfirmLowestRoleReorder')}
+            </div>
+          </DialogBody>
+          <DialogFooter className='flex gap-x-small'>
+            <Button variant='Emphasis' size='Medium' onClick={confirmReorder}>
+              {translateWithNamespace(TranslationNamespace.GroupManagement, 'Action.Continue')}
+            </Button>
+            <Button variant='Standard' size='Medium' onClick={cancelReorder}>
+              {translateWithNamespace(TranslationNamespace.GroupManagement, 'Action.Cancel')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Grid>
   );
 };

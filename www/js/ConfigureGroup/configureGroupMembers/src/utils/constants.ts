@@ -177,6 +177,21 @@ export enum GroupMembersMenuState {
   Invited = 'Invited',
 }
 
+export const MAX_EARLY_TESTERS = 10;
+
+export const EARLY_TESTER_PERMISSION_ID = 'Universe.EarlyTester';
+
+export const GROUP_ROLES_HREF = '/dashboard/group/roles';
+
+export const AGE_VERIFICATION_URL = process.env.robloxSiteDomain
+  ? `https://${process.env.robloxSiteDomain}/my/account?idVerification#!/info`
+  : undefined;
+
+export enum EarlyTesterMode {
+  Unset = 'Unset',
+  Assigned = 'Assigned',
+}
+
 export type InvitedMember = {
   userId?: string;
   user?: RobloxGroupsApiModelsResponseUserModel;

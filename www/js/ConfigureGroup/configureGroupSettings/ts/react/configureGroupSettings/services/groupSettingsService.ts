@@ -10,6 +10,7 @@ export interface GroupSettings {
   areEnemiesAllowed: boolean;
   isMemberListVisibleToPublic: boolean;
   isAutoAssignRoleDisabled?: boolean;
+  hasLegacyAutoAssignRole?: boolean;
 }
 
 export interface ConfigureGroupPolicies {

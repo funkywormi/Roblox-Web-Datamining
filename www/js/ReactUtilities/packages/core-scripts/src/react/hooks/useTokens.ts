@@ -4,6 +4,7 @@ import useTheme from "./useTheme";
 
 export type FoundationTokens = typeof FoundationDark | typeof FoundationLight;
 
+/** @deprecated Please use Tailwind Classes or the CSS variables instead, as these tokens do not respect theme and color mode. */
 const useTokens = (): FoundationTokens => {
   const theme = useTheme();
 
