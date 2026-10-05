@@ -108,6 +108,7 @@ export type TTopicLayoutData = {
   enableExplicitFeedback?: "true" | "false";
   enableSponsoredFeedback?: "true" | "false";
   sponsoredUserCohort?: string;
+  enableReportExperience?: "true" | "false";
   enableReportAd?: "true" | "false";
   sponsoredFooterAdLabelText?: string;
   sponsoredFooterAdLabelFirst?: "true" | "false";

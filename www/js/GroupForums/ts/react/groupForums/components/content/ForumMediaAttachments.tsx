@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-utilities';
 import { Thumbnail2d, ThumbnailAssetsSize, ThumbnailTypes } from 'roblox-thumbnails';
+import AccessibleDivButton from '../../../shared/components/AccessibleDivButton';
 import ImageViewerDialog from '../../../shared/components/ImageViewerDialog';
 import type { MediaAttachment } from '../../types';
 
@@ -26,9 +27,8 @@ const ForumMediaAttachments = ({ attachments }: ForumMediaAttachmentsProps): JSX
     <React.Fragment>
       <div className='forum-media-attachments' data-testid='forum-media-attachments'>
         {attachments.map(({ assetId }, index) => (
-          <button
+          <AccessibleDivButton
             key={assetId}
-            type='button'
             className={FORUM_MEDIA_ATTACHMENT_CLASS}
             data-testid={`forum-media-attachment-${assetId}`}
             aria-label={`${translate('Label.Image')} ${index + 1}`}
@@ -43,7 +43,7 @@ const ForumMediaAttachments = ({ attachments }: ForumMediaAttachmentsProps): JSX
               size={ThumbnailAssetsSize.size420}
               type={ThumbnailTypes.assetThumbnail}
             />
-          </button>
+          </AccessibleDivButton>
         ))}
       </div>
       {selectedAssetId !== null && (

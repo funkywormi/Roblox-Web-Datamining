@@ -96,8 +96,11 @@ const _: AllEntriesHaveValidOptions = true;
 export const getAll = (): Cookie[] =>
   // eslint-disable-next-line no-restricted-properties
   document.cookie.split("; ").map(kv => {
-    const [name, value] = kv.split("=");
-    return { name: name ?? "", value: decodeURIComponent(value ?? "") };
+    const separator = kv.indexOf("=");
+    if (separator === -1) {
+      return { name: kv, value: "" };
+    }
+    return { name: kv.slice(0, separator), value: decodeURIComponent(kv.slice(separator + 1)) };
   });
 
 /** Get a cookie from the browser. */
@@ -107,7 +110,7 @@ export const get = (name: keyof CookieRegistry): Cookie | null => {
   const value = document.cookie
     .split("; ")
     .find(row => row.startsWith(prefix))
-    ?.split("=")[1];
+    ?.slice(prefix.length);
 
   if (value == null) {
     return null;

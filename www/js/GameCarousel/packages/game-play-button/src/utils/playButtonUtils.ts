@@ -1,5 +1,6 @@
 import { GameLauncher } from "@rbx/core-scripts/legacy/Roblox";
 import environmentUrls from "@rbx/environment-urls";
+import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import "@rbx/core-scripts/global";
 import {
   JoinDataProperties,
@@ -17,10 +18,17 @@ import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import {
   TAppsFlyerReferralProperties,
+  TPrivatePlaytestInfo,
   TPlayabilityStatus,
   TPlayabilityStatusWithUnplayableError,
   type TPlayButtonPageContext,
 } from "../types/playButtonTypes";
+
+export const PlaytestUnlockUpsellType = {
+  AgeVerification: "AgeVerification",
+  UpdatePlaytestSettings: "UpdatePlaytestSettings",
+  AddTrustedFriend: "AddTrustedFriend",
+} as const;
 
 const {
   unlockPlayIntentConstants,
@@ -353,6 +361,55 @@ export const sendUnlockPlayIntentEvent = (
   );
 };
 
+export const getPlaytestUnlockUpsellType = (
+  playabilityStatus: TPlayabilityStatus | undefined,
+): (typeof PlaytestUnlockUpsellType)[keyof typeof PlaytestUnlockUpsellType] | undefined => {
+  if (
+    playabilityStatus === PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser ||
+    playabilityStatus === PlayabilityStatus.ContextualPlayabilityAgeCheckRequired
+  ) {
+    return PlaytestUnlockUpsellType.AgeVerification;
+  }
+
+  if (
+    playabilityStatus === PlayabilityStatus.ContextualPlayabilityRequireParentApproval ||
+    playabilityStatus === PlayabilityStatus.ContextualPlayabilityPlaytestDisabled
+  ) {
+    return PlaytestUnlockUpsellType.UpdatePlaytestSettings;
+  }
+
+  if (playabilityStatus === PlayabilityStatus.ContextualPlayabilityTrustedFriendRequired) {
+    return PlaytestUnlockUpsellType.AddTrustedFriend;
+  }
+
+  return undefined;
+};
+
+export const shouldUsePlaytestActionNeeded = (
+  playabilityStatus: TPlayabilityStatus | undefined,
+  privatePlaytestInfo: TPrivatePlaytestInfo | undefined | null,
+): privatePlaytestInfo is TPrivatePlaytestInfo => {
+  const isEligibleUnavailableStatus =
+    playabilityStatus !== undefined &&
+    playabilityStatus !== PlayabilityStatus.Playable &&
+    playabilityStatus !== PlayabilityStatus.GuestProhibited;
+  const requiresUpsell =
+    privatePlaytestInfo?.isPlayable === false &&
+    getPlaytestUnlockUpsellType(privatePlaytestInfo.playabilityStatus) !== undefined;
+
+  return isEligibleUnavailableStatus && requiresUpsell;
+};
+
+export const navigateToPlaytestSettings = (): void => {
+  window.location.assign(
+    getAbsoluteUrl("/my/account#!/privacy/ContentRestrictions/PrivatePlaytest"),
+  );
+};
+
+export const navigateToUserProfile = (userId: number): void => {
+  window.location.assign(getAbsoluteUrl(`/users/${userId}/profile`));
+};
+
 export default {
   handleShareLinkEventLogging,
   launchGame,
@@ -361,5 +418,6 @@ export default {
   startVoiceOptInOverlayFlow,
   startAgeCheckAccessManagementUpsellFlow,
   shouldShowUnplayableButton,
+  shouldUsePlaytestActionNeeded,
   sendUnlockPlayIntentEvent,
 };

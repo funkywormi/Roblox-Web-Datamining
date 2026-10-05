@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef, useLayoutEffect } from "react";
-import { throttle } from "lodash";
+import { throttle } from "es-toolkit";
 import { WithTranslationsProps } from "@rbx/core-scripts/react";
 import { Loading } from "@rbx/core-ui";
 import { GameGrid } from "../../common/components/GameGrid";

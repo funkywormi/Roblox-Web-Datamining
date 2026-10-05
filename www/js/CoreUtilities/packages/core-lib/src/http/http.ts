@@ -4,7 +4,6 @@ import { DeserializedJson, JsonDeserializationError, JsonSerializable, serialize
 import { AsyncResult, err, errAsync, ok, okAsync } from "../result";
 import type { Url } from "../url";
 import type { InternalUrl } from "../url/internal";
-import type { Mutable } from "../commonTypes";
 import { zodSafeParse } from "../zod";
 import {
   FetchError,
@@ -14,7 +13,6 @@ import {
   HttpError,
   HttpInterceptor,
   PostJsonError,
-  RequestInfo,
   RequestOptions,
   RetryDelayFunction,
   UnknownFetchError,
@@ -65,10 +63,7 @@ export const defaultBrowserRetryDelay = defaultRetryDelay({
   maxDelay: 30_000,
 });
 
-const fetchWithoutInterceptors: FetchFunction = (
-  url: Url | InternalUrl,
-  options: Mutable<RequestInfo>,
-): AsyncResult<Response, FetchError> =>
+const fetchWithoutInterceptors: FetchFunction = (url, options) =>
   AsyncResult.fromPromise(
     globalThis.fetch(url.href, options),
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion

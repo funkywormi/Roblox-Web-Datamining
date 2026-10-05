@@ -1,6 +1,9 @@
 import { JSX } from "react";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
-import { BadgeSizes, VerifiedBadgeIconContainer } from "@rbx/roblox-badges";
+import VerifiedBadgeIcon, {
+  VERIFIED_BADGE_ARIA_LABEL,
+  VERIFIED_BADGE_ARIA_LABEL_KEY,
+} from "@rbx/www-common/components/verified-badge";
 import {
   DisplayNameBadges,
   useIsPlusBadgeEnabled,
@@ -50,9 +53,14 @@ const FriendTileContent = ({
             {hasVerifiedBadge && (
               <div className="friend-tile-verified-badge">
                 <div className="friend-tile-spacer" />
-                <VerifiedBadgeIconContainer
-                  size={BadgeSizes.SUBHEADER}
-                  additionalContainerClass="verified-badge"
+                <VerifiedBadgeIcon
+                  size="Medium"
+                  className="verified-badge"
+                  titleText={translate(
+                    VERIFIED_BADGE_ARIA_LABEL_KEY,
+                    undefined,
+                    VERIFIED_BADGE_ARIA_LABEL,
+                  )}
                 />
               </div>
             )}

@@ -280,6 +280,7 @@ export type TNavigateToSortLink =
 
 export type TCarouselGameImpressions = TBaseGameImpressions & {
   [EventStreamMetadata.SortPos]: number;
+  [EventStreamMetadata.NumberOfLoadedTiles]?: number;
   [SessionInfoType.HomePageSessionInfo]?: string;
   [SessionInfoType.DiscoverPageSessionInfo]?: string;
   [SessionInfoType.SearchLandingPageSessionInfo]?: string;

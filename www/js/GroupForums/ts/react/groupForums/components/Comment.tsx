@@ -36,12 +36,12 @@ import { getCommentRepliesKey } from '../services/queryKeys';
 import { useForumExperiments } from '../contexts/ForumExperimentsContext';
 import { useCommunityFeatureFreezes } from '../../shared/contexts/CommunityFeatureFreezesContext';
 import '../../../../css/tailwind.css';
-import { MessageContent } from '../../shared/types';
+import { MessageContent, MessageContentRaw } from '../../shared/types';
 import Message from '../../shared/components/content/MessageContent';
 import { logGroupForumsClickEvent } from '../../shared/utils/logging';
 import AgeCheckWrapper from './AgeCheckWrapper';
 import { EventTriggerReason } from '../../shared/constants/eventConstants';
-import { hasRichTextContent } from '../../shared/utils/messageContentUtils';
+import { getDisplayContent, hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import ForumMediaAttachments from './content/ForumMediaAttachments';
 
 const RailWrapper: FC<{ hasRail: boolean; children: React.ReactNode }> = ({ children, hasRail }) =>
@@ -58,6 +58,7 @@ export type CommentProps = {
   createdAt: string;
   updatedAt: string;
   content: MessageContent;
+  contentToDisplay?: MessageContentRaw | null;
   title?: string;
   threadId: string | null; // The id of the channel with the thread of comments replying to this comment (if there is one)
   channelId: string; // The id of the channel this comment is in
@@ -82,6 +83,7 @@ const Comment = ({
   createdAt,
   updatedAt,
   content,
+  contentToDisplay,
   parentCommentId,
   reactions,
   creatorInfo,
@@ -408,7 +410,7 @@ const Comment = ({
       {title && <h2 className='group-forums-comment-title'>{title.trim()}</h2>}
       <RailWrapper hasRail={showRepliesSection}>
         <div className='group-forums-comment-content richtext-base'>
-          <Message content={content} />
+          <Message content={getDisplayContent(content, contentToDisplay)} />
           {editedDate && (
             <span
               className='group-forums-comment-content-edited-marker'

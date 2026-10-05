@@ -159,7 +159,7 @@ const Post = ({ translate }: WithTranslationsProps): JSX.Element => {
 
     return (
       <Comment
-        title={post.name}
+        title={post.nameToDisplay ?? post.name}
         variant={CommentVariants.Post}
         isActive={highlightedCommentId === post.firstComment.id}
         id={post.firstComment.id}
@@ -168,6 +168,7 @@ const Post = ({ translate }: WithTranslationsProps): JSX.Element => {
         updatedAt={post.firstComment.updatedAt}
         creatorInfo={post.firstComment.creatorInfo}
         content={post.firstComment.content}
+        contentToDisplay={post.firstComment.contentToDisplay}
         mediaAttachments={post.firstComment.mediaAttachments}
         threadId={null}
         channelId={post.firstComment.parentId}
@@ -190,7 +191,7 @@ const Post = ({ translate }: WithTranslationsProps): JSX.Element => {
           <PostNavigation
             categoryName={categoryName}
             backRoute={groupForumsConstants.router.getCategoryRoute(categoryShortId, categoryName)}
-            postTitle={post?.name}
+            postTitle={post?.nameToDisplay ?? post?.name}
             containerClassName='hide-on-native'
           />
           <SectionHeader

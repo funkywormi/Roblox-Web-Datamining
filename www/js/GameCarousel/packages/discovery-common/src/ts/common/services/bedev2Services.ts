@@ -280,8 +280,9 @@ const getProfiles = async (userIds: number[]): Promise<TGetProfilesResponse> => 
 
 const getSearchLandingRecommendations = async (
   sessionId: string,
+  deviceFeatures?: TDeviceFeatures,
 ): Promise<TExploreApiSortsResponse> => {
-  const params = { sessionId };
+  const params = { sessionId, ...deviceFeatures };
   const { data } = await http.get<TExploreApiSortsResponse>(
     bedev2Constants.url.getSearchLandingPage,
     params,

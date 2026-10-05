@@ -34,7 +34,11 @@ const DesktopPersistentComposer = ({ translate }: WithTranslationsProps): JSX.El
     contentFooter: imageUploadPreviews,
     input: imageUploadInput,
     reset: resetImageUploads
-  } = useCommentComposerAttachments(false, disabled);
+  } = useCommentComposerAttachments({
+    isEditing: false,
+    disabled,
+    onImagesChange: clearCommentSubmissionError
+  });
 
   const handleOnSubmit = useCallback(
     async (content: MessageContent) => {

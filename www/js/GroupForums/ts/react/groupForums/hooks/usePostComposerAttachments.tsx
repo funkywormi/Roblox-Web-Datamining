@@ -25,6 +25,7 @@ type UsePostComposerAttachmentsParams = {
   editingComment?: ForumComment;
   // Read at open time to seed the (first) bug report's details from the in-progress post.
   getPrefillDetails?: () => string;
+  onImagesChange?: () => void;
 };
 
 type UsePostComposerAttachmentsResult = {
@@ -55,7 +56,8 @@ const usePostComposerAttachments = ({
   canCreatePostInActiveCategory,
   isEditing,
   editingComment,
-  getPrefillDetails
+  getPrefillDetails,
+  onImagesChange
 }: UsePostComposerAttachmentsParams): UsePostComposerAttachmentsResult => {
   const { translate } = useTranslation();
   const [
@@ -84,7 +86,8 @@ const usePostComposerAttachments = ({
     activeCategory,
     canCreateInActiveCategory: canCreatePostInActiveCategory,
     isEditing,
-    editingComment
+    editingComment,
+    onImagesChange
   });
 
   // Snapshot the in-progress post into the details field only when starting a fresh report; editing

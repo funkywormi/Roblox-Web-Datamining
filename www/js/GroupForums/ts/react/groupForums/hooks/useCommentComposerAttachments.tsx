@@ -11,11 +11,19 @@ type UseCommentComposerAttachmentsResult = Omit<UseForumImageAttachmentsResult, 
   leadingControl: React.ReactNode;
 };
 
-const useCommentComposerAttachments = (
-  isEditing: boolean,
+type UseCommentComposerAttachmentsParams = {
+  isEditing: boolean;
+  disabled?: boolean;
+  editingComment?: ForumComment;
+  onImagesChange?: () => void;
+};
+
+const useCommentComposerAttachments = ({
+  isEditing,
   disabled = false,
-  editingComment?: ForumComment
-): UseCommentComposerAttachmentsResult => {
+  editingComment,
+  onImagesChange
+}: UseCommentComposerAttachmentsParams): UseCommentComposerAttachmentsResult => {
   const groupId = useForumStore.use.groupId();
   const categoryId = useForumStore.use.categoryId();
   const categories = useForumStore.use.categories();
@@ -30,7 +38,8 @@ const useCommentComposerAttachments = (
     activeCategory,
     canCreateInActiveCategory: canCreateComment && !disabled,
     isEditing,
-    editingComment
+    editingComment,
+    onImagesChange
   });
 
   return {

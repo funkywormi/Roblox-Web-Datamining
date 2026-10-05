@@ -30,6 +30,7 @@ type TGameGridTileProps = TSharedGameTileProps & {
   page?: PageContext;
   enableSponsoredFeedback?: boolean;
   sponsoredUserCohort?: string;
+  enableReportExperience?: boolean;
   enableReportAd?: boolean;
   sponsoredFooterAdLabelText?: string;
   sponsoredFooterAdLabelFirst?: boolean;
@@ -58,6 +59,7 @@ export const GameGridTile = forwardRef<HTMLDivElement, TGameGridTileProps>(
       page,
       enableSponsoredFeedback,
       sponsoredUserCohort,
+      enableReportExperience,
       enableReportAd,
       sponsoredFooterAdLabelText,
       sponsoredFooterAdLabelFirst,
@@ -91,6 +93,7 @@ export const GameGridTile = forwardRef<HTMLDivElement, TGameGridTileProps>(
         page={page}
         enableSponsoredFeedback={enableSponsoredFeedback}
         sponsoredUserCohort={sponsoredUserCohort}
+        enableReportExperience={enableReportExperience}
         enableReportAd={enableReportAd}
         sponsoredFooterAdLabelText={sponsoredFooterAdLabelText}
         sponsoredFooterAdLabelFirst={sponsoredFooterAdLabelFirst}

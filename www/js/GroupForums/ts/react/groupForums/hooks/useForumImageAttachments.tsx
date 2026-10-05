@@ -12,6 +12,7 @@ type UseForumImageAttachmentsParams = {
   canCreateInActiveCategory: boolean;
   isEditing: boolean;
   editingComment?: ForumComment;
+  onImagesChange?: () => void;
 };
 
 export type UseForumImageAttachmentsResult = {
@@ -30,7 +31,8 @@ const useForumImageAttachments = ({
   activeCategory,
   canCreateInActiveCategory,
   isEditing,
-  editingComment
+  editingComment,
+  onImagesChange
 }: UseForumImageAttachmentsParams): UseForumImageAttachmentsResult => {
   const { translate } = useTranslation();
   const { features } = useCommunityProductFeatures();
@@ -94,8 +96,9 @@ const useForumImageAttachments = ({
 
   const handleImageSelection = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    if (input.files) {
+    if (input.files?.length) {
       addFiles(input.files);
+      onImagesChange?.();
     }
     input.value = '';
   };
@@ -111,7 +114,14 @@ const useForumImageAttachments = ({
     : undefined;
 
   const previewImages = isEditing ? savedImages : images;
-  const removePreviewImage = isEditing ? removeSavedImage : removeByKey;
+  const removePreviewImage = (key: number) => {
+    if (isEditing) {
+      removeSavedImage(key);
+    } else {
+      removeByKey(key);
+    }
+    onImagesChange?.();
+  };
   // The rich-text editor shrinks its reserved rows for any footer, so pass one only when it
   // renders something.
   const hasPreviews = previewImages.length > 0 || errorKey !== null;

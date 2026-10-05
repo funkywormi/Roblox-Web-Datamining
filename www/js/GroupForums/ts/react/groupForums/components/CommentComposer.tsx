@@ -66,11 +66,12 @@ const CommentComposer = ({
     contentFooter: imageUploadPreviews,
     input: imageUploadInput,
     reset: resetImageUploads
-  } = useCommentComposerAttachments(
-    !!editingCommentId,
-    disabled || forumsWrite.isDisabled,
-    editingComment
-  );
+  } = useCommentComposerAttachments({
+    isEditing: !!editingCommentId,
+    disabled: disabled || forumsWrite.isDisabled,
+    editingComment,
+    onImagesChange: clearCommentSubmissionError
+  });
 
   const handleOnClose = useCallback(() => {
     commentComposerRef?.current?.clearText();

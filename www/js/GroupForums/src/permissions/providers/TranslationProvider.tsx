@@ -170,6 +170,7 @@ export const PermissionsTranslationProvider = withTranslation(
     TranslationNamespace.Permissions,
     TranslationNamespace.Error,
     TranslationNamespace.GroupManagement,
+    TranslationNamespace.StudioManageCollaborators,
   ],
 );
 

@@ -64,6 +64,7 @@ const PostComposer = ({
       .filter(Boolean)
       .join('\n');
   }, []);
+  const clearSubmitError = useCallback(() => setSubmitErrorKey(null), []);
   const { isLoading, data: forumPost } = useQuery<ForumPost | undefined>({
     retry: 1,
     queryKey: getPostKey(groupId, categoryId, editingPostId ?? ''),
@@ -101,7 +102,8 @@ const PostComposer = ({
       : false,
     isEditing,
     editingComment: forumPost?.firstComment,
-    getPrefillDetails: getSupportTicketPrefillDetails
+    getPrefillDetails: getSupportTicketPrefillDetails,
+    onImagesChange: clearSubmitError
   });
 
   const onSubmit = useCallback(

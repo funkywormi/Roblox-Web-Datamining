@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
-import { Loading } from "@rbx/core-ui/legacy/react-style-guide";
 import { TranslateFunction, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
 import ActionNeededButton from "./ActionNeededButton";
+import LoadingButton from "./LoadingButton";
 import SelfUpdateSettingModal from "./SelfUpdateSettingModal";
 import { translations } from "../constants/translations";
 import RestrictedUnplayableModal from "./RestrictedUnplayableModal";
@@ -70,7 +70,9 @@ const ParentalControlsActionNeededButton = ({
   );
 
   if (!hasError && isFetching) {
-    return <Loading />;
+    return (
+      <LoadingButton buttonClassName={buttonClassName ?? "btn-common-play-game-action-needed-lg"} />
+    );
   }
 
   return (

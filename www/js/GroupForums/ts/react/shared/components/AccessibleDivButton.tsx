@@ -2,8 +2,8 @@ import React from 'react';
 import useKeyboardSelectHandler from '../hooks/useKeyboardSelectHandler';
 
 type AccessibleDivButtonProps = {
-  onClick?: () => void;
-} & React.HTMLAttributes<HTMLDivElement>;
+  onClick?: (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => void;
+} & Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick'>;
 
 const AccessibleDivButton = ({
   onClick,

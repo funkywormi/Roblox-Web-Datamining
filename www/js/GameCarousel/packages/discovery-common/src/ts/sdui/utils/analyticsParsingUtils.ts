@@ -23,27 +23,7 @@ export const parseStringField = (
   return defaultValue;
 };
 
-/**
- * Parse a number field from a string, number, or boolean input.
- * Returns the default value if the input is not a valid number or undefined.
- */
-export const parseMaybeStringNumberField = (
-  input: string | number | boolean | undefined,
-  defaultValue: number,
-): number => {
-  if (typeof input === "number") {
-    return input;
-  }
-
-  if (typeof input === "string") {
-    const parsed = parseInt(input, 10);
-    if (!Number.isNaN(parsed)) {
-      return parsed;
-    }
-  }
-
-  return defaultValue;
-};
+export { parseMaybeStringNumberField } from "../../common/utils/parseMaybeStringNumberField";
 
 /**
  * Parse a boolean field from a string, number, or boolean input.
@@ -54,6 +34,10 @@ export const parseBooleanField = (
   defaultValue: boolean,
   pageContext: TSduiPageContext,
 ): boolean => {
+  if (input === undefined) {
+    return defaultValue;
+  }
+
   if (typeof input === "boolean") {
     return input;
   }
@@ -165,8 +149,8 @@ export const getSessionInfoKey = (
     case PageContext.HomePage:
       return SessionInfo.HomePageSessionInfo;
     case PageContext.GamesPage:
-      return SessionInfo.DiscoverPageSessionInfo;
     case PageContext.SongListPage:
+    case PageContext.SortDetailPageDiscover:
       return SessionInfo.DiscoverPageSessionInfo;
     case PageContext.SpotlightPage:
       return SessionInfo.SpotlightPageSessionInfo;
@@ -214,6 +198,7 @@ export const getEventContext = (pageContext: TSduiPageContext): EventContext | n
     case PageContext.HomePage:
       return EventContext.Home;
     case PageContext.GamesPage:
+    case PageContext.SortDetailPageDiscover:
       return EventContext.Games;
     case PageContext.SpotlightPage:
       return EventContext.Spotlight;

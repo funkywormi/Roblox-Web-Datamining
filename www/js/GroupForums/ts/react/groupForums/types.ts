@@ -4,7 +4,13 @@ import type {
   RobloxWebWebAPIModelsApiPageResponseRobloxGroupsApiModelsResponseResolvedPermissionsForEntityPageItemResponse,
   RobloxGroupsApiRolePermissionsForEntityResponse
 } from '@rbx/client-groups/v2';
-import { MessageContent, GroupRolePermissions, Reaction, Role } from '../shared/types';
+import {
+  MessageContent,
+  MessageContentRaw,
+  GroupRolePermissions,
+  Reaction,
+  Role
+} from '../shared/types';
 import type { SupportTicketAttachment } from './types/supportTicket';
 
 export type { Reaction };
@@ -66,6 +72,7 @@ interface ForumComment {
   id: string;
   parentId: string;
   content: MessageContent;
+  contentToDisplay?: MessageContentRaw | null;
   createdBy: number;
   createdAt: string;
   creatorInfo: CommentCreatorInfo;
@@ -83,6 +90,7 @@ interface ForumComment {
 interface ForumPost extends Channel {
   categoryId: string;
   name: string;
+  nameToDisplay?: string | null;
   isLocked: boolean;
   lockedBy: number | null;
   isPinned: boolean;

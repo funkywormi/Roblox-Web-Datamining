@@ -11,9 +11,11 @@ import {
   Toggle,
 } from '@rbx/foundation-ui';
 import { useTranslation } from '@rbx/intl';
+import { Alert } from '@rbx/ui';
 import TranslationNamespace from '../../constants/TranslationNamespace';
 import { useGetGroupConfigurationMetadata } from '../../queries/rolesQueries';
 import { DefaultRoleNameMaxLength } from '../../utils/constants';
+import { translateLowestRoleCopy } from '../utils/lowestRoleCopy';
 
 export type CreateRoleModalProps = {
   open: boolean;
@@ -21,6 +23,7 @@ export type CreateRoleModalProps = {
   onConfirm: (name: string, isPrivate: boolean) => Promise<void>;
   saving?: boolean;
   canSetVisibility?: boolean;
+  showLowestRoleWarning?: boolean;
 };
 
 const CreateRoleModal: FunctionComponent<CreateRoleModalProps> = ({
@@ -29,6 +32,7 @@ const CreateRoleModal: FunctionComponent<CreateRoleModalProps> = ({
   onConfirm,
   saving = false,
   canSetVisibility = false,
+  showLowestRoleWarning = false,
 }) => {
   const { translateWithNamespace } = useTranslation();
   const { data: configMetadata } = useGetGroupConfigurationMetadata();
@@ -90,6 +94,14 @@ const CreateRoleModal: FunctionComponent<CreateRoleModalProps> = ({
           <DialogTitle className='text-heading-small margin-none'>
             {translateWithNamespace(TranslationNamespace.GroupManagement, 'Heading.CreateRole')}
           </DialogTitle>
+          {showLowestRoleWarning && (
+            <Alert severity='warning' variant='standard'>
+              {translateLowestRoleCopy(
+                translateWithNamespace,
+                'Message.LowestRoleAutoGrantWarning',
+              )}
+            </Alert>
+          )}
           <div className='flex flex-col gap-small'>
             <div>
               <TextInput

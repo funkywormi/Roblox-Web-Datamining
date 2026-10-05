@@ -9,6 +9,7 @@ import Message from '../../shared/components/content/MessageContent';
 import groupForumsConstants from '../constants/groupForumsConstants';
 import useForumStore from '../hooks/useForumStore';
 import renderHighlightedText from '../utils/renderHighlightedText';
+import { getDisplayContent } from '../../shared/utils/messageContentUtils';
 
 export type ForumsSearchResultCommentProps = {
   post: ForumPost;
@@ -32,6 +33,7 @@ const ForumsSearchResultComment = ({
 }: ForumsSearchResultCommentProps): JSX.Element => {
   const groupId = useForumStore.use.groupId();
   const history = useHistory();
+  const displayContent = getDisplayContent(comment.content, comment.contentToDisplay);
 
   const postAuthor = post.firstComment?.creatorInfo?.displayName ?? '';
   // No post timestamp here: the only time shown is the comment's, on its UserDisplay below.
@@ -81,7 +83,7 @@ const ForumsSearchResultComment = ({
   return (
     <a className='group-forums-search-result-comment' href={commentHref} onClick={handleClick}>
       <div className='group-forums-search-result-comment-context text-body-small content-muted'>
-        <span className='content-emphasis'>{post.name}</span>
+        <span className='content-emphasis'>{post.nameToDisplay ?? post.name}</span>
         {contextMeta && ` • ${contextMeta}`}
       </div>
       <div className='group-forums-search-result-comment-body'>
@@ -97,7 +99,7 @@ const ForumsSearchResultComment = ({
           {highlights?.body ? (
             <span>{renderHighlightedText(highlights.body)}</span>
           ) : (
-            <Message content={comment.content} />
+            <Message content={displayContent} />
           )}
         </div>
       </div>

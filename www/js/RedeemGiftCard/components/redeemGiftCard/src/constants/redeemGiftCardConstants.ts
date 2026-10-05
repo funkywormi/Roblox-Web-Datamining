@@ -105,7 +105,7 @@ export const eventStreamNames = {
 export const RedeemInstructionsYoutubeVideoIdByLocale: Record<string, string> & {
   default: string;
 } = {
-  us: "GC8JtGIlNwU",
+  us: "KTOvZZHfODM",
   ar: "BzVLph6iFhc",
   es: "9fTANNYEPLg",
   pt: "fZOQfeoKr6c",
@@ -114,5 +114,5 @@ export const RedeemInstructionsYoutubeVideoIdByLocale: Record<string, string> & 
   it: "OCn3V770J2Q",
   de: "7IkNhJa3Sno",
   fr: "0i6PW5cWD08",
-  default: "GC8JtGIlNwU", // same as `us`
+  default: "KTOvZZHfODM", // same as `us`
 };

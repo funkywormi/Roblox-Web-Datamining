@@ -124,7 +124,10 @@ const HomeSortHeader = ({
         titleTextColor={
           hasBackgroundMural ? tokens.Color.Extended.Gray.Gray_100 : tokens.Color.Content.Emphasis
         }
-        titleFontStyle={tokens.Typography.HeadingSmall}
+        titleFontStyle={{
+          ...tokens.Typography.HeadingSmall,
+          FontFamily: "inherit",
+        }}
         titleGap={hideSeeAll ? undefined : tokens.Gap.XSmall}
         titleIconClassName={hideSeeAll ? undefined : "sdui-icon icon-push-right-16x16"}
         titleIconWidth={hideSeeAll ? undefined : 16}
@@ -132,7 +135,14 @@ const HomeSortHeader = ({
         subtitleText={subtitleText || undefined}
         // Force text color to dark mode token (white) if there is a background mural
         subtitleTextColor={subtitleTextColor}
-        subtitleFontStyle={subtitleText ? tokens.Typography.BodyMedium : undefined}
+        subtitleFontStyle={
+          subtitleText
+            ? {
+                ...tokens.Typography.BodyMedium,
+                FontFamily: "inherit",
+              }
+            : undefined
+        }
         subtitleGap={hasSubtitleLink ? tokens.Gap.XXSmall : undefined}
         onSubtitleActivated={onSubtitleActivated}
         subtitleLinkPath={hasSubtitleLink ? subtitleLink : undefined}

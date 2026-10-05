@@ -24,6 +24,9 @@ type GroupManagementProviderProps = PropsWithChildren<{
   isUnified?: boolean;
   studio?: GroupManagementStudio;
   unifiedLogger?: GroupManagementLogger;
+  isOwnerAgeVerified?: boolean | null;
+  isOwnerAgeVerifiedError?: boolean;
+  retryOwnerAgeVerification?: () => void;
 }>;
 
 const GroupManagementProvider: FunctionComponent<GroupManagementProviderProps> = ({
@@ -35,6 +38,9 @@ const GroupManagementProvider: FunctionComponent<GroupManagementProviderProps> =
   isUnified = true,
   studio,
   unifiedLogger,
+  isOwnerAgeVerified,
+  isOwnerAgeVerifiedError,
+  retryOwnerAgeVerification,
   children,
 }) => {
   const [organization, setOrganization] = useState<Organization | undefined | null>();
@@ -120,6 +126,9 @@ const GroupManagementProvider: FunctionComponent<GroupManagementProviderProps> =
       showToast,
       studio,
       unifiedLogger,
+      isOwnerAgeVerified,
+      isOwnerAgeVerifiedError,
+      retryOwnerAgeVerification,
       organization,
       permissions,
       rolePermissions,
@@ -137,6 +146,9 @@ const GroupManagementProvider: FunctionComponent<GroupManagementProviderProps> =
       showToast,
       studio,
       unifiedLogger,
+      isOwnerAgeVerified,
+      isOwnerAgeVerifiedError,
+      retryOwnerAgeVerification,
       organization,
       permissions,
       rolePermissions,

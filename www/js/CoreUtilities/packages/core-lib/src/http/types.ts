@@ -23,24 +23,25 @@ export class HttpError extends Error {
     /** The url of the request. */
     readonly url: Url | InternalUrl,
     /** The options used for the request . */
-    readonly request: RequestInfo,
+    readonly request: FetchRequest,
     /** The response information (headers, status, etc.). */
-    readonly response: ResponseInfo,
+    readonly response: FetchResponse,
   ) {
     super(`${response.status} ${request.method} ${url.href}`);
   }
 
   /**
-   * Build an {@link HttpError} from a response. Pass `bodyText` (read by the caller) to populate
-   * {@link ResponseInfo.body}; omit it to leave the body `undefined`.
+   * Build an {@link HttpError} from a response.
+   *
+   * To populate the {@link FetchResponse.body} for {@link response}, pass in the {@link body} paramater.
    */
   static new(
     url: Url | InternalUrl,
-    request: RequestInfo,
-    resp: Readonly<Response>,
+    request: FetchRequest,
+    response: Readonly<Response>,
     body?: string,
   ): HttpError {
-    const { headers, redirected, status, statusText, type, url: finalUrl } = resp;
+    const { headers, redirected, status, statusText, type, url: finalUrl } = response;
     return new HttpError(url, request, {
       headers,
       redirected,
@@ -117,7 +118,7 @@ export type FetchOptions = Prettify<
       retry?: RetryDelayFunction;
       /**
        * When `true`, the body of any non-ok response is read and included in the
-       * {@link HttpError.response} (as {@link ResponseInfo.body}).
+       * {@link HttpError.response} (as {@link FetchResponse.body}).
        */
       includeBodyOnError?: boolean;
     }
@@ -133,13 +134,14 @@ export type FetchOptions = Prettify<
 export type RequestOptions = Prettify<Omit<FetchOptions, "body" | "method">>;
 
 /**
- * The options for a fetch request excluding the body. Has required headers and method as well as an optional retry delay function.
+ * The options for a fetch request.
  *
+ * Similar to {@link FetchOptions} but has required headers and method.
  * Contains most of the options from {@link RequestInit}. See the [MDN Docs](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit).
  */
-export type RequestInfo = Prettify<
+export type FetchRequest = Prettify<
   Readonly<
-    Omit<FetchOptions, "body" | "headers" | "method"> & {
+    Omit<FetchOptions, "headers" | "method"> & {
       method: HttpMethod;
       headers: Headers;
     }
@@ -153,21 +155,21 @@ export type RequestInfo = Prettify<
  *
  * See the [MDN Docs](https://developer.mozilla.org/en-US/docs/Web/API/Response).
  */
-export type ResponseInfo = Prettify<
+export type FetchResponse = Prettify<
   Readonly<Omit<Response, keyof Body | "clone" | "ok"> & { body?: string }>
 >;
 
 /**
  * A HTTP fetch function.
  *
- * Takes a URL and a {@link RequestInfo} as input and returns an {@link AsyncResult} of
+ * Takes a URL and a {@link FetchRequest} as input and returns an {@link AsyncResult} of
  * either a {@link Response} or a {@link FetchError}.
  *
  * See {@link setInterceptors} for more information.
  */
 export type FetchFunction = (
   url: Url | InternalUrl,
-  options: Mutable<RequestInfo>,
+  options: Mutable<FetchRequest>,
 ) => AsyncResult<Response, FetchError>;
 
 /**

@@ -6,10 +6,11 @@ import { NavigateBeforeIcon, Button, CircularProgress, Grid } from '@rbx/ui';
 import EmptyState from '../../components/EmptyState';
 import ErrorState from '../../components/ErrorState';
 import PermissionDeniedState from '../../components/PermissionDeniedState';
+import EarlyTestersPanel from '../../earlyTesters/components/EarlyTestersPanel';
 import useCanAccessRolePermissions from '../../hooks/useCanAccessRolePermissions';
 import RoleIcon from '../../members/components/common/RoleIcon';
 import { DefaultMemberRoleIdNumber } from '../../utils/constants';
-import { CreatorGroupList } from '../components/CreatorGroupList';
+import { CreatorFilterChipRow, CreatorGroupList } from '../components/CreatorGroupList';
 import { PermissionGroupList } from '../components/PermissionGroupList';
 import {
   PermissionsTranslationProvider,
@@ -18,7 +19,7 @@ import {
 import { PermissionsUIConfigProvider, usePermissionsUiConfig } from '../providers/UIConfigProvider';
 import { PermissionTab } from '../utils/tabConfig';
 import type { CreatorDetails, EntityDetails, PermissionsUIConfig } from '../utils/types';
-import { CreatorTypes } from '../utils/types';
+import { CreatorFilterChipTypes, CreatorTypes, EntityTypes } from '../utils/types';
 
 export type PermissionsContainerProps = {
   entity: EntityDetails;
@@ -75,11 +76,13 @@ const PermissionsContainerInternal: FunctionComponent<PermissionsContainerIntern
   selectedCreator,
 }) => {
   const { translate } = usePermissionsTranslation();
-  const { showMobileView, singleCreatorExperience } = usePermissionsUiConfig();
+  const { showMobileView, singleCreatorExperience, showEarlyTestersTab } = usePermissionsUiConfig();
   const [mobileStep, setMobileStep] = useState<number>(1);
   const [selectedPermissionTab, setSelectedPermissionTab] = useState<PermissionTab>(
     PermissionTab.GENERAL,
   );
+  const [selectedChip, setSelectedChip] = useState(CreatorFilterChipTypes.ROLE);
+  const isEarlyTestersActive = selectedChip === CreatorFilterChipTypes.EARLY_TESTERS;
 
   const onCreatorSelect = useCallback(
     (creator: CreatorDetails | null) => {
@@ -89,15 +92,28 @@ const PermissionsContainerInternal: FunctionComponent<PermissionsContainerIntern
     [setSelectedCreator, setMobileStep],
   );
 
-  if (selectedCreator === null) {
-    const creatorType = entity.owner?.type;
-    return <DefaultEmptyState creatorType={creatorType} />;
-  }
+  const onSelectedChipChange = useCallback((chip: CreatorFilterChipTypes) => {
+    setSelectedChip(chip);
+    setMobileStep(1);
+  }, []);
+
+  const showEarlyTestersPill = showEarlyTestersTab && entity.type === EntityTypes.UNIVERSE;
 
   return (
-    <Grid container className='width-full' data-testid='permissions-container' alignItems='stretch'>
-      <Grid container className='flex-col medium:flex-row medium:gap-medium'>
-        {!singleCreatorExperience && (
+    <Grid container className='width-full flex-col gap-medium' data-testid='permissions-container'>
+      {!singleCreatorExperience && (
+        <Grid item className='width-full'>
+          <CreatorFilterChipRow
+            entity={entity}
+            creatorFilter={creatorFilter}
+            showEarlyTestersChip={showEarlyTestersPill}
+            selectedChip={selectedChip}
+            onSelectedChipChange={onSelectedChipChange}
+          />
+        </Grid>
+      )}
+      <Grid container className='flex-col medium:flex-row medium:gap-medium' alignItems='stretch'>
+        {!singleCreatorExperience && !isEarlyTestersActive && (
           <Grid
             item
             className='max-medium:width-full medium:grow-1 medium:shrink-1 medium:basis-0 medium:min-width-0 medium:max-width-[216px]'
@@ -108,35 +124,47 @@ const PermissionsContainerInternal: FunctionComponent<PermissionsContainerIntern
               creatorFilter={creatorFilter}
               selectedCreator={selectedCreator ?? undefined}
               onCreatorSelect={onCreatorSelect}
+              showEarlyTestersChip={showEarlyTestersPill}
+              selectedChip={selectedChip}
             />
           </Grid>
         )}
-        <Grid
-          item
-          hidden={showMobileView && mobileStep !== 2}
-          className={`max-medium:width-full medium:grow-2 medium:shrink-1 medium:basis-0 medium:min-width-0 ${
-            showMobileView ? 'absolute [top:0] [left:0] [right:0] bg-surface-0 [z-index:1]' : ''
-          }`}>
-          {showMobileView && (
-            <Button
-              startIcon={<NavigateBeforeIcon />}
-              onClick={() => setMobileStep(1)}
-              color='primary'
-              className='padding-y-small padding-x-xsmall'
-              data-testid='mobile-back-button'>
-              {selectedCreator
-                ? renderCreatorHeaderLabel(selectedCreator)
-                : translate('Action.MobileBackButton')}
-            </Button>
-          )}
-          <PermissionGroupList
-            entity={entity}
-            creator={selectedCreator}
-            selectedTab={selectedPermissionTab}
-            onSelectedTabChange={setSelectedPermissionTab}
-            key={selectedCreator?.id}
-          />
-        </Grid>
+        {isEarlyTestersActive ? (
+          <Grid item className='width-full' data-testid='early-testers-panel-container'>
+            <EarlyTestersPanel entity={entity} />
+          </Grid>
+        ) : (
+          <Grid
+            item
+            hidden={showMobileView && mobileStep !== 2}
+            className={`max-medium:width-full medium:grow-2 medium:shrink-1 medium:basis-0 medium:min-width-0 ${
+              showMobileView ? 'absolute [top:0] [left:0] [right:0] bg-surface-0 [z-index:1]' : ''
+            }`}>
+            {showMobileView && (
+              <Button
+                startIcon={<NavigateBeforeIcon />}
+                onClick={() => setMobileStep(1)}
+                color='primary'
+                className='padding-y-small padding-x-xsmall'
+                data-testid='mobile-back-button'>
+                {selectedCreator
+                  ? renderCreatorHeaderLabel(selectedCreator)
+                  : translate('Action.MobileBackButton')}
+              </Button>
+            )}
+            {selectedCreator ? (
+              <PermissionGroupList
+                entity={entity}
+                creator={selectedCreator}
+                selectedTab={selectedPermissionTab}
+                onSelectedTabChange={setSelectedPermissionTab}
+                key={selectedCreator.id}
+              />
+            ) : (
+              selectedCreator === null && <DefaultEmptyState creatorType={entity.owner?.type} />
+            )}
+          </Grid>
+        )}
       </Grid>
     </Grid>
   );

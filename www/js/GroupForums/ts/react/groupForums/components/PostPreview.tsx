@@ -25,7 +25,7 @@ import '../../../../css/tailwind.css';
 import Message from '../../shared/components/content/MessageContent';
 import { logGroupForumsClickEvent, logGroupPageExposureEvent } from '../../shared/utils/logging';
 import { EventContext, EventType } from '../../shared/constants/eventConstants';
-import { hasRichTextContent } from '../../shared/utils/messageContentUtils';
+import { getDisplayContent, hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import ScrollFlashOverlay from './ScrollFlashOverlay';
 import useLongPress from '../hooks/useLongPress';
 import renderHighlightedText from '../utils/renderHighlightedText';
@@ -218,6 +218,9 @@ const PostPreview = ({
     mediaAttachments
   } = firstComment;
 
+  const displayContent = getDisplayContent(content, firstComment.contentToDisplay);
+  const displayTitle = post.nameToDisplay ?? postTitle;
+
   const hasReactions = reactions.length > 0;
   const hasStatuses = isUnread || (showPinned && isPinned) || isLocked;
   const renderReplyCount = () => (
@@ -359,7 +362,7 @@ const PostPreview = ({
             </div>
           )}
           <h2 className='group-posts-preview-title text-emphasis text-overflow'>
-            {highlightedTitle ? renderHighlightedText(highlightedTitle) : postTitle}
+            {highlightedTitle ? renderHighlightedText(highlightedTitle) : displayTitle}
           </h2>
         </div>
         <div
@@ -368,7 +371,11 @@ const PostPreview = ({
             'richtext-base',
             isUnread ? 'font-bold text-emphasis' : 'text-default'
           )}>
-          {highlightedBody ? renderHighlightedText(highlightedBody) : <Message content={content} />}
+          {highlightedBody ? (
+            renderHighlightedText(highlightedBody)
+          ) : (
+            <Message content={displayContent} />
+          )}
         </div>
         <ForumMediaAttachments attachments={mediaAttachments} />
         {renderMetaData()}

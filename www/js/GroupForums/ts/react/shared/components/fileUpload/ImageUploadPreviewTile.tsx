@@ -56,7 +56,7 @@ const ImageUploadPreviewTile = ({
         <Thumbnail2d
           containerClass='image-upload-preview-thumbnail'
           targetId={assetId}
-          size={ThumbnailAssetsSize.size150}
+          size={ThumbnailAssetsSize.size420}
           format={ThumbnailFormat.png}
           type={ThumbnailTypes.assetThumbnail}
         />

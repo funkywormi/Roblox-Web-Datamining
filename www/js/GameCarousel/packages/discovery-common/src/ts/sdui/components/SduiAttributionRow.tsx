@@ -38,8 +38,10 @@ const SduiAttributionRow = ({
       title={title}
       subtitle={subtitle}
       textColor={tokens.Color.Content.Emphasis}
-      titleFontStyle={titleFontStyle ?? tokens.Typography.TitleMedium}
-      subtitleFontStyle={subtitleFontStyle ?? tokens.Typography.BodyMedium}
+      titleFontStyle={titleFontStyle ?? { ...tokens.Typography.TitleMedium, FontFamily: "inherit" }}
+      subtitleFontStyle={
+        subtitleFontStyle ?? { ...tokens.Typography.BodyMedium, FontFamily: "inherit" }
+      }
       titleWebTextElement={titleWebTextElement}
       subtitleWebTextElement={subtitleWebTextElement}
       titleSubtitleGap={titleSubtitleGap}

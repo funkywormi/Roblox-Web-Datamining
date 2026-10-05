@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { isEqual } from "lodash";
+import { isEqual } from "es-toolkit";
 import { SduiResponsiveConditionKey, TSduiConditionalPropSet, TSduiContext } from "./SduiTypes";
 import { checkResponsiveCondition } from "./extractResponsivePropOverrides";
 
