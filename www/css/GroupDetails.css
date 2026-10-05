@@ -1437,8 +1437,9 @@ fieldset[disabled] .file-upload-container {
     justify-content: flex-end
 }
 
-.image-viewer-dialog {
+.image-viewer-dialog.foundation-web-dialog-content[data-size] {
     width: 100%;
+    max-width: calc(var(--size-100)*250);
     overflow: hidden
 }
 
@@ -2891,6 +2892,10 @@ ul.hlist.game-cards {
     max-height: 380px
 }
 
+.max-height-\[500px\] {
+    max-height: 500px
+}
+
 .max-height-\[calc\(var\(--size-600\)\*3\+var\(--gap-small\)\*2\)\] {
     max-height: calc(var(--size-600)*3 + var(--gap-small)*2)
 }
@@ -2933,6 +2938,10 @@ ul.hlist.game-cards {
 
 .max-width-\[calc\(var\(--size-100\)\*50\)\] {
     max-width: calc(var(--size-100)*50)
+}
+
+.min-height-\[240px\] {
+    min-height: 240px
 }
 
 .min-height-\[48px\] {
@@ -2985,6 +2994,14 @@ ul.hlist.game-cards {
 
 .width-\[240px\] {
     width: 240px
+}
+
+.width-\[260px\] {
+    width: 260px
+}
+
+.width-\[440px\] {
+    width: 440px
 }
 
 .width-\[900px\] {
@@ -3119,6 +3136,10 @@ ul.hlist.game-cards {
 
 .icon-regular-chart-three-horizontal-bars {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28.99 19.204A2 2 0 0127 21H14v6l-.01.204A2 2 0 0112 29H5l-.204-.01a2 2 0 01-1.785-1.786L3 27V5l.01-.204A2 2 0 014.797 3.01L5 3h14a2 2 0 011.99 1.796L21 5v6h6a2 2 0 011.99 1.796L29 13v6l-.01.204zM5 21v6h7v-6H5zM5 5v6h14V5H5zm0 8v6h22v-6H5z'/%3E%3C/svg%3E")
+}
+
+.icon-regular-check {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M23.707 10.293a1 1 0 010 1.414l-10 10a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L13 19.586l9.293-9.293a1 1 0 011.414 0z'/%3E%3C/svg%3E")
 }
 
 .icon-filled-check {
@@ -3438,6 +3459,10 @@ ul.hlist.game-cards {
 
 .\[grid-template-columns\:minmax\(0\2c 1fr\)_auto\] {
     grid-template-columns: minmax(0, 1fr) auto
+}
+
+.\!\[height\:auto\] {
+    height: auto !important
 }
 
 .\[height\:auto\] {
@@ -3905,6 +3930,18 @@ ul.hlist.game-cards {
     border-bottom: 1px solid var(--color-stroke-default)
 }
 
+.\[\&\>div\:has\(\.member-picker-chips\)\]\:fill>div:has(.member-picker-chips) {
+    flex: 1 1 auto
+}
+
+.\[\&\>input\]\:grow>input {
+    flex: 1 0 auto
+}
+
+.\[\&\>input\]\:\!\[width\:auto\]>input {
+    width: auto !important
+}
+
 .\[\&\>span\:nth-child\(2\)\>span\:nth-child\(1\)\]\:width-full>span:nth-child(2)>span:first-child {
     width: 100%
 }
@@ -3919,6 +3956,15 @@ ul.hlist.game-cards {
 
 .\[\&\>span\:nth-child\(2\)\]\:min-width-0>span:nth-child(2) {
     min-width: var(--size-0)
+}
+
+.\[\&_\.content-emphasis\]\:content-muted .content-emphasis {
+    color: var(--color-content-muted)
+}
+
+.\[\&_\.padding-y-large\]\:padding-y-medium .padding-y-large {
+    padding-top: var(--padding-medium);
+    padding-bottom: var(--padding-medium)
 }
 
 .group-experiences-container .group-experience-tile {
@@ -4302,6 +4348,10 @@ ul.hlist.game-cards {
     max-height: 380px
 }
 
+.max-height-\[500px\] {
+    max-height: 500px
+}
+
 .max-height-\[calc\(var\(--size-600\)\*3\+var\(--gap-small\)\*2\)\] {
     max-height: calc(var(--size-600)*3 + var(--gap-small)*2)
 }
@@ -4344,6 +4394,10 @@ ul.hlist.game-cards {
 
 .max-width-\[calc\(var\(--size-100\)\*50\)\] {
     max-width: calc(var(--size-100)*50)
+}
+
+.min-height-\[240px\] {
+    min-height: 240px
 }
 
 .min-height-\[48px\] {
@@ -4396,6 +4450,14 @@ ul.hlist.game-cards {
 
 .width-\[240px\] {
     width: 240px
+}
+
+.width-\[260px\] {
+    width: 260px
+}
+
+.width-\[440px\] {
+    width: 440px
 }
 
 .width-\[900px\] {
@@ -4530,6 +4592,10 @@ ul.hlist.game-cards {
 
 .icon-regular-chart-three-horizontal-bars {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28.99 19.204A2 2 0 0127 21H14v6l-.01.204A2 2 0 0112 29H5l-.204-.01a2 2 0 01-1.785-1.786L3 27V5l.01-.204A2 2 0 014.797 3.01L5 3h14a2 2 0 011.99 1.796L21 5v6h6a2 2 0 011.99 1.796L29 13v6l-.01.204zM5 21v6h7v-6H5zM5 5v6h14V5H5zm0 8v6h22v-6H5z'/%3E%3C/svg%3E")
+}
+
+.icon-regular-check {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M23.707 10.293a1 1 0 010 1.414l-10 10a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L13 19.586l9.293-9.293a1 1 0 011.414 0z'/%3E%3C/svg%3E")
 }
 
 .icon-filled-check {
@@ -4849,6 +4915,10 @@ ul.hlist.game-cards {
 
 .\[grid-template-columns\:minmax\(0\2c 1fr\)_auto\] {
     grid-template-columns: minmax(0, 1fr) auto
+}
+
+.\!\[height\:auto\] {
+    height: auto !important
 }
 
 .\[height\:auto\] {
@@ -5316,6 +5386,18 @@ ul.hlist.game-cards {
     border-bottom: 1px solid var(--color-stroke-default)
 }
 
+.\[\&\>div\:has\(\.member-picker-chips\)\]\:fill>div:has(.member-picker-chips) {
+    flex: 1 1 auto
+}
+
+.\[\&\>input\]\:grow>input {
+    flex: 1 0 auto
+}
+
+.\[\&\>input\]\:\!\[width\:auto\]>input {
+    width: auto !important
+}
+
 .\[\&\>span\:nth-child\(2\)\>span\:nth-child\(1\)\]\:width-full>span:nth-child(2)>span:first-child {
     width: 100%
 }
@@ -5330,6 +5412,15 @@ ul.hlist.game-cards {
 
 .\[\&\>span\:nth-child\(2\)\]\:min-width-0>span:nth-child(2) {
     min-width: var(--size-0)
+}
+
+.\[\&_\.content-emphasis\]\:content-muted .content-emphasis {
+    color: var(--color-content-muted)
+}
+
+.\[\&_\.padding-y-large\]\:padding-y-medium .padding-y-large {
+    padding-top: var(--padding-medium);
+    padding-bottom: var(--padding-medium)
 }
 
 .group-profile-header {
@@ -5628,6 +5719,10 @@ ul.hlist.game-cards {
     max-height: 380px
 }
 
+.max-height-\[500px\] {
+    max-height: 500px
+}
+
 .max-height-\[calc\(var\(--size-600\)\*3\+var\(--gap-small\)\*2\)\] {
     max-height: calc(var(--size-600)*3 + var(--gap-small)*2)
 }
@@ -5670,6 +5765,10 @@ ul.hlist.game-cards {
 
 .max-width-\[calc\(var\(--size-100\)\*50\)\] {
     max-width: calc(var(--size-100)*50)
+}
+
+.min-height-\[240px\] {
+    min-height: 240px
 }
 
 .min-height-\[48px\] {
@@ -5722,6 +5821,14 @@ ul.hlist.game-cards {
 
 .width-\[240px\] {
     width: 240px
+}
+
+.width-\[260px\] {
+    width: 260px
+}
+
+.width-\[440px\] {
+    width: 440px
 }
 
 .width-\[900px\] {
@@ -5856,6 +5963,10 @@ ul.hlist.game-cards {
 
 .icon-regular-chart-three-horizontal-bars {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28.99 19.204A2 2 0 0127 21H14v6l-.01.204A2 2 0 0112 29H5l-.204-.01a2 2 0 01-1.785-1.786L3 27V5l.01-.204A2 2 0 014.797 3.01L5 3h14a2 2 0 011.99 1.796L21 5v6h6a2 2 0 011.99 1.796L29 13v6l-.01.204zM5 21v6h7v-6H5zM5 5v6h14V5H5zm0 8v6h22v-6H5z'/%3E%3C/svg%3E")
+}
+
+.icon-regular-check {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M23.707 10.293a1 1 0 010 1.414l-10 10a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L13 19.586l9.293-9.293a1 1 0 011.414 0z'/%3E%3C/svg%3E")
 }
 
 .icon-filled-check {
@@ -6175,6 +6286,10 @@ ul.hlist.game-cards {
 
 .\[grid-template-columns\:minmax\(0\2c 1fr\)_auto\] {
     grid-template-columns: minmax(0, 1fr) auto
+}
+
+.\!\[height\:auto\] {
+    height: auto !important
 }
 
 .\[height\:auto\] {
@@ -6642,6 +6757,18 @@ ul.hlist.game-cards {
     border-bottom: 1px solid var(--color-stroke-default)
 }
 
+.\[\&\>div\:has\(\.member-picker-chips\)\]\:fill>div:has(.member-picker-chips) {
+    flex: 1 1 auto
+}
+
+.\[\&\>input\]\:grow>input {
+    flex: 1 0 auto
+}
+
+.\[\&\>input\]\:\!\[width\:auto\]>input {
+    width: auto !important
+}
+
 .\[\&\>span\:nth-child\(2\)\>span\:nth-child\(1\)\]\:width-full>span:nth-child(2)>span:first-child {
     width: 100%
 }
@@ -6656,6 +6783,15 @@ ul.hlist.game-cards {
 
 .\[\&\>span\:nth-child\(2\)\]\:min-width-0>span:nth-child(2) {
     min-width: var(--size-0)
+}
+
+.\[\&_\.content-emphasis\]\:content-muted .content-emphasis {
+    color: var(--color-content-muted)
+}
+
+.\[\&_\.padding-y-large\]\:padding-y-medium .padding-y-large {
+    padding-top: var(--padding-medium);
+    padding-bottom: var(--padding-medium)
 }
 
 .group-videos-modal-close-button {
@@ -7008,6 +7144,10 @@ ul.hlist.game-cards {
     max-height: 380px
 }
 
+.max-height-\[500px\] {
+    max-height: 500px
+}
+
 .max-height-\[calc\(var\(--size-600\)\*3\+var\(--gap-small\)\*2\)\] {
     max-height: calc(var(--size-600)*3 + var(--gap-small)*2)
 }
@@ -7050,6 +7190,10 @@ ul.hlist.game-cards {
 
 .max-width-\[calc\(var\(--size-100\)\*50\)\] {
     max-width: calc(var(--size-100)*50)
+}
+
+.min-height-\[240px\] {
+    min-height: 240px
 }
 
 .min-height-\[48px\] {
@@ -7102,6 +7246,14 @@ ul.hlist.game-cards {
 
 .width-\[240px\] {
     width: 240px
+}
+
+.width-\[260px\] {
+    width: 260px
+}
+
+.width-\[440px\] {
+    width: 440px
 }
 
 .width-\[900px\] {
@@ -7236,6 +7388,10 @@ ul.hlist.game-cards {
 
 .icon-regular-chart-three-horizontal-bars {
     --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M28.99 19.204A2 2 0 0127 21H14v6l-.01.204A2 2 0 0112 29H5l-.204-.01a2 2 0 01-1.785-1.786L3 27V5l.01-.204A2 2 0 014.797 3.01L5 3h14a2 2 0 011.99 1.796L21 5v6h6a2 2 0 011.99 1.796L29 13v6l-.01.204zM5 21v6h7v-6H5zM5 5v6h14V5H5zm0 8v6h22v-6H5z'/%3E%3C/svg%3E")
+}
+
+.icon-regular-check {
+    --svg: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M23.707 10.293a1 1 0 010 1.414l-10 10a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L13 19.586l9.293-9.293a1 1 0 011.414 0z'/%3E%3C/svg%3E")
 }
 
 .icon-filled-check {
@@ -7555,6 +7711,10 @@ ul.hlist.game-cards {
 
 .\[grid-template-columns\:minmax\(0\2c 1fr\)_auto\] {
     grid-template-columns: minmax(0, 1fr) auto
+}
+
+.\!\[height\:auto\] {
+    height: auto !important
 }
 
 .\[height\:auto\] {
@@ -8022,6 +8182,18 @@ ul.hlist.game-cards {
     border-bottom: 1px solid var(--color-stroke-default)
 }
 
+.\[\&\>div\:has\(\.member-picker-chips\)\]\:fill>div:has(.member-picker-chips) {
+    flex: 1 1 auto
+}
+
+.\[\&\>input\]\:grow>input {
+    flex: 1 0 auto
+}
+
+.\[\&\>input\]\:\!\[width\:auto\]>input {
+    width: auto !important
+}
+
 .\[\&\>span\:nth-child\(2\)\>span\:nth-child\(1\)\]\:width-full>span:nth-child(2)>span:first-child {
     width: 100%
 }
@@ -8036,6 +8208,15 @@ ul.hlist.game-cards {
 
 .\[\&\>span\:nth-child\(2\)\]\:min-width-0>span:nth-child(2) {
     min-width: var(--size-0)
+}
+
+.\[\&_\.content-emphasis\]\:content-muted .content-emphasis {
+    color: var(--color-content-muted)
+}
+
+.\[\&_\.padding-y-large\]\:padding-y-medium .padding-y-large {
+    padding-top: var(--padding-medium);
+    padding-bottom: var(--padding-medium)
 }
 
 .groups-list-new {

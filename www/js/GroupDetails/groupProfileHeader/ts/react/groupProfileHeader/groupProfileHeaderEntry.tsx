@@ -10,6 +10,7 @@ import {
   CommunityTiersDisclosureBannerWithProvider,
   CommunityTiersDisclosureBannerProps
 } from './components/CommunityTiersDisclosureBanner';
+import { LegacyAutoAssignRoleBannerWithProvider } from './components/LegacyAutoAssignRoleBanner';
 import defaultQueryClientConfig from '../shared/constants/reactQueryConstants';
 import {
   GroupProfileHeaderContextProvider,
@@ -59,6 +60,10 @@ const renderCommunityTiersDisclosureBanner = (
     <TranslationProvider config={groupsConfig}>
       <QueryClientProvider client={queryClient}>
         <CommunityTiersDisclosureBannerWithProvider {...props} />
+        <LegacyAutoAssignRoleBannerWithProvider
+          groupId={props.groupId}
+          isCommunityPage={props.isCommunityPage}
+        />
       </QueryClientProvider>
     </TranslationProvider>,
     container

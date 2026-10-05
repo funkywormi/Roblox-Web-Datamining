@@ -394,6 +394,11 @@ interface MessageContent {
   slate?: Document;
 }
 
+interface MessageContentRaw {
+  plainText?: string | null;
+  slate?: Document | string | null;
+}
+
 interface ServiceError {
   code: number;
   message: string;
@@ -468,6 +473,7 @@ export {
   PermissionConfigurationState,
   ModerateUserPermissionsState,
   MessageContent,
+  MessageContentRaw,
   ServiceError,
   ServiceErrorResponse,
   CommunityProductFeatures,
