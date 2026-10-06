@@ -1094,6 +1094,10 @@
     color: var(--inverse-surface-0)
 }
 
+.content-\[var\(--light-mode-content-emphasis\)\] {
+    color: var(--light-mode-content-emphasis)
+}
+
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-alert)r g b/.2)
 }
@@ -1116,6 +1120,10 @@
 
 .bg-\[var\(--color-extended-white-100\)\] {
     background-color: var(--color-extended-white-100)
+}
+
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
 }
 
 .opacity-\[0\.5\] {

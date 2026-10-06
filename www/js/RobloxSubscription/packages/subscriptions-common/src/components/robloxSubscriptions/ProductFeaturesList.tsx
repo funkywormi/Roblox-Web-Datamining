@@ -1,13 +1,15 @@
+import { PeriodType } from "@rbx/client-subscriptions-api/v2";
 import { isReferralEnabled } from "@rbx/core-scripts/meta/subscription";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Icon, List } from "@rbx/foundation-ui";
+import { useFormatter } from "@rbx/www-common/intl";
 import { Fragment, useMemo } from "react";
 
-import { REFERRAL_REWARD_ROBUX } from "../../subscriptionConstants";
+import { INTRODUCTORY_DISCOUNT_DAYS, REFERRAL_REWARD_ROBUX } from "../../subscriptionConstants";
 
 import type {
-  PeriodType,
   RobloxSubscriptionProductFeatureConfig,
+  SubscriptionOffer,
   SubscriptionTenureDiscount,
 } from "@rbx/client-subscriptions-api/v2";
 import type { TTailwindIconClass } from "@rbx/foundation-tailwind/classes";
@@ -75,18 +77,28 @@ export type ProductFeaturesListProps = {
    * config: only surfaces shown to an existing subscriber can act on it.
    */
   includeReferralBenefit?: boolean;
+  freeTrialOffer?: SubscriptionOffer | null;
 };
 
-// The introductory discount is a fixed 60-day offer regardless of the product's billing period.
-const INTRODUCTORY_DISCOUNT_DAYS = 60;
+const DAYS_PER_WEEK = 7;
 
 const ProductFeaturesList: FC<ProductFeaturesListProps> = ({
   featureConfig,
   overrideIconName,
   onTileClick,
   includeReferralBenefit = false,
+  freeTrialOffer,
 }) => {
-  const { translate, intl } = useTranslation();
+  const { translate } = useTranslation();
+  const format = useFormatter();
+
+  // A weekly free trial is unpaid time and does not count toward the introductory-discount window (the
+  // backend credits only paid months toward the step-up). Extend the displayed window by the trial length
+  // so the copy matches when the step-up unlocks. Monthly trials count normally, so no extension.
+  const introDiscountDays =
+    freeTrialOffer?.freeTrialOffer?.periodType === PeriodType.Week
+      ? INTRODUCTORY_DISCOUNT_DAYS + freeTrialOffer.freeTrialOffer.duration * DAYS_PER_WEEK
+      : INTRODUCTORY_DISCOUNT_DAYS;
 
   const featureConfigBaseDiscount = useMemo(
     () =>
@@ -127,7 +139,7 @@ const ProductFeaturesList: FC<ProductFeaturesListProps> = ({
             featureConfigNextDiscount
               ? translate("Description.Benefit.DiscountBaseV2")
               : translate("Description.Benefit.DiscountBase", {
-                  discountPercent: intl.n(featureConfigBaseDiscount.discountPercent * 0.01, {
+                  discountPercent: format.number(featureConfigBaseDiscount.discountPercent * 0.01, {
                     style: "percent",
                   }),
                 })
@@ -138,13 +150,19 @@ const ProductFeaturesList: FC<ProductFeaturesListProps> = ({
           secondary={
             featureConfigNextDiscount
               ? translate("Description.Benefit.DiscountBaseSubtitleV2", {
-                  discountPercentTier1: intl.n(featureConfigBaseDiscount.discountPercent * 0.01, {
-                    style: "percent",
-                  }),
-                  discountTier1Days: intl.n(INTRODUCTORY_DISCOUNT_DAYS),
-                  discountPercentTier2: intl.n(featureConfigNextDiscount.discountPercent * 0.01, {
-                    style: "percent",
-                  }),
+                  discountPercentTier1: format.number(
+                    featureConfigBaseDiscount.discountPercent * 0.01,
+                    {
+                      style: "percent",
+                    },
+                  ),
+                  discountTier1Days: format.number(introDiscountDays),
+                  discountPercentTier2: format.number(
+                    featureConfigNextDiscount.discountPercent * 0.01,
+                    {
+                      style: "percent",
+                    },
+                  ),
                 })
               : translate("Description.Benefit.DiscountBaseSubtitle")
           }
@@ -187,7 +205,7 @@ const ProductFeaturesList: FC<ProductFeaturesListProps> = ({
           expandedSecondary={translate("Description.Benefit.PrivateServersExpandedBody")}
           iconName={overrideIconName ?? "icon-regular-controller"}
           primary={translate("Description.Benefit.PrivateServers", {
-            discountPercent: intl.n(privateServerBaseDiscount.discountPercent * 0.01, {
+            discountPercent: format.number(privateServerBaseDiscount.discountPercent * 0.01, {
               style: "percent",
             }),
           })}
@@ -230,12 +248,12 @@ const ProductFeaturesList: FC<ProductFeaturesListProps> = ({
           // Referring has no expanded copy of its own, so the tile repeats itself when opened.
           expandedPrimary={translate("Description.Benefit.Referral")}
           expandedSecondary={translate("Description.Benefit.ReferralSubtitle", {
-            amount: intl.n(REFERRAL_REWARD_ROBUX),
+            amount: format.number(REFERRAL_REWARD_ROBUX),
           })}
           iconName={overrideIconName ?? "icon-regular-person-plus"}
           primary={translate("Description.Benefit.Referral")}
           secondary={translate("Description.Benefit.ReferralSubtitle", {
-            amount: intl.n(REFERRAL_REWARD_ROBUX),
+            amount: format.number(REFERRAL_REWARD_ROBUX),
           })}
           onTileClick={onTileClick}
         />

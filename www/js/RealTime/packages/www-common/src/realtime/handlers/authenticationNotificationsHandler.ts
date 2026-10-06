@@ -1,0 +1,46 @@
+import environmentUrls from "@rbx/environment-urls";
+import { pubSub as pubSubUntyped } from "../../crossTabCommunication";
+import httpTransport, { getErrorStatus } from "../lib/httpTransport";
+import { getClient } from "../lib/client";
+import { onRealtimeConfigured } from "../lib/realtimeConfig";
+
+type RealtimeClient = {
+  Subscribe: (namespace: string, handler: (data: { Type?: string }) => void) => void;
+};
+
+// Untyped JS modules — cast at the boundary.
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
+const getRealtimeClient = getClient as unknown as () => RealtimeClient;
+const pubSub = pubSubUntyped as {
+  isAvailable: () => boolean;
+  subscribe: (key: string, subscriberId: string, callback: (newValue: unknown) => void) => void;
+};
+/* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+
+if (typeof document !== "undefined") {
+  onRealtimeConfigured(() => {
+    getRealtimeClient().Subscribe("AuthenticationNotifications", data => {
+      if (data.Type === "SignOut") {
+        const url = `${environmentUrls.usersApi}/v1/users/authenticated`;
+        httpTransport.get({ url, withCredentials: true }).catch((error: unknown) => {
+          if (getErrorStatus(error) === 401) {
+            window.location.reload();
+          }
+        });
+      }
+    });
+
+    // Cross-tab account switch → reload.
+    if (pubSub.isAvailable()) {
+      pubSub.subscribe(
+        "RBXASAccountSwitched",
+        "Roblox.Authentication.AccountSwitchHandler",
+        newValue => {
+          if (!newValue) {
+            window.location.reload();
+          }
+        },
+      );
+    }
+  });
+}

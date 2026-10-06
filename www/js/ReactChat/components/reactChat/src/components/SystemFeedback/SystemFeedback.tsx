@@ -1,5 +1,5 @@
 import { Snackbar } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import type { TChatFeedback } from "../../types/chat";
 
 type TSystemFeedbackProps = {
@@ -8,7 +8,7 @@ type TSystemFeedbackProps = {
 };
 
 const SystemFeedback = ({ feedback, onClose }: TSystemFeedbackProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
 
   if (!feedback) {
     return null;

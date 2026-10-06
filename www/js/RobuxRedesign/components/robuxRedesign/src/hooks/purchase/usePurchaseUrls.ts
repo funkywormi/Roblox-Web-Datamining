@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
+import { UrlSearchParams } from "@rbx/core-lib/url";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
-import { composeQueryString } from "@rbx/core-scripts/util/url";
 import { PaymentSession, Product } from "../../types/buyRobuxPageData";
 
 const desktopPurchaseUrl = "/upgrades/paymentmethods";
@@ -19,31 +19,31 @@ export function usePurchaseUrls(
   return useCallback(
     ({ productId, providerProductId }: Product, isSubscriptionProduct: boolean): string => {
       if (deviceMeta?.isAndroidApp && providerProductId) {
-        return `${mobilePurchaseUrl}?${composeQueryString({
+        return `${mobilePurchaseUrl}?${UrlSearchParams.new({
           id: providerProductId.toLowerCase(),
-          paymentSessionId,
+          ...(paymentSessionId !== undefined ? { paymentSessionId } : {}),
           recurring: isSubscriptionProduct && !providerProductId.endsWith("onemonth"),
-        })}`;
+        }).toString()}`;
       }
 
       if ((deviceMeta?.isAmazonApp || deviceMeta?.isUWPApp) && providerProductId) {
-        return `${mobilePurchaseUrl}?${composeQueryString({
+        return `${mobilePurchaseUrl}?${UrlSearchParams.new({
           id: providerProductId.toLowerCase(),
-        })}`;
+        }).toString()}`;
       }
 
       if (deviceMeta?.isIosApp && providerProductId) {
-        return `${mobilePurchaseUrl}?${composeQueryString({
+        return `${mobilePurchaseUrl}?${UrlSearchParams.new({
           id: providerProductId,
-          paymentSessionId,
-        })}`;
+          ...(paymentSessionId !== undefined ? { paymentSessionId } : {}),
+        }).toString()}`;
       }
 
-      return `${desktopPurchaseUrl}?${composeQueryString({
+      return `${desktopPurchaseUrl}?${UrlSearchParams.new({
         ap: productId,
         page: "RobuxRedesign",
-        paymentSessionId,
-      })}`;
+        ...(paymentSessionId !== undefined ? { paymentSessionId } : {}),
+      }).toString()}`;
     },
     [deviceMeta, paymentSessionId],
   );

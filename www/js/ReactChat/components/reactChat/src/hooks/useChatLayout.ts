@@ -20,6 +20,8 @@ export type TUseChatLayoutResult = {
   setConversationScreen: (layoutId: string, screen: TDialogScreen) => void;
   /** Routes the dialog to the in-app abuse-report confirmation screen for a specific participant. */
   reportParticipant: (layoutId: string, participantId: number) => void;
+  /** Routes the dialog to the remove-member confirmation screen for a specific participant. */
+  confirmRemoveParticipant: (layoutId: string, participantId: number) => void;
   /** Clears the blocking consent flags after the user accepts the group-OSA / U13 opt-in modal. */
   resolveConsent: (layoutId: string) => void;
   toggleCollapsed: () => void;
@@ -553,6 +555,7 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
         // Leaving any screen clears the abuse-report target; routing INTO the confirmation goes
         // through reportParticipant, which sets it.
         abuseReportTargetId: undefined,
+        removeMemberTargetId: undefined,
         isOpen: true,
         isMinimized: false,
       },
@@ -572,6 +575,24 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
         ...current[layoutId],
         currentScreen: "AbuseReportConfirmation",
         abuseReportTargetId: participantId,
+        isOpen: true,
+        isMinimized: false,
+      },
+    }));
+    // Focus but keep position (see setConversationScreen) — navigating screens must not reorder.
+    setLayout(current => ({
+      ...current,
+      focusedLayoutId: layoutId,
+    }));
+  }, []);
+
+  const confirmRemoveParticipant = useCallback((layoutId: string, participantId: number) => {
+    setConversationOverrides(current => ({
+      ...current,
+      [layoutId]: {
+        ...current[layoutId],
+        currentScreen: "RemoveMemberConfirmation",
+        removeMemberTargetId: participantId,
         isOpen: true,
         isMinimized: false,
       },
@@ -622,6 +643,7 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
     renameConversation,
     setConversationScreen,
     reportParticipant,
+    confirmRemoveParticipant,
     resolveConsent,
     toggleCollapsed,
     openGroupInviteDialog,

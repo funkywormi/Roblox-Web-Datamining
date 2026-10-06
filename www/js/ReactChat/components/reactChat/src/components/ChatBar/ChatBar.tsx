@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { useLayoutEffect, useRef, type MouseEvent } from "react";
 import { Badge, IconButton, ProgressCircle, TextInput } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import type { TChatConversation } from "../../types/chat";
 import type { TChatDisabledReason } from "../../utils/chatEnabledState";
 import FriendRow from "./FriendRow";
@@ -29,6 +29,8 @@ type TChatBarProps = {
   isLoaded: boolean;
   /** When set, show the disabled CTA instead of the list (the fetch fails when off). */
   chatDisabledReason: TChatDisabledReason | null;
+  /** Show Create Group: chat and group chat are on and the conversation list isn't empty. */
+  canCreateGroup: boolean;
   hasNextPage?: boolean;
   onSearchTermChange: (searchTerm: string) => void;
   onOpenConversation: (layoutId: string) => void;
@@ -44,6 +46,7 @@ const ChatBar = ({
   isCollapsed,
   isLoaded,
   chatDisabledReason,
+  canCreateGroup,
   hasNextPage = false,
   onSearchTermChange,
   onOpenConversation,
@@ -51,7 +54,7 @@ const ChatBar = ({
   onOpenGroupInviteDialog,
   onLoadMore,
 }: TChatBarProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const threadListRef = useRef<HTMLDivElement>(null);
 
   // Top-up: while more pages exist but the loaded (and search-filtered) list is too short to
@@ -78,7 +81,7 @@ const ChatBar = ({
       aria-label={translate("Heading.Chat")}
     >
       <div
-        className="react-chat-top-radius flex width-full shrink-0 items-center justify-between gap-small bg-surface-100 padding-x-small padding-y-small cursor-pointer"
+        className="react-chat-top-radius flex width-full min-height-[48px] shrink-0 items-center justify-between gap-small bg-surface-100 padding-x-small padding-y-small cursor-pointer"
         role="button"
         tabIndex={0}
         onClick={onToggleCollapsed}
@@ -94,17 +97,19 @@ const ChatBar = ({
           <span className="text-title-medium content-emphasis">{translate("Heading.Chat")}</span>
           {unreadConversationCount > 0 && <Badge label={String(unreadConversationCount)} />}
         </div>
-        <IconButton
-          ariaLabel={translate("Label.SpanTitle.CreateGroupNeeds2More")}
-          icon="icon-regular-pencil-square"
-          size="Small"
-          variant="Utility"
-          isCircular
-          onClick={(event: MouseEvent<HTMLButtonElement>) => {
-            event.stopPropagation();
-            onOpenGroupInviteDialog();
-          }}
-        />
+        {canCreateGroup && (
+          <IconButton
+            ariaLabel={translate("Label.SpanTitle.CreateGroupNeeds2More")}
+            icon="icon-regular-pencil-square"
+            size="Small"
+            variant="Utility"
+            isCircular
+            onClick={(event: MouseEvent<HTMLButtonElement>) => {
+              event.stopPropagation();
+              onOpenGroupInviteDialog();
+            }}
+          />
+        )}
       </div>
       {!isCollapsed && chatDisabledReason !== null && (
         <div

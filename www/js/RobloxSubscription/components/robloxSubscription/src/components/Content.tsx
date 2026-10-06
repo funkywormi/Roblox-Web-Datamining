@@ -3,6 +3,7 @@ import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { callBehaviour } from "@rbx/core-scripts/guac";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { isReferralEnabled } from "@rbx/core-scripts/meta/subscription";
+import { resolveReferrerId } from "@rbx/payments/services/subscriptions";
 import {
   consumeSubscriptionRedirectUrl,
   PLUS_REFERRALS_QUERY_PARAM,
@@ -122,8 +123,16 @@ const Content = () => {
   // Product info is sourced from the user's active subscription when subscribed; otherwise it
   // comes from the available-products list (extended terms and bundles included so the page
   // has every plan). This avoids a redundant GetSubscriptionProductInfo call for subscribed users.
+  // This list feeds PurchaseView, which renders each product's eligibleOffers -- so on a referral
+  // landing it is the surface that would otherwise advertise a free trial. Referral reward and
+  // trial are mutually exclusive, and subscriptions-service suppresses the offer only when told
+  // the referrer. Independent of skipEligibilityCheck: that flag gates purchase eligibility, not
+  // referral/trial exclusivity. Keyed so a referral landing cannot be served a cached
+  // non-referral list that still carries the trial, or the reverse.
+  const referrerId = resolveReferrerId();
+
   const robloxAvailableProductsQuery = useQuery({
-    queryKey: ["list-roblox-subscription-available-products"],
+    queryKey: ["list-roblox-subscription-available-products", referrerId ?? null],
     queryFn: async () => {
       const { products } =
         await subscriptionsV2Api.subscriptionsV2ListAvailableSubscriptionProducts({
@@ -132,6 +141,9 @@ const Content = () => {
           includeBundles: true,
           includeExtendedTermProducts: true,
           skipEligibilityCheck: true,
+          // Omitted from the query string when undefined; the generated client only serializes
+          // parameters it was actually given.
+          referrerId,
         });
       if (products.length === 0) {
         return null;

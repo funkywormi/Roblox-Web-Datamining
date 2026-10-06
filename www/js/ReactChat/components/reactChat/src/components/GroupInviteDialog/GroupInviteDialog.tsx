@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Checkbox, IconButton, TextInput } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import { useFriendsDirectory } from "../../hooks/useFriendsDirectory";
 import { useChatMetadataConfig } from "../../hooks/useChatMetadataConfig";
 import { getPresenceLabel } from "../../utils/chatPresenceLabels";
@@ -15,6 +15,7 @@ type TGroupInviteDialogProps = {
 
 const MIN_SELECTED_FRIENDS_TO_CREATE = 2;
 const CREATE_CHAT_HEADER_TRANSLATION_KEY = "Heading.NewChatGroup";
+const FRIEND_CHECKBOX_ID_PREFIX = "react-chat-create-group-friend-";
 
 const GroupInviteDialog = ({
   isOpen,
@@ -22,7 +23,7 @@ const GroupInviteDialog = ({
   onClose,
   onCreateGroup,
 }: TGroupInviteDialogProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const { groupInviteMemberCap, maxConversationTitleLength } = useChatMetadataConfig();
   const [groupName, setGroupName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -122,8 +123,9 @@ const GroupInviteDialog = ({
           const isSelected = selectedFriendIds.includes(friend.id);
 
           return (
-            <div
+            <label
               key={friend.id}
+              htmlFor={`${FRIEND_CHECKBOX_ID_PREFIX}${friend.id}`}
               className="flex shrink-0 items-center gap-small padding-x-small padding-y-xsmall cursor-pointer hover:bg-shift-100"
             >
               <AvatarHeadshot
@@ -140,7 +142,8 @@ const GroupInviteDialog = ({
                 </div>
               </div>
               <Checkbox
-                label=""
+                id={`${FRIEND_CHECKBOX_ID_PREFIX}${friend.id}`}
+                aria-label={friend.displayName}
                 isChecked={isSelected}
                 onCheckedChange={() => {
                   toggleFriendSelection(friend.id);
@@ -148,7 +151,7 @@ const GroupInviteDialog = ({
                 placement="Start"
                 size="Small"
               />
-            </div>
+            </label>
           );
         })}
       </div>

@@ -1,8 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import dataStores from "@rbx/core-scripts/data-store";
+import environmentUrls from "@rbx/environment-urls";
 import { chatQueryKeys } from "../constants/queryKeys";
+import chatHttpTransport from "../services/chatHttpTransport";
 
-const { gamesDataStore } = dataStores;
+type TPlaceDetailsResponse = {
+  placeId?: number;
+  universeId?: number;
+  universeRootPlaceId?: number;
+  name?: string;
+  description?: string;
+  url?: string;
+  isPlayable?: boolean;
+  reasonProhibited?: string;
+}[];
 
 /** The subset of `/v1/games/multiget-place-details` a chat game card renders. */
 export type TGamePlaceDetails = {
@@ -26,7 +36,13 @@ export const useGamePlaceDetails = (placeId: string) => {
     queryKey: chatQueryKeys.gamePlaceDetails(placeId),
     queryFn: async () => {
       const numericPlaceId = Number(placeId);
-      const { data } = await gamesDataStore.getPlaceDetails([numericPlaceId]);
+      const data = await chatHttpTransport.get<TPlaceDetailsResponse>(
+        {
+          url: `${environmentUrls.gamesApi}/v1/games/multiget-place-details`,
+          withCredentials: true,
+        },
+        { placeIds: numericPlaceId },
+      );
       const detail = data[0];
       if (!detail) {
         return null;

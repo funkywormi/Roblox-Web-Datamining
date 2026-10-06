@@ -1,5 +1,5 @@
 import { useCallback, useContext, useState } from "react";
-import { composeQueryString } from "@rbx/core-scripts/util/url";
+import { UrlSearchParams } from "@rbx/core-lib/url";
 import { Modals } from "../useModals";
 import { TrackingContext } from "../../contexts/TrackingContext";
 
@@ -32,10 +32,10 @@ export function useSamsungPaymentMethods({
   const handleRedeemCreditClick = useCallback(() => {
     trackSamsungPaymentMethodsRedeemCreditClick();
 
-    window.location.href = `/upgrades/redeem?${composeQueryString({
+    window.location.href = `/upgrades/redeem?${UrlSearchParams.new({
       ap: product?.productId ?? "",
       pm: "redeemCard",
-    })}`;
+    }).toString()}`;
 
     closeModal();
   }, [trackSamsungPaymentMethodsRedeemCreditClick, product, closeModal]);

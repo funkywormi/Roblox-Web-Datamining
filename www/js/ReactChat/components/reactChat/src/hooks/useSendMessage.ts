@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "./useChatTranslate";
 import { chatQueryKeys } from "../constants/queryKeys";
 import { markConversationsAsRead, sendMessage } from "../services/chatService";
 import type { TGetConversationMessagesResponse } from "../types/api";
@@ -46,7 +46,7 @@ const isSendConflictError = (error: unknown): boolean => {
 };
 
 export const useSendMessage = () => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const queryClient = useQueryClient();
 
   return useMutation({

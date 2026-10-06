@@ -2,6 +2,7 @@ import { paymentFlowAnalyticsService } from "@rbx/core-scripts/legacy/core-roblo
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Button } from "@rbx/foundation-ui";
 import { usePaymentSession } from "@rbx/payments/services/paymentSession";
+import { getFreeTrialDisplay } from "@rbx/payments/services/subscriptions";
 import {
   BillingInfoDisplay,
   BillingPeriodSheet,
@@ -126,18 +127,24 @@ const PurchaseView: FC<PurchaseViewProps> = ({
     [],
   );
 
-  const legalKey = isFreeTrial
-    ? "Description.SubscriptionFreeTrialLegal"
-    : "Description.SubscriptionLegal";
+  const trialDisplay = getFreeTrialDisplay(freeTrialOffer, baselineProduct.periodType);
+  const useVariableTrialCopy = isFreeTrial && trialDisplay != null;
 
   const legalFooter: ReactNode = isEntrypointDisabled
     ? translate("Description.EntrypointDisabled")
-    : translateHtml(
-        translate,
-        legalKey,
-        termsLink,
-        isFreeTrial ? { date: trialEndDate } : undefined,
-      );
+    : useVariableTrialCopy
+      ? translateHtml(translate, "Description.SubscriptionFreeTrialLegalV2", termsLink, {
+          date: trialEndDate,
+          trialDuration: String(trialDisplay.trialDuration),
+          trialPeriodLabel: translate(trialDisplay.trialPeriodKey),
+          billingPeriodLabel: translate(trialDisplay.billingPeriodKey),
+        })
+      : translateHtml(
+          translate,
+          isFreeTrial ? "Description.SubscriptionFreeTrialLegal" : "Description.SubscriptionLegal",
+          termsLink,
+          isFreeTrial ? { date: trialEndDate } : undefined,
+        );
 
   // Defer VIEW_SHOWN until `usePaymentSession` resolves so the event carries
   // the same `paymentSessionId` as downstream USER_INPUT events. Use a ref to
@@ -395,6 +402,8 @@ const PurchaseView: FC<PurchaseViewProps> = ({
               <span className="text-heading-small">
                 {translate("Title.Benefits", { productShort: translate("Label.BlackbirdShort") })}
               </span>
+              {/* No freeTrialOffer: the landing lists non-trial bundles too, so the shared benefits card
+                  shows the generic 60-day window rather than the base trial's extended window. */}
               <ProductFeaturesList
                 featureConfig={getFeatureConfig(baselineProduct)}
                 periodType={baselineProduct.periodType}

@@ -1,7 +1,7 @@
 import environmentUrls from "@rbx/environment-urls";
 import chatHttpTransport from "./chatHttpTransport";
 
-// Only the id is used; names come from user-profile-api-client's useUserProfiles.
+// Only the id is used; names come from @rbx/www-common/user-profiles.
 export type TFriendsApiFriendRow = {
   id: number;
 };

@@ -31,6 +31,7 @@ import {
   type TChatDisabledReason,
 } from "../utils/chatEnabledState";
 import { getCurrentUserId } from "../utils/currentUser";
+import { isQueryPending } from "../utils/queryStatus";
 
 export type TUseChatDataResult = {
   conversations: TChatConversation[];
@@ -172,8 +173,15 @@ export const useChatData = (): TUseChatDataResult => {
       [...pendingPage, ...(conversationPages ?? [])],
       currentUserId,
       partyChromeDisplayTimeStampInterval,
+      chatSettingsQuery.data,
     );
-  }, [conversationPages, pendingConversations, currentUserId, partyChromeDisplayTimeStampInterval]);
+  }, [
+    conversationPages,
+    pendingConversations,
+    currentUserId,
+    partyChromeDisplayTimeStampInterval,
+    chatSettingsQuery.data,
+  ]);
 
   // Unfriended/blocked users whose 1:1 stays in the server list until the removal propagates. Never
   // fetched — added via setQueryData in the realtime dispatcher — so it filters durably.
@@ -252,10 +260,10 @@ export const useChatData = (): TUseChatDataResult => {
   return {
     conversations,
     unreadConversationCount: metadataQuery.data?.global_unread_message_count ?? 0,
-    // status==='loading' — true only during the initial fetch (no data yet), false once it succeeds
-    // OR errors. The bar shows the spinner only while this is true; a settled fetch (empty success or
+    // True only during the initial fetch (no data, no error yet), false once it succeeds OR
+    // errors. The bar shows the spinner only while this is true; a settled fetch (empty success or
     // a failed cold boot) shows the empty "make friends" state, never a spinner or error (QALC-1437).
-    isLoading: conversationsQuery.isLoading,
+    isLoading: isQueryPending(conversationsQuery),
     fetchNextPage,
     hasNextPage,
     moderationEligibleIds,

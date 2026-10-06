@@ -1,6 +1,8 @@
 import { ReactNode, useCallback, useContext } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { ErrorBoundary } from "@sentry/react";
+import { useTranslation } from "@rbx/core-scripts/react";
+import { translateHtml } from "@rbx/translation-utils";
 import { FirstTimePurchaseConsentModal } from "@rbx/payments/firstTimePurchaseConsent";
 import { getTriggerContext } from "../utils/getTriggerContext";
 import { ModalContext } from "../contexts/ModalContext";
@@ -29,6 +31,7 @@ export const ModalContainer = ({
   quickPay: QuickPay;
   samsungPaymentMethods: SamsungPaymentMethods;
 }) => {
+  const { translate } = useTranslation();
   const { markConsentAcknowledged } = useContext(BuyRobuxPageContext);
 
   const onError = useCallback((error: unknown) => {
@@ -64,6 +67,41 @@ export const ModalContainer = ({
       )}
       <LoginRedirectErrorModal />
       <FirstTimePurchaseConsentModal
+        title={translate("Label.AskParentFirst")}
+        description={translateHtml(translate, "Description.ParentalApprovalRequired", [
+          {
+            opening: "learnLinkStart",
+            closing: "learnLinkEnd",
+            render: linkContent => (
+              <a
+                target="_blank"
+                href="https://en.help.roblox.com/hc/en-us/articles/4409558125460-Monthly-Spending-Limits-and-Notifications-FAQ"
+                className="color-content-default [text-decoration:underline] [text-underline-position:from-font]"
+                rel="noreferrer"
+              >
+                {linkContent}
+              </a>
+            ),
+          },
+        ])}
+        confirmation={translateHtml(translate, "Description.ParentalApprovalConfirmation", [
+          {
+            opening: "termsLinkStart",
+            closing: "termsLinkEnd",
+            render: linkContent => (
+              <a
+                target="_blank"
+                href="https://en.help.roblox.com/hc/en-us/articles/115004647846-Roblox-Terms-of-Use"
+                className="color-content-emphasis [text-decoration:underline] [text-underline-position:from-font]"
+                rel="noreferrer"
+              >
+                {linkContent}
+              </a>
+            ),
+          },
+        ])}
+        continueLabel={translate("Action.Continue")}
+        cancelLabel={translate("Action.Cancel")}
         isOpen={modals.firstTimePurchaseConsent.isOpen}
         onConfirm={handleConsentConfirm}
         onCancel={handleConsentCancel}

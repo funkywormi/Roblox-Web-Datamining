@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 import type { KeyboardEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { callBehaviour } from "@rbx/core-scripts/guac";
+import { callBehaviour } from "../services/guacService";
 import { KEYSTROKE_FLUSH_REASON, sendChatKeystrokes } from "../utils/chatAnalytics";
 import {
   KEYSTROKE_EVENT_TYPE,

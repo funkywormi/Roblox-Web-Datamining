@@ -135,6 +135,7 @@ export const buildGameImpressionParams = ({
       -1,
     ),
     [EventStreamMetadata.Page]: pageContext.pageName,
+    [EventStreamMetadata.NumberOfLoadedTiles]: collectionAnalyticsData.totalNumberOfItems,
     ...buildSessionAnalyticsData(pageSessionInfo, pageContext),
   };
 

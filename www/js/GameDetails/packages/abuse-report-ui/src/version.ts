@@ -5,4 +5,4 @@
  * into `dist`, so a packed tarball keeps reporting the version it was built at
  * even once the repo has moved on. `version.test.ts` guards it against drift.
  */
-export const CLIENT_VERSION = "1.4.0";
+export const CLIENT_VERSION = "1.4.1";

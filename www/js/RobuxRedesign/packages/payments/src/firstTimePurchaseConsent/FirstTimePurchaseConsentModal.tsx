@@ -1,6 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
-import { translateHtml } from "@rbx/translation-utils";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -23,6 +21,11 @@ export type FirstTimePurchaseConsentModalProps = {
   onCancel: () => void;
   publishMetric: FireTelemetryCounterFn;
   triggerContext: TriggeringContext;
+  title: string;
+  description: ReactNode;
+  confirmation: ReactNode;
+  continueLabel: string;
+  cancelLabel: string;
 };
 
 export function FirstTimePurchaseConsentModal({
@@ -31,9 +34,12 @@ export function FirstTimePurchaseConsentModal({
   onCancel,
   publishMetric,
   triggerContext,
+  title,
+  description,
+  confirmation,
+  continueLabel,
+  cancelLabel,
 }: FirstTimePurchaseConsentModalProps) {
-  const { translate } = useTranslation();
-
   const [isConsentChecked, setIsConsentChecked] = useState(false);
   const hasTrackedOpenRef = useRef(false);
 
@@ -107,27 +113,8 @@ export function FirstTimePurchaseConsentModal({
     >
       <DialogContent>
         <DialogBody>
-          <div className="text-heading-small content-emphasis padding-y-[4px]">
-            {translate("Label.AskParentFirst")}
-          </div>
-          <div className="text-body-medium padding-bottom-large content-default">
-            {translateHtml(translate, "Description.ParentalApprovalRequired", [
-              {
-                opening: "learnLinkStart",
-                closing: "learnLinkEnd",
-                render: children => (
-                  <a
-                    target="_blank"
-                    href="https://en.help.roblox.com/hc/en-us/articles/4409558125460-Monthly-Spending-Limits-and-Notifications-FAQ"
-                    className="color-content-default [text-decoration:underline] [text-underline-position:from-font]"
-                    rel="noreferrer"
-                  >
-                    {children}
-                  </a>
-                ),
-              },
-            ])}
-          </div>
+          <div className="text-heading-small content-emphasis padding-y-[4px]">{title}</div>
+          <div className="text-body-medium padding-bottom-large content-default">{description}</div>
           <div className="flex flex-row gap-medium">
             <Checkbox
               isChecked={isConsentChecked}
@@ -136,24 +123,7 @@ export function FirstTimePurchaseConsentModal({
               size="Medium"
               placement="Start"
             />
-            <div className="text-body-small content-emphasis">
-              {translateHtml(translate, "Description.ParentalApprovalConfirmation", [
-                {
-                  opening: "termsLinkStart",
-                  closing: "termsLinkEnd",
-                  render: children => (
-                    <a
-                      target="_blank"
-                      href="https://en.help.roblox.com/hc/en-us/articles/115004647846-Roblox-Terms-of-Use"
-                      className="color-content-emphasis [text-decoration:underline] [text-underline-position:from-font]"
-                      rel="noreferrer"
-                    >
-                      {children}
-                    </a>
-                  ),
-                },
-              ])}
-            </div>
+            <div className="text-body-small content-emphasis">{confirmation}</div>
           </div>
         </DialogBody>
         <DialogFooter>
@@ -164,10 +134,10 @@ export function FirstTimePurchaseConsentModal({
               variant="Emphasis"
               size="Medium"
             >
-              {translate("Action.Continue")}
+              {continueLabel}
             </Button>
             <Button className="width-full" onClick={handleCancel} variant="Standard" size="Medium">
-              {translate("Action.Cancel")}
+              {cancelLabel}
             </Button>
           </div>
         </DialogFooter>

@@ -18,7 +18,9 @@ export function GiftCard({ isPrimary, sectionBase, giftCard }: GiftCardProps) {
 
   const buttonClickHandler = useCallback(() => {
     trackGiftCardClick();
-    window.open(giftCard.redirectUrl, "_blank");
+    // The Android app (2.728+) loads target="_blank" popups in a hidden WebView, so window.open does
+    // nothing (MOBAPP-3220). Navigating in place lets the app's domain allow-list hand off to the browser.
+    window.location.assign(giftCard.redirectUrl);
   }, [trackGiftCardClick, giftCard.redirectUrl]);
 
   return (

@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
 import { Button, IconButton } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../../hooks/useChatTranslate";
 import type { TChatConversation } from "../../../types/chat";
 import AvatarHeadshot from "../../AvatarHeadshot";
 
@@ -49,7 +49,7 @@ const ConsentModal = ({
   onDecline,
   onClose,
 }: TConsentModalProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const createdOn = formatCreatedOn(conversation.createdAt);
   const trustedLabel = ` • ${translate("Label.Trusted")}`;
 
@@ -97,7 +97,9 @@ const ConsentModal = ({
         </div>
 
         <div className="flex min-height-0 grow-1 flex-col gap-medium scroll-y padding-x-medium">
-          <span className="text-body-medium content-default">{groupInfo}</span>
+          <span className="react-chat-consent-group-info text-body-medium content-default">
+            {groupInfo}
+          </span>
 
           {conversation.participants.length > 0 && (
             <ul className="flex flex-col gap-small">

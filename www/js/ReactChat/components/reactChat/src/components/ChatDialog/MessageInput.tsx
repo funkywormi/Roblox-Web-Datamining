@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import type { KeyboardEvent } from "react";
 import { TextArea } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../hooks/useChatTranslate";
 
 type TMessageInputProps = {
   value: string;
@@ -23,7 +23,7 @@ const MessageInput = ({
   isDisabled = false,
   isFocused = false,
 }: TMessageInputProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   useLayoutEffect(() => {

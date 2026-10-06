@@ -78,10 +78,17 @@ export const useModerationTimeouts = (conversationIds: string[]): TUseModeration
     // conversation ids (e.g. only the friends placeholder is open).
     enabled: useChatTimeouts,
     staleTime: 60_000,
-    // Keep the previous user-level result while a key change (conversation open/close) refetches,
-    // so the known restriction doesn't briefly disappear and the chat bar is briefly enabled.
-    keepPreviousData: true,
   });
+  // Keep the previous user-level result while a key change (conversation open/close) refetches,
+  // so the known restriction doesn't briefly disappear and the chat bar is briefly enabled.
+  // Done by hand because keepPreviousData is v4-only.
+  const previousDataRef = useRef(statusesQuery.data);
+  if (statusesQuery.data !== undefined) {
+    previousDataRef.current = statusesQuery.data;
+  }
+  const statuses = statusesQuery.isError
+    ? statusesQuery.data
+    : (statusesQuery.data ?? previousDataRef.current);
 
   // dataUpdatedAt is included so that an expiry refetch returning identical JSON is still reprocessed
   // with the current time. The map only re-evaluates when the query data changes — a time-based
@@ -89,11 +96,9 @@ export const useModerationTimeouts = (conversationIds: string[]): TUseModeration
   // on the local clock alone.
   const timeoutMap = useMemo(
     () =>
-      useChatTimeouts && statusesQuery.data
-        ? buildModerationTimeoutMap(statusesQuery.data, new Date())
-        : EMPTY_MAP,
+      useChatTimeouts && statuses ? buildModerationTimeoutMap(statuses, new Date()) : EMPTY_MAP,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [useChatTimeouts, statusesQuery.data, statusesQuery.dataUpdatedAt],
+    [useChatTimeouts, statuses, statusesQuery.dataUpdatedAt],
   );
 
   const refreshModerationStatuses = useCallback(

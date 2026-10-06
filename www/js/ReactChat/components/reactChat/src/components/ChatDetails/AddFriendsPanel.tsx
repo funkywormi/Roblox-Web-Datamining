@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Button, Checkbox, IconButton, TextInput } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import { useFriendsDirectory } from "../../hooks/useFriendsDirectory";
 import { useChatMetadataConfig } from "../../hooks/useChatMetadataConfig";
 import type { TChatConversation } from "../../types/chat";
@@ -14,13 +14,15 @@ type TAddFriendsPanelProps = {
   onAddFriends: (conversationId: string, userIds: number[]) => void;
 };
 
+const FRIEND_CHECKBOX_ID_PREFIX = "react-chat-add-friends-friend-";
+
 const AddFriendsPanel = ({
   conversation,
   onBack,
   onClose,
   onAddFriends,
 }: TAddFriendsPanelProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const { groupInviteMemberCap } = useChatMetadataConfig();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFriendIds, setSelectedFriendIds] = useState<number[]>([]);
@@ -115,10 +117,13 @@ const AddFriendsPanel = ({
       <div className="react-chat-details-scroll flex min-height-0 grow-1 flex-col scroll-y">
         {filteredFriends.map(friend => {
           const isSelected = selectedFriendIds.includes(friend.id);
+          // Several chat windows can show this panel at once, so the ID must be unique per conversation.
+          const checkboxId = `${FRIEND_CHECKBOX_ID_PREFIX}${conversation.id}-${friend.id}`;
 
           return (
-            <div
+            <label
               key={friend.id}
+              htmlFor={checkboxId}
               className="react-chat-details-row flex shrink-0 items-center gap-small padding-x-medium padding-y-small cursor-pointer hover:bg-shift-100"
             >
               <AvatarHeadshot
@@ -135,7 +140,8 @@ const AddFriendsPanel = ({
                 </div>
               </div>
               <Checkbox
-                label=""
+                id={checkboxId}
+                aria-label={friend.displayName}
                 isChecked={isSelected}
                 onCheckedChange={() => {
                   toggleFriendSelection(friend.id);
@@ -143,7 +149,7 @@ const AddFriendsPanel = ({
                 placement="Start"
                 size="Small"
               />
-            </div>
+            </label>
           );
         })}
       </div>

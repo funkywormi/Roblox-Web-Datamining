@@ -2,6 +2,7 @@ import { PeriodType } from "@rbx/client-subscriptions-api/v2";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Badge, OptionSelector } from "@rbx/foundation-ui";
 import { getSubscriptionPeriodTranslationKey } from "@rbx/payments/services/subscriptions";
+import { useFormatter } from "@rbx/www-common/intl";
 
 import { getPricePerMonth, getSavingsPercent } from "../../utils/billingPeriod";
 
@@ -39,10 +40,11 @@ const BillingPeriodOptionRow: FC<BillingPeriodOptionRowProps> = ({
   isBestValue,
   onSelect,
 }) => {
-  const { translate, intl } = useTranslation();
+  const { translate } = useTranslation();
+  const format = useFormatter();
 
   const formatPrice = ({ amount, currencyCode }: BillingPeriodPrice) =>
-    intl.n(amount, { style: "currency", currency: currencyCode });
+    format.number(amount, { style: "currency", currency: currencyCode });
 
   const savingsPercent = getSavingsPercent(option);
   const pricePerMonth = formatPrice({
@@ -60,7 +62,7 @@ const BillingPeriodOptionRow: FC<BillingPeriodOptionRowProps> = ({
           })
         : translate("Label.BillingPeriodSavings", {
             pricePerMonth,
-            savingsPercent: intl.n(savingsPercent / 100, { style: "percent" }),
+            savingsPercent: format.number(savingsPercent / 100, { style: "percent" }),
           });
   }
 

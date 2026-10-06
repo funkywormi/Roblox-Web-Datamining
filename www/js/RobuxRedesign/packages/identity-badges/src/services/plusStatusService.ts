@@ -1,4 +1,4 @@
-import { EnvironmentUrls } from "@rbx/core-scripts/legacy/Roblox";
+import environmentUrls from "@rbx/environment-urls";
 import * as http from "@rbx/core-scripts/http";
 import { PLUS_PROFILE_FIELD } from "../constants";
 
@@ -22,7 +22,7 @@ export const fetchPlusStatusForUsers = async (
   }
 
   const urlConfig = {
-    url: `${EnvironmentUrls.apiGatewayUrl}/user-profile-api/v1/user/profiles/get-profiles`,
+    url: `${environmentUrls.apiGatewayUrl}/user-profile-api/v1/user/profiles/get-profiles`,
     retryable: true,
     withCredentials: true,
   };

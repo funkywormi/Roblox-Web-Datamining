@@ -1,9 +1,13 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "react-dom";
+import dataStores from "@rbx/core-scripts/data-store";
+import { registerReferrerLookup } from "@rbx/subscriptions-common";
 import { PaymentsTranslationProvider } from "@rbx/payments";
 import ready from "@rbx/core-scripts/util/ready";
 import { queryClient, useTranslation } from "@rbx/core-scripts/react";
 import pfas from "@rbx/core-scripts/payments-flow";
+import type { Namespace } from "@rbx/www-common/i18n";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { ToastProvider } from "@rbx/payments/components";
 import { translations } from "./component.json";
 import { ROOT_ELEMENT_ID } from "./src/constants";
@@ -14,6 +18,11 @@ import "./src/stylesheets/robuxRedesign.scss";
 import "./src/stylesheets/styleGuidePatch.scss";
 import { reportPageLoad, reportPageView, ObsErrorBoundary } from "./src/observability";
 import { reportInteractive } from "./src/utils/publishMetric";
+
+registerReferrerLookup(referrerId => dataStores.userDataStore.getUser(referrerId));
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- CI narrows Namespace; component.json is always valid
+const namespaces = translations as unknown as readonly Namespace[];
 
 const ToastWrapper = ({ children }: { children: React.ReactNode }) => {
   const { translate } = useTranslation();
@@ -41,11 +50,13 @@ ready(() => {
   render(
     <ObsErrorBoundary name="BuyRobuxPageReactCrash">
       <QueryClientProvider client={queryClient}>
-        <PaymentsTranslationProvider config={translations} context="RobuxRedesign">
-          <ToastWrapper>
-            <App {...buyRobuxPageData} />
-          </ToastWrapper>
-        </PaymentsTranslationProvider>
+        <TranslationProviderSCC namespaces={namespaces}>
+          <PaymentsTranslationProvider config={translations} context="RobuxRedesign">
+            <ToastWrapper>
+              <App {...buyRobuxPageData} />
+            </ToastWrapper>
+          </PaymentsTranslationProvider>
+        </TranslationProviderSCC>
       </QueryClientProvider>
     </ObsErrorBoundary>,
     document.getElementById(ROOT_ELEMENT_ID),

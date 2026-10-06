@@ -28,3 +28,16 @@ export function getChatDisabledReason(
 export function getIsChatVisible(metadata: TGetChatMetadataResponse | undefined): boolean {
   return metadata?.isChatVisible !== false;
 }
+
+// Whether the user can create a group or add people to one, matching legacy. Off whenever chat is
+// off. Once the settings migration is on, only an explicit "enabled" group chat privacy setting
+// turns it on; before that (or before metadata loads) group chat follows chat.
+export function getIsGroupChatEnabled(metadata: TGetChatMetadataResponse | undefined): boolean {
+  if (getChatDisabledReason(metadata) !== null) {
+    return false;
+  }
+  if (!metadata?.isWebChatSettingsMigrationEnabled) {
+    return true;
+  }
+  return metadata.isGroupChatEnabledByPrivacySetting === "enabled";
+}

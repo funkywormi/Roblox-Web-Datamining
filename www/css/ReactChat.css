@@ -248,6 +248,10 @@ button.btn-common-play-game-unplayable-lg {
     color: var(--inverse-surface-0)
 }
 
+.content-\[var\(--light-mode-content-emphasis\)\] {
+    color: var(--light-mode-content-emphasis)
+}
+
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-alert)r g b/.2)
 }
@@ -262,6 +266,10 @@ button.btn-common-play-game-unplayable-lg {
 
 .bg-\[var\(--color-common-shimmer\)\] {
     background-color: var(--color-common-shimmer)
+}
+
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
 }
 
 .opacity-\[0\.5\] {
@@ -765,6 +773,10 @@ button.btn-common-play-game-unplayable-lg {
     -webkit-box-orient: vertical;
     display: -webkit-box;
     overflow: hidden
+}
+
+.react-chat-consent-group-info {
+    overflow-wrap: anywhere
 }
 
 .react-chat-thread-list,

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { useUniversalFeatureRestrictions } from "@rbx/universal-feature-restrictions";
+import useChatTranslate from "../hooks/useChatTranslate";
 import ChatBar from "../components/ChatBar/ChatBar";
 import ChatDialog from "../components/ChatDialog/ChatDialog";
 import GroupInviteDialog from "../components/GroupInviteDialog/GroupInviteDialog";
@@ -37,7 +37,8 @@ import {
   sendWebChatConversationsLoaded,
   sendWebChatRendered,
 } from "../utils/chatAnalytics";
-import type { TChatConversation, TChatFeedback } from "../types/chat";
+import { CHAT_UPDATE_STATUS } from "../constants/chatPolicyConstants";
+import type { TChatConversation, TChatFeedback, TRenameResult } from "../types/chat";
 import { applyModerationTimeouts } from "../utils/chatTransforms";
 import { clearAllPersistedChatLayouts } from "../utils/chatLayoutStorage";
 import { getCurrentUserId } from "../utils/currentUser";
@@ -87,7 +88,7 @@ const getTrayRightOffset = (visiblePanelCount: number) => {
 };
 
 const AppContainer = () => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const queryClient = useQueryClient();
   const chatData = useChatData();
   const isLiveData = !chatData.isLoading && chatData.conversations.length > 0;
@@ -101,7 +102,8 @@ const AppContainer = () => {
     enabled: !chatData.isLoading,
     isChatEnabled: chatData.chatDisabledReason === null && chatData.isChatVisible,
   });
-  const { shouldRespectConversationHasUnreadMessageToMarkAsRead } = useChatMetadataConfig();
+  const { shouldRespectConversationHasUnreadMessageToMarkAsRead, isGroupChatEnabled } =
+    useChatMetadataConfig();
   const { scheduleMarkRead } = useMarkAsRead({
     enabled: isLiveData,
     shouldRespectUnread: shouldRespectConversationHasUnreadMessageToMarkAsRead,
@@ -117,6 +119,7 @@ const AppContainer = () => {
     renameConversation,
     setConversationScreen,
     reportParticipant,
+    confirmRemoveParticipant,
     resolveConsent,
     toggleCollapsed,
     openGroupInviteDialog,
@@ -612,22 +615,29 @@ const AppContainer = () => {
   );
 
   const handleRenameConversation = useCallback(
-    async (layoutId: string, title: string) => {
+    async (layoutId: string, title: string): Promise<TRenameResult> => {
       const match = conversations.find(c => c.layoutId === layoutId);
       if (!match) {
-        return;
+        return "failed";
       }
       try {
         const updated = await renameGroupConversation(match.id, title);
+        // A moderated name is not an error: the server answers normally with status "moderated" and
+        // keeps the old title, so the panel shows why instead of the generic error toast.
+        if (updated.status === CHAT_UPDATE_STATUS.moderated) {
+          return "moderated";
+        }
         const updatedTitle = updated.name ?? title;
         renameConversation(layoutId, updatedTitle);
         await queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() });
+        return "success";
       } catch {
         setFeedback({
           id: Date.now(),
           type: "warning",
           message: translate("Message.Error"),
         });
+        return "failed";
       }
     },
     [conversations, queryClient, renameConversation, translate],
@@ -737,9 +747,7 @@ const AppContainer = () => {
               handleLeaveGroupConversation(layoutId).catch(() => undefined);
             }}
             onToggleCollapsed={handleToggleCollapsed}
-            onRenameConversation={(layoutId, title) => {
-              handleRenameConversation(layoutId, title).catch(() => undefined);
-            }}
+            onRenameConversation={handleRenameConversation}
             onAddFriends={(conversationId, userIds) => {
               handleAddFriends(conversationId, userIds).catch(() => undefined);
             }}
@@ -747,6 +755,7 @@ const AppContainer = () => {
               handleRemoveParticipant(conversationId, userId).catch(() => undefined);
             }}
             onSetScreen={setConversationScreen}
+            onRequestRemoveParticipant={confirmRemoveParticipant}
             onReportParticipant={reportParticipant}
             onPromoteFriendPlaceholder={handlePromoteFriendPlaceholder}
             onRemoveTrustedConnection={friendId => {
@@ -784,6 +793,7 @@ const AppContainer = () => {
         isCollapsed={layout.isCollapsed}
         isLoaded={!chatData.isLoading}
         chatDisabledReason={chatData.chatDisabledReason}
+        canCreateGroup={isGroupChatEnabled && chatData.conversations.length > 0}
         hasNextPage={chatData.hasNextPage}
         onSearchTermChange={setSearchTerm}
         onOpenConversation={handleOpenConversation}

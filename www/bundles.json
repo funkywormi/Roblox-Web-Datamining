@@ -1096,7 +1096,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/686df9109c1ce3a975b9c2843518ca921dac477dd4ef360d186350ebf3e3d0ee.js",
+            "url": "https://js.rbxcdn.com/f72cfbcd3523d7b6b57fff1c4cb825285cbf91060241f8db109d6ca205d0d81a.js",
             "sources": [
                 "ALL"
             ]
@@ -1280,6 +1280,13 @@
             "url": "https://js.rbxcdn.com/c9a5f3fb0b5a701ada0d21a4b1084534f46ce12ae6b96e0da5a89ed175d3d721.js",
             "sources": [
                 "/users/1/profile"
+            ]
+        },
+        {
+            "name": "Feature.Build",
+            "url": "https://js.rbxcdn.com/267fe48357fe208c9a2e34a630293a56ab99273d81de573756359e8fdbfbbd9c.js",
+            "sources": [
+                "/games/1818"
             ]
         },
         {
@@ -1701,7 +1708,7 @@
         },
         {
             "name": "Feature.ExperienceDetails",
-            "url": "https://js.rbxcdn.com/12dd94b06261ccebb0344ae563673e7a6cf6dc7f4ce450816191b2e6a68e4299.js",
+            "url": "https://js.rbxcdn.com/8752891d9471e6be28f41a516ec92a89a2ad1535bad936cfbc6f6f2c1a2203aa.js",
             "sources": [
                 "/home",
                 "/",
@@ -2500,7 +2507,7 @@
         },
         {
             "name": "Feature.Payment",
-            "url": "https://js.rbxcdn.com/d019a898070e91d505099dc38a934688ffa685b9c9a4c00d2b46dd91d547656d.js",
+            "url": "https://js.rbxcdn.com/9a5cda763caa57747f1f0eacd306feeaafd1e1c45a54d5d141ae652a0143afd1.js",
             "sources": [
                 "/redeem",
                 "/upgrades/robux",
@@ -3189,7 +3196,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/82e3a25a79577c00f9fe12a9695017e76c4f0c5040b4ce03397a57b3f44f109d.js",
+            "url": "https://js.rbxcdn.com/fb3741a9040ba678d0830d794baeaca0a19bdb88678074cdaaba3c183c97ebb7.js",
             "sources": [
                 "/home",
                 "/",
@@ -3301,7 +3308,7 @@
         },
         {
             "name": "Feature.SafetyDashboard",
-            "url": "https://js.rbxcdn.com/970635f96c78d5e9a4bdf41ce19baab8723f0b50b67c56ebba676f4ada4730e2.js",
+            "url": "https://js.rbxcdn.com/027d4792a12a28a483edb3fff9d29988977fe24ce726daf3fc5fef40516bd920.js",
             "sources": [
                 "/help-safety",
                 "/safety-dashboard"
@@ -3625,7 +3632,7 @@
         },
         {
             "name": "Feature.VerificationUpsell",
-            "url": "https://js.rbxcdn.com/0b9f85af9de09ba34d82c39d428fb0434bd87c2d34bf466a9ef71cc43ccc2031.js",
+            "url": "https://js.rbxcdn.com/3f05475f3c6402d21d3b177ba91ee2afc5583fa35c2c6dce56f6ba5692f08c56.js",
             "sources": [
                 "ALL"
             ]
@@ -4441,7 +4448,7 @@
         },
         {
             "name": "Challenge",
-            "url": "https://js.rbxcdn.com/9107fe8c64d34f8043a23e2be72efc69635fe1ae692a016773e1f5acab837a6c-Challenge.js",
+            "url": "https://js.rbxcdn.com/7bf3bbfba9944c4b866a7d9516a1184bc9ef4a6c1bced350626f805d1860c1ca-Challenge.js",
             "sources": [
                 "/home",
                 "/",
@@ -4630,7 +4637,7 @@
         },
         {
             "name": "CrossTabCommunication",
-            "url": "https://js.rbxcdn.com/bfb3e7a7efed2f8ba4d12dc9fdb70dce1ff97ee13e988833a8638cf3ed8fd7f8.js",
+            "url": "https://js.rbxcdn.com/91949ca310de66377f8e5c0cfab7880cca42e5c1eaac63972ed95c40c2a406dc-CrossTabCommunication.js",
             "sources": [
                 "/home",
                 "/",
@@ -4939,7 +4946,7 @@
         },
         {
             "name": "GameDetails",
-            "url": "https://js.rbxcdn.com/7c89c34d7e360fd5e264ce390a000964872cfdeb5e798a0a7dc25f225d28a5bb-GameDetails.js",
+            "url": "https://js.rbxcdn.com/49e62161b556e11746ec9a0567c2ef6d3231ef2deeb5e1685f4ad9c8632015ad-GameDetails.js",
             "sources": [
                 "/games/1818"
             ]
@@ -5718,7 +5725,7 @@
         },
         {
             "name": "PlacesList",
-            "url": "https://js.rbxcdn.com/dbabebdba933e8f47858850a99535f5c0250805916206765dea0db658bd02fcb-PlacesList.js",
+            "url": "https://js.rbxcdn.com/7b30ce041d70c4b936faad6a20f9fa65b47a743a5164c71a2aee9840d5a44884-PlacesList.js",
             "sources": [
                 "/home"
             ]
@@ -5931,7 +5938,7 @@
         },
         {
             "name": "ReactChat",
-            "url": "https://js.rbxcdn.com/f656e4710c79c84e96db19aa95d8afba82667e645f6ce380fd4c7dfefa1f3745-ReactChat.js",
+            "url": "https://js.rbxcdn.com/9cb3aa07c98dc5faa7aec3570e23fe4c84bd052f06676c1a21928d34a8de1446-ReactChat.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -6013,7 +6020,7 @@
         },
         {
             "name": "RealTime",
-            "url": "https://js.rbxcdn.com/e090342812e3d2471466cf17424cb3c5d831e564e5cb45622e2179b53b2e5ac0-RealTime.js",
+            "url": "https://js.rbxcdn.com/95aad7f7b1cdec3dc13afca4629d0d47d8fb30a40e4210acaca32664fe47b9ba-RealTime.js",
             "sources": [
                 "/home",
                 "/",
@@ -6146,14 +6153,14 @@
         },
         {
             "name": "RobloxSubscription",
-            "url": "https://js.rbxcdn.com/661a313a340b310753045234bb133cfed3e1e0c917d90ad237368c4a83df6a8d-RobloxSubscription.js",
+            "url": "https://js.rbxcdn.com/d6c668fedf0e9ece36b8cbaea40f3b6d6802350cc4aa88233f8d6525a1d782d9-RobloxSubscription.js",
             "sources": [
                 "/plus"
             ]
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/1c763f0cfee50b55b97357ad2947adc060580318e1f946910ac470df7856dba6-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/c24c1ad002cad06c84ce696e903b237c3e87be298e0cf25db059ffa111e87a1b-RobuxRedesign.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -6639,7 +6646,7 @@
         },
         {
             "name": "TranslationResources",
-            "url": "https://js.rbxcdn.com/4d2c3582a51f181b1d85fcc080513179bebd9bbde79534e1803bb0bf69132445-TranslationResources.js",
+            "url": "https://js.rbxcdn.com/d16e6f3b83d217e09e5c46ddcc078aeca8fa3b69fc40979b173ea1c0079cf481-TranslationResources.js",
             "sources": [
                 "ALL"
             ]
@@ -8144,7 +8151,7 @@
         },
         {
             "name": "PlacesList",
-            "url": "https://css.rbxcdn.com/e46275fcc655943eedfaf7097f97aec787675de05bd411a8b2dd3b71176bf33d-PlacesList.css",
+            "url": "https://css.rbxcdn.com/000cd9a7ce9b56744ab3c2afa4b068234a6901f4fbde127887cea9cfdf452649-PlacesList.css",
             "sources": [
                 "/home"
             ]
@@ -8250,7 +8257,7 @@
         },
         {
             "name": "ReactChat",
-            "url": "https://css.rbxcdn.com/e6675628a8065398c8dca9deba4dcc722ba81d7e694fd78ad78564efaffa9e21-ReactChat.css",
+            "url": "https://css.rbxcdn.com/937b748e3baf2abd77e16c99eb9b6adbfb203df9a5db060d6079cdfffcde8058-ReactChat.css",
             "sources": [
                 "/home",
                 "/charts",
@@ -8443,7 +8450,7 @@
         },
         {
             "name": "RobloxSubscription",
-            "url": "https://css.rbxcdn.com/5f54ea2daaef18706ef91a2bbcd68d6ff20ddc7f15b3dfda3671b757cad695c7-RobloxSubscription.css",
+            "url": "https://css.rbxcdn.com/c22441e2d0681aedd3c23dbed04b552c635fbbd42fc58380d9662c737bdddacb-RobloxSubscription.css",
             "sources": [
                 "/plus"
             ]
@@ -8504,7 +8511,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://css.rbxcdn.com/8aa38c10aeb7782b659b7840f25771d5163a5f17b7d8d6f93085557895e16ddc-RobuxRedesign.css",
+            "url": "https://css.rbxcdn.com/51f9298b3c42e49bc1bd09356fc0494b957b158084ceaf22b2bc324e32e7e8e3-RobuxRedesign.css",
             "sources": [
                 "/upgrades/robux"
             ]

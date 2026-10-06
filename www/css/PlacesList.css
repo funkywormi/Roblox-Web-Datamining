@@ -67,11 +67,11 @@
 }
 
 .light-theme .game-card-container.grid-item-container .game-tile-hidden-placeholder {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .game-card-container.grid-item-container .game-tile-hidden-placeholder {
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .game-card-container.grid-item-container .game-tile-hidden-placeholder .game-tile-hidden-placeholder-contents {
@@ -2989,36 +2989,36 @@ button.btn-common-play-game-unplayable-lg {
 
 .light-theme .friend-tile-dropdown-button {
     text-align: left;
+    border: 0;
+    border-top: .5px solid var(--color-extended-black-10);
     white-space: nowrap;
     text-overflow: ellipsis;
     width: 100%;
     color: var(--color-content-muted);
     background-color: transparent;
-    border: 0;
-    border-top: .5px solid rgba(0, 0, 0, .1);
     padding: 10px;
     overflow: hidden
 }
 
 .dark-theme .friend-tile-dropdown-button {
     text-align: left;
+    border: 0;
+    border-top: .5px solid var(--color-extended-white-10);
     white-space: nowrap;
     text-overflow: ellipsis;
     width: 100%;
     color: var(--color-content-muted);
     background-color: transparent;
-    border: 0;
-    border-top: .5px solid rgba(255, 255, 255, .1);
     padding: 10px;
     overflow: hidden
 }
 
 .light-theme .friend-tile-dropdown-button:hover {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .friend-tile-dropdown-button:hover {
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .friend-tile-non-styled-button {
@@ -3182,15 +3182,15 @@ button.btn-common-play-game-unplayable-lg {
 
 .light-theme .interaction-item:hover,
 .light-theme .interaction-item:focus {
+    background-color: var(--color-extended-black-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1)
+    color: var(--color-content-emphasis)
 }
 
 .light-theme .interaction-item:active,
 .light-theme .interaction-item.active {
     box-shadow: none;
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .interaction-item {
@@ -3199,15 +3199,15 @@ button.btn-common-play-game-unplayable-lg {
 
 .dark-theme .interaction-item:hover,
 .dark-theme .interaction-item:focus {
+    background-color: var(--color-extended-white-10);
     box-shadow: none;
-    color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1)
+    color: var(--color-content-emphasis)
 }
 
 .dark-theme .interaction-item:active,
 .dark-theme .interaction-item.active {
     box-shadow: none;
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .interaction-item:before,
@@ -4597,7 +4597,7 @@ button.btn-common-play-game-unplayable-lg {
 .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-count-container .avatar-card-image,
 .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-count-container .avatar-count {
     object-fit: cover;
-    background-color: #353741;
+    background-color: var(--color-extended-gray-800);
     width: 20px;
     height: 20px;
     transition: border .2s cubic-bezier(0, 0, 0, 1)
@@ -4668,16 +4668,16 @@ button.btn-common-play-game-unplayable-lg {
 .hover-game-tile.interest-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-count-container .avatar-count,
 .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-headshot-xs .avatar-count,
 .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-count-container .avatar-count {
-    color: #fff;
     width: -webkit-fit-content;
     width: -moz-fit-content;
+    width: fit-content;
+    min-width: 20px;
+    color: var(--color-extended-white-100);
     border-radius: 24px;
     -ms-flex-pack: center;
     justify-content: center;
     -ms-flex-align: center;
     align-items: center;
-    width: fit-content;
-    min-width: 20px;
     padding: 0 4px;
     display: -ms-flexbox;
     display: flex
@@ -4726,7 +4726,7 @@ button.btn-common-play-game-unplayable-lg {
 .dark-theme .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card.avatar-card-online .avatar-headshot-xs .avatar-count,
 .dark-theme .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card.avatar-card-online .avatar-count-container .avatar-card-image,
 .dark-theme .hover-game-tile.experience-events-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card.avatar-card-online .avatar-count-container .avatar-count {
-    box-shadow: 0 0 0 1px #39c582
+    box-shadow: 0 0 0 1px var(--color-extended-green-500)
 }
 
 .hover-game-tile.grid-tile .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card:first-child,
@@ -5256,14 +5256,14 @@ button.btn-common-play-game-unplayable-lg {
 .light-theme .hover-game-tile.event-tile.image-overlay .play-button-container .play-button.notification-button,
 .light-theme .hover-game-tile.interest-tile.image-overlay .play-button-container .play-button.notification-button,
 .light-theme .hover-game-tile.experience-events-tile.image-overlay .play-button-container .play-button.notification-button {
-    background-color: #bcbec8
+    background-color: var(--color-extended-gray-500)
 }
 
 .dark-theme .hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.notification-button,
 .dark-theme .hover-game-tile.event-tile.image-overlay .play-button-container .play-button.notification-button,
 .dark-theme .hover-game-tile.interest-tile.image-overlay .play-button-container .play-button.notification-button,
 .dark-theme .hover-game-tile.experience-events-tile.image-overlay .play-button-container .play-button.notification-button {
-    background-color: #494d5a
+    background-color: var(--color-extended-gray-700)
 }
 
 .light-theme .hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.notification-button.notification-on,
@@ -5383,7 +5383,7 @@ button.btn-common-play-game-unplayable-lg {
 
 .game-sort-mural-loaded .container-header,
 .game-sort-mural-loaded .font-sort-subtitle {
-    color: #fff
+    color: var(--color-extended-white-100)
 }
 
 .hover-game-tile.interest-tile .featured-game-container .tile-interest-button {
@@ -5404,8 +5404,8 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .light-theme .hover-game-tile.interest-tile .featured-game-container .tile-interest-button {
+    background-color: var(--color-extended-black-10);
     color: var(--color-content-emphasis);
-    background-color: rgba(0, 0, 0, .1);
     border-color: transparent
 }
 
@@ -5414,8 +5414,8 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .dark-theme .hover-game-tile.interest-tile .featured-game-container .tile-interest-button {
+    background-color: var(--color-extended-white-10);
     color: var(--color-content-emphasis);
-    background-color: rgba(255, 255, 255, .1);
     border-color: transparent
 }
 
@@ -6278,8 +6278,8 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .light-theme .filters-container .filter-items-container .filter-select.btn-primary-md {
-    color: #fff;
-    background-color: #272930
+    background-color: var(--color-extended-gray-900);
+    color: var(--color-extended-white-100)
 }
 
 .light-theme .filters-container .filter-items-container .filter-select.btn-secondary-md {
@@ -6288,12 +6288,12 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .light-theme .filters-container .filter-items-container .filter-select.btn-secondary-md:hover {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .filters-container .filter-items-container .filter-select.btn-primary-md {
-    color: #272930;
-    background-color: #fff
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-900)
 }
 
 .dark-theme .filters-container .filter-items-container .filter-select.btn-secondary-md {
@@ -6302,7 +6302,7 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .dark-theme .filters-container .filter-items-container .filter-select.btn-secondary-md:hover {
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .filters-container .filter-items-container .filter-select .filter-display-text {
@@ -6359,12 +6359,12 @@ button.btn-common-play-game-unplayable-lg {
 
 .light-theme .filters-container .filter-items-container .filters-modal-container {
     background-color: var(--color-surface-300);
-    border: 1px solid #bcbec8
+    border: 1px solid var(--color-extended-gray-500)
 }
 
 .dark-theme .filters-container .filter-items-container .filters-modal-container {
     background-color: var(--color-surface-300);
-    border: 1px solid #494d5a
+    border: 1px solid var(--color-extended-gray-700)
 }
 
 .filters-container .filter-items-container .filters-modal-container .header-container {
@@ -6433,11 +6433,11 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .light-theme .filters-container .filter-items-container .filters-modal-container .filter-options-container .filter-option:hover {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: var(--color-extended-black-10)
 }
 
 .dark-theme .filters-container .filter-items-container .filters-modal-container .filter-options-container .filter-option:hover {
-    background-color: rgba(255, 255, 255, .1)
+    background-color: var(--color-extended-white-10)
 }
 
 .filters-container .filter-items-container .filters-modal-container .filter-options-container .filter-option.selected-option {
@@ -6465,11 +6465,11 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .light-theme .filters-container .filter-items-container .filters-modal-container .filter-options-container .filter-option-divider {
-    border-top: 1px solid #bcbec8
+    border-top: 1px solid var(--color-extended-gray-500)
 }
 
 .dark-theme .filters-container .filter-items-container .filters-modal-container .filter-options-container .filter-option-divider {
-    border-top: 1px solid #494d5a
+    border-top: 1px solid var(--color-extended-gray-700)
 }
 
 .filters-container .filter-items-container .filters-modal-container .action-buttons-container {
@@ -6487,24 +6487,25 @@ button.btn-common-play-game-unplayable-lg {
 
 .light-theme .filters-container .filter-items-container .filters-modal-container .action-buttons-container .apply-button,
 .dark-theme .filters-container .filter-items-container .filters-modal-container .action-buttons-container .apply-button {
-    color: #fff;
-    background-color: #335fff;
+    background-color: var(--color-action-emphasis-background);
+    color: var(--color-extended-white-100);
     border-color: transparent
 }
 
 .light-theme .filters-container .filter-items-container .filters-modal-container .action-buttons-container .apply-button:disabled {
-    color: #fff;
-    background-color: #272930
+    background-color: var(--color-extended-gray-900);
+    color: var(--color-extended-white-100)
 }
 
 .dark-theme .filters-container .filter-items-container .filters-modal-container .action-buttons-container .apply-button:disabled {
-    color: #272930;
-    background-color: #fff
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-900)
 }
 
 .charts-sdui-page {
     --sdui-sticky-offset: 82px;
-    min-height: 100vh
+    min-height: 100vh;
+    padding-left: 10px
 }
 
 @media (min-width:992px) {
@@ -6519,8 +6520,35 @@ button.btn-common-play-game-unplayable-lg {
     }
 }
 
+.charts-sdui-page .sdui-tile-overlay-container .foundation-web-badge.bg-over-media-0 {
+    background-color: var(--color-extended-white-90)
+}
+
+.charts-sdui-page .sdui-tile-overlay-container .foundation-web-badge.bg-over-media-0 .icon,
+.charts-sdui-page .sdui-tile-overlay-container .foundation-web-badge.bg-over-media-0 span {
+    color: var(--light-mode-content-emphasis)
+}
+
+.charts-sdui-page .sdui-tile-overlay-container .foundation-web-badge.bg-over-media-0 .icon {
+    width: var(--icon-size-small);
+    height: var(--icon-size-small)
+}
+
+.charts-sdui-page .filters-container {
+    margin-bottom: 0;
+    margin-left: 0
+}
+
+.charts-sdui-page .sdui-vertical-feed-sticky {
+    margin-left: -10px
+}
+
 .charts-sdui-page .sdui-vertical-feed-sticky .filters-container {
-    margin-bottom: 0
+    margin-left: 10px
+}
+
+.charts-sdui-sort-detail {
+    padding-right: 10px
 }
 
 .charts-sdui-sort-detail h1 {
@@ -6536,7 +6564,7 @@ button.btn-common-play-game-unplayable-lg {
     }
 }
 
-:root {
+body {
     --faq-section-heading-font: var(--typography-heading-medium-font);
     --faq-question-heading-font: var(--typography-body-large-font)
 }
@@ -6622,7 +6650,7 @@ button.btn-common-play-game-unplayable-lg {
     }
 }
 
-.no-gutter-ads.logged-in:not(.left-nav-new-width) .content {
+.no-gutter-ads.logged-in:not(.left-nav-new-width) main.container-main:not(.no-header-nav) .content {
     margin-left: var(--left-nav-reserved-width)
 }
 

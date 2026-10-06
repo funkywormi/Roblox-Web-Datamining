@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { callBehaviour } from "@rbx/core-scripts/guac";
+import { callBehaviour } from "../services/guacService";
 import { getCurrentUserId } from "../utils/currentUser";
 
 // Chat UI policy flags come from the "chat-ui" GUAC behaviour. expandedChatEnabled is a plain

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { chatQueryKeys } from "../constants/queryKeys";
 import { CHAT_METADATA_DEFAULTS } from "../constants/chatMetadataConstants";
 import { getChatMetadata } from "../services/chatService";
+import { getIsGroupChatEnabled } from "../utils/chatEnabledState";
 
 export type TChatMetadataConfig = {
   maxConversationTitleLength: number;
@@ -12,6 +13,8 @@ export type TChatMetadataConfig = {
   partyChromeDisplayTimeStampInterval: number;
   shouldRespectConversationHasUnreadMessageToMarkAsRead: boolean;
   relativeValueToRecordUiPerformance: number;
+  /** Chat and group chat are on, so the user can create a group or add people to one. */
+  isGroupChatEnabled: boolean;
 };
 
 /**
@@ -48,6 +51,7 @@ export const useChatMetadataConfig = (): TChatMetadataConfig => {
     relativeValueToRecordUiPerformance:
       data?.relativeValueToRecordUiPerformance ??
       CHAT_METADATA_DEFAULTS.relativeValueToRecordUiPerformance,
+    isGroupChatEnabled: getIsGroupChatEnabled(data),
   };
 };
 

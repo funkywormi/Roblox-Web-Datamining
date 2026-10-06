@@ -5,6 +5,7 @@ import { getConversationMessages } from "../services/chatService";
 import type { TChatApiMessage, TGetConversationMessagesResponse } from "../types/api";
 import type { TChatMessage } from "../types/chat";
 import { toChatMessages } from "../utils/chatTransforms";
+import { isQueryPending } from "../utils/queryStatus";
 
 export type TUseConversationMessagesResult = {
   messages: TChatMessage[];
@@ -149,6 +150,6 @@ export const useConversationMessages = (
     messages,
     fetchNextPage,
     hasNextPage,
-    isLoading: messagesQuery.isLoading,
+    isLoading: isQueryPending(messagesQuery),
   };
 };

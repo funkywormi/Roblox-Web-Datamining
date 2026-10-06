@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, IconButton, TextArea } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import { useChatMetadataConfig } from "../../hooks/useChatMetadataConfig";
-import type { TChatConversation } from "../../types/chat";
+import type { TChatConversation, TRenameResult } from "../../types/chat";
 
 type TChatGroupNamePanelProps = {
   conversation: TChatConversation;
   onBack: () => void;
   onClose: (layoutId: string) => void;
-  onRenameConversation: (layoutId: string, title: string) => void;
+  onRenameConversation: (layoutId: string, title: string) => Promise<TRenameResult>;
 };
 
 const ChatGroupNamePanel = ({
@@ -17,19 +17,40 @@ const ChatGroupNamePanel = ({
   onClose,
   onRenameConversation,
 }: TChatGroupNamePanelProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const { maxConversationTitleLength } = useChatMetadataConfig();
   const [groupName, setGroupName] = useState(conversation.title);
   const trimmedGroupName = groupName.trim();
   const canSave = trimmedGroupName.length > 0;
   const groupNameLengthLabel = `${groupName.length}/${maxConversationTitleLength}`;
+  const [isSaving, setIsSaving] = useState(false);
+  const [isNameModerated, setIsNameModerated] = useState(false);
+  const isMountedRef = useRef(true);
 
-  const saveGroupName = () => {
-    if (!canSave) {
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const saveGroupName = async () => {
+    if (!canSave || isSaving) {
       return;
     }
 
-    onRenameConversation(conversation.layoutId, trimmedGroupName);
+    setIsSaving(true);
+    const result = await onRenameConversation(conversation.layoutId, trimmedGroupName);
+    if (!isMountedRef.current) {
+      return;
+    }
+
+    setIsSaving(false);
+    // A moderated name keeps the panel open so the user sees why and can pick another name.
+    if (result === "moderated") {
+      setIsNameModerated(true);
+      return;
+    }
     onBack();
   };
 
@@ -67,6 +88,7 @@ const ChatGroupNamePanel = ({
             value={groupName}
             onChange={event => {
               setGroupName(event.currentTarget.value.slice(0, maxConversationTitleLength));
+              setIsNameModerated(false);
             }}
             rows={1}
             size="Small"
@@ -76,13 +98,25 @@ const ChatGroupNamePanel = ({
           <span className="react-chat-group-name-editor-count text-caption-medium content-muted">
             {groupNameLengthLabel}
           </span>
+          {isNameModerated && (
+            <span role="alert" className="text-caption-medium content-system-alert">
+              {translate("Message.ConversationTitleModerated")}
+            </span>
+          )}
         </div>
       </div>
       <div className="react-chat-group-name-editor-footer flex shrink-0 gap-small bg-surface-100 padding-medium">
         <Button variant="Standard" size="Small" onClick={onBack}>
           {translate("Action.Cancel")}
         </Button>
-        <Button variant="Emphasis" size="Small" isDisabled={!canSave} onClick={saveGroupName}>
+        <Button
+          variant="Emphasis"
+          size="Small"
+          isDisabled={!canSave || isSaving}
+          onClick={() => {
+            saveGroupName().catch(() => undefined);
+          }}
+        >
           {translate("Action.Save")}
         </Button>
       </div>

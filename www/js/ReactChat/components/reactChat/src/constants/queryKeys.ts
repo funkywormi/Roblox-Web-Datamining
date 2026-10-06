@@ -41,3 +41,6 @@ export const chatQueryKeys = {
   gamePlaceDetails: (placeId: string) =>
     [...chatQueryKeys.all, "gamePlaceDetails", placeId] as const,
 };
+
+/** Profile fields for friend rows: combinedName for display, username for search. */
+export const FRIEND_PROFILE_FIELDS = ["names.combinedName", "names.username"] as const;

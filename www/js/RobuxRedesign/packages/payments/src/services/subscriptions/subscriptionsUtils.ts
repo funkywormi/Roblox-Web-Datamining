@@ -7,6 +7,8 @@ import {
   SubscriptionProductTypeDetails,
 } from "@rbx/client-subscriptions-api/v2";
 
+import type { SubscriptionOffer } from "@rbx/client-subscriptions-api/v2";
+
 export const SubscriptionContext = "subscription";
 export const ROBLOX_PLUS_TARGET_KEY_PREFIX = "RBP-";
 
@@ -53,6 +55,18 @@ const SUBSCRIPTION_PERIOD_TRANSLATION_KEY_MAP: Record<
     singular: "Label.SubscriptionPeriodYear",
     plural: "Label.SubscriptionPeriodYears",
   },
+};
+
+// Bare period-unit nouns ("week"/"weeks"/"month"...) for free-trial copy, where the number is
+// supplied separately by the surrounding string. Distinct from SUBSCRIPTION_PERIOD_TRANSLATION_KEY_MAP,
+// whose plural entries are ICU strings that require a periodCount argument.
+const PERIOD_UNIT_LABEL_KEY_MAP: Record<
+  SubscriptionPeriodType,
+  { singular: string; plural: string }
+> = {
+  [PeriodType.Week]: { singular: "label.week", plural: "label.weeks" },
+  [PeriodType.Month]: { singular: "Label.month", plural: "Label.months" },
+  [PeriodType.Year]: { singular: "label.year", plural: "label.years" },
 };
 
 const PAYMENT_METHOD_MAP: Record<string, PaymentMethod> = {
@@ -145,6 +159,63 @@ export function getSubscriptionPeriodTranslationKey(
     SUBSCRIPTION_PERIOD_TRANSLATION_KEY_MAP[periodType as SubscriptionPeriodType] ??
     SUBSCRIPTION_PERIOD_TRANSLATION_KEY_MAP.Month;
   return periodCount === 1 ? keys.singular : keys.plural;
+}
+
+/**
+ * Translation key for a bare period-unit noun ("week"/"weeks"/"month"...). Unlike
+ * getSubscriptionPeriodTranslationKey, these keys carry no count, so callers translate them with no
+ * periodCount argument and supply the number themselves.
+ */
+function getPeriodUnitLabelKey(periodType: string, count: number): string {
+  const keys =
+    PERIOD_UNIT_LABEL_KEY_MAP[periodType as SubscriptionPeriodType] ??
+    PERIOD_UNIT_LABEL_KEY_MAP.Month;
+  return count === 1 ? keys.singular : keys.plural;
+}
+
+/**
+ * Copy params for a variable-length free trial (7/14-day or 1-month).
+ * `trialPeriodKey`/`billingPeriodKey` are translation keys the caller resolves to
+ * localized, pluralized unit labels; the trial period is distinct from the billing period.
+ */
+export type FreeTrialDisplay = {
+  /** Numeric trial length from the offer (e.g. 1 for a month, 2 for two weeks). */
+  trialDuration: number;
+  /** Trial unit. */
+  trialPeriodType: PeriodType;
+  /** Translation key for the pluralized trial unit ("week"/"weeks"/"month"). */
+  trialPeriodKey: string;
+  /** Translation key for the billing-cadence unit (always count 1, e.g. "month"). */
+  billingPeriodKey: string;
+};
+
+/**
+ * Derives free-trial copy params from a FreeTrial offer. Returns null when the offer is missing
+ * or its period type is unrecognized so callers fall back to legacy copy rather than mislabel a
+ * week trial as "month" (e.g. a stale client seeing a new period type).
+ */
+export function getFreeTrialDisplay(
+  offer: SubscriptionOffer | undefined,
+  billingPeriodType: PeriodType,
+): FreeTrialDisplay | null {
+  const details = offer?.freeTrialOffer;
+  if (!details) {
+    return null;
+  }
+  const { duration, periodType } = details;
+  const isKnownPeriod =
+    periodType === PeriodType.Week ||
+    periodType === PeriodType.Month ||
+    periodType === PeriodType.Year;
+  if (!isKnownPeriod || !Number.isFinite(duration) || duration <= 0) {
+    return null;
+  }
+  return {
+    trialDuration: duration,
+    trialPeriodType: periodType,
+    trialPeriodKey: getPeriodUnitLabelKey(periodType, duration),
+    billingPeriodKey: getPeriodUnitLabelKey(billingPeriodType, 1),
+  };
 }
 
 /**

@@ -97,5 +97,6 @@
     "Label.Type.UserProfile": "User profile",
     "Label.Type.Video": "Video",
     "Label.Type.VoiceChat": "Voice chat",
-    "Label.Type.MarketplaceItem": "Marketplace item"
+    "Label.Type.MarketplaceItem": "Marketplace item",
+    "Label.SomethingWentWrong": "Something went wrong"
 }

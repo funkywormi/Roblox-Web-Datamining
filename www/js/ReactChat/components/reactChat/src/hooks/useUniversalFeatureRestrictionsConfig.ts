@@ -1,8 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
-import { get, post } from "@rbx/core-scripts/http";
-import { useTranslation } from "@rbx/core-scripts/react";
 import environmentUrls from "@rbx/environment-urls";
+import { useLocale } from "@rbx/www-common/i18n";
 import ExperimentationService from "@rbx/experimentation";
 import { translateHtml } from "@rbx/translation-utils";
 import {
@@ -11,17 +10,16 @@ import {
   type UniversalFeatureRestrictionsAnalyticsEvent,
   type UniversalFeatureRestrictionsConfig,
 } from "@rbx/universal-feature-restrictions";
+import chatHttpTransport from "../services/chatHttpTransport";
 import { getCurrentUserId } from "../utils/currentUser";
+import useChatTranslate from "./useChatTranslate";
 
 const PLACEMENT = "Web";
 
 const api = createUniversalFeatureRestrictionsApi({
-  httpGet: async <T>(url: string): Promise<T> => {
-    const response = await get<T>({ url, withCredentials: true });
-    return response.data;
-  },
+  httpGet: <T>(url: string): Promise<T> => chatHttpTransport.get<T>({ url, withCredentials: true }),
   httpPost: async (url: string, body: object): Promise<void> => {
-    await post({ url, withCredentials: true }, body);
+    await chatHttpTransport.post({ url, withCredentials: true }, body);
   },
   userModerationApiUrl: environmentUrls.userModerationApi,
 });
@@ -46,7 +44,8 @@ const ixp = {
 };
 
 const useUniversalFeatureRestrictionsConfig = (): UniversalFeatureRestrictionsConfig => {
-  const { translate, intl } = useTranslation();
+  const translate = useChatTranslate();
+  const locale = useLocale();
 
   const translateHtmlAdapter = useCallback<TranslateHtmlFn>(
     (key, tags, args) => translateHtml(translate, key, tags, args),
@@ -61,10 +60,10 @@ const useUniversalFeatureRestrictionsConfig = (): UniversalFeatureRestrictionsCo
       sendAnalyticsEvent,
       websiteUrl: environmentUrls.websiteUrl,
       placement: PLACEMENT,
-      locale: intl.locale,
+      locale,
       ixp,
     }),
-    [intl.locale, translate, translateHtmlAdapter],
+    [locale, translate, translateHtmlAdapter],
   );
 };
 

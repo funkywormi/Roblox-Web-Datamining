@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import classNames from "classnames";
 import { useQuery } from "@tanstack/react-query";
 import { Button, IconButton } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../../hooks/useChatTranslate";
 import { chatQueryKeys } from "../../../constants/queryKeys";
 import { getProfileInsights } from "../../../services/profileInsightsService";
 import { getCountryRegions } from "../../../services/localeService";
@@ -30,7 +30,7 @@ const ContactCard = ({
   onSeen,
   onRemoveTrustedConnection,
 }: TContactCardProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const friend = conversation.participants[0];
 
   // The card is only mounted while it is the visible screen (ChatDialog renders it conditionally

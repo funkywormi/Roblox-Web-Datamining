@@ -77,7 +77,7 @@ export function isFreeTrialEligible(product?: SubscriptionProductInfo): boolean 
 
 export function toBillingPeriodOption(product: SubscriptionProductInfo): BillingPeriodOption {
   const { localizedPrice, localizedStrikethroughPrice } = product;
-  const trialEndDate = findFreeTrialOffer(product)?.freeTrialOffer?.estimatedTrialEndDate;
+  const freeTrial = findFreeTrialOffer(product)?.freeTrialOffer;
   return {
     productId: product.productKey.id,
     productType: product.productKey.type,
@@ -89,6 +89,10 @@ export function toBillingPeriodOption(product: SubscriptionProductInfo): Billing
           currencyCode: localizedStrikethroughPrice.currencyCode,
         }
       : undefined,
-    freeTrialEndDate: trialEndDate ? new Date(trialEndDate) : undefined,
+    ...(freeTrial?.estimatedTrialEndDate && {
+      freeTrialEndDate: new Date(freeTrial.estimatedTrialEndDate),
+      freeTrialDuration: freeTrial.duration,
+      freeTrialPeriodType: freeTrial.periodType,
+    }),
   };
 }

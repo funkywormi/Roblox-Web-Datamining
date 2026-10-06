@@ -1,4 +1,4 @@
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../../hooks/useChatTranslate";
 import type { TChatConversation } from "../../../types/chat";
 import AvatarHeadshot from "../../AvatarHeadshot";
 
@@ -12,7 +12,7 @@ type TOsaInlineCardProps = {
  * above the message list; the viewer can still chat.
  */
 const OsaInlineCard = ({ conversation }: TOsaInlineCardProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const friend = conversation.participants[0];
   const friendUsernameLabel = friend?.username ? `@${friend.username}` : "";
   const heading = friend

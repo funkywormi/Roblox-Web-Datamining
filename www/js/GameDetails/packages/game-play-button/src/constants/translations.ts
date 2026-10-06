@@ -8,4 +8,6 @@ export const translations = [
   "CommonUI.Controls",
   "Feature.ExperienceDetails",
   "Feature.DownloadLanding",
+  "Feature.Build",
+  "Feature.Friends",
 ];

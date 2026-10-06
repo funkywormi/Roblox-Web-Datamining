@@ -1,4 +1,4 @@
-import type { TChatApiConversation } from "../types/api";
+import type { TChatApiConversation, TGetChatMetadataResponse } from "../types/api";
 import {
   CHAT_CONVERSATION_SOURCE,
   CHAT_MODERATION_TYPE,
@@ -7,10 +7,10 @@ import {
   CHAT_USER_MESSAGE_OPT_IN_STATUS,
 } from "../constants/chatPolicyConstants";
 
-export type TChatMetadataFlags = {
-  isWebChatRegionalityEnabled?: boolean;
-  isWebChatSettingsMigrationEnabled?: boolean;
-};
+export type TChatMetadataFlags = Pick<
+  TGetChatMetadataResponse,
+  "isWebChatRegionalityEnabled" | "isWebChatSettingsMigrationEnabled"
+>;
 
 export type TDerivedChatPolicyFlags = {
   isConversationUnavailableWithUser: boolean;

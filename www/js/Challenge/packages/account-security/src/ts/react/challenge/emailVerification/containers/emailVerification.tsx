@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Modal } from "react-style-guide";
 import { EmailVerifyCodeModalService } from "Roblox";
 
 import { OTP_CONTAINER_ID } from "../app.config";
@@ -86,17 +85,11 @@ const EmailVerification: React.FC = () => {
   /*
    * Rendering helper
    */
-  const getPageContent = () => {
-    const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
-
-    return (
-      <React.Fragment>
-        <BodyElement>
-          <div id={OTP_CONTAINER_ID} />
-        </BodyElement>
-      </React.Fragment>
-    );
-  };
+  const getPageContent = () => (
+    <InlineChallengeBody>
+      <div id={OTP_CONTAINER_ID} />
+    </InlineChallengeBody>
+  );
 
   const renderContent = () => {
     if (isConfirmationModalVisible) {
@@ -118,11 +111,14 @@ const EmailVerification: React.FC = () => {
       return <InlineChallenge titleText="">{getPageContent()}</InlineChallenge>;
     }
 
-    return (
-      <Modal className="modal-modern" backdrop="static" show={isModalVisible}>
-        {getPageContent()}
-      </Modal>
-    );
+    // The email verify-code modal renders its own modal into this container (see
+    // the EmailVerifyCodeModalService.renderEmailVerifyCodeModal call in loadChallenge
+    // above). renderEmailVerifyCodeModal looks the container up synchronously by id, so
+    // it must be a plain element that is already in the DOM — not wrapped in a Foundation
+    // (Radix) Dialog, whose portaled content is not reliably mounted at that moment, which
+    // left an empty, undismissable overlay with no form. Wrapping would also stack a modal
+    // inside the modal's own modal.
+    return <div id={OTP_CONTAINER_ID} data-testid="email-verification-challenge-container" />;
   };
 
   return <React.Fragment>{renderContent()}</React.Fragment>;

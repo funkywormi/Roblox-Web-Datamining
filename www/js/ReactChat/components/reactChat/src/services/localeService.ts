@@ -1,5 +1,6 @@
 import environmentUrls from "@rbx/environment-urls";
-import Intl from "@rbx/core-scripts/intl";
+import { getLocaleFromDocument } from "@rbx/www-common/intl";
+import { localeToLowercaseUnderscore } from "@rbx/www-common/locale";
 import chatHttpTransport from "./chatHttpTransport";
 import type { TCountryRegion, TCountryRegionsResponse } from "../types/api";
 
@@ -8,7 +9,7 @@ import type { TCountryRegion, TCountryRegionsResponse } from "../types/api";
  * account-location profile insight. Mirrors the legacy chat localeService.
  */
 export const getCountryRegions = async (): Promise<Record<string, TCountryRegion>> => {
-  const locale = new Intl().getRobloxLocale();
+  const locale = localeToLowercaseUnderscore(getLocaleFromDocument());
   const body = await chatHttpTransport.get<TCountryRegionsResponse>({
     url: `${environmentUrls.localeApi}/v1/country-regions?locale=${locale}`,
     retryable: true,

@@ -23,29 +23,36 @@ const isBaseTerm = (product: SectionSubscriptionV2Product) =>
   parseRobuxAllowance(product.robuxAmount) === 0 &&
   getMonths(product) !== undefined;
 
-const getFreeTrialEndDate = (product: SectionSubscriptionV2Product): Date | undefined => {
+const getFreeTrial = (product: SectionSubscriptionV2Product) => {
   const freeTrial = product.offers?.find(offer => offer.freeTrial)?.freeTrial;
   if (!freeTrial || !isPeriodType(freeTrial.periodType)) {
     return undefined;
   }
-  return addBillingPeriod(
-    Date.now(),
-    freeTrial.duration,
-    convertPeriodTypeForTranslation(freeTrial.periodType),
-  );
+  // Convert the proto-style period type (e.g. PERIOD_TYPE_WEEK) to the client enum (Week).
+  return {
+    duration: freeTrial.duration,
+    periodType: convertPeriodTypeForTranslation(freeTrial.periodType),
+  };
 };
 
-const toBillingPeriodOption = (product: SectionSubscriptionV2Product): BillingPeriodOption => ({
-  productId: product.subscriptionProductId,
-  productType: SECTION_PRODUCT_TYPE_TO_API[product.subscriptionProductType] ?? "",
-  months: getMonths(product) ?? 1,
-  price: { amount: getMoneyAmount(product.price), currencyCode: product.price.currencyCode },
-  strikethroughPrice: product.strikethroughPrice && {
-    amount: getMoneyAmount(product.strikethroughPrice),
-    currencyCode: product.strikethroughPrice.currencyCode,
-  },
-  freeTrialEndDate: getFreeTrialEndDate(product),
-});
+const toBillingPeriodOption = (product: SectionSubscriptionV2Product): BillingPeriodOption => {
+  const freeTrial = getFreeTrial(product);
+  return {
+    productId: product.subscriptionProductId,
+    productType: SECTION_PRODUCT_TYPE_TO_API[product.subscriptionProductType] ?? "",
+    months: getMonths(product) ?? 1,
+    price: { amount: getMoneyAmount(product.price), currencyCode: product.price.currencyCode },
+    strikethroughPrice: product.strikethroughPrice && {
+      amount: getMoneyAmount(product.strikethroughPrice),
+      currencyCode: product.strikethroughPrice.currencyCode,
+    },
+    freeTrialEndDate: freeTrial
+      ? addBillingPeriod(Date.now(), freeTrial.duration, freeTrial.periodType)
+      : undefined,
+    freeTrialDuration: freeTrial?.duration,
+    freeTrialPeriodType: freeTrial?.periodType,
+  };
+};
 
 export function partitionPlusBillingPeriods(
   products: SectionSubscriptionV2Product[],

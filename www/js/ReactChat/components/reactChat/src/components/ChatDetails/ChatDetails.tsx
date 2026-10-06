@@ -10,9 +10,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useChatMetadataConfig } from "../../hooks/useChatMetadataConfig";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import { getCurrentUserId } from "../../utils/currentUser";
-import type { TChatConversation, TDialogScreen } from "../../types/chat";
+import type { TChatConversation, TDialogScreen, TRenameResult } from "../../types/chat";
 import { getPresenceLabel } from "../../utils/chatPresenceLabels";
 import { presenceDotClassByType } from "../../utils/presenceStyles";
 import AvatarHeadshot from "../AvatarHeadshot";
@@ -27,10 +28,10 @@ export { getReportUrl } from "../../utils/abuseReport";
 type TChatDetailsProps = {
   conversation: TChatConversation;
   onClose: (layoutId: string) => void;
-  onLeaveGroupConversation: (layoutId: string) => void;
-  onRenameConversation: (layoutId: string, title: string) => void;
+  onRenameConversation: (layoutId: string, title: string) => Promise<TRenameResult>;
   onAddFriends: (conversationId: string, userIds: number[]) => void;
-  onRemoveParticipant: (conversationId: string, userId: number) => void;
+  /** Routes the dialog to the remove-member confirmation screen for a participant. */
+  onRequestRemoveParticipant: (layoutId: string, participantId: number) => void;
   onSetScreen: (layoutId: string, screen: TDialogScreen) => void;
   onReportParticipant: (layoutId: string, participantId: number) => void;
 };
@@ -38,14 +39,14 @@ type TChatDetailsProps = {
 const ChatDetails = ({
   conversation,
   onClose,
-  onLeaveGroupConversation,
   onRenameConversation,
   onAddFriends,
-  onRemoveParticipant,
+  onRequestRemoveParticipant,
   onSetScreen,
   onReportParticipant,
 }: TChatDetailsProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
+  const { isGroupChatEnabled } = useChatMetadataConfig();
   const [isAddingFriends, setIsAddingFriends] = useState(false);
   const [isEditingGroupName, setIsEditingGroupName] = useState(false);
   const [menuParticipantId, setMenuParticipantId] = useState<number | null>(null);
@@ -59,6 +60,8 @@ const ChatDetails = ({
     currentUserId != null &&
     conversation.createdBy === currentUserId &&
     !conversation.isUserPending;
+  const canAddFriends =
+    conversation.dialogType === "Group" && !conversation.isUserPending && isGroupChatEnabled;
 
   if (isAddingFriends) {
     return (
@@ -131,7 +134,7 @@ const ChatDetails = ({
                 participants={conversation.participants}
                 containerClassName="react-chat-details-group-avatar shrink-0 radius-circle bg-shift-300"
               />
-              <span className="min-width-none grow-1 text-body-medium content-emphasis text-truncate-end">
+              <span className="min-width-0 grow-1 text-body-medium content-emphasis text-no-wrap text-truncate-end">
                 {conversation.title}
               </span>
               <span className="icon icon-regular-chevron-large-right size-400 shrink-0 content-muted" />
@@ -141,7 +144,7 @@ const ChatDetails = ({
         <div className="react-chat-details-section-label text-caption-medium content-muted">
           {translate("Label.Members")}
         </div>
-        {conversation.dialogType === "Group" && (
+        {canAddFriends && (
           <button
             type="button"
             className="react-chat-details-row flex width-full shrink-0 items-center gap-small bg-none stroke-none padding-x-small padding-y-small text-left cursor-pointer hover:bg-shift-100"
@@ -228,7 +231,7 @@ const ChatDetails = ({
                         as="button"
                         onSelect={() => {
                           setMenuParticipantId(null);
-                          onRemoveParticipant(conversation.id, participant.id);
+                          onRequestRemoveParticipant(conversation.layoutId, participant.id);
                         }}
                       />
                     )}
@@ -244,10 +247,10 @@ const ChatDetails = ({
               variant="Standard"
               size="Medium"
               onClick={() => {
-                onLeaveGroupConversation(conversation.layoutId);
+                onSetScreen(conversation.layoutId, "LeaveGroupConfirmation");
               }}
             >
-              {translate("Label.LeaveChatGroup")}
+              {translate("Action.LeaveGroup")}
             </Button>
           </div>
         )}

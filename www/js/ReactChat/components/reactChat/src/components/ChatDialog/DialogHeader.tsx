@@ -1,13 +1,13 @@
 import classNames from "classnames";
 import type { MouseEvent } from "react";
 import { Badge, IconButton } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
 import {
   DisplayNameBadges,
   useIsPlusBadgeEnabled,
   PLUS_BADGE_ARIA_LABEL,
   PLUS_BADGE_ARIA_LABEL_KEY,
 } from "@rbx/identity-badges";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import { CHAT_MODERATION_TYPE } from "../../constants/chatPolicyConstants";
 import type { TChatConversation } from "../../types/chat";
 import { presenceDotClassByType } from "../../utils/presenceStyles";
@@ -26,7 +26,7 @@ const DialogHeader = ({
   onToggleCollapsed,
   onOpenDetails,
 }: TDialogHeaderProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const primaryParticipant = conversation.participants[0];
   const isPlusBadgeEnabled = useIsPlusBadgeEnabled();
   // SUBS-5048: Plus badge only renders for Direct (1:1) conversations

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Modal } from "react-style-guide";
 import { UpsellService } from "Roblox";
 import usePhoneVerificationContext from "../hooks/usePhoneVerificationContext";
 import { PhoneVerificationActionType } from "../store/action";
@@ -76,17 +75,11 @@ const PhoneVerification: React.FC = () => {
   /*
    * Rendering helpers
    */
-  const getPageContent = () => {
-    const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
-
-    return (
-      <React.Fragment>
-        <BodyElement>
-          <div id={PHONE_ROOT_ELEMENT_ID} />
-        </BodyElement>
-      </React.Fragment>
-    );
-  };
+  const getPageContent = () => (
+    <InlineChallengeBody>
+      <div id={PHONE_ROOT_ELEMENT_ID} />
+    </InlineChallengeBody>
+  );
 
   const renderContent = () => {
     if (isConfirmationModalVisible) {
@@ -108,11 +101,14 @@ const PhoneVerification: React.FC = () => {
       return <InlineChallenge titleText="">{getPageContent()}</InlineChallenge>;
     }
 
-    return (
-      <Modal className="modal-modern" backdrop="static" show={isModalVisible}>
-        {getPageContent()}
-      </Modal>
-    );
+    // The phone upsell renders its own modal into this container (see the
+    // UpsellService.renderPhoneUpsell call in the effect above). renderPhoneUpsell
+    // looks the container up synchronously by id, so it must be a plain element
+    // that is already in the DOM — not wrapped in a Foundation (Radix) Dialog,
+    // whose portaled content is not reliably mounted at that moment, which left
+    // an empty, undismissable overlay with no form. Wrapping would also stack a
+    // modal inside the upsell's own modal.
+    return <div id={PHONE_ROOT_ELEMENT_ID} data-testid="phone-verification-challenge-container" />;
   };
 
   return <React.Fragment>{renderContent()}</React.Fragment>;

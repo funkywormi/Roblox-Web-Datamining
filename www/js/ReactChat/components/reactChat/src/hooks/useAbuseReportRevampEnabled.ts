@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { callBehaviour } from "@rbx/core-scripts/guac";
+import { callBehaviour } from "../services/guacService";
 
 // The abuse-report revamp is gated by the "abuse-reporting-revamp" GUAC behaviour, whose payload
 // exposes an `EnableChat` boolean (parity with the legacy Angular chat, which reads the same

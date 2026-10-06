@@ -330,6 +330,7 @@ function inferCacheActionsFromEnvelope(record: UnknownRecord): TChatRealtimeCach
   // (contact info) and the conversation list (participant names are baked into conversation titles).
   if (type.includes("usertag")) {
     actions.push({ kind: "invalidate_friends_directory" });
+    actions.push({ kind: "invalidate_friend_profiles" });
     actions.push({ kind: "invalidate_user_conversations" });
     return actions;
   }

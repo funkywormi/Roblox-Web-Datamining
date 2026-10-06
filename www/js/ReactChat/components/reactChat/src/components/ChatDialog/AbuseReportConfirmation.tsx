@@ -1,5 +1,5 @@
 import { Button, IconButton } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import type { TChatConversation, TDialogScreen } from "../../types/chat";
 import { useAbuseReportRevampEnabled } from "../../hooks/useAbuseReportRevampEnabled";
 import { navigateAbuseReport } from "../../utils/abuseReport";
@@ -22,7 +22,7 @@ const AbuseReportConfirmation = ({
   onClose,
   onSetScreen,
 }: TAbuseReportConfirmationProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const revampEnabled = useAbuseReportRevampEnabled();
 
   const targetParticipant = conversation.participants.find(

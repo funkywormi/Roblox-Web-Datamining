@@ -23,34 +23,18 @@ export type LayoutSlots = {
 };
 
 const SheetBodySlot = forwardRef<HTMLDivElement, BodyProps>(
-  ({ children, className, hasPaddingX }, ref) => {
-    const combinedRef = (el: HTMLDivElement | null) => {
-      if (el) {
-        el.setAttribute("tabindex", "0");
-        el.addEventListener("focus", (e: FocusEvent) => {
-          if (e.target === el) {
-            const first = el.querySelector<HTMLElement>(
-              "button:not([disabled]), .foundation-web-interactable",
-            );
-            first?.focus();
-          }
-        });
-      }
-      if (typeof ref === "function") ref(el);
-      // eslint-disable-next-line no-param-reassign
-      else if (ref) ref.current = el;
-    };
-
-    return (
-      <SheetBody
-        ref={combinedRef}
-        className={`padding-bottom-large fill ${className ?? ""}`}
-        hasPaddingX={hasPaddingX}
-      >
-        {children}
-      </SheetBody>
-    );
-  },
+  ({ children, className, hasPaddingX }, ref) => (
+    <SheetBody
+      ref={ref}
+      className={`padding-bottom-large fill ${className ?? ""}`}
+      hasPaddingX={hasPaddingX}
+      // Focusable so D-pad spatial navigation (e.g. Android TV webviews) can move into the scrollable
+      // list. Spread because SheetBody's props type omits tabIndex, though it passes it to the div.
+      {...{ tabIndex: 0 }}
+    >
+      {children}
+    </SheetBody>
+  ),
 );
 SheetBodySlot.displayName = "SheetBodySlot";
 

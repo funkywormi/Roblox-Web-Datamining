@@ -34,6 +34,10 @@ export const parseBooleanField = (
   defaultValue: boolean,
   pageContext: TSduiPageContext,
 ): boolean => {
+  if (input === undefined) {
+    return defaultValue;
+  }
+
   if (typeof input === "boolean") {
     return input;
   }

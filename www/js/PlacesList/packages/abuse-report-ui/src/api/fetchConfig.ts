@@ -14,7 +14,9 @@ const fetchConfig = async (
     abuseVector,
     locale,
     entryPoint: "web",
-    version: "4",
+    // Bump only after checking the schema changelog in @rbx/abuse-report-config-types
+    // for changes Web must handle; fetchConfig.test.ts fails until this matches CONFIG_VERSION.
+    version: "5",
   });
   if (serializedAttributes) {
     params.set("attributes", serializedAttributes);

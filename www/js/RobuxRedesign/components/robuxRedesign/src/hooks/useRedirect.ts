@@ -1,6 +1,6 @@
 import { useCallback, useState, useEffect, useMemo } from "react";
+import { UrlSearchParams } from "@rbx/core-lib/url";
 import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
-import { composeQueryString } from "@rbx/core-scripts/util/url";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { PaymentSession } from "../types/buyRobuxPageData";
 import { EXP_FLOW_QUERY_PARAM, EXP_FLOW_QUERY_VALUE } from "../constants/loginRedirect";
@@ -31,7 +31,7 @@ const constructRedirectUrl = ({
   isInExperiment,
   userId,
 }: ConstructRedirectUrlParams) => {
-  const queryString = composeQueryString({
+  const queryString = UrlSearchParams.new({
     analyticId: paymentFlowAnalyticsService.purchaseFlowUuid,
     at: authTicket,
     ctx: CTX_URL_PARAM,
@@ -39,7 +39,7 @@ const constructRedirectUrl = ({
     paymentSessionId,
     returnUrl,
     tuid: userId,
-  });
+  }).toString();
 
   return `${loginRedirectPathname}?${queryString}`;
 };

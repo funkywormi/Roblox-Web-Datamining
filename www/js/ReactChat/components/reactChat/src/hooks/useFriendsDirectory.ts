@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { UserProfileField, useUserProfiles } from "@rbx/user-profiles";
-import { chatQueryKeys } from "../constants/queryKeys";
+import { useUserProfiles } from "@rbx/www-common/user-profiles";
+import { chatQueryKeys, FRIEND_PROFILE_FIELDS } from "../constants/queryKeys";
 import { fetchFriendsPage } from "../services/chatFriendsService";
 import { getUserPresences } from "../services/presenceService";
 import type { TChatParticipant, TPresenceType } from "../types/chat";
 import { getCurrentUserId } from "../utils/currentUser";
+import { isQueryPending } from "../utils/queryStatus";
 
 const toPresence = (presenceValue?: number | string): TPresenceType => {
   if (presenceValue === 1 || presenceValue === "Online") {
@@ -22,9 +23,6 @@ const toPresence = (presenceValue?: number | string): TPresenceType => {
 
 const firstNonEmptyString = (...values: (string | undefined)[]): string | undefined =>
   values.find(value => value != null && value.length > 0);
-
-// combinedName for display, username for search.
-const PROFILE_FIELDS = [UserProfileField.Names.CombinedName, UserProfileField.Names.Username];
 
 // `enabled` gates the fetch: GroupInviteDialog stays mounted while closed, so only fetch when open.
 export const useFriendsDirectory = (
@@ -62,14 +60,20 @@ export const useFriendsDirectory = (
 
   const friendIds = useMemo(() => friendsQuery.data?.ids ?? [], [friendsQuery.data]);
 
-  // Names via the shared @rbx/user-profiles external (same call as legacy watchUserProfiles); skips
-  // on empty ids.
-  const { data: profiles, loading: areNamesLoading } = useUserProfiles(friendIds, PROFILE_FIELDS);
+  const { data: profiles, isLoading: areNamesLoading } = useUserProfiles(
+    friendIds,
+    FRIEND_PROFILE_FIELDS,
+    {
+      enabled: enabled && friendIds.length > 0,
+      // Keep names for the page; user-tag events refresh them. New friends are new keys.
+      staleTime: Infinity,
+    },
+  );
 
   const friends = useMemo<TChatParticipant[]>(() => {
     const presenceByUserId = friendsQuery.data?.presenceByUserId ?? {};
     return friendIds.map(friendId => {
-      const names = profiles?.[friendId]?.names;
+      const names = profiles[friendId]?.names;
       const fallbackName = String(friendId);
       const displayName =
         firstNonEmptyString(names?.combinedName?.trim(), names?.username?.trim()) ?? fallbackName;
@@ -89,6 +93,6 @@ export const useFriendsDirectory = (
   return {
     friends,
     // Cover name loading too, so rows don't flash raw ids before combinedName resolves.
-    isLoading: friendsQuery.isLoading || (friendIds.length > 0 && areNamesLoading),
+    isLoading: isQueryPending(friendsQuery) || (friendIds.length > 0 && areNamesLoading),
   };
 };

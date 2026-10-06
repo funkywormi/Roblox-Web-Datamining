@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Badge } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import type { TChatConversation } from "../../types/chat";
 
 type TMinimizedTrayProps = {
@@ -18,7 +18,7 @@ const MinimizedTray = ({
   onRestoreConversation,
   onCloseConversation,
 }: TMinimizedTrayProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (conversations.length === 0) {
@@ -43,7 +43,7 @@ const MinimizedTray = ({
                 }}
                 aria-label={conversation.title}
               >
-                <span className="block min-width-0 grow-1 text-body-large content-emphasis text-truncate-end text-align-left">
+                <span className="block min-width-0 grow-1 text-body-large content-emphasis text-no-wrap text-truncate-end text-align-left">
                   {conversation.title}
                 </span>
               </button>

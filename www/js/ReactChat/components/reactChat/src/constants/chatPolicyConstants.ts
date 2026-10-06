@@ -15,6 +15,12 @@ export const CHAT_MODERATION_TYPE = {
 
 export type TChatModerationType = (typeof CHAT_MODERATION_TYPE)[keyof typeof CHAT_MODERATION_TYPE];
 
+/** `status` the server returns on a conversation after an update (for example a group rename). */
+export const CHAT_UPDATE_STATUS = {
+  success: "success",
+  moderated: "moderated",
+} as const;
+
 export const CHAT_CONVERSATION_SOURCE = {
   channels: "channels",
   friends: "friends",

@@ -1,5 +1,6 @@
 import type { InfiniteData, QueryClient } from "@tanstack/react-query";
-import { chatQueryKeys } from "../constants/queryKeys";
+import { userProfilesQueryKeys } from "@rbx/www-common/user-profiles";
+import { chatQueryKeys, FRIEND_PROFILE_FIELDS } from "../constants/queryKeys";
 import type { TChatApiConversation, TGetUserConversationsResponse } from "../types/api";
 
 export type TChatRealtimeCacheAction =
@@ -12,6 +13,7 @@ export type TChatRealtimeCacheAction =
     }
   | { kind: "refetch_conversation_messages"; conversationId: string }
   | { kind: "invalidate_friends_directory" }
+  | { kind: "invalidate_friend_profiles" }
   | { kind: "invalidate_presence" }
   | { kind: "invalidate_chat_settings" }
   | { kind: "invalidate_all_conversation_messages" };
@@ -86,6 +88,11 @@ export async function applyChatRealtimeCacheActions(
         return;
       case "invalidate_friends_directory":
         await client.invalidateQueries({ queryKey: chatQueryKeys.friendsDirectoryAll() });
+        return;
+      case "invalidate_friend_profiles":
+        await client.invalidateQueries({
+          queryKey: userProfilesQueryKeys.fields(FRIEND_PROFILE_FIELDS),
+        });
         return;
       case "invalidate_presence":
         await client.invalidateQueries({ queryKey: chatQueryKeys.presenceAll() });

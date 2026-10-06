@@ -9,6 +9,18 @@ export default class TranslationResourceProvider {
       {},
     );
 
+    // Keep the nested keys, and also expose each one as `namespace.key`.
+    translationResources.forEach(translationResource => {
+      const { namespace, resourceMap: sourceMap } = translationResource;
+      if (!namespace) {
+        return;
+      }
+
+      Object.entries(sourceMap).forEach(([key, value]) => {
+        resourceMap[`${namespace}.${key}`] = value;
+      });
+    });
+
     return new TranslationResource(intl, resourceMap, null);
   }
 

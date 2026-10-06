@@ -593,6 +593,8 @@ export const DefaultPlayButton = ({
     case PlayabilityStatus.ContextualPlayabilityAgeGatedByDescriptor:
     case PlayabilityStatus.ContextualPlayabilityExperienceBlockedParentalControls:
     case PlayabilityStatus.ContextualPlayabilityCoreGated:
+    case PlayabilityStatus.ContextualPlayabilityPlaytestDisabled:
+    case PlayabilityStatus.ContextualPlayabilityTrustedFriendRequired:
     default:
       fireEvent?.(counterEvents.Unplayable);
 

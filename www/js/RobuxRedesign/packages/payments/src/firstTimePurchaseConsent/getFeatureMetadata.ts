@@ -1,4 +1,4 @@
-import { EnvironmentUrls } from "@rbx/core-scripts/legacy/Roblox";
+import { EnvironmentUrls } from "@rbx/environment-urls";
 import type { WithApiMetricsFn } from "../withApiMetrics/withApiMetrics";
 
 export type GetFeatureMetadataResponse = {

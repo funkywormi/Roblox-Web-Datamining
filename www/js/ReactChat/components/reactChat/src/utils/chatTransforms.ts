@@ -10,7 +10,7 @@ import type {
   TChatParticipant,
   TPresenceType,
 } from "../types/chat";
-import { deriveChatPolicyFlags } from "../adapters/chatPolicyAdapters";
+import { deriveChatPolicyFlags, type TChatMetadataFlags } from "../adapters/chatPolicyAdapters";
 
 const DEFAULT_AVATAR_URL = "";
 const TIMESTAMP_BREAK_MS = 30_000;
@@ -208,6 +208,7 @@ export const toChatConversation = (
   conversation: TChatApiConversation,
   currentUserId: number | null,
   timestampBreakMs: number = TIMESTAMP_BREAK_MS,
+  metadata?: TChatMetadataFlags,
 ): TChatConversation => {
   const source = conversation.source?.toLowerCase();
   const conversationId =
@@ -224,7 +225,7 @@ export const toChatConversation = (
         ? fallbackTitle
         : (conversation.name ?? "");
 
-  const policyFlags = deriveChatPolicyFlags(conversation, undefined);
+  const policyFlags = deriveChatPolicyFlags(conversation, metadata);
 
   return {
     id: conversationId,
@@ -267,13 +268,19 @@ export const flattenConversationPages = (
   pages: TGetUserConversationsResponse[],
   currentUserId: number | null,
   timestampBreakMs: number = TIMESTAMP_BREAK_MS,
+  metadata?: TChatMetadataFlags,
 ): TChatConversation[] => {
   const seenIds = new Set<string>();
   const conversations: TChatConversation[] = [];
 
   for (const page of pages) {
     for (const apiConversation of page.conversations) {
-      const conversation = toChatConversation(apiConversation, currentUserId, timestampBreakMs);
+      const conversation = toChatConversation(
+        apiConversation,
+        currentUserId,
+        timestampBreakMs,
+        metadata,
+      );
       if (seenIds.has(conversation.id)) {
         continue;
       }

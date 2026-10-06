@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { useEffect, useMemo, useRef } from "react";
 import { Icon } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import { useDialog } from "../../hooks/useDialog";
 import { useChatKeystrokeTelemetry } from "../../hooks/useChatKeystrokeTelemetry";
 import { useChatUiPolicies } from "../../hooks/useChatUiPolicies";
@@ -15,11 +15,12 @@ import {
   getConversationIdForAnalytics,
   sendWebChatConversationRendered,
 } from "../../utils/chatAnalytics";
-import type { TChatConversation, TDialogScreen } from "../../types/chat";
+import type { TChatConversation, TDialogScreen, TRenameResult } from "../../types/chat";
 import ChatDetails from "../ChatDetails/ChatDetails";
 import ChatTimeoutTimer from "../ChatTimeoutTimer";
 import AbuseReportConfirmation from "./AbuseReportConfirmation";
 import ConsentModal from "./ConsentModal/ConsentModal";
+import ConfirmNegativeAction from "./ConfirmNegativeAction";
 import ContactCard from "./ContactCard/ContactCard";
 import DialogHeader from "./DialogHeader";
 import MessageInput from "./MessageInput";
@@ -31,9 +32,11 @@ type TChatDialogProps = {
   onClose: (layoutId: string) => void;
   onLeaveGroupConversation: (layoutId: string) => void;
   onToggleCollapsed: (layoutId: string) => void;
-  onRenameConversation: (layoutId: string, title: string) => void;
+  onRenameConversation: (layoutId: string, title: string) => Promise<TRenameResult>;
   onAddFriends: (conversationId: string, userIds: number[]) => void;
   onRemoveParticipant: (conversationId: string, userId: number) => void;
+  /** Routes the dialog to the remove-member confirmation screen for a participant. */
+  onRequestRemoveParticipant: (layoutId: string, participantId: number) => void;
   onSetScreen: (layoutId: string, screen: TDialogScreen) => void;
   /** Routes the dialog to the in-app abuse-report confirmation screen for a participant. */
   onReportParticipant: (layoutId: string, participantId: number) => void;
@@ -50,7 +53,15 @@ type TChatDialogProps = {
 };
 
 const fallbackScreenTranslationKeys: Record<
-  Exclude<TDialogScreen, "Default" | "Details" | "ContactCard" | "AbuseReportConfirmation">,
+  Exclude<
+    TDialogScreen,
+    | "Default"
+    | "Details"
+    | "ContactCard"
+    | "AbuseReportConfirmation"
+    | "LeaveGroupConfirmation"
+    | "RemoveMemberConfirmation"
+  >,
   string
 > = {
   Pending: "Label.Pending",
@@ -64,6 +75,7 @@ const ChatDialog = ({
   onRenameConversation,
   onAddFriends,
   onRemoveParticipant,
+  onRequestRemoveParticipant,
   onSetScreen,
   onReportParticipant,
   onPromoteFriendPlaceholder,
@@ -73,7 +85,7 @@ const ChatDialog = ({
   isMetadataLoaded,
   isConnectionLost,
 }: TChatDialogProps) => {
-  const { translate } = useTranslation();
+  const translate = useChatTranslate();
   const {
     messages,
     draftMessage,
@@ -154,6 +166,9 @@ const ChatDialog = ({
   // Non-blocking 1:1 OSA inline context card. Only records "seen" while the card is actually
   // visible: open, not minimized, not collapsed, and the blocking consent modal isn't taking over.
   const isDialogVisible = conversation.isOpen && !conversation.isMinimized && !isCollapsedInPlace;
+  const removeMemberTarget = conversation.participants.find(
+    participant => participant.id === conversation.removeMemberTargetId,
+  );
   const { showOsaInlineCard } = useOsaInlineCard(
     conversation,
     useOneToOneOsaContextCards && consentVariant == null && isDialogVisible,
@@ -222,7 +237,11 @@ const ChatDialog = ({
               {conversation.isConversationUnavailableWithUser ? (
                 <div className="flex items-center justify-between gap-small bg-surface-200 padding-medium">
                   <span className="text-body-small content-muted">
-                    {translate("Message.ChatUnavailableWithUser")}
+                    {translate(
+                      "Message.ChatUnavailableWithUser",
+                      undefined,
+                      "At this time, chat is not available with this user.",
+                    )}
                   </span>
                   <span className="icon icon-filled-circle-i size-400 content-system-alert" />
                 </div>
@@ -269,12 +288,48 @@ const ChatDialog = ({
         <ChatDetails
           conversation={conversation}
           onClose={onClose}
-          onLeaveGroupConversation={onLeaveGroupConversation}
           onRenameConversation={onRenameConversation}
           onAddFriends={onAddFriends}
-          onRemoveParticipant={onRemoveParticipant}
+          onRequestRemoveParticipant={onRequestRemoveParticipant}
           onSetScreen={onSetScreen}
           onReportParticipant={onReportParticipant}
+        />
+      ) : conversation.currentScreen === "LeaveGroupConfirmation" ? (
+        <ConfirmNegativeAction
+          title={translate("Action.LeaveGroup")}
+          question={translate("Heading.ConfirmLeaving")}
+          confirmLabel={translate("Action.Leave")}
+          cancelLabel={translate("Action.Stay")}
+          onBack={() => {
+            onSetScreen(conversation.layoutId, "Details");
+          }}
+          onClose={() => {
+            onClose(conversation.layoutId);
+          }}
+          onConfirm={() => {
+            onLeaveGroupConversation(conversation.layoutId);
+          }}
+        />
+      ) : conversation.currentScreen === "RemoveMemberConfirmation" ? (
+        <ConfirmNegativeAction
+          title={translate("Action.Remove")}
+          question={translate("Heading.RemoveUser")}
+          detail={removeMemberTarget?.displayName}
+          confirmLabel={translate("Action.Remove")}
+          cancelLabel={translate("Action.Cancel")}
+          onBack={() => {
+            onSetScreen(conversation.layoutId, "Details");
+          }}
+          onClose={() => {
+            onClose(conversation.layoutId);
+          }}
+          onConfirm={() => {
+            // Back to Details first: the member list refreshes there once the removal succeeds.
+            onSetScreen(conversation.layoutId, "Details");
+            if (removeMemberTarget) {
+              onRemoveParticipant(conversation.id, removeMemberTarget.id);
+            }
+          }}
         />
       ) : conversation.currentScreen === "AbuseReportConfirmation" ? (
         <AbuseReportConfirmation

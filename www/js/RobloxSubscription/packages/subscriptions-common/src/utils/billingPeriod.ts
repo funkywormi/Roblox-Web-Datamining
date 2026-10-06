@@ -12,6 +12,9 @@ export type BillingPeriodOption = {
   price: BillingPeriodPrice;
   strikethroughPrice?: BillingPeriodPrice;
   freeTrialEndDate?: Date;
+  /** Trial length, for the disclosure copy (e.g. "2 weeks free trial"). Set only when a trial applies. */
+  freeTrialDuration?: number;
+  freeTrialPeriodType?: PeriodType;
 };
 
 export function getBillingPeriodMonths(

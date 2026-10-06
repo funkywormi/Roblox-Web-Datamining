@@ -36,6 +36,8 @@ export const readPlusReferralLanding = (search: string): PlusReferralLanding => 
 };
 
 export type PlusReferralLandingContainerProps = {
+  /** Referral rollout, for hosts that do not emit the `subscription-referral-data` meta tag. */
+  isReferralRolloutEnabled?: boolean;
   /**
    * Checkout wiring from the surrounding page. `/plus` has the product loaded and passes it down;
    * the home page omits it and the sheet looks the product up itself.
@@ -53,6 +55,7 @@ export type PlusReferralLandingContainerProps = {
 
 /** Shows the recipient sheet when a referral link lands on the page carrying referral params. */
 const PlusReferralLandingContainer: FC<PlusReferralLandingContainerProps> = ({
+  isReferralRolloutEnabled,
   subscribeButtonProps,
   subscribePrice,
   subscribePeriodType,
@@ -69,6 +72,7 @@ const PlusReferralLandingContainer: FC<PlusReferralLandingContainerProps> = ({
   return (
     <PlusReferralSheet
       invite={landing.kind === "invite" ? landing : undefined}
+      isReferralRolloutEnabled={isReferralRolloutEnabled}
       open={open}
       subscribeButtonProps={subscribeButtonProps}
       subscribeEligibleOffers={subscribeEligibleOffers}
