@@ -5,7 +5,7 @@ import { MouseEventHandler, useState, useEffect } from "react";
 import angular from "angular";
 import { ValueOf } from "@rbx/core-types";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import localStorageService from "@rbx/core-scripts/local-storage";
 import { createSystemFeedback } from "@rbx/core-ui";
 import { Snackbar } from "@rbx/foundation-ui";
@@ -34,7 +34,9 @@ export default function HeaderIconsGroup({
 }: {
   toggleUniverseSearch: MouseEventHandler;
 }) {
-  const { translate } = useTranslation();
+  const tMessages = useTranslations("CommonUI.Messages");
+  const tAlerts = useTranslations("Common.AlertsAndOptions");
+  const tFeatures = useTranslations("CommonUI.Features");
   const user = authenticatedUser();
   const userId = user?.id;
   const isFoundation = useIsTopNavFoundation();
@@ -68,8 +70,11 @@ export default function HeaderIconsGroup({
           },
           () => {
             const untranslatedMessage = layoutConstants.economySystemOutageMessage;
-            const translatedMessage = translate(untranslatedMessage);
-            setRobuxError(translatedMessage || untranslatedMessage);
+            setRobuxError(
+              tMessages.has(untranslatedMessage)
+                ? tMessages(untranslatedMessage)
+                : untranslatedMessage,
+            );
           },
         )
         .finally(() => {
@@ -86,7 +91,7 @@ export default function HeaderIconsGroup({
           setCanAccessStream(guacData.notificationsCanAccessStream);
         },
         () => {
-          setVngMetadataError(translate(layoutConstants.economySystemOutageMessage));
+          setVngMetadataError(tMessages(layoutConstants.economySystemOutageMessage));
         },
       );
     }
@@ -150,7 +155,7 @@ export default function HeaderIconsGroup({
             setCurrencyCode(creditData.currencyCode ?? "USD");
           },
           () => {
-            setCreditError(translate(layoutConstants.economySystemOutageMessage));
+            setCreditError(tMessages(layoutConstants.economySystemOutageMessage));
           },
         )
         .finally(() => {
@@ -193,9 +198,9 @@ export default function HeaderIconsGroup({
         );
 
         if (accountSwitched) {
-          const accountSwitchedMessage = translate(
+          const accountSwitchedMessage = tAlerts(
             layoutConstants.accountSwitchConfirmationKeys.accountSwitchedMessage,
-            { accountName: user.name },
+            { accountName: user.name ?? "" },
           );
           if (isFoundation) {
             setSnackbarMessage(accountSwitchedMessage);
@@ -245,7 +250,7 @@ export default function HeaderIconsGroup({
             onClose={() => {
               setSnackbarMessage(null);
             }}
-            closeIconAriaLabel={translate("Action.Close")}
+            closeIconAriaLabel={tFeatures("Action.Close")}
           />
         )
       ) : (

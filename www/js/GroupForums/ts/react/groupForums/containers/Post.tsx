@@ -1,12 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { withTranslations, WithTranslationsProps } from 'react-utilities';
-import { useHistory, useRouteMatch } from 'react-router-dom';
+import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 import { groupsConfig } from '../translation.config';
 import PostSkeleton from '../components/PostSkeleton';
 import CommentsSection from './CommentsSection';
 import CategoriesList from './CategoriesList';
 import SectionHeader from '../../shared/components/SectionHeader';
-import groupForumsConstants, { CommentVariants } from '../constants/groupForumsConstants';
+import groupForumsConstants, {
+  CommentVariants,
+  FOCUS_COMMENT_PARAM
+} from '../constants/groupForumsConstants';
 import Comment from '../components/Comment';
 import { PostProvider, usePost } from '../contexts/PostContext';
 import { ComposerProvider, useComposer } from '../contexts/ComposerContext';
@@ -25,9 +28,11 @@ import useReplyDisabledState from '../hooks/useReplyDisabledState';
 import ForumTierGateMessage from '../components/ForumTierGateMessage';
 
 function NativeComposerOrTierGate({
-  translate
+  translate,
+  autoFocus
 }: {
   translate: WithTranslationsProps['translate'];
+  autoFocus?: boolean;
 }): JSX.Element {
   const { disabled, showTierGate } = useReplyDisabledState({ translate });
 
@@ -41,7 +46,7 @@ function NativeComposerOrTierGate({
 
   return (
     <div className='group-forums-native-comment-composer'>
-      <CommentComposer showCancelButton={false} disabled={disabled} />
+      <CommentComposer showCancelButton={false} disabled={disabled} autoFocus={autoFocus} />
     </div>
   );
 }
@@ -50,7 +55,19 @@ export type PostProps = {} & WithTranslationsProps;
 
 const Post = ({ translate }: WithTranslationsProps): JSX.Element => {
   const history = useHistory();
+  const location = useLocation();
   const match = useRouteMatch<PostRouteMatchParams>();
+
+  // Read once, because the composer mounts after the parameter has gone from the URL.
+  const [shouldFocusComment] = useState(() =>
+    new URLSearchParams(location.search).has(FOCUS_COMMENT_PARAM)
+  );
+
+  useEffect(() => {
+    if (shouldFocusComment) {
+      history.replace(location.pathname);
+    }
+  }, [shouldFocusComment, history, location.pathname]);
 
   const { isLoadingPost, post, loadingPostError, fetchPost } = usePost();
   const { highlightedCommentId } = useComposer();
@@ -206,7 +223,7 @@ const Post = ({ translate }: WithTranslationsProps): JSX.Element => {
         {!isLoadingPost && useInlineReply && (
           <div className='group-forums-post-comment-composer'>
             <AgeCheckWrapper trigger={EventTriggerReason.WriteComment}>
-              <DesktopPersistentComposer />
+              <DesktopPersistentComposer autoFocus={shouldFocusComment} />
             </AgeCheckWrapper>
           </div>
         )}
@@ -219,7 +236,9 @@ const Post = ({ translate }: WithTranslationsProps): JSX.Element => {
           </React.Fragment>
         )}
       </div>
-      {showNativeCommentComposer && <NativeComposerOrTierGate translate={translate} />}
+      {showNativeCommentComposer && (
+        <NativeComposerOrTierGate translate={translate} autoFocus={shouldFocusComment} />
+      )}
     </div>
   );
 };

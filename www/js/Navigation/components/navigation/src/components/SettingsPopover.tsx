@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useTranslation, TranslationProvider, queryClient } from "@rbx/core-scripts/react";
+import { queryClient } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { Popover as CoreUiPopover } from "@rbx/core-ui";
 import { Popover as FoundationPopover, PopoverContent, PopoverTrigger } from "@rbx/foundation-ui";
 import SettingsIcon from "./SettingsIcon";
 import SettingsMenu from "./SettingsMenu";
+import { navNamespaces } from "../constants/translationNamespaces";
 import { sendAccountSwitcherBlobPresentOnPageLoadEvent } from "../services/eventService";
-import { translations } from "../../component.json";
 import { useIsTopNavFoundation } from "../util/topNavFoundationIxp";
 import { popoverDismissGuard } from "../util/popoverDismissGuard";
 // disabling the metadata call since this is fully released.
@@ -20,7 +22,7 @@ export default function SettingsPopover({
 }: {
   accountNotificationCount?: number;
 }) {
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
   const isFoundation = useIsTopNavFoundation();
   const [isCrossDeviceLoginCodeValidationDisplayed, setCrossDeviceLoginCodeValidationDisplayed] =
     useState(false);
@@ -46,20 +48,22 @@ export default function SettingsPopover({
 
   const triggerLabel =
     accountNotificationCount > 0
-      ? translate("Label.sSettingsNotifications", {
-          notificationCount: formatNumber(accountNotificationCount),
-        }) || `Settings: ${formatNumber(accountNotificationCount)}`
-      : translate("Label.sSettings");
+      ? t.has("Label.sSettingsNotifications")
+        ? t("Label.sSettingsNotifications", {
+            notificationCount: formatNumber(accountNotificationCount),
+          })
+        : `Settings: ${formatNumber(accountNotificationCount)}`
+      : t("Label.sSettings");
 
   const menu = (
     <QueryClientProvider client={queryClient}>
-      <TranslationProvider config={translations}>
-        {isFoundation ? (
-          <SettingsMenu
-            isCrossDeviceLoginCodeValidationDisplayed={isCrossDeviceLoginCodeValidationDisplayed}
-            accountNotificationCount={accountNotificationCount}
-          />
-        ) : (
+      {isFoundation ? (
+        <SettingsMenu
+          isCrossDeviceLoginCodeValidationDisplayed={isCrossDeviceLoginCodeValidationDisplayed}
+          accountNotificationCount={accountNotificationCount}
+        />
+      ) : (
+        <TranslationProviderSCC namespaces={navNamespaces}>
           <div>
             <ul id="settings-popover-menu" className="dropdown-menu">
               <SettingsMenu
@@ -70,8 +74,8 @@ export default function SettingsPopover({
               />
             </ul>
           </div>
-        )}
-      </TranslationProvider>
+        </TranslationProviderSCC>
+      )}
     </QueryClientProvider>
   );
 

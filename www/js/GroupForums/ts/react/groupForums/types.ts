@@ -180,6 +180,7 @@ interface ForumPermissionsState {
   canCreatePostInCategory: (categoryId: string) => boolean;
   canAttachSupportTicketInCategory: (categoryId: string) => boolean;
   canCreateComment: boolean;
+  canCreateCommentInCategory: (categoryId: string) => boolean;
   canPinPost: boolean;
   canLockPost: (post: ForumPost) => boolean;
   canEditPost: (authorId: number) => boolean;

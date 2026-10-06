@@ -52,6 +52,9 @@ export enum CommentVariants {
   Reply = 'reply'
 }
 
+// The card asks for the composer through the URL, which survives the full page load it performs.
+export const FOCUS_COMMENT_PARAM = 'focusComment';
+
 export default {
   urls: {
     reportAbuseRevamp({

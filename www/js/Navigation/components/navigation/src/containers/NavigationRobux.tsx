@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ValueOf } from "@rbx/core-types";
 
 import analytics from "@rbx/core-scripts/payments-flow";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import links from "../constants/linkConstants";
 import { getGuacBehavior, getVngShopSignedRedirectionUrl } from "../services/navigationService";
@@ -10,7 +10,7 @@ import LeaveRobloxPopupDisclaimer from "../components/robux-popover/LeaveRobloxP
 import Link from "../components/NavLink";
 
 export default function NavigationRobux() {
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
   const { buyRobuxUrl } = links;
   const { buyRobux, buyRobuxOnVng } = buyRobuxUrl;
   const user = authenticatedUser();
@@ -92,7 +92,7 @@ export default function NavigationRobux() {
             cssClasses="font-header-2 nav-menu-title text-header robux-menu-btn"
             onClick={onBuyRobuxExternalClick}
           >
-            {translate(buyRobux.name)}
+            {t(buyRobux.name)}
           </Link>
         </React.Fragment>
       ) : (
@@ -101,7 +101,7 @@ export default function NavigationRobux() {
           url={buyRobux.url}
           onClick={onBuyRobuxClick}
         >
-          {translate(buyRobux.name)}
+          {t(buyRobux.name)}
         </Link>
       )}
     </div>

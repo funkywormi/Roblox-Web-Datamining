@@ -52,6 +52,7 @@ export type ErrorCode<T extends ChallengeType> = {
   [ChallengeType.BIOMETRIC]: Biometric.ErrorCode;
   [ChallengeType.CAPTCHA_V2]: CaptchaV2.ErrorCode;
   [ChallengeType.TURNSTILE]: Turnstile.ErrorCode;
+  [ChallengeType.FORCE_PASSWORDLESS_LOGIN]: ForceActionRedirect.ErrorCode;
 }[T];
 
 /*

@@ -25,6 +25,7 @@ const LoginLegacyView = ({ viewModel }: LoginLegacyViewProps): React.JSX.Element
 
   const {
     loginBaseContainerClass,
+    loginBaseAttributes,
     accountSwitcherProps,
     loginForm,
     challengeOverlaysProps,
@@ -36,10 +37,14 @@ const LoginLegacyView = ({ viewModel }: LoginLegacyViewProps): React.JSX.Element
   } = viewModel;
 
   const loginBase = (
-    <div id="login-base" className={loginBaseContainerClass}>
+    <div id="login-base" className={loginBaseContainerClass} {...loginBaseAttributes}>
       {accountSwitcherProps && <LoginAccountSwitcher {...accountSwitcherProps} />}
       {loginForm && (
-        <div className="section-content login-section">
+        <div
+          className="section-content login-section"
+          hidden={loginForm.isHidden}
+          data-testid="login-password-form"
+        >
           <h1 className="login-header">{loginForm.headerText}</h1>
           <LoginForm {...loginForm.formProps} />
           <ForgotCredentialLink

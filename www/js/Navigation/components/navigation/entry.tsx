@@ -3,6 +3,7 @@ import ready from "@rbx/core-scripts/util/ready";
 import { queryClient, renderWithErrorBoundary, TranslationProvider } from "@rbx/core-scripts/react";
 import { Browser, currentBrowser } from "@rbx/core-scripts/util/current-browser";
 import { addExternal } from "@rbx/externals";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { ageBadgeControl } from "./src/util/ageBadgeUtil";
 import LeftNavigation from "./src/leftNav";
 import NavigationRightHeader from "./src/containers/NavigationRightHeader";
@@ -14,6 +15,7 @@ import PostSignupDownloadModalRoot, {
   newUserSessionStorageValue,
 } from "./src/components/PostSignupDownloadModal";
 import { initializeDevelopLink } from "./src/util/developUtil";
+import { initializeLogoLink } from "./src/util/logoUtil";
 import { initNavClickEvents } from "./src/util/navClickUtil";
 import MenuIcon from "./src/containers/MenuIcon";
 import AgeBadge from "./src/components/AgeBadge";
@@ -21,6 +23,7 @@ import setupAuthInterceptor from "./src/services/authInterceptor";
 import { attemptPasskeyUpgrade } from "./src/util/conditionalPasskeyCreate";
 import * as navigation from "./src";
 import { translations } from "./component.json";
+import { navNamespaces } from "./src/constants/translationNamespaces";
 
 import "./src/main.css";
 import "./src/css/_header.css";
@@ -39,6 +42,7 @@ const ageBadgeContainerId = "age-badge-container";
 addExternal(["Roblox", "NavigationService"], navigation);
 cacheUserId();
 initializeDevelopLink();
+initializeLogoLink();
 initNavClickEvents();
 
 // Setup HTTP interceptor to listen for 401 auth codes
@@ -52,9 +56,11 @@ ready(() => {
 
   if (document.getElementById(menuIconContainerId)) {
     renderWithErrorBoundary(
-      <TranslationProvider config={translations}>
-        <MenuIcon />
-      </TranslationProvider>,
+      <TranslationProviderSCC namespaces={navNamespaces}>
+        <TranslationProvider config={translations}>
+          <MenuIcon />
+        </TranslationProvider>
+      </TranslationProviderSCC>,
       document.getElementById(menuIconContainerId),
     );
   }
@@ -62,9 +68,11 @@ ready(() => {
   const ageBadgeVariant = ageBadgeControl();
   if (ageBadgeVariant && document.getElementById(ageBadgeContainerId)) {
     renderWithErrorBoundary(
-      <TranslationProvider config={translations}>
-        <AgeBadge variant={ageBadgeVariant} />
-      </TranslationProvider>,
+      <TranslationProviderSCC namespaces={navNamespaces}>
+        <TranslationProvider config={translations}>
+          <AgeBadge variant={ageBadgeVariant} />
+        </TranslationProvider>
+      </TranslationProviderSCC>,
       document.getElementById(ageBadgeContainerId),
     );
 
@@ -76,18 +84,22 @@ ready(() => {
 
   if (document.getElementById(navigationRobuxContainerId)) {
     renderWithErrorBoundary(
-      <TranslationProvider config={translations}>
-        <NavigationRobux />
-      </TranslationProvider>,
+      <TranslationProviderSCC namespaces={navNamespaces}>
+        <TranslationProvider config={translations}>
+          <NavigationRobux />
+        </TranslationProvider>
+      </TranslationProviderSCC>,
       document.getElementById(navigationRobuxContainerId),
     );
   }
 
   if (document.getElementById(navigationRobuxMobileContainerId)) {
     renderWithErrorBoundary(
-      <TranslationProvider config={translations}>
-        <NavigationRobux />
-      </TranslationProvider>,
+      <TranslationProviderSCC namespaces={navNamespaces}>
+        <TranslationProvider config={translations}>
+          <NavigationRobux />
+        </TranslationProvider>
+      </TranslationProviderSCC>,
       document.getElementById(navigationRobuxMobileContainerId),
     );
   }
@@ -95,9 +107,11 @@ ready(() => {
   if (document.getElementById(rightNavigationHeaderContainerId)) {
     renderWithErrorBoundary(
       <QueryClientProvider client={queryClient}>
-        <TranslationProvider config={translations}>
-          <NavigationRightHeader />
-        </TranslationProvider>
+        <TranslationProviderSCC namespaces={navNamespaces}>
+          <TranslationProvider config={translations}>
+            <NavigationRightHeader />
+          </TranslationProvider>
+        </TranslationProviderSCC>
       </QueryClientProvider>,
       document.getElementById(rightNavigationHeaderContainerId),
     );
@@ -110,9 +124,11 @@ ready(() => {
         const snackbarContainer = document.createElement("div");
         document.body.appendChild(snackbarContainer);
         renderWithErrorBoundary(
-          <TranslationProvider config={translations}>
-            <PasskeyUpgradeSnackbar />
-          </TranslationProvider>,
+          <TranslationProviderSCC namespaces={navNamespaces}>
+            <TranslationProvider config={translations}>
+              <PasskeyUpgradeSnackbar />
+            </TranslationProvider>
+          </TranslationProviderSCC>,
           snackbarContainer,
         );
       }
@@ -122,9 +138,11 @@ ready(() => {
   if (document.getElementById(leftNavigationContainerId)) {
     renderWithErrorBoundary(
       <QueryClientProvider client={queryClient}>
-        <TranslationProvider config={translations}>
-          <LeftNavigation />
-        </TranslationProvider>
+        <TranslationProviderSCC namespaces={navNamespaces}>
+          <TranslationProvider config={translations}>
+            <LeftNavigation />
+          </TranslationProvider>
+        </TranslationProviderSCC>
       </QueryClientProvider>,
       document.getElementById(leftNavigationContainerId),
     );
@@ -135,9 +153,11 @@ ready(() => {
     document.body.appendChild(downloadModalContainer);
     renderWithErrorBoundary(
       <QueryClientProvider client={queryClient}>
-        <TranslationProvider config={translations}>
-          <PostSignupDownloadModalRoot />
-        </TranslationProvider>
+        <TranslationProviderSCC namespaces={navNamespaces}>
+          <TranslationProvider config={translations}>
+            <PostSignupDownloadModalRoot />
+          </TranslationProvider>
+        </TranslationProviderSCC>
       </QueryClientProvider>,
       downloadModalContainer,
     );

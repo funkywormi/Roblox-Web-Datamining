@@ -2911,8 +2911,17 @@ button.btn-generic-more-gray-vertical-sm .btn-text {
     flex: 1
 }
 
+.group-forums-post-preview-reply-area {
+    margin-left: auto
+}
+
 .group-forums-post-preview-reply-button {
     gap: 4px
+}
+
+.group-forums-post-preview-reply-button.disabled {
+    opacity: .5;
+    cursor: not-allowed
 }
 
 .group-forums-inline-reaction-picker {

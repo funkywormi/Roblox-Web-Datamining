@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import ClassNames from "classnames";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { Link, ScrollBar } from "@rbx/core-ui";
 import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
@@ -16,7 +16,7 @@ import { logLeftNavExposure } from "../../util/leftNavIxpUtil";
 const { headerMenuIconClickEvent } = layoutConstants;
 
 export default function LeftNavigation() {
-  const { translate } = useTranslation();
+  const t = useTranslations("Feature.ProfileBadges");
   const [isLeftNavOpen, setIsLeftNavOpen] = useState(false);
   const user = authenticatedUser();
   const nameForDisplay = useLiveUserNameForDisplay(user);
@@ -45,7 +45,7 @@ export default function LeftNavigation() {
       <VerifiedBadgeIcon
         className="verified-badge-icon-header"
         size="Small"
-        titleText={translate("Creator.VerifiedBadgeIconAccessibilityText")}
+        titleText={t("Creator.VerifiedBadgeIconAccessibilityText")}
       />
     </section>
   ) : null;

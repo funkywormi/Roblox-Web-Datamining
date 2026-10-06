@@ -1,6 +1,6 @@
 import { MouseEventHandler, useState } from "react";
 import ClassNames from "classnames";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 
 import {
   Thumbnail2d,
@@ -28,7 +28,7 @@ export function AutocompleteSearchLink({
   suggestion: TGamesAutocompleteSuggestionEntry;
   onClick: MouseEventHandler;
 }) {
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
 
   const listClass = ClassNames("navbar-search-option rbx-clickable-li", {
     "new-selected": selected,
@@ -52,8 +52,8 @@ export function AutocompleteSearchLink({
           />
           <span className="navbar-list-option-text">{searchQuery}</span>
           <span className="navbar-list-option-suffix">
-            {translate("Label.sSearchPhraseV2", {
-              location: translate(gameSearchLink.label),
+            {t("Label.sSearchPhraseV2", {
+              location: t.has(gameSearchLink.label) ? t(gameSearchLink.label) : "",
             })}
           </span>
           <span
@@ -93,8 +93,8 @@ export function AutocompleteSearchLink({
         />
         <span className="navbar-list-option-text">{searchQuery}</span>
         <span className="navbar-list-option-suffix">
-          {translate("Label.sSearchPhraseV2", {
-            location: translate(gameSearchLink.label),
+          {t("Label.sSearchPhraseV2", {
+            location: t.has(gameSearchLink.label) ? t(gameSearchLink.label) : "",
           })}
         </span>
       </Link>
@@ -111,7 +111,7 @@ export function AvatarAutocompleteSearchLink({
   suggestion: TAvatarAutocompleteSuggestionEntry;
   onClick: MouseEventHandler;
 }) {
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
   const listClass = ClassNames("navbar-search-option rbx-clickable-li", {
     "new-selected": selected,
   });
@@ -132,8 +132,8 @@ export function AvatarAutocompleteSearchLink({
         />
         <span className="navbar-list-option-text">{query}</span>
         <span className="navbar-list-option-suffix">
-          {translate("Label.sSearchPhraseV2", {
-            location: translate(avatarSearchLink.label),
+          {t("Label.sSearchPhraseV2", {
+            location: t.has(avatarSearchLink.label) ? t(avatarSearchLink.label) : "",
           })}
         </span>
       </Link>
@@ -152,7 +152,7 @@ export function SearchLink({
   suggestion: UniversalSearchLink;
   onClick: MouseEventHandler;
 }) {
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
 
   const { url, label, icon, foundationIcon } = suggestion;
 
@@ -174,8 +174,8 @@ export function SearchLink({
         />
         <span className="navbar-list-option-text">{searchInput.toLowerCase()}</span>
         <span className="navbar-list-option-suffix">
-          {translate("Label.sSearchPhraseV2", {
-            location: translate(label),
+          {t("Label.sSearchPhraseV2", {
+            location: t.has(label) ? t(label) : "",
           })}
         </span>
       </Link>

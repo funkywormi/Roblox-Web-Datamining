@@ -1619,6 +1619,9 @@ export const renderChallengeFromQueryParameters: RenderChallengeFromQueryParamet
     case ChallengeType.EMAIL_VERIFICATION:
       // Supported via generic challenge rendering.
       return false;
+    case ChallengeType.FORCE_PASSWORDLESS_LOGIN:
+      // Supported via generic challenge rendering.
+      return false;
     case ChallengeType.BLOCK_SESSION:
       return renderBlockSessionChallengeFromQueryParameters(
         containerId,

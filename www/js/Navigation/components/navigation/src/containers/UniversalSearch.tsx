@@ -6,7 +6,7 @@ import {
   KeyboardEventHandler,
   FormEventHandler,
 } from "react";
-import { usePrevious, useDebounce, useTranslation } from "@rbx/core-scripts/react";
+import { usePrevious, useDebounce } from "@rbx/core-scripts/react";
 import { UrlSearchParams } from "@rbx/core-lib/url";
 import * as http from "@rbx/core-scripts/http";
 import { PageNameProvider } from "@rbx/core-scripts/util/page-name";
@@ -42,7 +42,6 @@ export default function UniversalSearch({
 }: {
   isUniverseSearchShown?: boolean;
 }) {
-  const { translate } = useTranslation();
   const [searchInput, setSearchInput] = useState(
     UrlSearchParams.parse(window.location.search).get("keyword") ?? "",
   );
@@ -466,7 +465,6 @@ export default function UniversalSearch({
         onKeyDown,
         onKeyUp,
         isUniverseSearchShown,
-        translate,
         searchSuggestions,
         autocompleteSessionInfo,
         resetSessionInfo,

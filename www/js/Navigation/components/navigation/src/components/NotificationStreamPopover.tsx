@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { Popover as CoreUiPopover } from "@rbx/core-ui";
@@ -18,7 +18,7 @@ import { useIsTopNavFoundation } from "../util/topNavFoundationIxp";
 import { popoverDismissGuard } from "../util/popoverDismissGuard";
 
 export default function NotificationStreamPopover() {
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
   const isFoundation = useIsTopNavFoundation();
 
   const ref = useRef(null);
@@ -60,11 +60,12 @@ export default function NotificationStreamPopover() {
   const formattedCount = formatNumber(unreadCount);
   const ariaLabel =
     unreadCount > 0
-      ? translate("Label.sNotificationsCount", {
-          notificationCount: formattedCount,
-        }) || `Notifications: ${formattedCount}`
-      : translate("Label.sNotifications") ||
-        "Notifications"; /* TODO: remove fallback once Label.sNotifications is added to CommonUI.Features */
+      ? t.has("Label.sNotificationsCount")
+        ? t("Label.sNotificationsCount", { notificationCount: formattedCount })
+        : `Notifications: ${formattedCount}`
+      : t.has("Label.sNotifications")
+        ? t("Label.sNotifications")
+        : "Notifications"; /* TODO: remove fallback once Label.sNotifications is added to CommonUI.Features */
 
   const handleStreamClose = useCallback(() => {
     window.dispatchEvent(new Event("Roblox.NotificationStream.StreamClosed"));

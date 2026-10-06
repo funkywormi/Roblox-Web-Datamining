@@ -5,24 +5,26 @@ import { useCommunityFeatureFreezes } from '../../shared/contexts/CommunityFeatu
 import useForumStore from './useForumStore';
 import useForumTierGate from './useForumTierGate';
 
-type ReplyDisabledState = {
+export type ReplyDisabledState = {
   disabled: boolean;
   disabledTooltip?: string;
   showTierGate?: boolean;
 };
 
-const useReplyDisabledState = ({
-  translate
-}: {
-  translate: TranslateFunction;
-}): ReplyDisabledState => {
-  const { canCreateComment } = useForumPermissions();
-  const { post } = usePost();
-  const { forumsWrite } = useCommunityFeatureFreezes();
-  const isCategoryArchived = useForumStore.use.isCategoryArchived();
-  const { isTierGated, isResolving } = useForumTierGate();
+export type ReplyConditions = {
+  isWriteFrozen: boolean;
+  isCategoryArchived: boolean;
+  canCreateComment: boolean;
+  isPostLocked: boolean;
+};
 
-  if (forumsWrite.isDisabled) {
+// The post cards gather these from the post they render, so the reasons live apart from the
+// contexts that the post page reads them from.
+export const getReplyDisabledState = (
+  { isWriteFrozen, isCategoryArchived, canCreateComment, isPostLocked }: ReplyConditions,
+  translate: TranslateFunction
+): ReplyDisabledState => {
+  if (isWriteFrozen) {
     return {
       disabled: true,
       disabledTooltip: translate('Description.ReplyCommentDisabled')
@@ -36,8 +38,36 @@ const useReplyDisabledState = ({
     return { disabled: true, disabledTooltip: translate('Description.NoReplyPermission') };
   }
 
-  if (post?.isLocked) {
+  if (isPostLocked) {
     return { disabled: true, disabledTooltip: translate('Description.NoReplyLocked') };
+  }
+
+  return { disabled: false };
+};
+
+const useReplyDisabledState = ({
+  translate
+}: {
+  translate: TranslateFunction;
+}): ReplyDisabledState => {
+  const { canCreateComment } = useForumPermissions();
+  const { post } = usePost();
+  const { forumsWrite } = useCommunityFeatureFreezes();
+  const isCategoryArchived = useForumStore.use.isCategoryArchived();
+  const { isTierGated, isResolving } = useForumTierGate();
+
+  const replyState = getReplyDisabledState(
+    {
+      isWriteFrozen: forumsWrite.isDisabled,
+      isCategoryArchived,
+      canCreateComment,
+      isPostLocked: !!post?.isLocked
+    },
+    translate
+  );
+
+  if (replyState.disabled) {
+    return replyState;
   }
 
   // Fail closed until the gate resolves, but without the gate message: the viewer
@@ -53,7 +83,7 @@ const useReplyDisabledState = ({
     };
   }
 
-  return { disabled: false };
+  return replyState;
 };
 
 export default useReplyDisabledState;

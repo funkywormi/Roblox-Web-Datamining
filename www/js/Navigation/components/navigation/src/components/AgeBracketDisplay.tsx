@@ -1,5 +1,5 @@
 import { authenticatedUser, isBlackbirdUser } from "@rbx/core-scripts/meta/user";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 
 import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
 import VerifiedBadgeIcon from "@rbx/www-common/components/verified-badge";
@@ -14,7 +14,8 @@ import { useLiveUserNameForDisplay } from "../hooks/useLiveUserNameForDisplay";
 import Link from "./NavLink";
 
 export default function AgeBracketDisplayContent() {
-  const { translate } = useTranslation();
+  const tBadges = useTranslations("Feature.ProfileBadges");
+  const tSubscription = useTranslations("Feature.RobloxSubscription");
   const user = authenticatedUser();
   const nameForDisplay = useLiveUserNameForDisplay(user);
 
@@ -23,7 +24,7 @@ export default function AgeBracketDisplayContent() {
       <VerifiedBadgeIcon
         className="verified-badge-icon-header"
         size="Small"
-        titleText={translate("Creator.VerifiedBadgeIconAccessibilityText")}
+        titleText={tBadges("Creator.VerifiedBadgeIconAccessibilityText")}
       />
     </section>
   ) : null;
@@ -54,11 +55,11 @@ export default function AgeBracketDisplayContent() {
             <DisplayNameBadges
               isRobloxPlus
               size="Small"
-              plusBadgeAriaLabel={translate(
-                PLUS_BADGE_ARIA_LABEL_KEY,
-                undefined,
-                PLUS_BADGE_ARIA_LABEL,
-              )}
+              plusBadgeAriaLabel={
+                tSubscription.has(PLUS_BADGE_ARIA_LABEL_KEY)
+                  ? tSubscription(PLUS_BADGE_ARIA_LABEL_KEY)
+                  : PLUS_BADGE_ARIA_LABEL
+              }
             />
           </section>
         ) : null}

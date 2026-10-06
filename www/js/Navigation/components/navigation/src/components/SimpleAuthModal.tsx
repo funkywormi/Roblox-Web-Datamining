@@ -2,7 +2,8 @@ import React from "react";
 // TODO: figure out a better way to do this
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { render } from "react-dom";
-import { TranslationProvider, useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import {
   Button,
   Dialog,
@@ -11,7 +12,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import { translations } from "../../component.json";
+import { navNamespaces } from "../constants/translationNamespaces";
 import {
   MODAL_CONTAINER_ID,
   MODAL_TITLE_KEY,
@@ -37,7 +38,7 @@ export const SimpleAuthModal = ({
   bodyCtaKey,
   buttonKey,
 }: SimpleAuthModalComponentProps) => {
-  const { translate } = useTranslation();
+  const t = useTranslations("Authentication.LogoutModal");
   const [open, setOpen] = React.useState<boolean>(true);
 
   // fires once per mount, not again if props change
@@ -53,6 +54,7 @@ export const SimpleAuthModal = ({
     navigateToLoginWithRedirect();
   }, []);
 
+  const translate = (key: string) => (t.has(key) ? t(key) : "");
   const modalTitleText = translate(titleKey ?? MODAL_TITLE_KEY);
   const modalBodyContextText = bodyContextKey ? translate(bodyContextKey) : "";
   const modalBodyCtaText = translate(bodyCtaKey ?? MODAL_BODY_CTA);
@@ -94,9 +96,9 @@ export const renderSimpleAuth = (translationKeys: RenderSimpleAuthTranslationKey
   if (!container) return;
 
   render(
-    <TranslationProvider config={translations}>
+    <TranslationProviderSCC namespaces={navNamespaces}>
       <SimpleAuthModal {...translationKeys} />
-    </TranslationProvider>,
+    </TranslationProviderSCC>,
     container,
   );
 };

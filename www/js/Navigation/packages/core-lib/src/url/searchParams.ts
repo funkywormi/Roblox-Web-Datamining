@@ -6,14 +6,27 @@ const newURLSearchParams = (
   url: ConstructorParameters<typeof URLSearchParams>[0],
 ): Unique<URLSearchParams> => downcast(new URLSearchParams(url));
 
+/** A search parameter value. Numbers and booleans are converted with {@link String}. */
+export type SearchParamValue = string | number | boolean;
+
 /** The various types that can be constructed into a {@link UrlSearchParams}. */
 export type IntoSearchParams =
-  | Readonly<Record<string, string>>
-  | readonly (readonly [string, string])[]
+  | Readonly<Record<string, SearchParamValue>>
+  | readonly (readonly [string, SearchParamValue])[]
   | UrlSearchParams;
 
-const isArray = (params: IntoSearchParams): params is readonly (readonly [string, string])[] =>
-  Array.isArray(params);
+const isArray = (
+  params: IntoSearchParams,
+): params is readonly (readonly [string, SearchParamValue])[] => Array.isArray(params);
+
+const toSearchParamString = (value: SearchParamValue): string => String(value);
+
+const normalizeIntoSearchParams = (
+  params: Exclude<IntoSearchParams, UrlSearchParams>,
+): [string, string][] => {
+  const entries = isArray(params) ? params : Object.entries(params);
+  return entries.map(([key, value]) => [key, toSearchParamString(value)]);
+};
 
 /** Possibly malicious search parameter keys and values that will be removed during sanitization. */
 export const possiblyMaliciousParameters: readonly string[] = [
@@ -40,7 +53,8 @@ const sanitizeSearchParams = (searchParams: URLSearchParams) =>
  * ```
  * const searchParams = UrlSearchParams.new({
  *   foo: "bar",
- *   baz: "42",
+ *   baz: 42,
+ *   qux: true,
  * });
  *
  * const url = someUrl.withSearchParams(searchParams);
@@ -64,7 +78,8 @@ export class UrlSearchParams {
   /**
    * Create a new {@link UrlSearchParams} from key-value pairs in the form of an array or record.
    *
-   * URL encoding is automatically performed where necessary.
+   * Numbers and booleans are converted with {@link String}. URL encoding is automatically performed
+   * where necessary.
    *
    * To perform sanitization, set {@link sanitize} to `true`. See {@link possiblyMaliciousParameters}.
    */
@@ -72,12 +87,7 @@ export class UrlSearchParams {
     if (params instanceof UrlSearchParams) {
       return params;
     }
-    const searchParams = newURLSearchParams(
-      // The constructor of URLSearchParams does not support readonly types,
-      // even though it does not mutate the input parameters.
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      params as ConstructorParameters<typeof URLSearchParams>[0],
-    );
+    const searchParams = newURLSearchParams(normalizeIntoSearchParams(params));
     return UrlSearchParams.fromUnique(sanitize ? sanitizeSearchParams(searchParams) : searchParams);
   }
 
@@ -127,22 +137,33 @@ export class UrlSearchParams {
   /**
    * Returns whether {@link name} is present in the search parameters. If {@link value} is provided,
    * returns whether {@link name} with that particular {@link value} is present the search parameters.
+   *
+   * Numbers and booleans are compared as their {@link String} form.
    */
-  has(name: string, value?: string): boolean {
-    return this.searchParams.has(name, value);
+  has(name: string, value?: SearchParamValue): boolean {
+    return this.searchParams.has(
+      name,
+      value === undefined ? undefined : toSearchParamString(value),
+    );
   }
 
   /**
    * Makes a copy of this {@link UrlSearchParams} and appends {@link name}={@link value} as an
    * additional parameter.
+   *
+   * Numbers and booleans are converted with {@link String}.
    */
-  copyAndAppend(name: string, value: string): UrlSearchParams {
+  copyAndAppend(name: string, value: SearchParamValue): UrlSearchParams {
     const searchParams = newURLSearchParams(this.searchParams);
-    searchParams.append(name, value);
+    searchParams.append(name, toSearchParamString(value));
     return UrlSearchParams.fromUnique(searchParams);
   }
 
-  /** Makes a copy of this {@link UrlSearchParams} and appends all the other provided search parameters. */
+  /**
+   * Makes a copy of this {@link UrlSearchParams} and appends all the other provided search parameters.
+   *
+   * Numbers and booleans are converted with {@link String}.
+   */
   copyAndAppendAll(params: IntoSearchParams): UrlSearchParams {
     const others =
       params instanceof URLSearchParams || params instanceof UrlSearchParams || isArray(params)
@@ -156,21 +177,26 @@ export class UrlSearchParams {
    *
    * If multiple search parameters already exist with the key {@link name}, then they are all
    * removed/replaced with a single {@link name}={@link value} parameter.
+   *
+   * Numbers and booleans are converted with {@link String}.
    */
-  copyAndSet(name: string, value: string): UrlSearchParams {
+  copyAndSet(name: string, value: SearchParamValue): UrlSearchParams {
     const searchParams = newURLSearchParams(this.searchParams);
-    searchParams.set(name, value);
+    searchParams.set(name, toSearchParamString(value));
     return UrlSearchParams.fromUnique(searchParams);
   }
 
   /**
    * Makes a copy of this {@link UrlSearchParams} and deletes all parameters with the key {@link name}.
    * If {@link value} is provided, then only parameters also matching that value are removed.
+   *
+   * Numbers and booleans are compared as their {@link String} form.
    */
-  copyAndDelete(name: string, value?: string): UrlSearchParams {
-    if (this.searchParams.has(name, value)) {
+  copyAndDelete(name: string, value?: SearchParamValue): UrlSearchParams {
+    const stringValue = value === undefined ? undefined : toSearchParamString(value);
+    if (this.searchParams.has(name, stringValue)) {
       const searchParams = newURLSearchParams(this.searchParams);
-      searchParams.delete(name, value);
+      searchParams.delete(name, stringValue);
       return UrlSearchParams.fromUnique(searchParams);
     }
     return this;

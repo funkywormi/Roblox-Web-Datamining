@@ -135,6 +135,10 @@ export function ForumPermissionsProvider({
     return !!getForumCategoryPermissions(forumCategoryId).createBugReports;
   };
 
+  const canCreateCommentInCategory = (forumCategoryId: string) => {
+    return getForumCategoryPermissions(forumCategoryId).createComments;
+  };
+
   return (
     <ForumPermissionsContext.Provider
       value={{
@@ -142,6 +146,7 @@ export function ForumPermissionsProvider({
         canCreatePostInCategory,
         canAttachSupportTicketInCategory,
         canCreateComment: forumsPermissions.createComments,
+        canCreateCommentInCategory,
         canPinPost: forumsPermissions.pinPosts,
         canLockPost,
         canEditPost,

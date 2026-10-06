@@ -150,6 +150,16 @@ export type BlockSession = {
 } & Shared;
 
 /**
+ * The challenge metadata type returned by the GCS for `ForcePasswordlessLogin` with
+ * optional copy overrides. Its challenge ID is carried in the response header.
+ */
+export type ForcePasswordlessLogin = {
+  headerTranslationKey?: string;
+  bodyTranslationKey?: string;
+  actionTranslationKey?: string;
+} & Shared;
+
+/**
  * The challenge metadata type returned by the GCS for `CaptchaV2` with any
  * custom properties added by clients.
  */

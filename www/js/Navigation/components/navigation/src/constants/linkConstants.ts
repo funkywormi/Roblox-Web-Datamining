@@ -143,14 +143,31 @@ export default {
   miscSearchLink,
   newUniversalSearchUrls: [gameSearchLink, ...miscSearchLink] satisfies UniversalSearchLink[],
   settingsUrl: {
-    settings: { url: getAbsoluteUrl("/my/account"), label: "Label.sSettings" },
-    quickLogin: { url: getAbsoluteUrl("/home"), label: "Label.sQuickLogin" },
+    settings: {
+      url: getAbsoluteUrl("/my/account"),
+      label: "Label.sSettings",
+      namespace: "CommonUI.Features",
+    },
+    quickLogin: {
+      url: getAbsoluteUrl("/home"),
+      label: "Label.sQuickLogin",
+      namespace: "Common.AlertsAndOptions",
+    },
     safetySupport: {
       url: getAbsoluteUrl("/help-safety"),
       label: "Label.HelpAndSafety",
+      namespace: "CommonUI.Features",
     },
-    switchAccountKey: { url: getAbsoluteUrl("/home"), label: "Label.sSwitchAccount" },
-    logout: { url: `${environmentUrls.authApi}/v2/logout`, label: "Label.sLogout" },
+    switchAccountKey: {
+      url: getAbsoluteUrl("/home"),
+      label: "Label.sSwitchAccount",
+      namespace: "Common.AlertsAndOptions",
+    },
+    logout: {
+      url: `${environmentUrls.authApi}/v2/logout`,
+      label: "Label.sLogout",
+      namespace: "Common.AlertsAndOptions",
+    },
   },
   buyRobuxUrl: {
     myTransactions: {

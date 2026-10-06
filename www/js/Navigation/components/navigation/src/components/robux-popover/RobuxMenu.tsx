@@ -1,7 +1,7 @@
 import { useEffect, useState, Fragment } from "react";
 import { ValueOf } from "@rbx/core-types";
 import { formatNumber } from "@rbx/core-scripts/format/number";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { Icon, Menu, MenuItem, MenuLabel, MenuSection, MenuSeparator } from "@rbx/foundation-ui";
 import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
 
@@ -35,7 +35,9 @@ export default function RobuxMenu({
   creditDisplayConfig: ValueOf<typeof layoutConstants.creditDisplayConfigVariants>;
   onBuyRobuxExternalClick: () => void;
 }) {
-  const { translate } = useTranslation();
+  const tAlerts = useTranslations("Common.AlertsAndOptions");
+  const tFeatures = useTranslations("CommonUI.Features");
+  const tRedeem = useTranslations("Purchasing.RedeemGameCard");
   const isFoundation = useIsTopNavFoundation();
   const [isWalletDisplayed, setIsWalletDisplayed] = useState(true);
 
@@ -127,7 +129,7 @@ export default function RobuxMenu({
           {isEligibleForVng ? (
             <MenuItem
               value="buyRobuxExternal"
-              title={translate(buyRobuxUrl.buyRobux.label)}
+              title={tAlerts(buyRobuxUrl.buyRobux.label)}
               onSelect={onBuyRobuxExternalClick}
             />
           ) : (
@@ -135,8 +137,8 @@ export default function RobuxMenu({
               value="buyRobux"
               as="a"
               href={buyRobuxUrl.buyRobux.url}
-              title={translate(buyRobuxUrl.buyRobux.label)}
-              trailing={robuxBadgeStr ? translate(robuxBadgeStr) : undefined}
+              title={tAlerts(buyRobuxUrl.buyRobux.label)}
+              trailing={tAlerts.has(robuxBadgeStr) ? tAlerts(robuxBadgeStr) : undefined}
               onSelect={onBuyRobuxClicked}
             />
           )}
@@ -144,9 +146,9 @@ export default function RobuxMenu({
             value="myTransactions"
             as="a"
             href={buyRobuxUrl.myTransactions.url}
-            title={translate(buyRobuxUrl.myTransactions.label)}
+            title={tFeatures(buyRobuxUrl.myTransactions.label)}
           />
-          <MenuItem value="redeem" as="a" href={redeemUrl.url} title={translate(redeemUrl.label)} />
+          <MenuItem value="redeem" as="a" href={redeemUrl.url} title={tRedeem(redeemUrl.label)} />
         </MenuSection>
       </Menu>
     );
@@ -183,7 +185,7 @@ export default function RobuxMenu({
       {isEligibleForVng ? (
         <li>
           <button type="button" className="rbx-menu-item" onClick={onBuyRobuxExternalClick}>
-            {translate(buyRobuxUrl.buyRobux.label)}
+            {tAlerts(buyRobuxUrl.buyRobux.label)}
           </button>
         </li>
       ) : (
@@ -194,10 +196,12 @@ export default function RobuxMenu({
             onClick={onBuyRobuxClicked}
           >
             <span className="buy-robux-link-container">
-              {translate(buyRobuxUrl.buyRobux.label)}
+              {tAlerts(buyRobuxUrl.buyRobux.label)}
               {robuxBadgeStr && (
                 <div className="new-item-pill small">
-                  <span className="new-item-pill-text">{translate(robuxBadgeStr)}</span>
+                  <span className="new-item-pill-text">
+                    {tAlerts.has(robuxBadgeStr) ? tAlerts(robuxBadgeStr) : ""}
+                  </span>
                 </div>
               )}
             </span>
@@ -207,13 +211,13 @@ export default function RobuxMenu({
 
       <li>
         <Link cssClasses="rbx-menu-item" url={buyRobuxUrl.myTransactions.url}>
-          {translate(buyRobuxUrl.myTransactions.label)}
+          {tFeatures(buyRobuxUrl.myTransactions.label)}
         </Link>
       </li>
 
       <li>
         <Link cssClasses="rbx-menu-item" url={redeemUrl.url}>
-          {translate(redeemUrl.label)}
+          {tRedeem(redeemUrl.label)}
         </Link>
       </li>
     </Fragment>

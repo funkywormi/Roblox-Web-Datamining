@@ -1,8 +1,10 @@
 import { ProductType } from "@rbx/client-subscriptions-api/v2";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
-import { subscriptionsV2Api } from "@rbx/payments/services/subscriptions";
+import { resolveReferrerId, subscriptionsV2Api } from "@rbx/payments/services/subscriptions";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+
+import { getEntitledRobux } from "../utils/getEntitledRobux";
 
 import type { SubscriptionButtonProps } from "../components/shared/SubscriptionButton";
 import type {
@@ -10,7 +12,6 @@ import type {
   PeriodType,
   RobloxSubscriptionProductFeatureConfig,
   SubscriptionOffer,
-  SubscriptionProductInfo,
 } from "@rbx/client-subscriptions-api/v2";
 
 /** What the referral sheets need to hand `SubscriptionButton`; the rest is styling they own. */
@@ -18,13 +19,6 @@ export type PlusSubscribeButtonProps = Omit<
   SubscriptionButtonProps,
   "variant" | "size" | "className" | "children"
 >;
-
-/** Entitled Robux decides the tier order. API returns micros (1e6 units = 1 Robux). */
-const getEntitledRobux = (product: SubscriptionProductInfo): number =>
-  Math.floor(
-    (product.productTypeDetails.robloxSubscriptionProductDetails?.featureConfig
-      .currencySubscriptionConfig?.entitledAmountMicros ?? 0) / 1_000_000,
-  );
 
 export type UsePlusSubscribeProductResult = {
   /** `undefined` until the lookup lands, or for good if it fails. */
@@ -50,9 +44,15 @@ export type UsePlusSubscribeProductResult = {
 export const usePlusSubscribeProduct = ({
   enabled = true,
 }: { enabled?: boolean } = {}): UsePlusSubscribeProductResult => {
+  // A referral arrival must not be offered a free trial: the reward and the trial are mutually
+  // exclusive, and subscriptions-service suppresses the offer only when it is told the referrer.
+  // Part of the query key so a referral landing can never be served a cached non-referral product
+  // (whose eligibleOffers would still carry the trial), or the reverse.
+  const referrerId = resolveReferrerId();
+
   // No product means no CTA to offer, which callers treat as nothing to show.
   const { data: product, isLoading } = useQuery({
-    queryKey: ["plus-referrals", "subscribe-product"],
+    queryKey: ["plus-referrals", "subscribe-product", referrerId ?? null],
     enabled,
     // Every referral surface shares this key, so caching keeps them all on the same product.
     staleTime: Infinity,
@@ -63,6 +63,9 @@ export const usePlusSubscribeProduct = ({
           includePurchased: true,
           includeBundles: true,
           skipEligibilityCheck: true,
+          // Omitted from the query string when undefined; the generated client only serializes
+          // parameters it was actually given.
+          referrerId,
         });
       return products.toSorted((a, b) => getEntitledRobux(a) - getEntitledRobux(b)).at(0) ?? null;
     },

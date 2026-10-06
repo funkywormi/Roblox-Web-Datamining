@@ -1,41 +1,41 @@
 .cross-device-login-display-code-modal-title-container {
-    position: relative;
-    height: 28px
+    height: 28px;
+    position: relative
 }
 
 .cross-device-login-display-code-modal-title-button {
-    background: transparent;
+    z-index: 1;
+    background: 0 0;
     border: none;
     outline: none;
-    position: absolute;
-    z-index: 1
+    position: absolute
 }
 
 .cross-device-login-display-code-modal-image {
-    height: 142px;
+    background-image: url(https://images.rbxcdn.com/a3f93b5017745e3f.png);
     background-position: 50%;
-    background-size: auto 142px;
     background-repeat: no-repeat;
-    margin: 12px 0;
-    background-image: url(https://images.rbxcdn.com/97ece22f2b7d710a8d25196c871af810-lock.png)
+    background-size: auto 142px;
+    height: 142px;
+    margin: 12px 0
 }
 
 .cross-device-login-display-qr-code-image {
+    box-sizing: content-box;
+    background-color: #fff;
+    border-radius: 4px;
     height: 128px;
     margin: 12px 0;
-    background-color: #fff;
-    padding: 4px;
-    border-radius: 4px;
-    box-sizing: content-box
+    padding: 4px
 }
 
 .cross-device-login-ph-avatar-image {
-    background-image: url(https://images.rbxcdn.com/80225aae28d3aaa27ebd933f48538099-ph_avatar.png)
+    background-image: url(https://images.rbxcdn.com/337e6eb64b8cb7a1.png)
 }
 
 #contained-modal-title-vcenter {
-    width: 100%;
     text-align: center;
+    width: 100%;
     position: absolute;
     top: -4px
 }
@@ -44,7 +44,7 @@
     min-width: 319px
 }
 
-@media(max-width:319px) {
+@media (max-width:319px) {
     .cross-device-login-display-code-modal {
         padding: 0
     }
@@ -63,8 +63,8 @@
 }
 
 .cross-device-login-display-code-modal .modal-dialog .modal-content .modal-body {
-    margin: 0 12px;
-    text-align: center
+    text-align: center;
+    margin: 0 12px
 }
 
 .cross-device-login-display-code-modal .modal-dialog .modal-content .modal-body .cross-device-login-device-prompt-text {
@@ -80,14 +80,16 @@
 }
 
 .cross-device-login-display-code-modal .modal-dialog .modal-content .modal-body .cross-device-login-device-specific-instruction-text {
-    width: fit-content;
     text-align: justify;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
     margin: 12px auto
 }
 
 .cross-device-login-display-code-modal .modal-dialog .modal-content .modal-body .cross-device-login-avatar-thumbnail {
+    vertical-align: text-top;
     border-radius: 50%;
     width: 160px;
-    height: 160px;
-    vertical-align: text-top
+    height: 160px
 }

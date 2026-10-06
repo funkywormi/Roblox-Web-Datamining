@@ -1,4 +1,5 @@
-// @ts-expect-error Should be removed / fixed once React Chat is out
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Should be removed / fixed once React Chat is out
 import angular from "angular";
 import { MouseEventHandler } from "react";
 import localStorageService from "@rbx/core-scripts/local-storage";
@@ -172,7 +173,7 @@ const getIsVNGLandingRedirectEnabled = async () => {
 
 const cacheUserId = () => {
   const currentUserId = authenticatedUser()?.id?.toString() ?? null;
-  let cachedUserId = null;
+  let cachedUserId: string | null = null;
   try {
     const cached = localStorageService.getLocalStorage(userCacheKey) ?? null;
     if (typeof cached === "string") {

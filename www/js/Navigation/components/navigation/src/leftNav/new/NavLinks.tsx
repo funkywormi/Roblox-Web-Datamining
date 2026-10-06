@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import * as http from "@rbx/core-scripts/http";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useFormatter, useTranslations } from "@rbx/www-common/i18n";
 import { isReferralEnabled as isPlusReferralRolloutEnabled } from "@rbx/core-scripts/meta/subscription";
 import { AuthenticatedUser } from "@rbx/core-scripts/meta/user";
 import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
@@ -155,7 +155,7 @@ const LEFT_NAV_CONTEXT = "leftNav";
 const LEFT_NAV_ENTRY_POINT = "leftNav";
 
 const CommunitiesNavItem = ({ currentPath }: { currentPath: string }) => {
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
   const entrypointImpressionId = useEntrypointImpressionId();
   // Don't count the entry point when already inside communities.
   const isCurrentPath = /^\/([a-z]{2}\/)?communities(\/|$)/.test(currentPath);
@@ -164,7 +164,7 @@ const CommunitiesNavItem = ({ currentPath }: { currentPath: string }) => {
       path="/communities"
       isCurrentPath={isCurrentPath}
       icon="icon-regular-three-people"
-      text={translate("Label.sGroups")}
+      text={t("Label.sGroups")}
       onExpose={
         isCurrentPath
           ? undefined
@@ -192,7 +192,8 @@ const CommunitiesNavItem = ({ currentPath }: { currentPath: string }) => {
 };
 
 const ShopNavItem = () => {
-  const { translate } = useTranslation();
+  const tFeatures = useTranslations("CommonUI.Features");
+  const tShop = useTranslations("Feature.ShopDialog");
   const [shopDialogOpen, setShopDialogOpen] = useState(false);
   return (
     <li>
@@ -207,23 +208,23 @@ const ShopNavItem = () => {
         <span className={iconContainer}>
           <Icon name="icon-regular-building-store" size="Large" />
         </span>
-        <span>{translate("Label.OfficialStore")}</span>
+        <span>{tFeatures("Label.OfficialStore")}</span>
       </button>
       <Dialog
         open={shopDialogOpen}
         size="Medium"
         isModal
         hasCloseAffordance
-        closeLabel={translate("Action.Close")}
+        closeLabel={tFeatures("Action.Close")}
         onOpenChange={() => {
           setShopDialogOpen(false);
         }}
       >
         <DialogContent>
           <DialogBody>
-            <DialogTitle>{translate("Heading.LeavingRoblox")}</DialogTitle>
-            <p>{translate("Description.RetailWebsiteRedirect")}</p>
-            <p>{translate("Description.PurchaseAgeWarning")}</p>
+            <DialogTitle>{tShop("Heading.LeavingRoblox")}</DialogTitle>
+            <p>{tShop("Description.RetailWebsiteRedirect")}</p>
+            <p>{tShop("Description.PurchaseAgeWarning")}</p>
           </DialogBody>
           <DialogFooter className="flex gap-medium justify-end">
             <Button
@@ -232,7 +233,7 @@ const ShopNavItem = () => {
                 setShopDialogOpen(false);
               }}
             >
-              {translate("Action.Cancel")}
+              {tShop("Action.Cancel")}
             </Button>
             <Button
               as="a"
@@ -245,7 +246,7 @@ const ShopNavItem = () => {
                 sendEventWithTarget("clickContinueToAmazonStore", "click", {}, targetTypes.WWW);
               }}
             >
-              {translate("Action.Continue")}
+              {tShop("Action.Continue")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -257,14 +258,14 @@ const ShopNavItem = () => {
 const blackbirdPathRegex = /^\/plus(\/|$)/;
 
 const BlackbirdNavItem = ({ currentPath }: { currentPath: string }) => {
-  const { translate } = useTranslation();
+  const t = useTranslations("Feature.RobloxSubscription");
 
   return (
     <NavItem
       path="/plus"
       isCurrentPath={blackbirdPathRegex.test(currentPath)}
       icon="icon-regular-roblox-plus"
-      text={translate("Label.Blackbird")}
+      text={t("Label.Blackbird")}
     />
   );
 };
@@ -284,7 +285,7 @@ const ReferralNavItem = ({
   onSelect?: () => void;
   onExpose?: () => void;
 }) => {
-  const { translate } = useTranslation();
+  const t = useTranslations("Feature.RobloxSubscription");
   const [showNewBadge, setShowNewBadge] = useState(() => shouldShowReferralNewBadge(entry));
 
   const cardClassName = classNames(
@@ -306,7 +307,7 @@ const ReferralNavItem = ({
       <Icon className="shrink-0" name="icon-regular-roblox-plus" size="Large" />
       <span className="min-width-0 text-truncate-end grow-1 text-align-x-left">{label}</span>
       {showNewBadge ? (
-        <Badge label={translate("Label.New", undefined, "New")} variant="Contrast" />
+        <Badge label={t.has("Label.New") ? t("Label.New") : "New"} variant="Contrast" />
       ) : null}
     </Fragment>
   );
@@ -334,18 +335,19 @@ const ReferralNavItem = ({
  * points share the same destination.
  */
 const BlackbirdReferralNavItem = () => {
-  const { translate, intl } = useTranslation();
-  const rewardAmount = intl.n(REFERRAL_REWARD_ROBUX);
+  const t = useTranslations("Feature.RobloxSubscription");
+  const format = useFormatter();
+  const rewardAmount = format.number(REFERRAL_REWARD_ROBUX);
 
   return (
     <ReferralNavItem
       entry="share"
       href={getAbsoluteUrl(PLUS_REFERRALS_PATH)}
-      label={translate(
-        "Heading.ReferralEntry",
-        { amount: rewardAmount },
-        `Share Plus to get ${rewardAmount} Robux`,
-      )}
+      label={
+        t.has("Heading.ReferralEntry")
+          ? t("Heading.ReferralEntry", { amount: rewardAmount })
+          : `Share Plus to get ${rewardAmount} Robux`
+      }
       onExpose={() => {
         referralEventService.flyoutShareImpression();
       }}
@@ -361,20 +363,21 @@ const BlackbirdReferralNavItem = () => {
  * over the current page — only subscribing navigates — and carries the referrer for credit.
  */
 const BlackbirdJoinReferralNavItem = ({ referral }: { referral: SubscriptionReferral }) => {
-  const { translate, intl } = useTranslation();
+  const t = useTranslations("Feature.RobloxSubscription");
+  const format = useFormatter();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const rewardAmount = intl.n(REFERRAL_REWARD_ROBUX);
+  const rewardAmount = format.number(REFERRAL_REWARD_ROBUX);
   const referrerId = String(referral.senderUserId);
 
   return (
     <Fragment>
       <ReferralNavItem
         entry="join"
-        label={translate(
-          "Heading.ReferralRecipientEntry",
-          { amount: rewardAmount },
-          `Join Plus to get ${rewardAmount} Robux`,
-        )}
+        label={
+          t.has("Heading.ReferralRecipientEntry")
+            ? t("Heading.ReferralRecipientEntry", { amount: rewardAmount })
+            : `Join Plus to get ${rewardAmount} Robux`
+        }
         onSelect={() => {
           referralEventService.flyoutJoinClick(referrerId);
           setIsInviteOpen(true);
@@ -394,7 +397,7 @@ const BlackbirdJoinReferralNavItem = ({ referral }: { referral: SubscriptionRefe
 };
 
 const BlackbirdUpsellNavItem = ({ currentPath }: { currentPath: string }) => {
-  const { translate } = useTranslation();
+  const t = useTranslations("Feature.RobloxSubscription");
 
   if (blackbirdPathRegex.test(currentPath)) {
     return null;
@@ -410,12 +413,12 @@ const BlackbirdUpsellNavItem = ({ currentPath }: { currentPath: string }) => {
     >
       <Icon name="icon-regular-roblox-plus" />
       <span>
-        {translate("Description.ExclusiveBenefits", {
-          product: translate("Label.Blackbird"),
+        {t("Description.ExclusiveBenefits", {
+          product: t("Label.Blackbird"),
         })}
       </span>
       <span className="content-default [text-decoration:underline] [text-decoration-skip-ink:none] [text-underline-offset:3px]">
-        {translate("Action.Subscribe")}
+        {t("Action.Subscribe")}
       </span>
     </a>
   );
@@ -462,7 +465,8 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
     };
   }, []);
 
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
+  const tBadges = useTranslations("Feature.ProfileBadges");
 
   // Not `isBlackbirdUser`: the page-load meta tag still says no on the screen that follows a
   // purchase, which left the recipient entry up and the share entry hidden until a reload.
@@ -533,7 +537,7 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
           id={id}
           displayName={liveNameForDisplay}
           hasVerifiedBadge={user.hasVerifiedBadge}
-          verifiedBadgeLabel={translate("Creator.VerifiedBadgeIconAccessibilityText")}
+          verifiedBadgeLabel={tBadges("Creator.VerifiedBadgeIconAccessibilityText")}
           isPlusSubscriber={isBlackbird}
         />
         {isReferralRolloutEnabled &&
@@ -548,46 +552,46 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
           path="/home"
           isCurrentPath={/^\/([a-z]{2}\/)?home(\/|$)/.test(currentPath)}
           icon="icon-regular-house"
-          text={translate("Label.sHome")}
+          text={t("Label.sHome")}
         />
         <NavItem
           path="/users/profile"
           isCurrentPath={/^\/([a-z]{2}\/)?users\/(\d+\/)?profile(\/|$)/.test(currentPath)}
           icon="icon-regular-person"
-          text={translate("Label.sProfile")}
+          text={t("Label.sProfile")}
         />
         <BlackbirdNavItem currentPath={currentPath} />
         <NavItem
           path="/my/messages/#!/inbox"
           isCurrentPath={/^\/([a-z]{2}\/)?my\/messages(\/|$)/.test(currentPath)}
           icon="icon-regular-speech-bubble-align-center"
-          text={translate("Label.sMessages")}
+          text={t("Label.sMessages")}
           notification={messageUnreadCount ? plusAbbreviate(messageUnreadCount, 500) : undefined}
         />
         <NavItem
           path={friendRequestCount ? "/users/friends#!/friend-requests" : "/users/friends"}
           isCurrentPath={/^\/([a-z]{2}\/)?users\/(\d+\/)?friends(\/|$)/.test(currentPath)}
           icon="icon-regular-two-people"
-          text={translate("Label.Friends")}
+          text={t("Label.Friends")}
           notification={friendRequestCount ? plusAbbreviate(friendRequestCount, 500) : undefined}
         />
         <NavItem
           path="/my/avatar"
           isCurrentPath={/^\/([a-z]{2}\/)?my\/avatar(\/|$)/.test(currentPath)}
           icon="icon-regular-person-standing"
-          text={translate("Label.sAvatar")}
+          text={t("Label.sAvatar")}
         />
         <NavItem
           path="/users/inventory"
           isCurrentPath={/^\/([a-z]{2}\/)?users\/(\d+\/)?inventory(\/|$)/.test(currentPath)}
           icon="icon-regular-backpack"
-          text={translate("Label.sInventory")}
+          text={t("Label.sInventory")}
         />
         <NavItem
           path="/trades"
           isCurrentPath={/^\/([a-z]{2}\/)?trades(\/|$)/.test(currentPath)}
           icon="icon-regular-hand-two-arrows-horizontal"
-          text={translate("Label.sTrade")}
+          text={t("Label.sTrade")}
           notification={tradeInboundCount ? plusAbbreviate(tradeInboundCount, 999) : undefined}
         />
         <CommunitiesNavItem currentPath={currentPath} />
@@ -595,14 +599,14 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
           path={new URL("https://blog.roblox.com")}
           isCurrentPath={false}
           icon="icon-regular-fountain-pen-nib"
-          text={translate("Label.Newsroom")}
+          text={t("Label.Newsroom")}
         />
         <ShopNavItem />
         <NavItem
           path="/giftcards-us"
           isCurrentPath={/^\/([a-z]{2}\/)?giftcards-us(\/|$)/.test(currentPath)}
           icon="icon-regular-gift-card"
-          text={translate("Label.GiftCards")}
+          text={t("Label.GiftCards")}
         />
         {!isBlackbird && !pendingReferral ? (
           <BlackbirdUpsellNavItem currentPath={currentPath} />

@@ -1,5 +1,5 @@
 import { MouseEventHandler } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import NavIcon from "./NavIcon";
 
 export default function UniverseSearchIcon({
@@ -7,13 +7,13 @@ export default function UniverseSearchIcon({
 }: {
   toggleUniverseSearch: MouseEventHandler;
 }) {
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
   return (
     <li className="rbx-navbar-right-search">
       <button
         type="button"
         className="rbx-menu-item btn-navigation-nav-search-white-md"
-        aria-label={translate("Label.sSearch")}
+        aria-label={t("Label.sSearch")}
         onClick={toggleUniverseSearch}
       >
         <NavIcon

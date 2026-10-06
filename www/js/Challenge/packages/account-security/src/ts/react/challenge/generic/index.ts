@@ -640,6 +640,21 @@ export const renderChallenge: RenderChallenge = async ({
       return Promise.resolve(success);
     }
 
+    case ChallengeType.FORCE_PASSWORDLESS_LOGIN: {
+      const { challengeMetadata } = challengeSpecificProperties;
+      const fullParameters: ForceActionRedirectInterface.ChallengeParameters = {
+        forceActionRedirectChallengeType:
+          ForceActionRedirectInterface.ForceActionRedirectChallengeType.ForcePasswordlessLogin,
+        ...challengeBaseProperties,
+        ...challengeMetadata,
+      };
+      const success = ForceActionRedirect.renderChallenge(fullParameters);
+      if (success && challengeBaseProperties.onChallengeDisplayed !== undefined) {
+        challengeBaseProperties.onChallengeDisplayed({ displayed: true });
+      }
+      return Promise.resolve(success);
+    }
+
     case ChallengeType.BIOMETRIC: {
       const { challengeType, challengeMetadata } = challengeSpecificProperties;
       const fullParameters: BiometricInterface.ChallengeParameters = {

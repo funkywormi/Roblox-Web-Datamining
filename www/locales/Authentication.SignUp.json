@@ -264,5 +264,7 @@
     "Subtitle.AddYourBirthday": "Add your birthday to create your Roblox account.",
     "Action.StartPlay": "Start play",
     "Response.PasswordLowComplexity": "Password must contain at least one letter and at least one number or symbol.",
-    "Response.PasswordTooSimilarToUsername": "Password shouldn't be too similar to your username."
+    "Response.PasswordTooSimilarToUsername": "Password shouldn't be too similar to your username.",
+    "Header.CloseWithoutFinishing": "Close without finishing?",
+    "Subtitle.YoureAlmostThere": "You're almost there. If you close now, your account won't be fully created and you won't be able to play Roblox."
 }

@@ -1219,6 +1219,9 @@
     "Label.Dimension.PlacementType.Unknown": "Unknown",
     "Label.Dimension.AcquisitionSource.Moments": "Moments",
     "Description.Dimension.AcquisitionSource.Moments": "Includes joins from the Moments video feed",
+    "Description.ExperienceLaunchTime": "The time to first render of the experience after launching via the in app button, selectable as the P50 or P90 value; high values can indicate excessive usage of ReplicatedFirst/ReplicatedStorage and an opportunity to use StreamingEnabled.",
+    "Label.Quota.ExperienceLaunchTime": "High P50 Experience Launch Time",
+    "Label.Metric.ExperienceLaunchTime": "Experience Launch Time",
     "Label.Dimension.MetricResultType": "Result type",
     "Label.Dimension.MetricResultType.CIUpper": "CI upper bound",
     "Label.Dimension.MetricResultType.Mean": "Mean"

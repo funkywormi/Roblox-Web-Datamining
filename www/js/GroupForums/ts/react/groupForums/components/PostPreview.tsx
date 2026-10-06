@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useMemo, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { withTranslations, WithTranslationsProps } from 'react-utilities';
 import { useHistory } from 'react-router-dom';
@@ -13,7 +13,7 @@ import PostPreviewInlineReactions, {
   REACTION_PICKER_POPOVER_CLASS
 } from './PostPreviewInlineReactions';
 import AnimatedAbbreviatedCount from '../../shared/components/AnimatedAbbreviatedCount';
-import groupForumsConstants from '../constants/groupForumsConstants';
+import groupForumsConstants, { FOCUS_COMMENT_PARAM } from '../constants/groupForumsConstants';
 import PostMenu, { POST_MENU_CLASS } from './PostMenu';
 import {
   POST_PREVIEW_TICKET_STATUS_CLASS,
@@ -21,12 +21,20 @@ import {
 } from './supportTicket/SupportTicketStatusPill';
 import useForumStore from '../hooks/useForumStore';
 import { useForumExperiments } from '../contexts/ForumExperimentsContext';
+import { useForumPermissions } from '../contexts/ForumPermissionsContext';
+import { CommunityFeatureFreezesContext } from '../../shared/contexts/CommunityFeatureFreezesContext';
+import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
 import '../../../../css/tailwind.css';
 import Message from '../../shared/components/content/MessageContent';
 import { logGroupForumsClickEvent, logGroupPageExposureEvent } from '../../shared/utils/logging';
-import { EventContext, EventType } from '../../shared/constants/eventConstants';
+import { EventContext, EventTriggerReason, EventType } from '../../shared/constants/eventConstants';
 import { getDisplayContent, hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import ScrollFlashOverlay from './ScrollFlashOverlay';
+import ConditionalTooltip from '../../shared/components/ConditionalTooltip';
+import AccessibleDivButton from '../../shared/components/AccessibleDivButton';
+import AgeCheckWrapper from './AgeCheckWrapper';
+import { getReplyDisabledState } from '../hooks/useReplyDisabledState';
+import useGuacConfig from '../../shared/hooks/useGuacConfig';
 import useLongPress from '../hooks/useLongPress';
 import renderHighlightedText from '../utils/renderHighlightedText';
 import ContentPreviewCard from '../../shared/components/ContentPreviewCard';
@@ -39,6 +47,8 @@ const POST_EXPOSURE_THRESHOLD = 0.75;
 const POST_PREVIEW_MENU_CLASS = 'group-posts-preview-menu';
 const POST_PREVIEW_INLINE_REACTIONS_CLASS = 'post-preview-inline-reactions';
 const POST_PREVIEW_MOBILE_OVERLAY_CLASS = 'post-preview-inline-reactions-mobile-overlay';
+const POST_PREVIEW_REPLY_BUTTON_CLASS = 'group-forums-post-preview-reply-button';
+const POST_PREVIEW_REPLY_AREA_CLASS = 'group-forums-post-preview-reply-area';
 
 // Module-scope so the optional callbacks' defaults keep a stable identity across renders.
 const NOOP = (): void => undefined;
@@ -53,6 +63,8 @@ const POST_NAV_BLOCK_SELECTOR = [
   `.${POST_PREVIEW_INLINE_REACTIONS_CLASS}`,
   `.${POST_PREVIEW_MOBILE_OVERLAY_CLASS}`,
   `.${REACTION_PICKER_POPOVER_CLASS}`,
+  `.${POST_PREVIEW_REPLY_BUTTON_CLASS}`,
+  `.${POST_PREVIEW_REPLY_AREA_CLASS}`,
   `.${FORUM_MEDIA_ATTACHMENT_CLASS}`
 ].join(', ');
 
@@ -98,6 +110,11 @@ const PostPreview = ({
   const history = useHistory();
   const blockedUserList = useForumStore.use.blockedUserList();
   const setReturnToCategoryScrollTop = useForumStore.use.setReturnToCategoryScrollTop();
+  const { canCreateCommentInCategory } = useForumPermissions();
+  const { features } = useCommunityProductFeatures();
+  // The About tab mounts these cards outside the freeze provider, where the hook throws. Reading
+  // the context takes its permissive default there and the real value on the category feed.
+  const { forumsWrite } = useContext(CommunityFeatureFreezesContext);
   const {
     fetchSubscriberExperimentValues,
     inlineEngagementExperimentConfig,
@@ -107,6 +124,25 @@ const PostPreview = ({
   // row and then swap it, so the row holds its space and waits instead.
   const isExperimentResolved = inlineEngagementExperimentConfig != null;
   const showInlineReactions = inlineEngagementExperimentConfig?.isReactionsEnabled === true;
+  const { data: groupDetailsUi } = useGuacConfig('group-details-ui');
+  const canCreateComment = canCreateCommentInCategory(post.categoryId);
+  // When age checks are enabled, keep the button for viewers who need verification so it can
+  // open the dialog. Otherwise, viewers without comment permission see the reply count.
+  const needsAgeVerification =
+    groupDetailsUi?.eligibleForWritingTwoWayCommunications === 'AgeVerificationRequired';
+  const replyState = getReplyDisabledState(
+    {
+      isWriteFrozen: forumsWrite.isDisabled,
+      isCategoryArchived,
+      canCreateComment,
+      isPostLocked: post.isLocked
+    },
+    translate
+  );
+  const showReplyButton =
+    inlineEngagementExperimentConfig?.isCommentsEnabled === true &&
+    !forumsWrite.isDisabled &&
+    (canCreateComment || (features.ForumsAgeCheck && needsAgeVerification));
 
   const openPost = () => {
     setReturnToCategoryScrollTop(document.documentElement.scrollTop);
@@ -158,6 +194,47 @@ const PostPreview = ({
     if (post.commentCount <= 0) return 0;
     return post.commentCount - 1; // We don't count the first comment as a reply
   }, [post.commentCount]);
+
+  const onPressReply = useCallback(() => {
+    const focusQuery = `?${FOCUS_COMMENT_PARAM}=true`;
+
+    onOpened?.();
+
+    logGroupForumsClickEvent({
+      groupId: post.groupId,
+      clickTargetType: 'inlineReply',
+      clickTargetId: post.id
+    });
+
+    if (hasRouter) {
+      const postRoute = groupForumsConstants.router.getPostRoute(
+        categoryShortId,
+        categoryName,
+        post.shortId,
+        post.name
+      );
+      setReturnToCategoryScrollTop(document.documentElement.scrollTop);
+      history.push(`${postRoute}${focusQuery}`);
+      document.documentElement.scrollTop = 0;
+    } else {
+      const postUrl = groupForumsConstants.deepLinks.groupForumPostUrl(
+        post.groupId,
+        categoryShortId,
+        categoryName,
+        post.shortId,
+        post.name
+      );
+      window.location.href = `${postUrl}${focusQuery}`;
+    }
+  }, [
+    hasRouter,
+    history,
+    categoryShortId,
+    categoryName,
+    post,
+    setReturnToCategoryScrollTop,
+    onOpened
+  ]);
 
   const [isCardPickerOpen, setIsCardPickerOpen] = useState(false);
 
@@ -223,44 +300,90 @@ const PostPreview = ({
 
   const hasReactions = reactions.length > 0;
   const hasStatuses = isUnread || (showPinned && isPinned) || isLocked;
-  const renderReplyCount = () => (
-    <div className='group-posts-preview-meta-data-replies text-default flex-shrink-0'>
-      <span className='group-posts-preview-replies-icon' />
-      <AnimatedAbbreviatedCount variant='reply' value={replyCount} />{' '}
-      {replyCount === 1 ? translate('Label.Reply') : translate('Label.Replies')}
-    </div>
-  );
+  const renderReplyArea = () => {
+    if (showReplyButton) {
+      return (
+        <div
+          className={`${POST_PREVIEW_REPLY_AREA_CLASS} flex-shrink-0`}
+          role='presentation'
+          // The age check stops propagation before the card can hold the link, and stopping
+          // propagation leaves the href alone, so the link is stopped here first. The dialog it
+          // opens reports through here from a portal, and its own buttons keep their default.
+          onClickCapture={e => {
+            if (e.currentTarget.contains(e.target as Node)) e.preventDefault();
+          }}>
+          <ConditionalTooltip
+            id={`post-preview-reply-tooltip-${post.id}`}
+            position='left-center'
+            content={replyState.disabledTooltip}
+            enabled={replyState.disabled}
+            containerClassName='flex-shrink-0'>
+            <AgeCheckWrapper
+              groupId={post.groupId}
+              postId={post.id}
+              messageId={post.firstComment.id}
+              trigger={EventTriggerReason.InteractComment}>
+              <AccessibleDivButton
+                aria-disabled={replyState.disabled}
+                className={classNames(
+                  POST_PREVIEW_REPLY_BUTTON_CLASS,
+                  'group-forums-comment-reactions-reaction outline-none flex-shrink-0',
+                  { disabled: replyState.disabled }
+                )}
+                onPointerDown={e => e.stopPropagation()}
+                onPointerUp={e => e.stopPropagation()}
+                onClick={replyState.disabled ? undefined : onPressReply}>
+                <span className='group-forums-comment-reply-icon' />
+                {translate('Action.Reply')}
+              </AccessibleDivButton>
+            </AgeCheckWrapper>
+          </ConditionalTooltip>
+        </div>
+      );
+    }
+
+    return (
+      <div className='group-posts-preview-meta-data-replies text-default flex-shrink-0'>
+        <span className='group-posts-preview-replies-icon' />
+        <AnimatedAbbreviatedCount variant='reply' value={replyCount} />{' '}
+        {replyCount === 1 ? translate('Label.Reply') : translate('Label.Replies')}
+      </div>
+    );
+  };
 
   const renderMetaData = () => {
     if (!isExperimentResolved) {
       return <div className='group-posts-preview-meta-data' />;
     }
 
-    if (showInlineReactions) {
-      return (
-        <div className='group-posts-preview-meta-data'>
+    // The separator introduces the reply count, so it goes away with the Reply button.
+    const showLegacyReactions = !showInlineReactions && hasReactions;
+    const showSeparator = !showReplyButton && showLegacyReactions;
+
+    return (
+      <div
+        className={classNames('group-posts-preview-meta-data', {
+          'gap-small': showLegacyReactions && showReplyButton
+        })}>
+        {showInlineReactions && (
           <PostPreviewInlineReactions
             post={post}
             isCategoryArchived={isCategoryArchived}
             isOpenRequested={isCardPickerOpen}
             onOpenRequestHandled={() => setIsCardPickerOpen(false)}
           />
-          {renderReplyCount()}
-        </div>
-      );
-    }
-
-    return (
-      <div className='group-posts-preview-meta-data'>
-        {hasReactions && (
-          <React.Fragment>
-            <div className='group-forums-post-preview-meta-data-reactions text-default'>
-              <PostPreviewReactions reactions={reactions} />
-            </div>
-            <div className='group-posts-preview-meta-data-separator'>{META_DATA_SEPARATOR}</div>
-          </React.Fragment>
         )}
-        {renderReplyCount()}
+        {showLegacyReactions && (
+          <div className='group-posts-preview-meta-data-reactions text-default'>
+            <PostPreviewReactions reactions={reactions} />
+          </div>
+        )}
+        {showSeparator && (
+          <div className='group-posts-preview-meta-data-separator flex-shrink-0'>
+            {META_DATA_SEPARATOR}
+          </div>
+        )}
+        {renderReplyArea()}
       </div>
     );
   };
@@ -287,6 +410,8 @@ const PostPreview = ({
       data-is-locked={isLocked}
       data-inline-reactions={showInlineReactions}
       onClickCapture={e => {
+        // Portaled dialogs handle their own clicks outside the card.
+        if (!e.currentTarget.contains(e.target as Node)) return;
         if (consumeLongPressClick()) {
           // Consume the release click before ContentPreviewCard handles navigation.
           e.preventDefault();

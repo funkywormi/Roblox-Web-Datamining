@@ -11,12 +11,14 @@ import {
   type ResolvedAppDownload,
 } from "@rbx/app-download";
 import { DialogTitle } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { useTopNavDownloadButton } from "../util/topNavDownloadButtonIxp";
+import { useAppDownloadTranslate } from "../hooks/useAppDownloadTranslate";
 
 export default function DownloadAppNavItem() {
-  const { translate } = useTranslation();
+  const t = useTranslations("Feature.DownloadLanding");
+  const translate = useAppDownloadTranslate();
   const isEnabled = useTopNavDownloadButton();
   const { resolveTokenizedHref, logExposure } = useAppDownload({
     linkId: window.location.href,
@@ -56,13 +58,13 @@ export default function DownloadAppNavItem() {
     <div className="flex flex-col gap-xlarge padding-xlarge">
       <div className="flex flex-col gap-xsmall">
         <DialogTitle className="text-heading-medium content-emphasis padding-none">
-          {translate("Heading.DownloadConfirmation")}
+          {t("Heading.DownloadConfirmation")}
         </DialogTitle>
         <p
           className="text-body-large"
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
-            __html: `${translate("Label.FollowInstallSteps")} ${translate("Label.RetryDownload", {
+            __html: `${t("Label.FollowInstallSteps")} ${t("Label.RetryDownload", {
               startLink: `<a href="${retryHref}" class="download-link-underline">`,
               endLink: "</a>",
             })}`,
@@ -84,7 +86,7 @@ export default function DownloadAppNavItem() {
   return (
     <li className="!padding-y-xsmall !padding-left-xsmall !padding-right-medium">
       <DownloadButton
-        text={translate("Action.Download") || "Download"}
+        text={t.has("Action.Download") ? t("Action.Download") : "Download"}
         variant="Emphasis"
         size="Small"
         download={download}

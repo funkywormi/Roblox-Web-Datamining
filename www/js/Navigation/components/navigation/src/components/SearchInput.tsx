@@ -9,7 +9,8 @@ import React, {
 } from "react";
 import classNames from "classnames";
 import { sendEvent } from "@rbx/core-scripts/event-stream";
-import { useTranslation, useOnClickOutside } from "@rbx/core-scripts/react";
+import { useOnClickOutside } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { SearchLandingService } from "@rbx/core-scripts/legacy/Roblox";
 import { PageNameProvider } from "@rbx/core-scripts/util/page-name";
 import events from "../constants/searchEventStreamConstants";
@@ -47,7 +48,7 @@ export default function SearchInput({
   autocompleteSessionInfo: string;
   resetSessionInfo: () => void;
 }) {
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
   const isFoundation = useIsTopNavFoundation();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLUListElement | null>(null);
@@ -150,7 +151,7 @@ export default function SearchInput({
                 className="form-control input-field new-input-field"
                 value={searchInput}
                 onChange={onChange}
-                placeholder={translate("Label.sSearch")}
+                placeholder={t("Label.sSearch")}
                 maxLength={120}
                 onFocus={onFocus}
                 onBlur={onBlur}
@@ -190,7 +191,7 @@ export default function SearchInput({
               data-testid="navigation-search-input-search-button"
               className="input-addon-btn"
               type="submit"
-              aria-label={translate("Label.sSearch")}
+              aria-label={t("Label.sSearch")}
             >
               <NavIcon
                 legacyClass="icon-common-search-sm"

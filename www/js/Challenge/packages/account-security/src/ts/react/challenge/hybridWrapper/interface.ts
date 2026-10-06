@@ -50,6 +50,7 @@ export type OnChallengeCompletedData<T extends ChallengeType> = {
   [ChallengeType.PHONE_VERIFICATION]: PhoneVerification.OnChallengeCompletedData;
   [ChallengeType.EMAIL_VERIFICATION]: EmailVerification.OnChallengeCompletedData;
   [ChallengeType.BLOCK_SESSION]: never;
+  [ChallengeType.FORCE_PASSWORDLESS_LOGIN]: never;
   [ChallengeType.BIOMETRIC]: Biometric.OnChallengeCompletedData;
   [ChallengeType.CAPTCHA_V2]: CaptchaV2.OnChallengeCompletedData;
   [ChallengeType.TURNSTILE]: Turnstile.OnChallengeCompletedData;

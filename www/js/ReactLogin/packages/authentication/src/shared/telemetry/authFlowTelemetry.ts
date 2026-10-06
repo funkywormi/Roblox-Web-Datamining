@@ -1,5 +1,5 @@
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import { createFireTelemetryHistogram } from "@rbx/web-telemetry/v2/histogram";
+import { observabilityRegistry, trackCounter } from "../../observability";
 
 export const authFlow = {
   login: "login",
@@ -109,11 +109,10 @@ export type AuthFlowTelemetryConfig = {
 type BaseAttributes = {
   flow: AuthFlow;
   source: AuthSource;
-  variant?: AuthVariant;
+  variant: AuthVariant | "unspecified";
 };
 
-const fireCounter = createFireTelemetryCounter("WebAuthentication");
-const fireHistogram = createFireTelemetryHistogram("WebAuthentication", {});
+const fireHistogram = createFireTelemetryHistogram(observabilityRegistry.featureName, {});
 
 const suppressTelemetryFailure = (send: () => void): void => {
   try {
@@ -132,21 +131,14 @@ export const createAuthFlowTelemetry = ({
   const baseAttributes: BaseAttributes = {
     flow,
     source,
-    ...(variant ? { variant } : {}),
+    variant: variant ?? "unspecified",
   };
+  // Histograms are not tracked by the framework; retain their existing labels.
+  const histogramAttributes = { flow, source, ...(variant ? { variant } : {}) };
   let flowStartedAt: number | undefined;
   let requestStartedAt: number | undefined;
   let requestIsUserInitiated = true;
   let isFlowCompleted = false;
-
-  const recordCounter = (
-    name: (typeof authTelemetryCounters)[keyof typeof authTelemetryCounters],
-    attributes?: Record<string, string | boolean>,
-  ): void => {
-    suppressTelemetryFailure(() => {
-      fireCounter(name, { ...baseAttributes, ...attributes });
-    });
-  };
 
   const recordDuration = (
     name: (typeof authTelemetryHistograms)[keyof typeof authTelemetryHistograms],
@@ -160,7 +152,7 @@ export const createAuthFlowTelemetry = ({
     suppressTelemetryFailure(() => {
       fireHistogram(
         name,
-        { ...baseAttributes, method, ...attributes },
+        { ...histogramAttributes, method, ...attributes },
         Math.max(0, now() - startedAt),
       );
     });
@@ -170,60 +162,93 @@ export const createAuthFlowTelemetry = ({
     pageMounted: () => {
       flowStartedAt = now();
       isFlowCompleted = false;
-      recordCounter(authTelemetryCounters.pageMounted);
+      suppressTelemetryFailure(() =>
+        trackCounter(authTelemetryCounters.pageMounted, baseAttributes),
+      );
     },
     formReady: (primaryActionEnabled = true) => {
-      recordCounter(authTelemetryCounters.formReady, { primaryActionEnabled });
+      suppressTelemetryFailure(() =>
+        trackCounter(authTelemetryCounters.formReady, {
+          ...baseAttributes,
+          primaryActionEnabled: String(primaryActionEnabled),
+        }),
+      );
     },
     primaryActionClicked: method => {
-      recordCounter(authTelemetryCounters.primaryActionClicked, { method });
+      suppressTelemetryFailure(() =>
+        trackCounter(authTelemetryCounters.primaryActionClicked, { ...baseAttributes, method }),
+      );
     },
     submissionBlocked: (method, reason) => {
-      recordCounter(authTelemetryCounters.submissionBlocked, { method, reason });
+      suppressTelemetryFailure(() =>
+        trackCounter(authTelemetryCounters.submissionBlocked, {
+          ...baseAttributes,
+          method,
+          reason,
+        }),
+      );
     },
     requestStarted: (method, isUserInitiated = true) => {
       requestStartedAt = now();
       requestIsUserInitiated = isUserInitiated;
-      recordCounter(authTelemetryCounters.requestStarted, { method, isUserInitiated });
+      suppressTelemetryFailure(() =>
+        trackCounter(authTelemetryCounters.requestStarted, {
+          ...baseAttributes,
+          method,
+          isUserInitiated: String(isUserInitiated),
+        }),
+      );
     },
     requestSucceeded: (method, nextStep = authNextStep.complete) => {
       recordDuration(authTelemetryHistograms.requestDurationMs, requestStartedAt, method, {
         isUserInitiated: requestIsUserInitiated,
       });
       requestStartedAt = undefined;
-      recordCounter(authTelemetryCounters.requestSucceeded, {
-        method,
-        nextStep,
-        isUserInitiated: requestIsUserInitiated,
-      });
+      suppressTelemetryFailure(() =>
+        trackCounter(authTelemetryCounters.requestSucceeded, {
+          ...baseAttributes,
+          method,
+          nextStep,
+          isUserInitiated: String(requestIsUserInitiated),
+        }),
+      );
     },
     requestFailed: (method, reason) => {
       recordDuration(authTelemetryHistograms.requestDurationMs, requestStartedAt, method, {
         isUserInitiated: requestIsUserInitiated,
       });
       requestStartedAt = undefined;
-      recordCounter(authTelemetryCounters.requestFailed, {
-        method,
-        reason,
-        isUserInitiated: requestIsUserInitiated,
-      });
+      suppressTelemetryFailure(() =>
+        trackCounter(authTelemetryCounters.requestFailed, {
+          ...baseAttributes,
+          method,
+          reason,
+          isUserInitiated: String(requestIsUserInitiated),
+        }),
+      );
     },
     stepReached: stage => {
-      recordCounter(authTelemetryCounters.stepReached, { stage });
+      suppressTelemetryFailure(() =>
+        trackCounter(authTelemetryCounters.stepReached, { ...baseAttributes, stage }),
+      );
     },
     flowCompleted: method => {
       if (isFlowCompleted) {
         return;
       }
       recordDuration(authTelemetryHistograms.flowCompletionDurationMs, flowStartedAt, method);
-      recordCounter(authTelemetryCounters.flowCompleted, { method });
+      suppressTelemetryFailure(() =>
+        trackCounter(authTelemetryCounters.flowCompleted, { ...baseAttributes, method }),
+      );
       isFlowCompleted = true;
     },
     flowAbandoned: stage => {
       if (isFlowCompleted) {
         return;
       }
-      recordCounter(authTelemetryCounters.flowAbandoned, { stage });
+      suppressTelemetryFailure(() =>
+        trackCounter(authTelemetryCounters.flowAbandoned, { ...baseAttributes, stage }),
+      );
     },
   };
 };

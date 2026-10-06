@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
 import dataStores from "@rbx/core-scripts/data-store";
 import { getSignupUrl, getIsVNGLandingRedirectEnabled } from "../util/authUtil";
@@ -9,7 +9,7 @@ import { isAccountExperienceRevampEnabled } from "../util/accountExperienceUtils
 import Link from "./NavLink";
 
 export default function HeaderSignupLink() {
-  const { translate } = useTranslation();
+  const t = useTranslations("CommonUI.Features");
 
   const [isAccountSwitchingEnabledForBrowser] =
     AccountSwitcherService.useIsAccountSwitcherAvailableForBrowser();
@@ -37,7 +37,7 @@ export default function HeaderSignupLink() {
         id="sign-up-button"
         className="rbx-navbar-signup btn-growth-sm nav-menu-title signup-button"
       >
-        {translate(isAccountExperienceRevampEnabled() ? "Label.CreateAccount" : "Label.sSignUp")}
+        {t(isAccountExperienceRevampEnabled() ? "Label.CreateAccount" : "Label.sSignUp")}
       </Link>
     </li>
   );

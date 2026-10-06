@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { SimpleModal } from "@rbx/core-ui";
 import links from "../../constants/linkConstants";
 import layoutConstants from "../../constants/layoutConstants";
@@ -15,7 +15,8 @@ export default function ScrollList(props: {
   messagesData: { count?: number };
   tradeData: { count: number };
 }) {
-  const { translate } = useTranslation();
+  const tShop = useTranslations("Feature.ShopDialog");
+  const tSubscription = useTranslations("Feature.RobloxSubscription");
   const [isShopModalOpen, setShopModalOpen] = useState(false);
 
   const onClickShopLink = useCallback(() => {
@@ -34,7 +35,7 @@ export default function ScrollList(props: {
   };
 
   const listNavItems = Object.values(links.scrollListItems).map(item => (
-    <LeftNavItem key={item.name} {...{ translate, onClickShopLink, ...item, ...props }} />
+    <LeftNavItem key={item.name} {...{ onClickShopLink, ...item, ...props }} />
   ));
 
   const upgradeBtn = (
@@ -44,25 +45,25 @@ export default function ScrollList(props: {
         className="btn-growth-md btn-secondary-md"
         id="upgrade-now-button"
       >
-        {translate("Label.Blackbird")}
+        {tSubscription("Label.Blackbird")}
       </a>
     </li>
   );
 
   const modalBody = (
     <React.Fragment>
-      <p className="shop-description">{translate("Description.RetailWebsiteRedirect")}</p>
-      <p className="shop-warning">{translate("Description.PurchaseAgeWarning")}</p>
+      <p className="shop-description">{tShop("Description.RetailWebsiteRedirect")}</p>
+      <p className="shop-warning">{tShop("Description.PurchaseAgeWarning")}</p>
     </React.Fragment>
   );
   const shopModal = (
     <SimpleModal
-      title={translate("Heading.LeavingRoblox")}
+      title={tShop("Heading.LeavingRoblox")}
       body={modalBody}
       show={isShopModalOpen}
       actionButtonShow
-      actionButtonText={translate("Action.Continue")}
-      neutralButtonText={translate("Action.Cancel")}
+      actionButtonText={tShop("Action.Continue")}
+      neutralButtonText={tShop("Action.Cancel")}
       onAction={goToAmazonStop}
       onNeutral={closeShopModel}
       onClose={closeShopModel}

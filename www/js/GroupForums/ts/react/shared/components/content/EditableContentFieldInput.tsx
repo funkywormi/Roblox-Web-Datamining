@@ -98,6 +98,9 @@ const EditableContentFieldInputInner = forwardRef<
 
     const [text, setText] = useState<string>('');
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    // Not every caller passes an editorRef, and focusing the rich text editor needs a handle.
+    const fallbackEditorRef = useRef<RichTextEditorHandle>(null);
+    const richTextEditorRef = editorRef ?? fallbackEditorRef;
 
     const handleRichTextChange = useCallback(
       (value: Document) => {
@@ -129,7 +132,11 @@ const EditableContentFieldInputInner = forwardRef<
         handleChange(value);
       },
       focus: () => {
-        textAreaRef.current?.focus();
+        if (textAreaRef.current) {
+          textAreaRef.current.focus();
+        } else {
+          richTextEditorRef.current?.focus();
+        }
       }
     }));
 
@@ -157,12 +164,17 @@ const EditableContentFieldInputInner = forwardRef<
     }, [text, autoResize, maxTextFieldHeight]);
 
     useEffect(() => {
-      if (autoFocus) {
-        textAreaRef.current?.focus();
-        const textLength = textAreaRef.current?.textLength ?? 0;
-        textAreaRef.current?.setSelectionRange(textLength, textLength);
+      if (!autoFocus || locked) return;
+
+      if (textAreaRef.current) {
+        textAreaRef.current.focus();
+        const { textLength } = textAreaRef.current;
+        textAreaRef.current.setSelectionRange(textLength, textLength);
+        return;
       }
-    }, [autoFocus]);
+
+      richTextEditorRef.current?.focus();
+    }, [autoFocus, locked, richTextEditorRef]);
 
     const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (isSubmitHotKey(event)) {
@@ -184,7 +196,7 @@ const EditableContentFieldInputInner = forwardRef<
       <div className={classNames('editable-content-field-input', className)}>
         {isRichTextEnabled ? (
           <RichTextEditor
-            ref={editorRef}
+            ref={richTextEditorRef}
             placeholder={placeholder}
             initialValue={defaultSlateValue}
             onChange={handleRichTextChange}

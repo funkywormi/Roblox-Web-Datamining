@@ -131,6 +131,8 @@ import {
 import LoginPresentationRouter from "../components/LoginPresentationRouter";
 import type { LoginControllerViewModel } from "../types/loginControllerTypes";
 import { resolveLoginExperiments } from "../utils/loginExperimentUtils";
+import useForcePasswordlessLoginHandoff from "../hooks/useForcePasswordlessLoginHandoff";
+import { getLoginPageSupportAttributes } from "../../forcePasswordlessLogin/contract";
 
 type StudioEmbeddedWindow = Window & {
   rbx?: {
@@ -149,6 +151,16 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   const { translate } = useTranslation();
   // page state
   const [isNavigating, setIsNavigating] = useState(false);
+  const forcePasswordlessLogin = useForcePasswordlessLoginHandoff({
+    onShown: () => {
+      setPassword("");
+      passkeyAbortControllerRef.current.abort();
+    },
+    onUseEmailOtp: () => openOtpLoginModal(),
+    onUsePasskey: () => {
+      void attemptPasskeyLogin("required");
+    },
+  });
 
   // captcha states
   const [unifiedCaptchaId, setUnifiedCaptchaId] = useState("");
@@ -509,6 +521,7 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   const handleLoginError = (error: unknown, cType: CredentialType) => {
     // Ignore generic challenge abandons.
     if (AccountIntegrityChallengeService.Generic.ChallengeError.matchAbandoned(error)) {
+      returnToForcePasswordlessLogin();
       refetchPasskeyChallenge();
       setIsLoading(false);
       handleOtpLoginError("");
@@ -551,6 +564,7 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
         return;
 
       default:
+        returnToForcePasswordlessLogin();
         clearCaptchaData();
         setIsLoading(false);
         incrementEphemeralCounter(mapErrorCodeToEphemeralEvent(errorCode));
@@ -601,12 +615,17 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   };
 
   const handleDefaultLoginRequired = () => {
+    if (forcePasswordlessLogin.isActiveRef.current) {
+      returnToForcePasswordlessLogin();
+      return;
+    }
     clearCaptchaData();
     setUseDefaultCredentialType(true);
     incrementEphemeralCounter(eventCounters.defaultLoginRequired);
   };
 
   const handleUnknownError = () => {
+    returnToForcePasswordlessLogin();
     setErrorMsg(translate(FeatureLoginPage.MessageUnknownErrorTryAgain));
   };
 
@@ -624,6 +643,7 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   };
 
   const handleAccountSelectorAbandoned = (): void => {
+    returnToForcePasswordlessLogin();
     setMultipleUsersPerCredentialData({ users: [], invalidUsers: [] });
     setSelectedUserId(0);
     setIsLoading(false);
@@ -648,6 +668,8 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
       translate,
       handleSubmit,
       () => {
+        // handleAccountSelectorAbandoned already returns to the challenge; calling
+        // returnToForcePasswordlessLogin first would notify loginFailed twice.
         if (cType === CredentialType.EmailOtpSessionToken) {
           handleAccountSelectorAbandoned(); // clean up stale state values
           // close modal using event
@@ -656,6 +678,8 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
               detail: { errorMessage: "", shouldCloseModal: true },
             }),
           );
+        } else {
+          returnToForcePasswordlessLogin();
         }
       },
       isParentErrorVal,
@@ -684,6 +708,7 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
     setCredentialType(CredentialType.Username);
     setOtpLoginSessionToken("");
     setOtpLoginCode("");
+    forcePasswordlessLogin.notifyEmailOtpClosed();
   };
 
   const handleOtpLoginError = (errorMessage: string, isUserUnder13 = false) => {
@@ -737,9 +762,31 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
     }
   };
 
+  // While the force passwordless login challenge is up, a sign-in that did not finish hands the
+  // page back to it with the attempt's state cleared.
+  const returnToForcePasswordlessLogin = () => {
+    if (forcePasswordlessLogin.isActiveRef.current) {
+      setAuthTokenCode("");
+      setAuthTokenPrivateKey("");
+      setUserId("");
+      setChallengeId("");
+      setFailed2svChallengeCount(0);
+      setSecurityQuestionsSessionId("");
+      setSecurityQuestionsRedemptionToken("");
+      clearCaptchaData();
+      setCaptchaId("");
+      setCaptchaToken("");
+      setSelectedUserId(0);
+      setMultipleUsersPerCredentialData({ users: [], invalidUsers: [] });
+      setIsLoading(false);
+      forcePasswordlessLogin.notifyLoginFailed();
+    }
+  };
+
   // When hitting challenge invalidated or abandoned, clear states so that
   // subsequent requests can start from blank state
   const clearPostSubmitState = (errorMessage = "") => {
+    returnToForcePasswordlessLogin();
     clearCaptchaData();
     setSelectedUserId(0);
     handleOtpLoginError(errorMessage);
@@ -854,6 +901,16 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   */
   const handleSubmit = (isFromLoginButtonClick = true) => {
     const params = buildLoginParams();
+    // Quick Login, email codes and passkeys start their own requests; never resume the
+    // challenged password.
+    if (
+      forcePasswordlessLogin.isActiveRef.current &&
+      params.ctype !== CredentialType.AuthToken &&
+      params.ctype !== CredentialType.EmailOtpSessionToken &&
+      params.ctype !== CredentialType.Passkey
+    ) {
+      return;
+    }
     if (selectedUserId) {
       params.userId = selectedUserId;
     }
@@ -883,12 +940,18 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   };
 
   const attemptPasskeyLogin = async (mediation = "conditional") => {
+    // A signal is only replaced when a request fails on it, so one aborted with nothing pending
+    // (as showing the force passwordless login challenge does) would fail this request too.
+    if (passkeyAbortControllerRef.current.signal.aborted) {
+      passkeyAbortControllerRef.current = new AbortController();
+    }
     // network call to get passkey challenge to sign.
     let challenge: Awaited<ReturnType<typeof getPasskeyChallenge>> | null = null;
     try {
       challenge = await getPasskeyChallenge();
       // signed passkeyCredential to be sent.
     } catch (error) {
+      forcePasswordlessLogin.notifyLoginFailed();
       return;
     }
 
@@ -910,6 +973,11 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
       if ((error as any)?.name === "AbortError") {
         passkeyAbortControllerRef.current = new AbortController();
       } else {
+        // A dismissed passkey prompt leaves the challenge's other options in place.
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+        if ((error as any)?.name !== "NotAllowedError") {
+          forcePasswordlessLogin.notifyLoginFailed();
+        }
         // This case is unexpected, but if it were to be hit, this information would likely be helpful to display to console.
         // eslint-disable-next-line no-console
         console.error(error);
@@ -987,11 +1055,16 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   // Passkey call. Always calls- will probably break on unsupported browsers.
   useEffect(() => {
     // Check if passkey and conditional mediation are enabled.
-    if (isPasskeyLoginEnabled() && isConditionalMediationSupported) {
+    // Also re-runs when the challenge is dismissed, since showing it aborted autofill.
+    if (
+      !forcePasswordlessLogin.isActive &&
+      isPasskeyLoginEnabled() &&
+      isConditionalMediationSupported
+    ) {
       void attemptPasskeyLogin("conditional");
     }
     // send signedChallenge to finish endpoint.
-  }, [passkeyAttempt, isConditionalMediationSupported]);
+  }, [passkeyAttempt, isConditionalMediationSupported, forcePasswordlessLogin.isActive]);
 
   // Send the passkeys
   useEffect(() => {
@@ -1147,6 +1220,10 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
     status: "ready",
     experiments,
     loginBaseContainerClass,
+    loginBaseAttributes: getLoginPageSupportAttributes({
+      isEmailOtpOffered: isOtpLoginEnabled,
+      isPasskeyOffered: isPasskeyLoginEnabled() && isPasskeyLoginSupported,
+    }),
     accountSwitcherProps: shouldShowAccountSwitcher
       ? {
           containerId: containerConstants.reactLoginAccountSwitcherContainer,
@@ -1163,6 +1240,7 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
       : null,
     loginForm: shouldShowLoginForm
       ? {
+          isHidden: forcePasswordlessLogin.isActive,
           headerText: buildLoginFormHeaderText(
             authenticatedUser.isAuthenticated,
             translate,

@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, useCallback, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import useGuacConfig from '../../shared/hooks/useGuacConfig';
 import AgeCheckDialog from '../../shared/components/dialogs/AgeCheckDialog';
 import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
@@ -13,20 +13,31 @@ import { AgeCheckClickEvent, CommunityMetric } from '../../shared/utils/eventStr
 interface AgeCheckWrapperProps {
   trigger: EventTriggerReason;
   messageId?: string;
-  children?: ReactElement;
+  // A post card carries its own post, and the surfaces that show cards leave the store empty.
+  groupId?: number;
+  postId?: string;
+  children?: ReactNode;
 }
 
-const AgeCheckWrapper: FC<AgeCheckWrapperProps> = ({ children, trigger, messageId }) => {
+const AgeCheckWrapper = ({
+  children,
+  trigger,
+  messageId,
+  groupId: groupIdOverride,
+  postId: postIdOverride
+}: AgeCheckWrapperProps): JSX.Element | null => {
   const { isLoading, data: groupDetailsUi, refetch } = useGuacConfig('group-details-ui');
-  const groupId = useForumStore.use.groupId();
-  const postId = useForumStore.use.postId();
+  const storeGroupId = useForumStore.use.groupId();
+  const storePostId = useForumStore.use.postId();
+  const groupId = groupIdOverride ?? storeGroupId;
+  const postId = postIdOverride ?? storePostId;
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { features } = useCommunityProductFeatures();
 
   const upsellEligibility = groupDetailsUi?.checkTwoWayCommunicationsUpsell ?? 'Ineligible';
   const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e: React.SyntheticEvent<HTMLDivElement>) => {
       if (!features.ForumsAgeCheck) {
         return;
       }
@@ -36,7 +47,8 @@ const AgeCheckWrapper: FC<AgeCheckWrapperProps> = ({ children, trigger, messageI
         return;
       }
 
-      // prevent any children clicks, only works this inverted way due to onClickCapture
+      // Capture both mouse and keyboard activation before a child can perform its action.
+      e.preventDefault();
       e.stopPropagation();
       setIsDialogOpen(true);
     },
@@ -71,9 +83,9 @@ const AgeCheckWrapper: FC<AgeCheckWrapperProps> = ({ children, trigger, messageI
         role='button'
         tabIndex={0}
         onClickCapture={handleClick}
-        onKeyDown={e => {
+        onKeyDownCapture={e => {
           if (e.key === 'Enter' || e.key === ' ') {
-            handleClick((e as unknown) as React.MouseEvent<HTMLDivElement>);
+            handleClick(e);
           }
         }}>
         {children}

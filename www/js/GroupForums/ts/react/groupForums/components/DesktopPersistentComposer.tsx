@@ -15,7 +15,14 @@ import { hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import ForumTierGateMessage from './ForumTierGateMessage';
 import useCommentComposerAttachments from '../hooks/useCommentComposerAttachments';
 
-const DesktopPersistentComposer = ({ translate }: WithTranslationsProps): JSX.Element => {
+export type DesktopPersistentComposerProps = {
+  autoFocus?: boolean;
+} & WithTranslationsProps;
+
+const DesktopPersistentComposer = ({
+  autoFocus = false,
+  translate
+}: DesktopPersistentComposerProps): JSX.Element => {
   const groupId = useForumStore.use.groupId();
   const postId = useForumStore.use.postId();
   const inputRef = useRef<EditableContentFieldHandle>(null);
@@ -88,7 +95,7 @@ const DesktopPersistentComposer = ({ translate }: WithTranslationsProps): JSX.El
         enabled={disabled}>
         <div className={classNames('desktop-persistent-composer', disabled && 'disabled')}>
           <ContentComposer
-            autoFocus={false}
+            autoFocus={autoFocus}
             errorMessage={commentSubmissionError}
             contentLeadingControl={attachmentLeadingControl}
             contentFooter={imageUploadPreviews}
