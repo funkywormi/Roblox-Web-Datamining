@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import classNames from "classnames";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../utils/translate";
 import { Slider } from "@rbx/foundation-ui";
 import { ScalesKeys, Scale } from "../../constants/types";
 
@@ -21,7 +21,7 @@ function AvatarScalingScale({
   isBodyTypeScaleOutOfTab,
   scaleEnabled,
 }: AvatarScalingScaleProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const [value, setValue] = React.useState(0);
 
   useEffect(() => {

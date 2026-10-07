@@ -1,4 +1,5 @@
 import type { AccoutrementAsset } from "@rbx/avatar-common";
+import type { ThumbnailType } from "@rbx/www-common/components/thumbnail";
 
 type AssetType = {
   id: number;
@@ -30,7 +31,7 @@ type HatAssetSlot = {
   assetType: AssetType;
   currentVersionId: number;
   thumbnail: Thumbnail;
-  thumbnailType: string;
+  thumbnailType: ThumbnailType;
   link: string;
 };
 
@@ -43,7 +44,7 @@ export type AdvancedAccessoryAssetSlot = {
   assetType: AssetType;
   currentVersionId: number;
   thumbnail: Thumbnail;
-  thumbnailType: string;
+  thumbnailType: ThumbnailType;
   link: string;
 };
 
@@ -68,14 +69,14 @@ export type ClassicHeadAssetSlot = {
   favoriteCount: number;
   offSaleDeadline: string | null;
   saleLocationType: string;
-  thumbnailType: string;
+  thumbnailType: ThumbnailType;
 };
 
 export type ClassicHeadSlot = ClassicHeadAssetSlot | EmptySlot;
 
 export type LayeredClothingAssetSlot = AccoutrementAsset & {
   type: string;
-  thumbnailType: string;
+  thumbnailType: ThumbnailType;
   link: string;
   thumbnail: Thumbnail;
 };

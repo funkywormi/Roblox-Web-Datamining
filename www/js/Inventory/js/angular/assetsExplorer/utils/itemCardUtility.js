@@ -1,12 +1,45 @@
 import { seoName } from 'core-utilities';
-import { EnvironmentUrls, Endpoints } from 'Roblox';
+import { EnvironmentUrls, Endpoints, TranslationResourceProvider } from 'Roblox';
 import { ItemCardUtils } from 'react-style-guide';
 import assetsExplorerModule from '../assetsExplorerModule';
+
+// Matches the catalog item card: first-party gets the high-contrast badge, third-party
+// Foundation Neutral. Neutral's background is a translucent shift overlay.
+const licenseBadges = {
+  FirstParty: {
+    labelKey: 'Label.LicensingOfficial',
+    className: 'bg-system-contrast content-inverse-system-contrast'
+  },
+  ThirdParty: {
+    labelKey: 'Label.LicensingLicensed',
+    className: 'bg-shift-300 content-emphasis'
+  }
+};
 
 function itemCardUtility($filter, assetsConstants) {
   'ngInject';
 
+  let catalogResources;
+  const getCatalogResources = () => {
+    if (!catalogResources) {
+      catalogResources = new TranslationResourceProvider().getTranslationResource(
+        'Feature.Catalog'
+      );
+    }
+    return catalogResources;
+  };
+
   return {
+    mapLicenseBadge(license) {
+      const badge = license && licenseBadges[license.licenseType];
+      if (!badge) {
+        return undefined;
+      }
+      return {
+        label: getCatalogResources().get(badge.labelKey),
+        className: badge.className
+      };
+    },
     mapCatalogDetailsToInventoryItemCard(item, itemDetail) {
       this.buildUserLink(itemDetail);
       this.mapItemRestrictionIcons(itemDetail);
@@ -50,6 +83,7 @@ function itemCardUtility($filter, assetsConstants) {
           type: item.itemType.toLowerCase()
         },
         priceStatus: itemDetail.priceStatus,
+        licenseBadge: this.mapLicenseBadge(itemDetail.license),
         itemDetailsLoading: false
       };
       return parsedItem;

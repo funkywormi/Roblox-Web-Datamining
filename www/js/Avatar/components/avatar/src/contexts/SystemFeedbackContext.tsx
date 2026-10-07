@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useCallback, useMemo, useRef, useState } from "react";
 import { Snackbar } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../utils/translate";
 
 export type SystemFeedback = {
   error: (message: string) => void;
@@ -51,7 +51,7 @@ interface SystemFeedbackProviderProps {
 }
 
 export const SystemFeedbackProvider: React.FC<SystemFeedbackProviderProps> = ({ children }) => {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const [feedback, setFeedback] = useState<ActiveFeedback | null>(null);
   const idRef = useRef(0);
 

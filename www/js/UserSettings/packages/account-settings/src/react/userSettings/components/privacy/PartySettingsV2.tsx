@@ -8,7 +8,7 @@ import {
   UserSetting,
   useSnackbar,
 } from "@rbx/user-settings";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import { Access } from "../../../../types/accessManagementTypes";
 import { useUpdateUserSettingValueMutation } from "../../../apis/userSettingsApi";
 import SettingsSection from "../../../common/components/SettingsSection";
@@ -53,8 +53,7 @@ import {
 import birthdayUtils from "../../utils/birthdayUtils";
 import { useWrappedTranslation } from "../../hooks/useWrappedTranslation";
 import { useGetSettingsUiPolicyQuery } from "../../../apis/universalAppConfigurationApi";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { selectSettingConsentRequirementsV2 } from "../../../apis/slices/parentalConsentSlice";
+import { useAppDispatch } from "../../../redux/hooks";
 import { optionToString } from "../../utils/parentalControls/parentalConsentUtils";
 import useAgeVerificationUpsell from "../../hooks/useAgeVerificationUpsell";
 import baseApi from "../../../apis/common/baseApi";
@@ -62,8 +61,12 @@ import { getChildSettingsCacheTag } from "../../../apis/parentalControlsApi";
 import useSettingsModal from "../../../common/hooks/modals/useSettingsModal";
 import commonTranslationConstants from "../../constants/contentConstants/commonTranslationConstants";
 import useAutoSettingUpdate from "../../hooks/useAutoSettingUpdate";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
-export const PartySettingsV2 = ({ child }: { child?: TChildInfo }): JSX.Element => {
+export const PartySettingsV2 = ({
+  child,
+  onUpdateSetting,
+}: { child?: TChildSettingsInfo } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
   const { snackbarService } = useSnackbar();
@@ -76,7 +79,9 @@ export const PartySettingsV2 = ({ child }: { child?: TChildInfo }): JSX.Element 
     ? child.shouldShowTFRestrictiveCommsCopy
     : uiPolicy?.shouldShowTFRestrictiveCommsCopy;
 
-  const [settingsAndOptions] = useGetSettingsAndOptionsV2(child?.userId);
+  const [settingsAndOptions, , , , consentRequirementsV2] = useGetSettingsAndOptionsV2(
+    child?.userId,
+  );
 
   const partyChatAvailable =
     (settingsAndOptions?.[UserSetting.whoCanUsePartyChatWithMe]?.options?.length ?? 0) > 1;
@@ -88,9 +93,6 @@ export const PartySettingsV2 = ({ child }: { child?: TChildInfo }): JSX.Element 
   const [updateSettingValue] = useUpdateUserSettingValueMutation();
 
   const { handleAgeCheckUpsells, errorModal } = useAgeVerificationUpsell();
-  const consentRequirementsV2 = useAppSelector(
-    selectSettingConsentRequirementsV2(child?.userId ?? authenticatedUser.id!),
-  );
 
   const [whoCanPartyWithMeContent, whoCanPartyWithMeActions] =
     LegallySensitiveContentService.useLegallySensitiveContentAndActions(
@@ -231,6 +233,10 @@ export const PartySettingsV2 = ({ child }: { child?: TChildInfo }): JSX.Element 
         auditHeader: getAuditHeader(setting),
       };
       try {
+        if (onUpdateSetting) {
+          await onUpdateSetting(updateBody);
+          return;
+        }
         const result = await updateSettingValue(updateBody).unwrap();
         const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
         if (successMessageKey) {

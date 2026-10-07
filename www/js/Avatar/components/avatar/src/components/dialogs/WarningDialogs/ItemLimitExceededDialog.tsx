@@ -6,7 +6,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../../utils/translate";
 import avatarConstants from "../../../constants/avatarConstants";
 
 type ItemLimitExceededDialogProps = {
@@ -18,7 +18,7 @@ function ItemLimitExceededDialog({
   closeDialog,
   isOpen,
 }: ItemLimitExceededDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const modalLayout = avatarConstants.modalLayout.outfitDelete;
 
   const layeredClothingLimitMessage = avatarConstants.layeredClothingLimit;

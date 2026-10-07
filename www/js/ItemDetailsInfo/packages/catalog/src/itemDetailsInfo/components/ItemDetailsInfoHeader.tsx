@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-no-literals */
 import React, { useCallback } from "react";
 import { withTranslations, WithTranslationsProps } from "react-utilities";
+import { Badge } from "@rbx/foundation-ui";
 import {
   EntrypointExposure,
   useEntrypointImpressionId,
@@ -32,9 +33,16 @@ export const ItemDetailsInfoHeader = ({
   permissions,
   translate,
 }: TItemDetailsInfoHeaderProps & WithTranslationsProps): JSX.Element | null => {
-  const { name } = itemDetails;
+  const { name, license } = itemDetails;
 
   const { CreatorLinkComponent } = useCreatorReference(itemDetails);
+
+  let licenseLabel: string | undefined;
+  if (license?.licenseType === "ThirdParty") {
+    licenseLabel = translate("Label.LicensingLicensed");
+  } else if (license?.licenseType === "FirstParty") {
+    licenseLabel = translate("Label.LicensingOfficial");
+  }
 
   const isCommunityCreator = itemDetails.creatorType === "Group" && !!itemDetails.creatorTargetId;
   const groupId = itemDetails.creatorTargetId;
@@ -100,7 +108,19 @@ export const ItemDetailsInfoHeader = ({
         </div>
       </div>
       <div className="right">
-        <ShoppingCartButton />
+        <div className="item-details-header-actions">
+          {/* Unlike the item card badge, this one stays muted for both
+              first-party and third-party items. */}
+          {licenseLabel && (
+            <Badge
+              variant="Neutral"
+              shape="Box"
+              label={licenseLabel}
+              className="item-license-badge"
+            />
+          )}
+          <ShoppingCartButton />
+        </div>
         <ItemDetailsContextMenu itemDetails={itemDetails} permissions={permissions} />
       </div>
     </div>

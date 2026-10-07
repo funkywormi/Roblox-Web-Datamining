@@ -22,33 +22,35 @@ import { getSocialNetworkVisibilityOptions } from "../../constants/privacy/priva
 import commonTranslationConstants from "../../constants/contentConstants/commonTranslationConstants";
 import { useGetSettingsUiPolicyQuery } from "../../../apis/universalAppConfigurationApi";
 import RadioButtonOptionsWithParentalConsentV2 from "../../../common/components/RadioButtonOptionsWithParentalConsentV2";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
-import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
+import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
+import { useAppDispatch } from "../../../redux/hooks";
 import { optionToString } from "../../utils/parentalControls/parentalConsentUtils";
-import { selectSettingConsentRequirementsV2 } from "../../../apis/slices/parentalConsentSlice";
 import useSettingsModal from "../../../common/hooks/modals/useSettingsModal";
 import { getChildSettingsCacheTag } from "../../../apis/parentalControlsApi";
 import privacyTranslationConstants from "../../constants/contentConstants/privacyTranslationConstants";
 import { getSuccessMessageKeyForUserSettingsUpdate } from "../../utils/successMessageUtils";
 import useGetSettingsAndOptionsV2 from "../../../apis/hooks/useGetSettingsAndOptionsV2";
 import useAutoSettingUpdate from "../../hooks/useAutoSettingUpdate";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
-export const SocialNetworkVisibility = ({ child }: { child?: TChildInfo }): JSX.Element => {
+export const SocialNetworkVisibility = ({
+  child,
+  onUpdateSetting,
+}: { child?: TChildSettingsInfo } & TSettingUpdateProps): JSX.Element => {
   const childUserId = child?.userId;
   const { translate } = useWrappedTranslation();
   const dispatch = useAppDispatch();
   const { snackbarService } = useSnackbar();
   const [settingsAndOptions] = useGetSettingsAndOptions(childUserId);
-  const [settingsAndOptionsV2] = useGetSettingsAndOptionsV2(child?.userId);
+  const [settingsAndOptionsV2, , , , consentRequirementsV2] = useGetSettingsAndOptionsV2(
+    child?.userId,
+  );
   const [updateSettingValue] = useUpdateUserSettingValueMutation();
   const { socialNetworks } = accountInfoTranslationConstants;
   const { handleAgeCheckUpsells, errorModal } = useAgeVerificationUpsell();
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
   const enforceAgeVerificationForSocialLinks =
     uiPolicy?.enforceAgeVerificationForSocialLinks ?? false;
-  const consentRequirementsV2 = useAppSelector(
-    selectSettingConsentRequirementsV2(child?.userId ?? authenticatedUser.id!),
-  );
 
   const invalidChildSettingsCache = () => {
     const invalidateAction = baseApi.util.invalidateTags([
@@ -78,6 +80,10 @@ export const SocialNetworkVisibility = ({ child }: { child?: TChildInfo }): JSX.
       value: newPrivacyLevel,
     };
     try {
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {

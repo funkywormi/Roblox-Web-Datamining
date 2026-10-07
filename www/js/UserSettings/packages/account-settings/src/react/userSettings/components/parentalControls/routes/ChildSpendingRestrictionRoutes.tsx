@@ -8,20 +8,34 @@ import SpendSettingName from "../../../../../enums/SpendSettingName";
 import { TSettingsPage } from "../../../../../types/commonTypes";
 import SettingsList from "../../../../common/components/routing/SettingsList";
 import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
-import { selectChildPagesForChildUserId } from "../../../../apis/slices/childPagesSlice";
+import {
+  selectChildPagesForChildUserId,
+  TChildPages,
+} from "../../../../apis/slices/childPagesSlice";
 import { useAppSelector } from "../../../../redux/hooks";
 import ChildMonthlySpendingLimit from "../parentDashboard/ChildMonthlySpendingLimit";
-import { TChildInfo } from "../../../../../types/childrenInfoTypes";
+import { TSettingUpdateProps } from "../../../../../types/settingUpdateTypes";
+import { TChildSettingsInfo } from "../../../../../types/childrenInfoTypes";
 import ChildSpendingNotifications from "../parentDashboard/ChildSpendingNotifications";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import { spendingHelpUrl } from "../../../constants/urlConstants";
 import ChildAllowPurchases from "../parentDashboard/ChildAllowPurchases";
 import { getTranslatedOptionValue } from "../../../constants/contentConstants/consentTranslationConstants";
 
-export const ChildSpendingRestrictionRoutes = ({ child }: { child: TChildInfo }): JSX.Element => {
+export const ChildSpendingRestrictionRoutes = ({
+  child,
+  pages,
+  onUpdateSetting,
+}: {
+  child: TChildSettingsInfo;
+  pages?: Pick<TChildPages, "childSettingCategoryPages" | "spendingPages">;
+} & TSettingUpdateProps): JSX.Element => {
   const { translate } = useTranslation();
-  const childPages = useAppSelector(selectChildPagesForChildUserId(child.userId));
-  const { data: spendControlSettings } = useGetParentalSpendControlsQuery(child?.userId);
+  const linkedChildPages = useAppSelector(selectChildPagesForChildUserId(child.userId));
+  const childPages = pages ?? linkedChildPages;
+  const { data: spendControlSettings } = useGetParentalSpendControlsQuery(
+    onUpdateSetting ? undefined : child.userId,
+  );
   const [childSettings] = useGetSettingsAndOptions(child?.userId);
   const { spendControls } = parentalControlsTranslationConstants;
 
@@ -125,18 +139,23 @@ export const ChildSpendingRestrictionRoutes = ({ child }: { child: TChildInfo })
         }
       />
 
-      {childSettings?.[UserSetting.enablePurchases] && (
-        <Route path={subpages[SpendSettingName.AllowPurchases]?.path}>
-          <ChildAllowPurchases child={child} />
+      {childSettings?.[UserSetting.enablePurchases] &&
+        subpages[SpendSettingName.AllowPurchases] && (
+          <Route path={subpages[SpendSettingName.AllowPurchases]?.path}>
+            <ChildAllowPurchases child={child} onUpdateSetting={onUpdateSetting} />
+          </Route>
+        )}
+
+      {subpages[SpendSettingName.MonthlySpendingLimit] && (
+        <Route path={subpages[SpendSettingName.MonthlySpendingLimit]?.path}>
+          <ChildMonthlySpendingLimit child={child} onUpdateSetting={onUpdateSetting} />
         </Route>
       )}
-
-      <Route path={subpages[SpendSettingName.MonthlySpendingLimit]?.path}>
-        <ChildMonthlySpendingLimit child={child} />
-      </Route>
-      <Route path={subpages[SpendSettingName.SpendNotifications]?.path}>
-        <ChildSpendingNotifications child={child} />
-      </Route>
+      {subpages[SpendSettingName.SpendNotifications] && (
+        <Route path={subpages[SpendSettingName.SpendNotifications]?.path}>
+          <ChildSpendingNotifications child={child} onUpdateSetting={onUpdateSetting} />
+        </Route>
+      )}
     </div>
   );
 };

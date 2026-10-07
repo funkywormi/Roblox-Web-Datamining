@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 import classNames from "classnames";
-import { Thumbnail2d } from "@rbx/thumbnails";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 import AvatarAccoutrementService from "../../../../utils/avatarAccoutrementService";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../../../utils/translate";
 import { Badge, Icon, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
 import { OUTFIT_MENU_OPTIONS, OutfitOption } from "../../../../types";
 import { OUTFIT_SETTINGS } from "../../../../constants/avatarConstants";
@@ -14,6 +14,7 @@ import {
 } from "../../../../avatar.types";
 import { getLookUrl, getExpirationTimeShorthand } from "../../../../utils/assetManager.helpers";
 import { isCatalogItemUnavailable } from "../../../../utils/itemAvailability";
+import { getLicenseBadgeLabelKey } from "../../../../utils/itemLicense";
 import { useAssetManagerContext } from "../../../../contexts/AssetManagerContext";
 import { useAvatarEditingAccessContext } from "../../../../contexts/AvatarEditingAccessContext";
 
@@ -40,7 +41,7 @@ function AvatarItemCard({
   closeOutfitMenu,
   onExpiredAssetsClick,
 }: AvatarItemCardProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const isAssetTypeSelectionEnabled = useCallback((assetTypeName: string | undefined): boolean => {
     return !AvatarAccoutrementService.isEmote(assetTypeName || "");
   }, []);
@@ -83,6 +84,8 @@ function AvatarItemCard({
     ? getExpirationTimeShorthand(item.expirationTime, translate)
     : "";
 
+  const licenseLabelKey = getLicenseBadgeLabelKey(item);
+
   return (
     <div
       className={classNames("item-card-container", "remove-panel", {
@@ -108,15 +111,23 @@ function AvatarItemCard({
             data-thumbnail-target-id={item.id}
             data-thumbnail-type={item.thumbnailType}
           >
-            {expirationTimeShorthand && (
-              <div className="expiration-time-badge">
-                <Badge
-                  variant="Neutral"
-                  icon="icon-regular-clock"
-                  className="bg-surface-0"
-                  label={expirationTimeShorthand}
-                />
+            {/* Licensing and expiration badges share the top-left corner, so a
+                licensed item suppresses the expiration badge. */}
+            {licenseLabelKey ? (
+              <div className="license-badge">
+                <Badge variant="Neutral" label={translate(licenseLabelKey)} />
               </div>
+            ) : (
+              expirationTimeShorthand && (
+                <div className="expiration-time-badge">
+                  <Badge
+                    variant="Neutral"
+                    icon="icon-regular-clock"
+                    className="bg-surface-0"
+                    label={expirationTimeShorthand}
+                  />
+                </div>
+              )
             )}
             {isUnavailable ? (
               // Mirrors the Thumbnail2d "Blocked" state rendering (dark grey

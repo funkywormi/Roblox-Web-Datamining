@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import classNames from "classnames";
-import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
+import { ThumbnailTypes } from "../../../constants/thumbnailConstants";
 import { CatalogItem } from "../../../avatar.types";
 
 export type EmotesItemCardProps = {
@@ -30,8 +31,8 @@ const EmotesItemCard = ({
       <div className="item-card-link">
         <div className="item-card-thumb-container">
           <Thumbnail2d
-            containerClass="item-card-thumb emotes-center-div"
-            targetId={item.id?.toString()}
+            containerClassName="item-card-thumb emotes-center-div"
+            targetId={item.id}
             type={ThumbnailTypes.assetThumbnail}
           />
         </div>

@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../utils/translate";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import { reportAXError } from "../../utils/axAnalyticsService";
 import AvatarAccoutrementService from "../../utils/avatarAccoutrementService";
@@ -48,7 +48,7 @@ function ConfirmUpdateAdvancedAccessoriesDialog({
   avatarSettings,
   setWearingAssetsFromIdsV2,
 }: ConfirmUpdateAdvancedAccessoriesDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const { selectedSubcategory } = useAvatarTabsContext();
 
@@ -76,7 +76,7 @@ function ConfirmUpdateAdvancedAccessoriesDialog({
           ) {
             const error = translate("Message.ErrorAdvancedSave", {
               limitAmount: AvatarAccoutrementService.getAdvancedAccessoryLimit(assetType),
-              assetType: assetTypeLabels[assetType],
+              assetType: assetTypeLabels[assetType] ?? "",
             });
 
             systemFeedback.error(error);
@@ -85,7 +85,7 @@ function ConfirmUpdateAdvancedAccessoriesDialog({
           }
         } else if (AvatarAccoutrementService.isLayeredClothing(assetType)) {
           const error = translate("Message.ErrorAdvancedUnsupportedAssetType", {
-            assetType: assetTypeLabels[assetType],
+            assetType: assetTypeLabels[assetType] ?? "",
           });
 
           systemFeedback.error(error);

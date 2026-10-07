@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { reportAXError } from "../../utils/axAnalyticsService";
 import AvatarScalingScale from "./AvatarScalingScale";
 import avatarConstants from "../../constants/avatarConstants";
@@ -19,7 +19,7 @@ interface AvatarScalingProps {
 }
 
 function AvatarScaling({ scales, updateScale }: AvatarScalingProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const [isBodyTypeWarningOpen, setIsBodyTypeWarningOpen] = React.useState<boolean>(false);
   const { setAvatarType } = useAvatarPageContext();

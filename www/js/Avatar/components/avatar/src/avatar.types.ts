@@ -29,6 +29,28 @@ export type AvatarItemAvailabilityStatus =
   | "PendingReview"
   | "Expired";
 
+/**
+ * Whether an item is Roblox-owned or licensed from an external rights holder.
+ * - `FirstParty`: Roblox-owned IP, badged as "Official".
+ * - `ThirdParty`: licensed external IP, badged as "Licensed".
+ */
+export type ItemLicenseType = "FirstParty" | "ThirdParty";
+
+/**
+ * Per-item licensing metadata surfaced by `/v1/avatar-inventory`. Present only
+ * on items that carry a license; absent for ordinary UGC / catalog items.
+ *
+ * `badgeAssetId`, `name`, and `licenseDisplayName` are returned by the API but
+ * not yet rendered — their treatment is pending design.
+ */
+export type ItemLicense = {
+  id: string;
+  licenseType: ItemLicenseType;
+  badgeAssetId?: string;
+  name?: string;
+  licenseDisplayName?: string;
+};
+
 export type CatalogItemBase = {
   id: number;
   itemRestrictions?: ItemCardRestrictions;
@@ -40,6 +62,7 @@ export type CatalogItemBase = {
   count?: number;
   expirationTime?: string;
   availabilityStatus?: AvatarItemAvailabilityStatus;
+  license?: ItemLicense;
 };
 
 export type CatalogAssetItem = CatalogItemBase & {

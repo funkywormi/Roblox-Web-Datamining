@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { reportAXError } from "../utils/axAnalyticsService";
 import AvatarAPIService, { ErrorData } from "../services/avatarAPIService";
 import { useSystemFeedback } from "../contexts/SystemFeedbackContext";
@@ -11,7 +11,7 @@ interface RedrawThumbnailButtonProps {
 }
 
 function RedrawThumbnailButton({ forceRefreshThumbnail }: RedrawThumbnailButtonProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
 
   const [redrawFloodchecked, setRedrawFloodchecked] = useState(false);

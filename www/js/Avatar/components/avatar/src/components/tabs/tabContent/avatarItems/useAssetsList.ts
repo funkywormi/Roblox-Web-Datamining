@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { TranslateFunction } from "@rbx/core-scripts/react";
+import type { TranslateFn } from "../../../../utils/translate";
 import { mapItemRestrictionIcons } from "@rbx/www-common/components/itemCard";
 import { reportAXError } from "../../../../utils/axAnalyticsService";
 import AvatarAccoutrementService from "../../../../utils/avatarAccoutrementService";
@@ -17,7 +17,7 @@ import parseError from "../../../../utils/parseErrorUtil";
 
 export type AvatarListParams = {
   isItemSelected: (item: CatalogItem) => boolean;
-  translate: TranslateFunction;
+  translate: TranslateFn;
 };
 
 function useAssetsList({ isItemSelected, translate }: AvatarListParams) {

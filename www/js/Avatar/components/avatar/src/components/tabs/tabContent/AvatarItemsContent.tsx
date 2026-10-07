@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import classNames from "classnames";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../../utils/translate";
 import { isBlackbirdUser } from "@rbx/core-scripts/meta/user";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import { mapItemRestrictionIcons } from "@rbx/www-common/components/itemCard";
@@ -144,7 +144,7 @@ function AvatarItemsContent({
   onItemClicked,
   isItemSelected,
 }: AvatarItemsContentProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const { selectedTab, selectedSubcategory, selectedCategoryRow, showAdvancedAccessoriesLink } =
     useAvatarTabsContext();
 
@@ -371,6 +371,7 @@ function AvatarItemsContent({
                 type: "Asset",
                 expirationTime: returnedItem.expirationTime,
                 availabilityStatus: returnedItem.availabilityStatus,
+                license: returnedItem.license,
               };
               const catalogItem = {
                 ...assetItem,
@@ -398,6 +399,7 @@ function AvatarItemsContent({
                 linkedEntityId,
                 linkedEntityType,
                 availabilityStatus: returnedItem.availabilityStatus,
+                license: returnedItem.license,
               };
               const catalogItem = {
                 ...outfitItem,
@@ -589,6 +591,8 @@ function AvatarItemsContent({
                       // post-itemDetails update; catalog/itemDetails responses
                       // don't return it, but it drives the disabled tile.
                       availabilityStatus: existingItem?.availabilityStatus,
+                      // Same for the license block, which drives the licensing badge.
+                      license: existingItem?.license,
                     };
 
                     if (position !== undefined && newItems[position]) {

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../utils/translate";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { useAvatarEditingAccessContext } from "../contexts/AvatarEditingAccessContext";
 import {
@@ -32,7 +32,7 @@ import { trackAvatarEditorClick, AvatarEditorTrackingEvents } from "../utils/axT
 import { sendAXTracking, AXAnalyticsConstants } from "../utils/axAnalyticsService";
 
 function AvatarPage(): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const [version, setVersion] = useState<number>(0);
   const timeoutRef = useRef<number>();
   const [isEditingBlockedDialogOpen, setIsEditingBlockedDialogOpen] = useState(false);

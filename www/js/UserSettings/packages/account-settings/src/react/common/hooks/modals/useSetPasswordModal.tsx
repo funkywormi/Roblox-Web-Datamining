@@ -43,10 +43,6 @@ const useSetPasswordModal = (): [React.JSX.Element, IModalService] => {
   }, []);
 
   const actionHandler = async (): Promise<void> => {
-    // The request may trigger a 2SV challenge rendered in a separate legacy modal. If this
-    // dialog stays open, the two modals' focus traps fight and the code input cannot be focused.
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    setPasswordModalService.close(true);
     try {
       const secureAuthenticationIntent = await generateSecureAuthIntentV2();
       const updatebody: TUpdatePasswordBody = {
@@ -55,14 +51,14 @@ const useSetPasswordModal = (): [React.JSX.Element, IModalService] => {
         secureAuthenticationIntent,
       };
       await changePassword(updatebody).unwrap();
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      setPasswordModalService.close();
       passwordChangedModalService.open();
     } catch (error) {
       // Ignore challenge abandons for errors.
       if (error !== ChallengeAbandonedError) {
         setErrorMessage(translate(error as string));
       }
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      setPasswordModalService.open();
       return;
     }
     cleanUpState();

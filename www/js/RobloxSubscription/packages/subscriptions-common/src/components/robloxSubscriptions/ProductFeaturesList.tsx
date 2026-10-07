@@ -25,7 +25,7 @@ type ProductFeaturesDisplayRowProps = {
 };
 
 const tileCardClassName =
-  "height-full min-width-0 grow-1 gap-x-large radius-medium !bg-surface-100 stroke-standard stroke-default padding-medium box-border flex items-center";
+  "min-width-0 grow-1 gap-x-large radius-medium !bg-surface-100 stroke-standard stroke-default padding-medium box-border flex items-center";
 
 const ProductFeaturesDisplayRow: FC<ProductFeaturesDisplayRowProps> = ({
   expandedPrimary,
@@ -48,7 +48,7 @@ const ProductFeaturesDisplayRow: FC<ProductFeaturesDisplayRowProps> = ({
   );
 
   return (
-    <li className="min-width-0 height-full flex list-none flex-col [list-style:none]">
+    <li className="min-width-0 flex list-none flex-col [list-style:none]">
       {onTileClick != null ? (
         <button
           aria-label={primary}

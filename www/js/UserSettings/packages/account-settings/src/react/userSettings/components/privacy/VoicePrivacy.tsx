@@ -23,16 +23,20 @@ import {
   displayDataConsentSetting,
   displayMicrophoneSetting,
 } from "../../utils/voiceAvatarChatUtils";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
 import ToggleWithParentalConsent from "../../../common/components/ToggleWithParentalConsent";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import {
   voiceDataConsentSettingConsentName,
   voiceDataConsentSettingParentSideConsentName,
   voiceDataConsentSettingSurface,
 } from "../../constants/privacy/privacyConstants";
 
-export const VoicePrivacy = ({ child }: { child?: TChildInfo }): JSX.Element => {
+export const VoicePrivacy = ({
+  child,
+  onUpdateSetting,
+}: { child?: TChildSettingsInfo } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
 
@@ -61,10 +65,11 @@ export const VoicePrivacy = ({ child }: { child?: TChildInfo }): JSX.Element => 
     );
   };
 
-  const [settingsAndOptions] = useGetSettingsAndOptions();
+  const [settingsAndOptions] = useGetSettingsAndOptions(child?.userId);
 
   const dataConsentToggle = (
     <ToggleWithParentalConsent
+      onUpdateSetting={onUpdateSetting}
       label={
         (child
           ? parentSideLegallySensitiveContent.wordsOfConsent.title

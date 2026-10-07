@@ -6,6 +6,7 @@ import {
   remoteParentRequestApi,
   type RemoteParentRequestApi,
 } from "../../services/remoteParentRequestApi";
+import { useOdpAnalytics } from "../../analytics/odpAnalytics";
 import type { NodeComponent, NodeProps } from "../../types";
 
 const PARENT_CONSENT = "ParentConsent";
@@ -124,6 +125,8 @@ export const RemoteParentRequestNode: NodeComponent = ({
   const [errorKey, setErrorKey] = useState("Message.SomethingWentWrong");
   const startedRef = useRef(false);
   const reportedRef = useRef(false);
+  const requestSentReportedRef = useRef(false);
+  const odpAnalytics = useOdpAnalytics(ctx);
 
   const consentName =
     isChildSubjectToParentalControls === undefined
@@ -237,6 +240,15 @@ export const RemoteParentRequestNode: NodeComponent = ({
     return translate("Message.EmailSentPluralParent");
   }, [parentEmails, requestCreatedWithoutEmail, translate]);
 
+  useEffect(() => {
+    // Gate on the confirmation step only: `<sessionUuid>` is the analytics session (FAMEX-209),
+    // so the VPC send session must not gate or key this event.
+    if (step === "confirmation" && !requestSentReportedRef.current) {
+      requestSentReportedRef.current = true;
+      odpAnalytics.remoteRequestSent();
+    }
+  }, [odpAnalytics, step]);
+
   if (step === "loading" || step === "sending") {
     return (
       <div className="flex justify-center">
@@ -334,7 +346,8 @@ export const RemoteParentRequestNode: NodeComponent = ({
           dangerouslySetInnerHTML={{ __html: legallySensitiveCopy.description ?? "" }}
         />
       </div>
-      <div className="gap-xxlarge flex flex-col">
+      {/* The reserved caption row already separates the field from the button. */}
+      <div className="gap-xsmall flex flex-col">
         <TextInput
           type="email"
           size="Medium"
@@ -348,6 +361,16 @@ export const RemoteParentRequestNode: NodeComponent = ({
             setEmail(event.target.value);
           }}
           error={emailError}
+          // TextInput mounts its caption only when there is hint text. Keep that row
+          // reserved with the same string, hidden, so "Invalid email" fills it instead
+          // of pushing the send button and privacy footer down.
+          helperText={
+            emailError === undefined ? (
+              <span aria-hidden="true" className="invisible">
+                {translate("Message.InvalidEmail")}
+              </span>
+            ) : undefined
+          }
           hasError={emailError !== undefined}
         />
         <Button

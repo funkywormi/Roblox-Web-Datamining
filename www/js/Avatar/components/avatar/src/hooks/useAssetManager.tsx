@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
-import { ThumbnailTypes } from "@rbx/thumbnails";
+import { ThumbnailTypes } from "../constants/thumbnailConstants";
 import { ClassicHeadSlot, HatSlot, CategorySlot } from "../types";
 import avatarConstants from "../constants/avatarConstants";
 import AvatarAPIService, { getInvalidAssetIds } from "../services/avatarAPIService";

@@ -3,8 +3,9 @@ import classNames from "classnames";
 import { ItemCard, checkIfBundle } from "@rbx/www-common/components/itemCard";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import VerifiedBadgeIcon from "@rbx/www-common/components/verified-badge";
-import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
+import { ThumbnailTypes } from "../constants/thumbnailConstants";
+import { useAvatarTranslate } from "../utils/translate";
 import RecommendationsService, {
   CatalogMetadata,
   RecommendationsMetadata,
@@ -54,7 +55,8 @@ const AvatarRecommendations: React.FC<AvatarRecommendationsProps> = ({
   pageName,
   showSeeAllButton,
 }) => {
-  const { translate } = useTranslation();
+  const tAvatar = useAvatarTranslate("Feature.Avatar");
+  const tRecommendations = useAvatarTranslate("Feature.Recommendations");
   const [items, setItems] = useState<RecommendedItem[]>([]);
   // Display exactly one row sized to the editor's current column count (5/6/7),
   // while prefetching enough to fill the widest layout so resizing up never under-fills.
@@ -294,14 +296,14 @@ const AvatarRecommendations: React.FC<AvatarRecommendationsProps> = ({
         <div className="container-list layer recommendations-container">
           <div className="container-header recommendations-header">
             <h2>
-              <span>{translate("Heading.RecommendedTitle")}</span>
+              <span>{tRecommendations("Heading.RecommendedTitle")}</span>
             </h2>
             {showSeeAllButton && (
               <a
                 className="see-all-button see-all-link-icon btn-secondary-xs"
                 href={getSeeAllLink()}
               >
-                {translate("Action.SeeAll")}
+                {tRecommendations("Action.SeeAll")}
               </a>
             )}
           </div>
@@ -321,7 +323,7 @@ const AvatarRecommendations: React.FC<AvatarRecommendationsProps> = ({
                     // widths (avatar-non-fui.css) and the click-delegation analytics below
                     // both key off of.
                     containerClassName="item-card"
-                    translate={translate}
+                    translate={tAvatar}
                     id={item.id}
                     name={item.name}
                     type={item.itemType}

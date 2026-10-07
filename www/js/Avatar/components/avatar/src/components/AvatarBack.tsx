@@ -1,8 +1,9 @@
 import React, { useCallback } from "react";
 import classNames from "classnames";
-import { Thumbnail2d, ThumbnailAvatarsSize } from "@rbx/thumbnails";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 import { Thumbnail3d } from "@rbx/thumbnails3d";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { ThumbnailAvatarsSize } from "../constants/thumbnailConstants";
+import { useAvatarTranslate } from "../utils/translate";
 import { Button, Icon } from "@rbx/foundation-ui";
 import { getCurrentUserId } from "../utils/currentUser";
 import { DEFAULT_CLASSIC_HEAD } from "../constants/avatarConstants";
@@ -31,7 +32,7 @@ const AvatarBack: React.FC<AvatarBackProps> = ({
   avatarToggleButton,
   toggleThreeDee,
 }) => {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const {
     hatSlots,
     layeredClothingSlots,

@@ -1,5 +1,5 @@
 import { UserSetting } from "@rbx/user-settings";
-import { TChildInfo } from "../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../types/childrenInfoTypes";
 
 /** Structural subset of the V1 and V2 settings bodies, which are otherwise unrelated types. */
 export type TExperienceChatSettingsAndOptions = {
@@ -9,7 +9,7 @@ export type TExperienceChatSettingsAndOptions = {
 
 type TExperienceChatVisibilityArgs = {
   settingsAndOptions: TExperienceChatSettingsAndOptions | undefined;
-  child?: TChildInfo;
+  child?: TChildSettingsInfo;
 };
 
 /**
@@ -26,7 +26,7 @@ export const hasDirectChatSetting = (
 ): boolean => !!settingsAndOptions?.[UserSetting.whoCanWhisperChatWithMeInExperiences];
 
 /** Excludes the direct chat permission, which admits a parent for direct chat alone. */
-export const hasExperienceChatPermission = (child?: TChildInfo): boolean =>
+export const hasExperienceChatPermission = (child?: TChildSettingsInfo): boolean =>
   !child?.userId ||
   !!child.canParentManageChildsCommunicationSettings ||
   !!child.canParentAccessChildBasicPrivacySettings;

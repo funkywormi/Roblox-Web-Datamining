@@ -6,7 +6,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import EmotesRadialMenu from "./EmotesRadialMenu";
 import { CatalogItem } from "../../../avatar.types";
 
@@ -21,7 +21,7 @@ function EquipEmotesDialog({
   isOpen,
   selectedItem,
 }: EquipEmotesDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.Avatar");
   return (
     <Dialog
       open={isOpen}

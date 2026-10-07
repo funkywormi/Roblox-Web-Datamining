@@ -292,6 +292,16 @@ export const ItemDetailsInfoBody = (
           itemType={itemDetails.itemType}
         />
       )}
+      {itemDetails.license && (
+        <div className="clearfix item-info-row-container">
+          <div className="font-header-1 text-subheader text-label text-overflow row-label">
+            {catalogTranslations.labelLicensedBy()}
+          </div>
+          <span className="font-body text wait-for-i18n-format-render">
+            {itemDetails.license.licenseDisplayName}
+          </span>
+        </div>
+      )}
       <div className="clearfix item-info-row-container">
         <div className="font-header-1 text-subheader text-label text-overflow row-label">
           {catalogTranslations.labelTradable()}
@@ -432,7 +442,7 @@ export const ItemDetailsInfoBody = (
               containerClassName="item-details-info-tooltip-container"
             >
               <span className="item-hold-tooltip">
-                <span className="font-body text">{catalogTranslations.labelCategoryType()}</span>
+                <span>{catalogTranslations.labelCategoryType()}</span>
                 <span className="icon-actions-info-sm item-hold-icon" />
               </span>
             </Tooltip>
@@ -475,7 +485,7 @@ export const ItemDetailsInfoBody = (
               containerClassName="item-details-info-tooltip-container"
             >
               <span className="item-hold-tooltip">
-                <span className="font-body text">{catalogTranslations.labelAttributes()}</span>
+                <span>{catalogTranslations.labelAttributes()}</span>
                 <span className="icon-actions-info-sm item-hold-icon" />
               </span>
             </Tooltip>

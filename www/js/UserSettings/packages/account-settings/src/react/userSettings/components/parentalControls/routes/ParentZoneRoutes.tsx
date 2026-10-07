@@ -10,6 +10,8 @@ import OdpTopFriendsPage from "../parentZone/OdpTopFriendsPage";
 import TopGames from "../parentDashboard/TopGames";
 import ManageOnDeviceParentPage from "../parentZone/ManageOnDeviceParentPage";
 import OdpTopGameDetails from "../parentZone/OdpTopGameDetails";
+import OdpSettingsPage from "../parentZone/OdpSettingsPage";
+import { odpSettingsPageList } from "../parentZone/odpSettingsPages";
 import OdpRobuxPage from "../parentZone/OdpRobuxPage";
 import OdpRobuxTransferLimits from "../parentZone/OdpRobuxTransferLimits";
 import OdpScreentimeLimitPage from "../parentZone/OdpScreentimeLimitPage";
@@ -61,6 +63,12 @@ export const ParentZoneRoutes = (): JSX.Element => {
       <Route exact path={parentZonePages.manageOnDeviceParentPage.path}>
         <ManageOnDeviceParentPage />
       </Route>
+
+      {odpSettingsPageList.map(page => (
+        <Route path={page.path} key={page.path}>
+          <OdpSettingsPage name={page.name} />
+        </Route>
+      ))}
 
       {isChildContextSettled && (
         <Route path={`${baseParentalControlsPath}/*`}>

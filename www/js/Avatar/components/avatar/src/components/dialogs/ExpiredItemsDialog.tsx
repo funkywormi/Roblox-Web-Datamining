@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import {
-  Thumbnail2d,
-  ThumbnailTypes,
-  ThumbnailFormat,
-  DefaultThumbnailSize,
-} from "@rbx/thumbnails";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
+import { ThumbnailTypes, DefaultThumbnailSize } from "../../constants/thumbnailConstants";
 import {
   Button,
   Checkbox,
@@ -22,13 +18,13 @@ import {
 } from "@rbx/foundation-ui";
 import { escapeHtml } from "@rbx/core-scripts/format/string";
 import { useFormatter } from "@rbx/www-common/intl";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../utils/translate";
 import { AXSendTrackingActionType } from "@rbx/catalog/analytics/types";
 import { TDetailEntry } from "@rbx/catalog/itemDetailsHydrationService/constants/itemDetailsHydrationConstants";
 import { getCurrentUserId } from "../../utils/currentUser";
 import { sendAXTracking, AXAnalyticsConstants } from "../../utils/axAnalyticsService";
 import { getExpiredItemDetails } from "../../services/expiredItemDetails";
-import BatchBuyPriceContainer from "@rbx/purchase-common/js/react/itemPurchase/components/BatchBuyPriceContainer";
+import BatchBuyPriceContainer from "@rbx/purchase-common/ts/react/itemPurchase/components/BatchBuyPriceContainer";
 import { Asset } from "../../avatar.types";
 import AvatarAPIService from "../../services/avatarAPIService";
 import { getCatalogItemUrl } from "../../utils/assetManager.helpers";
@@ -112,7 +108,8 @@ function ExpiredItemsDialog({
   onRepurchase,
   systemFeedbackService,
 }: ExpiredItemsDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const tAvatar = useAvatarTranslate("Feature.Avatar");
+  const tCatalog = useAvatarTranslate("Feature.Catalog");
   const formatter = useFormatter();
   const [itemDetails, setItemDetails] = useState<TDetailEntry[]>([]);
   // Track selected timed options per asset: { [assetId]: TimedOption[] }
@@ -410,9 +407,9 @@ function ExpiredItemsDialog({
 
   const formatTimedOptionLabel = (days: number): string => {
     if (days === 0) {
-      return translate("Label.Permanent") || "Permanent";
+      return tAvatar("Label.Permanent") || "Permanent";
     }
-    return translate("Label.TimedOptionDays", { days: days.toString() }) || `${days} days`;
+    return tAvatar("Label.TimedOptionDays", { days: days.toString() }) || `${days} days`;
   };
 
   const isSingleItem = expiredAssets.length === 1;
@@ -426,7 +423,7 @@ function ExpiredItemsDialog({
       size="Medium"
       isModal
       hasCloseAffordance
-      closeLabel={translate("Action.Close")}
+      closeLabel={tAvatar("Action.Close")}
     >
       <DialogContent
         className="expired-items-dialog"
@@ -435,15 +432,14 @@ function ExpiredItemsDialog({
         <DialogBody className="flex flex-col gap-small">
           <DialogTitle className="text-title-medium content-emphasis">
             {isSingleItem
-              ? translate("Heading.BuyItem") || "Buy Item"
-              : translate("Title.TimedOptionsExpiredModalTitle", {
+              ? tCatalog("Heading.BuyItem") || "Buy Item"
+              : tAvatar("Title.TimedOptionsExpiredModalTitle", {
                   number: expiredAssets.length.toString(),
                 }) || `${expiredAssets.length} Expired items on this avatar`}
           </DialogTitle>
           {!isSingleItem && (
             <span className="text-body-medium content-default">
-              {translate("Body.TimedOptionsExpiredItemsBody") ||
-                "Buy these items again to use them"}
+              {tAvatar("Body.TimedOptionsExpiredItemsBody") || "Buy these items again to use them"}
             </span>
           )}
           {expiredAssets.length > 0 && (
@@ -488,8 +484,8 @@ function ExpiredItemsDialog({
                           type={ThumbnailTypes.assetThumbnail}
                           size={DefaultThumbnailSize}
                           targetId={asset.id}
-                          containerClass="expired-item-thumb"
-                          format={ThumbnailFormat.webp}
+                          containerClassName="expired-item-thumb"
+                          format="webp"
                           altName={
                             (itemName || "Expired Item") + (creatorName ? ` by ${creatorName}` : "")
                           }
@@ -504,7 +500,7 @@ function ExpiredItemsDialog({
                             onCheckedChange={() => {
                               handleItemCheckboxChange(asset.id);
                             }}
-                            aria-label={translate("Action.Select") || "Select item"}
+                            aria-label={tAvatar("Action.Select") || "Select item"}
                           />
                         </div>
                       )}
@@ -529,7 +525,7 @@ function ExpiredItemsDialog({
                               }}
                             >
                               <span className="timed-option-toggle-label">
-                                {translate("Action.Buy") || "Buy"}
+                                {tCatalog("Action.Buy") || "Buy"}
                               </span>
                               <span className="timed-option-toggle-price">
                                 <Icon name="icon-filled-robux" size="Small" />
@@ -556,7 +552,7 @@ function ExpiredItemsDialog({
                               }}
                             >
                               <span className="timed-option-toggle-label">
-                                {translate("Action.Rent") || "Rent"}
+                                {tCatalog("Action.Rent") || "Rent"}
                               </span>
                               <span className="timed-option-toggle-price">
                                 <Icon name="icon-filled-robux" size="Small" />
@@ -616,7 +612,7 @@ function ExpiredItemsDialog({
             {!isSingleItem && (
               <div className="total-row">
                 <span className="total-label">
-                  {translate("Label.TryOnManagerDescriptor", {
+                  {tAvatar("Label.TryOnManagerDescriptor", {
                     numItems: getSelectedCount().toString(),
                   }) || `Total: ${getSelectedCount()} items`}
                 </span>
@@ -637,11 +633,11 @@ function ExpiredItemsDialog({
                 />
               ) : (
                 <Button variant="Emphasis" size="Medium" isDisabled>
-                  {translate("Action.Buy") || "Buy"}
+                  {tCatalog("Action.Buy") || "Buy"}
                 </Button>
               )}
               <Button variant="Standard" size="Medium" onClick={closeDialog}>
-                {translate("Action.Cancel") || "Cancel"}
+                {tAvatar("Action.Cancel") || "Cancel"}
               </Button>
             </div>
             {remainingBalance !== null && (
@@ -650,7 +646,7 @@ function ExpiredItemsDialog({
                 // eslint-disable-next-line react/no-danger
                 dangerouslySetInnerHTML={{
                   __html:
-                    translate("Label.YourBalanceAfterTransaction", {
+                    tCatalog("Label.YourBalanceAfterTransaction", {
                       remainingBalance: `<span class='icon-robux-16x16'></span><span class='text-robux'>${escapeHtml(formatter.number(remainingBalance))}</span>`,
                     }) ||
                     `Your balance after this transaction will be <span class='icon-robux-16x16'></span><span class='text-robux'>${escapeHtml(formatter.number(remainingBalance))}</span>`,

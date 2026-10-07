@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { Toggle } from "@rbx/foundation-ui";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import { useCurrentlyWearingAssetsStoreContext } from "../contexts/CurrentlyWearingAssetsStoreContext";
@@ -8,7 +8,7 @@ import { useSystemFeedback } from "../contexts/SystemFeedbackContext";
 import avatarConstants from "../constants/avatarConstants";
 
 function FacialAnimationSwitch(): JSX.Element | null {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.Avatar");
   const { currentlyWornAssetsList } = useCurrentlyWearingAssetsStoreContext();
   const { setWearingAssets } = useAssetManagerContext();
   const systemFeedback = useSystemFeedback();

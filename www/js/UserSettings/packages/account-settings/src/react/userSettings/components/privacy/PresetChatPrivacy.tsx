@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-utilities";
-import { authenticatedUser } from "header-scripts";
 import {
   EnabledStatusValue,
   TUpdateUserSettingValueRequest,
@@ -19,24 +18,25 @@ import {
   getSuccessMessageKeyForUserSettingsUpdate,
   handleChildSettingsUpdateError,
 } from "../../utils/successMessageUtils";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
-import { useAppSelector } from "../../../redux/hooks";
-import { selectSettingConsentRequirementsV2 } from "../../../apis/slices/parentalConsentSlice";
+import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import useAutoSettingUpdate from "../../hooks/useAutoSettingUpdate";
 import { useGetSettingsUiPolicyQuery } from "../../../apis/universalAppConfigurationApi";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
-export const PresetChatPrivacy = ({ child }: { child?: TChildInfo }): JSX.Element => {
+export const PresetChatPrivacy = ({
+  child,
+  onUpdateSetting,
+}: { child?: TChildSettingsInfo } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
   const shouldShowRestrictivePresetChatSetting = child?.userId
     ? child.shouldShowRestrictivePresetChatSetting
     : uiPolicy?.shouldShowRestrictivePresetChatSetting;
-  const [settingsAndOptions] = useGetSettingsAndOptionsV2(child?.userId);
-  const [updateSettingValue] = useUpdateUserSettingValueV2Mutation();
-  const consentRequirementsV2 = useAppSelector(
-    selectSettingConsentRequirementsV2(child?.userId ?? authenticatedUser.id!),
+  const [settingsAndOptions, , , , consentRequirementsV2] = useGetSettingsAndOptionsV2(
+    child?.userId,
   );
+  const [updateSettingValue] = useUpdateUserSettingValueV2Mutation();
 
   const updatePresetChat = async (newValue: EnabledStatusValue) => {
     const updateBody: TUpdateUserSettingValueRequest = {
@@ -47,6 +47,10 @@ export const PresetChatPrivacy = ({ child }: { child?: TChildInfo }): JSX.Elemen
       useRequirementsMapV2: true,
     };
     try {
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {

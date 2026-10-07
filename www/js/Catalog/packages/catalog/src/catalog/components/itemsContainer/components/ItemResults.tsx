@@ -153,6 +153,7 @@ function ItemResults(props: ItemResultsProps & WithTranslationsProps): JSX.Eleme
             }
             enableThumbnailPrice={enableThumbnailPrice}
             timedOptions={processedTimedOptions}
+            licenseType={item.license?.licenseType}
           />
         </div>
       );

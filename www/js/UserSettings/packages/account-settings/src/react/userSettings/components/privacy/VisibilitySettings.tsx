@@ -25,11 +25,19 @@ import {
   handleChildSettingsUpdateError,
   getSuccessMessageKeyForUserSettingsUpdate,
 } from "../../utils/successMessageUtils";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import { shareActivityUpdatesHelpPageUrl } from "../../constants/urlConstants";
 import { ThirdPartyFriendAccess } from "./ThirdPartyFriendAccess";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
-export const VisibilitySettings = ({ child }: { child?: TChildInfo }): JSX.Element => {
+export const VisibilitySettings = ({
+  child,
+  onUpdateSetting,
+  showThirdPartyFriendAccess = true,
+}: {
+  child?: TChildSettingsInfo;
+  showThirdPartyFriendAccess?: boolean;
+} & TSettingUpdateProps): JSX.Element => {
   const childUserId = child?.userId;
   const { translate } = useWrappedTranslation();
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
@@ -52,6 +60,10 @@ export const VisibilitySettings = ({ child }: { child?: TChildInfo }): JSX.Eleme
       value: newPrivacyLevel,
     };
     try {
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {
@@ -72,6 +84,10 @@ export const VisibilitySettings = ({ child }: { child?: TChildInfo }): JSX.Eleme
       value: newPrivacyLevel,
     };
     try {
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {
@@ -133,24 +149,27 @@ export const VisibilitySettings = ({ child }: { child?: TChildInfo }): JSX.Eleme
         )}
 
         {/* Show current experience privacy */}
-        <RadioButtonOptionsWithParentalConsent
-          title={translate(privacyTranslationConstants.showCurrentExperienceLabel)}
-          settingName={UserSetting.whoCanJoinMeInExperiences}
-          options={joinExperiencePrivacyOptions}
-          className="section-content"
-          childUserId={childUserId}
-          onOptionSelected={updateJoinExperiencePrivacy}
-          description={
-            childUserId
-              ? translate(privacyTranslationConstants.parentSideShowCurrentExperienceDescription)
-              : translate(privacyTranslationConstants.showCurrentExperienceDescription)
-          }
-          id="show-current-experience-privacy"
-        />
+        {settingsAndOptions?.[UserSetting.whoCanJoinMeInExperiences] && (
+          <RadioButtonOptionsWithParentalConsent
+            title={translate(privacyTranslationConstants.showCurrentExperienceLabel)}
+            settingName={UserSetting.whoCanJoinMeInExperiences}
+            options={joinExperiencePrivacyOptions}
+            className="section-content"
+            childUserId={childUserId}
+            onOptionSelected={updateJoinExperiencePrivacy}
+            description={
+              childUserId
+                ? translate(privacyTranslationConstants.parentSideShowCurrentExperienceDescription)
+                : translate(privacyTranslationConstants.showCurrentExperienceDescription)
+            }
+            id="show-current-experience-privacy"
+          />
+        )}
 
         {/* Share activity updates setting */}
         {settingsAndOptions?.[UserSetting.updateFriendsAboutMyActivity] && (
           <ToggleWithParentalConsent
+            onUpdateSetting={onUpdateSetting}
             label={translate(privacyTranslationConstants.shareActivityUpdatesLabel)}
             settingName={UserSetting.updateFriendsAboutMyActivity}
             childUserId={childUserId}
@@ -180,13 +199,17 @@ export const VisibilitySettings = ({ child }: { child?: TChildInfo }): JSX.Eleme
         {/* Social networks visibility setting */}
         {/* This only exists in visibility settings for parent view */}
         {/* For child-side view, it lives in account info tab */}
-        {childUserId && settingsAndOptions?.[UserSetting.whoCanSeeMySocialNetworks] && (
-          <SocialNetworkVisibility child={child} />
-        )}
+        {childUserId &&
+          (uiPolicy?.enforceAgeVerificationForSocialLinks
+            ? settingsAndOptionsV2
+            : settingsAndOptions)?.[UserSetting.whoCanSeeMySocialNetworks] && (
+            <SocialNetworkVisibility onUpdateSetting={onUpdateSetting} child={child} />
+          )}
 
-        {settingsAndOptionsV2?.[UserSetting.allowThirdPartyFriendAccess] && (
-          <ThirdPartyFriendAccess childUserId={childUserId} />
-        )}
+        {showThirdPartyFriendAccess &&
+          settingsAndOptionsV2?.[UserSetting.allowThirdPartyFriendAccess] && (
+            <ThirdPartyFriendAccess childUserId={childUserId} />
+          )}
       </React.Fragment>
     </SettingsSection>
   );

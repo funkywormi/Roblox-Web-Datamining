@@ -2,11 +2,12 @@ import React from "react";
 import ChildDashboardLandingPage from "../childDashboard/ChildDashboardLandingPage";
 import OdpAccountUpgradeBanner from "./OdpAccountUpgradeBanner";
 import OdpParentInsights from "./OdpParentInsights";
+import OdpSettingManagement from "./OdpSettingManagement";
 import OdpRobuxSection from "./OdpRobuxSection";
 import { useGetOdpChildContextQuery } from "../../../../apis/parentalControlsApi";
 
 // Main landing page for when ODP is launched
-// Contains components for the ODP account upgrade banner, linked parent list, PIN management, insights, and settings you manage
+// Contains components for the ODP account upgrade banner, linked parent list, PIN management, insights, and settings management
 // Shows different components based on child's linked ODP/remote parent status
 export const ParentZoneLandingPage = (): JSX.Element => {
   const { data: odpChildContext } = useGetOdpChildContextQuery();
@@ -18,7 +19,7 @@ export const ParentZoneLandingPage = (): JSX.Element => {
       <OdpRobuxSection />
       <OdpParentInsights />
 
-      {/* TODO FAMEX-174: Add settings you manage */}
+      <OdpSettingManagement />
     </React.Fragment>
   );
 };

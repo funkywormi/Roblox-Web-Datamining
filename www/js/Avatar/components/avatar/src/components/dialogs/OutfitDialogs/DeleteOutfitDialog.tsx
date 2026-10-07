@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../../utils/translate";
 import { reportAXError } from "../../../utils/axAnalyticsService";
 import { CatalogOutfitItem } from "../../../avatar.types";
 import avatarConstants from "../../../constants/avatarConstants";
@@ -27,7 +27,7 @@ function DeleteOutfitDialog({
   closeDialog,
   deleteOutfitFromDataList,
 }: DeleteOutfitDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const outfitCostumeMessage = avatarConstants.outfits.characterMessages;
   const [hasError, setHasError] = React.useState<boolean>(false);

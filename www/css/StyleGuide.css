@@ -23633,6 +23633,25 @@ a.btn-growth-md:active {
     right: 6px
 }
 
+.item-card-thumb-container .thumbnail-badges-container {
+    float: left;
+    z-index: 1;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    gap: 4px;
+    display: -ms-flexbox;
+    display: flex;
+    position: absolute;
+    top: 16px;
+    left: 16px
+}
+
+.item-card-thumb-container .thumbnail-badges-container .timed-option-time {
+    margin-left: 4px
+}
+
 .item-card-thumb-container .item-expire-time-label {
     background-color: var(--color-extended-red-700);
     color: var(--color-extended-white-100);
@@ -23831,21 +23850,6 @@ a.btn-growth-md:active {
         width: 100%;
         height: 100%
     }
-}
-
-.item-cards-stackable .item-card-thumb-container .timed-options-container {
-    float: left;
-    z-index: 1;
-    border-radius: 9999px;
-    display: -ms-flexbox;
-    display: flex;
-    position: absolute;
-    top: 10px;
-    left: 10px
-}
-
-.item-cards-stackable .item-card-thumb-container .timed-options-container .timed-option-time {
-    margin-left: 4px
 }
 
 .item-cards-stackable .item-card-thumb-container .item-card-thumb-container-inner {

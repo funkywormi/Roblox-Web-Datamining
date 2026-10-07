@@ -25,6 +25,7 @@ import {
   TBundleItemDetails,
   TItemCardRestrictions,
 } from "../../itemDetailsInfo/constants/types";
+import type { TItemLicense } from "../../common/types/license";
 
 export type MetadataResponse = {
   isPremiumPriceOnItemTilesEnabled?: boolean;
@@ -74,6 +75,7 @@ export type MarketplaceWidgetContentItem = {
   // "Asset" | "Bundle" - already matches catalogConstants.itemTypes
   type: string;
   id: number;
+  license?: TItemLicense;
 };
 
 export type MarketplaceWidget = {
@@ -114,7 +116,11 @@ export const flattenMarketplaceWidgetItems = (
       const itemKey = `${normalizedType}:${entry.id}`;
       if (!seenItems.has(itemKey)) {
         seenItems.add(itemKey);
-        items.push({ id: entry.id, itemType: normalizedType });
+        items.push({
+          id: entry.id,
+          itemType: normalizedType,
+          ...(entry.license && { license: entry.license }),
+        });
       }
     });
   });
@@ -254,6 +260,7 @@ class CatalogAPIService {
                 }
 
                 const newItem: TGenericItemDetails = {
+                  ...(requestedItem.license && { license: requestedItem.license }),
                   ...item,
                   key: requestedItem.key,
                   ...(item.priceStatus === priceStatus.free && { isFree: true }),

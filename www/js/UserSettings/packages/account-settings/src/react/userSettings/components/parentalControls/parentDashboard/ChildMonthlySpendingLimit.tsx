@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-utilities";
 import { Button } from "react-style-guide";
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
-import { isMonthlyLimitOutOfRange, useSnackbar } from "@rbx/user-settings";
+import { isMonthlyLimitOutOfRange, useSnackbar, UserSetting } from "@rbx/user-settings";
 import {
   ParentConsentType,
   TConsentData,
@@ -11,20 +11,28 @@ import {
 import { useGetParentalSpendControlsQuery } from "../../../../apis/billingApi";
 import { useInitiateConsentByParentMutation } from "../../../../apis/parentalControlsApi";
 import SettingsSection from "../../../../common/components/SettingsSection";
-import { TChildInfo } from "../../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../../types/childrenInfoTypes";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
 import { handleChildSettingsUpdateError } from "../../../utils/successMessageUtils";
 import parentalControlsConstants from "../../../constants/parentalControls/parentalControlsConstants";
 import { spendRestrictionsHelpUrl } from "../../../constants/urlConstants";
+import { TSettingUpdateProps } from "../../../../../types/settingUpdateTypes";
 
-const ChildMonthlySpendingLimit = ({ child }: { child: TChildInfo }): JSX.Element => {
+const ChildMonthlySpendingLimit = ({
+  child,
+  onUpdateSetting,
+}: {
+  child: TChildSettingsInfo;
+} & TSettingUpdateProps): JSX.Element => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
 
   const { spendControls } = parentalControlsTranslationConstants;
 
-  const { data: spendControlSettings } = useGetParentalSpendControlsQuery(child.userId);
+  const { data: spendControlSettings } = useGetParentalSpendControlsQuery(
+    onUpdateSetting ? undefined : child.userId,
+  );
   const [updateChildSettings, { status: updateChildSettingsStatus }] =
     useInitiateConsentByParentMutation();
 
@@ -37,6 +45,15 @@ const ChildMonthlySpendingLimit = ({ child }: { child: TChildInfo }): JSX.Elemen
   }, [spendControlSettings]);
 
   const saveSpendRestrictionsHandler = async (newValue: number | null | undefined) => {
+    if (onUpdateSetting) {
+      await onUpdateSetting({
+        childUserId: child.userId,
+        setting: UserSetting.monthlySpendLimit,
+        value: newValue == null || Number.isNaN(newValue) ? null : newValue,
+        currencyCode: spendControlSettings?.monthlySpendLimitCurrencyType,
+      });
+      return;
+    }
     const details: TConsentData = {
       monthlySpendLimit: newValue,
       monthlySpendLimitCurrencyCode:

@@ -11,7 +11,7 @@ import { buildEntrypointRequest } from "../utils/buildEntrypointRequest";
 import { flowApi } from "../services/flowApi";
 import { WizardHost } from "./WizardHost";
 import { AmpV2WizardEvent, type StartWizardDetail } from "../services/wizardService";
-import type { FlowExitResult, FlowResponse, FlowSelector } from "../types";
+import type { FlowExitResult, FlowResponse, FlowSelector, OdpEventSurface } from "../types";
 
 type Session = {
   detail: StartWizardDetail;
@@ -20,6 +20,50 @@ type Session = {
 
 function rootFlowOf(flow?: FlowSelector): string | undefined {
   return flow != null && flow.name !== "" ? flow.name : undefined;
+}
+
+function asStateToken(value: unknown): string | undefined {
+  if (typeof value === "string" && value !== "") {
+    return value;
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+  return undefined;
+}
+
+function odpEventSurfaceOf(flow?: FlowSelector): OdpEventSurface | undefined {
+  const requestType = flow?.props?.requestType;
+  const requestDetails = flow?.props?.requestDetails;
+  if (
+    typeof requestDetails !== "object" ||
+    requestDetails === null ||
+    Array.isArray(requestDetails)
+  ) {
+    return undefined;
+  }
+
+  const details = Object.fromEntries(Object.entries(requestDetails));
+  const universeId = asStateToken(details.universeId);
+  // Play-button approval is the game-join funnel. Other VPC launches also carry a universe id
+  // (for example unblocking a game from parental controls) and must not be counted here.
+  if (universeId !== undefined && details.experienceManagementAction === "Approve") {
+    return { type: "GameJoin", universeId };
+  }
+
+  const settingNames = Object.keys(details);
+  const settingName = settingNames[0];
+  if (
+    requestType !== "UpdateUserSetting" ||
+    settingNames.length !== 1 ||
+    settingName === undefined ||
+    settingName === "contentAgeRestriction" ||
+    settingName === "universeId"
+  ) {
+    return undefined;
+  }
+
+  return { type: "Settings", settingName };
 }
 
 export function WizardApp(): JSX.Element | null {
@@ -98,6 +142,7 @@ export function WizardApp(): JSX.Element | null {
       initialFragment={fragment}
       target={detail.target}
       rootFlow={rootFlowOf(detail.flow)}
+      odpEventSurface={odpEventSurfaceOf(detail.flow)}
       surface={detail.surface}
       api={detail.api ?? flowApi}
       config={detail.config}

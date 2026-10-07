@@ -5,16 +5,20 @@ import useGetSettingsAndOptions from "../../../apis/hooks/useGetSettingsAndOptio
 import InlineSettingComponent from "../../../common/components/InlineSettingComponent";
 import ToggleWithParentalConsent from "../../../common/components/ToggleWithParentalConsent";
 import privacyTranslationConstants from "../../constants/contentConstants/privacyTranslationConstants";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import { useWrappedTranslation } from "../../hooks/useWrappedTranslation";
 import {
   friendDiscoveryConsentName,
   friendDiscoveryParentSideConsentName,
   friendDiscoverySurface,
 } from "../../constants/privacy/privacyConstants";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
 // Phone number discoverability and contact import settings
-const FriendDiscovery = ({ child }: { child?: TChildInfo }): JSX.Element => {
+const FriendDiscovery = ({
+  child,
+  onUpdateSetting,
+}: { child?: TChildSettingsInfo } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const [settingsAndOptions] = useGetSettingsAndOptions(child?.userId);
   const [legallySensitiveContent, legallySensitiveActions] =
@@ -38,6 +42,7 @@ const FriendDiscovery = ({ child }: { child?: TChildInfo }): JSX.Element => {
       {/* Phone number discoverability */}
       {settingsAndOptions?.[UserSetting.phoneNumberDiscoverability] && (
         <ToggleWithParentalConsent
+          onUpdateSetting={onUpdateSetting}
           label={content.wordsOfConsent.title ?? ""}
           description={content.wordsOfConsent.consent ?? ""}
           childUserId={child?.userId}

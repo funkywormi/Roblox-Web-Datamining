@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Toggle, Button } from "react-style-guide";
-
-import { authenticatedUser } from "header-scripts";
+import { TSettingUpdateProps } from "../../../types/settingUpdateTypes";
 
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import {
@@ -19,8 +18,6 @@ import {
   isOptionBlockedByParentalConsent,
   optionToBoolean,
 } from "../../userSettings/utils/parentalControls/parentalConsentUtils";
-import { useAppSelector } from "../../redux/hooks";
-import { selectSettingConsentRequirements } from "../../apis/slices/parentalConsentSlice";
 import useGetPendingParentalConsentRequest from "../../userSettings/hooks/useGetPendingParentalConsentRequest";
 import useCancelConsentRequestModal from "../hooks/modals/useCancelConsentRequestModal";
 import SettingOptionPendingPill from "./SettingOptionPendingPill";
@@ -52,6 +49,7 @@ export const ToggleWithParentalConsent = ({
   description,
   getAdditionalContent,
   auditHeader,
+  onUpdateSetting,
 }: {
   label: string;
   inputId: string;
@@ -60,16 +58,13 @@ export const ToggleWithParentalConsent = ({
   description?: string | JSX.Element;
   getAdditionalContent?: (isToggleOn: boolean) => React.ReactNode;
   auditHeader?: string;
-}): JSX.Element => {
+} & TSettingUpdateProps): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const { snackbarService } = useSnackbar();
 
-  const settingConsentRequirements = useAppSelector(
-    selectSettingConsentRequirements(childUserId ?? authenticatedUser.id!),
-  );
-
   const [updateSettingValue] = useUpdateUserSettingValueMutation();
-  const [settingsAndOptions, settingsAndOptionsStatus] = useGetSettingsAndOptions(childUserId);
+  const [settingsAndOptions, settingsAndOptionsStatus, settingConsentRequirements] =
+    useGetSettingsAndOptions(childUserId);
 
   const [isToggleOn, setIsToggleOn] = useState<boolean>(false);
   const [displayAskParentButton, setDisplayAskParentButton] = useState(false);
@@ -78,6 +73,7 @@ export const ToggleWithParentalConsent = ({
   const pendingConsent = useGetPendingParentalConsentRequest(
     ParentConsentType.UpdateUserSetting,
     settingName,
+    childUserId,
   );
   const pendingConsentValue = pendingConsent?.consentData?.[settingName];
 
@@ -92,6 +88,11 @@ export const ToggleWithParentalConsent = ({
       ?.currentValue,
   );
   const oppositeOption = booleanToOption(!currOptionAsBoolean, settingName);
+  const optionUnavailable =
+    onUpdateSetting !== undefined &&
+    !(settingsAndOptions as Record<string, TUserSettingAndOptions<any>>)?.[
+      settingName
+    ]?.options?.some(option => option.option.optionValue === oppositeOption);
 
   // Whether the setting requires parental consent to toggle to the opposite option (i.e enabled -> disabled)
   const parentalConsentRequired = isOptionBlockedByParentalConsent(
@@ -117,6 +118,10 @@ export const ToggleWithParentalConsent = ({
       auditHeader,
     };
     try {
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {
@@ -176,7 +181,7 @@ export const ToggleWithParentalConsent = ({
               <Toggle
                 isOn={isToggleOn}
                 onToggle={onToggleHandler}
-                isDisabled={optionBlockedByInheritance}
+                isDisabled={optionBlockedByInheritance || optionUnavailable}
               />
             </div>
           </React.Fragment>

@@ -5317,6 +5317,10 @@ input[type=button].btn-block {
     min-width: min(100% - max(2*var(--margin-small), env(safe-area-inset-left) + env(safe-area-inset-right)), 393px)
 }
 
+.min-width-\[min\(200px\,100\%\)\] {
+    min-width: min(200px, 100%)
+}
+
 .width-\[112px\] {
     width: 112px
 }
@@ -5355,6 +5359,10 @@ input[type=button].btn-block {
     color: var(--inverse-surface-0)
 }
 
+.content-\[var\(--light-mode-content-emphasis\)\] {
+    color: var(--light-mode-content-emphasis)
+}
+
 .content-\[white\] {
     color: #fff
 }
@@ -5369,6 +5377,10 @@ input[type=button].btn-block {
 
 .bg-\[rgb\(from_var\(--color-system-warning\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-warning)r g b/.2)
+}
+
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
 }
 
 .opacity-\[0\.5\] {
@@ -5534,6 +5546,10 @@ input[type=button].btn-block {
 
 .\[grid-template-columns\:repeat\(2\,minmax\(0\,1fr\)\)\] {
     grid-template-columns: repeat(2, minmax(0, 1fr))
+}
+
+.\[overflow-wrap\:anywhere\] {
+    overflow-wrap: anywhere
 }
 
 .\[text-align\:inherit\] {

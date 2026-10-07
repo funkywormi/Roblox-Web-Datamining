@@ -6,8 +6,9 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import classNames from "classnames";
-import { useTranslation } from "@rbx/core-scripts/react";
-import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
+import { useAvatarTranslate } from "../../../utils/translate";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
+import { ThumbnailTypes } from "../../../constants/thumbnailConstants";
 import { reportAXError } from "../../../utils/axAnalyticsService";
 import avatarConstants from "../../../constants/avatarConstants";
 import AvatarAPIService, { InventoryEmote } from "../../../services/avatarAPIService";
@@ -43,7 +44,7 @@ const numberOfEmotePositions = 8;
 const emoteConstants = avatarConstants.emotes;
 
 function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const { enableContinuousLoad } = useAvatarPageContext();
   const systemFeedback = useSystemFeedback();
 
@@ -290,10 +291,10 @@ function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): JSX.Element 
                         })}
                       >
                         <Thumbnail2d
-                          containerClass={classNames("emotes-radial-thumbnail", {
+                          containerClassName={classNames("emotes-radial-thumbnail", {
                             "slice-is-hovered": hoveredPositionIndex === slice.position,
                           })}
-                          targetId={slice.assetId?.toString()}
+                          targetId={slice.assetId}
                           type={ThumbnailTypes.assetThumbnail}
                         />
                       </div>

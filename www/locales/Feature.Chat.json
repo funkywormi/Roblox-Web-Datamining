@@ -159,6 +159,7 @@
     "Label.SearchConnections": "Search for Friends",
     "Heading.FirstInteractionWith": "First interaction with {displayName}",
     "Heading.FirstInteractionWithThisPerson": "First interaction with this person",
+    "Label.MessageNotAvailable": "This message is not available",
     "Description.OSAGroupDescription": "Your safety matters. You can block or report a person anytime from their profile.",
     "Description.OSAGroupViewDetail": "View details.",
     "Action.GroupOSAJoin": "Join",
@@ -188,5 +189,6 @@
     "Heading.SafeChattingWithUsername": "Be safe chatting with {displayName}",
     "Heading.SafeChattingWithThisUser": "Be safe chatting with this person",
     "Label.UnfilteredChat": "Unfiltered chat",
-    "Label.Trusted": "Trusted"
+    "Label.Trusted": "Trusted",
+    "Label.MinimizedChats": "Minimized chats"
 }

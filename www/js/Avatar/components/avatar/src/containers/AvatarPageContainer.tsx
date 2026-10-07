@@ -1,9 +1,9 @@
-import { TranslationProvider } from "@rbx/core-scripts/react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@rbx/core-scripts/react";
 import AvatarPage from "../components/AvatarPage";
 import { SystemFeedbackProvider } from "../contexts/SystemFeedbackContext";
 import { AvatarTabsProvider } from "../contexts/AvatarTabsContext";
 import { AssetManagerProvider } from "../contexts/AssetManagerContext";
-import { translations } from "../../component.json";
 import { CurrentlyWearingAssetsStoreProvider } from "../contexts/CurrentlyWearingAssetsStoreContext";
 import { AvatarPageProvider } from "../contexts/AvatarPageContext";
 import ErrorBoundary from "./ErrorBoundary";
@@ -33,9 +33,9 @@ function AvatarPageWithProviders(): JSX.Element {
 function AvatarPageContainer(): JSX.Element {
   return (
     <ErrorBoundary containerName="AvatarPageContainer">
-      <TranslationProvider config={translations}>
+      <QueryClientProvider client={queryClient}>
         <AvatarPageWithProviders />
-      </TranslationProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }

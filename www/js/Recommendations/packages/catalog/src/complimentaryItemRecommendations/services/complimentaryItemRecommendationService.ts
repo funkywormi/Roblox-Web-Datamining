@@ -1,6 +1,7 @@
 import { AxiosPromise, httpService } from "@rbx/core-scripts/legacy/core-utilities";
 import complimentaryItemRecommendationsConstants from "../constants/complimentaryItemRecommendationsConstants";
 import urlConfigs from "../constants/urlConfigs";
+import type { TItemLicense } from "../../common/types/license";
 
 export type TLCSortExperiementValues = {
   lcSortEnabled: boolean;
@@ -29,6 +30,7 @@ export type TDetailEntry = {
   itemRestrictions: string[];
   id: number;
   itemType: string;
+  license?: TItemLicense;
 };
 export type TItemDetailRequestEntry = {
   itemType: string;

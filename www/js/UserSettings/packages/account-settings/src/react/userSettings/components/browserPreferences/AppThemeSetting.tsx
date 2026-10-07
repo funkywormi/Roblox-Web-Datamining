@@ -12,6 +12,7 @@ import { Badge, Chip, Icon } from "@rbx/foundation-ui";
 import { UserSetting } from "@rbx/user-settings";
 import { useUpdateUserSettingValueMutation } from "../../../apis/userSettingsApi";
 import { useGetSettingsUiPolicyQuery } from "../../../apis/universalAppConfigurationApi";
+import { useGetPlusSubscriptionProductQuery } from "../../../apis/subscriptionsApi";
 import { AppThemesAccess } from "../../../../types/policyTypes";
 import {
   appThemeLabel,
@@ -68,6 +69,11 @@ const AppThemeSettingSection = ({
   const [theme, setTheme] = useState(appThemesByKey.get(getThemeGlobal()) ?? null);
   const [category, setCategory] = useState<AppThemeCategoryId>(theme?.category ?? "dynamic");
   const [upsellOpen, setUpsellOpen] = useState(false);
+  // Prefetched with the banner so its CTA knows about a trial; the sheet reuses the cache.
+  const { data: plusProduct, isLoading: isPlusProductLoading } = useGetPlusSubscriptionProductQuery(
+    undefined,
+    { skip: !isEligible },
+  );
 
   useEffect(() => clearPreviewTheme, []);
 
@@ -182,6 +188,8 @@ const AppThemeSettingSection = ({
             <div className="flex gap-medium">
               <div className="fill basis-0">
                 <AppThemeUpsellBanner
+                  eligibleOffers={plusProduct?.eligibleOffers}
+                  isLoading={isPlusProductLoading}
                   onFirstMount={() => {
                     sawUpsell.current = true;
                     appThemeEventService.upsellBannerShown(isPlus);

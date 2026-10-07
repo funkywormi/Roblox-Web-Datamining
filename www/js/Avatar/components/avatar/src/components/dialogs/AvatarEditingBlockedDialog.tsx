@@ -6,7 +6,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 
 type AvatarEditingBlockedDialogProps = {
   closeDialog: () => void;
@@ -19,7 +19,7 @@ function AvatarEditingBlockedDialog({
   isOpen,
   formattedBlockEndTime,
 }: AvatarEditingBlockedDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.Avatar");
   const blockedMessage = translate("Message.AvatarEditingDisabledTime", {
     date: formattedBlockEndTime,
   });

@@ -148,7 +148,7 @@
 }
 
 .open .dropdown-menu {
-    background-color: #fff;
+    background-color: var(--color-extended-white-100);
     border: 1px solid #ccc
 }
 
@@ -203,6 +203,24 @@
     position: absolute;
     bottom: -2px;
     left: -2px
+}
+
+.assets-explorer-main-content .item-cards .item-license-badge-container {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+    max-width: calc(100% - 24px)
+}
+
+.assets-explorer-main-content .item-cards .item-license-badge {
+    display: inline-block;
+    max-width: 100%;
+    padding: 4px 8px;
+    line-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
 }
 
 .assets-explorer-main-content .pager-holder {

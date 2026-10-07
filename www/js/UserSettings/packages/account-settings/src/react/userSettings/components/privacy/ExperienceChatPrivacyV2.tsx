@@ -7,15 +7,14 @@ import {
   UserSetting,
   useSnackbar,
 } from "@rbx/user-settings";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import baseApi from "../../../apis/common/baseApi";
-import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
+import { useAppDispatch } from "../../../redux/hooks";
 import RadioButtonOptionsWithParentalConsentV2 from "../../../common/components/RadioButtonOptionsWithParentalConsentV2";
 import { filterRadioButtonOptionsWithDescription } from "../../../../core/utils/settingOptionsUtils";
 import useGetSettingsAndOptionsV2 from "../../../apis/hooks/useGetSettingsAndOptionsV2";
 import { useUpdateUserSettingValueMutation } from "../../../apis/userSettingsApi";
 import useAgeVerificationUpsell from "../../hooks/useAgeVerificationUpsell";
-import { selectSettingConsentRequirementsV2 } from "../../../apis/slices/parentalConsentSlice";
 import { optionToString } from "../../utils/parentalControls/parentalConsentUtils";
 import SettingsSection from "../../../common/components/SettingsSection";
 import privacyTranslationConstants from "../../constants/contentConstants/privacyTranslationConstants";
@@ -40,8 +39,12 @@ import {
   hasDirectChatSetting,
   hasExperienceChatSetting,
 } from "../../utils/experienceChatVisibilityUtils";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
-export const ExperienceChatPrivacyV2 = ({ child }: { child?: TChildInfo }): JSX.Element => {
+export const ExperienceChatPrivacyV2 = ({
+  child,
+  onUpdateSetting,
+}: { child?: TChildSettingsInfo } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
   const shouldShowTFRestrictiveCommsCopy = child?.userId
@@ -50,12 +53,11 @@ export const ExperienceChatPrivacyV2 = ({ child }: { child?: TChildInfo }): JSX.
   const dispatch = useAppDispatch();
 
   const { snackbarService } = useSnackbar();
-  const [settingsAndOptions] = useGetSettingsAndOptionsV2(child?.userId);
+  const [settingsAndOptions, , , , consentRequirementsV2] = useGetSettingsAndOptionsV2(
+    child?.userId,
+  );
   const [updateSettingValue] = useUpdateUserSettingValueMutation();
   const { handleAgeCheckUpsells, errorModal } = useAgeVerificationUpsell();
-  const consentRequirementsV2 = useAppSelector(
-    selectSettingConsentRequirementsV2(child?.userId ?? authenticatedUser.id!),
-  );
   const invalidChildSettingsCache = () => {
     const invalidateAction = baseApi.util.invalidateTags([
       getChildSettingsCacheTag(child?.userId ?? authenticatedUser.id!),
@@ -94,6 +96,10 @@ export const ExperienceChatPrivacyV2 = ({ child }: { child?: TChildInfo }): JSX.
         useRequirementsMapV2: true,
       };
       try {
+        if (onUpdateSetting) {
+          await onUpdateSetting(updateBody);
+          return;
+        }
         const result = await updateSettingValue(updateBody).unwrap();
         const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
         if (successMessageKey) {
@@ -146,6 +152,10 @@ export const ExperienceChatPrivacyV2 = ({ child }: { child?: TChildInfo }): JSX.
         useRequirementsMapV2: true,
       };
       try {
+        if (onUpdateSetting) {
+          await onUpdateSetting(updateBody);
+          return;
+        }
         const result = await updateSettingValue(updateBody).unwrap();
         const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
         if (successMessageKey) {

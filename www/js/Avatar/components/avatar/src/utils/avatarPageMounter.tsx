@@ -1,6 +1,12 @@
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
+import type { Namespace } from "@rbx/www-common/i18n";
 import AvatarPageContainer from "../containers/AvatarPageContainer";
+import { translations as rawTranslations } from "../../component.json";
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- CI narrows Namespace; component.json is always valid
+const translations = rawTranslations as unknown as readonly Namespace[];
 
 /** *****************************************************************************
  NOTE:
@@ -12,7 +18,12 @@ function renderApp() {
   const entryPoint = document.getElementById("avatar-react-container");
 
   if (entryPoint) {
-    render(<AvatarPageContainer />, entryPoint);
+    render(
+      <TranslationProviderSCC namespaces={translations}>
+        <AvatarPageContainer />
+      </TranslationProviderSCC>,
+      entryPoint,
+    );
   } else {
     // Recursively call renderApp if target div not found
     // Callback will be triggered before every repaint

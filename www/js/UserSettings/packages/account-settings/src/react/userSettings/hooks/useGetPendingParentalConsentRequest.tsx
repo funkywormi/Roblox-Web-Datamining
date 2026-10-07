@@ -14,17 +14,24 @@ import { getFirstSettingNameInConsentData } from "../utils/parentalControls/pare
  *
  * @param consentType - The type of parental consent.
  * @param settingName - The name of the requested setting (required for UpdateUserSetting type).
+ * @param childUserId - When a parent or on-device parent (ODP) is viewing a child's settings,
+ *   the child's user ID.
  * @returns The pending parental consent for the specified setting, if any.
  */
 const useGetPendingParentalConsentRequest = (
   consentType: ParentConsentType,
   settingName?: UserSetting,
+  childUserId?: number,
 ): TConsentResponse | undefined => {
-  const { data: parentalConsents } = useGetParentalConsentsQuery({
-    childUserId: authenticatedUser.id!,
-    consentStatus: ParentConsentStatus.Pending,
-    consentType,
-  });
+  const skip = childUserId !== undefined;
+  const { data: parentalConsents } = useGetParentalConsentsQuery(
+    {
+      childUserId: authenticatedUser.id!,
+      consentStatus: ParentConsentStatus.Pending,
+      consentType,
+    },
+    { skip },
+  );
 
   const pendingConsent = useMemo(() => {
     const consents: TConsentResponse[] = parentalConsents?.consents ?? [];
@@ -40,7 +47,7 @@ const useGetPendingParentalConsentRequest = (
     }
   }, [consentType, parentalConsents, settingName]);
 
-  return pendingConsent;
+  return skip ? undefined : pendingConsent;
 };
 
 export default useGetPendingParentalConsentRequest;

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import classNames from "classnames";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../utils/translate";
 import { Slider } from "@rbx/foundation-ui";
 import { Scales, ScalesKeys, isScalesWithBodyTypeAndProportion } from "../../constants/types";
 import { useAvatarPageContext } from "../../contexts/AvatarPageContext";
@@ -12,7 +12,7 @@ export type AvatarBodyTypeScaleProps = {
 };
 
 function AvatarBodyTypeScale({ scales, updateScale }: AvatarBodyTypeScaleProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const [value, setValue] = React.useState(0);
 
   useEffect(() => {

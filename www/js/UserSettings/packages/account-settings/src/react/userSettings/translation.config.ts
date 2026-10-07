@@ -14,6 +14,7 @@ export const accountSettingstranslationConfig: TConfig = {
     "Feature.DoNotDisturb",
     "AccountIdentity.AgeCheck",
     "Feature.SocialLinks",
+    "Amp.Upsell",
     "Amp.FAEUpsell",
     "Feature.Accessibility",
     "Feature.RobloxSubscription",

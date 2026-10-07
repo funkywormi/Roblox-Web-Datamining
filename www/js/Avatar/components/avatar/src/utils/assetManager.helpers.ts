@@ -1,6 +1,6 @@
-import { ThumbnailTypes } from "@rbx/thumbnails";
+import { ThumbnailTypes } from "../constants/thumbnailConstants";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
-import { TranslateFunction } from "@rbx/core-scripts/react";
+import type { TranslateFn } from "./translate";
 import { CatalogAssetItem, CatalogOutfitItem } from "../avatar.types";
 
 const getSeoName = (assetName: string): string => {
@@ -40,10 +40,7 @@ function getItemThumbnailAndLink<T extends CatalogAssetItem | CatalogOutfitItem>
   } as Pick<T, "thumbnail" | "thumbnailType" | "link">;
 }
 
-const getExpirationTimeShorthand = (
-  expirationTime: string,
-  translate: TranslateFunction,
-): string => {
+const getExpirationTimeShorthand = (expirationTime: string, translate: TranslateFn): string => {
   const expiration = new Date(expirationTime);
   const now = new Date();
   const diffTime = expiration.getTime() - now.getTime();

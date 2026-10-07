@@ -6,7 +6,7 @@ import {
   useSnackbar,
 } from "@rbx/user-settings";
 import { useWrappedTranslation } from "../../hooks/useWrappedTranslation";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import { Access } from "../../../../types/accessManagementTypes";
 import RadioButtonOptionsWithParentalConsent from "../../../common/components/RadioButtonOptionsWithParentalConsent";
 import { filterRadioButtonOptions } from "../../../../core/utils/settingOptionsUtils";
@@ -23,9 +23,13 @@ import {
 import { useGetFeatureAccessQuery } from "../../../apis/accessManagementApi";
 import AMPFeaturesConstants from "../../constants/AMPFeaturesConstants";
 import birthdayUtils from "../../utils/birthdayUtils";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
 // Who can join your private servers, and whose private servers you can join
-export const PrivateServerPrivacy = ({ child }: { child?: TChildInfo }): JSX.Element => {
+export const PrivateServerPrivacy = ({
+  child,
+  onUpdateSetting,
+}: { child?: TChildSettingsInfo } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const { snackbarService } = useSnackbar();
   const [updateSettingValue] = useUpdateUserSettingValueMutation();
@@ -41,6 +45,10 @@ export const PrivateServerPrivacy = ({ child }: { child?: TChildInfo }): JSX.Ele
         setting: UserSetting.privateServerPrivacy,
         value: newPrivacyLevel,
       };
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {

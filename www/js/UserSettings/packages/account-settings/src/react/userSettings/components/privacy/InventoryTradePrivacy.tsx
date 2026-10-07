@@ -24,14 +24,23 @@ import {
   handleChildSettingsUpdateError,
   getSuccessMessageKeyForUserSettingsUpdate,
 } from "../../utils/successMessageUtils";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
-export const InventoryTradePrivacy = ({ childUserId }: { childUserId?: number }): JSX.Element => {
+export const InventoryTradePrivacy = ({
+  childUserId,
+  onUpdateSetting,
+  showTradeQualityFilter = true,
+}: {
+  childUserId?: number;
+  showTradeQualityFilter?: boolean;
+} & TSettingUpdateProps): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const { snackbarService } = useSnackbar();
   const [updateSettingValue] = useUpdateUserSettingValueMutation();
   const [settingsAndOptions] = useGetSettingsAndOptions(childUserId);
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
   const shouldShowTradeQualityFilter =
+    showTradeQualityFilter &&
     Boolean(uiPolicy?.displayTradeQualityFilter) &&
     Boolean(uiPolicy?.isTradeQualityFilterInSettingsRolledOut) &&
     Boolean(settingsAndOptions?.[UserSetting.tradeQualityFilter]);
@@ -43,6 +52,10 @@ export const InventoryTradePrivacy = ({ childUserId }: { childUserId?: number })
         setting: UserSetting.whoCanSeeMyInventory,
         value: newPrivacyLevel,
       };
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {
@@ -66,6 +79,10 @@ export const InventoryTradePrivacy = ({ childUserId }: { childUserId?: number })
         setting: UserSetting.whoCanTradeWithMe,
         value: newPrivacyLevel,
       };
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {
@@ -146,14 +163,16 @@ export const InventoryTradePrivacy = ({ childUserId }: { childUserId?: number })
   return (
     <SettingsSection description={description}>
       <React.Fragment>
-        <RadioButtonOptionsWithParentalConsent
-          title={translate(privacyTranslationConstants.inventoryVisibilityLabel)}
-          settingName={UserSetting.whoCanSeeMyInventory}
-          options={inventoryVisibilityOptions}
-          className="section-content"
-          childUserId={childUserId}
-          onOptionSelected={updateInventoryVisibility}
-        />
+        {settingsAndOptions?.[UserSetting.whoCanSeeMyInventory] && (
+          <RadioButtonOptionsWithParentalConsent
+            title={translate(privacyTranslationConstants.inventoryVisibilityLabel)}
+            settingName={UserSetting.whoCanSeeMyInventory}
+            options={inventoryVisibilityOptions}
+            className="section-content"
+            childUserId={childUserId}
+            onOptionSelected={updateInventoryVisibility}
+          />
+        )}
         {settingsAndOptions?.[UserSetting.whoCanTradeWithMe] && (
           <RadioButtonOptionsWithParentalConsent
             title={translate(privacyTranslationConstants.tradingLabel)}

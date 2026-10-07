@@ -8,7 +8,7 @@ import {
   DialogTitle,
   TextInput,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import AvatarAccoutrementService from "../../../utils/avatarAccoutrementService";
 import { AdvancedAccessorySlot } from "./AdvancedAccessoriesDialog.types";
@@ -27,7 +27,7 @@ function AdvancedAccessoriesDialog({
   closeDialog,
   isOpen,
 }: AdvancedAccessoriesDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.Avatar");
   const { avatarSettings } = useAvatarPageContext();
   const { setWearingAssetsFromIdsV2 } = useAssetManagerContext();
   const { currentlyWornAssetsList } = useCurrentlyWearingAssetsStoreContext();

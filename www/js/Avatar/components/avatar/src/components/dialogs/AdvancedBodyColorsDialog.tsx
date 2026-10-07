@@ -10,7 +10,7 @@ import {
   RadioGroup,
   TextInput,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../utils/translate";
 import { BodyColor } from "../../avatarRules";
 import { BodyPart } from "../../types";
 import useAdvancedBodyColorsController from "../../hooks/useAdvancedBodyColorsController";
@@ -35,7 +35,7 @@ function AdvancedBodyColorsDialog({
   bodyParts,
   getCurrentBodyPartColor,
 }: AdvancedBodyColorsDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const {
     selectedBodyPart,
     setSelectedBodyPart,

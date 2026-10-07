@@ -34,6 +34,8 @@ export interface CodeInputProps {
   /** Both are required to offer the reveal toggle. Without them, the code stays visible. Must be pre-translated. */
   showLabel?: ReactNode;
   hideLabel?: ReactNode;
+  /** Called with the new state each time the reveal toggle is pressed. */
+  onRevealToggle?: (isRevealed: boolean) => void;
   /** Shown below the boxes in the alert colour. An empty string counts as no error. Must be pre-translated. */
   error?: ReactNode;
   length?: number;
@@ -48,6 +50,7 @@ export const CodeInput = ({
   label,
   showLabel,
   hideLabel,
+  onRevealToggle,
   error,
   length = DEFAULT_LENGTH,
   disabled = false,
@@ -59,6 +62,9 @@ export const CodeInput = ({
   const messageId = `${inputId}-message`;
 
   const [isRevealed, setIsRevealed] = useState(false);
+  // Mirrors `isRevealed` so the toggle can report the state it switched to without a side effect in
+  // the state updater.
+  const isRevealedRef = useRef(false);
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -101,8 +107,10 @@ export const CodeInput = ({
   }, [pinTextCursorToEnd]);
 
   const toggleReveal = useCallback(() => {
-    setIsRevealed(revealed => !revealed);
-  }, []);
+    isRevealedRef.current = !isRevealedRef.current;
+    setIsRevealed(isRevealedRef.current);
+    onRevealToggle?.(isRevealedRef.current);
+  }, [onRevealToggle]);
 
   const canReveal = showLabel !== undefined && hideLabel !== undefined;
   const isMasked = canReveal && !isRevealed;

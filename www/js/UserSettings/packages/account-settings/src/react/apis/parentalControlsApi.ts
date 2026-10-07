@@ -2,6 +2,7 @@ import { FullTagDescription } from "@reduxjs/toolkit/dist/query/endpointDefiniti
 import { authenticatedUser } from "header-scripts";
 import { MaybeDrafted } from "@reduxjs/toolkit/dist/query/core/buildThunks";
 import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
+import { userId } from "@rbx/core-scripts/meta/user";
 import {
   cancelPendingConsentEndpoint,
   CancelPendingConsentErrorCode,
@@ -513,11 +514,16 @@ export const parentalControlsApi = baseApi.injectEndpoints({
         url: childSettingsUrl,
         queryParams: { childUserId },
       }),
-      onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
+      onQueryStarted: async (childUserId, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
+          // When an ODP fetches the signed-in user's own child-settings, skip updateSettingConsentRequirementsState
+          // so we don't overwrite settingConsentRequirementsMap for the signed-in user
+          if (childUserId === userId()) {
+            return;
+          }
           const body: TUpdateSettingConsentRequirementsPayload = {
-            userId: _arg,
+            userId: childUserId,
             settingsAndOptionsBody: data,
           };
           dispatch(updateSettingConsentRequirementsState(body));
@@ -546,11 +552,16 @@ export const parentalControlsApi = baseApi.injectEndpoints({
         url: childSettingsV2Url,
         queryParams: { childUserId },
       }),
-      onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
+      onQueryStarted: async (childUserId, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
+          // When an ODP fetches the signed-in user's own child-settings, skip updateSettingConsentRequirementsState
+          // so we don't overwrite settingConsentRequirementsMap for the signed-in user
+          if (childUserId === userId()) {
+            return;
+          }
           const body: TUpdateSettingConsentRequirementsV2Payload = {
-            userId: _arg,
+            userId: childUserId,
             settingsAndOptionsBody: data,
           };
           dispatch(updateSettingConsentRequirementsV2State(body));

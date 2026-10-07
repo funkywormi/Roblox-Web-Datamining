@@ -8,7 +8,7 @@ import {
   DialogTitle,
   TextInput,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../../utils/translate";
 import { reportAXError } from "../../../utils/axAnalyticsService";
 import avatarConstants from "../../../constants/avatarConstants";
 import AvatarAPIService from "../../../services/avatarAPIService";
@@ -29,7 +29,7 @@ function RenameOutfitDialog({
   closeDialog,
   updateOutfitNameInDataList,
 }: RenameOutfitDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const [newName, setNewName] = React.useState<string>("");
   const [error, setError] = React.useState<string | null>(null);
   const systemFeedback = useSystemFeedback();

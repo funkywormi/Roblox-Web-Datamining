@@ -112,12 +112,6 @@
     width: 125px
 }
 
-.item-list-container .item-list-carousel .item-card .timed-options-container {
-    position: absolute;
-    top: 6px;
-    left: 6px
-}
-
 .item-list-container .item-list-carousel .restriction-icon {
     position: absolute;
     bottom: -2px;

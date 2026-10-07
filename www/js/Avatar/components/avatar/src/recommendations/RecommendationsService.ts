@@ -1,7 +1,7 @@
 import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { formatSeoName } from "@rbx/core-scripts/format/string";
-import { ThumbnailTypes } from "@rbx/thumbnails";
+import { ThumbnailTypes } from "../constants/thumbnailConstants";
 import recommendationsRequests from "./recommendationsRequests";
 import recommendationsConstants, {
   recommendationTypes,

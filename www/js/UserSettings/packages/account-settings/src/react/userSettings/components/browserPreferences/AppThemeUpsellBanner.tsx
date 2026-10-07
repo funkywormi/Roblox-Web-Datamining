@@ -1,15 +1,17 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { Link } from "@rbx/foundation-ui";
-import {
-  appThemeUpsellText,
-  appThemeSubscribeText,
-} from "../../constants/contentConstants/browserPreferencesTranslationConstants";
+import PlusUpsellBanner from "@rbx/subscriptions-common/PlusUpsellBanner";
+import type { SubscriptionOffer } from "@rbx/client-subscriptions-api/v2";
+import { appThemeUpsellText } from "../../constants/contentConstants/browserPreferencesTranslationConstants";
 
 export default function AppThemeUpsellBanner({
+  eligibleOffers,
+  isLoading,
   onFirstMount,
   onSubscribe,
 }: {
+  eligibleOffers?: SubscriptionOffer[];
+  isLoading: boolean;
   onFirstMount: () => void;
   onSubscribe: () => void;
 }) {
@@ -25,16 +27,13 @@ export default function AppThemeUpsellBanner({
   }, [onFirstMount]);
 
   return (
-    <div
-      data-testid="app-theme-upsell"
-      className="flex items-center gap-large padding-medium bg-shift-200 radius-medium"
-    >
-      <span className="fill text-body-medium content-emphasis">
-        {translate(appThemeUpsellText)}
-      </span>
-      <Link as="button" size="Small" underline="always" onClick={onSubscribe}>
-        {translate(appThemeSubscribeText)}
-      </Link>
-    </div>
+    <PlusUpsellBanner
+      appearance="Filled"
+      eligibleOffers={eligibleOffers}
+      isLoading={isLoading}
+      testId="app-theme-upsell"
+      upsellText={translate(appThemeUpsellText)}
+      onClick={onSubscribe}
+    />
   );
 }

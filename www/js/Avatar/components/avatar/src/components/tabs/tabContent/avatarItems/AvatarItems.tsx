@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { CatalogItem, CatalogOutfitItem } from "../../../../avatar.types";
 import AvatarItemCard from "./AvatarItemCard";
 import { OutfitOption } from "../../../../types";
@@ -36,7 +36,8 @@ function AvatarItems({
   closeOutfitMenu,
   onExpiredAssetsClick,
 }: AvatarItemsProps): JSX.Element {
-  const { translate } = useTranslation();
+  const tAvatar = useTranslations("Feature.Avatar");
+  const tCatalog = useTranslations("Feature.Catalog");
   const { enableContinuousLoad } = useAvatarPageContext();
 
   return (
@@ -69,7 +70,7 @@ function AvatarItems({
       {!enableContinuousLoad && !loading && !!canLoadNextPage && (
         <div className="load-more-btn-container">
           <button type="button" className="btn-primary-md" onClick={getNextPage}>
-            <span>{translate("Action.LoadMore")}</span>
+            <span>{tCatalog("Action.LoadMore")}</span>
           </button>
         </div>
       )}

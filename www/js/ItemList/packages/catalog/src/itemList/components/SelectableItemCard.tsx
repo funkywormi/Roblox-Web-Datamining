@@ -9,13 +9,15 @@ import type { TTimedOption } from "../../itemDetailsHydrationService/constants/i
 import translationConfig from "../translation.config";
 import { TItemDisabledReason } from "./ItemListCarousel";
 import { trackItemCardClick, TItemCardSource } from "../../analytics/axTrackingEvents";
+import type { TItemLicense } from "../../common/types/license";
 
-type TDetailEntryWithTimedOptions = TDetailEntry & {
+type TExtendedDetailEntry = TDetailEntry & {
   timedOptions?: TTimedOption[];
+  license?: TItemLicense;
 };
 
 type TSelectableItemCardProps = {
-  item: TDetailEntry;
+  item: TExtendedDetailEntry;
   itemKey: string;
   purchasable: boolean;
   useCheckbox: boolean;
@@ -62,18 +64,17 @@ export const SelectableItemCard = ({
         (!item.isOffSale || item.hasResellers)));
 
   // Process timed options: if defaultPermanentTimedOption is true, set permanent as selected
-  const itemWithTimedOptions = item as TDetailEntryWithTimedOptions;
   let processedTimedOptions: TTimedOption[] | undefined;
-  if (itemWithTimedOptions.timedOptions && itemWithTimedOptions.timedOptions.length > 0) {
+  if (item.timedOptions && item.timedOptions.length > 0) {
     if (defaultPermanentTimedOption) {
       // Override: set permanent as selected, all others as not selected
-      processedTimedOptions = itemWithTimedOptions.timedOptions.map((opt: TTimedOption) => ({
+      processedTimedOptions = item.timedOptions.map((opt: TTimedOption) => ({
         ...opt,
         selected: opt.days === 0,
       }));
     } else {
       // Pass through as-is from hydration service
-      processedTimedOptions = itemWithTimedOptions.timedOptions;
+      processedTimedOptions = item.timedOptions;
     }
   }
 
@@ -163,6 +164,7 @@ export const SelectableItemCard = ({
             </div>
           }
           timedOptions={processedTimedOptions}
+          licenseType={item.license?.licenseType}
         />
       </div>
       {showItemType &&

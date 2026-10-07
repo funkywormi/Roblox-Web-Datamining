@@ -48,7 +48,7 @@ export type Tab = {
 
 export function getTabLabel(
   tab: Tab,
-  translate: (resourceId: string, parameters?: Record<string, unknown>) => string,
+  translate: (resourceId: string, parameters?: Record<string, string | number | Date>) => string,
 ): string {
   const label = translate(tab.label);
   const labelShort = tab.labelShort && translate(tab.labelShort);

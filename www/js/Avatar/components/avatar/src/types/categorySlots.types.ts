@@ -1,5 +1,6 @@
 import React from "react";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
+import type { ThumbnailType } from "@rbx/www-common/components/thumbnail";
 import { EmptySlot } from "./Slot.types";
 
 type AssetType = {
@@ -19,7 +20,7 @@ export type AssetSlot = {
   assetType: AssetType;
   currentVersionId: number;
   thumbnail?: Thumbnail;
-  thumbnailType?: string;
+  thumbnailType?: ThumbnailType;
   link?: string;
   meta?: {
     order?: number;

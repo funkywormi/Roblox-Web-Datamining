@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { authenticatedUser } from "header-scripts";
 import { Button } from "react-style-guide";
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import ClassNames from "classnames";
@@ -11,8 +10,6 @@ import {
   isOptionBlockedByConflictingInheritance,
   isOptionBlockedByParentalConsent,
 } from "../../userSettings/utils/parentalControls/parentalConsentUtils";
-import { useAppSelector } from "../../redux/hooks";
-import { selectSettingConsentRequirements } from "../../apis/slices/parentalConsentSlice";
 import useGetPendingParentalConsentRequest from "../../userSettings/hooks/useGetPendingParentalConsentRequest";
 import useCancelConsentRequestModal from "../hooks/modals/useCancelConsentRequestModal";
 import SettingOptionPendingPill from "./SettingOptionPendingPill";
@@ -56,10 +53,8 @@ export const RadioButtonOptionsWithParentalConsent = ({
   id?: string | undefined;
 }): JSX.Element => {
   const { translate } = useWrappedTranslation();
-  const [settingsAndOptions, settingsAndOptionsStatus] = useGetSettingsAndOptions(childUserId);
-  const settingConsentRequirements = useAppSelector(
-    selectSettingConsentRequirements(childUserId ?? authenticatedUser.id!),
-  );
+  const [settingsAndOptions, settingsAndOptionsStatus, settingConsentRequirements] =
+    useGetSettingsAndOptions(childUserId);
 
   // currentOption represents the value stored in the db (selectedOption could change without an API call if the option
   // is parent-restricted).
@@ -83,6 +78,7 @@ export const RadioButtonOptionsWithParentalConsent = ({
   const pendingConsent = useGetPendingParentalConsentRequest(
     ParentConsentType.UpdateUserSetting,
     settingName,
+    childUserId,
   );
   const pendingConsentValue = pendingConsent?.consentData?.[settingName];
 

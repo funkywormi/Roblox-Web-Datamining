@@ -6,7 +6,7 @@ import {
   useSnackbar,
 } from "@rbx/user-settings";
 import { useWrappedTranslation } from "../../hooks/useWrappedTranslation";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import { useGetFeatureAccessQuery } from "../../../apis/accessManagementApi";
 import { Access } from "../../../../types/accessManagementTypes";
 import { useUpdateUserSettingValueMutation } from "../../../apis/userSettingsApi";
@@ -26,8 +26,12 @@ import {
 } from "../../utils/successMessageUtils";
 import birthdayUtils from "../../utils/birthdayUtils";
 import AMPFeaturesConstants from "../../constants/AMPFeaturesConstants";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
-export const PartySettings = ({ child }: { child?: TChildInfo }): JSX.Element => {
+export const PartySettings = ({
+  child,
+  onUpdateSetting,
+}: { child?: TChildSettingsInfo } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const { snackbarService } = useSnackbar();
   const [settingsAndOptions] = useGetSettingsAndOptions(child?.userId);
@@ -47,6 +51,10 @@ export const PartySettings = ({ child }: { child?: TChildInfo }): JSX.Element =>
       value: newPartySetting,
     };
     try {
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {
@@ -67,6 +75,10 @@ export const PartySettings = ({ child }: { child?: TChildInfo }): JSX.Element =>
       value: newPartySetting,
     };
     try {
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {

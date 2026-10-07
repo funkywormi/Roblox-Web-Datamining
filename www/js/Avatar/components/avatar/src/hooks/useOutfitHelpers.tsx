@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign */
 import { useCallback, useEffect, useState } from "react";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
-import { TranslateFunction } from "@rbx/core-scripts/react";
+import type { TranslateFn } from "../utils/translate";
 import { reportAXError } from "../utils/axAnalyticsService";
 import AvatarAccoutrementService from "../utils/avatarAccoutrementService";
 import AvatarAPIService, {
@@ -39,7 +39,7 @@ import {
 
 const useOutfitHelpers = (
   forceRefreshThumbnail: () => void,
-  translate: TranslateFunction,
+  translate: TranslateFn,
   useExtendedAccessorySlots = false,
   switchToTwoDee?: () => void,
 ) => {

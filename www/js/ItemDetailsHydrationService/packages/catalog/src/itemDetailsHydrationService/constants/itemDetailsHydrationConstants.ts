@@ -1,3 +1,5 @@
+import type { TItemLicense } from "../../common/types/license";
+
 export type TItemDetailRequestEntry = {
   itemType: string;
   id: number;
@@ -96,6 +98,7 @@ export type TDetailEntry = {
   purchaseInfo?: THydratedMarketplacePurchaseInfo;
   timedOptions?: TTimedOption[];
   discountInformation?: TDiscountInformation;
+  license?: TItemLicense;
 };
 
 export type THydratedMarketplacePurchaseInfo = {

@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { authenticatedUser } from "header-scripts";
 import ClassNames from "classnames";
 import { Radio, RadioGroup } from "@rbx/foundation-ui";
 import { RequirementType, TUserSettingsAndOptionsV2, UserSetting } from "@rbx/user-settings";
 import { ParentConsentType } from "../../../types/parentConsentsTypes";
 import { TRadioButtonOptionV2 } from "./RadioButtonOptionsWithParentalConsent";
 import { optionToString } from "../../userSettings/utils/parentalControls/parentalConsentUtils";
-import { useAppSelector } from "../../redux/hooks";
-import { selectSettingConsentRequirementsV2 } from "../../apis/slices/parentalConsentSlice";
 import useGetPendingParentalConsentRequest from "../../userSettings/hooks/useGetPendingParentalConsentRequest";
 import useCancelConsentRequestModalV2 from "../hooks/modals/useCancelConsentRequestModalV2";
 import useGetSettingsAndOptionsV2 from "../../apis/hooks/useGetSettingsAndOptionsV2";
@@ -22,7 +19,7 @@ import {
 } from "../../../core/utils/settingOptionsUtils";
 import privacyTranslationConstants from "../../userSettings/constants/contentConstants/privacyTranslationConstants";
 import parentalControlsEventService from "../../userSettings/services/eventServices/parentalControlsEventService";
-import { TChildInfo } from "../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../types/childrenInfoTypes";
 import eventService from "../../userSettings/services/eventServices/eventService";
 import commonTranslationConstants from "../../userSettings/constants/contentConstants/commonTranslationConstants";
 
@@ -31,7 +28,7 @@ type RadioButtonOptionsWithParentalConsentV2Props = {
   settingName: UserSetting;
   onOptionSelected: (value: any) => void;
   className?: string;
-  child?: TChildInfo | undefined;
+  child?: TChildSettingsInfo | undefined;
   title?: string | undefined;
   description?: string | JSX.Element | undefined;
   id?: string | undefined;
@@ -57,12 +54,8 @@ const RadioButtonOptionsWithParentalConsentV2 = ({
   const canSeeChatTerminology = child?.userId
     ? (child?.canSeeChatTerminology ?? false)
     : (uiPolicy?.canSeeChatTerminology ?? false);
-  const [settingsAndOptions, isLoading, isError, isFetching] = useGetSettingsAndOptionsV2(
-    child?.userId,
-  );
-  const settingConsentRequirements = useAppSelector(
-    selectSettingConsentRequirementsV2(child?.userId ?? authenticatedUser.id!),
-  );
+  const [settingsAndOptions, isLoading, isError, isFetching, settingConsentRequirements] =
+    useGetSettingsAndOptionsV2(child?.userId);
 
   // currentOption represents the value stored in the db (selectedOption could change without an API call if the option
   // is parent-restricted).
@@ -84,10 +77,12 @@ const RadioButtonOptionsWithParentalConsentV2 = ({
   const settingPendingConsent = useGetPendingParentalConsentRequest(
     ParentConsentType.UpdateUserSetting,
     settingName,
+    child?.userId,
   );
   const ageCheckPendingConsent = useGetPendingParentalConsentRequest(
     ParentConsentType.UpdateUserSetting,
     UserSetting.allowFacialAgeEstimation,
+    child?.userId,
   );
   const optionsWithRequiredActions = settingConsentRequirements?.[settingName];
   let requireParentalConsentOnAgeCheck = false;

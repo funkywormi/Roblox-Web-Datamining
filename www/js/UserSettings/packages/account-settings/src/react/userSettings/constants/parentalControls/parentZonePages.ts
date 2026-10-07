@@ -4,6 +4,10 @@ import SettingCategoryPageName from "../../../../enums/SettingCategoryPageName";
 import { TSettingsPage } from "../../../../types/commonTypes";
 import { baseParentalControlsPath } from "./parentalControlsConstants";
 import parentalControlsTranslationConstants from "../contentConstants/parentalControlsTranslationConstants";
+import {
+  odpSettingsPageList,
+  odpSettingsSubpageList,
+} from "../../components/parentalControls/parentZone/odpSettingsPages";
 
 const { pageTitles } = parentalControlsTranslationConstants;
 
@@ -64,6 +68,10 @@ export const parentZonePages: TParentZonePages = {
 export const getParentZoneTopGameDetailsPath = (universeId: number | string): string =>
   `${topGamesPath}/${universeId}`;
 
-export const parentZonePageList: TSettingsPage[] = Object.values(parentZonePages);
+export const parentZonePageList: TSettingsPage[] = [
+  ...Object.values(parentZonePages),
+  ...odpSettingsPageList,
+  ...odpSettingsSubpageList,
+];
 
 export default parentZonePages;

@@ -19,7 +19,12 @@ import { AvatarConfig, AvatarConfigV2, AvatarScales } from "../avatarRequest";
 import { CatalogSettings } from "../catalogMetadataRequest";
 import { AvatarAppPolicy } from "../avatarAppPolicy";
 import { AvatarSettings } from "../metadataRequest";
-import { AvatarItemAvailabilityStatus, CatalogItem, CatalogOutfitItem } from "../avatar.types";
+import {
+  AvatarItemAvailabilityStatus,
+  CatalogItem,
+  CatalogOutfitItem,
+  ItemLicense,
+} from "../avatar.types";
 import { OutfitDetails, OutfitDetailsV3 } from "../types";
 import { BodyColorsStateV2, BodyColorsV2Request } from "../types/bodyColors.types";
 import {
@@ -155,6 +160,7 @@ export type AvatarInventoryItem = {
   headShape?: string;
   availabilityStatus?: AvatarItemAvailabilityStatus;
   isPlusExclusive?: boolean;
+  license?: ItemLicense;
   outfitDetail?: {
     // 64-bit long on the wire; rewritten to string by preserveJsonNumberPrecision.
     linkedEntityId?: string;

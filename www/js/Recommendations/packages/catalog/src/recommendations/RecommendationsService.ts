@@ -6,6 +6,7 @@ import { ItemCardUtils } from "@rbx/core-ui/legacy/react-style-guide";
 import recommendationsRequests from "./recommendationsRequests";
 import recommendationsConstants, { recommendationTypes } from "./recommendationsConstants";
 import { TAssetItemDetails, TBundleItemDetails } from "./types";
+import type { TItemLicense } from "../common/types/license";
 
 type Creator = {
   name: string;
@@ -94,6 +95,7 @@ type BaseItem = {
   priceStatus?: string;
   unitsAvailableForConsumption?: number;
   itemStatus?: string[];
+  license?: TItemLicense;
 };
 
 type BundleItem = BaseItem & {
@@ -213,6 +215,7 @@ class RecommendationsService {
         .itemRestrictionIcon,
       priceStatus: result.priceStatus,
       unitsAvailableForConsumption: result.unitsAvailableForConsumption,
+      license: result.license,
     };
 
     return item;
@@ -346,6 +349,7 @@ class RecommendationsService {
       priceStatus: result.priceStatus,
       unitsAvailableForConsumption: result.unitsAvailableForConsumption,
       itemStatus: result.itemStatus,
+      license: result.license,
     };
 
     return item;

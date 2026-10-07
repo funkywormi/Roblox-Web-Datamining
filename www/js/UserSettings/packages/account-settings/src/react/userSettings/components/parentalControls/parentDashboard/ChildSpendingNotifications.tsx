@@ -11,18 +11,26 @@ import { useUpdateUserSettingValueMutation } from "../../../../apis/userSettings
 import RadioButtonOptions from "../../../../common/components/RadioButtonOptions";
 import SettingsSection from "../../../../common/components/SettingsSection";
 import { useGetParentalSpendControlsQuery } from "../../../../apis/billingApi";
-import { TChildInfo } from "../../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../../types/childrenInfoTypes";
+import { TSettingUpdateProps } from "../../../../../types/settingUpdateTypes";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
 import { handleChildSettingsUpdateError } from "../../../utils/successMessageUtils";
 import parentalControlsConstants from "../../../constants/parentalControls/parentalControlsConstants";
 import parentalControlsEventService from "../../../services/eventServices/parentalControlsEventService";
 
-const ChildSpendingNotifications = ({ child }: { child: TChildInfo }): JSX.Element => {
+const ChildSpendingNotifications = ({
+  child,
+  onUpdateSetting,
+}: {
+  child: TChildSettingsInfo;
+} & TSettingUpdateProps): JSX.Element => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
 
-  const { data: spendControlSettings } = useGetParentalSpendControlsQuery(child.userId);
+  const { data: spendControlSettings } = useGetParentalSpendControlsQuery(
+    onUpdateSetting ? undefined : child.userId,
+  );
   const [updateChildSettings, { status: updateChildSettingsStatus }] =
     useUpdateUserSettingValueMutation();
 
@@ -32,6 +40,10 @@ const ChildSpendingNotifications = ({ child }: { child: TChildInfo }): JSX.Eleme
       setting: UserSetting.monthlySpendLimitNotificationType,
       value: setting,
     };
+    if (onUpdateSetting) {
+      await onUpdateSetting(updateBody);
+      return;
+    }
     try {
       await updateChildSettings(updateBody).unwrap();
       parentalControlsEventService.authButtonClickSettingsPControlsSpendingNotifications(

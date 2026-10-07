@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { ThumbnailAvatarsSize } from "@rbx/thumbnails";
+import type { ThumbnailType } from "@rbx/www-common/components/thumbnail";
+import { ThumbnailAvatarsSize } from "../constants/thumbnailConstants";
 import { reportAXError } from "../utils/axAnalyticsService";
 import AvatarAccoutrementService from "../utils/avatarAccoutrementService";
 import { getThumbnailMetrics } from "../utils/thumbnailMetrics";
@@ -28,30 +29,12 @@ export type AvatarThumbnailSuccessCallbackPayload = {
 
 export interface AvatarThumbnailDataModel {
   thumbnailCacheKey: string;
-  thumbnailType: string;
+  thumbnailType: ThumbnailType;
   thumbnailOptions: ThumbnailOptions;
   on2dAvatarSuccess: (payload: AvatarThumbnailSuccessCallbackPayload) => void;
   on3dAvatarSuccess: (payload: AvatarThumbnailSuccessCallbackPayload) => void;
   on2dAvatarFailure: (payload: AvatarThumbnailSuccessCallbackPayload) => void;
   on3dAvatarFailure: (payload: AvatarThumbnailSuccessCallbackPayload) => void;
-}
-
-export enum ThumbnailTypes {
-  avatar = "Avatar",
-  avatarHeadshot = "AvatarHeadshot",
-  gameIcon = "GameIcon",
-  gameThumbnail = "GameThumbnail",
-  badgeIcon = "BadgeIcon",
-  gamePassIcon = "GamePass",
-  assetThumbnail = "Asset",
-  bundleThumbnail = "BundleThumbnail",
-  userOutfit = "Outfit",
-  groupIcon = "GroupIcon",
-  developerProductIcon = "DeveloperProduct",
-  universeThumbnail = "UniverseThumbnail",
-  universeThumbnails = "UniverseThumbnails",
-  placeGameIcon = "PlaceGameIcon",
-  lookThumbnail = "Look",
 }
 
 const useLoadAvatarPage = () => {
@@ -245,7 +228,7 @@ const useLoadAvatarPage = () => {
   const initializeAvatarThumbnail = useCallback(() => {
     setAvatarThumbnailDataModel({
       thumbnailCacheKey: "",
-      thumbnailType: ThumbnailTypes.avatar,
+      thumbnailType: "Avatar",
       thumbnailOptions: {
         size: ThumbnailAvatarsSize.size352,
       },

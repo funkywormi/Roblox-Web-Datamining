@@ -3,11 +3,15 @@ import { useTranslation } from "react-utilities";
 import { UserSetting } from "@rbx/user-settings";
 import ToggleWithParentalConsent from "../../../../common/components/ToggleWithParentalConsent";
 import SettingsSection from "../../../../common/components/SettingsSection";
-import { TChildInfo } from "../../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../../types/childrenInfoTypes";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import { premiumHelpUrl, subscriptionsHelpUrl } from "../../../constants/urlConstants";
+import { TSettingUpdateProps } from "../../../../../types/settingUpdateTypes";
 
-const ChildAllowPurchases = ({ child }: { child: TChildInfo }): JSX.Element => {
+const ChildAllowPurchases = ({
+  child,
+  onUpdateSetting,
+}: { child: TChildSettingsInfo } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useTranslation();
   const { spendControls } = parentalControlsTranslationConstants;
 
@@ -26,6 +30,7 @@ const ChildAllowPurchases = ({ child }: { child: TChildInfo }): JSX.Element => {
   return (
     <SettingsSection description={description}>
       <ToggleWithParentalConsent
+        onUpdateSetting={onUpdateSetting}
         label={translate(spendControls.allowPurchasesHeading)}
         inputId="allow-purchases-toggle"
         settingName={UserSetting.enablePurchases}

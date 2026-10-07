@@ -86,6 +86,9 @@ export const catalogTranslations = {
   labelTradable: (): string => {
     return translationResources.featureCatalog.get("Label.Tradable", {});
   },
+  labelLicensedBy: (): string => {
+    return translationResources.featureCatalog.get("Label.LicensedBy", {});
+  },
   labelInExperienceOnly: (): string => {
     return translationResources.featureCatalog.get("Label.InExperienceOnly", {});
   },

@@ -6,7 +6,7 @@ import {
   TUpdateUserSettingValueRequest,
 } from "@rbx/user-settings";
 import wrapEventServiceWithTryCatch from "../../../../core/utils/eventUtils";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TChildInfo, TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import SpendSettingName from "../../../../enums/SpendSettingName";
 import ParentalControlsPageName from "../../../../enums/parentalControls/ParentalControlsPageName";
 import SettingCategoryPageName from "../../../../enums/SettingCategoryPageName";
@@ -17,7 +17,7 @@ import birthdayUtils from "../../utils/birthdayUtils";
 import { optionToString } from "../../utils/parentalControls/parentalConsentUtils";
 import settingsJourneyService from "../journeys/settingsJourneyService";
 
-const parentalControlsChildState = (child: TChildInfo): string => {
+const parentalControlsChildState = (child: TChildSettingsInfo): string => {
   const age = birthdayUtils.calculateAgeFromISO(child.birthDate);
   let ageState;
   if (age < 13) {
@@ -59,7 +59,7 @@ const parentalControlsEventService = {
     eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
   }),
   authButtonClickSettingsPControlsUpdateAttempt: wrapEventServiceWithTryCatch(
-    (request: TUpdateUserSettingValueRequest, child: TChildInfo): void => {
+    (request: TUpdateUserSettingValueRequest, child: TChildSettingsInfo): void => {
       settingsJourneyService.editAttempted("parental-controls", request.setting);
       const state = parentalControlsChildState(child);
       const params = getEventParams.authButtonClickSettingsPControlsUpdateAttempt(
@@ -519,7 +519,7 @@ const parentalControlsEventService = {
     },
   ),
   authButtonClickSettingsPControlsSpendingNotifications: wrapEventServiceWithTryCatch(
-    (child: TChildInfo, value: SpendNotificationSetting): void => {
+    (child: TChildSettingsInfo, value: SpendNotificationSetting): void => {
       const state = parentalControlsChildState(child);
       const params = getEventParams.authButtonClickSettingsPControlsSpendingNotifications(
         state,

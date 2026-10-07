@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import classNames from "classnames";
-import { Thumbnail2d } from "@rbx/thumbnails";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 import { CategorySlot, SlotConfiguration, isEmptyCategorySlot, AssetSlot } from "../../types";
 
 interface SlotItemProps {

@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../utils/translate";
 import { getTabLabel } from "../../types/avatarTab.types";
 import { useAvatarTabsContext } from "../../contexts/AvatarTabsContext";
 import { useAvatarPageContext } from "../../contexts/AvatarPageContext";
@@ -7,7 +7,7 @@ import { useAvatarPageContext } from "../../contexts/AvatarPageContext";
 const CREATE_URL = "/develop?directLink=1&view=";
 
 const AvatarTabContentHeader: React.FC = () => {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const { selectedTab, selectedCategoryRow, selectedSubcategory, onRowClick } =
     useAvatarTabsContext();
 

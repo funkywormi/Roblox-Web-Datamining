@@ -2,6 +2,7 @@ import { httpService } from "core-utilities";
 import { DefaultThumbnailSize, ThumbnailFormat } from "roblox-thumbnails";
 import itemDetailsConstants from "../constants/itemDetailsConstants";
 import urlConfigs from "../constants/urlConfigs";
+import type { TItemLicense } from "../../common/types/license";
 
 export type TBundledItem = {
   id: number;
@@ -16,6 +17,7 @@ export type TItemDetail = {
   creatorTargetId?: number;
   purchasable?: boolean;
   bundledItems?: TBundledItem[];
+  license?: TItemLicense;
 };
 
 export type TShowcaseEntry = {

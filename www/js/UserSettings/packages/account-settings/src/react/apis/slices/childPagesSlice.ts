@@ -49,12 +49,7 @@ const initialState: TChildPagesState = {
 const { pageTitles: privacyPageTitles } = privacyTranslationConstants;
 const { pageTitles } = parentalControlsTranslationConstants;
 
-const getChildPages = (childUserId: number): TChildPages => {
-  const linkedChildDetailsPath = getLinkedChildDetailsPath(childUserId);
-  const linkedChildDetailsLandingPage: TSettingsPage = {
-    name: ParentalControlsPageName.LinkedChildDetails,
-    path: linkedChildDetailsPath,
-  };
+export const getChildSettingsPages = (linkedChildDetailsPath: string) => {
   const childSettingCategoryPages = {
     [SettingCategoryPageName.ContentRestrictions]: {
       name: SettingCategoryPageName.ContentRestrictions,
@@ -279,6 +274,22 @@ const getChildPages = (childUserId: number): TChildPages => {
     },
   };
 
+  return {
+    childSettingCategoryPages,
+    contentRestrictionPages,
+    communicationPages,
+    spendingPages,
+    robuxPages,
+    visibilityAndPrivateServersPages,
+  };
+};
+
+const getChildPages = (childUserId: number): TChildPages => {
+  const linkedChildDetailsPath = getLinkedChildDetailsPath(childUserId);
+  const linkedChildDetailsLandingPage: TSettingsPage = {
+    name: ParentalControlsPageName.LinkedChildDetails,
+    path: linkedChildDetailsPath,
+  };
   const consentCenterPage: TSettingsPage = {
     name: ParentalControlsPageName.ConsentCenter,
     path: `${linkedChildDetailsPath}/${ParentalControlsPageName.ConsentCenter}`,
@@ -320,12 +331,7 @@ const getChildPages = (childUserId: number): TChildPages => {
 
   return {
     linkedChildDetailsLandingPage,
-    childSettingCategoryPages,
-    contentRestrictionPages,
-    communicationPages,
-    spendingPages,
-    robuxPages,
-    visibilityAndPrivateServersPages,
+    ...getChildSettingsPages(linkedChildDetailsPath),
     consentCenterPage,
     friendManagementPage,
     editProfilePage,

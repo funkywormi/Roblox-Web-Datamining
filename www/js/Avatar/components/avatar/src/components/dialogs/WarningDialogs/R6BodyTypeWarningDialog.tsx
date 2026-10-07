@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../../utils/translate";
 import { reportAXError } from "../../../utils/axAnalyticsService";
 import avatarConstants from "../../../constants/avatarConstants";
 import { AvatarType } from "../../../constants/types";
@@ -26,7 +26,7 @@ function R6BodyTypeWarningDialog({
   closeDialog,
   isOpen,
 }: R6BodyTypeWarningDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const { removeLayeredClothing } = useAssetManagerContext();
   const { setAvatarType } = useAvatarPageContext();

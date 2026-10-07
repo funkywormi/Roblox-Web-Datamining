@@ -6,9 +6,14 @@ import { Thumbnail2d, ThumbnailTypes, DefaultThumbnailSize } from "roblox-thumbn
 import type { TDetailEntry } from "@rbx/legacy-webapp-types/Roblox";
 import { TItemDisabledReason } from "./ComplimentaryItemRecommendationsCarousel";
 import { trackItemCardClick, TItemCardSource } from "../../analytics/axTrackingEvents";
+import type { TItemLicense } from "../../common/types/license";
+
+type TLicensedDetailEntry = TDetailEntry & {
+  license?: TItemLicense;
+};
 
 type TComplimentaryItemRecommendationsItemCardProps = {
-  item: TDetailEntry;
+  item: TLicensedDetailEntry;
   selectedItems: Array<TDetailEntry> | undefined;
   disabledItemsRecord: Record<number, TItemDisabledReason>;
   onCheckClicked: (itemId: number) => void;
@@ -81,6 +86,7 @@ export const ComplimentaryItemRecommendationsItemCard = ({
                 />
               </div>
             }
+            licenseType={item.license?.licenseType}
           />
         </div>
         {disabledItemsRecord[item.id] && disabledItemsRecord[item.id]!.isOwned && (

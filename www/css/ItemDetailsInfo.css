@@ -1050,6 +1050,21 @@
     margin-right: 10px
 }
 
+.item-details-info-header .item-details-header-actions {
+    -ms-flex-align: center;
+    align-items: center;
+    column-gap: 6px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.item-details-info-header .item-details-header-actions .item-license-badge {
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    position: relative;
+    top: 6px
+}
+
 .item-details-info-header .item-details-creator-container,
 .item-details-info-header .item-details-creator-container .community-creator-entrypoint {
     -ms-flex-align: center;
@@ -1066,7 +1081,46 @@
 @media (max-width:767px) {
 
     .item-details-info-header .right .shopping-cart-btn-container,
-    .item-details-info-header .right .shopping-cart-add-remove-btn-container,
+    .item-details-info-header .right .shopping-cart-add-remove-btn-container {
+        display: none
+    }
+
+    .item-details-info-header .item-details-header-actions:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+        margin-right: 28px
+    }
+
+    .item-details-info-header .item-details-header-actions:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+        margin-right: 28px
+    }
+
+    .item-details-info-header .item-details-header-actions:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+        margin-right: 28px
+    }
+
+    .item-details-info-header .item-details-header-actions:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+        margin-right: 28px
+    }
+
+    .item-details-info-header .item-details-header-actions:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+        margin-right: 28px
+    }
+
+    .item-details-info-header .item-details-header-actions:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+        margin-left: 28px
+    }
+
+    .item-details-info-header .item-details-header-actions:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+        margin-left: 28px
+    }
+
+    .item-details-info-header .item-details-header-actions:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+        margin-left: 28px
+    }
+
+    .item-details-info-header .item-details-header-actions .item-license-badge {
+        top: 0
+    }
+
     .item-info-row-container .shopping-cart-add-remove-btn-container {
         display: none
     }

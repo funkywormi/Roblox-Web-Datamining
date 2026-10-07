@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../../utils/translate";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import avatarConstants from "../../../constants/avatarConstants";
 import { useAssetManagerContext } from "../../../contexts/AssetManagerContext";
@@ -22,7 +22,7 @@ function LayeredClothingBodyTypeWarningDialog({
   closeDialog,
   assetToWear,
 }: LayeredClothingBodyTypeWarningDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const { wearAsset } = useAssetManagerContext();
   const { setAvatarType } = useAvatarPageContext();
 

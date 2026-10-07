@@ -1,11 +1,13 @@
+import { hasInheritanceRequirement, hasRequirement } from "../../../core/utils/settingOptionsUtils";
+import { TSettingUpdateProps } from "../../../types/settingUpdateTypes";
 import React, { useEffect, useState } from "react";
 import { Toggle, Button } from "react-style-guide";
-import { authenticatedUser } from "header-scripts";
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import {
   TUpdateUserSettingValueRequest,
   TUserSettingAndOptions,
   TOptionValue,
+  RequirementType,
   UserSetting,
   useSnackbar,
 } from "@rbx/user-settings";
@@ -17,8 +19,6 @@ import {
   isOptionBlockedByParentalConsentV2,
   optionToBoolean,
 } from "../../userSettings/utils/parentalControls/parentalConsentUtils";
-import { useAppSelector } from "../../redux/hooks";
-import { selectSettingConsentRequirementsV2 } from "../../apis/slices/parentalConsentSlice";
 import useGetPendingParentalConsentRequest from "../../userSettings/hooks/useGetPendingParentalConsentRequest";
 import useCancelConsentRequestModal from "../hooks/modals/useCancelConsentRequestModal";
 import SettingOptionPendingPill from "./SettingOptionPendingPill";
@@ -46,6 +46,7 @@ export const ToggleWithParentalConsentV2 = ({
   description,
   getAdditionalContent,
   auditHeader,
+  onUpdateSetting,
 }: {
   label: string;
   inputId: string;
@@ -54,17 +55,14 @@ export const ToggleWithParentalConsentV2 = ({
   description?: string | JSX.Element;
   getAdditionalContent?: (isToggleOn: boolean) => React.ReactNode;
   auditHeader?: string;
-}): JSX.Element => {
+} & TSettingUpdateProps): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const { snackbarService } = useSnackbar();
 
-  const settingConsentRequirements = useAppSelector(
-    selectSettingConsentRequirementsV2(childUserId ?? authenticatedUser.id!),
-  );
-
   const [updateSettingValueV2] = useUpdateUserSettingValueV2Mutation();
 
-  const [settingsAndOptions, isLoading, isError] = useGetSettingsAndOptionsV2(childUserId);
+  const [settingsAndOptions, isLoading, isError, , settingConsentRequirements] =
+    useGetSettingsAndOptionsV2(childUserId);
   const status = !isLoading && !isError ? QueryStatus.fulfilled : QueryStatus.pending;
   const settingsAndOptionsStatus = status;
 
@@ -75,6 +73,7 @@ export const ToggleWithParentalConsentV2 = ({
   const pendingConsent = useGetPendingParentalConsentRequest(
     ParentConsentType.UpdateUserSetting,
     settingName,
+    childUserId,
   );
   const pendingConsentValue = pendingConsent?.consentData?.[settingName];
 
@@ -90,6 +89,17 @@ export const ToggleWithParentalConsentV2 = ({
   );
 
   const oppositeOption = booleanToOption(!currOptionAsBoolean, settingName);
+  const optionUnavailable =
+    onUpdateSetting !== undefined &&
+    (!(settingsAndOptions as Record<string, TUserSettingAndOptions<TOptionValue>>)?.[
+      settingName
+    ]?.options?.some(option => option.option.optionValue === oppositeOption) ||
+      hasInheritanceRequirement(
+        settingConsentRequirements?.[settingName]?.[String(oppositeOption)],
+      ) ||
+      hasRequirement(settingConsentRequirements?.[settingName]?.[String(oppositeOption)], [
+        RequirementType.AgeCheckPending,
+      ]));
 
   // Whether the setting requires parental consent to toggle to the opposite option (i.e enabled -> disabled)
   const parentalConsentRequired = isOptionBlockedByParentalConsentV2(
@@ -112,6 +122,10 @@ export const ToggleWithParentalConsentV2 = ({
         value: newSetting,
         auditHeader,
       };
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValueV2(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {
@@ -173,7 +187,7 @@ export const ToggleWithParentalConsentV2 = ({
               <Toggle
                 isOn={isToggleOn}
                 onToggle={onToggleHandler}
-                isDisabled={optionBlockedByInheritance}
+                isDisabled={optionBlockedByInheritance || optionUnavailable}
               />
             </div>
           </React.Fragment>

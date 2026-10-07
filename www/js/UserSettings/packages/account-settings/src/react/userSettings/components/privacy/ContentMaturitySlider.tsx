@@ -2,7 +2,6 @@ import React, { SyntheticEvent, useEffect, useMemo, useState } from "react";
 import { Button } from "react-style-guide";
 import Slider from "@mui/material/Slider";
 import { SliderMarkSlotProps, SliderMarkSlotPropsOverrides } from "@mui/base";
-import { authenticatedUser } from "header-scripts";
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import { AccessManagementUpsellV2Service } from "Roblox";
 import ClassNames from "classnames";
@@ -30,8 +29,7 @@ import {
   isRestrictedOptionBlockedByContentAgeVerification,
   isOptionBlockedByParentalConsent,
 } from "../../utils/parentalControls/parentalConsentUtils";
-import { selectSettingConsentRequirements } from "../../../apis/slices/parentalConsentSlice";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch } from "../../../redux/hooks";
 import SettingOptionPendingPill from "../../../common/components/SettingOptionPendingPill";
 import { disableBackLinkInterrupt, enableBackLinkInterrupt } from "../../utils/backLinkUtils";
 import AMPFeaturesConstants from "../../constants/AMPFeaturesConstants";
@@ -41,11 +39,12 @@ import {
 } from "../../utils/successMessageUtils";
 import privacyEventService from "../../services/eventServices/privacyEventService";
 import { useGetSettingsUiPolicyQuery } from "../../../apis/universalAppConfigurationApi";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
-export const ContentMaturitySlider = ({ childUserId }: { childUserId?: number }): JSX.Element => {
-  const settingConsentRequirements = useAppSelector(
-    selectSettingConsentRequirements(childUserId ?? authenticatedUser.id!),
-  );
+export const ContentMaturitySlider = ({
+  childUserId,
+  onUpdateSetting,
+}: { childUserId?: number } & TSettingUpdateProps): JSX.Element => {
   const dispatch = useAppDispatch();
 
   const { translate } = useWrappedTranslation();
@@ -54,7 +53,8 @@ export const ContentMaturitySlider = ({ childUserId }: { childUserId?: number })
 
   const [updateUserSettingValue] = useUpdateUserSettingValueMutation();
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
-  const [settingsAndOptions, settingsAndOptionsStatus] = useGetSettingsAndOptions(childUserId);
+  const [settingsAndOptions, settingsAndOptionsStatus, settingConsentRequirements] =
+    useGetSettingsAndOptions(childUserId);
   const { data: showUnderAgeFor17PlusResult } = useGetFeatureAccessQuery({
     featureName: AMPFeaturesConstants.ShowUnderAgeFor17PlusSettingAmpFeature,
     namespace: AMPFeaturesConstants.Namespaces.UserSettingsPolicy,
@@ -120,6 +120,7 @@ export const ContentMaturitySlider = ({ childUserId }: { childUserId?: number })
   const pendingConsent = useGetPendingParentalConsentRequest(
     ParentConsentType.UpdateUserSetting,
     UserSetting.contentAgeRestriction,
+    childUserId,
   );
   const pendingConsentValue: ContentMaturityLevel | undefined = useMemo(() => {
     const contentControlValue = pendingConsent?.consentData?.[UserSetting.contentAgeRestriction];
@@ -288,6 +289,10 @@ export const ContentMaturitySlider = ({ childUserId }: { childUserId?: number })
           setting: UserSetting.contentAgeRestriction,
           value: contentAgeRestriction,
         };
+        if (onUpdateSetting) {
+          await onUpdateSetting(updateRequest);
+          return;
+        }
         const result = await updateUserSettingValue(updateRequest).unwrap();
         const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateRequest, result);
         if (successMessageKey) {

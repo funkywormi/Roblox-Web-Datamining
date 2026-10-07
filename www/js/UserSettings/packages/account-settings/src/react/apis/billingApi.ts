@@ -17,10 +17,10 @@ export const getChildSpendControlsSettingsCacheTag = (
 
 const billingApi = baseApi.injectEndpoints({
   endpoints: builder => ({
-    getParentalSpendControls: builder.query<TParentalSpendControlsSettings, number>({
+    getParentalSpendControls: builder.query<TParentalSpendControlsSettings, number | void>({
       query: userId => ({
         url: getParentalSpendControlsUrl,
-        queryParams: { userId },
+        ...(userId != null ? { queryParams: { userId } } : {}),
       }),
       transformResponse(result: TGetParentalSpendControlsBody): TParentalSpendControlsSettings {
         const parentalSpendControls: TParentalSpendControlsSettings = {
@@ -46,7 +46,11 @@ const billingApi = baseApi.injectEndpoints({
         };
         return parentalSpendControls;
       },
-      providesTags: (result, error, request) => [getChildSpendControlsSettingsCacheTag(request)],
+      providesTags: (result, error, request) => [
+        request != null
+          ? getChildSpendControlsSettingsCacheTag(request)
+          : { type: ApiCacheTag.SpendControls, id: "currentUser" },
+      ],
     }),
   }),
 });

@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import { Route } from "react-router-dom";
 import { UserSetting } from "@rbx/user-settings";
-import { TChildInfo } from "../../../../../types/childrenInfoTypes";
+import { TSettingUpdateProps } from "../../../../../types/settingUpdateTypes";
+import { TChildSettingsInfo } from "../../../../../types/childrenInfoTypes";
 import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOptions";
 import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
 import { TSettingsPage } from "../../../../../types/commonTypes";
@@ -20,11 +21,12 @@ export const ChildCommunicationRoutes = ({
   child,
   communicationPage,
   subpages,
+  onUpdateSetting,
 }: {
-  child: TChildInfo;
+  child: TChildSettingsInfo;
   communicationPage: TSettingsPage;
   subpages: Record<string, TSettingsPage>;
-}): JSX.Element => {
+} & TSettingUpdateProps): JSX.Element => {
   const [settingsAndOptions] = useGetSettingsAndOptions(child.userId);
   const [settingsAndOptionsV2] = useGetSettingsAndOptionsV2(child.userId);
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
@@ -112,42 +114,50 @@ export const ChildCommunicationRoutes = ({
   return (
     <React.Fragment>
       <SettingsList subPages={communicationSubpages} routingPath={communicationPage.path} />
-      {displayExperienceChatSettings && (
-        <Route path={subpages[SettingCategoryPageName.ExperienceChat]?.path}>
-          <ExperienceChatPrivacyV2 child={child} />
-        </Route>
-      )}
-      {displayPartySettings && (
+      {displayExperienceChatSettings &&
+        communicationSubpages[SettingCategoryPageName.ExperienceChat] && (
+          <Route path={subpages[SettingCategoryPageName.ExperienceChat]?.path}>
+            <ExperienceChatPrivacyV2 child={child} onUpdateSetting={onUpdateSetting} />
+          </Route>
+        )}
+      {displayPartySettings && communicationSubpages[SettingCategoryPageName.Party] && (
         <Route path={subpages[SettingCategoryPageName.Party]?.path}>
-          <PartySettings child={child} />
+          <PartySettings child={child} onUpdateSetting={onUpdateSetting} />
         </Route>
       )}
-      {displayPartySettingsV2 && (
-        <Route
-          path={
-            subpages[
-              canSeeChatTerminology
-                ? SettingCategoryPageName.PartyAndPartyChatV2
-                : SettingCategoryPageName.PartyAndPartyChat
-            ]?.path
-          }
-        >
-          <PartySettingsV2 child={child} />
-        </Route>
-      )}
-      {displayVoiceDataSettings && (
-        <Route path={subpages[SettingCategoryPageName.VoiceDataUsage]?.path}>
-          <VoicePrivacy child={child} />
-        </Route>
-      )}
-      {displayStudioCollaborationSettings && (
-        <Route path={subpages[SettingCategoryPageName.StudioCollaboration]?.path}>
-          <StudioCollaboration child={child} />
-        </Route>
-      )}
-      {displayPresetChatSettings && (
+      {displayPartySettingsV2 &&
+        communicationSubpages[
+          canSeeChatTerminology
+            ? SettingCategoryPageName.PartyAndPartyChatV2
+            : SettingCategoryPageName.PartyAndPartyChat
+        ] && (
+          <Route
+            path={
+              subpages[
+                canSeeChatTerminology
+                  ? SettingCategoryPageName.PartyAndPartyChatV2
+                  : SettingCategoryPageName.PartyAndPartyChat
+              ]?.path
+            }
+          >
+            <PartySettingsV2 child={child} onUpdateSetting={onUpdateSetting} />
+          </Route>
+        )}
+      {displayVoiceDataSettings &&
+        communicationSubpages[SettingCategoryPageName.VoiceDataUsage] && (
+          <Route path={subpages[SettingCategoryPageName.VoiceDataUsage]?.path}>
+            <VoicePrivacy child={child} onUpdateSetting={onUpdateSetting} />
+          </Route>
+        )}
+      {displayStudioCollaborationSettings &&
+        communicationSubpages[SettingCategoryPageName.StudioCollaboration] && (
+          <Route path={subpages[SettingCategoryPageName.StudioCollaboration]?.path}>
+            <StudioCollaboration child={child} onUpdateSetting={onUpdateSetting} />
+          </Route>
+        )}
+      {displayPresetChatSettings && communicationSubpages[SettingCategoryPageName.PresetChat] && (
         <Route path={subpages[SettingCategoryPageName.PresetChat]?.path}>
-          <PresetChatPrivacy child={child} />
+          <PresetChatPrivacy child={child} onUpdateSetting={onUpdateSetting} />
         </Route>
       )}
     </React.Fragment>

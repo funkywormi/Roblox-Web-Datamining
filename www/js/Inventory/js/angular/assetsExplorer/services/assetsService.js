@@ -348,6 +348,8 @@ function assetsService(
       };
 
       item.itemType = 'Asset';
+      // The favorites endpoint omits license metadata, so catalog details fill it in.
+      item.hydrationRequired = true;
       itemCardUtility.mapItemRestrictionIcons(item);
     },
 

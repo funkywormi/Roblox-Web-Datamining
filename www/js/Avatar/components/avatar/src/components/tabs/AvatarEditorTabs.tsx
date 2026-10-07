@@ -2,13 +2,13 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import classNames from "classnames";
 import { Icon } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../utils/translate";
 import { getTabLabel } from "../../types/avatarTab.types";
 import { useAvatarTabsContext } from "../../contexts/AvatarTabsContext";
 import TabScrollButton, { TabScrollDirection } from "./TabScrollButton";
 
 const AvatarEditorTabs: React.FC = () => {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const {
     tabs,
     selectedTab,

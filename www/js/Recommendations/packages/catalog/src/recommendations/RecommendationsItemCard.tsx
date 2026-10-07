@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { Thumbnail2d } from "@rbx/thumbnails";
 import { abbreviateNumber } from "@rbx/core-scripts/format/number";
 import type { TranslateFunction } from "@rbx/core-scripts/react";
+import { Badge } from "@rbx/foundation-ui";
 // Type-only: a value import evaluates RecommendationsService, whose EnvironmentUrls read throws on a
 // non-Roblox host.
 import type { RecommendedItem } from "./RecommendationsService";
@@ -48,11 +49,26 @@ const RecommendationsItemCard = ({
   const showDisplayPrice = saleable && Boolean(displayPrice) && !item.lowestPrice;
   const showLowestPrice = saleable && Boolean(item.lowestPrice);
   const showPremiumIcon = isPremiumIconOnItemTilesEnabled && doesItemHavePremiumPrice(item);
+  const licenseLabel =
+    item.license?.licenseType === "ThirdParty"
+      ? translate("Label.LicensingLicensed")
+      : item.license?.licenseType === "FirstParty"
+        ? translate("Label.LicensingOfficial")
+        : undefined;
+  // Licensed third-party items get the muted treatment; only first-party
+  // Roblox items get the high-contrast badge. Neutral's background is a
+  // translucent shift overlay, which is the intended look over thumbnails.
+  const licenseVariant = item.license?.licenseType === "ThirdParty" ? "Neutral" : "Contrast";
 
   return (
     <div className="item-card-container recommended-item-link">
       <a href={item.absoluteUrl} className="item-card-link">
         <div className="item-card-thumb-container">
+          {licenseLabel && (
+            <div className="thumbnail-badges-container">
+              <Badge variant={licenseVariant} label={licenseLabel} />
+            </div>
+          )}
           <Thumbnail2d
             containerClass="item-card-thumb"
             type={item.thumbnail.type}

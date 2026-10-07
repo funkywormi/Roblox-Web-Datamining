@@ -257,7 +257,7 @@
     "Action.Review": "Review",
     "Label.ReferralsLegalDisclosure": "By clicking \"Refer to Plus\", I agree to the {linkStart}Roblox Plus Referral Program Terms{linkEnd}.",
     "Label.ReferralsLegalDisclosureV2": "By clicking \\u{201C}Refer to Plus\\u{201D}, I agree to the {linkStart}Roblox Plus Referral Program Terms{linkEnd}.",
-    "Description.ReferralRecipientLegalDisclosure": "By clicking \"Subscribe\", you agree to the {linkStartRef}Referral Program Terms{linkEndRef}. and the {linkStart}Roblox Subscription Terms{linkEnd}. You will be automatically charged each month until you cancel.",
+    "Description.ReferralRecipientLegalDisclosure": "By clicking \"Subscribe\", you agree to the {linkStartRef}Referral Program Terms{linkEndRef} and the {linkStart}Roblox Subscription Terms{linkEnd}. You will be automatically charged each month until you cancel.",
     "Description.ReferralRecipientLegalDisclosurePurchase": "By clicking \\u{201C}{ctaText}\\u{201D}, you agree to the <a href=\"{referralTermsUrl}\">Referral Program Terms</a> and the <a href=\"{termsUrl}\">Roblox Subscription Terms</a>. You will be automatically charged each month until you cancel.",
     "Description.NoLongerValidReferralGenericError": "This referral link is no longer valid."
 }

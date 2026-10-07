@@ -177,28 +177,37 @@ const asOptionsWithRequirementsV2 = (
   });
   return result;
 };
+export const getSettingConsentRequirements = (
+  settingsAndOptionsBody: TUserSettingsAndOptionsBody,
+): TSettingConsentRequirements =>
+  Object.entries(settingsAndOptionsBody).reduce<TSettingConsentRequirements>(
+    (acc, [setting, settingData]) => {
+      const options = settingData?.options;
+      return options ? { ...acc, [setting]: asOptionsWithRequirements(options) } : acc;
+    },
+    {} as TSettingConsentRequirements,
+  );
+
+export const getSettingConsentRequirementsV2 = (
+  settingsAndOptionsBody: TUserSettingsAndOptionsV2Body,
+): TSettingConsentRequirementsV2 =>
+  Object.entries(settingsAndOptionsBody).reduce<TSettingConsentRequirementsV2>(
+    (acc, [setting, settingData]) => {
+      const options = settingData?.options;
+      return options ? { ...acc, [setting]: asOptionsWithRequirementsV2(options) } : acc;
+    },
+    {} as TSettingConsentRequirementsV2,
+  );
+
 export const parentalConsentSlice = createSlice({
   name: "parentalConsent",
   initialState,
   reducers: {
     updateSettingConsentRequirementsState: {
       prepare: (payload: TUpdateSettingConsentRequirementsPayload) => {
-        // maps the payload to a new object with the same keys, but the values
-        // are the options with requirements. i.e { settingName: { optionName: [requirements] } }
-        const consentRequirements = Object.entries(
-          payload.settingsAndOptionsBody,
-        ).reduce<TSettingConsentRequirements>((acc, [setting, settingData]) => {
-          const options = settingData?.options;
-          if (options) {
-            const optionsWithRequirements = asOptionsWithRequirements(options);
-            return { ...acc, [setting]: optionsWithRequirements };
-          }
-
-          return acc;
-        }, {} as TSettingConsentRequirements);
         const newPayload: TConsentRequirementsWithUserId = {
           userId: payload.userId,
-          consentRequirements,
+          consentRequirements: getSettingConsentRequirements(payload.settingsAndOptionsBody),
         };
         return { payload: newPayload };
       },
@@ -211,22 +220,9 @@ export const parentalConsentSlice = createSlice({
     },
     updateSettingConsentRequirementsV2State: {
       prepare: (payload: TUpdateSettingConsentRequirementsV2Payload) => {
-        // maps the payload to a new object with the same keys, but the values
-        // are the options with requirements. i.e { settingName: { optionName: [requirements] } }
-        const consentRequirements = Object.entries(
-          payload.settingsAndOptionsBody,
-        ).reduce<TSettingConsentRequirementsV2>((acc, [setting, settingData]) => {
-          const options = settingData?.options;
-          if (options) {
-            const optionsWithRequirements = asOptionsWithRequirementsV2(options);
-            return { ...acc, [setting]: optionsWithRequirements };
-          }
-
-          return acc;
-        }, {} as TSettingConsentRequirementsV2);
         const newPayload: TConsentRequirementsWithUserIdV2 = {
           userId: payload.userId,
-          consentRequirements,
+          consentRequirements: getSettingConsentRequirementsV2(payload.settingsAndOptionsBody),
         };
         return { payload: newPayload };
       },

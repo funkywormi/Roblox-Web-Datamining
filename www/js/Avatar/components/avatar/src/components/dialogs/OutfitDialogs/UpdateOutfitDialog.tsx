@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useAvatarTranslate } from "../../../utils/translate";
 import { reportAXError } from "../../../utils/axAnalyticsService";
 import { CatalogOutfitItem } from "../../../avatar.types";
 import avatarConstants from "../../../constants/avatarConstants";
@@ -29,7 +29,7 @@ function UpdateOutfitDialog({
   handleClose,
   updateOutfitInDataList,
 }: UpdateOutfitDialogProps): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useAvatarTranslate("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { constructLayeredClothingMetadata } = useAssetManagerContext();

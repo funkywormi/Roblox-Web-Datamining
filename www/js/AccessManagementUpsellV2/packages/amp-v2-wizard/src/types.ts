@@ -161,6 +161,11 @@ export type LogEventFn = (eventName: string, extra?: EventParams) => void;
  */
 export type FlowAnalyticsStrings = Record<string, string>;
 
+/** Launch metadata used only by the additive ODP auth-funnel events. */
+export type OdpEventSurface =
+  | { type: "GameJoin"; universeId: string }
+  | { type: "Settings"; settingName: string };
+
 /**
  * Per-node metadata for event/metric correlation, plus host-supplied `config` for client-specific
  * wiring the server doesn't own (e.g. a route a node navigates to).
@@ -170,6 +175,7 @@ export type NodeContext = {
   analytics: WizardEventContext;
   logEvent: LogEventFn;
   analyticsStrings?: FlowAnalyticsStrings;
+  odpEventSurface?: OdpEventSurface;
   /** Per-run analytics correlation id a node can stamp on its events. */
   analyticsSessionId?: string;
 };

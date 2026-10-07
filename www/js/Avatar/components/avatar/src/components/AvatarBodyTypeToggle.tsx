@@ -1,6 +1,6 @@
 import React from "react";
 import { Toggle } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { AvatarType } from "../constants/types";
 import { useAvatarPageContext } from "../contexts/AvatarPageContext";
 import { useAvatarEditingAccessContext } from "../contexts/AvatarEditingAccessContext";
@@ -12,7 +12,7 @@ export type AvatarBodyTypeToggleProps = {
 const AvatarBodyTypeToggle = (props: AvatarBodyTypeToggleProps): JSX.Element => {
   const { updateAvatarType } = props;
 
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.Avatar");
   const { avatarType } = useAvatarPageContext();
   const { isAvatarEditingBlocked } = useAvatarEditingAccessContext();
 

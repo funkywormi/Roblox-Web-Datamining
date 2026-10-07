@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import classNames from "classnames";
 import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { BodyColor } from "../../../../avatarRules";
 import avatarConstants from "../../../../constants/avatarConstants";
 import AdvancedBodyColorsDialog from "../../../dialogs/AdvancedBodyColorsDialog";
@@ -21,7 +21,7 @@ export type BodyColorsProps = {
 };
 
 function BodyColors(): JSX.Element {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.Avatar");
   const [currentColorId, setCurrentColorId] = useState<string | null>(null);
 
   const { bodyColors, setBodyColors, setShouldUpdateAvatarBodyColors } =

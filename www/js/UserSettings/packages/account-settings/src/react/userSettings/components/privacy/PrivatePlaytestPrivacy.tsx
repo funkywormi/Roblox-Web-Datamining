@@ -8,13 +8,12 @@ import {
   useSnackbar,
 } from "@rbx/user-settings";
 import { useWrappedTranslation } from "../../hooks/useWrappedTranslation";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch } from "../../../redux/hooks";
 import RadioButtonOptionsWithParentalConsentV2 from "../../../common/components/RadioButtonOptionsWithParentalConsentV2";
 import { filterRadioButtonOptionsWithDescription } from "../../../../core/utils/settingOptionsUtils";
 import useGetSettingsAndOptionsV2 from "../../../apis/hooks/useGetSettingsAndOptionsV2";
 import { useUpdateUserSettingValueV2Mutation } from "../../../apis/userSettingsApi";
 import useAgeVerificationUpsell from "../../hooks/useAgeVerificationUpsell";
-import { selectSettingConsentRequirementsV2 } from "../../../apis/slices/parentalConsentSlice";
 import { optionToString } from "../../utils/parentalControls/parentalConsentUtils";
 import SettingsSection from "../../../common/components/SettingsSection";
 import privacyTranslationConstants from "../../constants/contentConstants/privacyTranslationConstants";
@@ -27,20 +26,23 @@ import baseApi from "../../../apis/common/baseApi";
 import { getChildSettingsCacheTag } from "../../../apis/parentalControlsApi";
 import useSettingsModal from "../../../common/hooks/modals/useSettingsModal";
 import commonTranslationConstants from "../../constants/contentConstants/commonTranslationConstants";
-import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import useAutoSettingUpdate from "../../hooks/useAutoSettingUpdate";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
-export const PrivatePlaytestPrivacy = ({ child }: { child?: TChildInfo }): JSX.Element => {
+export const PrivatePlaytestPrivacy = ({
+  child,
+  onUpdateSetting,
+}: { child?: TChildSettingsInfo } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const { snackbarService } = useSnackbar();
   const dispatch = useAppDispatch();
 
-  const [settingsAndOptions] = useGetSettingsAndOptionsV2(child?.userId);
+  const [settingsAndOptions, , , , consentRequirementsV2] = useGetSettingsAndOptionsV2(
+    child?.userId,
+  );
   const [updateSettingValue] = useUpdateUserSettingValueV2Mutation();
   const { handleAgeCheckUpsells, errorModal } = useAgeVerificationUpsell();
-  const consentRequirementsV2 = useAppSelector(
-    selectSettingConsentRequirementsV2(child?.userId ?? authenticatedUser.id!),
-  );
 
   const invalidateChildSettingsCache = () => {
     const invalidateAction = baseApi.util.invalidateTags([
@@ -72,6 +74,10 @@ export const PrivatePlaytestPrivacy = ({ child }: { child?: TChildInfo }): JSX.E
       useRequirementsMapV2: true,
     };
     try {
+      if (onUpdateSetting) {
+        await onUpdateSetting(updateBody);
+        return;
+      }
       const result = await updateSettingValue(updateBody).unwrap();
       const successMessageKey = getSuccessMessageKeyForUserSettingsUpdate(updateBody, result);
       if (successMessageKey) {
