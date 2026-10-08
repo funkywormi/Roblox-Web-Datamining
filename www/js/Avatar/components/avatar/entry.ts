@@ -1,5 +1,6 @@
 import renderAvatarReactComponent from "./src/utils/avatarPageMounter";
 import constants from "./src/constants";
+import "./src/css/editor-layout.css";
 import "./src/css/avatar-non-fui.css";
 import "./src/css/emotes-non-fui.css";
 import "./src/css/main.css";

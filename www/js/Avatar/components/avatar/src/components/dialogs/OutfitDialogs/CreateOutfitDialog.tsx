@@ -28,7 +28,7 @@ function CreateOutfitDialog({
   closeDialog,
   open,
   refreshOutfits,
-}: CreateOutfitDialogProps): JSX.Element {
+}: CreateOutfitDialogProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const [newName, setNewName] = React.useState<string>("");
   const [error, setError] = React.useState<string | null>(null);

@@ -34,6 +34,7 @@ export const BlockedUserWithParentalConsent = ({
   unblockDisabled,
   canRequestUnblock,
   child,
+  onUnblockUser,
 }: {
   blockedCombinedName: string | null | undefined;
   blockedUser: TBlockedUser;
@@ -41,6 +42,7 @@ export const BlockedUserWithParentalConsent = ({
   unblockDisabled?: boolean;
   canRequestUnblock?: boolean;
   child?: TChildInfo;
+  onUnblockUser?: (blockedUserId: number) => Promise<void>;
 }): JSX.Element => {
   const { snackbarService } = useSnackbar();
   const { translate } = useTranslation();
@@ -49,11 +51,14 @@ export const BlockedUserWithParentalConsent = ({
   const [unblockUserMutation, result] = useUnblockUserMutation();
   const [manageChildFriend] = useManageChildFriendMutation();
 
-  const { data: parentalConsents } = useGetParentalConsentsQuery({
-    childUserId: child?.userId ?? authenticatedUser.id!,
-    consentStatus: ParentConsentStatus.Pending,
-    consentType: ParentConsentType.ManageFriend,
-  });
+  const { data: parentalConsents } = useGetParentalConsentsQuery(
+    {
+      childUserId: child?.userId ?? authenticatedUser.id!,
+      consentStatus: ParentConsentStatus.Pending,
+      consentType: ParentConsentType.ManageFriend,
+    },
+    { skip: !!onUnblockUser },
+  );
   const pendingConsent = parentalConsents?.consents.find(
     consent => consent.consentData?.friendUserId === blockedUser.blockedUserId,
   );
@@ -159,7 +164,7 @@ export const BlockedUserWithParentalConsent = ({
           {blockedCombinedName}
           <div className="text-secondary">{userName}</div>
         </div>
-        {!child && pendingConsent ? (
+        {!child && !onUnblockUser && pendingConsent ? (
           // Pending request button
           <Button
             className="user-blocking-btn"
@@ -179,6 +184,10 @@ export const BlockedUserWithParentalConsent = ({
             variant={Button.variants.control}
             isDisabled={unblockDisabled}
             onClick={async () => {
+              if (onUnblockUser) {
+                await onUnblockUser(blockedUser.blockedUserId);
+                return;
+              }
               if (canRequestUnblock) {
                 parentalControlsEventService.authButtonClickSettingsBlockedUsersUnblockVpc(
                   blockedUser.blockedUserId,

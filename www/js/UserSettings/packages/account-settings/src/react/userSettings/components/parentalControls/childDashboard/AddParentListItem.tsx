@@ -25,6 +25,7 @@ export const AddParentListItem = ({ divider }: { divider: TListItemDivider }): J
         </ListItemLeadingAccessorySpacer>
       }
       onSelect={handleParentLinking}
+      className="items-stretch"
     />
   );
 };

@@ -101,6 +101,8 @@ export enum ManagementAction {
   RevokeApproval = "RevokeApproval",
 }
 
+export type TManageExperience = (universeId: number, action: ManagementAction) => Promise<void>;
+
 export type TGrantConsentRequest = {
   childUserId: number;
   consentType: ParentConsentType;

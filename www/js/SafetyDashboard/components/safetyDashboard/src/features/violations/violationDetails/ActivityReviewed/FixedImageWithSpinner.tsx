@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { captureException } from "@sentry/react";
 import { ProgressCircle } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
@@ -13,7 +13,7 @@ interface Props {
  * A component that displays an image or a loading spinner if the image is still loading.
  * The container is styled to ensure that no layout shifts occur when the image is loading.
  */
-const FixedImageWithSpinner = ({ url, altLabelKey }: Props): JSX.Element => {
+const FixedImageWithSpinner = ({ url, altLabelKey }: Props): React.JSX.Element => {
   const { translate } = useTranslation();
   const [loading, setLoading] = useState(true);
 

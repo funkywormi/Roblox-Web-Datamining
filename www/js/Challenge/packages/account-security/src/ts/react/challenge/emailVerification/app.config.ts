@@ -1,34 +1,13 @@
-import { TranslationConfig } from "react-utilities";
-
 export const FEATURE_NAME = "EmailVerification" as const;
 export const LOG_PREFIX = "EmailVerification:" as const;
 
 export const OTP_CONTAINER_ID = "otp-challenge-container" as const;
 
 /**
- * Language resource keys for the email verification challenge that are requested
- * dynamically.
+ * Translation namespaces used by this web app. Keep in sync with the challenge
+ * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const EMAIL_VERIFICATION_LANGUAGE_RESOURCES = [
-  "Message.Error.Default",
-  "Header.VerifyYourAccount",
-  "Description.SuspiciousActivityEmailVerificationV1",
-  "Header.EnterCode",
-  "Description.EnterCode",
-  "Header.ConfirmAbandon",
-  "Description.ConfirmAbandon",
-  "Label.ConfirmAbandon",
-  "Label.RejectAbandon",
-] as const;
-
-/**
- * Translations required by this web app (remember to also edit
- * `bundle.config.js` if changing this configuration).
- */
-export const TRANSLATION_CONFIG: TranslationConfig = {
-  common: ["CommonUI.Messages"],
-  feature: "Feature.EmailVerificationChallenge",
-};
+export const TRANSLATION_NAMESPACES = ["Feature.EmailVerificationChallenge"] as const;
 
 /**
  * Constants for event stream events.

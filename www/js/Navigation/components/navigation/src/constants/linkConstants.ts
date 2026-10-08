@@ -3,13 +3,17 @@ import environmentUrls from "@rbx/environment-urls";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { TIconProps } from "@rbx/foundation-ui";
 
-export type UniversalSearchLink = {
+type BaseUniversalSearchLink = {
   url: string;
-  label: string;
   pageSort: string[];
   icon: string;
   foundationIcon: TIconProps["name"];
 };
+
+export type UniversalSearchLink =
+  | (BaseUniversalSearchLink & { label: string; isTopSearchResult?: never })
+  // The Top search result only shows the keyword and does not have a label
+  | (BaseUniversalSearchLink & { label?: never; isTopSearchResult: true });
 
 const gameSearchLink = {
   url: getAbsoluteUrl("/discover/?keyword="),
@@ -18,6 +22,15 @@ const gameSearchLink = {
   icon: "icon-menu-games-off",
   foundationIcon: "icon-regular-circle-play",
 } satisfies UniversalSearchLink;
+
+const topSearchLink = {
+  url: getAbsoluteUrl("/discover/?searchType=top&keyword="),
+  pageSort: [],
+  icon: "icon-menu-games-off",
+  foundationIcon: "icon-regular-circle-play",
+  isTopSearchResult: true,
+} satisfies UniversalSearchLink;
+
 const avatarSearchLink = {
   url: getAbsoluteUrl("/catalog?CatalogContext=1&keyword="),
   label: "Heading.Marketplace",
@@ -139,6 +152,7 @@ export default {
     },
   },
   gameSearchLink,
+  topSearchLink,
   avatarSearchLink,
   miscSearchLink,
   newUniversalSearchUrls: [gameSearchLink, ...miscSearchLink] satisfies UniversalSearchLink[],

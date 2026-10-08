@@ -188,7 +188,7 @@ const AvatarEditorTabs: React.FC = () => {
                 row.visible !== false && (
                   <div key={row.title} className="submenu-row">
                     <li
-                      className={classNames("text", "text-overflow", "text-label", {
+                      className={classNames("text-label", "text-truncate-end", "content-default", {
                         active: row === selectedCategoryRow,
                       })}
                       onMouseDown={() => {
@@ -203,7 +203,7 @@ const AvatarEditorTabs: React.FC = () => {
                           menu.visible !== false && (
                             <li
                               key={menu.label}
-                              className={classNames("text", {
+                              className={classNames({
                                 active: menu === selectedSubcategory,
                               })}
                               onMouseDown={() => {
@@ -227,7 +227,7 @@ const AvatarEditorTabs: React.FC = () => {
                   menu.visible !== false && (
                     <li
                       key={menu.label}
-                      className={classNames("text", {
+                      className={classNames({
                         active: menu === selectedSubcategory,
                       })}
                       onMouseDown={() => {

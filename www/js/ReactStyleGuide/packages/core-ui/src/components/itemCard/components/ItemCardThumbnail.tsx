@@ -113,23 +113,25 @@ function ItemCardThumbnail({
   return (
     <div className="item-card-link">
       <div className="item-card-thumb-container">
-        {(licenseLabel !== undefined || (timedOptions && timedOptions.length > 0)) && (
-          <div className="thumbnail-badges-container">
-            {licenseLabel && <Badge variant={licenseVariant} label={licenseLabel} />}
-            {timedOptions && timedOptions.length > 0 && (
-              <Badge
-                variant="Neutral"
-                icon="icon-regular-clock"
-                className="bg-surface-0"
-                label={
-                  selectedTimedOption?.days
-                    ? translate("Label.TimedOptionDaysAbbreviation", {
-                        days: selectedTimedOption.days,
-                      })
-                    : ""
-                }
-              />
-            )}
+        {licenseLabel && (
+          <div className="thumbnail-badges-container" data-testid="thumbnail-badges-container">
+            <Badge variant={licenseVariant} label={licenseLabel} />
+          </div>
+        )}
+        {timedOptions && timedOptions.length > 0 && (
+          <div className="thumbnail-timed-option-badge" data-testid="thumbnail-timed-option-badge">
+            <Badge
+              variant="Neutral"
+              icon="icon-regular-clock"
+              className="bg-surface-0"
+              label={
+                selectedTimedOption?.days
+                  ? translate("Label.TimedOptionDaysAbbreviation", {
+                      days: selectedTimedOption.days,
+                    })
+                  : ""
+              }
+            />
           </div>
         )}
         {enableThumbnailPrice && (

@@ -57,6 +57,7 @@ export const LinkedParentListItem = ({
         // Profiles are outside this SPA, so use a full-page navigation.
         window.location.href = getProfileUrl(parent.userId);
       }}
+      className="items-stretch"
     />
   );
 };

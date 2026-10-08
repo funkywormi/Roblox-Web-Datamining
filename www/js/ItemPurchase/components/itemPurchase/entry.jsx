@@ -2,8 +2,8 @@ import ready from "@rbx/core-scripts/util/ready";
 import { renderWithErrorBoundary } from "@rbx/core-scripts/react";
 import RobloxItemPurchase, {
   PriceContainer,
-} from "@rbx/purchase-common/js/react/itemPurchase/itemPurchase";
-import "@rbx/purchase-common/src/css/itemPurchase/itemPurchase.scss";
+} from "@rbx/purchase-common/ts/react/itemPurchase/itemPurchase";
+import "@rbx/purchase-common/src/css/itemPurchase/itemPurchase.css";
 import "@rbx/purchase-common/src/css/tailwind.css";
 
 // Deployable Static Content Component for ItemPurchase. Registers the

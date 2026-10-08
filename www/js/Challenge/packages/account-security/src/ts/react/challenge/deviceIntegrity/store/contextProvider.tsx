@@ -6,7 +6,7 @@ import React, {
   useReducer,
   useEffect,
 } from "react";
-import { TranslateFunction } from "react-utilities";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { DeviceIntegrityAction } from "./action";
 import { DeviceIntegrityState } from "./state";
 import {
@@ -34,7 +34,6 @@ type Props = {
   renderInline: boolean;
   eventService: EventService;
   metricsService: MetricsService;
-  translate: TranslateFunction;
   onChallengeDisplayed: OnChallengeDisplayedCallback;
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
@@ -55,7 +54,6 @@ export const DeviceIntegrityContextProvider = ({
   renderInline,
   eventService,
   metricsService,
-  translate,
   onChallengeDisplayed,
   onChallengeCompleted,
   onChallengeInvalidated,
@@ -64,6 +62,7 @@ export const DeviceIntegrityContextProvider = ({
 }: Props): ReactElement => {
   // We declare these variables as lazy-initialized state variables since they
   // do not need to be re-computed if this component re-renders.
+  const translate = useTranslations("Feature.DeviceIntegrityChallenge");
   const [resources] = useState(() => getResources(translate));
   const [initialState] = useState<DeviceIntegrityState>(() => ({
     // Immutable parameters:

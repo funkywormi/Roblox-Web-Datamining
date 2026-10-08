@@ -152,6 +152,14 @@ export const trackAsyncRedemptionDuration = (
   publishDuration("GiftCard_AsyncRedemptionDurationMs", { outcome }, durationMs);
 };
 
+// Submission-to-response duration for redemptions that resolve without a workflow to poll.
+export const trackSyncRedemptionDuration = (
+  durationMs: number,
+  outcome: "succeeded" | "failed",
+): void => {
+  publishDuration("GiftCard_SyncRedemptionDurationMs", { outcome }, durationMs);
+};
+
 export const { trackCounter, trackError, trackCriticalError } = createTrackers(
   observabilityRegistry,
   { publish: publishMetric, captureException, featureName: observabilityRegistry.featureName },

@@ -1,6 +1,6 @@
 import type { AxiosResponse } from "axios";
-import { EnvironmentUrls } from "Roblox";
 import { httpService } from "core-utilities";
+import { EnvironmentUrls } from "@rbx/environment-urls";
 
 type LocalCreditRedemptionConsent = {
   needConsent: boolean;

@@ -1,3 +1,4 @@
+import type React from "react";
 import {
   Button,
   Dialog,
@@ -18,7 +19,7 @@ function AvatarEditingBlockedDialog({
   closeDialog,
   isOpen,
   formattedBlockEndTime,
-}: AvatarEditingBlockedDialogProps): JSX.Element {
+}: AvatarEditingBlockedDialogProps): React.ReactElement {
   const translate = useTranslations("Feature.Avatar");
   const blockedMessage = translate("Message.AvatarEditingDisabledTime", {
     date: formattedBlockEndTime,

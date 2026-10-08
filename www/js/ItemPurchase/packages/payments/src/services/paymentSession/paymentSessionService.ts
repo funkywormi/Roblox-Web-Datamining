@@ -1,6 +1,6 @@
-import { EnvironmentUrls } from "Roblox";
+import { EnvironmentUrls } from "@rbx/environment-urls";
 import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
-import { APICall, Feature, HTTPVerb, withApiEvents } from "../../withApiMetrics/apiEventsCounter";
+import { withApiEventsV2 } from "../../observability";
 
 type CreatePaymentSessionResponse = {
   paymentSession: PaymentSession;
@@ -27,41 +27,51 @@ export enum PaymentSessionApplicationType {
 }
 
 export const createPaymentSession = async (): Promise<CreatePaymentSessionResponse | undefined> =>
-  withApiEvents<CreatePaymentSessionResponse>(
-    HTTPVerb.POST,
-    {
+  withApiEventsV2<CreatePaymentSessionResponse>({
+    method: "POST",
+    url: `${EnvironmentUrls.apiGatewayUrl}/payments-gateway/v1/payment-sessions`,
+    data: { paymentFlowId: paymentFlowAnalyticsService.getPaymentFlowUuid() },
+    config: {
       withCredentials: true,
-      url: `${EnvironmentUrls.apiGatewayUrl}/payments-gateway/v1/payment-sessions`,
     },
-    { feature: Feature.PAYMENT, call: APICall.CREATE_PAYMENT_SESSION },
-    {
-      paymentFlowId: paymentFlowAnalyticsService.getPaymentFlowUuid(),
-    },
-  );
+    eventCounterProps: { call: "CreatePaymentSession" },
+  })
+    .then(({ data }) => data)
+    .catch(() => {
+      // error is already captured by withApiEvents
+      return undefined;
+    });
 
 export const getPaymentSession = async (
   paymentSessionId: string,
 ): Promise<GetPaymentSessionResponse | undefined> =>
-  withApiEvents<GetPaymentSessionResponse>(
-    HTTPVerb.GET,
-    {
+  withApiEventsV2<GetPaymentSessionResponse>({
+    method: "GET",
+    url: `${EnvironmentUrls.apiGatewayUrl}/payments-gateway/v1/payment-sessions/${paymentSessionId}`,
+    config: {
       withCredentials: true,
-      url: `${EnvironmentUrls.apiGatewayUrl}/payments-gateway/v1/payment-sessions/${paymentSessionId}`,
     },
-    { feature: Feature.PAYMENT, call: APICall.GET_PAYMENT_SESSION },
-  );
+    eventCounterProps: { call: "GetPaymentSession" },
+  })
+    .then(({ data }) => data)
+    .catch(() => {
+      // error is already captured by withApiEvents
+      return undefined;
+    });
 
 export const getPaymentSessionByCheckoutSessionId = async (
   checkoutSessionId: string,
 ): Promise<GetPaymentSessionByCheckoutSessionIdResponse | undefined> =>
-  withApiEvents<GetPaymentSessionByCheckoutSessionIdResponse>(
-    HTTPVerb.GET,
-    {
+  withApiEventsV2<GetPaymentSessionByCheckoutSessionIdResponse>({
+    method: "GET",
+    url: `${EnvironmentUrls.apiGatewayUrl}/payments-gateway/v1/payment-sessions?checkoutSessionId=${checkoutSessionId}`,
+    config: {
       withCredentials: true,
-      url: `${EnvironmentUrls.apiGatewayUrl}/payments-gateway/v1/payment-sessions?checkoutSessionId=${checkoutSessionId}`,
     },
-    {
-      feature: Feature.PAYMENT,
-      call: APICall.GET_PAYMENT_SESSION_BY_CHECKOUT_SESSION_ID,
-    },
-  );
+    eventCounterProps: { call: "GetPaymentSessionByCheckoutSessionId" },
+  })
+    .then(({ data }) => data)
+    .catch(() => {
+      // error is already captured by withApiEvents
+      return undefined;
+    });

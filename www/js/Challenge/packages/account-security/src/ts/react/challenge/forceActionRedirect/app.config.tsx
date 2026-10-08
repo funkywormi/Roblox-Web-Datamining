@@ -1,4 +1,3 @@
-import { TranslationConfig } from "react-utilities";
 import { ForceActionRedirect } from "@rbx/generic-challenge-types";
 import { useTrustedSessionCount } from "../../common/hooks/useSessionsQuery";
 import { sessionManagementLinkWithRedirect } from "../../../common/urls";
@@ -11,9 +10,12 @@ export const LOG_PREFIX = "ForceActionRedirect:" as const;
 // This is the 2-Step Verification path in Account Settings.
 export const ACCOUNT_SETTINGS_SECURITY_PATH = "/my/account#!/security?src=";
 
+type TranslationConfig =
+  ForceActionRedirect.ForceActionRedirectChallengeConfig["translationConfig"];
+
 /**
- * Translations required by this web app (remember to also edit
- * `bundle.config.js` if changing this configuration).
+ * Translation namespace per challenge type (`feature`). Keep in sync with the challenge SCC's
+ * `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
 const FORCE_AUTHENTICATOR_TRANSLATION_CONFIG: TranslationConfig = {
   common: [],

@@ -40,7 +40,7 @@ function AvatarItemCard({
   openOutfitMenu,
   closeOutfitMenu,
   onExpiredAssetsClick,
-}: AvatarItemCardProps): JSX.Element {
+}: AvatarItemCardProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const isAssetTypeSelectionEnabled = useCallback((assetTypeName: string | undefined): boolean => {
     return !AvatarAccoutrementService.isEmote(assetTypeName || "");
@@ -111,23 +111,20 @@ function AvatarItemCard({
             data-thumbnail-target-id={item.id}
             data-thumbnail-type={item.thumbnailType}
           >
-            {/* Licensing and expiration badges share the top-left corner, so a
-                licensed item suppresses the expiration badge. */}
-            {licenseLabelKey ? (
+            {licenseLabelKey && (
               <div className="license-badge">
                 <Badge variant="Neutral" label={translate(licenseLabelKey)} />
               </div>
-            ) : (
-              expirationTimeShorthand && (
-                <div className="expiration-time-badge">
-                  <Badge
-                    variant="Neutral"
-                    icon="icon-regular-clock"
-                    className="bg-surface-0"
-                    label={expirationTimeShorthand}
-                  />
-                </div>
-              )
+            )}
+            {expirationTimeShorthand && (
+              <div className="expiration-time-badge">
+                <Badge
+                  variant="Neutral"
+                  icon="icon-regular-clock"
+                  className="bg-surface-0"
+                  label={expirationTimeShorthand}
+                />
+              </div>
             )}
             {isUnavailable ? (
               // Mirrors the Thumbnail2d "Blocked" state rendering (dark grey
@@ -161,8 +158,11 @@ function AvatarItemCard({
           item.selected &&
           (!isCatalogItemAsset(item) || isAssetTypeSelectionEnabled(item.assetType.name)) && (
             <div className="item-card-equipped" data-item-status="equipped">
-              <div className="item-card-equipped-label" />
-              <span className="icon-check-selection" />
+              <Icon
+                name="icon-filled-circle-check"
+                size="Medium"
+                className="item-card-equipped-icon"
+              />
             </div>
           )}
 
@@ -182,7 +182,7 @@ function AvatarItemCard({
                 key={option.label}
                 onClick={e => onItemMenuButtonClicked?.(e, item, option)}
                 type="button"
-                className="btn-secondary-xs"
+                className="text-label-small"
               >
                 {translate(option.label)}
               </button>
@@ -191,7 +191,7 @@ function AvatarItemCard({
         )}
 
         <a href={itemLink} onClick={handleItemClick} className="item-card-name-link">
-          <div title={item.name} className="text-overflow item-card-name">
+          <div title={item.name} className="item-card-name">
             {item.name}
           </div>
         </a>
@@ -225,9 +225,11 @@ function AvatarItemCard({
               tabIndex={0}
               role="button"
               aria-label={translate("Action.EditOutfit")}
-              className="icon-settings-16x16 edit-outfit"
+              className="edit-outfit content-default hover:content-emphasis"
               data-item-name={item.name}
-            />
+            >
+              <Icon name="icon-filled-gear" size="Small" />
+            </span>
           )}
       </div>
     </div>

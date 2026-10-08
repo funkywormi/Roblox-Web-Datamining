@@ -1,4 +1,4 @@
-import Roblox from "Roblox";
+import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
 import { EVENT_CONSTANTS } from "../app.config";
 
 /**
@@ -16,73 +16,73 @@ export class EventServiceDefault {
 
   sendChallengeInitializedEvent(): void {
     this.startTime = Date.now();
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeInitialized,
       {
         challengeId: this.challengeId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendPuzzleInitializedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.puzzleInitialized,
       {
         challengeId: this.challengeId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendPuzzleCompletedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.puzzleCompleted,
       {
         challengeId: this.challengeId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeCompletedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeCompleted,
       {
         challengeId: this.challengeId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeInvalidatedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeInvalidated,
       {
         challengeId: this.challengeId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeAbandonedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeAbandoned,
       {
         challengeId: this.challengeId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeTimeoutEvent(progress: number): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeTimeout,
       {
@@ -90,7 +90,7 @@ export class EventServiceDefault {
         timeoutProgress: progress,
         timeoutElapsedTime: this.startTime !== null ? Date.now() - this.startTime : 0,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 }

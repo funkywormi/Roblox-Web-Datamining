@@ -1,3 +1,4 @@
+import type React from "react";
 import classNames from "classnames";
 import {
   Button,
@@ -34,7 +35,7 @@ function AdvancedBodyColorsDialog({
   isColorSelected,
   bodyParts,
   getCurrentBodyPartColor,
-}: AdvancedBodyColorsDialogProps): JSX.Element {
+}: AdvancedBodyColorsDialogProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const {
     selectedBodyPart,

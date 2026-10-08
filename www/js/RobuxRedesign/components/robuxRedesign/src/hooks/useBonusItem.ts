@@ -6,10 +6,10 @@ export const BUY_ROBUX_CTX_LOCAL_STORAGE_KEY = "buyRobuxCtx";
 export const BUY_ROBUX_PRODUCT_ID_LOCAL_STORAGE_KEY = "buyRobuxProductId";
 
 export function useBonusItem(): void {
-  const { urlSearchParams } = useContext(BuyRobuxPageContext);
+  const { urlParams } = useContext(BuyRobuxPageContext);
   const [ctxUrlParam, productIdUrlParam] = useMemo(
-    () => [urlSearchParams.get("ctx"), urlSearchParams.get("product_id")],
-    [urlSearchParams],
+    () => [urlParams.ctx, urlParams.product_id],
+    [urlParams],
   );
 
   useEffect(() => {

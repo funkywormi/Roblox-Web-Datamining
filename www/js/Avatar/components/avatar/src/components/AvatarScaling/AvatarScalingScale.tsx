@@ -20,7 +20,7 @@ function AvatarScalingScale({
   pageLoaded,
   isBodyTypeScaleOutOfTab,
   scaleEnabled,
-}: AvatarScalingScaleProps): JSX.Element {
+}: AvatarScalingScaleProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const [value, setValue] = React.useState(0);
 
@@ -44,7 +44,7 @@ function AvatarScalingScale({
     >
       {!isBodyTypeScaleOutOfTab || scale.type !== "BodyType" ? (
         <React.Fragment>
-          <div className="text-label font-subheader-1">{translate(scale.label)}</div>
+          <div className="text-label content-default">{translate(scale.label)}</div>
           <div className="scale-label font-body">{`${scale.value.toFixed(0)}%`}</div>
           <Slider
             thumbAriaNames={["Scale"]}

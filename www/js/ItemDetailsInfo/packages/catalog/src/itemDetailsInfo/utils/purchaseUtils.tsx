@@ -281,6 +281,10 @@ function genPurchaseParams({
       purchaseParams.sellerName = collectibleSellerInfo.sellerName
         ? collectibleSellerInfo.sellerName
         : "";
+      // Creator discounts don't apply to resale copies; a lower resale price isn't a discount.
+      if (collectibleSellerInfo.collectibleItemInstanceId) {
+        purchaseParams.discountInformation = null;
+      }
     }
   } else if (resellers?.length) {
     // Sets specific Limited 1.0 purchase parameters used by the Roblox.Purchase.WebApp.
@@ -296,6 +300,9 @@ function genPurchaseParams({
       purchaseParams.expectedSellerId = limited1SellerInfo.expectedSellerId || 1;
       purchaseParams.sellerType = limited1SellerInfo.sellerType;
       purchaseParams.sellerName = limited1SellerInfo.sellerName;
+      if (limited1SellerInfo.userAssetId !== undefined) {
+        purchaseParams.discountInformation = null;
+      }
     }
   }
   return purchaseParams;

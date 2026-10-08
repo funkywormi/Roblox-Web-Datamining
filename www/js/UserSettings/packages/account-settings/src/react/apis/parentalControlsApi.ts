@@ -274,11 +274,16 @@ export const parentalControlsApi = baseApi.injectEndpoints({
         // So that we can merge together the data from all queries.
         return getChildFriendsCacheTag(queryArgs.userId, queryArgs.findFriendsType);
       },
-      merge: (currentCache, newItems) => {
-        if (currentCache) {
+      merge: (currentCache, newItems, { arg }) => {
+        // Only append for next pages. A first-page fetch (e.g. a refetch) replaces the list.
+        if (currentCache && arg.cursor) {
+          const cachedIds = new Set(currentCache.PageItems.map(friend => friend?.id));
           const result: TFindFriendsResponse = {
             PreviousCursor: newItems?.PreviousCursor,
-            PageItems: [...currentCache.PageItems, ...newItems.PageItems],
+            PageItems: [
+              ...currentCache.PageItems,
+              ...newItems.PageItems.filter(friend => !cachedIds.has(friend?.id)),
+            ],
             NextCursor: newItems?.NextCursor,
             HasMore: newItems.HasMore,
           };

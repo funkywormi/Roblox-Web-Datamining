@@ -154,7 +154,7 @@ export function SearchLink({
 }) {
   const t = useTranslations("CommonUI.Features");
 
-  const { url, label, icon, foundationIcon } = suggestion;
+  const { url, label, icon, foundationIcon, isTopSearchResult } = suggestion;
 
   const listClass = ClassNames("navbar-search-option rbx-clickable-li", {
     "new-selected": selected,
@@ -173,11 +173,13 @@ export function SearchLink({
           className="navbar-list-option-icon"
         />
         <span className="navbar-list-option-text">{searchInput.toLowerCase()}</span>
-        <span className="navbar-list-option-suffix">
-          {t("Label.sSearchPhraseV2", {
-            location: t.has(label) ? t(label) : "",
-          })}
-        </span>
+        {!isTopSearchResult && (
+          <span className="navbar-list-option-suffix">
+            {t("Label.sSearchPhraseV2", {
+              location: t.has(label) ? t(label) : "",
+            })}
+          </span>
+        )}
       </Link>
     </li>
   );

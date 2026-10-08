@@ -1,3 +1,4 @@
+import type React from "react";
 import {
   Button,
   Dialog,
@@ -20,7 +21,7 @@ function EquipEmotesDialog({
   closeDialog,
   isOpen,
   selectedItem,
-}: EquipEmotesDialogProps): JSX.Element {
+}: EquipEmotesDialogProps): React.ReactElement {
   const translate = useTranslations("Feature.Avatar");
   return (
     <Dialog
@@ -33,7 +34,7 @@ function EquipEmotesDialog({
       hasCloseAffordance
       closeLabel={translate("Action.Close")}
     >
-      <DialogContent>
+      <DialogContent className="avatar-emotes-dialog">
         <DialogBody className="flex flex-col gap-small">
           <DialogTitle className="text-title-medium content-emphasis">
             {translate("Heading.EquipEmotes")}

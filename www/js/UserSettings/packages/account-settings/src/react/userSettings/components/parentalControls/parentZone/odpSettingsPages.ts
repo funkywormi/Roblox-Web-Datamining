@@ -14,6 +14,7 @@ import { TGetOdpChildContextResponse } from "../../../../../types/odpChildContex
 import { TSettingsUIPolicyBody } from "../../../../../types/policyTypes";
 import { baseParentalControlsPath } from "../../../constants/parentalControls/parentalControlsConstants";
 import privacyTranslationConstants from "../../../constants/contentConstants/privacyTranslationConstants";
+import doesUserHaveNotificationSettings from "../../../utils/notificationUtils";
 
 export type TOdpSettingsPage = TSettingsPage & {
   settings: { name: UserSetting }[];
@@ -32,6 +33,7 @@ export const odpSettingsPageList: TSettingsPage[] = [
   categories.Spending,
   categories.VisibilityAndPrivateServers,
   categories.FriendsAndContacts,
+  categories.BlockedUsers,
   categories.TradingAndInventory,
   categories.ThirdPartyApplications,
   categories.Notifications,
@@ -74,16 +76,30 @@ const subpageSettings: Record<string, UserSetting[]> = {
   [PrivacySettingName.PrivateServerPrivacy]: [UserSetting.privateServerPrivacy],
 };
 
+const experienceSubpages: string[] = [
+  PrivacySettingName.BlockedExperiences,
+  PrivacySettingName.BlockedExperiencesSearch,
+  PrivacySettingName.ApprovedExperiences,
+];
+
 export const odpSettingsSubpageList = Object.values(odpSettingsSubpageGroups)
   .flatMap(group => Object.values(group))
-  .filter(page => subpageSettings[page.name]);
+  .filter(page => subpageSettings[page.name] || experienceSubpages.includes(page.name));
 
 export const getOdpSettingsSubpages = (
   page: TOdpSettingsPage,
   child: TChildSettingsInfo,
+  policy?: TSettingsUIPolicyBody,
 ): Record<string, TSettingsPage> =>
   Object.fromEntries(
     Object.entries(odpSettingsSubpageGroups[page.name] ?? {}).filter(([name]) => {
+      if (experienceSubpages.includes(name)) {
+        return (
+          child.canParentManageChildsExperiences === true &&
+          (name !== PrivacySettingName.ApprovedExperiences ||
+            policy?.isAllowedExperiencesEnabled === true)
+        );
+      }
       if (
         name ===
         (child.canSeeChatTerminology
@@ -110,22 +126,17 @@ export const getOdpSettingsPages = (
 
   const canParentAccessBasicPrivacySettings =
     context.canParentAccessChildBasicPrivacySettings === true;
-
   const canParentAccessCommunicationSettings =
     canParentAccessBasicPrivacySettings ||
     context.canParentManageChildsCommunicationSettings === true;
-
   const isPartyV2Enabled = policy?.shouldDisplayPartySettingsV2 === true;
-
   const useLegacyParty =
     canParentAccessCommunicationSettings &&
     !isPartyV2Enabled &&
     !!settings?.whoCanOneOnOnePartyWithMe &&
     !!settings.whoCanGroupPartyWithMe;
-
   const usePartyV2 =
     canParentAccessCommunicationSettings && isPartyV2Enabled && !!settingsV2?.whoCanPartyWithMe;
-
   const pages: Record<string, TOdpSettingsPage> = {};
 
   const addPage = (
@@ -155,12 +166,15 @@ export const getOdpSettingsPages = (
     }
   };
 
-  addPage(SettingCategoryPageName.ContentRestrictions, [
-    [UserSetting.contentAgeRestriction, canParentAccessBasicPrivacySettings],
-    [UserSetting.allowSensitiveIssues, true],
-    [UserSetting.privatePlaytest, context.canParentManageChildsPrivatePlaytestSetting, true],
-  ]);
-
+  addPage(
+    SettingCategoryPageName.ContentRestrictions,
+    [
+      [UserSetting.contentAgeRestriction, canParentAccessBasicPrivacySettings],
+      [UserSetting.allowSensitiveIssues, true],
+      [UserSetting.privatePlaytest, context.canParentManageChildsPrivatePlaytestSetting, true],
+    ],
+    context.canParentManageChildsExperiences === true,
+  );
   addPage(SettingCategoryPageName.Communication, [
     [UserSetting.whoCanChatWithMeInExperiences, canParentAccessCommunicationSettings, true],
     [
@@ -229,16 +243,48 @@ export const getOdpSettingsPages = (
     ],
     [UserSetting.privateServerPrivacy, canParentAccessBasicPrivacySettings],
   ]);
-
   addPage(
     SettingCategoryPageName.FriendsAndContacts,
     [[UserSetting.phoneNumberDiscoverability, true]],
     context.canParentViewChildDeviceContactAccessDisclaimer === true,
   );
-
+  addPage(PrivacySettingName.BlockedUsers, [], context.canParentManageChildsFriends === true);
   addPage(SettingCategoryPageName.TradingAndInventory, [
     [UserSetting.whoCanSeeMyInventory, canParentAccessBasicPrivacySettings],
     [UserSetting.whoCanTradeWithMe, canParentAccessBasicPrivacySettings],
+  ]);
+  addPage(SettingCategoryPageName.ThirdPartyApplications, [
+    [UserSetting.allowThirdPartyAppPermissions, true],
+  ]);
+
+  if (doesUserHaveNotificationSettings(settings)) {
+    addPage(
+      SettingCategoryPageName.Notifications,
+      [
+        [UserSetting.allowEnableEmailNotifications, true],
+        [UserSetting.allowEnablePushNotifications, true],
+        [
+          UserSetting.aggregatedDesktopNotifications,
+          policy?.displayDesktopNotificationSettings,
+          true,
+        ],
+        [UserSetting.doNotDisturb, context.canParentManageChildsDoNotDisturb],
+      ],
+      true,
+    );
+  }
+  addPage(SettingCategoryPageName.AgeCheck, [
+    [
+      UserSetting.allowFacialAgeEstimation,
+      policy?.enableAgeCheckSetting ||
+        (context.canParentViewChildCreatorCollaborationSettings &&
+          policy?.vpcForFaeCreatorCollabSettingEnabled),
+    ],
+    [
+      UserSetting.allowIdentityVerification,
+      context.canParentManageChildsAllowIdentityVerificationSetting,
+      true,
+    ],
   ]);
 
   return pages;

@@ -1,3 +1,4 @@
+import type React from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { PlatformEvidenceFullyTyped } from "../../util/types";
 import safeTranslateWithParams from "../../util/translation/safeTranslateWithParams";
@@ -17,8 +18,8 @@ interface Props {
 const PlatformEvidenceInfo = ({ evidence, createTime }: Props) => {
   const { translate } = useTranslation();
 
-  const imageElements: JSX.Element[] = [];
-  const textBasedElements: JSX.Element[] = [];
+  const imageElements: React.JSX.Element[] = [];
+  const textBasedElements: React.JSX.Element[] = [];
 
   evidence.elements.forEach(elem => {
     switch (elem.type) {

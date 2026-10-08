@@ -35,8 +35,8 @@ export const userBlockingApi = baseApi.injectEndpoints({
         url: blockedUsersEndpointUrl,
         queryParams: params,
       }),
-      merge: (currentCache, newItems) => {
-        if (currentCache) {
+      merge: (currentCache, newItems, { arg }) => {
+        if (currentCache && arg.cursor) {
           const result: TBlockedUsersResponse = {
             data: {
               cursor: newItems.data.cursor,

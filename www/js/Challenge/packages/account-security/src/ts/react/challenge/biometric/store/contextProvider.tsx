@@ -6,7 +6,7 @@ import React, {
   useReducer,
   useEffect,
 } from "react";
-import { TranslateFunction } from "react-utilities";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { BiometricAction } from "./action";
 import { BiometricState } from "./state";
 import {
@@ -34,7 +34,6 @@ type Props = {
   renderInline: boolean;
   eventService: EventService;
   metricsService: MetricsService;
-  translate: TranslateFunction;
   onChallengeDisplayed: OnChallengeDisplayedCallback;
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
@@ -55,7 +54,6 @@ export const BiometricContextProvider = ({
   renderInline,
   eventService,
   metricsService,
-  translate,
   onChallengeDisplayed,
   onChallengeCompleted,
   onChallengeInvalidated,
@@ -64,7 +62,9 @@ export const BiometricContextProvider = ({
 }: Props): ReactElement => {
   // We declare these variables as lazy-initialized state variables since they
   // do not need to be re-computed if this component re-renders.
-  const [resources] = useState(() => getResources(translate));
+  const translate = useTranslations("Feature.BiometricChallenge");
+  const translateCommon = useTranslations("CommonUI.Messages");
+  const [resources] = useState(() => getResources(translate, translateCommon));
   const [initialState] = useState<BiometricState>(() => ({
     // Immutable parameters
     challengeId,

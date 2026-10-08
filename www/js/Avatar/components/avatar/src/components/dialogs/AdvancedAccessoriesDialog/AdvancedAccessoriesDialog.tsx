@@ -26,7 +26,7 @@ type AdvancedAccessoriesDialogProps = {
 function AdvancedAccessoriesDialog({
   closeDialog,
   isOpen,
-}: AdvancedAccessoriesDialogProps): JSX.Element {
+}: AdvancedAccessoriesDialogProps): React.ReactElement {
   const translate = useTranslations("Feature.Avatar");
   const { avatarSettings } = useAvatarPageContext();
   const { setWearingAssetsFromIdsV2 } = useAssetManagerContext();

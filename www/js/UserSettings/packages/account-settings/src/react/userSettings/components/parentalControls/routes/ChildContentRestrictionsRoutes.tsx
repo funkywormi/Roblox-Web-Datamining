@@ -5,6 +5,7 @@ import { UserSetting } from "@rbx/user-settings";
 import PrivacySettingName from "../../../../../enums/privacy/PrivacySettingName";
 import { TSettingUpdateProps } from "../../../../../types/settingUpdateTypes";
 import { TChildInfo, TChildSettingsInfo } from "../../../../../types/childrenInfoTypes";
+import { TManageExperience } from "../../../../../types/parentConsentsTypes";
 import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOptions";
 import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAndOptionsV2";
 import { useGetSettingsUiPolicyQuery } from "../../../../apis/universalAppConfigurationApi";
@@ -23,14 +24,15 @@ export const ChildContentRestrictionsRoutes = ({
   contentRestrictionsPage,
   subpages,
   onUpdateSetting,
+  onManageExperience,
 }: {
+  child: TChildInfo | TChildSettingsInfo;
   contentRestrictionsPage: TSettingsPage;
   subpages: Record<string, TSettingsPage>;
-} & (
-  | { child: TChildInfo; onUpdateSetting?: undefined }
-  | ({ child: TChildSettingsInfo } & Required<TSettingUpdateProps>)
-)): JSX.Element => {
+  onManageExperience?: TManageExperience;
+} & TSettingUpdateProps): JSX.Element => {
   const displayContentMaturity = child.canParentAccessChildBasicPrivacySettings;
+  const remoteParentChild = "parentUserId" in child ? child : undefined;
   const { translate } = useTranslation();
   const [childSettings] = useGetSettingsAndOptions(child.userId);
   const [childSettingsV2] = useGetSettingsAndOptionsV2(child.userId);
@@ -112,24 +114,35 @@ export const ChildContentRestrictionsRoutes = ({
           <ContentMaturitySlider childUserId={child.userId} onUpdateSetting={onUpdateSetting} />
         </Route>
       )}
-      {!onUpdateSetting && (
-        <React.Fragment>
+      {(remoteParentChild || onManageExperience) &&
+        subpages[PrivacySettingName.BlockedExperiences] && (
           <Route exact path={subpages[PrivacySettingName.BlockedExperiences]?.path}>
             <BlockedExperiences
-              child={child}
+              child={remoteParentChild}
+              onManageExperience={onManageExperience}
               searchPagePath={subpages[PrivacySettingName.BlockedExperiencesSearch]?.path}
             />
           </Route>
+        )}
+      {(remoteParentChild || onManageExperience) &&
+        subpages[PrivacySettingName.BlockedExperiencesSearch] && (
           <Route path={subpages[PrivacySettingName.BlockedExperiencesSearch]?.path}>
-            <BlockedExperiencesSearch child={child} />
+            <BlockedExperiencesSearch
+              child={remoteParentChild}
+              onManageExperience={onManageExperience}
+            />
           </Route>
-          {displayAllowedExperiences && (
-            <Route path={subpages[PrivacySettingName.ApprovedExperiences]?.path}>
-              <ApprovedExperiences child={child} />
-            </Route>
-          )}
-        </React.Fragment>
-      )}
+        )}
+      {(remoteParentChild || onManageExperience) &&
+        displayAllowedExperiences &&
+        subpages[PrivacySettingName.ApprovedExperiences] && (
+          <Route path={subpages[PrivacySettingName.ApprovedExperiences]?.path}>
+            <ApprovedExperiences
+              child={remoteParentChild}
+              onManageExperience={onManageExperience}
+            />
+          </Route>
+        )}
       {displaySensitiveIssues && subpages[PrivacySettingName.SensitiveIssues] && (
         <Route path={subpages[PrivacySettingName.SensitiveIssues]?.path}>
           <SensitiveIssues child={child} onUpdateSetting={onUpdateSetting} />

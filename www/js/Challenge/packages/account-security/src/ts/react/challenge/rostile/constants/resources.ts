@@ -1,18 +1,8 @@
+import type { Translator } from "@rbx/www-common/i18n";
 import * as Rostile from "../../../../common/request/types/rostile";
-import { ROSTILE_LANGUAGE_RESOURCES } from "../app.config";
 import { ErrorCode } from "../interface";
 
-/**
- * A type adapted from the base type of `translate`, which we use to limit the
- * keys that can be translated.
- */
-type TranslateFunction = (
-  resourceId: (typeof ROSTILE_LANGUAGE_RESOURCES)[number],
-  parameters?: Record<string, unknown>,
-) => string;
-
-// IMPORTANT: Add resource keys to `app.config.ts` as well.
-export const getResources = (translate: TranslateFunction) =>
+export const getResources = (translate: Translator<"Feature.RostileChallenge">) =>
   ({
     Description: {
       VerificationError: translate("Description.VerificationError"),

@@ -1,3 +1,4 @@
+import type React from "react";
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import classNames from "classnames";
@@ -15,7 +16,7 @@ const EmotesItemCard = ({
   isSelected,
   item,
   onEmotesCardClick,
-}: EmotesItemCardProps): JSX.Element => {
+}: EmotesItemCardProps): React.ReactElement => {
   return (
     <div
       className={classNames("item-card-container", {
@@ -39,7 +40,7 @@ const EmotesItemCard = ({
       </div>
       <div className="item-card-caption">
         <div className="item-card-name-link">
-          <div title={item.name} className="text-overflow item-card-name">
+          <div title={item.name} className="item-card-name">
             {item.name}
           </div>
         </div>

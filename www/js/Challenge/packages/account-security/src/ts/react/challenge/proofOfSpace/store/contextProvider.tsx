@@ -6,7 +6,7 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { TranslateFunction } from "react-utilities";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { RequestService } from "../../../../common/request";
 import { getResources } from "../constants/resources";
 import {
@@ -36,7 +36,6 @@ type Props = {
   eventService: EventService;
   metricsService: MetricsService;
   requestService: RequestService;
-  translate: TranslateFunction;
   onChallengeDisplayed: OnChallengeDisplayedCallback;
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
@@ -56,7 +55,6 @@ export const ProofOfSpaceContextProvider = ({
   eventService,
   metricsService,
   requestService,
-  translate,
   onChallengeDisplayed,
   onChallengeCompleted,
   onChallengeInvalidated,
@@ -65,6 +63,7 @@ export const ProofOfSpaceContextProvider = ({
 }: Props): ReactElement => {
   // We declare these variables as lazy-initialized state variables since they
   // do not need to be re-computed if this component re-renders.
+  const translate = useTranslations("Feature.ProofOfSpaceChallenge");
   const [resources] = useState(() => getResources(translate));
   const [initialState] = useState<ProofOfSpaceState>(() => ({
     // Immutable parameters:

@@ -27,12 +27,12 @@ export function Banner({ transfers }: { transfers?: SectionTransfers }) {
   const {
     breakpoint,
     buyRobuxPageData: { pageHeaderMetadata },
-    urlSearchParams,
+    urlParams,
   } = useContext(BuyRobuxPageContext);
   const { translate } = useTranslation();
 
   const isAboveLarge = breakpoint.isAboveInclusive("large");
-  const showWebviewHeader = urlSearchParams.get("showHeader") === "true";
+  const showWebviewHeader = urlParams.showHeader === "true";
 
   const stickyRobuxBalance =
     showWebviewHeader && !transfers ? (

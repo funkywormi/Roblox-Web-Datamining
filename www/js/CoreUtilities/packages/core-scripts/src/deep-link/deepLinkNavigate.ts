@@ -965,6 +965,16 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
     // Pass through roblox:// unchanged for protocol / in-app handling.
     // roblox://navigation/plus_referral_dashboard
     urlTarget = target.url;
+  } else if (navigateSubPath === PathPart.PlusSubscribe) {
+    // roblox://navigation/plus_subscribe?surface=PlusReferralLandingSheet&referrer_id=123
+    const plusUrl = new URL(UrlPart.Plus, window.location.origin);
+    if (params.surface === "PlusReferralLandingSheet") {
+      plusUrl.searchParams.set("ctx", "plus_referral");
+    }
+    if (params.referrer_id) {
+      plusUrl.searchParams.set("referrerId", params.referrer_id);
+    }
+    urlTarget = `${plusUrl.pathname}${plusUrl.search}`;
   }
 
   if (urlTarget) {

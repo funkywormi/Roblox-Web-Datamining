@@ -1,11 +1,15 @@
 import React from 'react';
-import { TranslateFunction, withTranslations } from '@rbx/core-scripts/react';
 import { Dialog, DialogContent, DialogBody, DialogFooter, Button, Icon } from '@rbx/foundation-ui';
 import { translateHtml } from '@rbx/translation-utils';
 import type { TranslateHtmlTag } from '@rbx/translation-utils';
-import itemPurchaseConstants from '../../../js/react/itemPurchase/constants/itemPurchaseConstants';
+import itemPurchaseConstants from '../itemPurchase/constants/itemPurchaseConstants';
 import UnifiedPurchaseHeading from './UnifiedPurchaseHeading';
-import translationConfig from '../../../js/react/itemPurchase/translation.config';
+import { SelfProvidedTranslate } from '../itemPurchase/SelfProvidedTranslate';
+import {
+  purchasingNamespaces,
+  usePurchasingTranslate,
+  type PurchaseTranslate
+} from '../itemPurchase/useTranslate';
 
 const { resources } = itemPurchaseConstants;
 
@@ -14,16 +18,16 @@ type UnifiedPurchaseCompletionModalProps = {
   onClose: () => void;
   itemName: string;
   currentRobuxBalance?: number;
-  translate: TranslateFunction;
+  translate?: PurchaseTranslate;
 };
 
-const UnifiedPurchaseCompletionModal = ({
+const UnifiedPurchaseCompletionModalInner = ({
   open,
   onClose,
   itemName,
   currentRobuxBalance,
   translate
-}: UnifiedPurchaseCompletionModalProps): JSX.Element => {
+}: UnifiedPurchaseCompletionModalProps & { translate: PurchaseTranslate }): JSX.Element => {
   const completeTitle = translate(resources.purchaseCompleteHeading);
   const buttonLabel = translate(resources.okAction);
   const renderBold = (text: React.ReactNode) => <b>{text}</b>;
@@ -80,7 +84,18 @@ const UnifiedPurchaseCompletionModal = ({
   );
 };
 
-export default withTranslations(
-  UnifiedPurchaseCompletionModal,
-  translationConfig.purchasingResources
+// Dual-path translation boundary: a Next.js host passes `translate`; on the .NET path we
+// self-wrap in TranslationProviderSCC and source it, matching the old withTranslations behavior.
+const UnifiedPurchaseCompletionModal = ({
+  translate,
+  ...props
+}: UnifiedPurchaseCompletionModalProps): JSX.Element => (
+  <SelfProvidedTranslate
+    translate={translate}
+    namespaces={purchasingNamespaces}
+    useTranslate={usePurchasingTranslate}
+    render={t => <UnifiedPurchaseCompletionModalInner {...props} translate={t} />}
+  />
 );
+
+export default UnifiedPurchaseCompletionModal;

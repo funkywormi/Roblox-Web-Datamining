@@ -9,7 +9,7 @@ export type AvatarBodyTypeToggleProps = {
   updateAvatarType: (newAvatarType: AvatarType) => void;
 };
 
-const AvatarBodyTypeToggle = (props: AvatarBodyTypeToggleProps): JSX.Element => {
+const AvatarBodyTypeToggle = (props: AvatarBodyTypeToggleProps): React.ReactElement => {
   const { updateAvatarType } = props;
 
   const translate = useTranslations("Feature.Avatar");

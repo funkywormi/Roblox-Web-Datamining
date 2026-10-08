@@ -20,12 +20,20 @@ export type Transition = {
   node?: string;
 };
 
+/** Client presentation hints. Omitted fields keep today's behavior. */
+export type FlowNodeBehavior = {
+  /** Keep the previously rendered node mounted underneath this one. */
+  presentsOverPrevious?: boolean;
+};
+
 /** One flow node: the component to render (`type`), its props (`details`), and where each outcome leads. */
 export type FlowNode = {
   /** Component discriminator (e.g. "TextScreen"); matches a registry key and the backend node type. */
   type: string;
   /** Untyped server-authored props, passed to the node component verbatim. */
   details: Record<string, unknown>;
+  /** Optional presentation hints from the flow. */
+  behavior?: FlowNodeBehavior;
   /** Outcome key → transition the walker takes. */
   transitions: Record<string, Transition>;
 };

@@ -1,6 +1,6 @@
 import fpjs from "@fingerprintjs/fingerprintjs";
 import * as Option from "fp-ts/Option";
-import Roblox from "Roblox";
+import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
 import * as z from "zod";
 import {
   ParseChallengeSpecificProperties as NewParseChallengeSpecificProperties,
@@ -344,7 +344,7 @@ export const renderChallenge: RenderChallenge = async ({
           }
         });
 
-        Roblox.EventStream.SendEventWithTarget(
+        sendEventWithTarget(
           EVENT_CONSTANTS.eventName,
           EVENT_CONSTANTS.context.onCompleted,
           {
@@ -353,7 +353,7 @@ export const renderChallenge: RenderChallenge = async ({
             version: fp.version,
             ...fpjsData,
           },
-          Roblox.EventStream.TargetTypes.WWW,
+          targetTypes.WWW,
         );
       } catch (exception) {
         // Do nothing; failure to send fingerprint in shadow mode is not a fatal

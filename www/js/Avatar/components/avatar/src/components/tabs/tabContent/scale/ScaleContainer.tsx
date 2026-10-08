@@ -10,7 +10,7 @@ interface ScaleContainerProps {
   updateScale: (newValue: number, scaleKey: ScalesKeys) => void;
 }
 
-function ScaleContainer({ scales, updateScale }: ScaleContainerProps): JSX.Element | null {
+function ScaleContainer({ scales, updateScale }: ScaleContainerProps): React.ReactElement | null {
   const { selectedTab, selectedSubcategory } = useAvatarTabsContext();
   const { avatarSettings } = useAvatarPageContext();
 

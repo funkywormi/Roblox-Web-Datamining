@@ -31,7 +31,7 @@ export function useTracking(): Tracking {
     robuxBalance,
     sectionNames,
     subscriptionProductIds,
-    urlSearchParams,
+    urlParams,
   } = useContext(BuyRobuxPageContext);
 
   const applePayAvailability = useApplePayAvailabilityTracking();
@@ -47,7 +47,7 @@ export function useTracking(): Tracking {
       applePayAvailability: applePayAvailability?.toString() ?? "",
       // Entry-point context from the `ctx` URL param (e.g. "redirect");
       // empty when absent, matching the sibling fields.
-      ctx: urlSearchParams.get("ctx") ?? "",
+      ctx: urlParams.ctx ?? "",
       limitedTimeBonusItemIds: limitedTimeBonusItem.ids.toString(),
       // Unauth: empty string so impression events still fire.
       paymentSessionId: paymentSession?.id ?? "",
@@ -59,7 +59,7 @@ export function useTracking(): Tracking {
     }),
     [
       applePayAvailability,
-      urlSearchParams,
+      urlParams,
       limitedTimeBonusItem,
       paymentSession,
       bonusItemId,

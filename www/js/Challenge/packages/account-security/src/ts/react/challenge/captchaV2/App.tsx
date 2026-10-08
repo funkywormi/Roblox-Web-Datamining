@@ -1,7 +1,5 @@
 import React from "react";
-import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/react";
 import { RequestService } from "../../../common/request";
-import { TRANSLATION_CONFIG } from "./app.config";
 import CaptchaV2 from "./containers/captchaV2";
 import {
   CaptchaMode,
@@ -28,7 +26,7 @@ type Props = {
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
-} & WithTranslationsProps;
+};
 
 export const App: React.FC<Props> = ({
   challengeId,
@@ -38,7 +36,6 @@ export const App: React.FC<Props> = ({
   eventService,
   metricsService,
   requestService,
-  translate,
   onChallengeDisplayed,
   onChallengeCompleted,
   onChallengeInvalidated,
@@ -53,7 +50,6 @@ export const App: React.FC<Props> = ({
       eventService={eventService}
       metricsService={metricsService}
       requestService={requestService}
-      translate={translate}
       onChallengeDisplayed={onChallengeDisplayed}
       onChallengeCompleted={onChallengeCompleted}
       onChallengeInvalidated={onChallengeInvalidated}
@@ -64,4 +60,4 @@ export const App: React.FC<Props> = ({
   );
 };
 
-export default withTranslations(App, TRANSLATION_CONFIG);
+export default App;

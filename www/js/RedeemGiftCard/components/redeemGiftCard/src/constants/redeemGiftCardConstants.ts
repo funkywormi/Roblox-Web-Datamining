@@ -33,39 +33,48 @@ export const keyCodeMapping = {
   13: "Enter",
 };
 
+export const UNEXPECTED_ERROR_CODE = 0;
+export const ALREADY_REDEEMED_ERROR_CODE = 10;
+export const INVALID_CODE_ERROR_CODE = 20;
+export const NETWORK_ERROR_CODE = 30;
+export const OUT_OF_SERVICE_ERROR_CODE = 70;
+export const CAPTCHA_REQUIRED_ERROR_CODE = 80;
+export const CREDIT_CONVERSION_REQUIRED_ERROR_CODE = 120;
+export const UNOWNED_REDEMPTION_ERROR_CODE = 170;
+
 export const gameCardMessageMapping: Record<
   number,
   { translationKey: string; type: "server-error" | "input-error" }
 > = {
-  0: {
+  [UNEXPECTED_ERROR_CODE]: {
     translationKey: "Response.UnexpectedError",
     type: "server-error",
   },
-  10: {
+  [ALREADY_REDEEMED_ERROR_CODE]: {
     translationKey: "Response.AlreadyRedeemedCodeFullError",
     type: "input-error",
   },
-  20: {
+  [INVALID_CODE_ERROR_CODE]: {
     translationKey: "Response.InvalidCode",
     type: "input-error",
   },
-  30: {
+  [NETWORK_ERROR_CODE]: {
     translationKey: "Response.NetworkError",
     type: "server-error",
   },
-  70: {
+  [OUT_OF_SERVICE_ERROR_CODE]: {
     translationKey: "Response.OutOfService",
     type: "server-error",
   },
-  80: {
+  [CAPTCHA_REQUIRED_ERROR_CODE]: {
     translationKey: "Response.NeedCaptcha",
     type: "input-error",
   },
-  120: {
+  [CREDIT_CONVERSION_REQUIRED_ERROR_CODE]: {
     translationKey: "Response.RedeemGiftCardCurrencyCodeNotMatchV2",
     type: "input-error",
   },
-  170: {
+  [UNOWNED_REDEMPTION_ERROR_CODE]: {
     translationKey: "Response.InvalidCard",
     type: "input-error",
   },

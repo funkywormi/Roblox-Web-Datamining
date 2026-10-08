@@ -148,6 +148,8 @@
     "Message.ChatUnavailableWithUser": "At this time, chat is not available with this user.",
     "RobloxConnectUnavailableWithUser": "At this time, Roblox Connect is not available with this user.",
     "Toast.Error.InvalidUserSelected": "One or more people in this list can’t be added",
+    "Message.FailedToRenameConversation.V2": "The group {EXISTING_NAME} could not be renamed to {NEW_NAME}.",
+    "Response.ChatNameFullyModerated.V2": "Group name was moderated.",
     "Label.ChatDisabled": "Chat Disabled",
     "Heading.FirstConversationWith": "First conversation with {displayName}",
     "Description.OSAContextCardDescription": "Your safety matters. Not feeling comfortable? You can block or report this person anytime from their profile.",

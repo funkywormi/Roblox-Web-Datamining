@@ -28,7 +28,7 @@ function UpdateOutfitDialog({
   outfit,
   handleClose,
   updateOutfitInDataList,
-}: UpdateOutfitDialogProps): JSX.Element {
+}: UpdateOutfitDialogProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

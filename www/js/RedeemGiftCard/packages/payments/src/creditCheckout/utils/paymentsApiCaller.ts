@@ -6,7 +6,7 @@
 import { fireEvent } from "roblox-event-tracker";
 import { TranslateFunction } from "react-utilities";
 import { TSystemFeedbackService } from "react-style-guide";
-import { fireApiErrorCounters } from "@rbx/payments/utils";
+import { apiErrorStatusCode, trackError } from "../../observability";
 import { ErrorUtils } from "./errorUtils";
 import { TRANSLATION_KEYS, SYSTEM_FEEDBACK_CONFIG } from "../constants/redeemConstants";
 
@@ -90,7 +90,11 @@ export async function callApi<T>(
       const statusCode = ErrorUtils.extractStatusCode(error);
 
       // Always log metrics
-      fireApiErrorCounters("CreditConversion", callType, error);
+      trackError(
+        "Error_CreditConversion_ApiFailed",
+        { call: callType, statusCode: apiErrorStatusCode(error) },
+        error,
+      );
       if (statusCode && counterPrefix) {
         const suffix = isRetryAttempt ? "_RETRY" : "";
         fireEvent(`${counterPrefix}${statusCode}${suffix}`);

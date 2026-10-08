@@ -1,4 +1,4 @@
-import Roblox from "Roblox";
+import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
 import { EVENT_CONSTANTS } from "../app.config";
 
 /**
@@ -12,79 +12,79 @@ export class EventServiceDefault {
   }
 
   sendChallengeInitializedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeInitialized,
       {
         sessionId: this.sessionId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendPuzzleInitializedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.puzzleInitialized,
       {
         sessionId: this.sessionId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendPuzzleCompletedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.puzzleCompleted,
       {
         sessionId: this.sessionId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeCompletedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeCompleted,
       {
         sessionId: this.sessionId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeInvalidatedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeInvalidated,
       {
         sessionId: this.sessionId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeAbandonedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeAbandoned,
       {
         sessionId: this.sessionId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeTimeoutEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeTimeout,
       {
         sessionId: this.sessionId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 }

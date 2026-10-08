@@ -46,6 +46,7 @@ export enum PathPart {
   SupportCenter = "support_center",
   PlusUpsell = "plus_upsell",
   PlusReferralDashboard = "plus_referral_dashboard",
+  PlusSubscribe = "plus_subscribe",
 }
 
 export enum ItemType {

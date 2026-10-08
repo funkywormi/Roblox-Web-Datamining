@@ -16,6 +16,14 @@ export type LimitedTimeBonusItemFields = {
   imageUrls: string[];
 };
 
+// Plain query values the Buy Robux page actually reads. A record (not URLSearchParams)
+// so Next.js can pass search params across the server/client boundary.
+export type BuyRobuxUrlParams = Partial<{
+  ctx: string;
+  product_id: string;
+  showHeader: string;
+}>;
+
 export type BuyRobuxPageContextProps = {
   limitedTimeBonusItem: LimitedTimeBonusItemFields;
   bonusItemBannerImageUrl: string;
@@ -37,7 +45,7 @@ export type BuyRobuxPageContextProps = {
   sectionNames: string[];
   subscriptionProductIds: string[];
   upsellProduct: Product | undefined;
-  urlSearchParams: URLSearchParams;
+  urlParams: BuyRobuxUrlParams;
   redirect?: UseRedirectResult;
   collectibleBonusItemMetadata: CollectibleItemMetadata | undefined;
   shouldShowFirstTimePurchaseConsent: boolean | undefined;
@@ -76,7 +84,11 @@ export const BuyRobuxPageContext = createContext<BuyRobuxPageContextProps>({
   sectionNames: [],
   subscriptionProductIds: [],
   upsellProduct: undefined,
-  urlSearchParams: new URLSearchParams(),
+  urlParams: {
+    ctx: undefined,
+    product_id: undefined,
+    showHeader: undefined,
+  },
   collectibleBonusItemMetadata: undefined,
   shouldShowFirstTimePurchaseConsent: undefined,
   markConsentAcknowledged: () => undefined,

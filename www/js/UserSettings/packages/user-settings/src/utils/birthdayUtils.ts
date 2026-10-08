@@ -61,7 +61,7 @@ const birthdayUtils = {
     };
   },
   isoStringToBirthdate: (isoDate: string): TUserBirthdate =>
-    birthdayUtils.dateToBirthdate(new Date(birthdayUtils.formatBirthdateFromISO(isoDate))),
+    birthdayUtils.dateInUTCToBirthdate(new Date(isoDate)),
   dateInUTCToBirthdate: (date: Date): TUserBirthdate => {
     const year = date.getUTCFullYear();
     const month = date.getUTCMonth() + 1;

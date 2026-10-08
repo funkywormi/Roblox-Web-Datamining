@@ -1,12 +1,13 @@
 import React from 'react';
-import { withTranslations } from '@rbx/core-scripts/react';
-import itemPurchaseTranslationConfig from '../../../js/react/itemPurchase/translation.config';
 
 export type GamepassItemPurchaseWrapperProps = {
   ItemPurchase: React.FC<any>;
   itemPurchaseService: { start: () => void };
 } & Record<string, any>;
 
+// This wrapper only starts the purchase flow; it does not translate anything itself. The wrapped
+// `ItemPurchase` subtree self-sources its own translations (dual-path SelfProvidedTranslate), so
+// no translation HOC/provider is needed here.
 const GamepassItemPurchaseWrapper: React.FC<GamepassItemPurchaseWrapperProps> = ({
   ItemPurchase,
   itemPurchaseService,
@@ -21,7 +22,4 @@ const GamepassItemPurchaseWrapper: React.FC<GamepassItemPurchaseWrapperProps> = 
   return <ItemPurchase {...innerProps} />;
 };
 
-export default withTranslations(
-  GamepassItemPurchaseWrapper,
-  itemPurchaseTranslationConfig.purchasingResources
-);
+export default GamepassItemPurchaseWrapper;

@@ -6,7 +6,7 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { TranslateFunction } from "react-utilities";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { RequestService } from "../../../../common/request";
 import { TIMEOUT_BEFORE_CALLBACK_MILLISECONDS } from "../app.config";
 import { getResources } from "../constants/resources";
@@ -54,7 +54,6 @@ type Props = {
   eventService: EventService;
   metricsService: MetricsService;
   requestService: RequestService;
-  translate: TranslateFunction;
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
@@ -77,7 +76,6 @@ export const TwoStepVerificationContextProvider = ({
   eventService,
   metricsService,
   requestService,
-  translate,
   onChallengeCompleted,
   onChallengeInvalidated,
   onModalChallengeAbandoned,
@@ -85,6 +83,7 @@ export const TwoStepVerificationContextProvider = ({
   recoveryParameters,
   children,
 }: Props): ReactElement => {
+  const translate = useTranslations("Authentication.TwoStepVerification");
   // We declare these variables as lazy-initialized state variables since they
   // do not need to be re-computed if this component re-renders.
   const [resources] = useState(() => getResources(translate));

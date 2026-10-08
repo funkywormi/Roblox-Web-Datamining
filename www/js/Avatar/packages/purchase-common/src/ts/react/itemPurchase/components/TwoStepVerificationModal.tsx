@@ -103,7 +103,6 @@ function TwoStepVerificationModal({
       />
       {challengeToken && (
         <TwoStepVerificationChallenge
-          translate={translate}
           userId={String(userId() ?? '')}
           challengeId={challengeToken}
           actionType={TwoStepVerification.ActionType.RobuxSpend}

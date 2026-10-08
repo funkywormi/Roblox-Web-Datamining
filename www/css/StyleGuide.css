@@ -23652,6 +23652,13 @@ a.btn-growth-md:active {
     margin-left: 4px
 }
 
+.item-card-thumb-container .thumbnail-timed-option-badge {
+    z-index: 1;
+    position: absolute;
+    bottom: 16px;
+    right: 16px
+}
+
 .item-card-thumb-container .item-expire-time-label {
     background-color: var(--color-extended-red-700);
     color: var(--color-extended-white-100);

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { TranslateFunction } from '@rbx/core-scripts/react';
+import { type PurchaseTranslate } from '../../itemPurchase/useTranslate';
 import { Badge, Icon } from '@rbx/foundation-ui';
-import type { SubscriptionProductInfo, SubscriptionOffer } from '@rbx/client-subscriptions-api/v1';
+import type { SubscriptionProductInfo, SubscriptionOffer } from '@rbx/client-subscriptions-api/v2';
 import useUpsellTracking from '../../hooks/useUpsellTracking';
 
 const NEW_BADGE_SEEN_STORAGE_KEY = 'roblox_plus_upsell_new_badge_seen';
@@ -25,7 +25,7 @@ const writeHasSeenUpsellNewBadge = (): void => {
 };
 
 type SubscriptionUpsellBannerProps = {
-  translate: TranslateFunction;
+  translate: PurchaseTranslate;
   assetType: string;
   subscriptionProductInfo?: SubscriptionProductInfo;
   onBannerClick: () => void;

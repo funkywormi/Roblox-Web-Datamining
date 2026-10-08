@@ -6,6 +6,7 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import classNames from "classnames";
+import { Icon } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../../../utils/translate";
 import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 import { ThumbnailTypes } from "../../../constants/thumbnailConstants";
@@ -16,6 +17,7 @@ import { EmoteRequestModel } from "../../../types/updateAvatarV4.types";
 import { CatalogItem } from "../../../avatar.types";
 import useAssetsList from "../../tabs/tabContent/avatarItems/useAssetsList";
 import EmotesItemCard from "./EmotesItemCard";
+import LoadingSpinner from "../../LoadingSpinner";
 import { useSystemFeedback } from "../../../contexts/SystemFeedbackContext";
 import { useAvatarPageContext } from "../../../contexts/AvatarPageContext";
 import parseError from "../../../utils/parseErrorUtil";
@@ -43,7 +45,7 @@ type EmotesRadialMenuProps = {
 const numberOfEmotePositions = 8;
 const emoteConstants = avatarConstants.emotes;
 
-function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): JSX.Element {
+function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const { enableContinuousLoad } = useAvatarPageContext();
   const systemFeedback = useSystemFeedback();
@@ -243,17 +245,17 @@ function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): JSX.Element 
           <div className="emotes-radial-img" />
 
           {selectedAssetId === null && selectedPositionIndex === null && (
-            <div className="text-emphasis emotes-radial-middle-text emotes-center-div">
+            <div className="content-emphasis emotes-radial-middle-text emotes-center-div">
               {translate("Message.ChooseEmoteSlotOrEmote")}
             </div>
           )}
           {selectedAssetId === null && selectedPositionIndex !== null && (
-            <div className="text-emphasis emotes-radial-middle-text emotes-center-div">
+            <div className="content-emphasis emotes-radial-middle-text emotes-center-div">
               {translate("Message.ChooseEmote")}
             </div>
           )}
           {selectedAssetId !== null && selectedPositionIndex === null && (
-            <div className="text-emphasis emotes-radial-middle-text emotes-center-div">
+            <div className="content-emphasis emotes-radial-middle-text emotes-center-div">
               {translate("Message.ChooseEmoteSlot")}
             </div>
           )}
@@ -264,7 +266,7 @@ function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): JSX.Element 
             <div key={slice.position} className="emotes-radial-slice-container">
               <div
                 className={classNames(
-                  "text-emphasis",
+                  "content-emphasis",
                   "emotes-radial-slice",
                   `emotes-radial-slice-${slice.position - 1}`,
                 )}
@@ -333,7 +335,7 @@ function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): JSX.Element 
                     <div className="item-card-link">
                       <div className="item-card-thumb-container">
                         <div className="emotes-center-div">
-                          <div className="icon-close" />
+                          <Icon name="icon-regular-x" size="XXLarge" />
                         </div>
                       </div>
                     </div>
@@ -354,14 +356,10 @@ function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): JSX.Element 
               <div ref={loadMoreRef} style={{ height: "20px" }} />
             )}
           </div>
-          {loading && (
-            <div className="loading-animated">
-              <span className="spinner spinner-default" />
-            </div>
-          )}
+          {loading && <LoadingSpinner />}
 
           {!loading && items.length === 0 && (
-            <div className="col-xs-12 section-content-off">
+            <div className="section-content-off">
               <div>{emptyMessage}</div>
             </div>
           )}

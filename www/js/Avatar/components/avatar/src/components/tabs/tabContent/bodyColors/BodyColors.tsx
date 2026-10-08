@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import classNames from "classnames";
+import { Link } from "@rbx/foundation-ui";
 import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { BodyColor } from "../../../../avatarRules";
@@ -20,7 +21,7 @@ export type BodyColorsProps = {
   setBodyColors: React.Dispatch<React.SetStateAction<BodyColorsStateV2>>;
 };
 
-function BodyColors(): JSX.Element {
+function BodyColors(): React.ReactElement {
   const translate = useTranslations("Feature.Avatar");
   const [currentColorId, setCurrentColorId] = useState<string | null>(null);
 
@@ -362,20 +363,15 @@ function BodyColors(): JSX.Element {
             />
           ))}
         </div>
-        <button
-          type="button"
-          className="text-link advanced-link"
+        <Link
+          as="button"
+          variant="Standalone"
+          className="advanced-link"
+          style={{ float: "inline-end" }}
           onClick={openAdvancedBodyColors}
-          style={{
-            background: "none",
-            border: "none",
-            float: "inline-end",
-            width: "auto",
-            textAlign: "initial",
-          }}
         >
           {translate("Action.Advanced")}
-        </button>
+        </Link>
       </div>
     </React.Fragment>
   );

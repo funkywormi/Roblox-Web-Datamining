@@ -1,13 +1,8 @@
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
-import {
-  Thumbnail2d,
-  ThumbnailTypes,
-  ThumbnailFormat,
-  ThumbnailGamePassIconSize
-} from '@rbx/thumbnails';
-import { ASSET_TYPE_ENUM } from '../../../js/core/services/itemPurchaseUpsellService/constants/upsellConstants';
-import createItemPurchase from '../../../js/react/itemPurchase/factories/createItemPurchase';
+import { Thumbnail2d } from '@rbx/www-common/components/thumbnail';
+import { ASSET_TYPE_ENUM } from '../../core/services/itemPurchaseUpsellService/constants/upsellConstants';
+import createItemPurchase from '../itemPurchase/factories/createItemPurchase';
 import GamepassItemPurchaseWrapper from '../components/GamepassItemPurchaseWrapper';
 import type { DiscountInformation } from '../components/discountInformation';
 
@@ -62,10 +57,10 @@ export function startGamepassPurchaseFlow(args: TStartGamepassPurchaseFlowArgs):
   }
 
   const thumbnail = React.createElement(Thumbnail2d, {
-    type: ThumbnailTypes.assetThumbnail,
+    type: 'Asset',
     targetId: args.iconAssetId,
-    size: ThumbnailGamePassIconSize.size150,
-    format: ThumbnailFormat.webp,
+    size: '150x150',
+    format: 'webp',
     altName: args.assetName
   });
 

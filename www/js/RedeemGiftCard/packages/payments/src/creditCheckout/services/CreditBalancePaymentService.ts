@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { httpService } from "core-utilities";
-import { EnvironmentUrls } from "Roblox";
 import { upsellUtil, paymentFlowAnalyticsService } from "core-roblox-utilities";
+import { EnvironmentUrls } from "@rbx/environment-urls";
 import { PaymentSession } from "@rbx/payments/services/paymentSession";
 import type { Address } from "@rbx/payments/billingAddress";
 import type { GrantedAssetListItem } from "@rbx/payments/types";

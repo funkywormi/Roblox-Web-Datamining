@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Modal, ProgressBar } from "react-style-guide";
-import { localStorageService } from "core-roblox-utilities";
+import { getItem, setItem } from "@rbx/core-lib/local-storage";
 import {
   TimeLockPuzzleMessage,
   TimeLockPuzzleParameters,
@@ -302,14 +302,12 @@ const ProofOfWork: React.FC = () => {
   useEffect(() => {
     // Check if the component with the same session id has initialized the challenge flow previously,
     // if so then we quit early, if not then we will memoize it in the local storage.
-    const currentSessionId = localStorageService.getLocalStorage(SESSION_ID_KEY) as
-      | string
-      | undefined;
+    const currentSessionId = getItem(SESSION_ID_KEY);
     if (sessionId === currentSessionId) {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       return () => {};
     }
-    localStorageService.setLocalStorage(SESSION_ID_KEY, sessionId);
+    setItem(SESSION_ID_KEY, sessionId);
     eventService.sendChallengeInitializedEvent();
     metricsService.fireChallengeInitializedEvent();
 

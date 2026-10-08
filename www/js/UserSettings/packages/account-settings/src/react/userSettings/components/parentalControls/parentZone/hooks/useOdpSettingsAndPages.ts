@@ -40,7 +40,7 @@ const useOdpSettingsAndPages = (pageName?: string) => {
   });
   const hasRemoteParent =
     !parentInfo.isError &&
-    parentInfo.data?.parents.some(parent => parent.isOnDeviceParent !== true) === true;
+    parentInfo.data?.parents.some(parent => parent.isRemoteParent === true) === true;
   const queries = [
     context,
     policy,

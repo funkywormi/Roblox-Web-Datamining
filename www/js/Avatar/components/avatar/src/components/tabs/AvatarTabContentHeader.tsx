@@ -1,4 +1,5 @@
 import React from "react";
+import { Button, Icon } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../../utils/translate";
 import { getTabLabel } from "../../types/avatarTab.types";
 import { useAvatarTabsContext } from "../../contexts/AvatarTabsContext";
@@ -21,7 +22,7 @@ const AvatarTabContentHeader: React.FC = () => {
         {selectedCategoryRow && selectedTab && (
           <React.Fragment>
             <li>
-              <span className="icon-right-16x16" />
+              <Icon name="icon-regular-chevron-small-right" size="Small" />
             </li>
             <li>
               <button
@@ -39,7 +40,7 @@ const AvatarTabContentHeader: React.FC = () => {
         {selectedSubcategory && (
           <React.Fragment>
             <li>
-              <span className="icon-right-16x16" />
+              <Icon name="icon-regular-chevron-small-right" size="Small" />
             </li>
             <li>{translate(selectedSubcategory.label)}</li>
           </React.Fragment>
@@ -50,28 +51,37 @@ const AvatarTabContentHeader: React.FC = () => {
       {selectedSubcategory && (
         <span>
           {shirtId && selectedSubcategory.name === "Shirts" && (
-            <a
-              className="btn-float-right btn-min-width btn-secondary-xs"
+            <Button
+              as="a"
+              variant="Standard"
+              size="XSmall"
+              className="btn-float-right"
               href={`${CREATE_URL}${shirtId}`}
             >
               {translate("Action.Create")}
-            </a>
+            </Button>
           )}
           {pantsId && selectedSubcategory.name === "Pants" && (
-            <a
-              className="btn-float-right btn-min-width btn-secondary-xs"
+            <Button
+              as="a"
+              variant="Standard"
+              size="XSmall"
+              className="btn-float-right"
               href={`${CREATE_URL}${pantsId}`}
             >
               {translate("Action.Create")}
-            </a>
+            </Button>
           )}
           {tShirtId && selectedSubcategory.name === "T-Shirts" && (
-            <a
-              className="btn-float-right btn-min-width btn-secondary-xs"
+            <Button
+              as="a"
+              variant="Standard"
+              size="XSmall"
+              className="btn-float-right"
               href={`${CREATE_URL}${tShirtId}`}
             >
               {translate("Action.Create")}
-            </a>
+            </Button>
           )}
         </span>
       )}

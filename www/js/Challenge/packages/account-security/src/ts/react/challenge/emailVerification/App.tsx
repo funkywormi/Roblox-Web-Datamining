@@ -1,6 +1,4 @@
 import React from "react";
-import { withTranslations, WithTranslationsProps } from "react-utilities";
-import { TRANSLATION_CONFIG } from "./app.config";
 import EmailVerification from "./containers/emailVerification";
 import {
   OnChallengeCompletedCallback,
@@ -19,14 +17,13 @@ type Props = {
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
-} & WithTranslationsProps;
+};
 
 const App: React.FC<Props> = ({
   challengeId,
   renderInline,
   eventService,
   metricsService,
-  translate,
   onChallengeCompleted,
   onChallengeInvalidated,
   onModalChallengeAbandoned,
@@ -37,7 +34,6 @@ const App: React.FC<Props> = ({
       renderInline={renderInline}
       eventService={eventService}
       metricsService={metricsService}
-      translate={translate}
       onChallengeCompleted={onChallengeCompleted}
       onChallengeInvalidated={onChallengeInvalidated}
       onModalChallengeAbandoned={onModalChallengeAbandoned}
@@ -47,4 +43,4 @@ const App: React.FC<Props> = ({
   );
 };
 
-export default withTranslations(App, TRANSLATION_CONFIG);
+export default App;

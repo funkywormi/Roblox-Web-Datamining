@@ -1,4 +1,4 @@
-import Roblox from "Roblox";
+import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
 import { EVENT_CONSTANTS } from "../app.config";
 
 /**
@@ -12,46 +12,46 @@ export class EventServiceDefault {
   }
 
   sendChallengeInitializedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeInitialized,
       {
         challengeId: this.challengeId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeCompletedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeCompleted,
       {
         challengeId: this.challengeId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeInvalidatedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeInvalidated,
       {
         challengeId: this.challengeId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeAbandonedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeAbandoned,
       {
         challengeId: this.challengeId,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 }

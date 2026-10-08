@@ -41,6 +41,7 @@ export type AuthenticatedUser = {
   hasVerifiedBadge: boolean;
 };
 
+/** @deprecated Use getCurrentUser from @rbx/www-common/user instead. */
 export const authenticatedUser = (): AuthenticatedUser | null => {
   const dataset = userDataset();
   if (dataset == null) {

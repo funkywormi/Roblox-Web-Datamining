@@ -11,7 +11,7 @@ const AppealDisclosures = () => {
   const { translate } = useTranslation();
 
   return (
-    <p className="text-body-small">
+    <p className="text-body-medium">
       {translateHtml(translate, "Description.AppealDisclosures", [
         {
           opening: "link",

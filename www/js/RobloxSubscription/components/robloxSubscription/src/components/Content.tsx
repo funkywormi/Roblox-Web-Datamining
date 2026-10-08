@@ -25,6 +25,7 @@ import { sortProductsByAllowanceAscending } from "../utils/subscriptionProductIn
 
 type AppPolicyResponse = {
   DisableBlackbirdEntrypoints?: boolean;
+  ShouldDeeplinkToReferral?: boolean;
 };
 
 const MEMBERSHIP_POLL_REFETCH_INTERVAL_MS = 3000;
@@ -174,14 +175,13 @@ const Content = () => {
     retry: 3,
   });
 
-  const isEntrypointDisabledQuery = useQuery({
-    queryKey: ["guac/app-policy/disable-blackbird-entrypoints"],
-    queryFn: async (): Promise<boolean> => {
+  const appPolicyQuery = useQuery({
+    queryKey: ["guac/app-policy"],
+    queryFn: async (): Promise<AppPolicyResponse> => {
       try {
-        const data = await callBehaviour<AppPolicyResponse>("app-policy");
-        return data.DisableBlackbirdEntrypoints === true;
+        return await callBehaviour<AppPolicyResponse>("app-policy");
       } catch {
-        return false;
+        return {};
       }
     },
     retry: 3,
@@ -190,9 +190,12 @@ const Content = () => {
   });
 
   const isEntrypointDisabled = useLatest(
-    isEntrypointDisabledQuery.data,
-    () => isEntrypointDisabledQuery.data !== undefined,
+    appPolicyQuery.data?.DisableBlackbirdEntrypoints === true,
+    () => appPolicyQuery.data !== undefined,
   );
+
+  const shouldDeeplinkToReferral =
+    deviceMeta?.isInApp === true && appPolicyQuery.data?.ShouldDeeplinkToReferral === true;
 
   const enableWelcome = useCallback(() => {
     const url = new URL(window.location.href);
@@ -279,7 +282,7 @@ const Content = () => {
     robloxAvailableProductsQuery.error ||
     robloxAvailableProductsQuery.data === null ||
     (robloxSubscriptionMembershipQuery.error && !isPollingForMembership) ||
-    isEntrypointDisabledQuery.error ||
+    appPolicyQuery.error ||
     !deviceMeta
   ) {
     return <ErrorView />;
@@ -358,6 +361,7 @@ const Content = () => {
         robloxPlusUserBenefits={robloxPlusUserBenefitsQuery.data}
         robloxSubscriptionMembership={robloxSubscriptionMembership}
         robloxSubscriptionProduct={robloxSubscriptionProduct}
+        shouldDeeplinkToReferral={shouldDeeplinkToReferral}
         onOpenReferrals={enableReferralsDashboard}
       />
     );

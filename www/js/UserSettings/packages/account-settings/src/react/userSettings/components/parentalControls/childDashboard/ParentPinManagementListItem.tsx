@@ -34,6 +34,7 @@ export const ParentPinManagementListItem = ({
       }
       trailing={<ListItemChevronTrailingAccessory />}
       onSelect={() => history.push(parentZonePages.manageOnDeviceParentPage.path)}
+      className="items-stretch"
     />
   );
 };

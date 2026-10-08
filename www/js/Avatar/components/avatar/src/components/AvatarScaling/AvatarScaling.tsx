@@ -1,11 +1,13 @@
 import React, { useCallback } from "react";
 import { useTranslations } from "@rbx/www-common/i18n";
+import { Icon, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
 import { reportAXError } from "../../utils/axAnalyticsService";
 import AvatarScalingScale from "./AvatarScalingScale";
 import avatarConstants from "../../constants/avatarConstants";
 import { AvatarType, Scales, ScalesKeys } from "../../constants/types";
 import AvatarAPIService from "../../services/avatarAPIService";
 import AvatarBodyTypeToggle from "../AvatarBodyTypeToggle";
+import LoadingSpinner from "../LoadingSpinner";
 import { R6BodyTypeWarningDialog } from "../dialogs";
 import { useSystemFeedback } from "../../contexts/SystemFeedbackContext";
 import { useAvatarPageContext } from "../../contexts/AvatarPageContext";
@@ -18,7 +20,7 @@ interface AvatarScalingProps {
   updateScale: (newValue: number, scaleKey: ScalesKeys) => void;
 }
 
-function AvatarScaling({ scales, updateScale }: AvatarScalingProps): JSX.Element {
+function AvatarScaling({ scales, updateScale }: AvatarScalingProps): React.ReactElement {
   const translate = useTranslations("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const [isBodyTypeWarningOpen, setIsBodyTypeWarningOpen] = React.useState<boolean>(false);
@@ -60,18 +62,16 @@ function AvatarScaling({ scales, updateScale }: AvatarScalingProps): JSX.Element
         }}
         isOpen={isBodyTypeWarningOpen}
       />
-      <h4 className="scaling-info">
-        {translate("Heading.Scaling")}{" "}
-        <span
-          className="tooltip-container"
-          data-toggle="tooltip"
-          title={translate("Message.SelectEnableScaling")}
-        >
-          <span className="icon-moreinfo-16x16" />
-        </span>
+      <h4 className="scaling-info flex items-center gap-xsmall text-heading-small">
+        {translate("Heading.Scaling")}
+        <Tooltip position="top-center" title={translate("Message.SelectEnableScaling")}>
+          <TooltipTrigger asChild>
+            <Icon name="icon-regular-circle-i" size="Small" className="cursor-pointer" />
+          </TooltipTrigger>
+        </Tooltip>
       </h4>
       <div className="avatar-type-container">
-        <div className="text-label font-subheader-1">{translate("Label.BodyType")}</div>
+        <div className="text-label content-default">{translate("Label.BodyType")}</div>
 
         <div className="avatar-type-contents-container">
           {/* Avatar Type Toggle */}
@@ -85,11 +85,7 @@ function AvatarScaling({ scales, updateScale }: AvatarScalingProps): JSX.Element
         </div>
       </div>
 
-      {!pageLoaded && (
-        <div className="loading-animated">
-          <span className="spinner spinner-default" />
-        </div>
-      )}
+      {!pageLoaded && <LoadingSpinner />}
 
       {pageLoaded && (
         <div className="section-sliders">

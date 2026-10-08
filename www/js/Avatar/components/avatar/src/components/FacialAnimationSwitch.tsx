@@ -7,7 +7,7 @@ import { useAssetManagerContext } from "../contexts/AssetManagerContext";
 import { useSystemFeedback } from "../contexts/SystemFeedbackContext";
 import avatarConstants from "../constants/avatarConstants";
 
-function FacialAnimationSwitch(): JSX.Element | null {
+function FacialAnimationSwitch(): React.ReactElement | null {
   const translate = useTranslations("Feature.Avatar");
   const { currentlyWornAssetsList } = useCurrentlyWearingAssetsStoreContext();
   const { setWearingAssets } = useAssetManagerContext();

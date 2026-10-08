@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useCallback, useMemo, useRef, useState } from "react";
 import { Snackbar } from "@rbx/foundation-ui";
-import { useAvatarTranslate } from "../utils/translate";
+import { useTranslations } from "@rbx/www-common/i18n";
 
 export type SystemFeedback = {
   error: (message: string) => void;
@@ -51,16 +51,14 @@ interface SystemFeedbackProviderProps {
 }
 
 export const SystemFeedbackProvider: React.FC<SystemFeedbackProviderProps> = ({ children }) => {
-  const translate = useAvatarTranslate("Feature.Avatar");
+  const t = useTranslations("Feature.Avatar");
   const [feedback, setFeedback] = useState<ActiveFeedback | null>(null);
   const idRef = useRef(0);
 
   const translateIfKey = useCallback(
-    (message: string): string => {
-      const translated = translate(message);
-      return translated !== message ? translated : message;
-    },
-    [translate],
+    // Callers pass either a key or already-translated text; only look up keys.
+    (message: string): string => (t.has(message) ? t(message) : message),
+    [t],
   );
 
   const show = useCallback(
@@ -106,7 +104,7 @@ export const SystemFeedbackProvider: React.FC<SystemFeedbackProviderProps> = ({ 
           title={feedback.message}
           icon={getFeedbackIcon(feedback.type)}
           onClose={clear}
-          closeIconAriaLabel={translate("Action.Close")}
+          closeIconAriaLabel={t("Action.Close")}
           shouldAutoDismiss={feedback.type !== "loading"}
         />
       )}

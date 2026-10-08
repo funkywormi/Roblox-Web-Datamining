@@ -1,13 +1,11 @@
 import { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import Modal from "react-bootstrap/lib/Modal";
 import ModalDialog from "react-bootstrap/lib/ModalDialog";
 import ModalTitle from "react-bootstrap/lib/ModalTitle";
 import { Dialog, DialogContent } from "@rbx/foundation-ui";
 import ModalBody from "./RobloxModalBody";
 import ModalFooter from "./RobloxModalFooter";
 import ModalHeader from "./RobloxModalHeader";
-import { useFoundationModalExperiment } from "../utils/useFoundationModalExperiment";
 
 // Size mapping from Bootstrap sizes to Foundation sizes
 const SIZE_MAP = {
@@ -17,7 +15,10 @@ const SIZE_MAP = {
   lg: "Large",
 };
 
-function FoundationRobloxModal({
+// There is a lot more props that we can utilize in the implementation
+// I only list those common ones here so we can do type checking
+// We can discuss to define the props we want to support as the API
+function RobloxModal({
   show,
   size,
   onHide,
@@ -113,71 +114,6 @@ function FoundationRobloxModal({
   );
 }
 
-// There is a lot more props that we can utilize in the implementation
-// I only list those common ones here so we can do type checking
-// We can discuss to define the props we want to support as the API
-function RobloxModal({
-  show,
-  size,
-  onHide,
-  children,
-  backdrop,
-  keyboard,
-  dialogClassName,
-  onExited,
-  onEntered,
-  onEntering,
-  onExiting,
-  "aria-labelledby": ariaLabelledBy,
-  id,
-  ...otherProps
-}) {
-  const { useFoundation } = useFoundationModalExperiment();
-
-  if (useFoundation) {
-    return (
-      <FoundationRobloxModal
-        {...otherProps}
-        show={show}
-        size={size}
-        onHide={onHide}
-        backdrop={backdrop}
-        keyboard={keyboard}
-        dialogClassName={dialogClassName}
-        onExited={onExited}
-        onEntered={onEntered}
-        onEntering={onEntering}
-        onExiting={onExiting}
-        aria-labelledby={ariaLabelledBy}
-        id={id}
-      >
-        {children}
-      </FoundationRobloxModal>
-    );
-  }
-
-  // Original Bootstrap implementation
-  return (
-    <Modal
-      {...otherProps}
-      show={show}
-      bsSize={size}
-      onHide={onHide}
-      backdrop={backdrop}
-      keyboard={keyboard}
-      dialogClassName={dialogClassName}
-      onExited={onExited}
-      onEntered={onEntered}
-      onEntering={onEntering}
-      onExiting={onExiting}
-      aria-labelledby={ariaLabelledBy}
-      id={id}
-    >
-      {children}
-    </Modal>
-  );
-}
-
 RobloxModal.defaultProps = {
   show: false,
   size: null,
@@ -188,22 +124,6 @@ RobloxModal.defaultProps = {
 };
 
 RobloxModal.propTypes = {
-  show: PropTypes.bool,
-  size: PropTypes.oneOf(["sm", "md", "lg"]),
-  onHide: PropTypes.func,
-  children: PropTypes.node,
-  backdrop: PropTypes.oneOfType([PropTypes.bool, PropTypes.oneOf(["static"])]),
-  keyboard: PropTypes.bool,
-  dialogClassName: PropTypes.string,
-  onExited: PropTypes.func,
-  onEntered: PropTypes.func,
-  onEntering: PropTypes.func,
-  onExiting: PropTypes.func,
-  "aria-labelledby": PropTypes.string,
-  id: PropTypes.string,
-};
-
-FoundationRobloxModal.propTypes = {
   show: PropTypes.bool,
   size: PropTypes.oneOf(["sm", "md", "lg"]),
   onHide: PropTypes.func,

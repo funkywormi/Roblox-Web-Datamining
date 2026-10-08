@@ -1,5 +1,4 @@
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@rbx/core-scripts/react";
+import type React from "react";
 import AvatarPage from "../components/AvatarPage";
 import { SystemFeedbackProvider } from "../contexts/SystemFeedbackContext";
 import { AvatarTabsProvider } from "../contexts/AvatarTabsContext";
@@ -10,7 +9,7 @@ import ErrorBoundary from "./ErrorBoundary";
 import { AvatarBodyColorsProvider } from "../contexts/AvatarBodyColorsContext";
 import { AvatarEditingAccessProvider } from "../contexts/AvatarEditingAccessContext";
 
-function AvatarPageWithProviders(): JSX.Element {
+function AvatarPageWithProviders(): React.ReactElement {
   return (
     <SystemFeedbackProvider>
       <AvatarEditingAccessProvider>
@@ -30,12 +29,10 @@ function AvatarPageWithProviders(): JSX.Element {
   );
 }
 
-function AvatarPageContainer(): JSX.Element {
+function AvatarPageContainer(): React.ReactElement {
   return (
     <ErrorBoundary containerName="AvatarPageContainer">
-      <QueryClientProvider client={queryClient}>
-        <AvatarPageWithProviders />
-      </QueryClientProvider>
+      <AvatarPageWithProviders />
     </ErrorBoundary>
   );
 }

@@ -21,7 +21,7 @@ type LayeredClothingBodyTypeWarningDialogProps = {
 function LayeredClothingBodyTypeWarningDialog({
   closeDialog,
   assetToWear,
-}: LayeredClothingBodyTypeWarningDialogProps): JSX.Element {
+}: LayeredClothingBodyTypeWarningDialogProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const { wearAsset } = useAssetManagerContext();
   const { setAvatarType } = useAvatarPageContext();

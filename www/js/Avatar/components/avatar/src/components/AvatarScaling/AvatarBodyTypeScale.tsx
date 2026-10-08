@@ -11,7 +11,10 @@ export type AvatarBodyTypeScaleProps = {
   updateScale: (newValue: number, scaleKey: ScalesKeys) => void;
 };
 
-function AvatarBodyTypeScale({ scales, updateScale }: AvatarBodyTypeScaleProps): JSX.Element {
+function AvatarBodyTypeScale({
+  scales,
+  updateScale,
+}: AvatarBodyTypeScaleProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const [value, setValue] = React.useState(0);
 
@@ -49,7 +52,7 @@ function AvatarBodyTypeScale({ scales, updateScale }: AvatarBodyTypeScaleProps):
           invisible: !pageLoaded,
         })}
       >
-        <div className="text-label font-subheader-1">{translate(scales.bodyType.label)}</div>
+        <div className="text-label content-default">{translate(scales.bodyType.label)}</div>
         <div className="scale-label font-body">{bodyTypePercentageValue}</div>
         <Slider
           thumbAriaNames={["Body Type Scale"]}

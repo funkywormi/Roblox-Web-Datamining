@@ -29,7 +29,7 @@ export const LinkedParentsList = (): JSX.Element => {
 
   return (
     <PreviewCard title={translate(parentalControlsTranslationConstants.linkedParentsHeading)}>
-      <List className="bg-shift-100 stroke-standard stroke-default radius-large clip">
+      <List className="stroke-standard stroke-default radius-large clip">
         {rows.map((renderRow, index) => renderRow(index === rows.length - 1 ? "None" : "Inset"))}
       </List>
     </PreviewCard>

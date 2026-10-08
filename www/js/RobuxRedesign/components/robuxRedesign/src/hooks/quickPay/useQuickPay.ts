@@ -129,7 +129,7 @@ export function useQuickPay({
     url: quickPay3DSUrl,
   },
 }: Modals): QuickPay {
-  const { getPurchaseUrl, paymentSession, purchaseFlowId, urlSearchParams } =
+  const { getPurchaseUrl, paymentSession, purchaseFlowId, urlParams } =
     useContext(BuyRobuxPageContext);
   const { trackQuickPayClick, trackQuickPayPurchase } = useContext(TrackingContext);
 
@@ -169,7 +169,7 @@ export function useQuickPay({
 
   const fetchQuickPayMetadata = useCallback(async () => {
     let quickPayFlowType: QuickPayFlowType = QuickPayFlowType.BuyRobuxPage;
-    if (urlSearchParams.get("product_id") && isInUniversalApp) {
+    if (urlParams.product_id && isInUniversalApp) {
       quickPayFlowType = QuickPayFlowType.BuyRobuxPagePreselectedProduct;
     }
 
@@ -215,7 +215,7 @@ export function useQuickPay({
     setSelectedPaymentProfile(eligibleProfiles[0]);
 
     firePaymentMethodSelectedCounter(eligibleProfiles[0]);
-  }, [urlSearchParams, firePaymentMethodSelectedCounter]);
+  }, [urlParams.product_id, firePaymentMethodSelectedCounter]);
 
   const fetchStripe = useCallback(async () => {
     try {

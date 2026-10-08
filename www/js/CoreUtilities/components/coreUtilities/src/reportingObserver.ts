@@ -38,8 +38,18 @@ let initialized = false;
 
 // patterns to ignore when in report only mode
 // these can have false alarms where we aren't sending credentials
-const ignoredReportOnlyHostPatterns = [/\.rbxcdn\.com$/];
-
+const ignoredReportOnlyUrlMatchFuncs: ((url: URL) => boolean)[] = [
+  // CDNs don't need credentials
+  ({ hostname }) => hostname.endsWith(".rbxcdn.com"),
+  ({ hostname }) => hostname === "cdn.foundation.roblox.com",
+  // LMS: https://roblox.atlassian.net/wiki/spaces/NET/pages/4996235269/Latency+Measurement+System+LMS
+  // e.g. https://atl4-128-116-2-3.roblox.com/_/_/1px.gif?t=...
+  ({ hostname, pathname }) => hostname.endsWith(".roblox.com") && pathname === "/_/_/1px.gif",
+  // CSP report happens without credentials
+  ({ hostname, pathname }) => hostname.startsWith("metrics") && pathname.startsWith("/v1/csp"),
+  // browser extension to ignore
+  ({ hostname }) => hostname.endsWith("studyquicks.com"),
+];
 const fireTelemetry = createFireTelemetryCounter("Web_ReportingObserver");
 export function initReportingObserver() {
   if (initialized) {
@@ -72,14 +82,15 @@ export function initReportingObserver() {
           if (body.disposition === "enforce") {
             return true;
           }
-          let host: string;
+
+          let url: URL;
           try {
-            ({ host } = new URL(body.blockedURL));
+            url = new URL(body.blockedURL);
           } catch {
             return true;
           }
 
-          return !ignoredReportOnlyHostPatterns.some(pattern => pattern.test(host));
+          return !ignoredReportOnlyUrlMatchFuncs.some(matchFunc => matchFunc(url));
         });
 
       coepBodies.forEach(coepBody => {

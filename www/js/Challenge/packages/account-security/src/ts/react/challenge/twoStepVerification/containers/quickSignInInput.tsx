@@ -44,9 +44,11 @@ const QuickSignInInput: React.FC<Props> = ({ setModalTitleText, children }: Prop
       // In RobloxApp webview, close the hybrid overlay. window.Roblox.Hybrid is injected by
       // the native app webview bridge (no importable module); read defensively so off-app
       // paths no-op instead of throwing.
-      const { Hybrid } = window.Roblox as {
-        Hybrid?: { Overlay?: { close: (callback: () => void) => void } };
-      };
+      const Hybrid = (
+        window.Roblox as
+          | { Hybrid?: { Overlay?: { close: (callback: () => void) => void } } }
+          | undefined
+      )?.Hybrid;
       Hybrid?.Overlay?.close(() => undefined);
     } else {
       // On web, open the cross-device login modal via the imported service.

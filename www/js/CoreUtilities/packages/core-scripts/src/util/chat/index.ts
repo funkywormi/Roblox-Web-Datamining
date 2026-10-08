@@ -17,8 +17,11 @@ export const startDesktopAndMobileWebChat = ({ userId }: { userId: number | stri
       window.location.href = `roblox://navigation/chat?userId=${userId}&entryPoint=AppShellWebView`;
     } else if (deviceType?.isUniversalApp) {
       window.location.href = `roblox://navigation/chat?userId=${userId}&entryPoint=AppShellWebView`;
-    } else {
+    } else if ("jQuery" in window) {
+      // Legacy listeners read userId from jQuery's extra args.
       $(document).triggerHandler("Roblox.Chat.StartChat", { userId });
+    } else {
+      document.dispatchEvent(new CustomEvent("Roblox.Chat.StartChat", { detail: { userId } }));
     }
     sendEventWithTarget("startChatByUser", "click", { userId });
   } else {

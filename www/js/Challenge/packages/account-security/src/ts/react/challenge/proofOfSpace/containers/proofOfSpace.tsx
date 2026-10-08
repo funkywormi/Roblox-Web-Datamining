@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Modal, ProgressBar } from "react-style-guide";
-import { localStorageService } from "core-roblox-utilities";
+import { getItem, setItem } from "@rbx/core-lib/local-storage";
 import {
   GraphPebblingPuzzleAnswer,
   GraphPebblingPuzzleMessage,
@@ -306,14 +306,12 @@ const ProofOfSpace: React.FC = () => {
   useEffect(() => {
     // Check if the component with the same challenge id has initialized the challenge flow previously,
     // if so then we quit early, if not then we will memoize it in the local storage.
-    const currentChallengeId = localStorageService.getLocalStorage(CHALLENGE_ID_KEY) as
-      | string
-      | undefined;
+    const currentChallengeId = getItem(CHALLENGE_ID_KEY);
     if (challengeId === currentChallengeId) {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       return () => {};
     }
-    localStorageService.setLocalStorage(CHALLENGE_ID_KEY, challengeId);
+    setItem(CHALLENGE_ID_KEY, challengeId);
     eventService.sendChallengeInitializedEvent();
     metricsService.fireChallengeInitializedEvent();
 

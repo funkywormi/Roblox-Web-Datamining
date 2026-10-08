@@ -61,6 +61,10 @@
     color: var(--inverse-surface-0)
 }
 
+.content-\[var\(--light-mode-content-emphasis\)\] {
+    color: var(--light-mode-content-emphasis)
+}
+
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-alert)r g b/.2)
 }
@@ -71,6 +75,10 @@
 
 .bg-\[rgb\(from_var\(--color-system-warning\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-warning)r g b/.2)
+}
+
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
 }
 
 .opacity-\[0\.5\] {

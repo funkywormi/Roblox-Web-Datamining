@@ -29,6 +29,7 @@ import {
   getNewUniversalSearchLinks,
   getAvatarAutocompleteSearchLinks,
 } from "../util/navigationUtil";
+import { logTopSearchResultsExposureOnce } from "../util/topSearchResultsIxp";
 import {
   getAutocompleteSearchType,
   getAvatarAutocompleteLanguageCode,
@@ -129,6 +130,14 @@ export default function UniversalSearch({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [autocompleteSuggestions, universalSearchLinks],
   );
+
+  const isSearchInputEmpty = searchInput.length === 0;
+
+  useEffect(() => {
+    if (isMenuOpen && !isSearchInputEmpty) {
+      logTopSearchResultsExposureOnce();
+    }
+  }, [isMenuOpen, isSearchInputEmpty]);
 
   const processAvatarShopAutocompleteSuggestions = (
     avatarShopSuggestions: readonly TAvatarAutocompleteSuggestionEntry[],
@@ -395,7 +404,7 @@ export default function UniversalSearch({
           ),
         );
         sendEvent(...events.catalogSearch(1, PageNameProvider.getInternalPageName()));
-      } else if ("label" in suggestion) {
+      } else if ("label" in suggestion || "isTopSearchResult" in suggestion) {
         sendEvent(
           ...events.searchSuggestionClicked(
             debouncedSearchInput,

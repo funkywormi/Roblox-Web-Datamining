@@ -6,7 +6,6 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { TranslateFunction } from "react-utilities";
 import { ForceActionRedirect } from "@rbx/generic-challenge-types";
 import { DelayParameters } from "../../twoStepVerification/delay";
 import { ForceActionRedirectConfig, useMaybeConditionalDynamicBody } from "../app.config";
@@ -37,7 +36,7 @@ export const ForceActionRedirectContext = createContext<ForceActionRedirectConte
 type Props = {
   forceActionRedirectChallengeConfig: ForceActionRedirectConfig;
   renderInline: boolean;
-  translate: TranslateFunction;
+  translate: ForceActionRedirect.ForceActionRedirectTranslateFunction;
   onModalChallengeAbandoned: ForceActionRedirect.OnModalChallengeAbandonedCallback | null;
   onChallengeAbandoned: ForceActionRedirect.OnChallengeAbandonedCallback | null;
   delayParameters?: DelayParameters;

@@ -5,8 +5,12 @@ import useGetSettingsAndOptions from "../../../apis/hooks/useGetSettingsAndOptio
 import ToggleWithParentalConsent from "../../../common/components/ToggleWithParentalConsent";
 import appPermissionsTranslationConstants from "../../constants/contentConstants/appPermissionsTranslationConstants";
 import SettingsSection from "../../../common/components/SettingsSection";
+import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
 
-const AllowThirdPartyAppsSetting = ({ childUserId }: { childUserId?: number }): JSX.Element => {
+const AllowThirdPartyAppsSetting = ({
+  childUserId,
+  onUpdateSetting,
+}: { childUserId?: number } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useTranslation();
   const [settingsAndOptions] = useGetSettingsAndOptions(childUserId);
 
@@ -19,6 +23,7 @@ const AllowThirdPartyAppsSetting = ({ childUserId }: { childUserId?: number }): 
           }
         >
           <ToggleWithParentalConsent
+            onUpdateSetting={onUpdateSetting}
             label={translate(appPermissionsTranslationConstants.thirdPartyApplications)}
             childUserId={childUserId}
             inputId="third-party-applications-toggle"

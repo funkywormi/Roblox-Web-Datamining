@@ -1,3 +1,5 @@
+import type React from "react";
+
 interface Props {
   fieldLabel: string;
   fieldValue: string | undefined;
@@ -17,7 +19,7 @@ const EvidenceField = ({
   fieldValue,
   preWrap = false,
   size = "medium",
-}: Props): JSX.Element => {
+}: Props): React.JSX.Element => {
   // In the future, this should be added to the translations themselves.
   const labelWithColon = `${fieldLabel}:`;
 

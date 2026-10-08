@@ -26,7 +26,7 @@ function DeleteOutfitDialog({
   outfit,
   closeDialog,
   deleteOutfitFromDataList,
-}: DeleteOutfitDialogProps): JSX.Element {
+}: DeleteOutfitDialogProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const outfitCostumeMessage = avatarConstants.outfits.characterMessages;

@@ -25,11 +25,14 @@ import useIncrementalUserProfiles from "../../../apis/hooks/useIncrementalGetUse
 export const BlockedUsersList = ({
   child,
   shouldShowParentalRelationshipView = false, // We should show chips for users with a parent/child with a blocking relationship
+  onUnblockUser,
 }: {
   child?: TChildInfo;
   shouldShowParentalRelationshipView?: boolean;
+  onUnblockUser?: (blockedUserId: number) => Promise<void>;
 }): JSX.Element => {
   const { translate } = useWrappedTranslation();
+  const isParentView = !!child || !!onUnblockUser;
   const [userSelectedFilter, setUserSelectedFilter] = useState<BlockedUserFilterType>(
     BlockedUserFilterType.All,
   );
@@ -43,7 +46,7 @@ export const BlockedUsersList = ({
       text: translate(privacyTranslationConstants.all),
     };
 
-    if (child) {
+    if (isParentView) {
       return [
         allChip,
         {
@@ -68,7 +71,7 @@ export const BlockedUsersList = ({
         text: translate(privacyTranslationConstants.blockedByYourParent),
       },
     ];
-  }, [translate, child]);
+  }, [translate, isParentView]);
 
   const queryParams = useMemo((): BlockedUsersQueryParams => {
     const params: BlockedUsersQueryParams = {
@@ -87,7 +90,12 @@ export const BlockedUsersList = ({
     return params;
   }, [activeFilter, child]);
 
-  const { data: blockedUsersData, isError, isLoading } = useGetBlockedUsersQuery(queryParams);
+  const {
+    data: blockedUsersData,
+    isError,
+    isLoading,
+    refetch,
+  } = useGetBlockedUsersQuery(queryParams);
   const [fetchNextBlockedUsers, { isFetching: isFetchingNextPage }] = useLazyGetBlockedUsersQuery();
   const userProfileFields = [UserProfileField.Names.CombinedName, UserProfileField.Names.Username];
   const blockedUsers = useMemo(() => blockedUsersData?.data.blockedUsers ?? [], [blockedUsersData]);
@@ -124,9 +132,10 @@ export const BlockedUsersList = ({
       const { blockedUserId } = blockedUser;
       const userProfile = userProfiles?.[blockedUserId];
 
-      const isUnblockDisabled = child && blockedUser.blockManagerType === TBlockManagerType.Blocker; // Parent can not unblock someone their child blocked
+      const isUnblockDisabled =
+        isParentView && blockedUser.blockManagerType === TBlockManagerType.Blocker; // Parent can not unblock someone their child blocked
       const canRequestUnblock =
-        !child &&
+        !isParentView &&
         shouldShowParentalRelationshipView &&
         blockedUser.blockManagerType === TBlockManagerType.Parent; // Child can not unblock someone their parent blocked, unless the parent no longer has block permissions (i.e. showParentChildChips is false)
 
@@ -139,6 +148,14 @@ export const BlockedUsersList = ({
           unblockDisabled={isUnblockDisabled}
           canRequestUnblock={canRequestUnblock}
           child={child}
+          onUnblockUser={
+            onUnblockUser
+              ? async id => {
+                  await onUnblockUser(id);
+                  await refetch();
+                }
+              : undefined
+          }
         />
       );
     });

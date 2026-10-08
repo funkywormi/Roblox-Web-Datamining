@@ -11,7 +11,7 @@ type TabScrollButtonProps = {
 /**
  * Circular chevron button used to horizontally scroll the avatar editor tab nav.
  */
-const TabScrollButton = ({ direction, onClick }: TabScrollButtonProps): JSX.Element => {
+const TabScrollButton = ({ direction, onClick }: TabScrollButtonProps): React.ReactElement => {
   return (
     <div
       data-testid="game-carousel-scroll-bar"

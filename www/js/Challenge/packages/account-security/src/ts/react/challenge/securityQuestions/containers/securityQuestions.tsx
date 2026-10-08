@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Endpoints } from "Roblox";
+import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { Modal } from "react-style-guide";
 import {
   AnswerPrompt,
@@ -186,7 +186,7 @@ const SecurityQuestions: React.FC = () => {
   const redirectAfterForceReset = () => {
     // Redirect user to Security Notification page. No need to invalidate the
     // challenge since we are sending the user elsewhere.
-    window.location.href = Endpoints.getAbsoluteUrl(SECURITY_NOTIFICATION_PATH);
+    window.location.href = getAbsoluteUrl(SECURITY_NOTIFICATION_PATH);
   };
 
   /*

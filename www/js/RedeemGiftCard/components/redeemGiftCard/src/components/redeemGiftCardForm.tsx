@@ -19,6 +19,7 @@ import {
   TooltipTrigger,
 } from "@rbx/foundation-ui";
 import type { CreditConversionData, RedeemReponse, RedemptionResult } from "@rbx/payments/types";
+import { requiresCreditConversion } from "@rbx/payments/utils/requiresCreditConversion";
 import { useRedeemConsent } from "@rbx/payments/redeemConsent";
 import {
   createCancelCreditConversionModal,
@@ -29,6 +30,7 @@ import {
   trackCriticalError,
   trackError,
   trackAsyncRedemptionDuration,
+  trackSyncRedemptionDuration,
 } from "@rbx/payments/creditCheckout";
 import {
   useRedemptionStatusPoll,
@@ -36,11 +38,13 @@ import {
 } from "@rbx/payments/gift-card";
 import type { RedemptionStatusResponse } from "@rbx/payments/gift-card";
 import { getRobloxPlusProductIdFromTargetKey } from "@rbx/payments/services/subscriptions";
-import { redeemPromoCode } from "@rbx/payments/promoCodes";
+import { redeemPromoCode } from "@rbx/payments-legacy/promoCodes";
 import HeuristicConvertToCredit from "./HeuristicConvertToCredit";
 import {
+  CREDIT_CONVERSION_REQUIRED_ERROR_CODE,
   eventTypes,
   gameCardMessageMapping,
+  INVALID_CODE_ERROR_CODE,
   keyCodeMapping,
   legacyPromoCodes,
   promoCodeMarker,
@@ -70,6 +74,9 @@ type RedeemGiftCardFormProps = {
     itemType?: string;
   }) => void;
 };
+
+const hasRedeemErrors = (data: RedeemReponse): boolean =>
+  (!!data.errorMsg && data.errorMsg.length > 0) || (!!data.errors && data.errors.length > 0);
 
 const ScanToRedeemIcon = ({
   translate,
@@ -270,8 +277,8 @@ function RedeemGiftCardForm({
     if (data?.errors && data.errors.length > 0) {
       const errorCode = data.errors?.[0]?.code!;
       apiErrorCode = String(errorCode ?? "unknown");
-      if (errorCode !== 20 || data.errors[0]?.message !== null) {
-        // did not reach the consent creation when errorCode = 20 and there is no valid message
+      if (errorCode !== INVALID_CODE_ERROR_CODE || data.errors[0]?.message !== null) {
+        // did not reach consent creation for this error when there is no valid message
         // technically, we could simply set this to false but this is a simple UX improvement for user
         setNeedFirstTimeConsent(false);
       }
@@ -362,22 +369,36 @@ function RedeemGiftCardForm({
       });
       return;
     }
-    if ((data.errorMsg && data.errorMsg.length > 0) || (data.errors && data.errors.length > 0)) {
+    if (hasRedeemErrors(data)) {
       handleFailure(data);
     } else {
       handleSuccess(data);
     }
   };
 
-  const reportAsyncRedemptionDuration = (
-    outcome: Parameters<typeof trackAsyncRedemptionDuration>[1],
-  ) => {
+  const takeRedemptionDurationMs = () => {
     if (redemptionSubmittedAt.current === undefined) {
-      return;
+      return undefined;
     }
     const durationMs = performance.now() - redemptionSubmittedAt.current;
     redemptionSubmittedAt.current = undefined;
-    trackAsyncRedemptionDuration(durationMs, outcome);
+    return durationMs;
+  };
+
+  const reportAsyncRedemptionDuration = (
+    outcome: Parameters<typeof trackAsyncRedemptionDuration>[1],
+  ) => {
+    const durationMs = takeRedemptionDurationMs();
+    if (durationMs !== undefined) {
+      trackAsyncRedemptionDuration(durationMs, outcome);
+    }
+  };
+
+  const reportSyncRedemptionDuration = (data: RedeemReponse) => {
+    const durationMs = takeRedemptionDurationMs();
+    if (durationMs !== undefined) {
+      trackSyncRedemptionDuration(durationMs, hasRedeemErrors(data) ? "failed" : "succeeded");
+    }
   };
 
   const handleTerminalRedemptionStatus = (response: RedemptionStatusResponse) => {
@@ -455,7 +476,7 @@ function RedeemGiftCardForm({
       return;
     }
 
-    // Each submission starts fresh, excluding time spent confirming credit conversion.
+    // Each submission starts fresh, excluding time spent on captcha or conversion confirmation.
     redemptionSubmittedAt.current = performance.now();
     (
       redeemPaymentsGateway(
@@ -468,13 +489,30 @@ function RedeemGiftCardForm({
       ) as Promise<AxiosResponse<RedeemReponse>>
     )
       .then(res => {
-        // Poll iff there is a workflowId. Otherwise, `res.data` contains the sync response.
-        if (res.data?.redemptionWorkflowId) {
-          startPoll(res.data.redemptionWorkflowId);
+        const { data } = res;
+        if (!data) {
+          redemptionSubmittedAt.current = undefined;
+          resolveRedeemResponse();
           return;
         }
-        redemptionSubmittedAt.current = undefined;
-        resolveRedeemResponse(res.data);
+        // Poll iff there is a workflowId. Otherwise, `data` contains the sync response.
+        if (data.redemptionWorkflowId) {
+          startPoll(data.redemptionWorkflowId);
+          return;
+        }
+        if (data.errorMsg === "Captcha") {
+          redemptionSubmittedAt.current = undefined;
+          resolveRedeemResponse(data);
+          return;
+        }
+        if (requiresCreditConversion(data, CREDIT_CONVERSION_REQUIRED_ERROR_CODE)) {
+          // Confirmation starts a separate submission
+          redemptionSubmittedAt.current = undefined;
+          resolveRedeemResponse(data);
+          return;
+        }
+        reportSyncRedemptionDuration(data);
+        resolveRedeemResponse(data);
       })
       .catch(errors => {
         redemptionSubmittedAt.current = undefined;

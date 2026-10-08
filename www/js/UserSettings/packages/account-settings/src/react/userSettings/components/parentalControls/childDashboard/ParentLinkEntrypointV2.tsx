@@ -26,25 +26,31 @@ export const ParentLinkEntrypointV2 = (): JSX.Element => {
       : addParentLink.heading;
 
   return (
-    <div className="flex flex-col items-center gap-xlarge padding-y-large">
-      <div className="flex flex-col gap-xlarge width-full max-width-[400px]">
+    <div className="flex flex-col items-start gap-xlarge padding-y-large">
+      <div className="flex flex-col gap-xlarge width-full max-width-[640px]">
         <OdpTiltedCardsArt />
-        <div className="flex flex-col gap-small">
+        <div className="flex flex-col gap-small text-align-x-left">
           <h3 className="text-title-large content-emphasis">{translate(heading)}</h3>
           <p className="text-body-medium content-default">
             {translate(addParentLink.upsellVariantDescription)}
           </p>
         </div>
-        <div className="flex flex-col gap-small">
+        <div className="flex flex-col gap-small margin-top-medium medium:flex-row">
           {canAddOnDeviceParent && (
-            <Button variant="Emphasis" className="width-full" onClick={startOnDeviceParentLinking}>
+            <Button
+              variant="Emphasis"
+              size="Medium"
+              className="width-full medium:basis-0 medium:grow-1"
+              onClick={startOnDeviceParentLinking}
+            >
               {translate(addParentLink.addOnDeviceParentAction)}
             </Button>
           )}
           {canAddRemoteParent && (
             <Button
               variant={canAddOnDeviceParent ? "Standard" : "Emphasis"}
-              className="width-full"
+              size="Medium"
+              className="width-full medium:basis-0 medium:grow-1"
               onClick={handleParentLinking}
             >
               {canAddOnDeviceParent

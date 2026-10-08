@@ -26,6 +26,7 @@ import {
   ParentConsentStatus,
   ParentConsentType,
   TGrantConsentRequest,
+  TManageExperience,
 } from "../../../../../types/parentConsentsTypes";
 import { useManageChildBlockedExperiencesMutation } from "../../../../apis/experienceBlockingApi";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
@@ -58,6 +59,7 @@ type TPlaytimeGameTileProps = {
   child?: TChildInfo;
   sessionId?: string;
   onRevokeApproval?: () => void;
+  onManageExperience?: TManageExperience;
 };
 
 const GameTile = ({
@@ -67,6 +69,7 @@ const GameTile = ({
   child,
   sessionId,
   onRevokeApproval,
+  onManageExperience,
 }: TPlaytimeGameTileProps): JSX.Element => {
   const { perExperienceScreentime } = parentalControlsTranslationConstants;
 
@@ -75,11 +78,14 @@ const GameTile = ({
   const dispatch = useAppDispatch();
 
   const [manageBlockedExperiences] = useManageChildBlockedExperiencesMutation();
-  const { data: parentalConsents } = useGetParentalConsentsQuery({
-    childUserId: child?.userId ?? authenticatedUser.id!,
-    consentStatus: ParentConsentStatus.Pending,
-    consentType: ParentConsentType.ManageExperience,
-  });
+  const { data: parentalConsents } = useGetParentalConsentsQuery(
+    {
+      childUserId: child?.userId ?? authenticatedUser.id!,
+      consentStatus: ParentConsentStatus.Pending,
+      consentType: ParentConsentType.ManageExperience,
+    },
+    { skip: !!onManageExperience },
+  );
   const pendingConsent = parentalConsents?.consents.find(
     consent => consent.consentData?.universeId === gameData.universeId,
   );
@@ -239,7 +245,11 @@ const GameTile = ({
     },
   });
 
-  const handleManageExperience = (action: ManagementAction) => {
+  const handleManageExperience = async (action: ManagementAction) => {
+    if (onManageExperience) {
+      await onManageExperience(gameData.universeId, action);
+      return;
+    }
     if (action === ManagementAction.Block) {
       confirmBlockModalService.open();
     } else {
@@ -269,6 +279,10 @@ const GameTile = ({
         className="experience-management-btn"
         variant={Button.variants.control}
         onClick={async () => {
+          if (onManageExperience) {
+            await onManageExperience(gameData.universeId, ManagementAction.Unblock);
+            return;
+          }
           if (child) {
             parentalControlsEventService.authButtonClickSettingsPControlsBlockedExperiencesUnblock(
               child,
@@ -286,7 +300,7 @@ const GameTile = ({
         width={Button.widths.full}
         isDisabled={gameData.disabled}
       >
-        {!child && <span className="icon-status-private themified-icon" />}
+        {!child && !onManageExperience && <span className="icon-status-private themified-icon" />}
         {gameData.disabled
           ? translate(perExperienceScreentime.blockedButton)
           : translate(perExperienceScreentime.unblockButton)}
@@ -317,7 +331,7 @@ const GameTile = ({
       </Button>
     );
 
-    if (!child && pendingConsent) {
+    if (!child && !onManageExperience && pendingConsent) {
       return pendingRequestButton;
     }
 

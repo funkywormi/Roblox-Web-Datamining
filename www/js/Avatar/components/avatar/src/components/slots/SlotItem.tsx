@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import classNames from "classnames";
+import { Icon } from "@rbx/foundation-ui";
 import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 import { CategorySlot, SlotConfiguration, isEmptyCategorySlot, AssetSlot } from "../../types";
 
@@ -121,7 +122,7 @@ const SlotItem: React.FC<SlotItemProps> = ({
                     }
                   }}
                 >
-                  <div className="icon-up" />
+                  <Icon name="icon-regular-chevron-small-up" size="Small" />
                 </div>
               )}
               {(reverseOrder ? canMoveUp : canMoveDown) && (
@@ -138,7 +139,7 @@ const SlotItem: React.FC<SlotItemProps> = ({
                     }
                   }}
                 >
-                  <div className="icon-down" />
+                  <Icon name="icon-regular-chevron-small-down" size="Small" />
                 </div>
               )}
             </div>

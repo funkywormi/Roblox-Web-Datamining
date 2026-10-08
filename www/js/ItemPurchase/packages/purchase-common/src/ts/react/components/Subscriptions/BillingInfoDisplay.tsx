@@ -1,7 +1,8 @@
 import React from 'react';
-import { TranslateFunction } from '@rbx/core-scripts/react';
+import { getFreeTrialDisplay } from '@rbx/payments/services/subscriptions';
+import { type PurchaseTranslate } from '../../itemPurchase/useTranslate';
 import { translateHtml } from '@rbx/translation-utils';
-import type { Money, PeriodType, SubscriptionOffer } from '@rbx/client-subscriptions-api/v1';
+import type { Money, PeriodType, SubscriptionOffer } from '@rbx/client-subscriptions-api/v2';
 
 const formatMoney = (money: Money): string => {
   const amount = money.units + money.nanos * 1e-9;
@@ -12,7 +13,7 @@ const formatMoney = (money: Money): string => {
 };
 
 type BillingInfoDisplayProps = {
-  translate: TranslateFunction;
+  translate: PurchaseTranslate;
   eligibleOffers?: SubscriptionOffer[];
   price: Money;
   periodType: PeriodType;
@@ -25,11 +26,31 @@ const BillingInfoDisplay: React.FC<BillingInfoDisplayProps> = ({
   periodType
 }) => {
   const displayPrice = formatMoney(price);
-  const isFreeTrial =
-    eligibleOffers?.some((o: SubscriptionOffer) => o.offerType === 'FreeTrial') ?? false;
+  const freeTrialOffer = eligibleOffers?.find(
+    (o: SubscriptionOffer) => o.offerType === 'FreeTrial'
+  );
+  const isFreeTrial = freeTrialOffer != null;
+  const trialDisplay = getFreeTrialDisplay(freeTrialOffer, periodType);
 
-  const content = isFreeTrial
+  const freeTrialContent = trialDisplay
     ? translateHtml(
+        translate,
+        'Label.RobloxPlusPriceRowV3',
+        [
+          {
+            opening: 'boldStart',
+            closing: 'boldEnd',
+            render: text => <span className='font-bold'>{text}</span>
+          }
+        ],
+        {
+          trialDuration: String(trialDisplay.trialDuration),
+          trialPeriodLabel: translate(trialDisplay.trialPeriodKey),
+          price: displayPrice,
+          periodType
+        }
+      )
+    : translateHtml(
         translate,
         'Description.BillingInfoWithFreeTrialOffer',
         [
@@ -40,7 +61,10 @@ const BillingInfoDisplay: React.FC<BillingInfoDisplayProps> = ({
           }
         ],
         { trialPeriod: '1', trialPeriodType: periodType, price: displayPrice, periodType }
-      )
+      );
+
+  const content = isFreeTrial
+    ? freeTrialContent
     : translateHtml(
         translate,
         'Description.BillingInfo',

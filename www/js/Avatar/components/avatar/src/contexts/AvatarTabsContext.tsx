@@ -42,7 +42,7 @@ export type TabSelectionData = {
   clickedTab: Tab | undefined;
 };
 
-export function AvatarTabsProvider({ children }: AvatarTabsProviderProps): JSX.Element {
+export function AvatarTabsProvider({ children }: AvatarTabsProviderProps): React.ReactElement {
   // All of the available tabs
   const [tabs, setTabs] = useState<Tab[]>(avatarEditorTabs);
 

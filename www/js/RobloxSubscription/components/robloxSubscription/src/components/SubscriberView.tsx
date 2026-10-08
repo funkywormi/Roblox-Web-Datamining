@@ -40,6 +40,7 @@ export type SubscriberViewProps = {
   robloxSubscriptionMembership: Subscription;
   robloxPlusUserBenefits: GetRobloxPlusUserBenefitsResponse | undefined;
   isFaeFreeTrial: boolean;
+  shouldDeeplinkToReferral: boolean;
   onOpenReferrals: () => void;
 };
 
@@ -48,6 +49,7 @@ const SubscriberView: FC<SubscriberViewProps> = ({
   robloxSubscriptionMembership,
   robloxPlusUserBenefits,
   isFaeFreeTrial,
+  shouldDeeplinkToReferral,
   onOpenReferrals,
 }) => {
   const { translate } = useTranslation();
@@ -146,7 +148,10 @@ const SubscriberView: FC<SubscriberViewProps> = ({
               it rather than leaving a heading above an empty carousel. */}
           {isPlusReferralRolloutEnabled() && senderEligibility === "Eligible" ? (
             <InteractWithPlusSection>
-              <PlusReferralShareCard onOpenDashboard={onOpenReferrals} />
+              <PlusReferralShareCard
+                shouldDeeplinkToReferral={shouldDeeplinkToReferral}
+                onOpenDashboard={onOpenReferrals}
+              />
             </InteractWithPlusSection>
           ) : null}
           <SavingsDashboard

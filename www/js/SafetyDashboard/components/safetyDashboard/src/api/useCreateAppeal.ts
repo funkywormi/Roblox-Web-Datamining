@@ -18,7 +18,10 @@ export const isAppealIneligibleError = (error: unknown): boolean =>
 
 // TODO: [future] Seems like there is no Appeal Request TYPE that is correct, so
 // manual workaround for now (abech)
-export type AppealRequestBody = Pick<AppealV2, "message" | "violation" | "communication_opt_out">;
+export type AppealRequestBody = Pick<
+  AppealV2,
+  "message" | "violation" | "communication_opt_out" | "appeal_type"
+>;
 
 /**
  * Create an Appeal for a violation.

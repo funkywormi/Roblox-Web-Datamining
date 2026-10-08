@@ -1,6 +1,7 @@
 import { Button } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { translateHtml } from "@rbx/translation-utils";
+import { AppealType } from "@rbx/moderation-portal";
 import { formatter } from "../util/dateTime";
 import { EnrichedViolation } from "../util/violations";
 import { AppealEligibilityResponse } from "../../../api/useAppealEligibility";
@@ -11,12 +12,12 @@ import { onSupportClick } from "../SupportItem";
 interface Props {
   violation: EnrichedViolation;
   /** Opens the appeal text modal directly (used when no pre-condition is required). */
-  onShowAppealModal: () => void;
+  onShowAppealModal: (appealType: AppealType) => void;
   /**
    * Starts the IDV pre-condition flow before the appeal can be submitted. Called
    * instead of `onShowAppealModal` when eligibility is `false`.
    */
-  onStartIdvFlow?: () => void;
+  onStartIdvFlow?: (appealType: AppealType) => void;
   /** Appeal-creation eligibility for this violation, if it has been fetched. */
   eligibility?: AppealEligibilityResponse;
 }
@@ -38,6 +39,9 @@ const SendAppealSection = ({
   const showStandardAppeal = violation.appealMethod === "inline";
   const showSupportAppeal = violation.appealMethod === "support";
 
+  const canSendAppeal = violation.allowed_appeal_types.includes(AppealType.APPEAL);
+  const canAskForReview = violation.allowed_appeal_types.includes(AppealType.FIXED);
+
   /**
    * Eligibility refines the inline appeal entry:
    * - `isEligible === true`: the regular appeal modal opens directly.
@@ -48,18 +52,47 @@ const SendAppealSection = ({
    */
   const requiresIdv = eligibility !== undefined && !eligibility.isEligible;
 
+  const onAppealClick = (appealType: AppealType) => () => {
+    if (requiresIdv && onStartIdvFlow) {
+      onStartIdvFlow(appealType);
+    } else {
+      onShowAppealModal(appealType);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-medium medium:items-start padding-top-small margin-bottom-medium">
       {showStandardAppeal && (
         <div className="flex flex-col gap-xsmall medium:items-start">
-          <Button
-            variant="Standard"
-            size="Medium"
-            onClick={requiresIdv ? onStartIdvFlow : onShowAppealModal}
-            aria-label={translate("Action.SendAppeal")}
-          >
-            {translate("Action.SendAppeal")}
-          </Button>
+          {canAskForReview && (
+            <div
+              className={`flex flex-col gap-medium medium:items-start${
+                canSendAppeal ? " margin-bottom-medium" : ""
+              }`}
+            >
+              <Button
+                variant="Standard"
+                size="Medium"
+                onClick={onAppealClick(AppealType.FIXED)}
+                aria-label={translate("Action.AskForReview")}
+              >
+                {translate("Action.AskForReview")}
+              </Button>
+              <p className="text-body-medium">
+                {translate("Description.FixByDate", { date: expirationDate })}
+              </p>
+            </div>
+          )}
+          {canSendAppeal && (
+            <Button
+              variant="Standard"
+              size="Medium"
+              onClick={onAppealClick(AppealType.APPEAL)}
+              aria-label={translate("Action.SendAppeal")}
+            >
+              {translate("Action.SendAppeal")}
+            </Button>
+          )}
           {requiresIdv && (
             <p className="text-caption-small content-default">
               {translate("Description.AppealRequiresIdv")}
@@ -91,7 +124,7 @@ const SendAppealSection = ({
 
       <div className="flex flex-col">
         {(showStandardAppeal || showSupportAppeal) && (
-          <p className="text-body-small">
+          <p className="text-body-medium">
             {translate("Label.AppealByDate", { date: expirationDate })}
           </p>
         )}

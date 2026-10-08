@@ -63,7 +63,7 @@ const useOutfitsMenu = (): {
   }, []);
 
   const onItemMenuButtonClicked = useCallback(
-    ($event, item: CatalogOutfitItem, option: OutfitOption) => {
+    (_event: React.MouseEvent, item: CatalogOutfitItem, option: OutfitOption) => {
       setActiveItem(null);
 
       if (option.name === "Delete") {

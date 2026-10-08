@@ -1,7 +1,5 @@
 import React from "react";
-import { withTranslations, WithTranslationsProps } from "react-utilities";
 import { RequestService } from "../../../common/request";
-import { TRANSLATION_CONFIG } from "./app.config";
 import SecurityQuestions from "./containers/securityQuestions";
 import {
   OnChallengeCompletedCallback,
@@ -22,7 +20,7 @@ type Props = {
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
-} & WithTranslationsProps;
+};
 
 export const App: React.FC<Props> = ({
   userId,
@@ -31,7 +29,6 @@ export const App: React.FC<Props> = ({
   eventService,
   metricsService,
   requestService,
-  translate,
   onChallengeCompleted,
   onChallengeInvalidated,
   onModalChallengeAbandoned,
@@ -44,7 +41,6 @@ export const App: React.FC<Props> = ({
       eventService={eventService}
       metricsService={metricsService}
       requestService={requestService}
-      translate={translate}
       onChallengeCompleted={onChallengeCompleted}
       onChallengeInvalidated={onChallengeInvalidated}
       onModalChallengeAbandoned={onModalChallengeAbandoned}
@@ -54,4 +50,4 @@ export const App: React.FC<Props> = ({
   );
 };
 
-export default withTranslations(App, TRANSLATION_CONFIG);
+export default App;

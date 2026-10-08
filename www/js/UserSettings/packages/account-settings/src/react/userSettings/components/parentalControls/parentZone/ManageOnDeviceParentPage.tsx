@@ -21,7 +21,7 @@ export const ManageOnDeviceParentPage = (): JSX.Element => {
 
   return (
     <SettingsSection>
-      <List className="bg-shift-100 stroke-standard stroke-default radius-large clip">
+      <List className="stroke-standard stroke-default radius-large clip">
         <ListItem
           isContained={false}
           size="Medium"

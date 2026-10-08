@@ -141,7 +141,7 @@ function useAssetsList({ isItemSelected, translate }: AvatarListParams) {
   const systemFeedback = useSystemFeedback();
 
   const loadError = useCallback(
-    error => {
+    (error: string) => {
       reportAXError({
         itemName: "AssetPagerLoadError",
         counterName: "AvatarEditorError",

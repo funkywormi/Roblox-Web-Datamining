@@ -3,7 +3,7 @@ import classNames from "classnames";
 import BodyColors from "./BodyColors";
 import { useAvatarTabsContext } from "../../../../contexts/AvatarTabsContext";
 
-function BodyColorsContainer(): JSX.Element {
+function BodyColorsContainer(): React.ReactElement {
   const { selectedTab, selectedSubcategory } = useAvatarTabsContext();
 
   return (

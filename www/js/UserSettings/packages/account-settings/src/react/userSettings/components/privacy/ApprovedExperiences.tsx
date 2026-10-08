@@ -3,6 +3,7 @@ import { authenticatedUser } from "header-scripts";
 import { Loading } from "react-style-guide";
 import { useTranslation } from "react-utilities";
 import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TManageExperience } from "../../../../types/parentConsentsTypes";
 import GameTile, { TGameData } from "../parentalControls/parentDashboard/GameTile";
 import {
   useGetAgeRecommendationQuery,
@@ -13,7 +14,13 @@ import { useGetApprovedExperiencesQuery } from "../../../apis/experienceBlocking
 import parentalControlsTranslationConstants from "../../constants/contentConstants/parentalControlsTranslationConstants";
 import ApprovedExperienceTile from "./ApprovedExperienceTile";
 
-export const ApprovedExperiences = ({ child }: { child?: TChildInfo }): JSX.Element => {
+export const ApprovedExperiences = ({
+  child,
+  onManageExperience,
+}: {
+  child?: TChildInfo;
+  onManageExperience?: TManageExperience;
+}): JSX.Element => {
   const { translate } = useTranslation();
   const { approvedExperiences } = parentalControlsTranslationConstants;
   const {
@@ -70,8 +77,13 @@ export const ApprovedExperiences = ({ child }: { child?: TChildInfo }): JSX.Elem
             maturityRating: ageRec?.maturityRating,
             isApproved: true,
           };
-          return child ? (
-            <ApprovedExperienceTile key={universeId} gameData={gameData} child={child} />
+          return child || onManageExperience ? (
+            <ApprovedExperienceTile
+              key={universeId}
+              gameData={gameData}
+              child={child}
+              onManageExperience={onManageExperience}
+            />
           ) : (
             <GameTile key={universeId} gameData={gameData} />
           );
@@ -83,7 +95,7 @@ export const ApprovedExperiences = ({ child }: { child?: TChildInfo }): JSX.Elem
 
   return (
     <React.Fragment>
-      {child && (
+      {(child || onManageExperience) && (
         <div className="text-description">
           {translate(approvedExperiences.approvedExperiencesDescription)}
         </div>

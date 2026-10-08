@@ -954,6 +954,10 @@ div.MuiDialog-root:not(:first-of-type) .MuiDialog-container {
     color: var(--inverse-surface-0)
 }
 
+.content-\[var\(--light-mode-content-emphasis\)\] {
+    color: var(--light-mode-content-emphasis)
+}
+
 .content-\[white\] {
     color: #fff
 }
@@ -972,6 +976,10 @@ div.MuiDialog-root:not(:first-of-type) .MuiDialog-container {
 
 .bg-\[var\(--color-content-emphasis\)\] {
     background-color: var(--color-content-emphasis)
+}
+
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
 }
 
 .bg-\[white\] {

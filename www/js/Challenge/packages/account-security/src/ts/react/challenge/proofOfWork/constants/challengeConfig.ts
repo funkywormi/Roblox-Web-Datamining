@@ -12,3 +12,9 @@ export const PROGRESS_DISPLAY_PERCENTAGE_PRECISION = 0;
 export const VISIBILITY_DELAY_MILLISECONDS = 5000;
 
 export const SESSION_ID_KEY = "PoWSessionId";
+
+declare module "@rbx/core-lib/local-storage" {
+  interface LocalStorageRegistry {
+    PoWSessionId: string;
+  }
+}

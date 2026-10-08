@@ -1,7 +1,9 @@
 import React from "react";
+import { Button } from "@rbx/foundation-ui";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { CatalogItem, CatalogOutfitItem } from "../../../../avatar.types";
 import AvatarItemCard from "./AvatarItemCard";
+import LoadingSpinner from "../../../LoadingSpinner";
 import { OutfitOption } from "../../../../types";
 import { useAvatarPageContext } from "../../../../contexts/AvatarPageContext";
 
@@ -10,7 +12,7 @@ export type AvatarItemsProps = {
   loading: boolean;
   canLoadNextPage: boolean;
   getNextPage?: () => void;
-  emptyMessage: string | (() => string);
+  emptyMessage: string;
   onItemClicked: (item: CatalogItem, event: React.MouseEvent<HTMLElement>) => void;
   activeItem?: CatalogOutfitItem | null;
   onItemMenuButtonClicked?: (
@@ -35,7 +37,7 @@ function AvatarItems({
   openOutfitMenu,
   closeOutfitMenu,
   onExpiredAssetsClick,
-}: AvatarItemsProps): JSX.Element {
+}: AvatarItemsProps): React.ReactElement {
   const tAvatar = useTranslations("Feature.Avatar");
   const tCatalog = useTranslations("Feature.Catalog");
   const { enableContinuousLoad } = useAvatarPageContext();
@@ -61,22 +63,18 @@ function AvatarItems({
         ))}
       </ul>
 
-      {loading && (
-        <div className="loading-animated">
-          <span className="spinner spinner-default" />
-        </div>
-      )}
+      {loading && <LoadingSpinner />}
 
       {!enableContinuousLoad && !loading && !!canLoadNextPage && (
         <div className="load-more-btn-container">
-          <button type="button" className="btn-primary-md" onClick={getNextPage}>
-            <span>{tCatalog("Action.LoadMore")}</span>
-          </button>
+          <Button variant="Emphasis" size="Medium" onClick={getNextPage}>
+            {tCatalog("Action.LoadMore")}
+          </Button>
         </div>
       )}
 
       {!loading && items.length === 0 && !canLoadNextPage && (
-        <div className="col-xs-12 section-content-off">
+        <div className="section-content-off">
           <div>{emptyMessage}</div>
         </div>
       )}

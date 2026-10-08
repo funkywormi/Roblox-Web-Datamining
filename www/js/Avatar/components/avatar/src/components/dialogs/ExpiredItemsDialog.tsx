@@ -107,7 +107,7 @@ function ExpiredItemsDialog({
   expiredAssets,
   onRepurchase,
   systemFeedbackService,
-}: ExpiredItemsDialogProps): JSX.Element {
+}: ExpiredItemsDialogProps): React.ReactElement {
   const tAvatar = useAvatarTranslate("Feature.Avatar");
   const tCatalog = useAvatarTranslate("Feature.Catalog");
   const formatter = useFormatter();
@@ -596,7 +596,7 @@ function ExpiredItemsDialog({
                           </Dropdown>
                         )}
                         <div className="item-price-container">
-                          <span className="icon-robux-16x16" />
+                          <Icon name="icon-filled-robux" size="Small" />
                           <span className="item-price">{formatter.number(displayPrice)}</span>
                         </div>
                       </div>
@@ -617,7 +617,7 @@ function ExpiredItemsDialog({
                   }) || `Total: ${getSelectedCount()} items`}
                 </span>
                 <div className="total-price-container">
-                  <span className="icon-robux-16x16" />
+                  <Icon name="icon-filled-robux" size="Small" />
                   <span className="total-price">{formatter.number(getTotalPrice())}</span>
                 </div>
               </div>
@@ -647,9 +647,9 @@ function ExpiredItemsDialog({
                 dangerouslySetInnerHTML={{
                   __html:
                     tCatalog("Label.YourBalanceAfterTransaction", {
-                      remainingBalance: `<span class='icon-robux-16x16'></span><span class='text-robux'>${escapeHtml(formatter.number(remainingBalance))}</span>`,
+                      remainingBalance: `<span class='icon icon-filled-robux size-[var(--icon-size-small)]'></span><span class='text-robux'>${escapeHtml(formatter.number(remainingBalance))}</span>`,
                     }) ||
-                    `Your balance after this transaction will be <span class='icon-robux-16x16'></span><span class='text-robux'>${escapeHtml(formatter.number(remainingBalance))}</span>`,
+                    `Your balance after this transaction will be <span class='icon icon-filled-robux size-[var(--icon-size-small)]'></span><span class='text-robux'>${escapeHtml(formatter.number(remainingBalance))}</span>`,
                 }}
               />
             )}

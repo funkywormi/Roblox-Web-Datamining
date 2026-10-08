@@ -1,4 +1,8 @@
 const subscriptionReferralDataset = (): DOMStringMap | null => {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
   const metaTag = document.querySelector<HTMLMetaElement>(
     'meta[name="subscription-referral-data"]',
   );

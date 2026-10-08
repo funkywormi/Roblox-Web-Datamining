@@ -1,6 +1,6 @@
 import type { AxiosResponse } from "axios";
 import { httpService } from "core-utilities";
-import { EnvironmentUrls } from "Roblox";
+import { EnvironmentUrls } from "@rbx/environment-urls";
 import { Address } from "../constants/TypeDefinitions";
 
 // TODO: add frontend tracking via grafana for this API call.

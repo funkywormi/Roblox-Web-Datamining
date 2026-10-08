@@ -7,6 +7,7 @@ import { minutesToTimeString } from "../../userSettings/utils/doNotDisturbUtils"
 import parentalControlsTranslationConstants from "../../userSettings/constants/contentConstants/parentalControlsTranslationConstants";
 import useDoNotDisturbTimePickerModal from "../hooks/modals/useDoNotDisturbTimePickerModal";
 import ToggleWithParentalConsent from "./ToggleWithParentalConsent";
+import { TSettingUpdateProps } from "../../../types/settingUpdateTypes";
 
 /*
   A toggle component for Do Not Disturb setting with time pickers
@@ -18,13 +19,14 @@ export const DoNotDisturbToggle = ({
   settingName,
   childUserId,
   description,
+  onUpdateSetting,
 }: {
   label: string;
   inputId: string;
   settingName: UserSetting.doNotDisturb;
   childUserId?: number | undefined;
   description?: string;
-}): JSX.Element => {
+} & TSettingUpdateProps): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const { notifications } = parentalControlsTranslationConstants;
 
@@ -37,7 +39,14 @@ export const DoNotDisturbToggle = ({
 
   // Time picker modals
   const [timePickerModals, startTimeModalService, endTimeModalService] =
-    useDoNotDisturbTimePickerModal(childUserId, timeWindow);
+    useDoNotDisturbTimePickerModal(
+      childUserId,
+      timeWindow,
+      onUpdateSetting
+        ? value =>
+            onUpdateSetting({ childUserId, setting: UserSetting.doNotDisturbTimeWindow, value })
+        : undefined,
+    );
 
   const getAdditionalContent = (isToggleOn: boolean): React.ReactNode => (
     <React.Fragment>
@@ -83,6 +92,7 @@ export const DoNotDisturbToggle = ({
 
   return (
     <ToggleWithParentalConsent
+      onUpdateSetting={onUpdateSetting}
       label={label}
       inputId={inputId}
       settingName={settingName}

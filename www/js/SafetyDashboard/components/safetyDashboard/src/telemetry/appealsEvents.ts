@@ -66,6 +66,7 @@ export const sendRequestAppealEvent = ({
   msgLength,
   violationType,
   violationReason,
+  appealType,
   isV2UI = false,
   optOutCommunication = false,
 }: {
@@ -73,6 +74,7 @@ export const sendRequestAppealEvent = ({
   msgLength: number;
   violationType: string;
   violationReason: string;
+  appealType: string;
   isV2UI?: boolean;
   optOutCommunication?: boolean;
 }): void => {
@@ -81,6 +83,7 @@ export const sendRequestAppealEvent = ({
     msgLength,
     violationType,
     violationReason,
+    appealType,
     isV2UI,
     optOutCommunication,
   });
@@ -118,6 +121,7 @@ export const sendStartAppealEvent = ({
   prevAppealCount,
   violationType,
   violationReason,
+  appealType,
   isV2UI = false,
 }: {
   isEligible: boolean;
@@ -125,6 +129,7 @@ export const sendStartAppealEvent = ({
   prevAppealCount: number;
   violationType: string;
   violationReason: string;
+  appealType: string;
   isV2UI?: boolean;
 }): void => {
   sendAppealsEvent(AppealsEventType.StartAppeal, "ViolationDetails", {
@@ -133,6 +138,7 @@ export const sendStartAppealEvent = ({
     prevAppealCount,
     violationType,
     violationReason,
+    appealType,
     isV2UI,
   });
 };

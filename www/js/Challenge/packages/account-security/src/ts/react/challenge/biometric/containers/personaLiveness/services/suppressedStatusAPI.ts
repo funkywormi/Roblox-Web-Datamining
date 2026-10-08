@@ -1,6 +1,6 @@
-import { EnvironmentUrls } from "Roblox";
+import environmentUrls from "@rbx/environment-urls";
 
-const { userModerationApi } = EnvironmentUrls;
+const { userModerationApi } = environmentUrls;
 
 const NOT_APPROVED_URL = `${userModerationApi}/v2/not-approved`;
 

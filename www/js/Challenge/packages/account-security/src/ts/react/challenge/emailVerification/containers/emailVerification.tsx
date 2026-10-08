@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { EmailVerifyCodeModalService } from "Roblox";
+import type { EmailVerifyCodeModalService as EmailVerifyCodeModalServiceType } from "Roblox";
 
-import { OTP_CONTAINER_ID } from "../app.config";
+import { LOG_PREFIX, OTP_CONTAINER_ID } from "../app.config";
+import { ErrorCode } from "../interface";
 import * as Otp from "../../../../common/request/types/otp";
 
 import useEmailVerificationContext from "../hooks/useEmailVerificationContext";
@@ -12,6 +13,14 @@ import { useOtpCodeLength } from "../hooks/useOtpCodeLength";
 import InlineChallenge from "../../../common/inlineChallenge";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import QuitVerificationConfirmation from "../../../common/quitVerificationConfirmation";
+
+// Provided by a separate .NET-only bundle; absent on Next.js.
+const getEmailVerifyCodeModalService = () =>
+  (
+    window.Roblox as
+      | { EmailVerifyCodeModalService?: typeof EmailVerifyCodeModalServiceType }
+      | undefined
+  )?.EmailVerifyCodeModalService;
 
 const EmailVerification: React.FC = () => {
   const {
@@ -49,30 +58,37 @@ const EmailVerification: React.FC = () => {
   }, [dispatch, eventService, metricsService]);
 
   const loadChallenge = () => {
-    if (EmailVerifyCodeModalService) {
-      EmailVerifyCodeModalService.renderEmailVerifyCodeModal({
-        containerId: OTP_CONTAINER_ID,
-        codeLength: otpCodeLength,
-        onEmailCodeEntered: (sessionToken: string, code: string) => {
-          dispatch({
-            type: EmailVerificationActionType.SET_CHALLENGE_COMPLETED,
-            onChallengeCompletedData: {
-              otpSession: sessionToken,
-            },
-          });
-          eventService.sendChallengeCompletedEvent();
-          metricsService.fireChallengeCompletedEvent();
-        },
-        onModalAbandoned,
-        enterEmailTitle: resources.Header.VerifyYourAccount,
-        enterEmailDescription: resources.Description.SuspiciousActivityEmailVerification,
-        enterCodeTitle: resources.Header.EnterCode,
-        enterCodeDescription: resources.Description.EnterCode,
-        origin: Otp.Origin.Challenge,
-        translate,
-        renderInWebview: renderInline,
+    const EmailVerifyCodeModalService = getEmailVerifyCodeModalService();
+    if (!EmailVerifyCodeModalService) {
+      console.error(LOG_PREFIX, "EmailVerifyCodeModalService is unavailable");
+      dispatch({
+        type: EmailVerificationActionType.SET_CHALLENGE_INVALIDATED,
+        errorCode: ErrorCode.UNKNOWN,
       });
+      return;
     }
+    EmailVerifyCodeModalService.renderEmailVerifyCodeModal({
+      containerId: OTP_CONTAINER_ID,
+      codeLength: otpCodeLength,
+      onEmailCodeEntered: (sessionToken: string, code: string) => {
+        dispatch({
+          type: EmailVerificationActionType.SET_CHALLENGE_COMPLETED,
+          onChallengeCompletedData: {
+            otpSession: sessionToken,
+          },
+        });
+        eventService.sendChallengeCompletedEvent();
+        metricsService.fireChallengeCompletedEvent();
+      },
+      onModalAbandoned,
+      enterEmailTitle: resources.Header.VerifyYourAccount,
+      enterEmailDescription: resources.Description.SuspiciousActivityEmailVerification,
+      enterCodeTitle: resources.Header.EnterCode,
+      enterCodeDescription: resources.Description.EnterCode,
+      origin: Otp.Origin.Challenge,
+      translate,
+      renderInWebview: renderInline,
+    });
   };
 
   useEffect(() => {

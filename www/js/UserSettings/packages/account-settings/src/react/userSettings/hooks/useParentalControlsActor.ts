@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import ParentalControlsActor from "../../../enums/parentalControls/ParentalControlsActor";
 import ParentLinkStatus from "../../../enums/parentalControls/ParentLinkStatus";
 import { Access } from "../../../types/accessManagementTypes";
@@ -51,7 +51,7 @@ const useParentalControlsActor = (): TParentalControlsActorState => {
     }
     const parents = parentInfo?.parents ?? [];
     const hasOnDevice = parents.some(parent => parent.isOnDeviceParent === true);
-    const hasRemote = parents.some(parent => parent.isOnDeviceParent !== true);
+    const hasRemote = parents.some(parent => parent.isRemoteParent === true);
 
     if (hasOnDevice && hasRemote) {
       return ParentLinkStatus.OnDeviceAndRemote;
@@ -78,8 +78,15 @@ const useParentalControlsActor = (): TParentalControlsActorState => {
   const isUiPolicySettled = !isUiPolicyLoading && !isUiPolicyUninitialized;
   const isOdpEnabled = uiPolicy?.onDeviceParentalControlsEnabled === true;
 
-  const isLoading =
+  // RTK Query refetches errored queries whenever a new subscriber mounts, which flips `isLoading`
+  // back to true. Keep track of the 1st resolution so we don't get stuck in infinute loop.
+  const hasResolvedRef = useRef(false);
+  const isResolving =
     !isAgeOfMajoritySettled || !isParentInfoSettled || (hasOnDeviceParent && !isUiPolicySettled);
+  if (!isResolving) {
+    hasResolvedRef.current = true;
+  }
+  const isLoading = isResolving && !hasResolvedRef.current;
 
   const actor: ParentalControlsActor = useMemo(() => {
     if (isLoading) {

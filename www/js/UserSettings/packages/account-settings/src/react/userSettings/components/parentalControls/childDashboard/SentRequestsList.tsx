@@ -57,9 +57,7 @@ export const SentRequestsList = (): JSX.Element => {
 
     return (
       <React.Fragment>
-        <List className="bg-shift-100 stroke-standard stroke-default radius-large clip">
-          {consentCards}
-        </List>
+        <List className="stroke-standard stroke-default radius-large clip">{consentCards}</List>
         {/* Infinite scroll sentinel */}
         <div ref={loadMoreRef}>{isFetchingMore && <Loading />}</div>
       </React.Fragment>

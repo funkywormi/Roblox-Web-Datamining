@@ -1,4 +1,6 @@
 import { QueryClientProvider } from "@tanstack/react-query";
+import dataStores from "@rbx/core-scripts/data-store";
+import { registerReferrerLookup } from "@rbx/subscriptions-common";
 import ready from "@rbx/core-scripts/util/ready";
 import { queryClient, renderWithErrorBoundary, TranslationProvider } from "@rbx/core-scripts/react";
 import { Browser, currentBrowser } from "@rbx/core-scripts/util/current-browser";
@@ -31,6 +33,8 @@ import "./src/css/_leftnav.css";
 import "./src/css/_themes.css";
 import "./src/css/_searchLanding.css";
 import "./src/css/_downloadAppNavItem.css";
+
+registerReferrerLookup(referrerId => dataStores.userDataStore.getUser(referrerId));
 
 const rightNavigationHeaderContainerId = "right-navigation-header";
 const leftNavigationContainerId = "left-navigation-container";

@@ -3,10 +3,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import { createModal, Button } from "react-style-guide";
 import { withTranslations, WithTranslationsProps } from "react-utilities";
 import { paymentFlowAnalyticsService } from "core-roblox-utilities";
-import { fireApiErrorCounters } from "@rbx/payments/utils";
+import { BillingInfoForm, type Address } from "@rbx/payments/billingAddress";
+import { apiErrorStatusCode, trackError } from "../../../observability";
 import { TRANSLATION_KEYS, LOW_COGS_ROBUX_PACKAGE_MAP } from "../../constants/redeemConstants";
 import PriceTag from "../../../priceTag/components/PriceTag";
-import { BillingInfoForm, type Address } from "@rbx/payments/billingAddress";
 import { useHeuristicCreditConversionData } from "../../store/HeuristicCreditConversionContext";
 import translationConfig from "../../translation.config";
 import { TaxDisplay } from "./TaxDisplay";
@@ -68,7 +68,11 @@ const PurchasePackageModal: React.FC<PurchasePackageModalProps> = ({ translate }
         sendUpdateAddressForCheckoutSessionStatusEvent(true, isTaxFlowEnabled, true);
       } catch (error) {
         sendUpdateAddressForCheckoutSessionStatusEvent(false, isTaxFlowEnabled, true);
-        fireApiErrorCounters("CreditConversion", "UpdateAddress", error);
+        trackError(
+          "Error_CreditConversion_ApiFailed",
+          { call: "UpdateAddress", statusCode: apiErrorStatusCode(error) },
+          error,
+        );
       }
     },
     [onUpdatedAddress, isTaxFlowEnabled],
@@ -80,7 +84,11 @@ const PurchasePackageModal: React.FC<PurchasePackageModalProps> = ({ translate }
     }
     processPaymentAction().catch(error => {
       sendProcessPaymentStatusEvent(false, isTaxFlowEnabled, true);
-      fireApiErrorCounters("CreditConversion", "ProcessPaymentAction", error);
+      trackError(
+        "Error_CreditConversion_ApiFailed",
+        { call: "ProcessPaymentAction", statusCode: apiErrorStatusCode(error) },
+        error,
+      );
     });
     sendProcessPaymentStatusEvent(true, isTaxFlowEnabled, true);
   }, [isTaxFlowEnabled, processPaymentAction]);

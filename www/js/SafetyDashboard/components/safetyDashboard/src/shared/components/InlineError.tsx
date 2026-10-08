@@ -1,3 +1,4 @@
+import type React from "react";
 import { IconButton } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
 
@@ -10,7 +11,7 @@ const InlineError = ({
 }: {
   errorMessage?: string;
   onRefresh?: () => unknown;
-}): JSX.Element => {
+}): React.JSX.Element => {
   const { translate } = useTranslation();
   const actualMessage =
     errorMessage && errorMessage.length > 0 ? errorMessage : translate("Response.UnexpectedError");

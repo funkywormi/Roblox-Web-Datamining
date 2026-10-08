@@ -8,6 +8,7 @@ import {
   ManagementAction,
   ParentConsentType,
   TGrantConsentRequest,
+  TManageExperience,
 } from "../../../../types/parentConsentsTypes";
 import parentalControlsTranslationConstants from "../../constants/contentConstants/parentalControlsTranslationConstants";
 import commonTranslationConstants from "../../constants/contentConstants/commonTranslationConstants";
@@ -16,9 +17,11 @@ import useSettingsModal from "../../../common/hooks/modals/useSettingsModal";
 const ApprovedExperienceTile = ({
   gameData,
   child,
+  onManageExperience,
 }: {
   gameData: TGameData;
-  child: TChildInfo;
+  child?: TChildInfo;
+  onManageExperience?: TManageExperience;
 }): JSX.Element => {
   const { translate } = useTranslation();
   const { approvedExperiences } = parentalControlsTranslationConstants;
@@ -26,6 +29,9 @@ const ApprovedExperienceTile = ({
   const [manageBlockedExperiences] = useManageChildBlockedExperiencesMutation();
 
   const handleRevoke = useCallback(async () => {
+    if (!child) {
+      return;
+    }
     try {
       const request: TGrantConsentRequest = {
         childUserId: child.userId,
@@ -60,7 +66,12 @@ const ApprovedExperienceTile = ({
         gameData={gameData}
         showPopover
         child={child}
-        onRevokeApproval={confirmRevokeModalService.open}
+        onManageExperience={onManageExperience}
+        onRevokeApproval={
+          onManageExperience
+            ? () => onManageExperience(gameData.universeId, ManagementAction.RevokeApproval)
+            : confirmRevokeModalService.open
+        }
       />
       {confirmRevokeModal}
     </React.Fragment>

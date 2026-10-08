@@ -1,4 +1,4 @@
-import { EnvironmentUrls } from "Roblox";
+import { EnvironmentUrls } from "@rbx/environment-urls";
 
 const { billingApi, apiGatewayUrl } = EnvironmentUrls;
 

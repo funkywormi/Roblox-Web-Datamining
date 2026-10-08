@@ -1,24 +1,12 @@
-import { TranslationConfig } from "@rbx/core-scripts/react";
 import environmentUrls from "@rbx/environment-urls";
 
 export const FEATURE_NAME = "CaptchaV2" as const;
 
 /**
- * Translations required by this web app.
+ * Translation namespaces used by this web app. Keep in sync with the challenge
+ * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const TRANSLATION_CONFIG: TranslationConfig = ["Feature.CaptchaV2Challenge"];
-
-/**
- * Language resource keys for CaptchaV2 that are requested dynamically.
- */
-export const CAPTCHA_V2_LANGUAGE_RESOURCES = [
-  "Title.VerifyHuman",
-  "Content.HoldToConfirm",
-  "Content.TryAgain",
-  "Content.ReferenceID",
-  "Action.PressAndHold",
-  "Label.Cancel",
-] as const;
+export const TRANSLATION_NAMESPACES = ["Feature.CaptchaV2Challenge"] as const;
 
 /**
  * Constants for event stream events.
@@ -88,3 +76,9 @@ export const SENSOR_LOAD_DELAY = 2000;
 
 // Local storage key for init guard.
 export const CHALLENGE_ID_STORAGE_KEY = "CaptchaV2ChallengeId";
+
+declare module "@rbx/core-lib/local-storage" {
+  interface LocalStorageRegistry {
+    CaptchaV2ChallengeId: string;
+  }
+}

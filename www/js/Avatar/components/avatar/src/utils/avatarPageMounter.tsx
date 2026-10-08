@@ -1,5 +1,7 @@
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@rbx/core-scripts/react";
 import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import type { Namespace } from "@rbx/www-common/i18n";
 import AvatarPageContainer from "../containers/AvatarPageContainer";
@@ -19,9 +21,11 @@ function renderApp() {
 
   if (entryPoint) {
     render(
-      <TranslationProviderSCC namespaces={translations}>
-        <AvatarPageContainer />
-      </TranslationProviderSCC>,
+      <QueryClientProvider client={queryClient}>
+        <TranslationProviderSCC namespaces={translations}>
+          <AvatarPageContainer />
+        </TranslationProviderSCC>
+      </QueryClientProvider>,
       entryPoint,
     );
   } else {

@@ -4,6 +4,7 @@ import { REFERRAL_REWARD_ROBUX, referralEventService } from "@rbx/subscriptions-
 import { useEffect, useRef } from "react";
 
 import { Event } from "../utils/eventsCounter";
+import { navigateToPlusReferralDashboardDeepLink } from "../utils/plusReferralDeepLink";
 import { publishMetric } from "../utils/publishMetric";
 
 import type { FC } from "react";
@@ -12,6 +13,7 @@ import type { FC } from "react";
 const CARD_WIDTH_CLASS = "width-[235px]";
 
 export type PlusReferralShareCardProps = {
+  shouldDeeplinkToReferral?: boolean;
   onOpenDashboard: () => void;
 };
 
@@ -19,7 +21,10 @@ export type PlusReferralShareCardProps = {
  * Card-shaped referral entry point for the "Interact with Plus" rail. The home feed uses
  * {@link PlusReferralBanner} instead, which is a list row.
  */
-const PlusReferralShareCard: FC<PlusReferralShareCardProps> = ({ onOpenDashboard }) => {
+const PlusReferralShareCard: FC<PlusReferralShareCardProps> = ({
+  shouldDeeplinkToReferral,
+  onOpenDashboard,
+}) => {
   const { translate, intl } = useTranslation();
   const amount = intl.n(REFERRAL_REWARD_ROBUX);
 
@@ -55,7 +60,11 @@ const PlusReferralShareCard: FC<PlusReferralShareCardProps> = ({ onOpenDashboard
         onClick={() => {
           referralEventService.shareCardInviteClick();
           publishMetric(Event.SHARE_CARD_INVITE_CLICK);
-          onOpenDashboard();
+          if (shouldDeeplinkToReferral) {
+            navigateToPlusReferralDashboardDeepLink();
+          } else {
+            onOpenDashboard();
+          }
         }}
       >
         {translate("Action.ReferralInvite", undefined, "Invite")}

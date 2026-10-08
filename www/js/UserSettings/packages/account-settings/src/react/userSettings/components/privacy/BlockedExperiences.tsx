@@ -4,6 +4,7 @@ import { authenticatedUser } from "header-scripts";
 import { Loading } from "react-style-guide";
 import { useTranslation } from "react-utilities";
 import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TManageExperience } from "../../../../types/parentConsentsTypes";
 import GameTile, { TGameData } from "../parentalControls/parentDashboard/GameTile";
 import {
   useGetAgeRecommendationQuery,
@@ -16,9 +17,11 @@ import parentalControlsTranslationConstants from "../../constants/contentConstan
 export const BlockedExperiences = ({
   searchPagePath,
   child,
+  onManageExperience,
 }: {
   searchPagePath?: string;
   child?: TChildInfo;
+  onManageExperience?: TManageExperience;
 }): JSX.Element => {
   const { translate } = useTranslation();
   const { perExperienceScreentime } = parentalControlsTranslationConstants;
@@ -77,7 +80,13 @@ export const BlockedExperiences = ({
             isBlocked: true,
           };
           return (
-            <GameTile key={universeId} gameData={gameData} showManagementButton child={child} />
+            <GameTile
+              key={universeId}
+              gameData={gameData}
+              showManagementButton
+              child={child}
+              onManageExperience={onManageExperience}
+            />
           );
         })}
         {isFetching && <Loading />}
@@ -87,7 +96,7 @@ export const BlockedExperiences = ({
 
   return (
     <React.Fragment>
-      {child && searchPagePath && (
+      {(child || onManageExperience) && searchPagePath && (
         <Link to={searchPagePath} className="experience-search-link">
           <span className="icon-additem" />
         </Link>

@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useTranslations } from "@rbx/www-common/i18n";
+import { Link } from "@rbx/foundation-ui";
 import { reportAXError } from "../utils/axAnalyticsService";
 import AvatarAPIService, { ErrorData } from "../services/avatarAPIService";
 import { useSystemFeedback } from "../contexts/SystemFeedbackContext";
@@ -10,7 +11,9 @@ interface RedrawThumbnailButtonProps {
   forceRefreshThumbnail: () => void;
 }
 
-function RedrawThumbnailButton({ forceRefreshThumbnail }: RedrawThumbnailButtonProps): JSX.Element {
+function RedrawThumbnailButton({
+  forceRefreshThumbnail,
+}: RedrawThumbnailButtonProps): React.ReactElement {
   const translate = useTranslations("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
 
@@ -56,21 +59,16 @@ function RedrawThumbnailButton({ forceRefreshThumbnail }: RedrawThumbnailButtonP
       ) : (
         <span>{translate("Label.RedrawUnavailable")}</span>
       )}
-      <button
+      <Link
+        as="button"
+        variant="Standalone"
+        underline="always"
+        className="redraw-link"
         disabled={redrawFloodchecked}
         onClick={redrawThumbnail}
-        className="text-link"
-        style={{
-          background: "none",
-          border: "none",
-          margin: 0,
-          padding: 0,
-          textDecoration: "underline",
-        }}
-        type="button"
       >
         {translate("Action.Redraw")}
-      </button>
+      </Link>
     </div>
   );
 }

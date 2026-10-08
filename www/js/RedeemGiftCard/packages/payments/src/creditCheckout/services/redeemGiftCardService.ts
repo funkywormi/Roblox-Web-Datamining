@@ -1,18 +1,19 @@
 /* eslint-disable no-nested-ternary */
 import type { AxiosResponse } from "axios";
-import { EnvironmentUrls, ExperimentationService } from "Roblox";
+import { ExperimentationService } from "Roblox";
 import { httpService } from "core-utilities";
 import { paymentFlowAnalyticsService } from "core-roblox-utilities";
+import { EnvironmentUrls } from "@rbx/environment-urls";
+import { PaymentSession } from "@rbx/payments/services/paymentSession";
+import type { Address } from "@rbx/payments/billingAddress";
 import { CREDIT_PAYMENT_PROVIDER_TYPE } from "../constants/redeemConstants";
+import { TNextPurchasableMetadata, TProcessPayment } from "../constants/redeemTypeDefinitions";
 import {
   getRedeemGiftCardMetadataUrlConfig,
   redeemPaymentsGatewayConfig,
   twentyPercentMoreRobuxBrazilLayerName,
   twentyPercentMoreRobuxUKLayerName,
 } from "../constants/redeemApiConstants";
-import { TNextPurchasableMetadata, TProcessPayment } from "../constants/redeemTypeDefinitions";
-import { PaymentSession } from "@rbx/payments/services/paymentSession";
-import type { Address } from "@rbx/payments/billingAddress";
 import { createWithApiMetrics } from "../../withApiMetrics/withApiMetrics";
 import { publishMetric } from "../observability";
 

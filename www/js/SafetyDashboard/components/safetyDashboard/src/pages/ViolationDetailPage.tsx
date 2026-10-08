@@ -2,6 +2,7 @@ import { useState, ReactElement } from "react";
 import { useParams } from "react-router-dom";
 import { createSystemFeedback } from "@rbx/core-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
+import { AppealType } from "@rbx/moderation-portal";
 import AppealsModal from "../features/violations/violationDetails/AppealsModal";
 import { useViolation } from "../api/useViolation";
 import {
@@ -71,6 +72,7 @@ const ViolationDetailPage = (): ReactElement => {
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [appealType, setAppealType] = useState<AppealType>(AppealType.APPEAL);
   const [showVerifyIdentityModal, setShowVerifyIdentityModal] = useState(false);
 
   /*
@@ -173,19 +175,21 @@ const ViolationDetailPage = (): ReactElement => {
    * Logs the "appeal started" funnel event for the click on "Send Appeal".
    * `requiresIdv` distinguishes the IDV pre-condition path from a direct appeal.
    */
-  const fireStartAppealEvent = (requiresIdv: boolean) => {
+  const fireStartAppealEvent = (requiresIdv: boolean, appealType: AppealType) => {
     sendStartAppealEvent({
       isEligible: eligibility?.isEligible ?? true,
       requiresIdv,
       prevAppealCount: violation.appeals.length,
       violationType: getAnalyticsViolationType(violation),
       violationReason: Object.keys(violation.abuse_type_keys).join(","),
+      appealType,
       isV2UI: true,
     });
   };
 
-  const onShowAppealModal = () => {
-    fireStartAppealEvent(false);
+  const onShowAppealModal = (nextAppealType: AppealType) => {
+    setAppealType(nextAppealType);
+    fireStartAppealEvent(false, nextAppealType);
     setShowModal(true);
   };
 
@@ -195,8 +199,9 @@ const ViolationDetailPage = (): ReactElement => {
    * appeal-specific intro screen (the AMP wizard's prologue is generic), then
    * launch the IDV upsell wizard once the user confirms via "Continue".
    */
-  const onStartIdvFlow = () => {
-    fireStartAppealEvent(true);
+  const onStartIdvFlow = (nextAppealType: AppealType) => {
+    setAppealType(nextAppealType);
+    fireStartAppealEvent(true, nextAppealType);
 
     const ampConfig = eligibility?.ampConfig;
     if (!ampConfig) {
@@ -249,6 +254,7 @@ const ViolationDetailPage = (): ReactElement => {
       await createAppeal.mutateAsync({
         violation: violation.name,
         message: text ?? "",
+        appeal_type: appealType,
         // We only want to set communication_opt_out if truthy for safety
         ...(optOutCommunication && { communication_opt_out: optOutCommunication }),
       });
@@ -261,6 +267,7 @@ const ViolationDetailPage = (): ReactElement => {
         msgLength: text?.length ?? 0,
         violationType: getAnalyticsViolationType(violation),
         violationReason: Object.keys(violation.abuse_type_keys).join(","),
+        appealType,
         isV2UI: true,
         optOutCommunication,
       });
@@ -324,7 +331,9 @@ const ViolationDetailPage = (): ReactElement => {
             setShowModal(false);
           }}
           onSubmit={onSubmitAppeal}
-          isLoading={createAppeal.isLoading}
+          appealType={appealType}
+          contentType={violation.contentTypeI18nLower}
+          isLoading={createAppeal.isPending}
           enableOptOutCommunication={guacConfig?.EnableOptOutCommunication ?? false}
         />
       )}

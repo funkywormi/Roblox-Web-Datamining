@@ -29,7 +29,7 @@ function AvatarTabContent({
   isInlineAdvancedEditorEnabled,
   advancedEditorModeEnabled,
   toggleAdvancedEditorMode,
-}: AvatarTabContentProps): JSX.Element {
+}: AvatarTabContentProps): React.ReactElement {
   const { selectedTab, selectedSubcategory } = useAvatarTabsContext();
 
   // Configuration for Recent Items

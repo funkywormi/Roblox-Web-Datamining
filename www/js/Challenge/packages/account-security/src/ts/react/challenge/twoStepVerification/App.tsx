@@ -1,9 +1,7 @@
 import React from "react";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, MemoryRouter } from "react-router-dom";
-import { withTranslations, WithTranslationsProps, queryClient } from "react-utilities";
 import { RequestService } from "../../../common/request";
-import { TRANSLATION_CONFIG } from "./app.config";
 import TwoStepVerification from "./containers/twoStepVerification";
 import {
   ActionType,
@@ -16,6 +14,17 @@ import { EventService } from "./services/eventService";
 import { MetricsService } from "./services/metricsService";
 import { TwoStepVerificationContextProvider } from "./store/contextProvider";
 import { DelayParameters } from "./delay";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    },
+  },
+});
 
 type Props = {
   userId: string;
@@ -32,7 +41,7 @@ type Props = {
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
   delayParameters?: DelayParameters;
   recoveryParameters?: RecoveryParameters;
-} & WithTranslationsProps;
+};
 
 export const App: React.FC<Props> = ({
   userId,
@@ -44,7 +53,6 @@ export const App: React.FC<Props> = ({
   eventService,
   metricsService,
   requestService,
-  translate,
   onChallengeCompleted,
   onChallengeInvalidated,
   onModalChallengeAbandoned,
@@ -61,7 +69,6 @@ export const App: React.FC<Props> = ({
       eventService={eventService}
       metricsService={metricsService}
       requestService={requestService}
-      translate={translate}
       onChallengeCompleted={onChallengeCompleted}
       onChallengeInvalidated={onChallengeInvalidated}
       onModalChallengeAbandoned={onModalChallengeAbandoned}
@@ -86,4 +93,4 @@ export const App: React.FC<Props> = ({
   return <QueryClientProvider client={queryClient}>{RouterElement}</QueryClientProvider>;
 };
 
-export default withTranslations(App, TRANSLATION_CONFIG);
+export default App;

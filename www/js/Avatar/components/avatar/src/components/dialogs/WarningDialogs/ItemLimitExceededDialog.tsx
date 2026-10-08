@@ -1,3 +1,4 @@
+import type React from "react";
 import {
   Button,
   Dialog,
@@ -17,7 +18,7 @@ type ItemLimitExceededDialogProps = {
 function ItemLimitExceededDialog({
   closeDialog,
   isOpen,
-}: ItemLimitExceededDialogProps): JSX.Element {
+}: ItemLimitExceededDialogProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const modalLayout = avatarConstants.modalLayout.outfitDelete;
 

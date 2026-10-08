@@ -47,11 +47,8 @@ const useLinkedParentsState = (): TLinkedParentsState => {
     const hasOnDeviceParent =
       isOdpLaunchEnabled && parents.some(parent => parent.isOnDeviceParent === true);
 
-    // An ODP who has upgraded is both a remote and ODP parent.
-    // They only get a profile row once they have an valid email.
-    const remoteParents = parents.filter(
-      parent => parent.isOnDeviceParent !== true || (parent.email ?? "") !== "",
-    );
+    // A parent can be both an ODP and a remote parent. Only remote parents get a profile row.
+    const remoteParents = parents.filter(parent => parent.isRemoteParent === true);
     const visibleParentCount = remoteParents.length + (hasOnDeviceParent ? 1 : 0);
 
     const eligibleParentTypesToAdd =

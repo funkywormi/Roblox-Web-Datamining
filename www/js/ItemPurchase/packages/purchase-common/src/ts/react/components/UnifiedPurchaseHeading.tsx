@@ -1,10 +1,10 @@
 import React from 'react';
-import { TranslateFunction } from '@rbx/core-scripts/react';
+import { type PurchaseTranslate } from '../itemPurchase/useTranslate';
 
 import UnifiedPriceLabel from './UnifiedPriceLabel';
 
 export type UnifiedPurchaseHeadingProps = {
-  translate: TranslateFunction;
+  translate: PurchaseTranslate;
   titleText: string;
   currentRobuxBalance?: number;
 };

@@ -28,7 +28,7 @@ function RenameOutfitDialog({
   outfit,
   closeDialog,
   updateOutfitNameInDataList,
-}: RenameOutfitDialogProps): JSX.Element {
+}: RenameOutfitDialogProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const [newName, setNewName] = React.useState<string>("");
   const [error, setError] = React.useState<string | null>(null);

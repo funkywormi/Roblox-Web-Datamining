@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { withTranslations, TranslateFunction } from '@rbx/core-scripts/react';
 import { paymentFlowAnalyticsService } from '@rbx/core-scripts/legacy/core-roblox-utilities';
 import {
   Button,
@@ -10,8 +9,13 @@ import {
   DialogFooter,
   TCheckboxCheckState
 } from '@rbx/foundation-ui';
-import type { SubscriptionProductInfo, SubscriptionOffer } from '@rbx/client-subscriptions-api/v1';
-import translationConfig from '../../../js/react/itemPurchase/translation.config';
+import type { SubscriptionProductInfo, SubscriptionOffer } from '@rbx/client-subscriptions-api/v2';
+import { SelfProvidedTranslate } from '../itemPurchase/SelfProvidedTranslate';
+import {
+  purchasingNamespaces,
+  usePurchasingTranslate,
+  type PurchaseTranslate
+} from '../itemPurchase/useTranslate';
 import SubscriptionUpsellBanner from './Subscriptions/SubscriptionUpsellBanner';
 import RobloxSubscriptionSheet from './Subscriptions/RobloxSubscriptionSheet';
 import UnifiedProductDetails from './UnifiedProductDetails';
@@ -37,7 +41,7 @@ export type UnifiedPurchaseActionParams = {
 };
 
 export type UnifiedPurchaseModalProps = {
-  translate: TranslateFunction;
+  translate?: PurchaseTranslate;
   expectedPrice: number;
   displayPrice?: string;
   thumbnail: React.ReactNode;
@@ -63,7 +67,9 @@ export type UnifiedPurchaseModalProps = {
   isLimited?: boolean;
 };
 
-export const UnifiedPurchaseModalComponent: React.FC<UnifiedPurchaseModalProps> = ({
+export const UnifiedPurchaseModalComponent: React.FC<
+  UnifiedPurchaseModalProps & { translate: PurchaseTranslate }
+> = ({
   translate,
   titleText,
   actionButtonText,
@@ -365,7 +371,16 @@ export const UnifiedPurchaseModalComponent: React.FC<UnifiedPurchaseModalProps> 
   );
 };
 
-export default withTranslations(
-  UnifiedPurchaseModalComponent,
-  translationConfig.purchasingResources
+// Dual-path translation boundary: Next.js hosts pass `translate` (next-intl) directly; on the
+// .NET / window.RobloxItemPurchase path it is omitted and we self-wrap in TranslationProviderSCC
+// and source `translate` via `usePurchasingTranslate` (matching the old withTranslations behavior).
+const UnifiedPurchaseModal: React.FC<UnifiedPurchaseModalProps> = ({ translate, ...props }) => (
+  <SelfProvidedTranslate
+    translate={translate}
+    namespaces={purchasingNamespaces}
+    useTranslate={usePurchasingTranslate}
+    render={t => <UnifiedPurchaseModalComponent {...props} translate={t} />}
+  />
 );
+
+export default UnifiedPurchaseModal;

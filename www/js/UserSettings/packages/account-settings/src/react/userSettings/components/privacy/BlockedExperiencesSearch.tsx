@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { userId } from "@rbx/core-scripts/meta/user";
 import { uuidService } from "core-utilities";
 import { Loading } from "react-style-guide";
 import { useTranslation } from "react-utilities";
@@ -13,13 +14,20 @@ import { blockedExperiencesPageSize } from "../../constants/privacy/privacyConst
 import parentalControlsTranslationConstants from "../../constants/contentConstants/parentalControlsTranslationConstants";
 import parentalControlsEventService from "../../services/eventServices/parentalControlsEventService";
 import { TChildInfo } from "../../../../types/childrenInfoTypes";
+import { TManageExperience } from "../../../../types/parentConsentsTypes";
 
-export const BlockedExperiencesSearch = ({ child }: { child: TChildInfo }): JSX.Element => {
+export const BlockedExperiencesSearch = ({
+  child,
+  onManageExperience,
+}: {
+  child?: TChildInfo;
+  onManageExperience?: TManageExperience;
+}): JSX.Element => {
   const { translate } = useTranslation();
 
   const [getExperiences, searchResults] = useLazyGetExperiencesQuery();
   const { data: blockedExperiencesResult } = useGetBlockedExperiencesQuery({
-    targetUserId: child.userId,
+    targetUserId: child?.userId ?? userId()!,
     limit: blockedExperiencesPageSize,
     offset: 0,
   });
@@ -59,11 +67,13 @@ export const BlockedExperiencesSearch = ({ child }: { child: TChildInfo }): JSX.
         searchInput={searchInput}
         onSearchInputChange={e => setSearchInput(e.target.value)}
         onSubmit={async () => {
-          parentalControlsEventService.authFormInteractionSettingsPControlsBlockedExperiencesSearch(
-            child,
-            searchInput,
-            sessionId,
-          );
+          if (child) {
+            parentalControlsEventService.authFormInteractionSettingsPControlsBlockedExperiencesSearch(
+              child,
+              searchInput,
+              sessionId,
+            );
+          }
           await fetchExperiences();
         }}
       />
@@ -97,6 +107,7 @@ export const BlockedExperiencesSearch = ({ child }: { child: TChildInfo }): JSX.
               showManagementButton
               child={child}
               sessionId={sessionId}
+              onManageExperience={onManageExperience}
             />
           );
         })}

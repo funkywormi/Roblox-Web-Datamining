@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
+import { Button } from "@rbx/foundation-ui";
 import { ItemCard, checkIfBundle } from "@rbx/www-common/components/itemCard";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import VerifiedBadgeIcon from "@rbx/www-common/components/verified-badge";
@@ -293,24 +294,25 @@ const AvatarRecommendations: React.FC<AvatarRecommendationsProps> = ({
       />
       {complimentaryItemRecommendations.enabled && <div className="complimentary-items-divider" />}
       {items.length > 0 && (
-        <div className="container-list layer recommendations-container">
-          <div className="container-header recommendations-header">
-            <h2>
-              <span>{tRecommendations("Heading.RecommendedTitle")}</span>
-            </h2>
+        <div className="recommendations-container">
+          <div className="recommendations-header flex items-center justify-between">
+            <h2 className="text-heading-small">{tRecommendations("Heading.RecommendedTitle")}</h2>
             {showSeeAllButton && (
-              <a
-                className="see-all-button see-all-link-icon btn-secondary-xs"
+              <Button
+                as="a"
+                variant="Standard"
+                size="XSmall"
+                className="see-all-button"
                 href={getSeeAllLink()}
               >
                 {tRecommendations("Action.SeeAll")}
-              </a>
+              </Button>
             )}
           </div>
           <div className="recommended-items-slider">
             <ul
               ref={recommendedItemsRef}
-              className={classNames("hlist", "item-cards", "recommended-items", {
+              className={classNames("item-cards", "recommended-items", {
                 "single-row": recommendationNumRows <= 1,
               })}
             >

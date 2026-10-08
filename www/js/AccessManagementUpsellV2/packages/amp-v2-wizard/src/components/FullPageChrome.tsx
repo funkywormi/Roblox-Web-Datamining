@@ -7,7 +7,7 @@
 import { useContext, type JSX, type ReactNode } from "react";
 import { Dialog, DialogContent, DialogTitle, IconButton } from "@rbx/foundation-ui";
 
-import { WizardLoadingContext } from "./WizardLoadingContext";
+import { WizardBackgroundedContext, WizardLoadingContext } from "./WizardLoadingContext";
 
 // 20px inset from `medium` (min-width 601px) up; full-width on phones. Arbitrary: margin scale stops at 16px.
 export const FULL_PAGE_CTA_INSET_CLASS = "medium:[margin-inline:20px]";
@@ -31,9 +31,16 @@ export function FullPageChrome({
   children,
 }: FullPageChromeProps): JSX.Element {
   const isLoading = useContext(WizardLoadingContext);
+  const isBackgrounded = useContext(WizardBackgroundedContext);
 
   return (
-    <Dialog open isModal size="Medium" hasCloseAffordance={false}>
+    <Dialog
+      open
+      isModal={!isBackgrounded}
+      size="Medium"
+      hasCloseAffordance={false}
+      experimentalDisablePointerEventsStylingOnBody={isBackgrounded}
+    >
       <DialogContent
         overlayClassName="!padding-none ![overflow:hidden] ![animation:none]"
         className="!bg-surface-0 !radius-none ![border:0] ![box-shadow:none] ![animation:none] ![min-width:0] ![max-width:none] width-full [height:100dvh] flex flex-col"

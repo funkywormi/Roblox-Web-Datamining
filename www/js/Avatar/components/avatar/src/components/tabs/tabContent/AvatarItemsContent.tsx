@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import classNames from "classnames";
+import { Button, Link } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../../../utils/translate";
 import { isBlackbirdUser } from "@rbx/core-scripts/meta/user";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
@@ -143,7 +144,7 @@ function AvatarItemsContent({
   config,
   onItemClicked,
   isItemSelected,
-}: AvatarItemsContentProps): JSX.Element {
+}: AvatarItemsContentProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const { selectedTab, selectedSubcategory, selectedCategoryRow, showAdvancedAccessoriesLink } =
     useAvatarTabsContext();
@@ -768,25 +769,27 @@ function AvatarItemsContent({
       {/* Action Buttons */}
       <div>
         {config.actionButtons?.createOutfit?.show && (
-          <button
-            type="button"
-            className="btn-secondary-xs btn-float-right"
+          <Button
+            variant="Standard"
+            size="XSmall"
+            className="btn-float-right"
             onClick={() => {
               setCreateOutfitIsOpen(true);
             }}
           >
             {translate(config.actionButtons.createOutfit.label)}
-          </button>
+          </Button>
         )}
 
         {config.actionButtons?.equipEmotes?.show && (
-          <button
-            type="button"
-            className="equip-emotes-button btn-secondary-xs btn-float-right"
+          <Button
+            variant="Standard"
+            size="XSmall"
+            className="equip-emotes-button btn-float-right"
             onClick={config.actionButtons.equipEmotes.onClick}
           >
             {translate("Heading.EquipEmotes")}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -858,20 +861,15 @@ function AvatarItemsContent({
 
       {/* Advanced Accessories Link */}
       {config.actionButtons?.advancedAccessories?.show && showAdvancedAccessoriesLink && (
-        <div style={{ display: "flex", justifyContent: "end" }}>
-          <button
-            type="button"
-            className="text-link advanced-link"
+        <div className="flex justify-end">
+          <Link
+            as="button"
+            variant="Standalone"
+            className="advanced-link"
             onClick={config.actionButtons.advancedAccessories.onClick}
-            style={{
-              background: "none",
-              border: "none",
-              width: "auto",
-              textAlign: "initial",
-            }}
           >
             {translate("Action.Advanced")}
-          </button>
+          </Link>
         </div>
       )}
 

@@ -19,3 +19,9 @@ export const modalCloseDelay = 2000;
 
 // ChallengeId key to prevent component from calling initializing multiple times.
 export const challengeIdKey = "RostileChallengeId";
+
+declare module "@rbx/core-lib/local-storage" {
+  interface LocalStorageRegistry {
+    RostileChallengeId: string;
+  }
+}

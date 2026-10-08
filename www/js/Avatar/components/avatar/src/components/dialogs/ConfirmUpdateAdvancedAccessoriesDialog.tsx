@@ -47,7 +47,7 @@ function ConfirmUpdateAdvancedAccessoriesDialog({
   otherAssets,
   avatarSettings,
   setWearingAssetsFromIdsV2,
-}: ConfirmUpdateAdvancedAccessoriesDialogProps): JSX.Element {
+}: ConfirmUpdateAdvancedAccessoriesDialogProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const { selectedSubcategory } = useAvatarTabsContext();
@@ -99,114 +99,111 @@ function ConfirmUpdateAdvancedAccessoriesDialog({
     [avatarSettings?.LCEnabledInEditorAndCatalog, systemFeedback, translate],
   );
 
-  const onSaveAdvancedAccessories = useCallback(
-    submitFunc => {
-      // validate all inputs
-      const assetIds: (string | number)[] = [];
-      const assets: (AccoutrementAsset | AdvancedAccessorySlot)[] = [];
-      advancedAccessorySlots.forEach(slot => {
-        if (slot.id !== "") {
-          assetIds.push(slot.id);
-          assets.push(slot);
-        }
-      });
-      // add other assets
-      otherAssets.forEach(asset => {
-        assets.push(asset);
-      });
+  const onSaveAdvancedAccessories = useCallback(() => {
+    // validate all inputs
+    const assetIds: (string | number)[] = [];
+    const assets: (AccoutrementAsset | AdvancedAccessorySlot)[] = [];
+    advancedAccessorySlots.forEach(slot => {
+      if (slot.id !== "") {
+        assetIds.push(slot.id);
+        assets.push(slot);
+      }
+    });
+    // add other assets
+    otherAssets.forEach(asset => {
+      assets.push(asset);
+    });
 
-      const items: { assetId: number }[] = [];
-      assetIds.forEach(asset => {
-        const item = {
-          assetId: asset as number,
-        };
-        items.push(item);
-      });
+    const items: { assetId: number }[] = [];
+    assetIds.forEach(asset => {
+      const item = {
+        assetId: asset as number,
+      };
+      items.push(item);
+    });
 
-      AvatarAPIService.postItemDetails(items, "Asset").then(
-        postItemDetailsResponse => {
-          const assetDetails = postItemDetailsResponse;
-          if (validateAdvancedAccessories(assetDetails)) {
-            setWearingAssetsFromIdsV2(assets as AccoutrementAsset[], true).then(
-              response => {
-                let success = false;
-                // leave the modal open and update the form fields to show valid/invalid.
-                // getInvalidAssetIds tolerates both the legacy `invalidAssetIds` (v2) and the
-                // consolidated PATCH /v4/avatar `invalidAssets` shapes.
-                const invalidAssetIds = getInvalidAssetIds(response);
-                if (invalidAssetIds.length > 0) {
-                  // mark them as dirty
-                  setAdvancedAccessorySlots(prevAdvancedAccessorySlots => {
-                    return prevAdvancedAccessorySlots.map((accessorySlot, index) => {
-                      const valid =
-                        accessorySlot.id === "" ||
-                        !invalidAssetIds.includes(parseInt(accessorySlot.id as string, 10));
-                      // update valid state
-                      return {
-                        ...accessorySlot,
-                        valid,
-                      };
-                    });
+    AvatarAPIService.postItemDetails(items, "Asset").then(
+      postItemDetailsResponse => {
+        const assetDetails = postItemDetailsResponse;
+        if (validateAdvancedAccessories(assetDetails)) {
+          setWearingAssetsFromIdsV2(assets as AccoutrementAsset[], true).then(
+            response => {
+              let success = false;
+              // leave the modal open and update the form fields to show valid/invalid.
+              // getInvalidAssetIds tolerates both the legacy `invalidAssetIds` (v2) and the
+              // consolidated PATCH /v4/avatar `invalidAssets` shapes.
+              const invalidAssetIds = getInvalidAssetIds(response);
+              if (invalidAssetIds.length > 0) {
+                // mark them as dirty
+                setAdvancedAccessorySlots(prevAdvancedAccessorySlots => {
+                  return prevAdvancedAccessorySlots.map((accessorySlot, index) => {
+                    const valid =
+                      accessorySlot.id === "" ||
+                      !invalidAssetIds.includes(parseInt(accessorySlot.id as string, 10));
+                    // update valid state
+                    return {
+                      ...accessorySlot,
+                      valid,
+                    };
                   });
-
-                  // Did save succeed - false
-                  sendAdvancedEditSaveEvent(
-                    assetIds as string[],
-                    selectedSubcategory?.assetType,
-                    false,
-                  );
-                  success = true;
-                  systemFeedback.success(avatarConstants.assets.savedAdvancedAccessories);
-                  sendAdvancedEditSaveEvent(
-                    assetIds as string[],
-                    selectedSubcategory?.assetType,
-                    true,
-                  );
-                }
-                closeDialog(success);
-              },
-              response => {
-                reportAXError({
-                  itemName: "SaveAdvancedAccessoriesPostItemDetailsError",
-                  counterName: "AvatarEditorError",
-                  log: parseError(response),
                 });
 
-                // something really wrong
                 // Did save succeed - false
-                systemFeedback.error(avatarConstants.assets.errorUpdatingItems);
                 sendAdvancedEditSaveEvent(
                   assetIds as string[],
                   selectedSubcategory?.assetType,
                   false,
                 );
-                closeDialog();
-              },
-            );
-          }
-        },
-        response => {
-          reportAXError({
-            itemName: "SaveAdvancedAccessoriesSetWearingIdsError",
-            counterName: "AvatarEditorError",
-            log: parseError(response),
-          });
-          systemFeedback.error(avatarConstants.assets.errorUpdatingItems);
-          closeDialog();
-        },
-      );
-    },
-    [
-      advancedAccessorySlots,
-      closeDialog,
-      otherAssets,
-      selectedSubcategory?.assetType,
-      setAdvancedAccessorySlots,
-      setWearingAssetsFromIdsV2,
-      systemFeedback,
-      validateAdvancedAccessories,
-    ],
-  );
+                success = true;
+                systemFeedback.success(avatarConstants.assets.savedAdvancedAccessories);
+                sendAdvancedEditSaveEvent(
+                  assetIds as string[],
+                  selectedSubcategory?.assetType,
+                  true,
+                );
+              }
+              closeDialog(success);
+            },
+            response => {
+              reportAXError({
+                itemName: "SaveAdvancedAccessoriesPostItemDetailsError",
+                counterName: "AvatarEditorError",
+                log: parseError(response),
+              });
+
+              // something really wrong
+              // Did save succeed - false
+              systemFeedback.error(avatarConstants.assets.errorUpdatingItems);
+              sendAdvancedEditSaveEvent(
+                assetIds as string[],
+                selectedSubcategory?.assetType,
+                false,
+              );
+              closeDialog();
+            },
+          );
+        }
+      },
+      response => {
+        reportAXError({
+          itemName: "SaveAdvancedAccessoriesSetWearingIdsError",
+          counterName: "AvatarEditorError",
+          log: parseError(response),
+        });
+        systemFeedback.error(avatarConstants.assets.errorUpdatingItems);
+        closeDialog();
+      },
+    );
+  }, [
+    advancedAccessorySlots,
+    closeDialog,
+    otherAssets,
+    selectedSubcategory?.assetType,
+    setAdvancedAccessorySlots,
+    setWearingAssetsFromIdsV2,
+    systemFeedback,
+    validateAdvancedAccessories,
+  ]);
 
   const modalLayout = avatarConstants.modalLayout.advancedAccessoriesDoubleCheck;
 

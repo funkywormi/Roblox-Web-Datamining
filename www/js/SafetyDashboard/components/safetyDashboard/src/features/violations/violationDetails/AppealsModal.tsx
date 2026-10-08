@@ -12,6 +12,7 @@ import {
 } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { translateHtml } from "@rbx/translation-utils";
+import { AppealType } from "@rbx/moderation-portal-v2";
 import CommunityStandardsLink from "../CommunityStandardsLink";
 
 export const MAX_APPEAL_MESSAGE_LENGTH = 1000;
@@ -19,6 +20,8 @@ export const MAX_APPEAL_MESSAGE_LENGTH = 1000;
 interface Props {
   onSubmit: (text?: string, optOutCommunication?: boolean) => unknown;
   onClose: () => unknown;
+  appealType: AppealType;
+  contentType: string;
   enableOptOutCommunication: boolean;
   isLoading?: boolean;
 }
@@ -29,6 +32,8 @@ interface Props {
 const AppealsModal: React.FC<Props> = ({
   onSubmit,
   onClose,
+  appealType,
+  contentType,
   enableOptOutCommunication,
   isLoading,
 }) => {
@@ -51,6 +56,33 @@ const AppealsModal: React.FC<Props> = ({
       max: String(MAX_APPEAL_MESSAGE_LENGTH),
     });
 
+  let titleContents: React.ReactNode = null;
+  let bodyContents: React.ReactNode = null;
+  let showMessageInput = true;
+  let showOneAppealNotice = true;
+  switch (appealType) {
+    case AppealType.APPEAL:
+      titleContents = translate("Header.RequestAppeal");
+      bodyContents = translateHtml(translate, "Description.RequestAppealReview.V3", [
+        {
+          opening: "link",
+          closing: "linkEnd",
+          render: linkContent => <CommunityStandardsLink>{linkContent}</CommunityStandardsLink>,
+        },
+      ]);
+      showMessageInput = true;
+      showOneAppealNotice = true;
+      break;
+    case AppealType.FIXED:
+      titleContents = translate("Action.AskForReview");
+      bodyContents = translate("Description.AskForReview", { contentType });
+      showMessageInput = false;
+      showOneAppealNotice = false;
+      break;
+    default:
+      appealType satisfies never;
+  }
+
   return (
     <Dialog
       open
@@ -64,54 +96,44 @@ const AppealsModal: React.FC<Props> = ({
       <DialogContent data-testid="appeals-modal" aria-describedby={undefined}>
         <DialogBody className="flex flex-col gap-xlarge">
           <div className="flex flex-col gap-xsmall">
-            <DialogTitle className="text-heading-medium">
-              {translate("Header.RequestAppeal")}
-            </DialogTitle>
-            <span className="text-body-large">
-              {translateHtml(translate, "Description.RequestAppealReview.V3", [
-                {
-                  opening: "link",
-                  closing: "linkEnd",
-                  render: linkContent => (
-                    <CommunityStandardsLink>{linkContent}</CommunityStandardsLink>
-                  ),
-                },
-              ])}
-            </span>
+            <DialogTitle className="text-heading-medium">{titleContents}</DialogTitle>
+            <span className="text-body-large">{bodyContents}</span>
           </div>
 
-          <div className="flex flex-col gap-xxsmall">
-            <TextArea
-              placeholder={translate("Label.RequestAppealPlaceholder")}
-              value={text}
-              maxLength={MAX_APPEAL_MESSAGE_LENGTH}
-              onChange={e => {
-                const { value } = e.target;
-                setText(
-                  value.length > MAX_APPEAL_MESSAGE_LENGTH
-                    ? value.slice(0, MAX_APPEAL_MESSAGE_LENGTH)
-                    : value,
-                );
-              }}
-              textareaStyle={{
-                resize: "vertical",
-                minHeight: "60px",
-                /**
-                 * These are only needed because the global styles override both the Foundation UI styles and the
-                 * Tailwind styles. Can be removed once the code is migrated to the /workspace directory.
-                 */
-                borderColor: "var(--color-stroke-emphasis)",
-                backgroundColor: "transparent",
-              }}
-            />
-            <span
-              className="text-caption-small content-default self-end"
-              data-testid="appeal-message-char-count"
-              aria-live="polite"
-            >
-              {formatAppealMessageCharCount(text.length)}
-            </span>
-          </div>
+          {showMessageInput && (
+            <div className="flex flex-col gap-xxsmall">
+              <TextArea
+                placeholder={translate("Label.RequestAppealPlaceholder")}
+                value={text}
+                maxLength={MAX_APPEAL_MESSAGE_LENGTH}
+                onChange={e => {
+                  const { value } = e.target;
+                  setText(
+                    value.length > MAX_APPEAL_MESSAGE_LENGTH
+                      ? value.slice(0, MAX_APPEAL_MESSAGE_LENGTH)
+                      : value,
+                  );
+                }}
+                textareaStyle={{
+                  resize: "vertical",
+                  minHeight: "60px",
+                  /**
+                   * These are only needed because the global styles override both the Foundation UI styles and the
+                   * Tailwind styles. Can be removed once the code is migrated to the /workspace directory.
+                   */
+                  borderColor: "var(--color-stroke-emphasis)",
+                  backgroundColor: "transparent",
+                }}
+              />
+              <span
+                className="text-caption-small content-default self-end"
+                data-testid="appeal-message-char-count"
+                aria-live="polite"
+              >
+                {formatAppealMessageCharCount(text.length)}
+              </span>
+            </div>
+          )}
 
           {enableOptOutCommunication && (
             <Checkbox
@@ -141,7 +163,9 @@ const AppealsModal: React.FC<Props> = ({
               {translate("Action.Send")}
             </Button>
           </div>
-          <span className="text-caption-small">{translate("Description.OneAppeal")}</span>
+          {showOneAppealNotice && (
+            <span className="text-caption-small">{translate("Description.OneAppeal")}</span>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

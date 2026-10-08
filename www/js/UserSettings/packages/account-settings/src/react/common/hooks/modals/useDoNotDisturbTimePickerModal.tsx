@@ -22,6 +22,7 @@ export type TUseDoNotDisturbTimePickerModalReturn = [JSX.Element, IModalService,
 const useDoNotDisturbTimePickerModal = (
   childUserId?: number,
   currentTimeWindow?: TDoNotDisturbTimeWindow,
+  onSave?: (timeWindow: TDoNotDisturbTimeWindow) => Promise<void>,
 ): TUseDoNotDisturbTimePickerModalReturn => {
   const { translate } = useWrappedTranslation();
   const { snackbarService } = useSnackbar();
@@ -54,6 +55,11 @@ const useDoNotDisturbTimePickerModal = (
       startTimeMinutes,
       endTimeMinutes,
     };
+
+    if (onSave) {
+      await onSave(newTimeWindow);
+      return;
+    }
 
     const updateBody: TUpdateUserSettingValueRequest = {
       childUserId,

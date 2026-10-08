@@ -1,5 +1,5 @@
-import { localStorageService } from "core-roblox-utilities";
-import { httpResponseCodes } from "core-utilities";
+import { getItem, setItem } from "@rbx/core-lib/local-storage";
+import { HttpResponseCodes } from "@rbx/core-scripts/http";
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal } from "react-style-guide";
 import InlineChallenge from "../../../common/inlineChallenge";
@@ -8,6 +8,15 @@ import { mapPrivateAccessTokenErrorToChallengeErrorCode } from "../constants/res
 import { AnswerState } from "../constants/types";
 import usePrivateAccessTokenContext from "../hooks/usePrivateAccessTokenContext";
 import { PrivateAccessTokenActionType } from "../store/action";
+
+// Challenge session identifier key.
+const CHALLENGE_ID_KEY = "ChallengeId";
+
+declare module "@rbx/core-lib/local-storage" {
+  interface LocalStorageRegistry {
+    ChallengeId: string;
+  }
+}
 
 /**
  * A container element for the Private-Access-Token challenge.
@@ -24,11 +33,6 @@ const PrivateAccessToken: React.FC = () => {
   const [answerState, setAnswerState] = useState<AnswerState>(AnswerState.INITIAL);
 
   /*
-   * Challenge session identifier key.
-   */
-  const CHALLENGE_ID_KEY = "ChallengeId";
-
-  /*
    * Event Handlers
    */
   const checkAnswer = useCallback(async () => {
@@ -39,20 +43,18 @@ const PrivateAccessToken: React.FC = () => {
     // Check if the component with the same challenge id has tried to redeem PAT token previously,
     // if so then we opt to not duplicate the request,
     // if not then we will memoize it in the local storage.
-    const currentChallengeId = localStorageService.getLocalStorage(CHALLENGE_ID_KEY) as
-      | string
-      | undefined;
+    const currentChallengeId = getItem(CHALLENGE_ID_KEY);
     if (challengeId === currentChallengeId) {
       return;
     }
-    localStorageService.setLocalStorage(CHALLENGE_ID_KEY, challengeId);
+    setItem(CHALLENGE_ID_KEY, challengeId);
 
     const result = await requestService.privateAccessToken.getPatToken(challengeId);
 
     if (result.isError) {
       // CASE: getPATToken yields a 401 status indicating device/platform is not supporting PAT.
       // Pass empty redemption token for verification.
-      if (result.errorStatusCode === httpResponseCodes.unauthorized) {
+      if (result.errorStatusCode === HttpResponseCodes.unauthorized) {
         setAnswerState(AnswerState.COMPLETED_SUCCESS);
         dispatch({
           type: PrivateAccessTokenActionType.SET_CHALLENGE_COMPLETED,

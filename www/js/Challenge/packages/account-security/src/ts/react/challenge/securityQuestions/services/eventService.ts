@@ -1,4 +1,4 @@
-import Roblox from "Roblox";
+import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
 import { EVENT_CONSTANTS } from "../app.config";
 
 /**
@@ -15,7 +15,7 @@ export class EventServiceDefault {
     answerChoicesWithNoCaption: string[],
     answerChoicesWithNoIcon: string[],
   ): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.answerChoicesFailedToLoad,
       {
@@ -23,7 +23,7 @@ export class EventServiceDefault {
         answerChoicesWithNoCaption: JSON.stringify(answerChoicesWithNoCaption),
         answerChoicesWithNoIcon: JSON.stringify(answerChoicesWithNoIcon),
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 }

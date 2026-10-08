@@ -48,8 +48,8 @@ import { recordHybridEventCounters } from "./counters";
 
 const HYBRID_TARGET_KEY = "feature";
 const CALLBACK_EVENT_NAME = "callbackInputChanged";
-const CLASS_LIGHT_MODE = "light-theme";
-const CLASS_DARK_MODE = "dark-theme";
+const LIGHT_MODE_CLASSES = ["light-theme", "color-mode-light"];
+const DARK_MODE_CLASSES = ["dark-theme", "color-mode-dark"];
 const CHALLENGE_HYBRID_WEB_PAGE_LIFECYCLE_EVENT = "challengeHybridWebPageLifecycle";
 
 // For when we fail @ parsing or something, for Generic challenges.
@@ -1543,11 +1543,11 @@ export const renderChallengeFromQueryParameters: RenderChallengeFromQueryParamet
 
   // Set dark or light mode theming.
   if (queryParametersBase.darkMode) {
-    document.body.classList.remove(CLASS_LIGHT_MODE);
-    document.body.classList.add(CLASS_DARK_MODE);
+    document.body.classList.remove(...LIGHT_MODE_CLASSES);
+    document.body.classList.add(...DARK_MODE_CLASSES);
   } else {
-    document.body.classList.remove(CLASS_DARK_MODE);
-    document.body.classList.add(CLASS_LIGHT_MODE);
+    document.body.classList.remove(...DARK_MODE_CLASSES);
+    document.body.classList.add(...LIGHT_MODE_CLASSES);
   }
 
   // Read more query parameters and render the specific challenge from the base

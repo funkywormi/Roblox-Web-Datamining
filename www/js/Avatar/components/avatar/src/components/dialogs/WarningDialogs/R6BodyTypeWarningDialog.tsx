@@ -25,7 +25,7 @@ type R6BodyTypeWarningDialogProps = {
 function R6BodyTypeWarningDialog({
   closeDialog,
   isOpen,
-}: R6BodyTypeWarningDialogProps): JSX.Element {
+}: R6BodyTypeWarningDialogProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const { removeLayeredClothing } = useAssetManagerContext();

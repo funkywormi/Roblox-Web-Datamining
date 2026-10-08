@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CurrentUser } from "Roblox";
+import { getCurrentUser } from "@rbx/www-common/user";
 import localStorageService from "@rbx/core-scripts/local-storage";
 import { urlService } from "@rbx/core-scripts/legacy/core-utilities";
 import { createPaymentSession, getPaymentSession, PaymentSession } from "./paymentSessionService";
 
-const PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2 = `paymentSession-${CurrentUser?.userId || "loggedout"}`;
+const PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2 = `paymentSession-${getCurrentUser()?.id ?? "loggedout"}`;
 export const PAYMENT_SESSION_ID_URL_PARAM = "paymentSessionId";
 
 export type UsePaymentSessionResult = {

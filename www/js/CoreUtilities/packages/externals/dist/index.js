@@ -80,6 +80,7 @@ var externals = {
   "@rbx/presence": "RobloxPresence",
   "@rbx/roblox-badges": "RobloxBadges",
   "@rbx/prompts-orchestrator": ["Roblox", "PromptsOrchestrator"],
+  "@rbx/sdui-core-module": ["Roblox", "SduiCoreModule"],
   "@rbx/navigation": ["Roblox", "NavigationService"],
   "@rbx/thumbnails": "RobloxThumbnails",
   "@rbx/thumbnails3d": "RobloxThumbnail3d",

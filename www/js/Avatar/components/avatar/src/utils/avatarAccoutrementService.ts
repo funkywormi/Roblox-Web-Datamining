@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference -- lets consumers' tsc see the ambient declaration
+/// <reference path="../types/avatarCommonRules.d.ts" />
 import type { AvatarAccoutrementService as TAvatarAccoutrementService } from "@rbx/avatar-common";
 import * as accoutrementRulesService from "@rbx/avatar-common/src/accoutrementRules/services/accoutrementRulesService";
 

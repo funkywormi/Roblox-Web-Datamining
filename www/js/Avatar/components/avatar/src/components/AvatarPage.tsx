@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
+import { Button } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../utils/translate";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { useAvatarEditingAccessContext } from "../contexts/AvatarEditingAccessContext";
@@ -14,6 +15,7 @@ import { AvatarEditorTabs, AvatarTabContentHeader, AvatarTabContent } from "./ta
 import AvatarBack from "./AvatarBack";
 import AvatarBodyTypeScale from "./AvatarScaling/AvatarBodyTypeScale";
 import AvatarScaling from "./AvatarScaling/AvatarScaling";
+import LoadingSpinner from "./LoadingSpinner";
 import {
   useRefreshAvatarOnPageFocus,
   useAvatarScaleController,
@@ -31,10 +33,10 @@ import { useAvatarBodyColorsContext } from "../contexts/AvatarBodyColorsContext"
 import { trackAvatarEditorClick, AvatarEditorTrackingEvents } from "../utils/axTracking";
 import { sendAXTracking, AXAnalyticsConstants } from "../utils/axAnalyticsService";
 
-function AvatarPage(): JSX.Element {
+function AvatarPage(): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const [version, setVersion] = useState<number>(0);
-  const timeoutRef = useRef<number>();
+  const timeoutRef = useRef<number | undefined>(undefined);
   const [isEditingBlockedDialogOpen, setIsEditingBlockedDialogOpen] = useState(false);
 
   const {
@@ -162,13 +164,15 @@ function AvatarPage(): JSX.Element {
   return (
     <div>
       {/* Header */}
-      <div className="avatar-editor-header">
-        <h1>{translate("Heading.AvatarPageTitle")}</h1>
-        <div className="catalog-header">
-          <div>{translate("Label.ExploreMarketplace")}</div>
-          <a
+      <div className="avatar-editor-header flex items-center justify-between">
+        <h1 className="text-heading-large">{translate("Heading.AvatarPageTitle")}</h1>
+        <div className="flex items-center gap-medium">
+          <span>{translate("Label.ExploreMarketplace")}</span>
+          <Button
+            as="a"
             href={getAbsoluteUrl("/catalog")}
-            className="btn-primary-md"
+            variant="Emphasis"
+            size="Medium"
             onClick={() => {
               trackAvatarEditorClick(AvatarEditorTrackingEvents.GetMoreClick, {
                 destination: "catalog",
@@ -176,7 +180,7 @@ function AvatarPage(): JSX.Element {
             }}
           >
             {translate("Action.GetMore")}
-          </a>
+          </Button>
         </div>
       </div>
 
@@ -246,7 +250,7 @@ function AvatarPage(): JSX.Element {
       {/* Right Panel */}
       {!pageLoaded ? (
         <div className="right-panel seven-column">
-          <span className="spinner spinner-default" />
+          <LoadingSpinner />
         </div>
       ) : (
         <div

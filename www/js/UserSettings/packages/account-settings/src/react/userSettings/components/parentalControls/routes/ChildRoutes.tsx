@@ -24,7 +24,7 @@ import AllowThirdPartyAppsSetting from "../../appPermissions/AllowThirdPartyApps
 import ContentMaturitySlider from "../../privacy/ContentMaturitySlider";
 import FriendDiscovery from "../../privacy/FriendDiscovery";
 import InventoryTradePrivacy from "../../privacy/InventoryTradePrivacy";
-import ChildNotificationSettings from "../parentDashboard/ChildNotificationSetings";
+import ChildNotificationSettings from "../parentDashboard/ChildNotificationSettings";
 import ChildCommunicationRoutes from "./ChildCommunicationRoutes";
 import ChildSpendingRestrictionRoutes from "./ChildSpendingRestrictionRoutes";
 import ChildRobuxRoutes from "./ChildRobuxRoutes";

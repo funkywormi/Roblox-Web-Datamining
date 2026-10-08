@@ -1,17 +1,7 @@
-import { PHONE_VERIFICATION_LANGUAGE_RESOURCES } from "../app.config";
+import type { Translator } from "@rbx/www-common/i18n";
 import { ErrorCode } from "../interface";
 
-/**
- * A type adapted from the base type of `translate`, which we use to limit the
- * keys that can be translated.
- */
-type TranslateFunction = (
-  resourceId: (typeof PHONE_VERIFICATION_LANGUAGE_RESOURCES)[number],
-  parameters?: Record<string, unknown>,
-) => string;
-
-// IMPORTANT: Add resource keys to `app.config.ts` as well.
-export const getResources = (translate: TranslateFunction) =>
+export const getResources = (translate: Translator<"Feature.PhoneVerificationChallenge">) =>
   ({
     Header: {
       ConfirmAbandon: translate("Header.ConfirmAbandon"),
@@ -21,7 +11,8 @@ export const getResources = (translate: TranslateFunction) =>
     },
     Message: {
       Error: {
-        Default: translate("Message.Error.Default"),
+        // Absent from the namespace; `dynamic` keeps the existing empty string.
+        Default: translate.dynamic("Message.Error.Default"),
       },
     },
     Label: {
