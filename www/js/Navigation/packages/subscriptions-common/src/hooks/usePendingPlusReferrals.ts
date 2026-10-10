@@ -4,6 +4,8 @@ import { isBlackbirdUser, userId } from "@rbx/core-scripts/meta/user";
 import { subscriptionsV2Api } from "@rbx/payments/services/subscriptions";
 import { useQuery } from "@tanstack/react-query";
 
+import { withApiMetrics } from "../utils/withApiMetrics";
+
 import type { SubscriptionReferral } from "@rbx/client-subscriptions-api/v2";
 
 const PENDING_REFERRALS_PAGE_SIZE = 5;
@@ -34,11 +36,13 @@ export const usePendingPlusReferrals = (): UsePendingPlusReferralsResult => {
     queryKey: ["plus-referrals", "pending"],
     enabled,
     queryFn: async () => {
-      const { referrals } = await subscriptionsV2Api.subscriptionsV2ListSubscriptionReferrals({
-        // Proto Pending = 1 (OpenAPI emits NUMBER_1).
-        status: SubscriptionReferralStatus.NUMBER_1,
-        pageSize: PENDING_REFERRALS_PAGE_SIZE,
-      });
+      const { referrals } = await withApiMetrics("PendingPlusReferrals", () =>
+        subscriptionsV2Api.subscriptionsV2ListSubscriptionReferrals({
+          // Proto Pending = 1 (OpenAPI emits NUMBER_1).
+          status: SubscriptionReferralStatus.NUMBER_1,
+          pageSize: PENDING_REFERRALS_PAGE_SIZE,
+        }),
+      );
       return referrals;
     },
   });

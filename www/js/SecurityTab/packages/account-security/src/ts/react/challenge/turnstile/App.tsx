@@ -1,7 +1,5 @@
 import React from "react";
-import { WithTranslationsProps, withTranslations } from "@rbx/core-scripts/react";
 import { RequestService } from "../../../common/request";
-import { TRANSLATION_CONFIG } from "./app.config";
 import TurnstileV1 from "./containers/turnstile";
 import {
   OnChallengeCompletedCallback,
@@ -26,7 +24,7 @@ type Props = {
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
-} & WithTranslationsProps;
+};
 
 export const App: React.FC<Props> = ({
   challengeId,
@@ -36,7 +34,6 @@ export const App: React.FC<Props> = ({
   eventService,
   metricsService,
   requestService,
-  translate,
   onChallengeDisplayed,
   onChallengeCompleted,
   onChallengeInvalidated,
@@ -51,7 +48,6 @@ export const App: React.FC<Props> = ({
       eventService={eventService}
       metricsService={metricsService}
       requestService={requestService}
-      translate={translate}
       onChallengeDisplayed={onChallengeDisplayed}
       onChallengeCompleted={onChallengeCompleted}
       onChallengeInvalidated={onChallengeInvalidated}
@@ -62,4 +58,4 @@ export const App: React.FC<Props> = ({
   );
 };
 
-export default withTranslations(App, TRANSLATION_CONFIG);
+export default App;

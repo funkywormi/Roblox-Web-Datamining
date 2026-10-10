@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as http from "@rbx/core-scripts/http";
 import environmentUrls from "@rbx/environment-urls";
+import { withApiMetrics } from "../topNav/observability";
 import { useRealTime } from "../leftNav/new/useRealTime";
 
 export const NOTIFICATION_STREAM_UNREAD_COUNT_QUERY_KEY = ["notification-stream-unread-count"];
@@ -13,12 +14,12 @@ export const useUnreadNotificationCount = (): number => {
   const { data: unreadCount = 0 } = useQuery({
     queryKey: QUERY_KEY,
     queryFn: () =>
-      http
-        .get<{ unreadNotifications: number }>({
+      withApiMetrics("NotificationUnreadCount", () =>
+        http.get<{ unreadNotifications: number }>({
           url: `${environmentUrls.notificationApi}/v2/stream-notifications/unread-count`,
           withCredentials: true,
-        })
-        .then(({ data }) => data.unreadNotifications),
+        }),
+      ).then(({ data }) => data.unreadNotifications),
     staleTime: Infinity,
   });
 

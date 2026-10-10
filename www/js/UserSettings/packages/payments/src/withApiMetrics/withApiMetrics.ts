@@ -1,5 +1,5 @@
 import { httpService } from "@rbx/core-scripts/legacy/core-utilities";
-import type { AxiosError, UrlConfig } from "@rbx/core-scripts/http";
+import type { AxiosError, AxiosResponse, UrlConfig } from "@rbx/core-scripts/http";
 import type { FireTelemetryCounterFn } from "@rbx/web-telemetry/v2/fire";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,6 +28,10 @@ export type POSTRequestConfig<C extends string = string> = CommonRequestConfig<C
 
 type RequestData<C extends string = string> = GETRequestConfig<C> | POSTRequestConfig<C>;
 
+type V2RequestData<C extends string = string> =
+  | RequestData<C>
+  | (CommonRequestConfig<C> & { method: "DELETE"; data: object });
+
 export type WithApiMetricsFn<C extends string = string> = <T>(
   requestData: RequestData<C>,
 ) => Promise<T | undefined>;
@@ -38,7 +42,7 @@ export type WithApiMetricsV2Result<T> = {
 };
 
 export type WithApiMetricsV2Fn<C extends string = string> = <T>(
-  requestData: RequestData<C>,
+  requestData: V2RequestData<C>,
 ) => Promise<WithApiMetricsV2Result<T>>;
 
 type CaptureExceptionFn = (error: unknown, tags?: Record<string, string>) => void;
@@ -107,22 +111,24 @@ export function createWithApiMetricsV2<C extends string = string>(
   publishMetric: FireTelemetryCounterFn,
   captureException: CaptureExceptionFn,
 ): WithApiMetricsV2Fn<C> {
-  return async <T>(requestData: RequestData<C>) => {
+  return async <T>(requestData: V2RequestData<C>) => {
     const { call } = requestData.eventCounterProps;
     const metricName = `${call}_API`;
 
     publishMetric(metricName, { statusCode: "Throughput" });
 
     try {
-      const { data, headers } = await (requestData.method === "GET"
-        ? httpService.get<T>(
-            { url: requestData.url, fullError: true, ...requestData.config },
-            requestData.config?.params,
-          )
-        : httpService.post<T>(
-            { url: requestData.url, fullError: true, ...requestData.config },
-            requestData.data,
-          ));
+      const urlConfig = { url: requestData.url, fullError: true, ...requestData.config };
+      let response: AxiosResponse<T>;
+      if (requestData.method === "GET") {
+        response = await httpService.get<T>(urlConfig, requestData.config?.params);
+      } else if (requestData.method === "POST") {
+        response = await httpService.post<T>(urlConfig, requestData.data);
+      } else {
+        response = await httpService.delete<T>(urlConfig, requestData.data);
+      }
+
+      const { data, headers } = response;
 
       publishMetric(metricName, { statusCode: "200" });
       return { data, headers };

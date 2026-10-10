@@ -8,6 +8,9 @@ import {
   sendOverflowMenuItemClickEvent
 } from '../../shared/userActivity/groupPageEventStream';
 
+const isOwnerDeactivateAction = (action: ProfileActionWithKey): boolean =>
+  (action.key === 'LeaveCommunity' || action.key === 'Unfollow') && !!action.href;
+
 const ContextualMenuActions: React.FC = () => {
   const { actionsData } = useGroupProfileHeaderContext();
   const { contextual } = actionsData ?? {};
@@ -40,6 +43,15 @@ const ContextualMenuActions: React.FC = () => {
         });
       }
     });
+
+    const deactivateIndex = mappedActions.findIndex(isOwnerDeactivateAction);
+    const changeOwnerIndex = mappedActions.findIndex(
+      action => action.key === 'ChangeCommunityOwner'
+    );
+    if (deactivateIndex !== -1 && changeOwnerIndex > deactivateIndex) {
+      const [deactivateAction] = mappedActions.splice(deactivateIndex, 1);
+      mappedActions.splice(changeOwnerIndex, 0, deactivateAction);
+    }
 
     return mappedActions;
   }, [contextual, profileActions]);
@@ -90,7 +102,9 @@ const ContextualMenuActions: React.FC = () => {
               action.href ? 'contextual-menu-actions-menu-item-link' : ''
             }`}
             onClick={() => {
-              sendOverflowMenuItemClickEvent(action.key);
+              sendOverflowMenuItemClickEvent(
+                isOwnerDeactivateAction(action) ? 'DeactivateGroup' : action.key
+              );
               // href items navigate via the anchor; just close the menu.
               if (action.href) {
                 handleMenuClose();
@@ -99,7 +113,7 @@ const ContextualMenuActions: React.FC = () => {
               }
             }}>
             {action.label}
-            {action.key === 'ChangeCommunityOwner' && (
+            {action.href && (
               <span
                 className='icon-nav-external-link-sm change-owner-action-icon'
                 aria-hidden='true'

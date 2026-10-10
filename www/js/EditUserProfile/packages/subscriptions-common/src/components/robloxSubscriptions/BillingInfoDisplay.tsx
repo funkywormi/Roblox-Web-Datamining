@@ -1,9 +1,10 @@
 import { escapeHtml } from "@rbx/core-scripts/format/string";
 import { useTranslation } from "@rbx/core-scripts/react";
+import { getFreeTrialDisplay } from "@rbx/payments/services/subscriptions";
 
 import useLocalizedMoney from "../../hooks/useLocalizedMoney";
 
-import type { Money, PeriodType, SubscriptionOffer } from "@rbx/client-subscriptions-api/v1";
+import type { Money, PeriodType, SubscriptionOffer } from "@rbx/client-subscriptions-api/v2";
 import type { FC } from "react";
 
 export type BillingInfoDisplayProps = {
@@ -20,17 +21,30 @@ const BillingInfoDisplay: FC<BillingInfoDisplayProps> = ({ eligibleOffers, price
     price: priceElement,
     periodType,
   });
-  const freeTrialHtml = translate("Description.BillingInfoWithFreeTrialOffer", {
-    boldTagStart: "<b>",
-    boldTagEnd: "</b>",
-    trialPeriod: 1,
-    trialPeriodType: periodType,
-    price: escapeHtml(displayPrice),
-    periodType: periodType,
-  });
 
-  const isFreeTrial =
-    eligibleOffers?.some((o: SubscriptionOffer) => o.offerType === "FreeTrial") ?? false;
+  const freeTrialOffer = eligibleOffers?.find(
+    (o: SubscriptionOffer) => o.offerType === "FreeTrial",
+  );
+  const isFreeTrial = freeTrialOffer != null;
+
+  const trialDisplay = getFreeTrialDisplay(freeTrialOffer, periodType);
+  const freeTrialHtml = trialDisplay
+    ? translate("Label.RobloxPlusPriceRowV3", {
+        boldStart: "<b>",
+        boldEnd: "</b>",
+        trialDuration: trialDisplay.trialDuration,
+        trialPeriodLabel: translate(trialDisplay.trialPeriodKey),
+        price: escapeHtml(displayPrice),
+        periodType,
+      })
+    : translate("Description.BillingInfoWithFreeTrialOffer", {
+        boldTagStart: "<b>",
+        boldTagEnd: "</b>",
+        trialPeriod: 1,
+        trialPeriodType: periodType,
+        price: escapeHtml(displayPrice),
+        periodType: periodType,
+      });
 
   return (
     <span

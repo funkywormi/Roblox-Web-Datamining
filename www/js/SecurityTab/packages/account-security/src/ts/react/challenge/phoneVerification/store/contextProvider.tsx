@@ -6,7 +6,7 @@ import React, {
   useReducer,
   useEffect,
 } from "react";
-import { TranslateFunction } from "react-utilities";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { PhoneVerificationAction } from "./action";
 import { PhoneVerificationState } from "./state";
 import {
@@ -31,7 +31,6 @@ type Props = {
   renderInline: boolean;
   eventService: EventService;
   metricsService: MetricsService;
-  translate: TranslateFunction;
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
@@ -43,19 +42,18 @@ export const PhoneVerificationContextProvider = ({
   renderInline,
   eventService,
   metricsService,
-  translate,
   onChallengeCompleted,
   onChallengeInvalidated,
   onModalChallengeAbandoned,
   children,
 }: Props): ReactElement => {
+  const translate = useTranslations("Feature.PhoneVerificationChallenge");
   const [resources] = useState(() => getResources(translate));
   const [initialState] = useState<PhoneVerificationState>(() => ({
     // Immutable parameters:
     challengeId,
     renderInline,
     // Immutable state
-    translate,
     resources,
     eventService,
     metricsService,

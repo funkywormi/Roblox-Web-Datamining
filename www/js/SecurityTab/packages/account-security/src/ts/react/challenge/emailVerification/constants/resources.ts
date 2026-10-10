@@ -1,17 +1,7 @@
-import { EMAIL_VERIFICATION_LANGUAGE_RESOURCES } from "../app.config";
+import type { Translator } from "@rbx/www-common/i18n";
 import { ErrorCode } from "../interface";
 
-/**
- * A type adapted from the base type of `translate`, which we use to limit the
- * keys that can be translated.
- */
-type TranslateFunction = (
-  resourceId: (typeof EMAIL_VERIFICATION_LANGUAGE_RESOURCES)[number],
-  parameters?: Record<string, unknown>,
-) => string;
-
-// IMPORTANT: Add resource keys to `app.config.ts` as well.
-export const getResources = (translate: TranslateFunction) =>
+export const getResources = (translate: Translator<"Feature.EmailVerificationChallenge">) =>
   ({
     Header: {
       VerifyYourAccount: translate("Header.VerifyYourAccount"),
@@ -19,7 +9,9 @@ export const getResources = (translate: TranslateFunction) =>
       ConfirmAbandon: translate("Header.ConfirmAbandon"),
     },
     Description: {
-      SuspiciousActivityEmailVerification: translate(
+      // TODO: key is absent from the namespace (it has the non-V1 key), so this renders blank;
+      // `dynamic` keeps that behavior until the owners decide on the copy.
+      SuspiciousActivityEmailVerification: translate.dynamic(
         "Description.SuspiciousActivityEmailVerificationV1",
       ),
       EnterCode: translate("Description.EnterCode"),
@@ -27,7 +19,8 @@ export const getResources = (translate: TranslateFunction) =>
     },
     Message: {
       Error: {
-        Default: translate("Message.Error.Default"),
+        // Absent from the namespace; `dynamic` keeps the existing empty string.
+        Default: translate.dynamic("Message.Error.Default"),
       },
     },
     Label: {

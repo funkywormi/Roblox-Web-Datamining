@@ -1,4 +1,4 @@
-import Roblox from "Roblox";
+import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
 import { EVENT_CONSTANTS } from "../app.config";
 
 export class EventServiceDefault {
@@ -12,19 +12,19 @@ export class EventServiceDefault {
   }
 
   sendChallengeInitializedEvent(): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeInitialized,
       {
         challengeId: this.challengeId,
         integrityType: this.integrityType,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeCompletedEvent(result: string): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeCompleted,
       {
@@ -32,12 +32,12 @@ export class EventServiceDefault {
         integrityType: this.integrityType,
         result,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 
   sendChallengeInvalidatedEvent(result: string): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeInvalidated,
       {
@@ -45,7 +45,7 @@ export class EventServiceDefault {
         integrityType: this.integrityType,
         result,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 }

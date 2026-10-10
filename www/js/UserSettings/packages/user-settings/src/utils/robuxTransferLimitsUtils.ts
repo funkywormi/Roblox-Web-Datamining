@@ -108,6 +108,41 @@ export const buildRobuxTransferLimitsConsentValue = (input: TRobuxTransferLimits
   return JSON.stringify(value);
 };
 
+/** Reads one window of a serialized `TRobuxTransferLimitsValue`, or undefined when malformed. */
+const fromWindow = (window: unknown): number | null | undefined => {
+  if (typeof window !== "object" || window === null) {
+    return undefined;
+  }
+  if ("unset" in window) {
+    return null;
+  }
+  // Protobuf JSON can write an int64 as a string.
+  const cap = "value" in window ? Number(window.value) : NaN;
+  return Number.isFinite(cap) ? cap : undefined;
+};
+
+/** Inverse of `buildRobuxTransferLimitsConsentValue`, or undefined when the value is malformed. */
+export const parseRobuxTransferLimitsConsentValue = (
+  value: string | null | undefined,
+): TRobuxTransferLimitsInput | undefined => {
+  if (!value) {
+    return undefined;
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    return undefined;
+  }
+  if (typeof parsed !== "object" || parsed === null) {
+    return undefined;
+  }
+  const record = parsed as Partial<Record<keyof TRobuxTransferLimitsValue, unknown>>;
+  const daily = fromWindow(record.daily);
+  const monthly = fromWindow(record.monthly);
+  return daily === undefined || monthly === undefined ? undefined : { daily, monthly };
+};
+
 /**
  * Whether a proposed cap falls outside what the parent may save for that
  * window. A parent may not exceed the child's current tier ceiling.

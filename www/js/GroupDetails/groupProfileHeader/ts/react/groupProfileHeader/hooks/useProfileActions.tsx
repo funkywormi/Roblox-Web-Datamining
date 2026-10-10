@@ -1,4 +1,4 @@
-import { EnvironmentUrls } from 'Roblox';
+import { CurrentUser, EnvironmentUrls } from 'Roblox';
 import { useMemo } from 'react';
 import { useSystemFeedback } from 'react-style-guide';
 import { useTranslation } from 'react-utilities';
@@ -29,6 +29,20 @@ const useProfileActions = (): ProfileActions => {
 
   const profileActions = useMemo(() => {
     const changeOwnerCreatorHubUrl = `https://create.${EnvironmentUrls.domain}/dashboard/group/profile?activeTab=GroupProfileTab&groupId=${context.groupId}`;
+    const isCurrentUserOwner =
+      CurrentUser.isAuthenticated &&
+      context.communityProfileHeaderData?.ownerUserId === Number(CurrentUser.userId);
+    // Owners deactivate in Creator Hub instead of leaving.
+    const leaveAction: ProfileAction = isCurrentUserOwner
+      ? {
+          label: translate('Action.DeactivateGroup'),
+          href: changeOwnerCreatorHubUrl,
+          onClick: context.showChangeOwnerModal
+        }
+      : {
+          label: translate('Action.LeaveGroup'),
+          onClick: context.showLeaveGroupOrChangeOwnerModal
+        };
     const mappedActions: ProfileActions = {
       CancelJoinCommunityRequest: {
         label: translate('Action.CancelRequest'),
@@ -63,10 +77,7 @@ const useProfileActions = (): ProfileActions => {
         btnVariant: 'contained',
         btnColor: 'primaryBrand'
       },
-      LeaveCommunity: {
-        label: translate('Action.LeaveGroup'),
-        onClick: context.showLeaveGroupOrChangeOwnerModal
-      },
+      LeaveCommunity: leaveAction,
       MakePrimaryCommunity: {
         label: translate('Action.MakePrimary'),
         onClick: context.makePrimary
@@ -79,10 +90,12 @@ const useProfileActions = (): ProfileActions => {
         label: translate('Action.ReportAbuse'),
         onClick: context.showReportAbuseModal
       },
-      Unfollow: {
-        label: translate('Action.Unfollow'),
-        onClick: context.showLeaveGroupOrChangeOwnerModal
-      }
+      Unfollow: isCurrentUserOwner
+        ? leaveAction
+        : {
+            label: translate('Action.Unfollow'),
+            onClick: context.showLeaveGroupOrChangeOwnerModal
+          }
     };
 
     if (navigator.clipboard) {

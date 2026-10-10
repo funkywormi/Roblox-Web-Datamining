@@ -174,7 +174,7 @@ export const ParentalControlsContainer = (): JSX.Element => {
       {isCurrentlyOnParentalControlsEntryPage && getParentalControlsInnerComponent()}
       {/* Scope the wildcard redirect so it does not intercept valid parent routes. */}
       {isOnDeviceParent && <ParentZoneRoutes />}
-      {isChild && !isOnDeviceParent && <ChildDashboardRoutes />}
+      {isChild && !isOnDeviceParent && !isLoading && <ChildDashboardRoutes />}
       {!isChild && <ParentDashboardRoutes />}
     </div>
   );

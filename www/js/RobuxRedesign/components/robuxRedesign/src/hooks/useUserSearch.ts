@@ -1,6 +1,6 @@
 /* eslint-disable no-void */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { useDebounce } from "@rbx/core-scripts/react";
 import {
   getUsers,
@@ -39,7 +39,7 @@ export function useUserSearch({
   const [users, setUsers] = useState<OmniSearchUser[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const requestId = useRef("");
-  const sessionId = useMemo(() => uuidService.generateRandomUuid(), []);
+  const sessionId = useMemo(() => generateRandomUuid(), []);
 
   useEffect(() => {
     if (searchText !== debouncedSearchText) {
@@ -67,7 +67,7 @@ export function useUserSearch({
         return;
       }
 
-      const id = uuidService.generateRandomUuid();
+      const id = generateRandomUuid();
       requestId.current = id;
 
       try {

@@ -5,6 +5,7 @@ import { Divider } from "@rbx/foundation-ui";
 import NavLinks from "./NavLinks";
 import { sendLeftSidebarEvent } from "../../services/eventService";
 import { logLeftNavExposure } from "../../util/leftNavIxpUtil";
+import { trackOpenToVisible } from "../observability";
 
 export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
   // Changes the value of a CSS variable for the left nav width.
@@ -24,6 +25,7 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
       sendLeftSidebarEvent(open, "NEW");
       if (open) {
         logLeftNavExposure();
+        trackOpenToVisible("NEW");
       }
       return open;
     });

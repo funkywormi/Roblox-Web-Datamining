@@ -1,8 +1,6 @@
 import React from "react";
-import { WithTranslationsProps, withTranslations } from "react-utilities";
 import { RequestService } from "../../../common/request";
 import { GetMetadataReturnType } from "../../../common/request/types/captcha";
-import { TRANSLATION_CONFIG } from "./app.config";
 import CaptchaV2 from "./containers/captchaV2";
 import {
   ActionType,
@@ -30,7 +28,7 @@ type Props = {
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
-} & WithTranslationsProps;
+};
 
 export const App: React.FC<Props> = ({
   actionType,
@@ -43,7 +41,6 @@ export const App: React.FC<Props> = ({
   metadataResponse,
   eventService,
   metricsService,
-  translate,
   onChallengeDisplayed,
   onChallengeCompleted,
   onChallengeInvalidated,
@@ -58,7 +55,6 @@ export const App: React.FC<Props> = ({
       captchaVersion={captchaVersion}
       renderInline={renderInline}
       requestService={requestService}
-      translate={translate}
       metadataResponse={metadataResponse}
       eventService={eventService}
       metricsService={metricsService}
@@ -72,4 +68,4 @@ export const App: React.FC<Props> = ({
   );
 };
 
-export default withTranslations(App, TRANSLATION_CONFIG);
+export default App;

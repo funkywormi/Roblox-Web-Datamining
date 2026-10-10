@@ -1,4 +1,4 @@
-import { localStorageService } from "core-roblox-utilities";
+import { getItem, setItem } from "@rbx/core-lib/local-storage";
 import React, { useEffect, useState } from "react";
 import { Modal } from "react-style-guide";
 import { RostileError, Solution } from "../../../../common/request/types/rostile";
@@ -112,14 +112,12 @@ const Rostile: React.FC = () => {
   useEffect(() => {
     // Check if the component with the same challenge id has been initialized previously.
     // If so then we quit early, if not then we will memoize it in the local storage.
-    const currentChallengeId = localStorageService.getLocalStorage(challengeIdKey) as
-      | string
-      | undefined;
+    const currentChallengeId = getItem(challengeIdKey);
     if (challengeId === currentChallengeId) {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       return;
     }
-    localStorageService.setLocalStorage(challengeIdKey, challengeId);
+    setItem(challengeIdKey, challengeId);
     eventService.sendChallengeInitializedEvent();
     metricsService.fireChallengeInitializedEvent();
 

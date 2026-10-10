@@ -12,7 +12,10 @@ import FriendsList from "../components/FriendsList";
 import FriendCarouselNames from "../constants/friendCarouselNames";
 import { mustHideConnectionsDueToAMP, isBlockingViewer } from "../utils/osa";
 
-const FRIENDSHIP_EVENT_TYPE = "FriendshipNotifications";
+const FRIEND_REQUEST_COUNT_EVENT_TYPES = [
+  "FriendshipNotifications",
+  "TrustedConnectionNotifications",
+] as const;
 const BADGING_EXPERIMENT_LAYER = "Social.Friends";
 const FULFILLED_PROMISE_STATUS = "fulfilled";
 
@@ -109,7 +112,8 @@ const FriendsCarouselContainer = ({
     userDataStore.clearUserDataStoreCache();
   }, []);
 
-  // Listen to friend events if carousel is visible
+  // Refresh the badge when friendship or trusted-friend events arrive.
+  // The new-friend-requests count includes unseen trusted friend requests.
   useEffect(() => {
     if (!showFriendsCarousel) return undefined;
 
@@ -121,13 +125,16 @@ const FriendsCarouselContainer = ({
         console.error("Error fetching friend request count:", error);
       }
     };
-    // Subscribe to friending events
     const realTimeClient = RealTime.GetClient();
 
-    realTimeClient.Subscribe(FRIENDSHIP_EVENT_TYPE, handleFriendEvent);
+    FRIEND_REQUEST_COUNT_EVENT_TYPES.forEach(eventType => {
+      realTimeClient.Subscribe(eventType, handleFriendEvent);
+    });
 
     return () => {
-      realTimeClient.Unsubscribe(FRIENDSHIP_EVENT_TYPE, handleFriendEvent);
+      FRIEND_REQUEST_COUNT_EVENT_TYPES.forEach(eventType => {
+        realTimeClient.Unsubscribe(eventType, handleFriendEvent);
+      });
     };
   }, [showFriendsCarousel]);
 

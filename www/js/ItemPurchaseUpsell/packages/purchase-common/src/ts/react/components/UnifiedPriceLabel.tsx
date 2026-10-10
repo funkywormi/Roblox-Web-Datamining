@@ -1,18 +1,19 @@
 import React from 'react';
-import { withTranslations, TranslateFunction } from '@rbx/core-scripts/react';
 import { formatNumber } from '@rbx/core-scripts/format/number';
-import itemPurchaseConstants from '../../../js/react/itemPurchase/constants/itemPurchaseConstants';
-import translationConfig from '../../../js/react/itemPurchase/translation.config';
+import itemPurchaseConstants from '../itemPurchase/constants/itemPurchaseConstants';
+import { type PurchaseTranslate } from '../itemPurchase/useTranslate';
 
 const { resources } = itemPurchaseConstants;
 
 export type UnifiedPriceLabelProps = {
-  translate: TranslateFunction;
+  translate: PurchaseTranslate;
   price: number;
   color?: string;
   useFreeText?: boolean;
 };
 
+// Prop-driven: the only caller (UnifiedPurchaseHeading) always supplies `translate` from its own
+// dual-path provider, so this leaf needs no self-wrap.
 function UnifiedPriceLabel({
   translate,
   price,
@@ -32,4 +33,4 @@ function UnifiedPriceLabel({
   );
 }
 
-export default withTranslations(UnifiedPriceLabel, translationConfig.purchasingResources);
+export default UnifiedPriceLabel;

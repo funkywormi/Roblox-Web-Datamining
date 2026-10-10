@@ -1,4 +1,4 @@
-import { Violation } from "@rbx/moderation-portal";
+import { AppealType, Violation } from "@rbx/moderation-portal";
 import { AppealsEventType } from "./eventTypes";
 import { sendAppealsEvent } from "./sendAppealsEvent";
 
@@ -67,6 +67,7 @@ export const sendRequestAppealEvent = ({
   violationType,
   violationReason,
   appealType,
+  allowedAppealTypes,
   isV2UI = false,
   optOutCommunication = false,
 }: {
@@ -74,16 +75,31 @@ export const sendRequestAppealEvent = ({
   msgLength: number;
   violationType: string;
   violationReason: string;
-  appealType: string;
+  appealType: AppealType;
+  allowedAppealTypes: AppealType[];
   isV2UI?: boolean;
   optOutCommunication?: boolean;
 }): void => {
+  // Isolate metrics for the "fixed" appeal type with a new event type, since it shouldn't be counted as a normal appeal.
+  if (appealType === AppealType.FIXED) {
+    sendAppealsEvent(AppealsEventType.AskForReview, "ViolationDetails", {
+      prevAppealCount,
+      msgLength,
+      violationType,
+      violationReason,
+      allowedAppealTypes,
+      isV2UI,
+      optOutCommunication,
+    });
+    return;
+  }
   sendAppealsEvent(AppealsEventType.RequestAppeal, "RequestAppeal", {
     prevAppealCount,
     msgLength,
     violationType,
     violationReason,
     appealType,
+    allowedAppealTypes,
     isV2UI,
     optOutCommunication,
   });
@@ -122,6 +138,7 @@ export const sendStartAppealEvent = ({
   violationType,
   violationReason,
   appealType,
+  allowedAppealTypes,
   isV2UI = false,
 }: {
   isEligible: boolean;
@@ -129,9 +146,23 @@ export const sendStartAppealEvent = ({
   prevAppealCount: number;
   violationType: string;
   violationReason: string;
-  appealType: string;
+  appealType: AppealType;
+  allowedAppealTypes: AppealType[];
   isV2UI?: boolean;
 }): void => {
+  // Isolate metrics for the "fixed" appeal type with a new event type, since it shouldn't be counted as a normal appeal.
+  if (appealType === AppealType.FIXED) {
+    sendAppealsEvent(AppealsEventType.StartAskForReview, "ViolationDetails", {
+      isEligible,
+      requiresIdv,
+      prevAppealCount,
+      violationType,
+      violationReason,
+      allowedAppealTypes,
+      isV2UI,
+    });
+    return;
+  }
   sendAppealsEvent(AppealsEventType.StartAppeal, "ViolationDetails", {
     isEligible,
     requiresIdv,
@@ -139,6 +170,7 @@ export const sendStartAppealEvent = ({
     violationType,
     violationReason,
     appealType,
+    allowedAppealTypes,
     isV2UI,
   });
 };

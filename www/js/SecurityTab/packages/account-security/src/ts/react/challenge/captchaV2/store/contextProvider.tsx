@@ -6,7 +6,7 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { WithTranslationsProps } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { RequestService } from "../../../../common/request";
 import { getResources } from "../constants/resources";
 import {
@@ -44,7 +44,7 @@ type Props = {
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
   children: ReactChild;
-} & Pick<WithTranslationsProps, "translate">;
+};
 
 /**
  * A React provider is a special component that wraps a tree of components and
@@ -63,9 +63,9 @@ export const CaptchaV2ContextProvider = ({
   onChallengeCompleted,
   onChallengeInvalidated,
   onModalChallengeAbandoned,
-  translate,
   children,
 }: Props): ReactElement => {
+  const translate = useTranslations("Feature.CaptchaV2Challenge");
   // We declare these variables as lazy-initialized state variables since they
   // do not need to be re-computed if this component re-renders.
   const [initialState] = useState<CaptchaV2State>(() => ({

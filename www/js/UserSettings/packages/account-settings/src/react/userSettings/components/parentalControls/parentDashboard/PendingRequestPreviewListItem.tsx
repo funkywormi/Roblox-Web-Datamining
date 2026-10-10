@@ -1,7 +1,6 @@
 import { Intl } from "Roblox";
 import React from "react";
 import { Button } from "react-style-guide";
-import { useTranslation } from "react-utilities";
 import { UserProfileField, useUserProfiles } from "@rbx/user-profile-api-client";
 import { IconButton, ListItem, type TListItemDivider } from "@rbx/foundation-ui";
 import useCancelConsentRequestModal from "../../../../common/hooks/modals/useCancelConsentRequestModal";
@@ -20,6 +19,7 @@ import {
   getRequestSettingHeading,
   requestSettingHeadings,
 } from "../../../constants/contentConstants/consentTranslationConstants";
+import { useWrappedTranslation } from "../../../hooks/useWrappedTranslation";
 
 const PendingRequestPreviewListItem = ({
   consent,
@@ -34,7 +34,7 @@ const PendingRequestPreviewListItem = ({
   canSeeChatTerminology?: boolean;
   divider?: TListItemDivider;
 }): JSX.Element => {
-  const { translate } = useTranslation();
+  const { translate } = useWrappedTranslation();
   const intl = new Intl();
 
   const { parentalConsents } = parentalControlsTranslationConstants;

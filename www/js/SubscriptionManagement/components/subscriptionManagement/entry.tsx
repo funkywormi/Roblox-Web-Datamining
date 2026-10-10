@@ -2,8 +2,13 @@ import "./src/main.css";
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import Roblox from "Roblox";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
+import type { Namespace } from "@rbx/www-common/i18n";
 import * as Interface from "@rbx/subscriptions/ts/react/subscriptionManagement/interface";
 import App from "@rbx/subscriptions/ts/react/subscriptionManagement/App";
+
+// Each must also be listed in component.json `translations`, which decides what the page seeds.
+const translationNamespaces: readonly Namespace[] = ["Feature.RobloxSubscription"];
 
 /**
  * Renders the Subscriptions Tab UI for a given set of parameters.
@@ -16,7 +21,12 @@ export const renderComponent: Interface.RenderComponent = (containerId: string) 
     unmountComponentAtNode(rootElement);
 
     // Render the app on the selected element.
-    render(<App />, rootElement);
+    render(
+      <TranslationProviderSCC namespaces={translationNamespaces}>
+        <App />
+      </TranslationProviderSCC>,
+      rootElement,
+    );
     return true;
   }
   return false;

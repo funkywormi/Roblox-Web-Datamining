@@ -1,26 +1,11 @@
-import { TranslationConfig } from "react-utilities";
-
 export const FEATURE_NAME = "PrivateAccessToken" as const;
 export const LOG_PREFIX = "Private-Access-Token:" as const;
 
 /**
- * Translations required by this web app (remember to also edit
- * `bundle.config.js` if changing this configuration).
+ * Translation namespaces used by this web app. Keep in sync with the challenge
+ * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const TRANSLATION_CONFIG: TranslationConfig = {
-  common: ["CommonUI.Messages"],
-  feature: "Feature.PrivateAccessTokenChallenge",
-};
-
-/**
- * Language resource keys for private access token that are requested
- * dynamically.
- */
-export const PRIVATE_ACCESS_TOKEN_LANGUAGE_RESOURCES = [
-  "Description.VerificationError",
-  "Description.VerificationSuccess",
-  "Description.VerifyingYouAreNotBot",
-] as const;
+export const TRANSLATION_NAMESPACES = ["Feature.PrivateAccessTokenChallenge"] as const;
 
 /**
  * Constants for event stream events.

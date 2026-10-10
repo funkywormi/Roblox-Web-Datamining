@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { DeviceMeta } from "Roblox";
-import { hybridResponseService } from "core-roblox-utilities";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import * as hybridResponseService from "@rbx/core-scripts/auth/hybrid-response";
 
 export interface PlatformSupportMetadata {
   isAndroidSecurityKeyEnabled: boolean;
@@ -10,9 +10,9 @@ export interface PlatformSupportMetadata {
  * Check if FIDO2 is supported via hybrid API (native iOS/Android apps)
  */
 const isFido2SupportedViaHybridApi = async (): Promise<boolean> => {
-  const isInApp = DeviceMeta && DeviceMeta().isInApp;
+  const deviceMeta = getDeviceMeta();
   const isInIosOrAndroidApp =
-    isInApp && DeviceMeta && (DeviceMeta().isIosApp || DeviceMeta().isAndroidApp);
+    !!deviceMeta?.isInApp && (deviceMeta.isIosApp || deviceMeta.isAndroidApp);
 
   if (isInIosOrAndroidApp) {
     // This checks if the native implementation of security keys or passkeys exists
@@ -35,7 +35,7 @@ const isFido2SupportedViaHybridApi = async (): Promise<boolean> => {
  * Check if FIDO2 is supported via browser API (web browsers)
  */
 const isFido2SupportedViaBrowserApi = (): boolean => {
-  const isInApp = DeviceMeta && DeviceMeta().isInApp;
+  const isInApp = getDeviceMeta()?.isInApp ?? false;
   if (isInApp || typeof PublicKeyCredential === "undefined") {
     return false;
   }

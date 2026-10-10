@@ -15,7 +15,7 @@ function getAppsFlyerUrl(deepLinkUrl: string): string {
   return url.toString();
 }
 
-function navigateToDeepLink(deepLinkUrl: string): void {
+export function navigateToDeepLink(deepLinkUrl: string): void {
   const deviceMeta = getDeviceMeta();
   if (isInApp) {
     window.location.href = deepLinkUrl;

@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { getSubscriptionPeriodTranslationKey } from "@rbx/subscriptions-common";
 import { useTranslation } from "react-utilities";
 import { Price } from "../../../core/types/price";
 import { PeriodType } from "../../../core/types/subscriptionEnums";
@@ -14,15 +15,9 @@ type PriceDisplayProps = {
 const PriceDisplay: React.FC<PriceDisplayProps> = ({ price, period, periodCount, className }) => {
   const { translate } = useTranslation();
 
-  // Price-period suffix: " / month", " / year", " / 3 months". Label.SubscriptionDuration renders
-  // the localized, parametrized duration ("month" / "3 months"), so any period/count works without
-  // a dedicated key; the " / " forms the suffix. The price
-  // itself is rendered by the adjacent price tag, so we use the duration-only key rather than
-  // Action.PricePerSubscriptionDuration (which also embeds the price). periodCount is normalized
-  // to >= 1 by the backend.
-  const duration = translate("Label.SubscriptionDuration", {
-    periodType: period,
-    periodCount: periodCount ?? 1,
+  const count = periodCount ?? 1;
+  const duration = translate(getSubscriptionPeriodTranslationKey(period, count), {
+    periodCount: count,
   });
   const periodString = ` / ${duration}${className === "resubscribe" ? "." : ""}`;
 

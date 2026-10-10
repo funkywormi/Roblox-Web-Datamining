@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { RobloxIntlInstance } from '@rbx/legacy-webapp-types/Roblox';
-import { TranslateFunction } from '@rbx/core-scripts/react';
 import { urlService } from '@rbx/core-scripts/legacy/core-utilities';
+import { type PurchaseTranslate } from '../itemPurchase/useTranslate';
 import { translateHtml } from '@rbx/translation-utils';
 import type { TranslateHtmlTag } from '@rbx/translation-utils';
 import {
   ROBLOX_TERMS_OF_USE_URL,
   ROBLOX_TERMS_OF_USE_ANCHOR_FOR_DMCCA,
   LANG_KEYS
-} from '../../../js/core/services/itemPurchaseUpsellService/constants/upsellConstants';
+} from '../../core/services/itemPurchaseUpsellService/constants/upsellConstants';
 import ampFeatureService from '../services/ampFeatureService';
 
 export default function useTermsOfUseText(
-  translate: TranslateFunction,
+  translate: PurchaseTranslate,
   intl: RobloxIntlInstance
 ): React.ReactNode {
   const [isDmccaLegalTextFeature, setIsDmccaLegalTextFeature] = useState(false);

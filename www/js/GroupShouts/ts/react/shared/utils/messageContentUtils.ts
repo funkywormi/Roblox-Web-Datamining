@@ -4,7 +4,7 @@ import {
   getPlaintext,
   hasRichTextContent as hasRichTextContentRbx
 } from '@rbx/richtext';
-import { MessageContent } from '../types';
+import { MessageContent, MessageContentRaw } from '../types';
 
 export type MessageContentFragment = {
   content?: string;
@@ -14,14 +14,14 @@ export type MessageContentFragment = {
 export const createMessageContentFragment = (content: MessageContent): MessageContentFragment => {
   if (content.slate) {
     return {
-      slate: JSON.stringify(content.slate)
+      slate: typeof content.slate === 'string' ? content.slate : JSON.stringify(content.slate)
     };
   }
 
   return { content: content.plainText || '' };
 };
 
-export const parseDocument = (content: MessageContent): Document | undefined => {
+export const parseDocument = (content: MessageContentRaw): Document | undefined => {
   if (content.slate) {
     // attempt to parse slate content only if its a string
     if (typeof content.slate === 'string') {
@@ -36,6 +36,21 @@ export const parseDocument = (content: MessageContent): Document | undefined => 
   }
 
   return undefined;
+};
+
+// Keep the source available to editors and reporting; only display consumers select translations.
+export const getDisplayContent = (
+  original: MessageContent,
+  translated?: MessageContentRaw | null
+): MessageContent => {
+  if (!translated) return original;
+
+  const slate = parseDocument(translated);
+  if (slate?.type === 'document' && Array.isArray(slate.children)) {
+    return { plainText: translated.plainText ?? undefined, slate };
+  }
+
+  return translated.plainText != null ? { plainText: translated.plainText } : original;
 };
 
 export const createSimpleSlateContent = (text: string): MessageContent => {

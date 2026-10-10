@@ -7,7 +7,8 @@ import React, {
   useEffect,
 } from "react";
 
-import { TranslateFunction } from "react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { EmailVerificationAction } from "./action";
 import { EmailVerificationState } from "./state";
 import {
@@ -32,7 +33,6 @@ type Props = {
   renderInline: boolean;
   eventService: EventService;
   metricsService: MetricsService;
-  translate: TranslateFunction;
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
@@ -50,30 +50,35 @@ export const EmailVerificationContextProvider = ({
   renderInline,
   eventService,
   metricsService,
-  translate,
   onChallengeCompleted,
   onChallengeInvalidated,
   onModalChallengeAbandoned,
   children,
 }: Props): ReactElement => {
+  const translate = useTranslations("Feature.EmailVerificationChallenge");
   // We declare these variables as lazy-initialized state variables since they
   // do not need to be re-computed if this component re-renders.
   const [resources] = useState(() => getResources(translate));
-  const [initialState] = useState<EmailVerificationState>(() => ({
-    // Immutable parameters:
-    challengeId,
-    renderInline,
-    // Immutable state
-    translate,
-    resources,
-    eventService,
-    metricsService,
-    onModalChallengeAbandoned,
-    // Mutable state:
-    onChallengeCompletedData: null,
-    onChallengeInvalidatedData: null,
-    isModalVisible: true,
-  }));
+  const [initialState] = useState<EmailVerificationState>(() => {
+    // The OTP modal's params still require a legacy-shaped `translate`; it renders its own strings.
+    const legacyTranslate: TranslateFunction = (key, _parameters, fallback) =>
+      translate.dynamic(key, undefined, fallback);
+    return {
+      // Immutable parameters:
+      challengeId,
+      renderInline,
+      // Immutable state
+      translate: legacyTranslate,
+      resources,
+      eventService,
+      metricsService,
+      onModalChallengeAbandoned,
+      // Mutable state:
+      onChallengeCompletedData: null,
+      onChallengeInvalidatedData: null,
+      isModalVisible: true,
+    };
+  });
 
   // Components will access and mutate state via these variables:
   const [state, dispatch] = useReducer(emailVerificationStateReducer, initialState);

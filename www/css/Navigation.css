@@ -4568,42 +4568,15 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     --dark-mode-navigation-background: #042349;
     --light-mode-navigation-image: url(https://images.rbxcdn.com/14f90134de033a4e.png);
     --dark-mode-navigation-image: url(https://images.rbxcdn.com/69e65f4a3990375f.png);
-    --color-navigation-background: var(--light-mode-navigation-background);
-    --color-navigation-image: var(--light-mode-navigation-image)
+    --color-navigation-background: var(--lightningcss-light, var(--light-mode-navigation-background))var(--lightningcss-dark, var(--dark-mode-navigation-background));
+    --color-navigation-image: var(--lightningcss-light, var(--light-mode-navigation-image))var(--lightningcss-dark, var(--dark-mode-navigation-image))
 }
 
-@media (prefers-color-scheme:dark) {
-    :root {
-        --color-navigation-background: var(--dark-mode-navigation-background);
-        --color-navigation-image: var(--dark-mode-navigation-image)
-    }
-}
-
-.age-kids-theme {
-    --light-mode-navigation-image: url(https://images.rbxcdn.com/87258df758e769b3.png);
-    --dark-mode-navigation-image: url(https://images.rbxcdn.com/0d42830c4c700fb2.png)
-}
-
-.light-theme {
-    --color-navigation-background: var(--light-mode-navigation-background);
-    --color-navigation-image: var(--light-mode-navigation-image)
-}
-
-.dark-theme {
-    --color-navigation-background: var(--dark-mode-navigation-background);
-    --color-navigation-image: var(--dark-mode-navigation-image)
-}
-
-.system-theme {
-    --color-navigation-background: var(--light-mode-navigation-background);
-    --color-navigation-image: var(--light-mode-navigation-image)
-}
-
-@media (prefers-color-scheme:dark) {
-    .system-theme {
-        --color-navigation-background: var(--dark-mode-navigation-background);
-        --color-navigation-image: var(--dark-mode-navigation-image)
-    }
+.color-mode-light,
+.color-mode-dark,
+.color-mode-system {
+    --color-navigation-background: var(--lightningcss-light, var(--light-mode-navigation-background))var(--lightningcss-dark, var(--dark-mode-navigation-background));
+    --color-navigation-image: var(--lightningcss-light, var(--light-mode-navigation-image))var(--lightningcss-dark, var(--dark-mode-navigation-image))
 }
 
 .classic-theme .rbx-header {
@@ -4635,12 +4608,12 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     background-color: transparent !important
 }
 
-.classic-theme:not(.age-kids-theme) .rbx-header {
+.classic-theme .rbx-header {
     background-color: var(--color-navigation-background) !important
 }
 
-.classic-theme:not(.age-kids-theme) .left-nav,
-.classic-theme:not(.age-kids-theme) .rbx-left-col {
+.classic-theme .left-nav,
+.classic-theme .rbx-left-col {
     background-color: var(--color-navigation-background)
 }
 
@@ -6019,36 +5992,36 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
 }
 
 @media (prefers-color-scheme:dark) {
-    .dark\:block:where(:not(:-webkit-any(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:-webkit-any(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:block:where(:not(:-moz-any(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:-moz-any(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:block:where(:not(:is(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:is(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:hidden:where(:not(:-webkit-any(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:-webkit-any(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 
-    .dark\:hidden:where(:not(:-moz-any(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:-moz-any(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 
-    .dark\:hidden:where(:not(:is(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:is(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 }
 
-.dark\:block:where(.dark-theme, .dark-theme *) {
+.dark\:block:where(.color-mode-dark, .color-mode-dark *) {
     display: block
 }
 
-.dark\:hidden:where(.dark-theme, .dark-theme *) {
+.dark\:hidden:where(.color-mode-dark, .color-mode-dark *) {
     display: none
 }
 

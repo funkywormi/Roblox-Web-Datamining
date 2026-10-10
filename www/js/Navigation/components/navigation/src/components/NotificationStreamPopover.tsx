@@ -16,6 +16,7 @@ import NotificationStreamBase from "../containers/NotificationStreamBase";
 import events from "../constants/notificationsEventStreamConstants";
 import { useIsTopNavFoundation } from "../util/topNavFoundationIxp";
 import { popoverDismissGuard } from "../util/popoverDismissGuard";
+import { trackOpenToVisible } from "../topNav/observability";
 
 export default function NotificationStreamPopover() {
   const t = useTranslations("CommonUI.Features");
@@ -47,6 +48,7 @@ export default function NotificationStreamPopover() {
   }, [isReactBell]);
 
   const handleStreamOpen = useCallback(() => {
+    trackOpenToVisible("Notifications");
     logNotificationStreamExposureIfEnabled();
     sendEventWithTarget(events.openContent.name, events.openContent.context, {
       countOfUnreadNotification: unreadCount,

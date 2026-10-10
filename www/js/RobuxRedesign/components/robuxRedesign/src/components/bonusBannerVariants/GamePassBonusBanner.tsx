@@ -24,7 +24,7 @@ export function GamePassBonusBanner({ metadata }: BannerProps) {
   return (
     // Note: this component is always rendered in the dark theme with --color-extended-gray-1200 as the main background color
     <div
-      className="dark-theme self-stretch flex flex-row justify-start items-center gap-large clip relative buy-robux-page min-height-[112px]"
+      className="color-mode-dark dark-theme self-stretch flex flex-row justify-start items-center gap-large clip relative buy-robux-page min-height-[112px]"
       style={{
         borderTopLeftRadius: "var(--radius-large)",
         borderTopRightRadius: "var(--radius-large)",

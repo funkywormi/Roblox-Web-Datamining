@@ -1,5 +1,3 @@
-import { TranslationConfig } from "@rbx/core-scripts/react";
-
 export const FEATURE_NAME = "Turnstile" as const;
 export const LOG_PREFIX = "Turnstile:" as const;
 
@@ -34,13 +32,7 @@ export const METRICS_CONSTANTS = {
 } as const;
 
 /**
- * Translations required by this web app (remember to also edit
- * `bundle.config.js` if changing this configuration). We reuse the existing
- * captcha translation feature since it already contains the shared strings.
+ * Translation namespaces used by this web app. Keep in sync with the challenge
+ * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const TRANSLATION_CONFIG: TranslationConfig = ["Authentication.Captcha"];
-
-/**
- * Language resource keys for turnstile that are requested dynamically.
- */
-export const TURNSTILE_LANGUAGE_RESOURCES = ["Description.VerifyingYouAreNotBot"] as const;
+export const TRANSLATION_NAMESPACES = ["Authentication.Captcha"] as const;

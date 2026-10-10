@@ -1,15 +1,16 @@
 import { useRef, useState } from "react";
 import { userId } from "@rbx/core-scripts/meta/user";
-import { startWizard } from "@rbx/amp-v2-wizard";
 import { ManagementAction } from "../../../../../../types/parentConsentsTypes";
 import { FindFriendsTypes, FindFriendsUserSort } from "../../../../../../types/friendsTypes";
 import { parentalControlsApi } from "../../../../../apis/parentalControlsApi";
 import { useAppDispatch } from "../../../../../redux/hooks";
+import useStartOdpWizard from "../../../../hooks/useStartOdpWizard";
 
 const useManageOdpFriend = () => {
   const dispatch = useAppDispatch();
   const isWizardActiveRef = useRef(false);
   const [isManaging, setIsManaging] = useState(false);
+  const startOdpWizard = useStartOdpWizard();
 
   const manageFriend = async (
     friendUserId: number,
@@ -22,7 +23,7 @@ const useManageOdpFriend = () => {
     isWizardActiveRef.current = true;
     setIsManaging(true);
     try {
-      await startWizard({
+      await startOdpWizard({
         flow: {
           name: "ODP",
           props: {
@@ -35,7 +36,7 @@ const useManageOdpFriend = () => {
           },
         },
         surface: "ParentalControlsSettings",
-      }).catch(() => undefined);
+      });
     } finally {
       // Refetch the first page. Invalidating the tag refetches the last page loaded.
       dispatch(

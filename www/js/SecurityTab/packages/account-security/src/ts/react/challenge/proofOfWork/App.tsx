@@ -1,7 +1,5 @@
 import React from "react";
-import { withTranslations, WithTranslationsProps } from "react-utilities";
 import { RequestService } from "../../../common/request";
-import { TRANSLATION_CONFIG } from "./app.config";
 import ProofOfWork from "./containers/proofOfWork";
 import {
   OnChallengeDisplayedCallback,
@@ -23,7 +21,7 @@ type Props = {
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
-} & WithTranslationsProps;
+};
 
 const App: React.FC<Props> = ({
   sessionId,
@@ -32,7 +30,6 @@ const App: React.FC<Props> = ({
   metricsService,
   requestService,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  translate,
   onChallengeDisplayed,
   onChallengeCompleted,
   onChallengeInvalidated,
@@ -45,7 +42,6 @@ const App: React.FC<Props> = ({
       eventService={eventService}
       metricsService={metricsService}
       requestService={requestService}
-      translate={translate}
       onChallengeDisplayed={onChallengeDisplayed}
       onChallengeCompleted={onChallengeCompleted}
       onChallengeInvalidated={onChallengeInvalidated}
@@ -56,4 +52,4 @@ const App: React.FC<Props> = ({
   );
 };
 
-export default withTranslations(App, TRANSLATION_CONFIG);
+export default App;

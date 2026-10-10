@@ -12,6 +12,7 @@ import { useLiveUserNameForDisplay } from "../../hooks/useLiveUserNameForDisplay
 import layoutConstants from "../../constants/layoutConstants";
 import { sendLeftSidebarEvent } from "../../services/eventService";
 import { logLeftNavExposure } from "../../util/leftNavIxpUtil";
+import { trackOpenToVisible } from "../observability";
 
 const { headerMenuIconClickEvent } = layoutConstants;
 
@@ -27,6 +28,7 @@ export default function LeftNavigation() {
       sendLeftSidebarEvent(open, "OLD");
       if (open) {
         logLeftNavExposure();
+        trackOpenToVisible("OLD");
       }
       return open;
     });

@@ -1,8 +1,9 @@
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { RequestServiceDefault } from "../../../common/request";
 import App from "./App";
-import { LOG_PREFIX, USE_LIGHTBOX_MODAL } from "./app.config";
+import { LOG_PREFIX, TRANSLATION_NAMESPACES, USE_LIGHTBOX_MODAL } from "./app.config";
 import { RenderChallenge } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
@@ -67,22 +68,24 @@ export const renderChallenge: RenderChallenge = async ({
 
     // Render the app on the selected element.
     render(
-      <App
-        actionType={actionType}
-        appType={appType}
-        dataExchangeBlob={dataExchangeBlob}
-        unifiedCaptchaId={unifiedCaptchaId}
-        renderInline={renderInline}
-        requestService={requestServiceDefault}
-        metadataResponse={metadata.value}
-        eventService={eventService}
-        metricsService={metricsService}
-        captchaVersion={captchaVersion}
-        onChallengeDisplayed={onChallengeDisplayed}
-        onChallengeCompleted={onChallengeCompleted}
-        onChallengeInvalidated={onChallengeInvalidated}
-        onModalChallengeAbandoned={onModalChallengeAbandoned}
-      />,
+      <TranslationProviderSCC namespaces={TRANSLATION_NAMESPACES}>
+        <App
+          actionType={actionType}
+          appType={appType}
+          dataExchangeBlob={dataExchangeBlob}
+          unifiedCaptchaId={unifiedCaptchaId}
+          renderInline={renderInline}
+          requestService={requestServiceDefault}
+          metadataResponse={metadata.value}
+          eventService={eventService}
+          metricsService={metricsService}
+          captchaVersion={captchaVersion}
+          onChallengeDisplayed={onChallengeDisplayed}
+          onChallengeCompleted={onChallengeCompleted}
+          onChallengeInvalidated={onChallengeInvalidated}
+          onModalChallengeAbandoned={onModalChallengeAbandoned}
+        />
+      </TranslationProviderSCC>,
       container,
     );
     return true;

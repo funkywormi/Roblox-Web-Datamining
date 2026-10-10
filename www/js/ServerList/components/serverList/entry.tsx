@@ -36,6 +36,6 @@ ready(() => {
       serversSectionContainer,
     );
   } else {
-    window.EventTracker.fireEvent("ServerListEntryNoDomNodeFound");
+    window.EventTracker?.fireEvent("ServerListEntryNoDomNodeFound");
   }
 });

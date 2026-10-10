@@ -1,16 +1,6 @@
-import { CAPTCHA_V2_LANGUAGE_RESOURCES } from "../app.config";
+import type { Translator } from "@rbx/www-common/i18n";
 
-/**
- * A type adapted from the base type of `translate`, which we use to limit the
- * keys that can be translated.
- */
-type TranslateFunction = (
-  resourceId: (typeof CAPTCHA_V2_LANGUAGE_RESOURCES)[number],
-  parameters?: Record<string, unknown>,
-) => string;
-
-// IMPORTANT: Add resource keys to `app.config.ts` as well.
-export const getResources = (translate: TranslateFunction) =>
+export const getResources = (translate: Translator<"Feature.CaptchaV2Challenge">) =>
   ({
     Title: {
       VerifyHuman: translate("Title.VerifyHuman"),

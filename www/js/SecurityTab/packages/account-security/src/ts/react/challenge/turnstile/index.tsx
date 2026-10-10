@@ -1,8 +1,9 @@
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { RequestServiceDefault } from "../../../common/request";
 import App from "./App";
-import { LOG_PREFIX } from "./app.config";
+import { LOG_PREFIX, TRANSLATION_NAMESPACES } from "./app.config";
 import { RenderChallenge } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
@@ -57,19 +58,21 @@ export const renderChallenge: RenderChallenge = async ({
 
   // Render the app on the selected element.
   render(
-    <App
-      challengeId={challengeId}
-      appType={appType}
-      siteKey={metadata.value.cloudflare_turnstile_site_key}
-      renderInline={renderInline}
-      eventService={eventService}
-      metricsService={metricsService}
-      requestService={requestServiceDefault}
-      onChallengeDisplayed={onChallengeDisplayed}
-      onChallengeCompleted={onChallengeCompleted}
-      onChallengeInvalidated={onChallengeInvalidated}
-      onModalChallengeAbandoned={onModalChallengeAbandoned}
-    />,
+    <TranslationProviderSCC namespaces={TRANSLATION_NAMESPACES}>
+      <App
+        challengeId={challengeId}
+        appType={appType}
+        siteKey={metadata.value.cloudflare_turnstile_site_key}
+        renderInline={renderInline}
+        eventService={eventService}
+        metricsService={metricsService}
+        requestService={requestServiceDefault}
+        onChallengeDisplayed={onChallengeDisplayed}
+        onChallengeCompleted={onChallengeCompleted}
+        onChallengeInvalidated={onChallengeInvalidated}
+        onModalChallengeAbandoned={onModalChallengeAbandoned}
+      />
+    </TranslationProviderSCC>,
     container,
   );
   return true;

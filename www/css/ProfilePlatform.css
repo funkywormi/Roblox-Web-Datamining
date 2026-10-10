@@ -1752,6 +1752,10 @@
     background-color: rgb(from var(--color-system-warning)r g b/.2)
 }
 
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
+}
+
 .bg-\[var\(--light-mode-surface-100\)\] {
     background-color: var(--light-mode-surface-100)
 }

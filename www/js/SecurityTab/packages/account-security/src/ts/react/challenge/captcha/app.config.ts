@@ -1,17 +1,13 @@
-import { TranslationConfig } from "react-utilities";
 import { ActionType } from "./interface";
 
 export const FEATURE_NAME = "Captcha" as const;
 export const LOG_PREFIX = "Captcha:" as const;
 
 /**
- * Translations required by this web app (remember to also edit
- * `bundle.config.js` if changing this configuration).
+ * Translation namespaces used by this web app. Keep in sync with the challenge
+ * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const TRANSLATION_CONFIG: TranslationConfig = {
-  common: [],
-  feature: "Authentication.Captcha",
-};
+export const TRANSLATION_NAMESPACES = ["Authentication.Captcha"] as const;
 
 /**
  * Constants for event stream events.
@@ -47,16 +43,6 @@ export const METRICS_CONSTANTS = {
     solveTime: "SolveTime",
   },
 };
-
-/**
- * Language resource keys for captcha that are requested dynamically.
- */
-export const CAPTCHA_LANGUAGE_RESOURCES = [
-  "Action.PleaseTryAgain",
-  "Action.Reload",
-  "Description.VerifyingYouAreNotBot",
-  "Message.Error.Default",
-] as const;
 
 /**
  * The type of `FUNCAPTCHA_PUBLIC_KEY_MAP`.

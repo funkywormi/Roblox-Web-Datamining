@@ -90,7 +90,7 @@
 
 .modal-modern .modal-dialog .modal-content .modal-header {
     grid-gap: 48px;
-    border-bottom-color: rgba(39, 41, 48, .2);
+    border-bottom-color: color-mix(in srgb, var(--color-extended-gray-900)20%, transparent);
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     -ms-flex-align: center;
     align-items: center;
@@ -158,7 +158,7 @@
 }
 
 .modal-modern .modal-dialog .modal-content .modal-body .modal-text-danger {
-    color: #e75750
+    color: var(--color-extended-red-700)
 }
 
 .modal-modern .modal-dialog .modal-content .modal-body .modal-lock-icon {
@@ -182,7 +182,7 @@
 }
 
 .modal-modern .modal-dialog .modal-content .modal-body .modal-body-button-link {
-    color: #121215;
+    color: var(--color-extended-gray-1200);
     background: 0 0;
     border: none;
     margin-left: auto;
@@ -195,6 +195,12 @@
 .modal-modern .modal-dialog .modal-content .modal-body .modal-action-button {
     width: 100%;
     display: block
+}
+
+.modal-modern .modal-dialog .modal-content .modal-body .challenge-action-button {
+    width: 100%;
+    display: -ms-flexbox;
+    display: flex
 }
 
 .modal-modern .modal-dialog .modal-content .modal-footer {
@@ -246,12 +252,18 @@
     margin-bottom: 18px
 }
 
+.modal-modern .modal-dialog .modal-content .modal-footer .challenge-action-button {
+    width: 100%;
+    display: -ms-flexbox;
+    display: flex
+}
+
 .dark-theme .modal-modern .modal-dialog .modal-content .modal-header {
-    border-bottom-color: rgba(255, 255, 255, .2)
+    border-bottom-color: var(--color-extended-white-20)
 }
 
 .dark-theme .modal-modern .modal-dialog .modal-content .modal-body .modal-body-button-link {
-    color: #f7f7f8
+    color: var(--color-extended-gray-100)
 }
 
 .dark-theme .modal-modern .modal-dialog .modal-content .modal-body .modal-protection-shield-icon {
@@ -299,9 +311,9 @@
 .spinner-circle:before {
     visibility: visible;
     box-sizing: border-box;
-    content: "";
     border: .2em solid rgba(0, 0, 0, .25);
-    border-top-color: #272930;
+    border-top-color: var(--color-extended-gray-900);
+    content: "";
     border-radius: 50%;
     width: 75%;
     height: 75%;
@@ -314,7 +326,7 @@
 }
 
 .computation-progress-body .progress {
-    background-color: #bcbec8;
+    background-color: var(--color-extended-gray-500);
     background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
     background-repeat: repeat-x;
     background-size: 30px 30px;
@@ -471,7 +483,7 @@
 }
 
 .answer-choice-area .answer-choice .answer-choice-image .answer-choice-img-placeholder {
-    background-color: #f7f7f8;
+    background-color: var(--color-extended-gray-100);
     background-clip: padding-box;
     -ms-flex-pack: center;
     justify-content: center;
@@ -484,16 +496,16 @@
 
 .answer-choice-area .answer-choice .answer-choice-image:not(.answer-choice-selected):hover img,
 .answer-choice-area .answer-choice .answer-choice-image:not(.answer-choice-selected):hover .answer-choice-img-placeholder {
-    border: 4px solid #e6e7ea
+    border: 4px solid var(--color-extended-gray-300)
 }
 
 .answer-choice-area .answer-choice .answer-choice-image:active img,
 .answer-choice-area .answer-choice .answer-choice-image:active .answer-choice-img-placeholder,
 .answer-choice-area .answer-choice .answer-choice-image.answer-choice-selected img,
 .answer-choice-area .answer-choice .answer-choice-image.answer-choice-selected .answer-choice-img-placeholder {
+    border: 4px solid var(--color-extended-gray-1200);
     -webkit-filter: grayscale(0%);
-    filter: grayscale(0%);
-    border: 4px solid #121215
+    filter: grayscale(0%)
 }
 
 .answer-choice-area .answer-choice .answer-choice-caption {
@@ -510,23 +522,23 @@
 }
 
 .dark-theme .answer-choice-area .answer-choice .answer-choice-image .answer-choice-img-placeholder {
-    background-color: #121215
+    background-color: var(--color-extended-gray-1200)
 }
 
 .dark-theme .answer-choice-area .answer-choice .answer-choice-image:not(.answer-choice-selected):hover img,
 .dark-theme .answer-choice-area .answer-choice .answer-choice-image:not(.answer-choice-selected):hover .answer-choice-img-placeholder {
-    border: 4px solid #494d5a
+    border: 4px solid var(--color-extended-gray-700)
 }
 
 .dark-theme .answer-choice-area .answer-choice .answer-choice-image:active img,
 .dark-theme .answer-choice-area .answer-choice .answer-choice-image:active .answer-choice-img-placeholder,
 .dark-theme .answer-choice-area .answer-choice .answer-choice-image.answer-choice-selected img,
 .dark-theme .answer-choice-area .answer-choice .answer-choice-image.answer-choice-selected .answer-choice-img-placeholder {
-    border: 4px solid #f7f7f8
+    border: 4px solid var(--color-extended-gray-100)
 }
 
 .dark-theme .answer-choice-area .answer-choice .answer-choice-caption {
-    color: #f7f7f8
+    color: var(--color-extended-gray-100)
 }
 
 .media-type-list .media-type-row {
@@ -1069,7 +1081,7 @@ input[type=button].btn-block {
 }
 
 .inline-challenge .inline-challenge-content .inline-challenge-body .inline-challenge-body-button-link {
-    color: #121215;
+    color: var(--color-extended-gray-1200);
     background: 0 0;
     border: none;
     margin-left: auto;
@@ -1082,6 +1094,12 @@ input[type=button].btn-block {
 .inline-challenge .inline-challenge-content .inline-challenge-body .inline-challenge-action-button {
     width: 100%;
     display: block
+}
+
+.inline-challenge .inline-challenge-content .inline-challenge-body .challenge-action-button {
+    width: 100%;
+    display: -ms-flexbox;
+    display: flex
 }
 
 .inline-challenge .inline-challenge-content .inline-challenge-footer {
@@ -1132,12 +1150,18 @@ input[type=button].btn-block {
     margin-bottom: 18px
 }
 
+.inline-challenge .inline-challenge-content .inline-challenge-footer .challenge-action-button {
+    width: 100%;
+    display: -ms-flexbox;
+    display: flex
+}
+
 .dark-theme .inline-challenge .inline-challenge-content {
-    background-color: #272930
+    background-color: var(--color-extended-gray-900)
 }
 
 .dark-theme .inline-challenge .inline-challenge-content .inline-challenge-body .inline-challenge-body-button-link {
-    color: #f7f7f8
+    color: var(--color-extended-gray-100)
 }
 
 .dark-theme .inline-challenge .inline-challenge-content .inline-challenge-body .inline-challenge-protection-shield-icon {
@@ -1262,6 +1286,10 @@ input[type=button].btn-block {
     color: var(--inverse-surface-0)
 }
 
+.content-\[var\(--light-mode-content-emphasis\)\] {
+    color: var(--light-mode-content-emphasis)
+}
+
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-alert)r g b/.2)
 }
@@ -1276,6 +1304,10 @@ input[type=button].btn-block {
 
 .bg-\[var\(--color-common-backdrop\)\] {
     background-color: var(--color-common-backdrop)
+}
+
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
 }
 
 .opacity-\[0\.5\] {
@@ -1344,6 +1376,10 @@ input[type=button].btn-block {
 
 .icon-regular-smartphone-portrait {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M14 24C13.4477 24 13 24.4477 13 25C13 25.5523 13.4477 26 14 26H18C18.5523 26 19 25.5523 19 25C19 24.4477 18.5523 24 18 24H14Z' fill='black'/%3E %3Cpath d='M6 6C6 3.79086 7.79086 2 10 2H22C24.2091 2 26 3.79086 26 6V26C26 28.2091 24.2091 30 22 30H10C7.79086 30 6 28.2091 6 26V6ZM10 4C8.89543 4 8 4.89543 8 6V26C8 27.1046 8.89543 28 10 28H22C23.1046 28 24 27.1046 24 26V6C24 4.89543 23.1046 4 22 4H10Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-squares-grid-qr {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M4 6C4 4.89543 4.89543 4 6 4H12C13.1046 4 14 4.89543 14 6V12C14 13.1046 13.1046 14 12 14H6C4.89543 14 4 13.1046 4 12V6ZM6 6L6 12H12V6H6Z' fill='black'/%3E %3Cpath d='M4 20C4 18.8954 4.89543 18 6 18H12C13.1046 18 14 18.8954 14 20V26C14 27.1046 13.1046 28 12 28H6C4.89543 28 4 27.1046 4 26V20ZM6 20L6 26H12V20H6Z' fill='black'/%3E %3Cpath d='M20 4C18.8954 4 18 4.89543 18 6V12C18 13.1046 18.8954 14 20 14H26C27.1046 14 28 13.1046 28 12V6C28 4.89543 27.1046 4 26 4H20ZM26 6V12H20V6H26Z' fill='black'/%3E %3Cpath d='M18 18V20H20V22H18V24H20V26H22V28H24V24H26V26H28V24H26V20H28V18H26V20H24V18H18ZM22 22V20H24V22H22ZM22 22V24H20V22H22Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-regular-x {

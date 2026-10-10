@@ -1,4 +1,4 @@
-import type { Subscription, PaymentProfileCardInfo } from "@rbx/client-subscriptions-api/v1";
+import type { Subscription, PaymentProfileCardInfo } from "@rbx/client-subscriptions-api/v2";
 import { PaymentProviderCardInfo } from "../../../core/types/cardInfo";
 import { Price } from "../../../core/types/price";
 import { UserSubscription } from "../../../core/types/userSubscription";
@@ -12,6 +12,7 @@ const TARGET_KEY_PREFIX: Record<string, string> = {
   CurrencySubscription: "CUR",
   DeveloperSubscription: "EXP",
   Premium: "PRM",
+  RobuxSubscription: "RBX",
 };
 
 /**
@@ -53,9 +54,34 @@ const mapV2DisplayPrice = (displayPrice: Subscription["displayPrice"]): Price =>
   };
 };
 
+const resolveCurrencySubscriptionBenefit = (
+  sub: Subscription,
+): UserSubscription["currencySubscriptionBenefit"] => {
+  const membershipBenefit =
+    sub.productTypeMembershipDetails?.robloxSubscriptionMembershipDetails
+      ?.currencySubscriptionBenefit ?? null;
+  if (membershipBenefit) {
+    return membershipBenefit;
+  }
+
+  const config =
+    sub.productInfo?.productTypeDetails?.robloxSubscriptionProductDetails?.featureConfig
+      ?.currencySubscriptionConfig;
+  if (!config || !(config.entitledAmountMicros > 0)) {
+    return null;
+  }
+
+  return {
+    currencyType: config.currencyType,
+    entitledAmountMicrosPerGrantingPeriod: config.entitledAmountMicros,
+    grantingPeriodType: "Month",
+  };
+};
+
 /**
  * Maps a V2 subscription response to the UserSubscription type.
- * Used for Roblox-owned subscriptions (Blackbird, CurrencySubscription) fetched via ListSubscriptions V2.
+ * Used for Roblox-owned subscriptions (Blackbird, CurrencySubscription, RobuxSubscription)
+ * fetched via ListSubscriptions V2.
  * Display name and description are translated at the UI layer via translate().
  */
 export const mapV2ToUserSubscription = (sub: Subscription): UserSubscription => {
@@ -63,6 +89,7 @@ export const mapV2ToUserSubscription = (sub: Subscription): UserSubscription => 
   const productId = sub.productKey?.id ?? "";
   return {
     subscriptionTargetKey: toTargetKey(productType, productId) ?? "",
+    subscriptionId: sub.subscriptionId,
     name: productType,
     subscriptionProviderName: "Roblox",
     productType: productType || undefined,
@@ -76,9 +103,7 @@ export const mapV2ToUserSubscription = (sub: Subscription): UserSubscription => 
     paymentProfileId: sub.paymentProfile?.id ?? "",
     purchasePlatform: sub.purchasePlatform as PurchasePlatform,
     subscriptionOffers: sub.activeOffers?.length ? sub.activeOffers : undefined,
-    currencySubscriptionBenefit:
-      sub.productTypeMembershipDetails?.robloxSubscriptionMembershipDetails
-        ?.currencySubscriptionBenefit ?? null,
+    currencySubscriptionBenefit: resolveCurrencySubscriptionBenefit(sub),
   };
 };
 

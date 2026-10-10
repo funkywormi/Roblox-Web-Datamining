@@ -12,6 +12,8 @@ import {
 import { PendingRequestRow } from "./PendingRequestRow";
 import { PendingTransfersSheet } from "./PendingTransfersSheet";
 import { PendingTransfer } from "../../types/buyRobuxPageData";
+import { navigateToDeepLink } from "../../utils/robuxTransfersDeepLinks";
+import { buildPlusSubscribeDeepLink, referralEventService } from "@rbx/subscriptions-common";
 
 function PendingTransfersRequestRow({
   pendingTransfers,
@@ -67,7 +69,13 @@ function PendingTransfersRequestRow({
   );
 }
 
-function PendingReferralRow({ referral }: { referral: SubscriptionReferral }) {
+function PendingReferralRow({
+  referral,
+  shouldDeeplinkToReferral,
+}: {
+  referral: SubscriptionReferral;
+  shouldDeeplinkToReferral?: boolean;
+}) {
   const { translate, intl } = useTranslation();
   const { handle, isLoading } = useReferrerHandle(String(referral.senderUserId));
   const [isInviteOpen, setIsInviteOpen] = useState(false);
@@ -100,6 +108,20 @@ function PendingReferralRow({ referral }: { referral: SubscriptionReferral }) {
             : reward
         }
         onSelect={() => {
+          if (shouldDeeplinkToReferral) {
+            referralEventService.buyRobuxReferralReviewClick(
+              String(referral.senderUserId),
+              referral.referralId,
+            );
+            navigateToDeepLink(
+              buildPlusSubscribeDeepLink({
+                surface: "PlusReferralLandingSheet",
+                entrypoint: "BuyRobuxPage",
+                referrerId: referral.senderUserId,
+              }),
+            );
+            return;
+          }
           setIsInviteOpen(true);
         }}
       />
@@ -117,6 +139,7 @@ type PendingRequestsSheetProps = {
   pendingTransfers: PendingTransfer[];
   acceptTransfersTranslationKey?: string;
   pendingReferrals: SubscriptionReferral[];
+  shouldDeeplinkToReferral?: boolean;
 };
 
 /**
@@ -127,6 +150,7 @@ export function PendingRequestsSheet({
   pendingTransfers,
   acceptTransfersTranslationKey,
   pendingReferrals,
+  shouldDeeplinkToReferral,
 }: PendingRequestsSheetProps) {
   const { translate } = useTranslation();
 
@@ -147,7 +171,11 @@ export function PendingRequestsSheet({
             />
           ) : null}
           {pendingReferrals.map(referral => (
-            <PendingReferralRow key={referral.referralId} referral={referral} />
+            <PendingReferralRow
+              key={referral.referralId}
+              referral={referral}
+              shouldDeeplinkToReferral={shouldDeeplinkToReferral}
+            />
           ))}
         </div>
       </SheetBody>

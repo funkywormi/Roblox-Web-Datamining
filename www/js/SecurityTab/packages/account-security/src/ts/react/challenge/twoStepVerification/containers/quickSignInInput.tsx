@@ -5,9 +5,8 @@ import { Modal } from "react-style-guide";
 import { openModal as openCrossDeviceLoginDisplayCodeModal } from "@rbx/authentication/crossDeviceLoginDisplayCodeModal/services/crossDeviceLoginDisplayCodeService";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
-import { InlineChallengeFooter } from "../../../common/inlineChallengeFooter";
-import { FooterButtonConfig, FragmentModalFooter } from "../../../common/modalFooter";
 import SupportHelp from "../components/supportHelp";
+import VerificationFooter, { VerificationFooterButton } from "../components/verificationFooter";
 import useTwoStepVerificationContext from "../hooks/useTwoStepVerificationContext";
 import { ActionType } from "../interface";
 
@@ -45,9 +44,11 @@ const QuickSignInInput: React.FC<Props> = ({ setModalTitleText, children }: Prop
       // In RobloxApp webview, close the hybrid overlay. window.Roblox.Hybrid is injected by
       // the native app webview bridge (no importable module); read defensively so off-app
       // paths no-op instead of throwing.
-      const { Hybrid } = window.Roblox as {
-        Hybrid?: { Overlay?: { close: (callback: () => void) => void } };
-      };
+      const Hybrid = (
+        window.Roblox as
+          | { Hybrid?: { Overlay?: { close: (callback: () => void) => void } } }
+          | undefined
+      )?.Hybrid;
       Hybrid?.Overlay?.close(() => undefined);
     } else {
       // On web, open the cross-device login modal via the imported service.
@@ -57,15 +58,14 @@ const QuickSignInInput: React.FC<Props> = ({ setModalTitleText, children }: Prop
 
   const buttonLabel = inRobloxApp ? resources.Action.Okay : resources.Action.Continue;
 
-  const positiveButton: FooterButtonConfig = {
-    content: buttonLabel,
+  const positiveButton: VerificationFooterButton = {
     label: buttonLabel,
     enabled: true,
+    loading: false,
     action: handleButtonClick,
   };
 
   const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
-  const FooterElement = renderInline ? InlineChallengeFooter : FragmentModalFooter;
   const lockIconClassName = renderInline
     ? "inline-challenge-protection-shield-icon"
     : "modal-protection-shield-icon";
@@ -81,11 +81,11 @@ const QuickSignInInput: React.FC<Props> = ({ setModalTitleText, children }: Prop
         <BodyElement>
           <div className={lockIconClassName} />
           <p className={marginBottomXLargeClassName}>{bodyText}</p>
-          {children}
         </BodyElement>
-        <FooterElement positiveButton={positiveButton} negativeButton={null}>
+        <VerificationFooter positiveButton={positiveButton}>
+          {children}
           <SupportHelp className={marginBottomClassName} />
-        </FooterElement>
+        </VerificationFooter>
       </React.Fragment>
     )
   );

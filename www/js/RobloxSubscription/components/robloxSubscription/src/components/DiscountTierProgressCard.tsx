@@ -13,6 +13,8 @@ export type DiscountTierProgressCardProps = {
   /** Lowest tier above the user's current tier, or null when at max / no tiers. */
   nextDiscount: SubscriptionTenureDiscount | null;
   activationTimestampMs: number;
+  /** Trial end (first paid charge); when set, the countdown measures from here, not activation. */
+  trialEndTimestampMs?: number | null;
   isCancelled: boolean;
   periodType: PeriodType;
 };
@@ -21,6 +23,7 @@ const DiscountTierProgressCard: FC<DiscountTierProgressCardProps> = ({
   currentDiscountPercent,
   nextDiscount,
   activationTimestampMs,
+  trialEndTimestampMs,
   isCancelled,
   periodType,
 }) => {
@@ -31,9 +34,11 @@ const DiscountTierProgressCard: FC<DiscountTierProgressCardProps> = ({
       return null;
     }
 
+    // During a trial the step-up clock starts at the trial end, not activation.
+    const tenureStartTimestampMs = trialEndTimestampMs ?? activationTimestampMs;
     const nowTimestampMs = Date.now();
     const targetDateTimestampMs = addBillingPeriod(
-      activationTimestampMs,
+      tenureStartTimestampMs,
       nextDiscount.periodIndex,
       periodType,
     ).getTime();
@@ -46,8 +51,8 @@ const DiscountTierProgressCard: FC<DiscountTierProgressCardProps> = ({
     const targetDateProgressPercent = Math.min(
       Math.max(
         0,
-        ((nowTimestampMs - activationTimestampMs) /
-          (targetDateTimestampMs - activationTimestampMs)) *
+        ((nowTimestampMs - tenureStartTimestampMs) /
+          (targetDateTimestampMs - tenureStartTimestampMs)) *
           100,
       ),
       100,
@@ -58,7 +63,7 @@ const DiscountTierProgressCard: FC<DiscountTierProgressCardProps> = ({
       targetDateDaysUntil,
       targetDateProgressPercent,
     };
-  }, [nextDiscount, activationTimestampMs, periodType]);
+  }, [nextDiscount, activationTimestampMs, trialEndTimestampMs, periodType]);
 
   // TODO(SUBS-4070): handle case where targetDateDaysUntil is 0 (i.e., waiting for next renewal)
 

@@ -1,3 +1,4 @@
+import { unmountComponentAtNode } from "react-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import dataStores from "@rbx/core-scripts/data-store";
 import { registerReferrerLookup } from "@rbx/subscriptions-common";
@@ -12,15 +13,13 @@ import NavigationRightHeader from "./src/containers/NavigationRightHeader";
 import NavigationRobux from "./src/containers/NavigationRobux";
 import { cacheUserId } from "./src/util/authUtil";
 import PasskeyUpgradeSnackbar from "./src/components/PasskeyUpgradeSnackbar";
-import PostSignupDownloadModalRoot, {
-  newUserSessionStorageKey,
-  newUserSessionStorageValue,
-} from "./src/components/PostSignupDownloadModal";
+import PostSignupDownloadModal from "./src/components/PostSignupDownloadModal";
 import { initializeDevelopLink } from "./src/util/developUtil";
 import { initializeLogoLink } from "./src/util/logoUtil";
 import { initNavClickEvents } from "./src/util/navClickUtil";
 import MenuIcon from "./src/containers/MenuIcon";
 import AgeBadge from "./src/components/AgeBadge";
+import { TopNavErrorBoundary } from "./src/topNav/observability";
 import setupAuthInterceptor from "./src/services/authInterceptor";
 import { attemptPasskeyUpgrade } from "./src/util/conditionalPasskeyCreate";
 import * as navigation from "./src";
@@ -60,11 +59,13 @@ ready(() => {
 
   if (document.getElementById(menuIconContainerId)) {
     renderWithErrorBoundary(
-      <TranslationProviderSCC namespaces={navNamespaces}>
-        <TranslationProvider config={translations}>
-          <MenuIcon />
-        </TranslationProvider>
-      </TranslationProviderSCC>,
+      <TopNavErrorBoundary name="MenuIconCrash">
+        <TranslationProviderSCC namespaces={navNamespaces}>
+          <TranslationProvider config={translations}>
+            <MenuIcon />
+          </TranslationProvider>
+        </TranslationProviderSCC>
+      </TopNavErrorBoundary>,
       document.getElementById(menuIconContainerId),
     );
   }
@@ -72,11 +73,13 @@ ready(() => {
   const ageBadgeVariant = ageBadgeControl();
   if (ageBadgeVariant && document.getElementById(ageBadgeContainerId)) {
     renderWithErrorBoundary(
-      <TranslationProviderSCC namespaces={navNamespaces}>
-        <TranslationProvider config={translations}>
-          <AgeBadge variant={ageBadgeVariant} />
-        </TranslationProvider>
-      </TranslationProviderSCC>,
+      <TopNavErrorBoundary name="AgeBadgeCrash">
+        <TranslationProviderSCC namespaces={navNamespaces}>
+          <TranslationProvider config={translations}>
+            <AgeBadge variant={ageBadgeVariant} />
+          </TranslationProvider>
+        </TranslationProviderSCC>
+      </TopNavErrorBoundary>,
       document.getElementById(ageBadgeContainerId),
     );
 
@@ -88,41 +91,47 @@ ready(() => {
 
   if (document.getElementById(navigationRobuxContainerId)) {
     renderWithErrorBoundary(
-      <TranslationProviderSCC namespaces={navNamespaces}>
-        <TranslationProvider config={translations}>
-          <NavigationRobux />
-        </TranslationProvider>
-      </TranslationProviderSCC>,
+      <TopNavErrorBoundary name="RobuxCrash">
+        <TranslationProviderSCC namespaces={navNamespaces}>
+          <TranslationProvider config={translations}>
+            <NavigationRobux />
+          </TranslationProvider>
+        </TranslationProviderSCC>
+      </TopNavErrorBoundary>,
       document.getElementById(navigationRobuxContainerId),
     );
   }
 
   if (document.getElementById(navigationRobuxMobileContainerId)) {
     renderWithErrorBoundary(
-      <TranslationProviderSCC namespaces={navNamespaces}>
-        <TranslationProvider config={translations}>
-          <NavigationRobux />
-        </TranslationProvider>
-      </TranslationProviderSCC>,
+      <TopNavErrorBoundary name="RobuxCrash">
+        <TranslationProviderSCC namespaces={navNamespaces}>
+          <TranslationProvider config={translations}>
+            <NavigationRobux />
+          </TranslationProvider>
+        </TranslationProviderSCC>
+      </TopNavErrorBoundary>,
       document.getElementById(navigationRobuxMobileContainerId),
     );
   }
 
   if (document.getElementById(rightNavigationHeaderContainerId)) {
     renderWithErrorBoundary(
-      <QueryClientProvider client={queryClient}>
-        <TranslationProviderSCC namespaces={navNamespaces}>
-          <TranslationProvider config={translations}>
-            <NavigationRightHeader />
-          </TranslationProvider>
-        </TranslationProviderSCC>
-      </QueryClientProvider>,
+      <TopNavErrorBoundary name="RightHeaderCrash">
+        <QueryClientProvider client={queryClient}>
+          <TranslationProviderSCC namespaces={navNamespaces}>
+            <TranslationProvider config={translations}>
+              <NavigationRightHeader />
+            </TranslationProvider>
+          </TranslationProviderSCC>
+        </QueryClientProvider>
+      </TopNavErrorBoundary>,
       document.getElementById(rightNavigationHeaderContainerId),
     );
   }
 
   if (currentBrowser() === Browser.Safari) {
-    // eslint-disable-next-line no-void
+    // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation
     void upgradeResult.then(success => {
       if (success) {
         const snackbarContainer = document.createElement("div");
@@ -152,14 +161,32 @@ ready(() => {
     );
   }
 
-  if (window.sessionStorage.getItem(newUserSessionStorageKey) === newUserSessionStorageValue) {
+  const takeNewUserFlag = () => {
+    try {
+      const flag = window.sessionStorage.getItem("new-user");
+      if (flag != null) {
+        try {
+          window.sessionStorage.removeItem("new-user");
+        } catch {
+          // do nothing
+        }
+      }
+      return flag === "true";
+    } catch {
+      return false;
+    }
+  };
+
+  if (takeNewUserFlag()) {
     const downloadModalContainer = document.createElement("div");
     document.body.appendChild(downloadModalContainer);
     renderWithErrorBoundary(
       <QueryClientProvider client={queryClient}>
         <TranslationProviderSCC namespaces={navNamespaces}>
           <TranslationProvider config={translations}>
-            <PostSignupDownloadModalRoot />
+            <PostSignupDownloadModal
+              unmount={() => unmountComponentAtNode(downloadModalContainer)}
+            />
           </TranslationProvider>
         </TranslationProviderSCC>
       </QueryClientProvider>,

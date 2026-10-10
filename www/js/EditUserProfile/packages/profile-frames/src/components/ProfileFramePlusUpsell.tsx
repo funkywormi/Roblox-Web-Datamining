@@ -4,8 +4,7 @@ import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { SheetRoot } from "@rbx/foundation-ui";
 
-import { RobloxSubscriptionSheet } from "@rbx/subscriptions-common";
-import { usePlusSubscriptionProduct } from "../hooks/usePlusSubscriptionProduct";
+import { RobloxSubscriptionSheet, usePlusUpsellProduct } from "@rbx/subscriptions-common";
 import { ROBLOX_PLUS_URL } from "../profileFrameConfig";
 
 type ProfileFramePlusUpsellProps = {
@@ -26,11 +25,11 @@ type ProfileFramePlusUpsellProps = {
 export const ProfileFramePlusUpsell = ({ open, onBack }: ProfileFramePlusUpsellProps) => {
   const { translate } = useTranslation();
   const {
-    data: subscriptionProductInfo,
+    product: subscriptionProductInfo,
     isError,
     isSuccess,
-  } = usePlusSubscriptionProduct({
-    isEnabled: open,
+  } = usePlusUpsellProduct({
+    enabled: open,
   });
   const deviceMeta = getDeviceMeta();
   const redirectUrl = typeof window !== "undefined" ? window.location.href : undefined;
@@ -55,7 +54,10 @@ export const ProfileFramePlusUpsell = ({ open, onBack }: ProfileFramePlusUpsellP
         <RobloxSubscriptionSheet
           deviceMeta={deviceMeta}
           redirectUrl={redirectUrl}
-          showBillingInfo={false}
+          // Billing row only for trials; otherwise the price CTA already shows it.
+          showBillingInfo={subscriptionProductInfo.eligibleOffers.some(
+            offer => offer.offerType === "FreeTrial",
+          )}
           showBrandIcon={false}
           showPriceInCta
           subscriptionProductInfo={subscriptionProductInfo}

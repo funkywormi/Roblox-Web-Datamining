@@ -289,6 +289,10 @@
     color: var(--inverse-surface-0)
 }
 
+.content-\[var\(--light-mode-content-emphasis\)\] {
+    color: var(--light-mode-content-emphasis)
+}
+
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-alert)r g b/.2)
 }
@@ -303,6 +307,10 @@
 
 .bg-\[var\(--color-extended-orange-700\)\] {
     background-color: var(--color-extended-orange-700)
+}
+
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
 }
 
 .opacity-\[0\.5\] {
@@ -693,36 +701,36 @@
 }
 
 @media (prefers-color-scheme:dark) {
-    .dark\:block:where(:not(:-webkit-any(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:-webkit-any(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:block:where(:not(:-moz-any(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:-moz-any(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:block:where(:not(:is(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:is(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:hidden:where(:not(:-webkit-any(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:-webkit-any(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 
-    .dark\:hidden:where(:not(:-moz-any(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:-moz-any(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 
-    .dark\:hidden:where(:not(:is(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:is(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 }
 
-.dark\:block:where(.dark-theme, .dark-theme *) {
+.dark\:block:where(.color-mode-dark, .color-mode-dark *) {
     display: block
 }
 
-.dark\:hidden:where(.dark-theme, .dark-theme *) {
+.dark\:hidden:where(.color-mode-dark, .color-mode-dark *) {
     display: none
 }
 

@@ -1,5 +1,8 @@
 export const ONE_ROBUX_IN_MICROS = 1_000_000;
 
+/** The introductory VT discount is a fixed 60-day offer regardless of the product's billing period. */
+export const INTRODUCTORY_DISCOUNT_DAYS = 60;
+
 /** Terms every subscribe CTA links to. Not the Referral Program terms, which are their own page. */
 export const SUBSCRIPTION_TERMS_URL = "https://www.roblox.com/info/terms";
 

@@ -32,4 +32,8 @@ export enum AppealsEventType {
   SupportClick = "appealsPortalSupportClick",
   UnknownViolation = "appealsPortalUnknownViolation",
   ValidationError = "appealsPortalValidationError",
+  // Events for "fixed" appeal type, where the user selects "Ask for review" rather than "Send appeal"
+  // Analogous to RequestAppeal and StartAppeal, but for the "fixed" appeal type specifically to separate metrics.
+  AskForReview = "appealsPortalAskForReview",
+  StartAskForReview = "appealsPortalStartAskForReview",
 }

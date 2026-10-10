@@ -1,26 +1,11 @@
-import { TranslationConfig } from "react-utilities";
-
 export const FEATURE_NAME = "ProofOfWork" as const;
 export const LOG_PREFIX = "Proof-of-Work:" as const;
 
 /**
- * Translations required by this web app (remember to also edit
- * `bundle.config.js` if changing this configuration).
+ * Translation namespaces used by this web app. Keep in sync with the challenge
+ * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const TRANSLATION_CONFIG: TranslationConfig = {
-  common: ["CommonUI.Messages"],
-  feature: "Feature.ProofOfWorkChallenge",
-};
-
-/**
- * Language resource keys for proof of work that are requested
- * dynamically.
- */
-export const PROOF_OF_WORK_LANGUAGE_RESOURCES = [
-  "Description.VerificationError",
-  "Description.VerificationSuccess",
-  "Description.VerifyingYouAreNotBot",
-] as const;
+export const TRANSLATION_NAMESPACES = ["Feature.ProofOfWorkChallenge"] as const;
 
 /**
  * Constants for event stream events.

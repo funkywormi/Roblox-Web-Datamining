@@ -1,26 +1,11 @@
-import { TranslationConfig } from "react-utilities";
-
 export const FEATURE_NAME = "DeviceIntegrity" as const;
 export const LOG_PREFIX = "Device Integrity:" as const;
 
 /**
- * Translations required by this web app (remember to also edit
- * `bundle.config.js` if changing this configuration).
+ * Translation namespaces used by this web app. Keep in sync with the challenge
+ * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const TRANSLATION_CONFIG: TranslationConfig = {
-  common: ["CommonUI.Messages"],
-  feature: "Feature.DeviceIntegrityChallenge",
-};
-
-/**
- * Language resource keys for the device integrity challenge that are requested
- * dynamically.
- */
-export const DEVICE_INTEGRITY_LANGUAGE_RESOURCES = [
-  "Description.VerificationError",
-  "Description.VerificationSuccess",
-  "Description.VerifyingYouAreNotBot",
-] as const;
+export const TRANSLATION_NAMESPACES = ["Feature.DeviceIntegrityChallenge"] as const;
 
 /**
  * Constants for event stream events.

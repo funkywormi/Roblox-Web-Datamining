@@ -1,13 +1,13 @@
 import React, { useMemo } from "react";
 import classNames from "classnames";
 import { useTranslation } from "react-utilities";
-import { ProductType } from "@rbx/client-subscriptions-api/v1";
+import { ProductType } from "@rbx/client-subscriptions-api/v2";
 import { Pagination as PaginationBase } from "@rbx/core-ui";
-import { ONE_ROBUX_IN_MICROS } from "@rbx/subscriptions-common";
 import { PremiumSubscription } from "../../../core/types/premiumSubscription";
 import { SubscriptionListItem, UserSubscription } from "../../../core/types/userSubscription";
 import SubscriptionCard from "./SubscriptionCard";
 import { premiumName, premiumPeriod } from "../utils/premiumUtils";
+import { getManagedSubscriptionDisplayName } from "../utils/getManagedSubscriptionDisplayName";
 import "../../../../css/subscriptionManagement/subscriptionsList.scss";
 import { SubscriptionListItemType } from "../../../core/types/subscriptionEnums";
 import PrivateServerCard from "./PrivateServerCard";
@@ -42,22 +42,8 @@ const SubscriptionsList: React.FC<SubscriptionsListProps> = ({
   const { translate } = useTranslation();
 
   const subscriptionCards = useMemo(() => {
-    const resolveSubscriptionName = (sub: UserSubscription): string => {
-      switch (sub.productType) {
-        case ProductType.Blackbird:
-          if (
-            sub.currencySubscriptionBenefit &&
-            sub.currencySubscriptionBenefit.entitledAmountMicrosPerGrantingPeriod > 0
-          ) {
-            return `Plus ${sub.currencySubscriptionBenefit.entitledAmountMicrosPerGrantingPeriod / ONE_ROBUX_IN_MICROS}`;
-          }
-          return translate("Label.Blackbird");
-        case ProductType.CurrencySubscription:
-          return translate("Label.CurrencySubscription");
-        default:
-          return sub.name;
-      }
-    };
+    const resolveSubscriptionName = (sub: UserSubscription): string =>
+      getManagedSubscriptionDisplayName(sub, translate);
 
     const renderSubscriptionListItem = (
       subscriptionListItem: SubscriptionListItem,

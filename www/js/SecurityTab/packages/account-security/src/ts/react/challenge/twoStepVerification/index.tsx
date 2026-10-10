@@ -1,10 +1,12 @@
 import { render, unmountComponentAtNode } from "react-dom";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import "../../../../css/challenge/twoStepVerification/twoStepVerification.scss";
 import "../../../../css/common/inlineChallenge.scss";
 import "../../../../css/common/modalModern.scss";
 import "../../../../css/common/spinner.scss";
 import { RequestServiceDefault } from "../../../common/request";
 import App from "./App";
+import { TRANSLATION_NAMESPACES } from "./app.config";
 import { RenderChallenge } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
@@ -49,22 +51,24 @@ export const renderChallenge: RenderChallenge = ({
 
     // Render the app on the selected element.
     render(
-      <App
-        userId={userId}
-        challengeId={challengeId}
-        actionType={actionType}
-        renderInline={renderInline}
-        shouldModifyBrowserHistory={shouldModifyBrowserHistory || false}
-        shouldShowRememberDeviceCheckbox={shouldShowRememberDeviceCheckbox}
-        eventService={eventService}
-        metricsService={metricsService}
-        requestService={requestServiceDefault}
-        onChallengeCompleted={onChallengeCompleted}
-        onChallengeInvalidated={onChallengeInvalidated}
-        onModalChallengeAbandoned={onModalChallengeAbandoned}
-        delayParameters={delayParameters}
-        recoveryParameters={recoveryParameters}
-      />,
+      <TranslationProviderSCC namespaces={TRANSLATION_NAMESPACES}>
+        <App
+          userId={userId}
+          challengeId={challengeId}
+          actionType={actionType}
+          renderInline={renderInline}
+          shouldModifyBrowserHistory={shouldModifyBrowserHistory || false}
+          shouldShowRememberDeviceCheckbox={shouldShowRememberDeviceCheckbox}
+          eventService={eventService}
+          metricsService={metricsService}
+          requestService={requestServiceDefault}
+          onChallengeCompleted={onChallengeCompleted}
+          onChallengeInvalidated={onChallengeInvalidated}
+          onModalChallengeAbandoned={onModalChallengeAbandoned}
+          delayParameters={delayParameters}
+          recoveryParameters={recoveryParameters}
+        />
+      </TranslationProviderSCC>,
       container,
     );
     eventService.sendChallengeInitializedEvent();

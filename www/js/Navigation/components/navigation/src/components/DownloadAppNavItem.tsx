@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { MouseEvent } from "react";
 import {
   DownloadButton,
   InstallInstructionsList,
@@ -7,7 +7,7 @@ import {
   downloadSourceType,
   resolveAppDownload,
   sendPrimaryAppDownloadClickEvent,
-  useAppDownload,
+  getDownloadLinkParams,
   type ResolvedAppDownload,
 } from "@rbx/app-download";
 import { DialogTitle } from "@rbx/foundation-ui";
@@ -20,11 +20,7 @@ export default function DownloadAppNavItem() {
   const t = useTranslations("Feature.DownloadLanding");
   const translate = useAppDownloadTranslate();
   const isEnabled = useTopNavDownloadButton();
-  const { resolveTokenizedHref, logExposure } = useAppDownload({
-    linkId: window.location.href,
-    downloadSource: downloadSourceType.Installer,
-  });
-  const download = useMemo(() => resolveAppDownload({ translate }), [translate]);
+  const download = resolveAppDownload({ translate });
 
   if (!isEnabled) {
     return null;
@@ -37,15 +33,18 @@ export default function DownloadAppNavItem() {
     return null;
   }
 
-  const handleClick = async (click: ResolvedAppDownload, event: React.MouseEvent<HTMLElement>) => {
-    logExposure();
+  const handleClick = async (click: ResolvedAppDownload, event: MouseEvent<HTMLElement>) => {
     sendPrimaryAppDownloadClickEvent(click.link.name);
     if (!click.isDirectDownload) {
       return;
     }
     // Intercept anchor navigation so we can append a deferred-deeplink token.
     event.preventDefault();
-    const url = await resolveTokenizedHref(click.href);
+    const params = await getDownloadLinkParams({
+      linkId: window.location.href,
+      downloadSource: downloadSourceType.Installer,
+    });
+    const url = click.href.withSearchParamsAppended(params);
     window.location.assign(url.toString());
   };
 

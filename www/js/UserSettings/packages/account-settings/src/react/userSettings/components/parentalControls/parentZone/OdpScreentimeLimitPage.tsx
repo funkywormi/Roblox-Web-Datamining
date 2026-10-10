@@ -1,10 +1,10 @@
 import React from "react";
-import { startWizard } from "@rbx/amp-v2-wizard";
 import { UserSetting } from "@rbx/user-settings";
 import baseApi from "../../../../apis/common/baseApi";
 import ApiCacheTag from "../../../../apis/common/cacheTagEnum";
 import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOptions";
 import { useAppDispatch } from "../../../../redux/hooks";
+import useStartOdpWizard from "../../../hooks/useStartOdpWizard";
 import ScreentimeLimitControl from "../shared/ScreentimeLimitControl";
 
 const odpFlowName = "ODP";
@@ -16,10 +16,11 @@ const surface = "ParentalControlsSettings";
  */
 export const OdpScreentimeLimitPage = (): JSX.Element => {
   const dispatch = useAppDispatch();
+  const startOdpWizard = useStartOdpWizard();
   const [userSettings] = useGetSettingsAndOptions();
 
   const saveScreentimeLimit = async (newValue: number): Promise<void> => {
-    await startWizard({
+    await startOdpWizard({
       flow: {
         name: odpFlowName,
         props: {
@@ -29,8 +30,6 @@ export const OdpScreentimeLimitPage = (): JSX.Element => {
         },
       },
       surface,
-    }).catch(() => {
-      // startWizard resolves on every exit, so there is nothing to recover from here.
     });
 
     dispatch(baseApi.util.invalidateTags([ApiCacheTag.UserSettingsAndOptions]));

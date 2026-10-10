@@ -16,6 +16,9 @@ import { groupsConfig } from '../../translation.config';
 import { MessageContent } from '../../types';
 import { parseDocument } from '../../utils/messageContentUtils';
 import useViewportSize from '../../hooks/useViewportSize';
+import webLinkRenderer from './WebLink';
+
+const WEB_LINK_RENDERERS = [webLinkRenderer];
 
 export enum HotKeyType {
   Submit = 'HotKey:Submit'
@@ -57,6 +60,8 @@ export type EditableContentFieldInputProps = {
    * control row (e.g. an attachment chip). Rich-text mode only.
    */
   footer?: React.ReactNode;
+  /** When false, a URL the editor turns into a link stays plain text. Rich-text mode only. */
+  isLinkAuthoringEnabled?: boolean;
 };
 
 export type EditableContentFieldHandle = {
@@ -91,13 +96,17 @@ const EditableContentFieldInputInner = forwardRef<
       minHeight,
       editorRef,
       leadingControl,
-      footer
+      footer,
+      isLinkAuthoringEnabled = false
     } = props;
 
     const [slateValue, setSlateValue] = useState<Document | undefined>(undefined);
 
     const [text, setText] = useState<string>('');
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    // Not every caller passes an editorRef, and focusing the rich text editor needs a handle.
+    const fallbackEditorRef = useRef<RichTextEditorHandle>(null);
+    const richTextEditorRef = editorRef ?? fallbackEditorRef;
 
     const handleRichTextChange = useCallback(
       (value: Document) => {
@@ -129,7 +138,11 @@ const EditableContentFieldInputInner = forwardRef<
         handleChange(value);
       },
       focus: () => {
-        textAreaRef.current?.focus();
+        if (textAreaRef.current) {
+          textAreaRef.current.focus();
+        } else {
+          richTextEditorRef.current?.focus();
+        }
       }
     }));
 
@@ -157,12 +170,17 @@ const EditableContentFieldInputInner = forwardRef<
     }, [text, autoResize, maxTextFieldHeight]);
 
     useEffect(() => {
-      if (autoFocus) {
-        textAreaRef.current?.focus();
-        const textLength = textAreaRef.current?.textLength ?? 0;
-        textAreaRef.current?.setSelectionRange(textLength, textLength);
+      if (!autoFocus || locked) return;
+
+      if (textAreaRef.current) {
+        textAreaRef.current.focus();
+        const { textLength } = textAreaRef.current;
+        textAreaRef.current.setSelectionRange(textLength, textLength);
+        return;
       }
-    }, [autoFocus]);
+
+      richTextEditorRef.current?.focus();
+    }, [autoFocus, locked, richTextEditorRef]);
 
     const handleKeyPress = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (isSubmitHotKey(event)) {
@@ -184,7 +202,7 @@ const EditableContentFieldInputInner = forwardRef<
       <div className={classNames('editable-content-field-input', className)}>
         {isRichTextEnabled ? (
           <RichTextEditor
-            ref={editorRef}
+            ref={richTextEditorRef}
             placeholder={placeholder}
             initialValue={defaultSlateValue}
             onChange={handleRichTextChange}
@@ -195,6 +213,8 @@ const EditableContentFieldInputInner = forwardRef<
             leadingControls={leadingControl}
             footer={footer}
             translate={translate}
+            renderers={WEB_LINK_RENDERERS}
+            isLinkAuthoringEnabled={isLinkAuthoringEnabled}
           />
         ) : (
           <textarea

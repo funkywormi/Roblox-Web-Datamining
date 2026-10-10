@@ -27,3 +27,7 @@ export const useDownloadModalIxp = (): UseDownloadModalIxpResult => {
     isLoading,
   };
 };
+
+export const logDownloadModalExposure = (): void => {
+  ixp.logLayerExposure(downloadFunnelLayerName);
+};

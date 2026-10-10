@@ -1,6 +1,5 @@
 import { RobloxIntlInstance } from '@rbx/legacy-webapp-types/Roblox';
 import React, { useCallback, useMemo } from 'react';
-import { TranslateFunction } from '@rbx/core-scripts/react';
 import {
   Button,
   Checkbox,
@@ -14,13 +13,19 @@ import UnifiedPurchaseHeading from './UnifiedPurchaseHeading';
 import UnifiedProductDetails from './UnifiedProductDetails';
 import DiscountPriceDetail from './DiscountPriceDetail';
 import EmbeddableText from './EmbeddableText';
-import RobuxUpsellPackageDetails from '../../../js/react/itemPurchase/components/RobuxUpsellPackageDetails';
-import { LANG_KEYS } from '../../../js/core/services/itemPurchaseUpsellService/constants/upsellConstants';
+import RobuxUpsellPackageDetails from '../itemPurchase/components/RobuxUpsellPackageDetails';
+import { LANG_KEYS } from '../../core/services/itemPurchaseUpsellService/constants/upsellConstants';
 import useTermsOfUseText from '../hooks/useTermsOfUseText';
 import useModalShownTracking from '../hooks/useModalShownTracking';
 import useMarketplaceOffers from '../hooks/useMarketplaceOffers';
 import { normalizeDiscountInformation } from './discountInformation';
 import type { DiscountInformation } from './discountInformation';
+import { SelfProvidedTranslate } from '../itemPurchase/SelfProvidedTranslate';
+import {
+  purchasingNamespaces,
+  usePurchasingTranslate,
+  type PurchaseTranslate
+} from '../itemPurchase/useTranslate';
 
 export type UnifiedRobuxUpsellActionParams = {
   purchasePrice: number;
@@ -28,7 +33,7 @@ export type UnifiedRobuxUpsellActionParams = {
 };
 
 export type UnifiedRobuxUpsellModalProps = {
-  translate: TranslateFunction;
+  translate?: PurchaseTranslate;
   expectedPrice: number;
   thumbnail: React.ReactNode;
   assetName: string;
@@ -57,7 +62,9 @@ export type UnifiedRobuxUpsellModalProps = {
   /** Direct purchase when the discount already makes the item affordable. */
   onDirectPurchase?: (params: UnifiedRobuxUpsellActionParams) => void;
 };
-const UnifiedRobuxUpsellModal: React.FC<UnifiedRobuxUpsellModalProps> = ({
+const UnifiedRobuxUpsellModalInner: React.FC<
+  UnifiedRobuxUpsellModalProps & { translate: PurchaseTranslate }
+> = ({
   translate,
   expectedPrice,
   thumbnail,
@@ -239,5 +246,17 @@ const UnifiedRobuxUpsellModal: React.FC<UnifiedRobuxUpsellModalProps> = ({
     </Dialog>
   );
 };
+
+// Dual-path translation boundary. Rendered into a detached root by openUnifiedRobuxUpsellModal,
+// so on .NET it must self-wrap in TranslationProviderSCC (no ancestor provider to inherit); a
+// Next.js host passes `translate` directly.
+const UnifiedRobuxUpsellModal: React.FC<UnifiedRobuxUpsellModalProps> = ({ translate, ...props }) => (
+  <SelfProvidedTranslate
+    translate={translate}
+    namespaces={purchasingNamespaces}
+    useTranslate={usePurchasingTranslate}
+    render={t => <UnifiedRobuxUpsellModalInner {...props} translate={t} />}
+  />
+);
 
 export default UnifiedRobuxUpsellModal;

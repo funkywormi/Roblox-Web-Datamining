@@ -76,13 +76,6 @@ export const getInstallInstructions = () => {
   return installInstructionStrings.windows.chrome;
 };
 
-export const sendAppClickEvent = (appName: string) => {
-  sendEventWithTarget(eventTypes.formInteraction, pageName, {
-    field: `${appName}AppLink`,
-    aType: "click",
-  });
-};
-
 export const sendPrimaryAppDownloadClickEvent = (appName: string) => {
   sendEventWithTarget(eventTypes.formInteraction, pageName, {
     field: `${appName}DownloadLink`,

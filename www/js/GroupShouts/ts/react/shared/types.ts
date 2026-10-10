@@ -394,6 +394,11 @@ interface MessageContent {
   slate?: Document;
 }
 
+interface MessageContentRaw {
+  plainText?: string | null;
+  slate?: Document | string | null;
+}
+
 interface ServiceError {
   code: number;
   message: string;
@@ -428,6 +433,7 @@ interface CommunityProductFeatures {
   CommunityCompletionCarousel: boolean;
   ForumConcealment: boolean;
   ForumPreventSimilar: boolean;
+  ForumsLinksCreate: boolean;
 }
 
 enum CommunityFeatureFreezeName {
@@ -468,6 +474,7 @@ export {
   PermissionConfigurationState,
   ModerateUserPermissionsState,
   MessageContent,
+  MessageContentRaw,
   ServiceError,
   ServiceErrorResponse,
   CommunityProductFeatures,

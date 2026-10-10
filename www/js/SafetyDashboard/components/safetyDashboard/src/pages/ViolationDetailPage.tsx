@@ -183,6 +183,7 @@ const ViolationDetailPage = (): ReactElement => {
       violationType: getAnalyticsViolationType(violation),
       violationReason: Object.keys(violation.abuse_type_keys).join(","),
       appealType,
+      allowedAppealTypes: violation.allowed_appeal_types,
       isV2UI: true,
     });
   };
@@ -268,6 +269,7 @@ const ViolationDetailPage = (): ReactElement => {
         violationType: getAnalyticsViolationType(violation),
         violationReason: Object.keys(violation.abuse_type_keys).join(","),
         appealType,
+        allowedAppealTypes: violation.allowed_appeal_types,
         isV2UI: true,
         optOutCommunication,
       });

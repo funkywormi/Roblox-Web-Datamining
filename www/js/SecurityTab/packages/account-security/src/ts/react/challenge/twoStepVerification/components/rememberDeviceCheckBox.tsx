@@ -27,7 +27,7 @@ const RememberDeviceCheckBox: React.FC<Props> = ({
   };
 
   return (
-    <p className={className}>
+    <p className={className} data-testid="remember-device-checkbox">
       <input
         id="remember-device"
         type="checkbox"

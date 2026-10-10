@@ -4,6 +4,8 @@ import { isBlackbirdUser, userId } from "@rbx/core-scripts/meta/user";
 import environmentUrls from "@rbx/environment-urls";
 import { useQuery } from "@tanstack/react-query";
 
+import { withApiMetrics } from "../utils/withApiMetrics";
+
 type AmpFeatureResponse = { access: "Granted" | "Denied" };
 
 /**
@@ -28,10 +30,12 @@ export const useIsPlusSubscriber = (): boolean => {
     enabled: canHaveSubscribedSince,
     queryFn: async () => {
       const namespace = encodeURIComponent("subscriptions/PlusSubscription");
-      const { data } = await http.get<AmpFeatureResponse>({
-        url: `${environmentUrls.apiGatewayUrl}/access-management/v1/upsell-feature-access?featureName=IsRobloxPlusSubscribed&namespace=${namespace}`,
-        withCredentials: true,
-      });
+      const { data } = await withApiMetrics("PlusSubscriberAccess", () =>
+        http.get<AmpFeatureResponse>({
+          url: `${environmentUrls.apiGatewayUrl}/access-management/v1/upsell-feature-access?featureName=IsRobloxPlusSubscribed&namespace=${namespace}`,
+          withCredentials: true,
+        }),
+      );
       return data.access === "Granted";
     },
   });

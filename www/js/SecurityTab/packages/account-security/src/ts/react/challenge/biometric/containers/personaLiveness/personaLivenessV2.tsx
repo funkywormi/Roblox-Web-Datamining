@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CurrentUser, DeviceMeta } from "Roblox";
-import { urlService } from "core-utilities";
+import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { QRDeepLinkDialog } from "@rbx/identity-verification";
 import LoadingPage from "./LoadingPage";
 import useBiometricContext from "../../hooks/useBiometricContext";
@@ -26,9 +27,13 @@ function PersonaLivenessCheckV2(): React.ReactElement {
   const livenessResources = resources.personaLiveness;
 
   const [canceled, setCanceled] = useState<boolean>(false);
+  const [userId] = useState(() => {
+    const id = authenticatedUser()?.id;
+    return id == null ? null : String(id);
+  });
 
   const isMobileBrowser = useMemo(() => {
-    const meta = DeviceMeta?.();
+    const meta = getDeviceMeta();
     return !!meta && !meta.isInApp && (meta.isIosDevice || meta.isAndroidDevice);
   }, []);
 
@@ -63,7 +68,7 @@ function PersonaLivenessCheckV2(): React.ReactElement {
     // pageload bounces to /not-approved. Mirrors accountLock's
     // `ACCOUNT_UNLOCK_DELAY`.
     setTimeout(() => {
-      window.location.href = urlService.getAbsoluteUrl("/home");
+      window.location.href = getAbsoluteUrl("/home");
     }, REDIRECT_TO_HOME_DELAY_MS);
   }, [cleanupPolling, eventService, metricsService]);
 
@@ -135,7 +140,7 @@ function PersonaLivenessCheckV2(): React.ReactElement {
 
   useEffect(() => {
     // Defensively render only for authenticated users.
-    if (!CurrentUser?.isAuthenticated || !CurrentUser.userId) {
+    if (!userId) {
       invalidateChallenge(
         ErrorCode.UNKNOWN,
         "Persona Liveness V2 requires an authenticated user",
@@ -150,7 +155,7 @@ function PersonaLivenessCheckV2(): React.ReactElement {
     // Deeplink directly when it is a mobile browser (going into app if installed)
     // or browser if not.
     if (isMobileBrowser) {
-      window.location.href = buildAccountUnlockDeeplink(CurrentUser.userId);
+      window.location.href = buildAccountUnlockDeeplink(userId);
     }
 
     startPolling();
@@ -170,7 +175,7 @@ function PersonaLivenessCheckV2(): React.ReactElement {
     [abandonChallenge],
   );
 
-  if (canceled || terminatedRef.current || !CurrentUser?.userId) {
+  if (canceled || terminatedRef.current || !userId) {
     return <LoadingPage />;
   }
 
@@ -178,7 +183,7 @@ function PersonaLivenessCheckV2(): React.ReactElement {
     <QRDeepLinkDialog
       open
       onOpenChange={handleOpenChange}
-      deeplink={buildAccountUnlockDeeplink(CurrentUser.userId)}
+      deeplink={buildAccountUnlockDeeplink(userId)}
       title={livenessResources.qrTitle}
       description={livenessResources.qrDescription}
       footer={

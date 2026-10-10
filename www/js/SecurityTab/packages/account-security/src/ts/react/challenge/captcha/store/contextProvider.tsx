@@ -6,7 +6,7 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { TranslateFunction } from "react-utilities";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { RequestService } from "../../../../common/request";
 import { GetMetadataReturnType } from "../../../../common/request/types/captcha";
 import { getResources } from "../constants/resources";
@@ -54,7 +54,6 @@ type Props = {
   metadataResponse: GetMetadataReturnType;
   eventService: EventService;
   metricsService: MetricsService;
-  translate: TranslateFunction;
   onChallengeDisplayed: OnChallengeDisplayedCallback;
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
@@ -78,7 +77,6 @@ export const CaptchaContextProvider = ({
   metadataResponse,
   eventService,
   metricsService,
-  translate,
   onChallengeDisplayed,
   onChallengeCompleted,
   onChallengeInvalidated,
@@ -87,6 +85,7 @@ export const CaptchaContextProvider = ({
 }: Props): ReactElement => {
   // We declare these variables as lazy-initialized state variables since they
   // do not need to be re-computed if this component re-renders.
+  const translate = useTranslations("Authentication.Captcha");
   const [resources] = useState(() => getResources(translate));
   const [initialState] = useState<CaptchaState>(() => ({
     // Immutable parameters:

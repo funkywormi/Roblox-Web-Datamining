@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal } from "react-style-guide";
 import { authenticatedUser } from "header-scripts";
 import { Button } from "@rbx/foundation-ui";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { ModalFragmentProps } from "../../constants/types";
 import useSecurityTabContext from "../../hooks/useSecurityTabContext";
 import ModalState from "../../store/modalState";
@@ -20,6 +21,8 @@ const ModalRecoveryCodesDisplay: React.FC<ModalFragmentProps> = ({
    */
   const [hasCopied, setHasCopied] = useState<boolean>(false);
   const [hasDownloaded, setHasDownloaded] = useState<boolean>(false);
+  const deviceMeta = getDeviceMeta();
+  const isWeb = !deviceMeta?.isInApp;
 
   /*
    * Effects
@@ -37,11 +40,12 @@ const ModalRecoveryCodesDisplay: React.FC<ModalFragmentProps> = ({
   const handleCopy = async () => {
     const allRecoveryCodes = modalStateAndProps.additionalModalProps.recoveryCodes.join("\n");
     try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(allRecoveryCodes);
-        systemFeedbackService.success(resources.Message.RecoveryCodesCopied);
-        eventService.sendRecoveryCodesCopyEvent();
+      if (!navigator.clipboard || !window.isSecureContext) {
+        throw new Error("Clipboard unavailable");
       }
+      await navigator.clipboard.writeText(allRecoveryCodes);
+      systemFeedbackService.success(resources.Message.RecoveryCodesCopied);
+      eventService.sendRecoveryCodesCopyEvent();
     } catch {
       systemFeedbackService.warning(resources.Message.RecoveryCodesNotCopied);
     } finally {
@@ -130,16 +134,18 @@ const ModalRecoveryCodesDisplay: React.FC<ModalFragmentProps> = ({
           </div>
           <br />
           <div className="recovery-codes-actions" data-testid="recovery-codes-actions">
-            <Button
-              variant="Emphasis"
-              size="Medium"
-              icon="icon-regular-arrow-down-to-line"
-              className="flex-col fill"
-              data-testid="recovery-codes-download-button"
-              onClick={handleDownload}
-            >
-              {resources.Action.Download}
-            </Button>
+            {isWeb && (
+              <Button
+                variant="Emphasis"
+                size="Medium"
+                icon="icon-regular-arrow-down-to-line"
+                className="flex-col fill"
+                data-testid="recovery-codes-download-button"
+                onClick={handleDownload}
+              >
+                {resources.Action.Download}
+              </Button>
+            )}
             <Button
               variant="Standard"
               size="Medium"

@@ -1,4 +1,3 @@
-import { TranslationConfig } from "react-utilities";
 import { ForceActionRedirect } from "@rbx/generic-challenge-types";
 import { useTrustedSessionCount } from "../../common/hooks/useSessionsQuery";
 import { sessionManagementLinkWithRedirect } from "../../../common/urls";
@@ -11,9 +10,12 @@ export const LOG_PREFIX = "ForceActionRedirect:" as const;
 // This is the 2-Step Verification path in Account Settings.
 export const ACCOUNT_SETTINGS_SECURITY_PATH = "/my/account#!/security?src=";
 
+type TranslationConfig =
+  ForceActionRedirect.ForceActionRedirectChallengeConfig["translationConfig"];
+
 /**
- * Translations required by this web app (remember to also edit
- * `bundle.config.js` if changing this configuration).
+ * Translation namespace per challenge type (`feature`). Keep in sync with the challenge SCC's
+ * `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
 const FORCE_AUTHENTICATOR_TRANSLATION_CONFIG: TranslationConfig = {
   common: [],
@@ -28,6 +30,13 @@ const FORCE_TWO_STEP_VERIFICATION_TRANSLATION_CONFIG: TranslationConfig = {
 const BLOCK_SESSION_TRANSLATION_CONFIG: TranslationConfig = {
   common: [],
   feature: "Feature.Denied",
+};
+
+export const FORCE_PASSWORDLESS_LOGIN_SIGNIFIER = "forcepasswordlesslogin" as const;
+
+const FORCE_PASSWORDLESS_LOGIN_TRANSLATION_CONFIG: TranslationConfig = {
+  common: [],
+  feature: "Feature.ForcePasswordlessLogin",
 };
 
 /**
@@ -53,6 +62,17 @@ export const BLOCK_SESSION_LANGUAGE_RESOURCES = [
   "Denied.Body",
   "Denied.Action",
   "Denied.Delayed.BodyWithTrustedSession",
+];
+
+// GCC may override the header, body and action translation keys.
+export const FORCE_PASSWORDLESS_LOGIN_LANGUAGE_RESOURCES = [
+  "ForcePasswordlessLogin.Header",
+  "ForcePasswordlessLogin.Body",
+  "ForcePasswordlessLogin.QRCode",
+  "ForcePasswordlessLogin.Error",
+  "ForcePasswordlessLogin.EmailOtp",
+  "ForcePasswordlessLogin.Passkey",
+  "ForcePasswordlessLogin.Help",
 ];
 
 // translationsParametersByKey populates translation key templates by their key. Dynamic key
@@ -134,10 +154,32 @@ export const translationsParametersByKey = (
         linkEnd: "</a>",
       };
     }
+    case "ForcePasswordlessLogin.Help": {
+      return {
+        supportLinkStart: `<a href="/support"
+          class="text-link"
+          data-testid="force-passwordless-login-support"
+          target="_blank"
+          rel="noopener noreferrer">`,
+        linkEnd: "</a>",
+      };
+    }
     default: {
       return {};
     }
   }
+};
+
+/**
+ * The shared config, plus what only this app needs. It is not added to the shared type because
+ * that package is free of app concerns.
+ */
+export type ForceActionRedirectConfig = ForceActionRedirect.ForceActionRedirectChallengeConfig & {
+  /**
+   * The body key used when GCC does not override it. It must live in the challenge type's own
+   * translation namespace; unset means the Denied namespace's.
+   */
+  defaultBodyKey?: string;
 };
 
 // Hook that resolves the body translation key, multiplexing to the trusted-session
@@ -150,7 +192,7 @@ export const useMaybeConditionalDynamicBody = (
   translate: ForceActionRedirect.ForceActionRedirectTranslateFunction,
   delayParameters?: DelayParameters,
 ): string => {
-  const trustedSessionCount = useTrustedSessionCount();
+  const trustedSessionCount = useTrustedSessionCount(maybeConditionalKey === "Denied.Delayed.Body");
 
   switch (maybeConditionalKey) {
     case "Denied.Delayed.Body": {
@@ -190,7 +232,7 @@ export const getForceActionRedirectChallengeConfig = ({
   | "bodyTranslationKey"
   | "headerTranslationKey"
   | "delayParameters"
->): ForceActionRedirect.ForceActionRedirectChallengeConfig => {
+>): ForceActionRedirectConfig => {
   switch (forceActionRedirectChallengeType) {
     case ForceActionRedirect.ForceActionRedirectChallengeType.ForceAuthenticator:
       return {
@@ -241,7 +283,11 @@ export const getForceActionRedirectChallengeConfig = ({
             ),
             Body: translate(
               maybeDynamicBodyKey,
-              translationsParametersByKey(maybeDynamicBodyKey, delayParameters, translate),
+              translationsParametersByKey(
+                maybeDynamicBodyKey,
+                delayParameters ?? undefined,
+                translate,
+              ),
             ),
             Action: translate(
               maybeDynamicActionKey,
@@ -250,6 +296,40 @@ export const getForceActionRedirectChallengeConfig = ({
           } as const;
         },
       };
+    case ForceActionRedirect.ForceActionRedirectChallengeType.ForcePasswordlessLogin: {
+      const defaultBodyKey = "ForcePasswordlessLogin.Body";
+      return {
+        redirectURLSignifier: FORCE_PASSWORDLESS_LOGIN_SIGNIFIER,
+        defaultBodyKey,
+        translationConfig: FORCE_PASSWORDLESS_LOGIN_TRANSLATION_CONFIG,
+        translationResourceKeys: FORCE_PASSWORDLESS_LOGIN_LANGUAGE_RESOURCES,
+        getTranslationResources: (
+          translate: ForceActionRedirect.ForceActionRedirectTranslateFunction,
+        ) => {
+          const maybeDynamicHeaderKey = headerTranslationKey || "ForcePasswordlessLogin.Header";
+          const maybeDynamicBodyKey = bodyTranslationKey || defaultBodyKey;
+          const maybeDynamicActionKey = actionTranslationKey || "ForcePasswordlessLogin.QRCode";
+          return {
+            Header: translate(
+              maybeDynamicHeaderKey,
+              translationsParametersByKey(maybeDynamicHeaderKey),
+            ),
+            Body: translate(
+              maybeDynamicBodyKey,
+              translationsParametersByKey(
+                maybeDynamicBodyKey,
+                delayParameters ?? undefined,
+                translate,
+              ),
+            ),
+            Action: translate(
+              maybeDynamicActionKey,
+              translationsParametersByKey(maybeDynamicActionKey),
+            ),
+          } as const;
+        },
+      };
+    }
     default:
       throw new Error("Invalid ForceActionRedirectChallengeType");
   }

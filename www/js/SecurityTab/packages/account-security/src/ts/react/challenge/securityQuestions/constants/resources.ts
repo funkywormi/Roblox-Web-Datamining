@@ -1,32 +1,20 @@
+import type { Translator } from "@rbx/www-common/i18n";
 import * as Games from "../../../../common/request/types/games";
 import * as SecurityQuestions from "../../../../common/request/types/securityQuestions";
 import * as Thumbnails from "../../../../common/request/types/thumbnails";
-import {
-  COMMON_UI_MESSAGES_LANGUAGE_RESOURCES,
-  SECURITY_QUESTIONS_LANGUAGE_RESOURCES,
-} from "../app.config";
 import { ErrorCode } from "../interface";
 
 export const WHICH_GAMES_DAYS_DEFAULT = 7;
 
-/**
- * A type adapted from the base type of `translate`, which we use to limit the
- * keys that can be translated.
- */
-type TranslateFunction = (
-  resourceId:
-    | (typeof SECURITY_QUESTIONS_LANGUAGE_RESOURCES)[number]
-    | (typeof COMMON_UI_MESSAGES_LANGUAGE_RESOURCES)[number],
-  parameters?: Record<string, unknown>,
-) => string;
-
-// IMPORTANT: Add resource keys to `app.config.ts` as well.
-export const getResources = (translate: TranslateFunction) =>
+export const getResources = (
+  translate: Translator<"Feature.SecurityQuestions">,
+  translateCommon: Translator<"CommonUI.Messages">,
+) =>
   ({
     Action: {
       Confirm: translate("Action.Confirm"),
       Continue: translate("Action.Continue"),
-      Ok: translate("Action.OK"),
+      Ok: translateCommon("Action.OK"),
       PickN: (count: number) => translate("Action.PickN", { count }),
       PleaseTryAgain: translate("Action.PleaseTryAgain"),
       Reload: translate("Action.Reload"),

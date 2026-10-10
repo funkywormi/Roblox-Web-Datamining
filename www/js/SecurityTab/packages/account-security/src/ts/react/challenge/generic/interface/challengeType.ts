@@ -23,6 +23,7 @@ enum ChallengeType {
   BIOMETRIC = "biometric",
   CAPTCHA_V2 = "captchav2",
   TURNSTILE = "turnstile",
+  FORCE_PASSWORDLESS_LOGIN = "forcepasswordlesslogin",
 }
 
 export default ChallengeType;

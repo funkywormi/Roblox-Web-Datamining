@@ -6,10 +6,9 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { TranslateFunction } from "react-utilities";
 import { ForceActionRedirect } from "@rbx/generic-challenge-types";
 import { DelayParameters } from "../../twoStepVerification/delay";
-import { useMaybeConditionalDynamicBody } from "../app.config";
+import { ForceActionRedirectConfig, useMaybeConditionalDynamicBody } from "../app.config";
 import { ForceActionRedirectAction } from "./action";
 import { ForceActionRedirectState } from "./state";
 import forceActionStateReducer from "./stateReducer";
@@ -35,9 +34,9 @@ export const ForceActionRedirectContext = createContext<ForceActionRedirectConte
 );
 
 type Props = {
-  forceActionRedirectChallengeConfig: ForceActionRedirect.ForceActionRedirectChallengeConfig;
+  forceActionRedirectChallengeConfig: ForceActionRedirectConfig;
   renderInline: boolean;
-  translate: TranslateFunction;
+  translate: ForceActionRedirect.ForceActionRedirectTranslateFunction;
   onModalChallengeAbandoned: ForceActionRedirect.OnModalChallengeAbandonedCallback | null;
   onChallengeAbandoned: ForceActionRedirect.OnChallengeAbandonedCallback | null;
   delayParameters?: DelayParameters;
@@ -60,8 +59,9 @@ export const ForceActionRedirectContextProvider = ({
   bodyTranslationKey,
   children,
 }: Props): ReactElement => {
-  const definedKey = bodyTranslationKey ?? "Denied.Body";
-  const definedNonEmptyKey = definedKey === "" ? "Denied.Body" : definedKey;
+  const defaultBodyKey = forceActionRedirectChallengeConfig.defaultBodyKey ?? "Denied.Body";
+  const definedKey = bodyTranslationKey ?? defaultBodyKey;
+  const definedNonEmptyKey = definedKey === "" ? defaultBodyKey : definedKey;
   const dynamicBody = useMaybeConditionalDynamicBody(
     definedNonEmptyKey,
     translate,

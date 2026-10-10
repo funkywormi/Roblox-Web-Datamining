@@ -8,6 +8,7 @@ import useBlock from "./useBlock";
 import useFollow from "./useFollow";
 import useImpersonateUser from "./useImpersonateUser";
 import useAcceptFriendRequest from "./useAcceptFriendRequest";
+import useIgnoreFriendRequest from "./useIgnoreFriendRequest";
 import useAddFriend from "./useAddFriend";
 import useChat from "./useChat";
 import useEditAlias from "./useEditAlias";
@@ -63,6 +64,8 @@ export const useActionMap = (): ActionMapReturnType => {
   const { handler: handleChat } = useChat();
   const { handler: handleEditAlias, Component: EditAliasComponent } = useEditAlias();
   const { handler: handleFollow, isLoading: isFollowLoading } = useFollow();
+  const { handler: handleIgnoreFriendRequest, isLoading: isIgnoreFriendRequestLoading } =
+    useIgnoreFriendRequest();
   const { handler: handleImpersonateUser, isLoading: isImpersonateUserLoading } =
     useImpersonateUser();
   const { handler: handleJoinExperience } = useJoinExperience();
@@ -130,6 +133,11 @@ export const useActionMap = (): ActionMapReturnType => {
         text: translate("Action.Follow"),
         handler: handleFollow,
         isLoading: isFollowLoading,
+      },
+      [Action.IgnoreFriendRequest]: {
+        text: translate("Action.Ignore"),
+        handler: handleIgnoreFriendRequest,
+        isLoading: isIgnoreFriendRequestLoading,
       },
       [Action.ImpersonateUser]: {
         text: translate("Action.ImpersonateUser"),
@@ -226,6 +234,8 @@ export const useActionMap = (): ActionMapReturnType => {
       EditAliasComponent,
       handleFollow,
       isFollowLoading,
+      handleIgnoreFriendRequest,
+      isIgnoreFriendRequestLoading,
       handleImpersonateUser,
       isImpersonateUserLoading,
       handleJoinExperience,

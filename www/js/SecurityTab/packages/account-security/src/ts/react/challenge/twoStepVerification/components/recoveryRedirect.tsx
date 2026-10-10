@@ -26,7 +26,12 @@ const RecoveryRedirect: React.FC<Props> = ({ username, actionType, recoverySessi
     target = "_blank";
   } else if (deviceMeta?.isInApp) {
     baseUrl = "roblox://navigation/account_recovery";
-    target = "_blank";
+    // Keep the default "_self": Android's in-app WebView routes target="_blank"
+    // navigations through onCreateWindow (unhandled for custom schemes), so a
+    // "_blank" roblox:// deeplink is silently dropped and never reaches the
+    // native app. Same-tab navigation is intercepted correctly on both
+    // Android and iOS. (AA-7746)
+    target = "_self";
   }
 
   let origin = "";

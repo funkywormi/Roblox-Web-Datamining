@@ -9,7 +9,7 @@ import {
   PeriodType as ApiPeriodType,
   ProductType,
   RobloxSubscriptionProductFeatureConfig,
-} from "@rbx/client-subscriptions-api/v1";
+} from "@rbx/client-subscriptions-api/v2";
 import { PremiumPurchasePlatform } from "../../../core/types/premiumEnums";
 import {
   CreditBalance,
@@ -341,13 +341,14 @@ const ManagementContainer: React.FC = () => {
     // Get all subscriptions that have an expiration time after the current time
     // V1 for developer subscriptions
     const fetchV1Subscriptions = getUserSubscriptions(new Date()).then(results => {
-      // Dev subs (EXP) always come from V1. RBP/CUR may also appear on V1; V2 is preferred when it returns
+      // Dev subs (EXP) always come from V1. RBP/CUR/RBX may also appear on V1; V2 is preferred when it returns
       // the same target key, but some products (e.g. internal billing) are only present on V1 — keep those.
       const devSubs = results.filter(sub => sub.subscriptionTargetKey.startsWith("EXP"));
       const v1RobloxOwnedSubs = results.filter(
         sub =>
           sub.subscriptionTargetKey.startsWith("RBP") ||
-          sub.subscriptionTargetKey.startsWith("CUR"),
+          sub.subscriptionTargetKey.startsWith("CUR") ||
+          sub.subscriptionTargetKey.startsWith("RBX"),
       );
 
       const premiumSubInfo = results.find(sub => sub.subscriptionTargetKey.startsWith("PRM"));
@@ -369,11 +370,12 @@ const ManagementContainer: React.FC = () => {
       return { devSubs, v1RobloxOwnedSubs };
     });
 
-    // V2 for Blackbird and Currency Subscription (two parallel calls since API accepts single productType)
+    // V2 for Blackbird, Currency, and Robux Subscription (parallel calls since API accepts single productType)
     const fetchV2Subscriptions = Promise.all([
       listSubscriptionsV2(ProductType.Blackbird),
       listSubscriptionsV2(ProductType.CurrencySubscription),
-    ]).then(([blackbirdSubs, currencySubs]) => {
+      listSubscriptionsV2(ProductType.RobuxSubscription),
+    ]).then(([blackbirdSubs, currencySubs, robuxSubs]) => {
       const blackbirdInfo = blackbirdSubs[0]?.productInfo;
       const featureConfig =
         blackbirdInfo?.productTypeDetails?.robloxSubscriptionProductDetails?.featureConfig;
@@ -391,10 +393,11 @@ const ManagementContainer: React.FC = () => {
       return [
         ...blackbirdSubs.map(mapV2ToUserSubscription),
         ...currencySubs.map(mapV2ToUserSubscription),
+        ...robuxSubs.map(mapV2ToUserSubscription),
       ];
     });
 
-    // Combine: EXP from V1, Roblox-owned rows from V2, plus V1 RBP/CUR only when V2 did not return that key
+    // Combine: EXP from V1, Roblox-owned rows from V2, plus V1 RBP/CUR/RBX only when V2 did not return that key
     Promise.all([fetchV1Subscriptions, fetchV2Subscriptions])
       .then(([{ devSubs, v1RobloxOwnedSubs }, robloxSubs]) => {
         const v2Keys = new Set(robloxSubs.map(s => s.subscriptionTargetKey));
@@ -534,18 +537,20 @@ const ManagementContainer: React.FC = () => {
     let inFlight = false;
 
     const refreshAll = async () => {
-      const [freshV1, [freshPlus, freshCurrency]] = await Promise.all([
+      const [freshV1, [freshPlus, freshCurrency, freshRobux]] = await Promise.all([
         getUserSubscriptions(new Date()).then(r =>
           r.filter(s => s.subscriptionTargetKey.startsWith("EXP")),
         ),
         Promise.all([
           listSubscriptionsV2(ProductType.Blackbird),
           listSubscriptionsV2(ProductType.CurrencySubscription),
+          listSubscriptionsV2("RobuxSubscription" as ProductType),
         ]),
       ]);
       setSubscriptions([
         ...[...freshV1, ...freshPlus.map(mapV2ToUserSubscription)],
         ...freshCurrency.map(mapV2ToUserSubscription),
+        ...freshRobux.map(mapV2ToUserSubscription),
       ]);
       // Private server pricing depends on Plus status; invalidate so React Query refetches it.
       await queryClient.invalidateQueries({ queryKey: privateServerKeys.all() });

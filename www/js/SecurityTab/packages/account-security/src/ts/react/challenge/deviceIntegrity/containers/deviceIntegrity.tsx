@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { hybridResponseService } from "core-roblox-utilities";
+import * as hybridResponseService from "@rbx/core-scripts/auth/hybrid-response";
 import { Modal } from "react-style-guide";
-import { DeviceMeta } from "Roblox";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import InlineChallenge from "../../../common/inlineChallenge";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import useDeviceIntegrityContext from "../hooks/useDeviceIntegrityContext";
@@ -24,7 +24,7 @@ const DeviceIntegrity: React.FC = () => {
    */
   const getIntegrityToken = useCallback(async () => {
     try {
-      if (DeviceMeta && DeviceMeta().isInApp) {
+      if (getDeviceMeta()?.isInApp) {
         // NOTE: currently only supporting play integrity in webview.
 
         const deviceIntegrityParams = {

@@ -5,7 +5,7 @@ import * as cookie from "@rbx/core-lib/cookie";
 import "@rbx/www-common/global";
 
 // Note: "modes" used to be called "themes". So for legacy reasons, some things still refer to "themes":
-// - The mode classes are named as `{light,dark,system}-theme`.
+// - The legacy mode classes are named as `{light,dark,system}-theme`.
 // - The local storage key for modes is `theme`, but this actually stores the mode per user.
 // - The webview mode override cookie is `RBXThemeOverride`.
 
@@ -29,48 +29,49 @@ let currentMode: Mode = defaultMode;
 
 const prefersDarkMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-const setLightMode = () => {
+const setLegacyLightMode = () => {
   const { classList } = document.body;
   classList.add("light-theme");
   classList.remove("dark-theme");
 };
 
-const setDarkMode = () => {
+const setLegacyDarkMode = () => {
   const { classList } = document.body;
   classList.add("dark-theme");
   classList.remove("light-theme");
 };
 
-const updateMode = (dark: boolean) => {
+const updateLegacyMode = (dark: boolean) => {
   if (dark) {
-    setDarkMode();
+    setLegacyDarkMode();
   } else {
-    setLightMode();
+    setLegacyLightMode();
   }
 };
 
 const modeEventListener = (e: MediaQueryListEvent) => {
-  updateMode(e.matches);
+  updateLegacyMode(e.matches);
 };
 
 const setModeWithoutLocalStorage = (mode: Mode): void => {
   currentMode = mode;
   const { classList } = document.body;
+  classList.remove("color-mode-system", "color-mode-light", "color-mode-dark");
   switch (mode) {
     case "system":
-      classList.add("system-theme");
-      updateMode(prefersDarkMediaQuery.matches);
+      classList.add("color-mode-system");
+      updateLegacyMode(prefersDarkMediaQuery.matches);
       prefersDarkMediaQuery.addEventListener("change", modeEventListener);
       break;
     case "light":
+      classList.add("color-mode-light");
       prefersDarkMediaQuery.removeEventListener("change", modeEventListener);
-      setLightMode();
-      classList.remove("system-theme");
+      setLegacyLightMode();
       break;
     case "dark":
+      classList.add("color-mode-dark");
       prefersDarkMediaQuery.removeEventListener("change", modeEventListener);
-      setDarkMode();
-      classList.remove("system-theme");
+      setLegacyDarkMode();
       break;
   }
 };
@@ -186,15 +187,15 @@ export type InitializeOptions = {
 
 export const initialize = (currentUserId: number, options: InitializeOptions = {}): void => {
   const { classList } = document.body;
-  if (classList.contains("system-theme")) {
+  if (classList.contains("color-mode-system")) {
     setModeWithoutLocalStorage("system");
     return;
   }
-  if (classList.contains("light-theme")) {
+  if (classList.contains("color-mode-light") || classList.contains("light-theme")) {
     setModeWithoutLocalStorage("light");
     return;
   }
-  if (classList.contains("dark-theme")) {
+  if (classList.contains("color-mode-dark") || classList.contains("dark-theme")) {
     setModeWithoutLocalStorage("dark");
     return;
   }

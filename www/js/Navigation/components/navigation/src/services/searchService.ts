@@ -1,5 +1,6 @@
 import * as http from "@rbx/core-scripts/http";
 import searchConstants from "../constants/searchConstants";
+import { withApiMetrics } from "../topNav/observability";
 
 let cancelToken = http.createCancelToken();
 
@@ -32,11 +33,13 @@ export const getSearchSuggestion = async (
   cancelToken.cancel();
   cancelToken = http.createCancelToken();
 
-  const { data } = await http.get<TGamesAutocompleteSuggestion>({
-    ...searchConstants.getSuggestionUrl,
-    url: searchConstants.getSuggestionUrl.url + encodeURIComponent(search.toLowerCase()),
-    cancelToken: cancelToken.token,
-  });
+  const { data } = await withApiMetrics("GamesAutocomplete", () =>
+    http.get<TGamesAutocompleteSuggestion>({
+      ...searchConstants.getSuggestionUrl,
+      url: searchConstants.getSuggestionUrl.url + encodeURIComponent(search.toLowerCase()),
+      cancelToken: cancelToken.token,
+    }),
+  );
 
   return data;
 };
@@ -102,27 +105,31 @@ export const getAvatarRequestSuggestion = async (
   cancelToken = http.createCancelToken();
 
   if (useFallback) {
-    const { data } = await http.get<TAvatarAutocompleteSuggestion>(
-      {
-        ...searchConstants.avatarRequestSuggestionUrl,
-        timeout: searchConstants.expiryTimeout,
-        cancelToken: cancelToken.token,
-        fullError: true,
-      },
-      params,
+    const { data } = await withApiMetrics("AvatarAutocomplete", () =>
+      http.get<TAvatarAutocompleteSuggestion>(
+        {
+          ...searchConstants.avatarRequestSuggestionUrl,
+          timeout: searchConstants.expiryTimeout,
+          cancelToken: cancelToken.token,
+          fullError: true,
+        },
+        params,
+      ),
     );
 
     return data;
   }
 
-  const { data } = await http.get<TAvatarAutocompleteSuggestion>(
-    {
-      ...searchConstants.avatarRequestSuggestionCdnUrl,
-      timeout: searchConstants.expiryTimeout,
-      cancelToken: cancelToken.token,
-      fullError: true,
-    },
-    params,
+  const { data } = await withApiMetrics("AvatarAutocomplete", () =>
+    http.get<TAvatarAutocompleteSuggestion>(
+      {
+        ...searchConstants.avatarRequestSuggestionCdnUrl,
+        timeout: searchConstants.expiryTimeout,
+        cancelToken: cancelToken.token,
+        fullError: true,
+      },
+      params,
+    ),
   );
 
   return data;

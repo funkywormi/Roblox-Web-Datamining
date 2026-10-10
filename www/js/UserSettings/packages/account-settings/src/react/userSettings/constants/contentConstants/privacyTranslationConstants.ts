@@ -66,7 +66,6 @@ export default {
   deactivateConfirmationHeading: "Heading.DeactivateAccount",
   deactivateConfirmationBody: "Description.DeactivateConfirmation",
   deleteDescription: "Description.AccountDeletionRequest",
-  deleteSuccessMessage: "Heading.AccountDeletionSuccessMessage",
   deleteAccountBtnText: "Action.DeleteAccount",
   deleteMyAccountReceivedHeading: "Label.DeleteAccountReceived",
   deleteMyAccountReceivedBody: "Description.DeleteAccountReceived",
@@ -344,7 +343,6 @@ export default {
   adsPrivacySettingsTitle: "Heading.AdsPreferences",
 
   // Age Verification
-  ageCheckBannerDescription: "Description.ageCheckBanner",
   ageCheckRequiredModalTitle: "Title.AgeCheckRequiredForChild",
   ageCheckRequiredModalDescription: "Description.AgeCheckRequiredForChild",
 };

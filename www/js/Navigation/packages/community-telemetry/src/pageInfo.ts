@@ -1,14 +1,28 @@
 import { EnvironmentUrls } from "@rbx/core-scripts/legacy/Roblox";
 
+const FORUM_POST_ROUTE = /^\/forums\/[^/]+\/post\//;
+const FORUM_CATEGORY_ROUTE = /^\/forums\/[^/]+/;
+const ANNOUNCEMENT_EDIT_ROUTE = /^\/announcements\/[^/]+\/edit$/;
+const ANNOUNCEMENT_POST_ROUTE = /^\/announcements\/[^/]+/;
+
 export const CUSTOM_MAPPER: Record<string, (pageRoute: string) => string> = {
   forums: pageRoute => {
-    if (/^\/forums\/[^/]+\/post\//.test(pageRoute)) {
+    if (FORUM_POST_ROUTE.test(pageRoute)) {
       return "/forums/post";
     }
-    if (/^\/forums\/[^/]+/.test(pageRoute)) {
+    if (FORUM_CATEGORY_ROUTE.test(pageRoute)) {
       return "/forums/category";
     }
     return "/forums";
+  },
+  announcements: pageRoute => {
+    if (ANNOUNCEMENT_EDIT_ROUTE.test(pageRoute)) {
+      return "/announcements/edit";
+    }
+    if (ANNOUNCEMENT_POST_ROUTE.test(pageRoute)) {
+      return "/announcements/post";
+    }
+    return "/announcements";
   },
 };
 
@@ -16,7 +30,7 @@ const DEFAULT_HASH_ROUTE = "/about";
 
 /**
  * Hash routes permitted by the group ui-router config (see js/angular/groupDetails/groupModule.js).
- * Order: longest forum paths first so shorter patterns do not steal matches.
+ * Order: longest forum/announcement paths first so shorter patterns do not steal matches.
  */
 const PERMITTED_GROUP_HASH_ROUTE = new RegExp(
   "^" +
@@ -27,6 +41,9 @@ const PERMITTED_GROUP_HASH_ROUTE = new RegExp(
     "|/forums/[^/]+/post/[^/]+" +
     "|/forums/[^/]+" +
     "|/forums" +
+    "|/announcements/[^/]+/edit" +
+    "|/announcements/[^/]+" +
+    "|/announcements" +
     "|/(?:about|store|affiliates|events)" +
     ")$",
 );

@@ -3,71 +3,26 @@
 import angular from "angular";
 import { MouseEventHandler } from "react";
 import localStorageService from "@rbx/core-scripts/local-storage";
-import { urlService } from "@rbx/core-scripts/legacy/core-utilities";
 import * as http from "@rbx/core-scripts/http";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
 import { handleLogoutUpsell } from "@rbx/authentication";
 import { userCacheKey } from "../constants/cacheConstants";
 import layoutConstants from "../constants/layoutConstants";
+import { getLoginUrl, getHomeUrl, getRefreshSessionUrl } from "../constants/urlConstants";
 import {
-  getSignupRedirUrl,
-  getLoginUrl,
-  getNewLoginUrl,
-  getHomeUrl,
-  getAccountSwitchingSignUpUrl,
-  getRefreshSessionUrl,
-} from "../constants/urlConstants";
-import { getIntAuthCompliancePolicy } from "../services/complianceService";
-import {
-  sendCacheUserChangedAuthClientErrorEvent,
   sendLogoutButtonClickEvent,
   sendSwitchAccountButtonClickEvent,
 } from "../services/eventService";
 import { logout } from "../services/navigationService";
+import { cacheUserId } from "./userCacheUtil";
+import {
+  getIsVNGLandingRedirectEnabled,
+  getLoginLinkUrl,
+  getSignupUrl,
+  isLoginLinkAvailable,
+} from "./authLinkUtil";
 
-const { getQueryParam, composeQueryString } = urlService;
-
-const { logoutEvent, loginEvent, signupEvent } = layoutConstants;
-const getReturnUrl = () => {
-  // return from the current page if there is no returnUrl param, except it is from login page or the signup page.
-  let returnUrl = getQueryParam("returnUrl") ?? window.location.href;
-  returnUrl =
-    returnUrl === getLoginUrl() || returnUrl === getAccountSwitchingSignUpUrl() ? "" : returnUrl;
-  return returnUrl;
-};
-
-const getSignupUrl = (isAccountSwitcherAvailableForBrowser = false) => {
-  let returnUrl;
-  let signupUrl;
-  if (authenticatedUser() != null && isAccountSwitcherAvailableForBrowser) {
-    returnUrl = getReturnUrl();
-    signupUrl = getAccountSwitchingSignUpUrl();
-  } else {
-    returnUrl = getQueryParam("returnUrl") ?? window.location.href;
-
-    if (Array.isArray(returnUrl)) {
-      returnUrl = returnUrl[0] ?? window.location.href;
-    }
-
-    // Do not add return url if the url points to login page in any way
-    const lowerCaseReturnUrl = returnUrl.toLowerCase();
-    const doesReturnUrlStartWithLoginUrl =
-      lowerCaseReturnUrl.startsWith(getLoginUrl().toLowerCase()) ||
-      lowerCaseReturnUrl.startsWith(getNewLoginUrl().toLowerCase());
-    returnUrl = doesReturnUrlStartWithLoginUrl ? "" : returnUrl;
-    signupUrl = getSignupRedirUrl();
-  }
-  return `${signupUrl}?${composeQueryString({ returnUrl })}`;
-};
-
-const getLoginLinkUrl = () => {
-  // TODO: this should call AccountSwitcherService.isAccountSwitcherAvailable() once that is no longer an async function
-  const returnUrl = getReturnUrl();
-  const loginUrl = getLoginUrl();
-  return `${loginUrl}?${composeQueryString({ returnUrl })}`;
-};
-
+const { logoutEvent } = layoutConstants;
 const logoutAndRedirect = () =>
   logout().then(() => {
     document.dispatchEvent(new CustomEvent(logoutEvent.name));
@@ -155,56 +110,6 @@ const switchAccount: MouseEventHandler = e => {
   e.stopPropagation();
   e.preventDefault();
   openAccountSwitcher();
-};
-
-const isLoginLinkAvailable = () => {
-  const currentPath = window.location.pathname.toLowerCase();
-  return !currentPath.startsWith("/login") && !currentPath.startsWith("/newlogin");
-};
-
-const getIsVNGLandingRedirectEnabled = async () => {
-  try {
-    const intAuth = await getIntAuthCompliancePolicy();
-    return intAuth.isVNGComplianceEnabled ?? false;
-  } catch {
-    return false;
-  }
-};
-
-const cacheUserId = () => {
-  const currentUserId = authenticatedUser()?.id?.toString() ?? null;
-  let cachedUserId: string | null = null;
-  try {
-    const cached = localStorageService.getLocalStorage(userCacheKey) ?? null;
-    if (typeof cached === "string") {
-      cachedUserId = cached;
-    }
-  } catch {
-    // ignore error
-  }
-  if (cachedUserId != null && currentUserId != null && cachedUserId !== currentUserId) {
-    sendCacheUserChangedAuthClientErrorEvent(
-      `${currentUserId},${cachedUserId}`,
-      window.location.href,
-    );
-  }
-  localStorageService.setLocalStorage(userCacheKey, currentUserId);
-
-  // listen for login event
-  window.addEventListener(loginEvent.name, e => {
-    const { userId } = (e as unknown as { detail: { userId?: string } }).detail;
-    if (userId != null) {
-      localStorageService.setLocalStorage(userCacheKey, userId);
-    }
-  });
-
-  // listen for signup event
-  window.addEventListener(signupEvent.name, e => {
-    const { userId } = (e as unknown as { detail: { userId?: string } }).detail;
-    if (userId != null) {
-      localStorageService.setLocalStorage(userCacheKey, userId);
-    }
-  });
 };
 
 export {

@@ -35,7 +35,8 @@ export const sendRankClickEvent = (): void => sendGroupPageClick('rank');
 // Opening the header overflow (three-dot) menu.
 export const sendOverflowMenuClickEvent = (): void => sendGroupPageClick('overflowMenu');
 
-// An overflow menu item; menuItem is the action key (e.g. ConfigureCommunity, Report).
+// An overflow menu item; menuItem is the action key (e.g. ConfigureCommunity, Report), except the
+// owner's Deactivate Group link, which ContextualMenuActions.tsx logs as DeactivateGroup.
 export const sendOverflowMenuItemClickEvent = (menuItem: string): void =>
   sendGroupPageClick('overflowMenuItem', menuItem);
 

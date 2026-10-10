@@ -1,18 +1,8 @@
+import type { Translator } from "@rbx/www-common/i18n";
 import * as ProofOfSpace from "../../../../common/request/types/proofOfSpace";
-import { PROOF_OF_SPACE_LANGUAGE_RESOURCES } from "../app.config";
 import { ErrorCode } from "../interface";
 
-/**
- * A type adapted from the base type of `translate`, which we use to limit the
- * keys that can be translated.
- */
-type TranslateFunction = (
-  resourceId: (typeof PROOF_OF_SPACE_LANGUAGE_RESOURCES)[number],
-  parameters?: Record<string, unknown>,
-) => string;
-
-// IMPORTANT: Add resource keys to `app.config.ts` as well.
-export const getResources = (translate: TranslateFunction) =>
+export const getResources = (translate: Translator<"Feature.ProofOfSpaceChallenge">) =>
   ({
     Description: {
       VerificationError: translate("Description.VerificationError"),

@@ -9,12 +9,12 @@ import {
   DialogTitle,
   Icon,
 } from "@rbx/foundation-ui";
+import { PlusUpsellBanner, usePlusUpsellProduct } from "@rbx/subscriptions-common";
 import { Thumbnail2d, ThumbnailTypes, ThumbnailAvatarHeadshotSize } from "@rbx/thumbnails";
 
 import { ProfileFrameItem } from "./ProfileFrameItem";
 import { ProfileFrameOverlay } from "./ProfileFrameOverlay";
 import { NONE_FRAME_ASSET_ID, findProfileFrame } from "../profileFrameConstants";
-import { PlusUpsellBanner } from "./PlusUpsellBanner";
 import {
   trackProfileFrameFrameSelected,
   trackProfileFrameUpsellClicked,
@@ -61,6 +61,10 @@ export const ProfileFrameDialog = ({
 }: ProfileFrameDialogProps) => {
   const { translate } = useTranslation();
   const [selectedFrameId, setSelectedFrameId] = useState(equippedFrameId);
+  // Prefetched on open so the banner CTA knows about a trial; the upsell sheet reuses the cache.
+  const { product: plusProduct, isLoading: isPlusProductLoading } = usePlusUpsellProduct({
+    enabled: open && !hasPlus,
+  });
 
   // Seed the local selection from the equipped frame while the dialog is open, until the
   // user makes a choice. This covers opening the dialog before the equipped-frame query
@@ -167,7 +171,15 @@ export const ProfileFrameDialog = ({
 
             {/* Plus upsell (non-Plus only): preview stays enabled, but framing is a
                 Plus perk, so we point the user at the Plus page instead of saving. */}
-            {!hasPlus && <PlusUpsellBanner onUpsellOpen={handleUpsellOpen} />}
+            {!hasPlus && (
+              <PlusUpsellBanner
+                appearance="Outlined"
+                eligibleOffers={plusProduct?.eligibleOffers}
+                isLoading={isPlusProductLoading}
+                upsellText={translate("Label.ProfileFramesUnlockBanner")}
+                onClick={handleUpsellOpen}
+              />
+            )}
           </div>
 
           {/* Selectable frame grid + scroll region. Layout (columns, gaps, responsive

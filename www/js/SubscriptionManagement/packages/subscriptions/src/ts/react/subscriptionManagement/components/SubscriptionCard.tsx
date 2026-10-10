@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-utilities";
 import { Thumbnail2d, ThumbnailTypes } from "roblox-thumbnails";
-import { ProductType } from "@rbx/client-subscriptions-api/v1";
+import { ProductType } from "@rbx/client-subscriptions-api/v2";
 import { Chip, Icon } from "@rbx/foundation-ui";
-import type { SubscriptionOffer } from "@rbx/client-subscriptions-api/v1";
+import type { SubscriptionOffer } from "@rbx/client-subscriptions-api/v2";
 import {
   PaymentProvider,
   PeriodType,
@@ -33,7 +33,7 @@ type SubscriptionCardProps = {
   expiration: Date;
   renewal: Date;
   isPremium?: boolean;
-  productType?: string; // Product type for Blackbird/CurrencySubscription icon handling
+  productType?: string; // Product type for Blackbird/CurrencySubscription/RobuxSubscription icon handling
   purchasePlatform?: PurchasePlatform;
   showLowBalanceNotification?: boolean;
   subscriptionOffers?: SubscriptionOffer[];
@@ -88,7 +88,10 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     if (productType === ProductType.Blackbird) {
       return <Icon className="blackbird-icon" name="icon-regular-roblox-plus" size="Large" />;
     }
-    if (productType === ProductType.CurrencySubscription) {
+    if (
+      productType === ProductType.CurrencySubscription ||
+      productType === ProductType.RobuxSubscription
+    ) {
       return <span className="premium-icon" />;
     }
     return (

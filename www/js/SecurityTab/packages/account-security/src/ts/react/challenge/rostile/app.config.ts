@@ -1,30 +1,11 @@
-import { TranslationConfig } from "react-utilities";
-
 export const FEATURE_NAME = "Rostile" as const;
 export const LOG_PREFIX = "Rostile" as const;
 
 /**
- * Translations required by this web app (remember to also edit
- * `bundle.config.js` if changing this configuration).
+ * Translation namespaces used by this web app. Keep in sync with the challenge
+ * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const TRANSLATION_CONFIG: TranslationConfig = {
-  common: ["CommonUI.Messages"],
-  feature: "Feature.RostileChallenge",
-};
-
-/**
- * Language resource keys for rostile that are requested
- * dynamically.
- */
-export const ROSTILE_LANGUAGE_RESOURCES = [
-  "Description.VerificationError",
-  "Description.VerificationSuccess",
-  "Description.VerificationPrompt",
-  "Description.VerificationHeader",
-  "Description.VerificationErrorHeader",
-  "Description.ImAHuman",
-  "Description.Ok",
-] as const;
+export const TRANSLATION_NAMESPACES = ["Feature.RostileChallenge"] as const;
 
 /**
  * Constants for event stream events.

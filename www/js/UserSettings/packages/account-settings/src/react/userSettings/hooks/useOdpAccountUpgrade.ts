@@ -1,7 +1,7 @@
-import { startWizard } from "@rbx/amp-v2-wizard";
 import baseApi from "../../apis/common/baseApi";
 import ApiCacheTag from "../../apis/common/cacheTagEnum";
 import { useAppDispatch } from "../../redux/hooks";
+import useStartOdpWizard from "./useStartOdpWizard";
 
 const odpFlowName = "ODP";
 const odpUpgradeRequestType = "ManageODPUpgrade";
@@ -22,9 +22,10 @@ export type TOdpAccountUpgradeAction =
  */
 const useOdpAccountUpgrade = (): ((action: TOdpAccountUpgradeAction) => void) => {
   const dispatch = useAppDispatch();
+  const startOdpWizard = useStartOdpWizard();
 
   return (action: TOdpAccountUpgradeAction) => {
-    startWizard({
+    startOdpWizard({
       flow: {
         name: odpFlowName,
         props: {

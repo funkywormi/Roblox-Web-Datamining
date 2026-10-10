@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   Button,
   Dialog,
@@ -15,14 +15,15 @@ import windowsAppIcon from "@rbx/branding-assets/images/app_icons/app_icon_windo
 import {
   InstallInstructionsList,
   MobileAppQrPanel,
+  ResolvedAppDownload,
   appDownloadType,
   downloadSourceType,
   installInstructionsDelayMs,
   resolveAppDownload,
   sendPrimaryAppDownloadClickEvent,
-  useAppDownload,
+  getDownloadLinkParams,
 } from "@rbx/app-download";
-import { useDownloadModalIxp } from "../util/postSignupDownloadModalIxp";
+import { logDownloadModalExposure, useDownloadModalIxp } from "../util/postSignupDownloadModalIxp";
 import { sendSignupDownloadModalEvent } from "../util/postSignupDownloadModalEvent";
 import { useAppDownloadTranslate } from "../hooks/useAppDownloadTranslate";
 
@@ -30,60 +31,28 @@ const headingTranslationKey = "Heading.GetTheRobloxApp";
 const subtitleTranslationKey = "Description.PlayExploreBuildAndMore";
 const ctaTranslationKey = "Action.GetTheApp";
 
-export const newUserSessionStorageKey = "new-user";
-export const newUserSessionStorageValue = "true";
-
-const consumeNewUserFlag = (): boolean => {
-  const isNewUser =
-    window.sessionStorage.getItem(newUserSessionStorageKey) === newUserSessionStorageValue;
-  if (isNewUser) {
-    window.sessionStorage.removeItem(newUserSessionStorageKey);
-  }
-  return isNewUser;
-};
-
-export default function PostSignupDownloadModal() {
+function PostSignupDownloadModalContent({
+  download,
+  unmount,
+}: {
+  download: ResolvedAppDownload;
+  unmount: () => void;
+}) {
   const t = useTranslations("Feature.DownloadLanding");
   const tFeatures = useTranslations("CommonUI.Features");
   const translate = useAppDownloadTranslate();
-  const [open, setOpen] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
-  const hasLoggedExposure = useRef(false);
-  const [isNewUser] = useState(consumeNewUserFlag);
 
-  const { isDownloadModalEnabled, isLoading } = useDownloadModalIxp();
-  const { resolveTokenizedHref, logExposure } = useAppDownload({
-    linkId: window.location.href,
-    downloadSource: downloadSourceType.Installer,
-  });
-  const download = useMemo(() => resolveAppDownload({ translate }), [translate]);
-
-  const deviceMeta = getDeviceMeta();
-  const isEligible =
-    isNewUser && !isLoading && download != null && !deviceMeta?.isPhone && !deviceMeta?.isTablet;
-
-  useEffect(() => {
-    if (!isEligible || hasLoggedExposure.current) {
-      return;
-    }
-    hasLoggedExposure.current = true;
-    logExposure();
-    if (isDownloadModalEnabled) {
-      setOpen(true);
-      sendSignupDownloadModalEvent(window.location.href);
-    }
-  }, [isEligible, isDownloadModalEnabled, logExposure]);
-
-  if (!open || download == null) {
-    return null;
-  }
-
-  const handleGetApp = async (): Promise<void> => {
+  const performDownload = async () => {
     sendPrimaryAppDownloadClickEvent(download.link.name);
     if (!download.isDirectDownload) {
       return;
     }
-    const url = await resolveTokenizedHref(download.href);
+    const params = await getDownloadLinkParams({
+      linkId: window.location.href,
+      downloadSource: downloadSourceType.Installer,
+    });
+    const url = download.href.withSearchParamsAppended(params);
     window.location.assign(url.toString());
     window.setTimeout(() => {
       setShowInstructions(true);
@@ -96,14 +65,12 @@ export default function PostSignupDownloadModal() {
 
   return (
     <Dialog
-      open={open}
+      open
       size={showInstructions ? "Large" : "Medium"}
       isModal
       hasCloseAffordance
       closeLabel={tFeatures("Action.Close")}
-      onOpenChange={() => {
-        setOpen(false);
-      }}
+      onOpenChange={unmount}
     >
       <DialogContent>
         {showInstructions ? (
@@ -156,7 +123,7 @@ export default function PostSignupDownloadModal() {
                 size="Medium"
                 className="fill"
                 onClick={() => {
-                  handleGetApp().catch(() => undefined);
+                  performDownload().catch(() => undefined);
                 }}
               >
                 {t(ctaTranslationKey)}
@@ -167,4 +134,28 @@ export default function PostSignupDownloadModal() {
       </DialogContent>
     </Dialog>
   );
+}
+
+export default function PostSignupDownloadModal({ unmount }: { unmount: () => void }) {
+  const hasLoggedExposure = useRef(false);
+  const translate = useAppDownloadTranslate();
+  const { isDownloadModalEnabled, isLoading } = useDownloadModalIxp();
+  const download = resolveAppDownload({ translate });
+  const deviceMeta = getDeviceMeta();
+  const isEligible = !isLoading && download != null && deviceMeta?.isDesktop;
+
+  useEffect(() => {
+    if (!isEligible || hasLoggedExposure.current) {
+      return;
+    }
+    hasLoggedExposure.current = true;
+    logDownloadModalExposure();
+    if (isDownloadModalEnabled) {
+      sendSignupDownloadModalEvent(window.location.href);
+    }
+  }, [isEligible, isDownloadModalEnabled]);
+
+  return isEligible && isDownloadModalEnabled ? (
+    <PostSignupDownloadModalContent download={download} unmount={unmount} />
+  ) : null;
 }

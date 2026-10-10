@@ -1,34 +1,17 @@
 /**
- * Markdown tokenizer configuration for marked library
- * Contains both interactive (live typing) and non-interactive (paste) tokenizers
+ * Markdown tokenizer configuration for marked: interactive (typing) and non-interactive (paste)
  */
-import { marked } from 'marked';
-// Do not support lists with a start number greater than 1000
+import { marked, Lexer, Tokenizer } from 'marked';
 const MAX_START_NUMBER = 1000;
-/**
- * Get the previous token from the tokens array
- */
 function getPrevToken(tokens) {
     return tokens.length > 0 ? tokens[tokens.length - 1] : undefined;
 }
-/**
- * Get the character preceding a match in the source string
- */
 function getPrevChar(match, maskedSrc) {
     const srcIndex = maskedSrc.indexOf(match[0]);
     return srcIndex > 0 ? maskedSrc[srcIndex - 1] : undefined;
 }
-/**
- * Regex used to test the previous token when determining if we
- * should convert an inline markdown trigger. Ensures we don't
- * convert if there isn't a space preceding or if at start of
- * text -- this avoids converting tokens inside other words
- * e.g. foo_bar_baz
- */
+/** An inline trigger needs a non-word character before it, so `foo_bar_baz` stays text. */
 const PREV_TOKEN_INLINE_REGEX = /[^a-zA-Z0-9]$/;
-/**
- * Disabled tokenizers shared between interactive and non-interactive modes
- */
 const DISABLED_TOKENIZERS = {
     code: () => undefined,
     heading: () => undefined,
@@ -38,18 +21,17 @@ const DISABLED_TOKENIZERS = {
     tag: () => undefined,
     link: () => undefined,
     reflink: () => undefined,
-    autolink: () => undefined,
-    url: () => undefined,
     html: () => undefined,
     table: () => undefined,
     def: () => undefined,
     fences: () => undefined,
-    // Disable marked's built-in GFM strikethrough. It matches single-tilde
-    // `~text~` and emits `del` tokens without a triggerLength, which both
-    // (a) converts single tildes we don't want to treat as strikethrough and
-    // (b) breaks the trigger-stripping index math in normalizeMark. All tilde
-    // handling is owned by linethroughExtension, which requires `~~`.
-    del: () => undefined
+    // del - marked's GFM strikethrough matches single-tilde `~text~` and emits no triggerLength,
+    // which breaks the trigger-stripping index math in normalizeMark. linethroughExtension owns
+    // tilde handling and requires `~~`.
+    del: () => undefined,
+    // url, autolink - reached through `urlExtension`, which adds the word-boundary check they lack.
+    url: () => undefined,
+    autolink: () => undefined
 };
 // ============================================================================
 // Shared Extensions (used by both interactive and non-interactive tokenizers)
@@ -65,11 +47,10 @@ export const underlineExtension = {
         if (prevToken && !prevToken.raw.match(/[\sa-zA-Z0-9\\/]/)) {
             return undefined;
         }
-        // Manual check replaces negative lookbehind (?<!\s) to ensure text doesn't end with whitespace
+        // The check below replaces a (?<!\s) lookbehind
         const rule = /^(?:__(?![_\s]+)(.+?)?__)/;
         const match = rule.exec(src);
         if (match) {
-            // Ensure the matched text doesn't end with whitespace
             if (match[1] && /\s$/.test(match[1])) {
                 return undefined;
             }
@@ -84,6 +65,145 @@ export const underlineExtension = {
         return undefined;
     }
 };
+/**
+ * A dotted host, TLD captured lowercase. The host keeps its case: a TLD is never capitalised, so
+ * `finished.It` is a missing space and `Roblox.com` is a URL.
+ */
+const HOST = String.raw `(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+([a-z]{2,})`;
+/**
+ * A bare host with an optional port, path, query or fragment. marked's own rules match no
+ * scheme-less host. The tail drops the brackets and braces `_backpedal` cannot trim.
+ */
+const BARE_URL_RULE = new RegExp(String.raw `^${HOST}(?::\d{1,5})?(?:[/?#][^\s<>[\]{}\`]*)?`);
+/** Where the next URL may start: a scheme, a `<` autolink, or a bare host. */
+const URL_START = new RegExp(String.raw `[a-zA-Z][a-zA-Z0-9+.-]*://|<|${HOST}`);
+/**
+ * A URL must start at a token boundary. These end characters put the match inside a word, a path
+ * or an e-mail address: `xhttps://roblox.com`, `foo/roblox.com`, a host right after an `@`.
+ */
+const PREV_CHAR_BLOCKS_URL = /[\w@./-]$/;
+/** marked's trailing-punctuation trimmer. */
+// eslint-disable-next-line no-underscore-dangle
+const BACKPEDAL = Lexer.rules.inline.gfm._backpedal;
+function trimTrailingPunctuation(url) {
+    let current = url;
+    let previous;
+    do {
+        previous = current;
+        current = BACKPEDAL.exec(current)?.[0] ?? '';
+    } while (previous !== current);
+    return current;
+}
+/**
+ * A TLD that is also an English word needs proof of intent: a `www.` prefix, or a port, path,
+ * query or fragment. `www.` is checked here because marked's own `url` tokenizer gives a `www.`
+ * host `http`.
+ */
+const WORD_TLDS = new Set(['id', 'in', 'it', 'me', 'no', 'us']);
+const TLD_TAIL = /[:/?#]/;
+const WWW_HOST = /^www\./i;
+/**
+ * Hand-curated. Without a list every dotted token is a host, so `photo.png` reads as a link. A
+ * missed link is the cheaper mistake. A typed scheme skips the list.
+ */
+const BARE_URL_TLDS = new Set([
+    // Generic
+    'com',
+    'org',
+    'net',
+    'io',
+    'gg',
+    'co',
+    'edu',
+    'gov',
+    'dev',
+    'app',
+    'me',
+    'tv',
+    'xyz',
+    'info',
+    'biz',
+    // Country codes
+    'us',
+    'uk',
+    'ca',
+    'au',
+    'de',
+    'fr',
+    'jp',
+    'br',
+    'ru',
+    'in',
+    'nl',
+    'es',
+    'it',
+    'pl',
+    'se',
+    'no',
+    'kr',
+    'mx',
+    'ar',
+    'cl',
+    'ph',
+    'id',
+    'tr',
+    'vn',
+    'th',
+    // Shorteners
+    'gl',
+    'ly'
+]);
+function bareUrlToken(src) {
+    const match = BARE_URL_RULE.exec(src);
+    if (!match) {
+        return undefined;
+    }
+    const url = trimTrailingPunctuation(match[0]);
+    if (!url.includes('.')) {
+        return undefined;
+    }
+    const tld = match[1];
+    if (!BARE_URL_TLDS.has(tld)) {
+        return undefined;
+    }
+    if (WORD_TLDS.has(tld) && !TLD_TAIL.test(url) && !WWW_HOST.test(url)) {
+        return undefined;
+    }
+    return {
+        type: 'bare-url',
+        raw: url,
+        text: url,
+        href: `https://${url}`
+    };
+}
+/** The live tokenizer, whose `rules` the built-in URL tokenizers read. */
+function builtinTokenizer(lexer) {
+    return lexer.tokenizer;
+}
+/**
+ * The only entry point for a URL of any shape, so the word-boundary check below covers the two
+ * built-in tokenizers too. The bare-host rule runs first to keep `www.roblox.com` on `https`.
+ *
+ * Must not be named `url` or `autolink` - marked ignores an inline extension whose name is a
+ * built-in tokenizer's.
+ */
+export const urlExtension = {
+    name: 'web-url',
+    level: 'inline',
+    start(src) {
+        return src.match(URL_START)?.index;
+    },
+    tokenizer(src, tokens) {
+        const prevToken = getPrevToken(tokens);
+        if (prevToken && PREV_CHAR_BLOCKS_URL.test(prevToken.raw)) {
+            return undefined;
+        }
+        const tokenizer = builtinTokenizer(this.lexer);
+        return (bareUrlToken(src) ??
+            Tokenizer.prototype.autolink.call(tokenizer, src) ??
+            Tokenizer.prototype.url.call(tokenizer, src));
+    }
+};
 export const linethroughExtension = {
     name: 'linethrough',
     level: 'inline',
@@ -92,18 +212,15 @@ export const linethroughExtension = {
     },
     tokenizer(src, tokens) {
         const prevToken = getPrevToken(tokens);
-        // Only bail when the tilde run is glued to the end of the previous token
-        // (e.g. a stray leading `~` in `~~~foo~~`). Anchoring to the end avoids
-        // false negatives like `~ foo ~~bar~~`, where an earlier tilde in the
-        // preceding text must not block the `~~bar~~` match.
+        // Bail only on a tilde glued to the end of the previous token, as in `~~~foo~~`. A loose
+        // earlier tilde must not block the match, as in `~ foo ~~bar~~`.
         if (prevToken && prevToken.raw.match(/~$/)) {
             return undefined;
         }
-        // Manual check replaces negative lookbehind (?<!\s) to ensure text doesn't end with whitespace
+        // The check below replaces a (?<!\s) lookbehind
         const rule = /^(?:~~(?![~\s]+)(.+?)~~)/;
         const match = rule.exec(src);
         if (match) {
-            // Ensure the matched text doesn't end with whitespace
             if (match[1] && /\s$/.test(match[1])) {
                 return undefined;
             }
@@ -147,13 +264,10 @@ export const codespanExtension = {
 };
 export function createInteractiveTokenizer() {
     return {
-        // Handle bold and italic with custom logic to avoid conflicts
         emStrong(src, maskedSrc, fallbackPrevChar) {
-            // Bold with **text**
-            // Manual check replaces negative lookbehind (?<!\s) to ensure text doesn't end with whitespace
+            // Each check below replaces a (?<!\s) lookbehind
             let match = src.match(/^\*\*([^\s*].*?)\*\*/);
             if (match) {
-                // Ensure the matched text doesn't end with whitespace
                 if (match[1] && /\s$/.test(match[1])) {
                     return undefined;
                 }
@@ -165,11 +279,8 @@ export function createInteractiveTokenizer() {
                     triggerLength: 2
                 };
             }
-            // Italic with *text*
-            // Manual check replaces negative lookbehind (?<!\s) to ensure text doesn't end with whitespace
             match = src.match(/^\*([^\s*][^*]*?)\*(?!\*)/);
             if (match) {
-                // Ensure the matched text doesn't end with whitespace
                 if (match[1] && /\s$/.test(match[1])) {
                     return undefined;
                 }
@@ -185,11 +296,8 @@ export function createInteractiveTokenizer() {
                     triggerLength: 1
                 };
             }
-            // Italic with _text_
-            // Manual check replaces negative lookbehind (?<!\s) to ensure text doesn't end with whitespace
             match = src.match(/^_([^\s_][^_]*?)_(?!_)/);
             if (match) {
-                // Ensure the matched text doesn't end with whitespace
                 if (match[1] && /\s$/.test(match[1])) {
                     return undefined;
                 }
@@ -210,7 +318,6 @@ export function createInteractiveTokenizer() {
         },
         // Disable codespan in tokenizer - handled by extension
         codespan: () => undefined,
-        // Handle blockquote with > prefix
         blockquote(src) {
             const match = src.match(/^> (.*)/);
             if (match) {
@@ -224,7 +331,6 @@ export function createInteractiveTokenizer() {
             }
             return undefined;
         },
-        // Handle unordered lists with -, *, or +
         list(src) {
             let match = src.match(/^([-*+]) (.*)/);
             if (match) {
@@ -279,7 +385,12 @@ export function createInteractiveTokenizer() {
         ...DISABLED_TOKENIZERS
     };
 }
-export const interactiveExtensions = [codespanExtension, underlineExtension, linethroughExtension];
+export const interactiveExtensions = [
+    codespanExtension,
+    underlineExtension,
+    linethroughExtension,
+    urlExtension
+];
 export function initializeMarked() {
     marked.setOptions({
         ...marked.getDefaults(),
@@ -296,7 +407,6 @@ const defaultTokenizer = new marked.Tokenizer();
 function processListToken(token) {
     if (token.type === 'list') {
         const listToken = token;
-        // Find the delimiter character (e.g., '-', '*', '+', '.', ')')
         let delimiter;
         for (let i = 0; i < listToken.raw.length; i += 1) {
             const char = listToken.raw[i];
@@ -316,10 +426,8 @@ function processListToken(token) {
             delimiter,
             start: typeof listToken.start === 'number' ? listToken.start : undefined,
             items: listToken.items.map(item => {
-                // Check if this item has nested lists by looking for the items property
                 const itemWithItems = item;
                 if (itemWithItems.items && Array.isArray(itemWithItems.items)) {
-                    // This is a nested list, recursively process it
                     const nestedList = {
                         ...item,
                         type: 'list'
@@ -334,14 +442,12 @@ function processListToken(token) {
 }
 export function createNonInteractiveTokenizer() {
     return {
-        // Handle bold and italic with standard CommonMark parsing
         emStrong(...args) {
             const token = defaultTokenizer.emStrong.call(this, ...args);
             if (token) {
                 const typedToken = token;
                 typedToken.triggerLength =
                     (typedToken.raw.length - typedToken.text.length) / 2;
-                // If using __ for bold, treat it as underline instead
                 if (typedToken.type === 'strong' && typedToken.raw.startsWith('__')) {
                     return {
                         type: 'underline',
@@ -351,7 +457,6 @@ export function createNonInteractiveTokenizer() {
                         tokens: typedToken.tokens
                     };
                 }
-                // Mark _ trigger for italic
                 if (typedToken.raw.startsWith('_')) {
                     typedToken.trigger = '_';
                 }
@@ -359,7 +464,6 @@ export function createNonInteractiveTokenizer() {
             return token;
         },
         codespan(src) {
-            // Use a regex pattern similar to what marked uses internally
             const rule = /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/;
             const cap = rule.exec(src);
             if (!cap) {
@@ -383,7 +487,7 @@ export function createNonInteractiveTokenizer() {
             return token;
         },
         list(src) {
-            // Check if this is an hr pattern first
+            // A row of dashes, underscores or stars is an hr, not a list
             const hrRule = /^ {0,3}((?:-[\t ]*){3,}|(?:_[ \t]*){3,}|(?:\*[ \t]*){3,})(?:\n+|$)/;
             if (hrRule.test(src)) {
                 return undefined;
@@ -392,15 +496,13 @@ export function createNonInteractiveTokenizer() {
             if (!token) {
                 return token;
             }
-            // Do not support ordered lists with a start number greater than MAX_START_NUMBER
             if (token.ordered && typeof token.start === 'number' && token.start > MAX_START_NUMBER) {
                 return undefined;
             }
             return processListToken(token);
         },
-        // Custom paragraph tokenizer that treats single newlines as paragraph breaks
+        // A single newline is a paragraph break here, unlike CommonMark
         paragraph(src) {
-            // Match text up to a single newline (treat \n as paragraph break)
             const match = src.match(/^([^\n]+)(?:\n|$)/);
             if (match) {
                 return {
@@ -415,7 +517,11 @@ export function createNonInteractiveTokenizer() {
         ...DISABLED_TOKENIZERS
     };
 }
-export const nonInteractiveExtensions = [underlineExtension, linethroughExtension];
+export const nonInteractiveExtensions = [
+    underlineExtension,
+    linethroughExtension,
+    urlExtension
+];
 export function initializeNonInteractiveMarked() {
     const options = {
         ...marked.getDefaults(),
@@ -426,7 +532,6 @@ export function initializeNonInteractiveMarked() {
     marked.use({ extensions: nonInteractiveExtensions });
     const tokenizer = createNonInteractiveTokenizer();
     marked.use({ tokenizer });
-    // Return a snapshot of the current marked defaults for use in lexing
     return { ...marked.defaults };
 }
 //# sourceMappingURL=tokenizer.js.map

@@ -1,7 +1,7 @@
 /* eslint-disable no-void */
 import { useEffect, useState } from "react";
 import { captureException } from "@rbx/payments/error";
-import { CurrentUser } from "@rbx/core-scripts/legacy/Roblox";
+import { getCurrentUser, userIdToNumber } from "@rbx/www-common/user";
 import * as friendsService from "@rbx/friends-common/services/friends";
 import { TFriend } from "@rbx/friends-common/types/friendsCarousel";
 import { trackCounter } from "../observability";
@@ -22,11 +22,11 @@ export function useMyFriends(): UseMyFriendsResult {
   const [friends, setFriends] = useState<TFriend[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const userId = CurrentUser?.userId;
-  const isLoggedIn = userId != null && Number(userId) > 0;
+  const userId = getCurrentUser()?.id;
+  const isLoggedIn = userId !== undefined;
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (userId === undefined) {
       setIsLoading(false);
       return;
     }
@@ -34,7 +34,7 @@ export function useMyFriends(): UseMyFriendsResult {
     void (async () => {
       trackCounter("GetMyFriends_API", { status: "Throughput" });
       try {
-        const result = await friendsService.getFriends(Number(userId), true);
+        const result = await friendsService.getFriends(userIdToNumber(userId), true);
         trackCounter("GetMyFriends_API", { status: "200" });
         if (!state.cancelled) setFriends(result);
       } catch (e) {

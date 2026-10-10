@@ -129,7 +129,7 @@ const Actions: React.FC<ActionsProps> = ({
             <span className='icon-status-private-primary actions-verification-icon' />
           )}
           {action.label}
-          {action.key === 'ChangeCommunityOwner' && (
+          {action.href && (
             <span
               className='icon-nav-external-link-sm change-owner-action-icon'
               aria-hidden='true'

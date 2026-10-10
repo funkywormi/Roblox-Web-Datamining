@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal } from "react-style-guide";
+import { Button } from "@rbx/foundation-ui";
 import * as TwoStepVerification from "../../../../common/request/types/twoStepVerification";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import { TIMEOUT_BEFORE_CALLBACK_MILLISECONDS } from "../app.config";
@@ -154,16 +155,6 @@ const CD2SVInput: React.FC<Props> = ({
   const marginBottomClassName = renderInline
     ? "inline-challenge-margin-bottom"
     : "modal-margin-bottom";
-  let actionButtonClassName = renderInline
-    ? "inline-challenge-action-button"
-    : "modal-action-button";
-  actionButtonClassName = actionButtonClassName.concat(" ", "btn-secondary-md");
-  actionButtonClassName = actionButtonClassName.concat(" ", marginBottomClassName);
-  let ackErrorButtonClassName = renderInline
-    ? "inline-challenge-action-button"
-    : "modal-action-button";
-  ackErrorButtonClassName = ackErrorButtonClassName.concat(" ", "btn-cta-md");
-  ackErrorButtonClassName = ackErrorButtonClassName.concat(" ", marginBottomClassName);
   const marginBottomLargeClassName = renderInline
     ? "inline-margin-bottom-xlarge"
     : "modal-margin-bottom-xlarge";
@@ -277,33 +268,31 @@ const CD2SVInput: React.FC<Props> = ({
           {modalDescription} {maybeDelayedText ?? ""}
         </p>
         {showRetryButton ? (
-          <button
-            type="button"
-            className={`${actionButtonClassName} focus-visible:outline-focus`}
+          <Button
+            variant="Standard"
+            size="Medium"
+            className={`challenge-action-button ${marginBottomClassName}`}
             aria-label={resources.Action.Retry}
-            disabled={requestInFlight}
+            isDisabled={requestInFlight}
+            isLoading={requestInFlight || shouldDebounceRetry}
             onClick={retryPrompt}
+            data-testid="cross-device-retry-button"
           >
-            {requestInFlight || shouldDebounceRetry ? (
-              <span className="spinner spinner-xs spinner-no-margin" />
-            ) : (
-              resources.Action.Retry
-            )}
-          </button>
+            {resources.Action.Retry}
+          </Button>
         ) : (
-          <button
-            type="button"
-            className={`${ackErrorButtonClassName} focus-visible:outline-focus`}
+          <Button
+            variant="Emphasis"
+            size="Medium"
+            className={`challenge-action-button ${marginBottomClassName}`}
             aria-label={resources.Action.Okay}
-            disabled={requestInFlight}
+            isDisabled={requestInFlight}
+            isLoading={requestInFlight}
             onClick={closeModal}
+            data-testid="cross-device-okay-button"
           >
-            {requestInFlight ? (
-              <span className="spinner spinner-xs spinner-no-margin" />
-            ) : (
-              resources.Action.Okay
-            )}
-          </button>
+            {resources.Action.Okay}
+          </Button>
         )}
         {showRetryButton ? children : null}
         {showRetryButton || showHelpCenterLink ? (

@@ -3,6 +3,8 @@ import { isReferralEnabled } from "@rbx/core-scripts/meta/subscription";
 import { subscriptionsV2Api } from "@rbx/payments/services/subscriptions";
 import { useQuery } from "@tanstack/react-query";
 
+import { withApiMetrics } from "../utils/withApiMetrics";
+
 import type { ReferralEligibility } from "./useReferralEligibility";
 
 const ELIGIBILITY_BY_WIRE_VALUE = new Map<string | number, ReferralEligibility>([
@@ -33,8 +35,9 @@ export const useSenderReferralEligibility = ({
     queryKey: ["plus-referrals", "sender-eligibility"],
     enabled: shouldRequest,
     queryFn: async () => {
-      const { eligibility: wireValue } =
-        await subscriptionsV2Api.subscriptionsV2CheckSubscriptionReferralEligibility({});
+      const { eligibility: wireValue } = await withApiMetrics("SenderReferralEligibility", () =>
+        subscriptionsV2Api.subscriptionsV2CheckSubscriptionReferralEligibility({}),
+      );
       return ELIGIBILITY_BY_WIRE_VALUE.get(wireValue);
     },
   });

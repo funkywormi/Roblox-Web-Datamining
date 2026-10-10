@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-utilities";
 import { Modal } from "react-style-guide";
+import { Button } from "@rbx/foundation-ui";
 import "../../../../css/subscriptionManagement/resubscribeSubscription.scss";
 import classNames from "classnames";
 import { Price } from "../../../core/types/price";
@@ -174,14 +175,14 @@ const ResubscribeSubscription: React.FC<ResubscribeSubscriptionProps> = ({
   return (
     <React.Fragment>
       {canResubscribe && (
-        <button
-          type="button"
+        <Button
           className={className}
-          onClick={resubscribeButtonClick}
           data-testid="resubscribe"
+          variant="Standard"
+          onClick={resubscribeButtonClick}
         >
           {translate("Action.Resubscribe")}
-        </button>
+        </Button>
       )}
       <Modal show={isResubscribeModalVisible} onHide={() => setIsResubscribeModalVisible(false)}>
         <Modal.Header

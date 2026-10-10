@@ -7,7 +7,7 @@ import {
   ProductType,
   PeriodType,
   GrantType,
-} from "@rbx/client-subscriptions-api/v1";
+} from "@rbx/client-subscriptions-api/v2";
 import serviceConstants from "../constants/serviceConstants";
 import {
   GetSubscriptionStatusesRequest,
@@ -32,6 +32,7 @@ import {
 import { UserSubscription } from "../types/userSubscription";
 import { PremiumSubscription } from "../types/premiumSubscription";
 import { normalizeSubscriptionPaymentProvider } from "../utils/normalizeSubscriptionPaymentProvider";
+import { trackCounter } from "../../../observability";
 
 export const getSubscriptions = async (
   params: GetSubscriptionsRequest,
@@ -298,14 +299,18 @@ export const getFaeTrialProductId = async (): Promise<string | null> => {
 };
 
 export const listSubscriptionsV2 = async (productType: ProductType): Promise<Subscription[]> => {
+  trackCounter("ListSubscriptionsV2Called", { productType });
   try {
     const response = await subscriptionsV2Api.subscriptionsV2ListSubscriptions({
       productType,
       expirationTimestampMsStart: Date.now(),
       resultsPerPage: 100,
     });
-    return response.subscriptions ?? [];
+    const subscriptions = response.subscriptions ?? [];
+    trackCounter("ListSubscriptionsV2Succeeded", { productType });
+    return subscriptions;
   } catch (error) {
+    trackCounter("ListSubscriptionsV2Failed", { productType });
     return [];
   }
 };

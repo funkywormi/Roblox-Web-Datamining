@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import * as http from "@rbx/core-scripts/http";
 import environmentUrls from "@rbx/environment-urls";
+import { withApiMetrics } from "../topNav/observability";
 import { NOTIFICATION_STREAM_UNREAD_COUNT_QUERY_KEY } from "./useUnreadNotificationCount";
 
 /**
@@ -22,14 +23,15 @@ export const useClearUnreadOnOpen = (unreadCount: number) => {
       return;
     }
     queryClient.setQueryData(NOTIFICATION_STREAM_UNREAD_COUNT_QUERY_KEY, 0);
-    http
-      .post(
+    withApiMetrics("NotificationClearUnread", () =>
+      http.post(
         {
           url: `${environmentUrls.notificationApi}/v2/stream-notifications/clear-unread`,
           withCredentials: true,
         },
         {},
-      )
+      ),
+    )
       .then(() =>
         queryClient.invalidateQueries({ queryKey: NOTIFICATION_STREAM_UNREAD_COUNT_QUERY_KEY }),
       )

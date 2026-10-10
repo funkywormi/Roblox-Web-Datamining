@@ -107,7 +107,8 @@ const PlusBundleCards: FC<PlusBundleCardsProps> = ({
 }) => {
   const { translate } = useTranslation();
   const heading = translate("Heading.GetRobuxEveryMonth");
-  const inverseThemeClass = useTheme() === "dark" ? "light-theme" : "dark-theme";
+  const inverseThemeClass =
+    useTheme() === "dark" ? "color-mode-light light-theme" : "color-mode-dark dark-theme";
 
   return (
     <div className="gap-y-large flex flex-col" data-testid="plus-bundle-cards">

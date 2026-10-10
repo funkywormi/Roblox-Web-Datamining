@@ -1,4 +1,4 @@
-import { httpService } from "core-utilities";
+import * as httpService from "@rbx/core-scripts/http";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as AccountRecovery from "../types/accountRecovery";

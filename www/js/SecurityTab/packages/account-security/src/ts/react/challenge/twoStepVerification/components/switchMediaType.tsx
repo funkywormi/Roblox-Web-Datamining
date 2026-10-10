@@ -1,5 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router";
+import { Button } from "@rbx/foundation-ui";
 import { mediaTypeToPath } from "../hooks/useActiveMediaType";
 import useTwoStepVerificationContext from "../hooks/useTwoStepVerificationContext";
 import { ActionType, MediaType } from "../interface";
@@ -30,21 +31,22 @@ const SwitchMediaType: React.FC<Props> = ({
     history.push(mediaTypeToPath(null));
   };
 
-  const buttonLinkClassName = renderInline
-    ? "inline-challenge-body-button-link"
-    : "modal-body-button-link";
+  const marginBottomClassName = renderInline
+    ? "inline-challenge-margin-bottom"
+    : "modal-margin-bottom";
 
   return (
-    <p className={className}>
-      <button
-        type="button"
-        className={`${buttonLinkClassName} small focus-visible:outline-focus`}
-        onClick={clearMediaType}
-        disabled={requestInFlight}
-      >
-        {resources.Action.ChangeMediaType}
-      </button>
-    </p>
+    <Button
+      variant="Standard"
+      size="Medium"
+      className={`challenge-action-button ${marginBottomClassName} ${className ?? ""}`}
+      aria-label={resources.Action.ChangeMediaType}
+      isDisabled={requestInFlight}
+      onClick={clearMediaType}
+      data-testid="switch-media-type-button"
+    >
+      {resources.Action.ChangeMediaType}
+    </Button>
   );
 };
 

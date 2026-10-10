@@ -1,8 +1,10 @@
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import "../../../../css/challenge/computationalProof/computationalProof.scss";
 import { RequestServiceDefault } from "../../../common/request";
 import App from "./App";
+import { TRANSLATION_NAMESPACES } from "./app.config";
 import { RenderChallenge } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
@@ -43,18 +45,20 @@ export const renderChallenge: RenderChallenge = ({
     const eventService = new EventServiceDefault(challengeId);
     const metricsService = new MetricsServiceDefault(appType, requestServiceDefault);
     render(
-      <App
-        challengeId={challengeId}
-        renderInline={renderInline}
-        artifacts={artifacts}
-        eventService={eventService}
-        metricsService={metricsService}
-        requestService={requestServiceDefault}
-        onChallengeDisplayed={onChallengeDisplayed}
-        onChallengeCompleted={onChallengeCompleted}
-        onChallengeInvalidated={onChallengeInvalidated}
-        onModalChallengeAbandoned={onModalChallengeAbandoned}
-      />,
+      <TranslationProviderSCC namespaces={TRANSLATION_NAMESPACES}>
+        <App
+          challengeId={challengeId}
+          renderInline={renderInline}
+          artifacts={artifacts}
+          eventService={eventService}
+          metricsService={metricsService}
+          requestService={requestServiceDefault}
+          onChallengeDisplayed={onChallengeDisplayed}
+          onChallengeCompleted={onChallengeCompleted}
+          onChallengeInvalidated={onChallengeInvalidated}
+          onModalChallengeAbandoned={onModalChallengeAbandoned}
+        />
+      </TranslationProviderSCC>,
       container,
     );
     return true;

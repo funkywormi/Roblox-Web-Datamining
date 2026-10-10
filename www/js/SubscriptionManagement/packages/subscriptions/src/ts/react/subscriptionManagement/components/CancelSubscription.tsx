@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { fireEvent } from "roblox-event-tracker";
 import { useTranslation } from "react-utilities";
 import { Modal } from "react-style-guide";
+import { Button } from "@rbx/foundation-ui";
 import { authenticatedUser, deviceMeta } from "header-scripts";
-import { ProductType } from "@rbx/client-subscriptions-api/v1";
+import { ProductType } from "@rbx/client-subscriptions-api/v2";
 import { PremiumPurchasePlatform } from "../../../core/types/premiumEnums";
 import "../../../../css/subscriptionManagement/cancelSubscription.scss";
 import { ANDROID_CANCEL_RENEWAL_URL } from "../../../core/constants/websiteConstants";
@@ -127,9 +128,9 @@ const CancelSubscription: React.FC<CancelSubscriptionProps> = ({
   return (
     <React.Fragment>
       {showCancelButton() && (
-        <button type="button" className={className} onClick={cancelButtonClick}>
+        <Button className={className} variant="Standard" onClick={cancelButtonClick}>
           {translate("Action.CancelRenewal")}
-        </button>
+        </Button>
       )}
       <Modal show={isCancelModalVisible} onHide={() => setIsCancelModalVisible(false)}>
         <Modal.Header

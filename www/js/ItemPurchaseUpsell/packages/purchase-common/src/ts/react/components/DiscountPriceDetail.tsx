@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
-import { TranslateFunction } from '@rbx/core-scripts/react';
+import { type PurchaseTranslate } from '../itemPurchase/useTranslate';
 import { formatNumber } from '@rbx/core-scripts/format/number';
 import {
   Accordion,
@@ -16,7 +16,7 @@ import isPlusBenefitDiscount from '../utils/isPlusBenefitDiscount';
 import EmbeddableText from './EmbeddableText';
 
 export type DiscountPriceDetailProps = {
-  translate: TranslateFunction;
+  translate: PurchaseTranslate;
   normalizedDiscount: NormalizedDiscountInformation;
   savingsSummary?: string;
 };

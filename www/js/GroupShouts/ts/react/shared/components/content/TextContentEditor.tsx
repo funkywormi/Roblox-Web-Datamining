@@ -19,6 +19,7 @@ export type TextContentEditorProps = {
   contentPlaceholder: string;
   submitText: string;
   submitDisabled?: boolean;
+  hasUnsavedAttachmentChanges?: boolean;
   customControls?: JSX.Element;
   titleMaxLength?: number;
   contentMaxLength: number;
@@ -51,6 +52,7 @@ export type TextContentEditorProps = {
   contentLeadingControl?: React.ReactNode;
   /** Flow content rendered below the content editor's text, above its control row. */
   contentFooter?: React.ReactNode;
+  isLinkAuthoringEnabled?: boolean;
 } & WithTranslationsProps;
 
 const VALIDATION_DEBOUNCE_MS = 500;
@@ -61,6 +63,7 @@ const TextContentEditor = ({
   contentPlaceholder,
   submitText,
   submitDisabled,
+  hasUnsavedAttachmentChanges,
   customControls,
   titleMaxLength,
   contentMaxLength,
@@ -87,6 +90,7 @@ const TextContentEditor = ({
   footerControls,
   contentLeadingControl,
   contentFooter,
+  isLinkAuthoringEnabled,
   translate
 }: TextContentEditorProps): JSX.Element => {
   const [title, setTitle] = useState<MessageContent>(
@@ -109,7 +113,16 @@ const TextContentEditor = ({
     });
   }
 
-  const { resetForm, updateFormItem, formStatus } = useStatefulForm(fields);
+  const { resetForm, updateFormItem, formStatus: textFormStatus } = useStatefulForm(fields);
+  const formStatus = useMemo(
+    () => ({
+      ...textFormStatus,
+      isValidAndUnsaved:
+        textFormStatus.isValidAndUnsaved ||
+        (!!hasUnsavedAttachmentChanges && !textFormStatus.isInvalid)
+    }),
+    [textFormStatus, hasUnsavedAttachmentChanges]
+  );
 
   const contentValidationError = useValidationError(
     content,
@@ -126,13 +139,14 @@ const TextContentEditor = ({
   );
 
   const onSubmitClicked = useCallback(async () => {
+    const submittedContent = textFormStatus.isDirty ? content : defaultContent ?? content;
     setIsSubmitting(true);
-    const isSaved = await onSubmit({ title: title.plainText || '', content });
+    const isSaved = await onSubmit({ title: title.plainText || '', content: submittedContent });
     if (isSaved) {
       resetForm();
     }
     setIsSubmitting(false);
-  }, [title, content, onSubmit, resetForm]);
+  }, [title, content, defaultContent, textFormStatus.isDirty, onSubmit, resetForm]);
 
   const onTitleChanged = useCallback(
     (value: MessageContent) => {
@@ -263,6 +277,7 @@ const TextContentEditor = ({
                 minHeight={hasTitle ? 'Medium' : undefined}
                 leadingControl={contentLeadingControl}
                 footer={contentFooter}
+                isLinkAuthoringEnabled={isLinkAuthoringEnabled}
                 validationError={
                   countdown?.isActive
                     ? translate('Error.RetryAfterSeconds', {

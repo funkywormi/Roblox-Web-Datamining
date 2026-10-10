@@ -1,13 +1,11 @@
 import { useRef, useState } from "react";
 import { userId } from "@rbx/core-scripts/meta/user";
 import { getChildSettingsCacheTag } from "../../../../../apis/parentalControlsApi";
-import { startWizard } from "@rbx/amp-v2-wizard";
-import { UserSetting, useSnackbar } from "@rbx/user-settings";
+import { UserSetting } from "@rbx/user-settings";
 import { useAppDispatch } from "../../../../../redux/hooks";
 import baseApi from "../../../../../apis/common/baseApi";
 import ApiCacheTag from "../../../../../apis/common/cacheTagEnum";
-import useWrappedTranslation from "../../../../hooks/useWrappedTranslation";
-import commonTranslationConstants from "../../../../constants/contentConstants/commonTranslationConstants";
+import useStartOdpWizard from "../../../../hooks/useStartOdpWizard";
 import { TSettingUpdateRequest } from "../../../../../../types/settingUpdateTypes";
 
 const useManageOdpSetting = () => {
@@ -15,8 +13,7 @@ const useManageOdpSetting = () => {
   const isWizardActiveRef = useRef(false);
   const [isManaging, setIsManaging] = useState(false);
   const [revision, setRevision] = useState(0);
-  const { translate } = useWrappedTranslation();
-  const { snackbarService } = useSnackbar();
+  const startOdpWizard = useStartOdpWizard();
 
   const manageSetting = async ({
     setting,
@@ -29,7 +26,7 @@ const useManageOdpSetting = () => {
     isWizardActiveRef.current = true;
     setIsManaging(true);
     try {
-      await startWizard({
+      await startOdpWizard({
         flow: {
           name: "ODP",
           props: {
@@ -50,8 +47,6 @@ const useManageOdpSetting = () => {
         },
         surface: "ParentalControlsSettings",
       });
-    } catch {
-      snackbarService.warning(translate(commonTranslationConstants.unknownError));
     } finally {
       // Wizard exit does not indicate whether a setting was saved.
       const childUserId = userId();

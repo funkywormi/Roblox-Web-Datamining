@@ -1,15 +1,9 @@
-import { BIOMETRIC_LANGUAGE_RESOURCES } from "../app.config";
+import type { Translator } from "@rbx/www-common/i18n";
 
-/**
- * A type adapted from the base type of `translate`, which we use to limit the
- * keys that can be translated.
- */
-type TranslateFunction = (
-  resourceId: (typeof BIOMETRIC_LANGUAGE_RESOURCES)[number],
-  parameters?: Record<string, unknown>,
-) => string;
-
-export const getResources = (translate: TranslateFunction) =>
+export const getResources = (
+  translate: Translator<"Feature.BiometricChallenge">,
+  translateCommon: Translator<"CommonUI.Messages">,
+) =>
   ({
     personaLiveness: {
       title: translate("Title.ConfirmHuman"),
@@ -17,7 +11,7 @@ export const getResources = (translate: TranslateFunction) =>
       loading: translate("Content.Loading"),
       cancelButton: translate("Action.Cancel"),
       continueButton: translate("Action.Continue"),
-      closeAffordance: translate("Action.Close"),
+      closeAffordance: translateCommon("Action.Close"),
       qrTitle: translate("Title.QRHandoff"),
       qrDescription: translate("Content.ScanQR"),
       qrFooter: translate("Content.QRHelpFull", {

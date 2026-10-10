@@ -1,16 +1,16 @@
 import React from 'react';
-import { TranslateFunction } from '@rbx/core-scripts/react';
+import { type PurchaseTranslate } from '../itemPurchase/useTranslate';
 import { Icon } from '@rbx/foundation-ui';
 
-import AssetName from '../../../js/react/itemPurchase/components/AssetName';
-import PriceLabel from '../../../js/react/itemPurchase/components/PriceLabel';
-import itemPurchaseConstants from '../../../js/react/itemPurchase/constants/itemPurchaseConstants';
+import AssetName from '../itemPurchase/components/AssetName';
+import PriceLabel from '../itemPurchase/components/PriceLabel';
+import itemPurchaseConstants from '../itemPurchase/constants/itemPurchaseConstants';
 import type { DiscountInformation } from './discountInformation';
 
 const { resources } = itemPurchaseConstants;
 
 export type UnifiedProductDetailsProps = {
-  translate: TranslateFunction;
+  translate: PurchaseTranslate;
   thumbnail: React.ReactNode;
   assetName: string;
   expectedPrice: number;
@@ -53,7 +53,7 @@ const UnifiedProductDetails: React.FC<UnifiedProductDetailsProps> = ({
             style={{ textDecoration: 'line-through', opacity: 0.6 }}>
             <PriceLabel
               translate={translate}
-              price={discountInformation.originalPrice}
+              price={discountInformation.originalPrice ?? 0}
               color=''
               useFreeText={false}
             />

@@ -77,6 +77,22 @@ import {
   CmntyAnnouncementViewedEvent,
 } from "@rbx/event-stream-proto/eventstream/usercommunities/cmnty_announcement_viewed_event_pb";
 import {
+  CmntyAnnouncementClickedEventSchema,
+  CmntyAnnouncementClickedEvent,
+} from "@rbx/event-stream-proto/eventstream/usercommunities/cmnty_announcement_clicked_event_pb";
+import {
+  CmntyAnnouncementArchiveAnnouncementViewedEventSchema,
+  CmntyAnnouncementArchiveAnnouncementViewedEvent,
+} from "@rbx/event-stream-proto/eventstream/usercommunities/cmnty_announcement_archive_announcement_viewed_event_pb";
+import {
+  CmntyAnnouncementSeeMoreButtonShownEventSchema,
+  CmntyAnnouncementSeeMoreButtonShownEvent,
+} from "@rbx/event-stream-proto/eventstream/usercommunities/cmnty_announcement_see_more_button_shown_event_pb";
+import {
+  CmntyAnnouncementSeeMoreButtonClickEventSchema,
+  CmntyAnnouncementSeeMoreButtonClickEvent,
+} from "@rbx/event-stream-proto/eventstream/usercommunities/cmnty_announcement_see_more_button_click_event_pb";
+import {
   GroupPageExposureEventSchema,
   GroupPageExposureEvent,
 } from "@rbx/event-stream-proto/eventstream/usercommunities/group_page_exposure_event_pb";
@@ -326,6 +342,28 @@ export const CommunityMetric = {
     getMetricEvent(
       CmntyAnnouncementViewedEventSchema,
       msg as unknown as CmntyAnnouncementViewedEvent,
+    ),
+  AnnouncementClicked: (msg: SafeEvent<CmntyAnnouncementClickedEvent>) =>
+    getMetricEvent(
+      CmntyAnnouncementClickedEventSchema,
+      msg as unknown as CmntyAnnouncementClickedEvent,
+    ),
+  AnnouncementArchiveAnnouncementViewed: (
+    msg: SafeEvent<CmntyAnnouncementArchiveAnnouncementViewedEvent>,
+  ) =>
+    getMetricEvent(
+      CmntyAnnouncementArchiveAnnouncementViewedEventSchema,
+      msg as unknown as CmntyAnnouncementArchiveAnnouncementViewedEvent,
+    ),
+  AnnouncementSeeMoreButtonShown: (msg: SafeEvent<CmntyAnnouncementSeeMoreButtonShownEvent>) =>
+    getMetricEvent(
+      CmntyAnnouncementSeeMoreButtonShownEventSchema,
+      msg as unknown as CmntyAnnouncementSeeMoreButtonShownEvent,
+    ),
+  AnnouncementSeeMoreButtonClick: (msg: SafeEvent<CmntyAnnouncementSeeMoreButtonClickEvent>) =>
+    getMetricEvent(
+      CmntyAnnouncementSeeMoreButtonClickEventSchema,
+      msg as unknown as CmntyAnnouncementSeeMoreButtonClickEvent,
     ),
   GroupPageExposure: (msg: GroupPageExposureEventParams) =>
     getMetricEvent(GroupPageExposureEventSchema, msg as unknown as GroupPageExposureEvent),

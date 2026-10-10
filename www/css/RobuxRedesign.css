@@ -2156,36 +2156,36 @@ h5 {
 }
 
 @media (prefers-color-scheme:dark) {
-    .dark\:block:where(:not(:-webkit-any(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:-webkit-any(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:block:where(:not(:-moz-any(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:-moz-any(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:block:where(:not(:is(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:is(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:hidden:where(:not(:-webkit-any(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:-webkit-any(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 
-    .dark\:hidden:where(:not(:-moz-any(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:-moz-any(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 
-    .dark\:hidden:where(:not(:is(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:is(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 }
 
-.dark\:block:where(.dark-theme, .dark-theme *) {
+.dark\:block:where(.color-mode-dark, .color-mode-dark *) {
     display: block
 }
 
-.dark\:hidden:where(.dark-theme, .dark-theme *) {
+.dark\:hidden:where(.color-mode-dark, .color-mode-dark *) {
     display: none
 }
 

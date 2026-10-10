@@ -1,6 +1,6 @@
 import { createTrackers } from "@rbx/observability-framework/trackers";
 import { captureException } from "@rbx/payments/error";
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 
 import type { RegistryInput } from "@rbx/observability-framework/schema";
 import type { MakeObservabilityTypes } from "@rbx/observability-framework/types";

@@ -202,7 +202,8 @@ function groupController(
         modalData: {
           groupId,
           userId,
-          isOwner: $scope.isCurrentUserOwner(),
+          // A deactivated group can never get a new owner, so skip the "ownerless" warning.
+          isOwner: $scope.isCurrentUserOwner() && !$scope.isDeactivatedGroup(),
           refreshGroupData() {
             loadGroupData().then(
               () => {
@@ -604,6 +605,8 @@ function groupController(
         $scope.profilePlatform.components.CommunityLocked)
     );
   };
+
+  $scope.isDeactivatedGroup = () => $scope.library?.currentGroup?.group?.isDeactivated === true;
 
   $scope.isGroupRestrictedByPolicy = () => {
     return (

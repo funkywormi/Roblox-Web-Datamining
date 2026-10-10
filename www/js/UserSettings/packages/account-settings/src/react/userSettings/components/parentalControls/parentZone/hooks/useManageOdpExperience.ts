@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { userId } from "@rbx/core-scripts/meta/user";
-import { startWizard } from "@rbx/amp-v2-wizard";
 import { TManageExperience } from "../../../../../../types/parentConsentsTypes";
 import baseApi from "../../../../../apis/common/baseApi";
 import {
@@ -8,11 +7,13 @@ import {
   getBlockedExperiencesCacheTag,
 } from "../../../../../apis/experienceBlockingApi";
 import { useAppDispatch } from "../../../../../redux/hooks";
+import useStartOdpWizard from "../../../../hooks/useStartOdpWizard";
 
 const useManageOdpExperience = () => {
   const dispatch = useAppDispatch();
   const isWizardActiveRef = useRef(false);
   const [isManaging, setIsManaging] = useState(false);
+  const startOdpWizard = useStartOdpWizard();
 
   const manageExperience: TManageExperience = async (universeId, action) => {
     const childUserId = userId();
@@ -22,7 +23,7 @@ const useManageOdpExperience = () => {
     isWizardActiveRef.current = true;
     setIsManaging(true);
     try {
-      await startWizard({
+      await startOdpWizard({
         flow: {
           name: "ODP",
           props: {
@@ -35,7 +36,7 @@ const useManageOdpExperience = () => {
           },
         },
         surface: "ParentalControlsSettings",
-      }).catch(() => undefined);
+      });
     } finally {
       // Wizard exit does not indicate whether the action was applied.
       dispatch(

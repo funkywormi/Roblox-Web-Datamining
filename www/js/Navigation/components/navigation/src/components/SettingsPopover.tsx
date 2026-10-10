@@ -13,6 +13,7 @@ import { navNamespaces } from "../constants/translationNamespaces";
 import { sendAccountSwitcherBlobPresentOnPageLoadEvent } from "../services/eventService";
 import { useIsTopNavFoundation } from "../util/topNavFoundationIxp";
 import { popoverDismissGuard } from "../util/popoverDismissGuard";
+import { trackOpenToVisible } from "../topNav/observability";
 // disabling the metadata call since this is fully released.
 // this will also reduce the traffic. ticket to remove comments: WEBGROW-10026
 // import navigationService from '../services/navigationService';
@@ -93,7 +94,13 @@ export default function SettingsPopover({
   if (isFoundation) {
     return (
       <li id="navbar-settings" ref={ref} className="navbar-icon-item">
-        <FoundationPopover>
+        <FoundationPopover
+          onOpenChange={open => {
+            if (open) {
+              trackOpenToVisible("Settings");
+            }
+          }}
+        >
           <PopoverTrigger asChild>{trigger}</PopoverTrigger>
           <PopoverContent
             side="bottom"
@@ -117,6 +124,9 @@ export default function SettingsPopover({
         containerPadding={20}
         button={trigger}
         container={ref.current}
+        onEnter={() => {
+          trackOpenToVisible("Settings");
+        }}
         role="menu"
       >
         {menu}

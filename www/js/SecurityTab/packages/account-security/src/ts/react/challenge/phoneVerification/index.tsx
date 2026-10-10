@@ -1,7 +1,9 @@
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { RequestServiceDefault } from "../../../common/request";
 import App from "./App";
+import { TRANSLATION_NAMESPACES } from "./app.config";
 import { RenderChallenge } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
@@ -38,15 +40,17 @@ export const renderChallenge: RenderChallenge = ({
 
     // Render the app on the selected element.
     render(
-      <App
-        challengeId={challengeId}
-        renderInline={renderInline}
-        eventService={eventService}
-        metricsService={metricsService}
-        onChallengeCompleted={onChallengeCompleted}
-        onChallengeInvalidated={onChallengeInvalidated}
-        onModalChallengeAbandoned={onModalChallengeAbandoned}
-      />,
+      <TranslationProviderSCC namespaces={TRANSLATION_NAMESPACES}>
+        <App
+          challengeId={challengeId}
+          renderInline={renderInline}
+          eventService={eventService}
+          metricsService={metricsService}
+          onChallengeCompleted={onChallengeCompleted}
+          onChallengeInvalidated={onChallengeInvalidated}
+          onModalChallengeAbandoned={onModalChallengeAbandoned}
+        />
+      </TranslationProviderSCC>,
       container,
     );
     eventService.sendChallengeInitializedEvent();

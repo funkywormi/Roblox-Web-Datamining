@@ -40,6 +40,7 @@ import {
   useEntrypointImpressionId,
 } from "@rbx/community-telemetry";
 import { useRealTime } from "./useRealTime";
+import { withApiMetrics } from "../observability";
 import { useLiveUserNameForDisplay } from "../../hooks/useLiveUserNameForDisplay";
 import {
   recordReferralNavClick,
@@ -485,12 +486,14 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
   const { data: friendRequestCount } = useQuery({
     queryKey: ["friend-request-count"],
     queryFn: () =>
-      http
-        .get<{ count: number }>({
-          url: `${environmentUrls.friendsApi}/v1/user/friend-requests/count`,
-          withCredentials: true,
-        })
-        .then(({ data }) => data.count),
+      withApiMetrics("FriendRequestCount", () =>
+        http
+          .get<{ count: number }>({
+            url: `${environmentUrls.friendsApi}/v1/user/friend-requests/count`,
+            withCredentials: true,
+          })
+          .then(({ data }) => data.count),
+      ),
     staleTime: Infinity,
   });
 
@@ -503,12 +506,14 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
   const { data: messageUnreadCount } = useQuery({
     queryKey: ["message-unread-count"],
     queryFn: () =>
-      http
-        .get<{ count: number }>({
-          url: `${environmentUrls.privateMessagesApi}/v1/messages/unread/count`,
-          withCredentials: true,
-        })
-        .then(({ data }) => data.count),
+      withApiMetrics("MessageUnreadCount", () =>
+        http
+          .get<{ count: number }>({
+            url: `${environmentUrls.privateMessagesApi}/v1/messages/unread/count`,
+            withCredentials: true,
+          })
+          .then(({ data }) => data.count),
+      ),
     staleTime: Infinity,
   });
 
@@ -521,12 +526,14 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
   const { data: tradeInboundCount } = useQuery({
     queryKey: ["trade-inbound-count"],
     queryFn: () =>
-      http
-        .get<{ count: number }>({
-          url: `${environmentUrls.tradesApi}/v1/trades/inbound/count`,
-          withCredentials: true,
-        })
-        .then(({ data }) => data.count),
+      withApiMetrics("TradeInboundCount", () =>
+        http
+          .get<{ count: number }>({
+            url: `${environmentUrls.tradesApi}/v1/trades/inbound/count`,
+            withCredentials: true,
+          })
+          .then(({ data }) => data.count),
+      ),
     staleTime: Infinity,
   });
 

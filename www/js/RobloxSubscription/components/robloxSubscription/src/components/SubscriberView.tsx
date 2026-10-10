@@ -64,16 +64,22 @@ const SubscriberView: FC<SubscriberViewProps> = ({
     [robloxSubscriptionMembership.activeOffers],
   );
 
+  // Paid-tenure start from the backend: trial end for weekly trials, else activation. The step-up
+  // countdown and period index measure from here. Nullable on endpoints that don't compute it.
+  const paidTenureStartTimestampMs =
+    robloxSubscriptionMembership.paidTenureStartTimestampMs ?? undefined;
+
   // TODO(SUBS-4071): fetch current period index from membership endpoint
   const currentPeriodIndex = useMemo(
     () =>
       calculateCurrentPeriodIndex(
-        robloxSubscriptionMembership.activationTimestampMs,
+        paidTenureStartTimestampMs ?? robloxSubscriptionMembership.activationTimestampMs,
         robloxSubscriptionMembership.periodType,
         robloxSubscriptionMembership.nextRenewalTimestampMs,
         Date.now(),
       ),
     [
+      paidTenureStartTimestampMs,
       robloxSubscriptionMembership.activationTimestampMs,
       robloxSubscriptionMembership.nextRenewalTimestampMs,
       robloxSubscriptionMembership.periodType,
@@ -141,6 +147,7 @@ const SubscriberView: FC<SubscriberViewProps> = ({
             }
             nextDiscount={discountTier.next}
             periodType={robloxSubscriptionMembership.periodType}
+            trialEndTimestampMs={paidTenureStartTimestampMs}
           />
         </div>
         <div className="flex flex-col gap-y-[32px]">

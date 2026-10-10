@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { Button } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { usePendingPlusReferrals } from "@rbx/subscriptions-common";
+import { useQuery } from "@tanstack/react-query";
 import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
 import { Section } from "../types/buyRobuxPageData";
 import { InlinePendingRequests } from "./InlinePendingRequests";
@@ -12,6 +13,7 @@ import { TrackingContext } from "../contexts/TrackingContext";
 import { ModalContext } from "../contexts/ModalContext";
 import { isInApp } from "../utils/platform";
 import { getSectionTrackingProps } from "../hooks/useScrollTracking";
+import { getAppPolicy } from "../services/guacService";
 
 const HEADER_SHELL_CLASS =
   "flex flex-col self-stretch medium:self-end medium:margin-top-[16px] medium:margin-right-[16px]";
@@ -34,7 +36,17 @@ export function Header({
 
   const { translate } = useTranslation();
   const { pendingReferrals: allPendingReferrals } = usePendingPlusReferrals();
-  const pendingReferrals = isInApp ? [] : allPendingReferrals;
+
+  const appPolicyQuery = useQuery({
+    queryKey: ["guac/app-policy"],
+    queryFn: getAppPolicy,
+    staleTime: Infinity,
+    enabled: isInApp,
+  });
+  const shouldDeeplinkToReferral =
+    isInApp && appPolicyQuery.data?.ShouldDeeplinkToReferral === true;
+
+  const pendingReferrals = isInApp && !shouldDeeplinkToReferral ? [] : allPendingReferrals;
 
   const transfers = transfersSection?.transfers;
   const robuxGift = robuxGiftSection?.robuxGift;
@@ -44,7 +56,11 @@ export function Header({
 
   const pendingRequestsRow = hasPendingRequests ? (
     <div className="flex padding-y-medium padding-x-medium medium:padding-x-large self-stretch radius-medium justify-center bg-shift-100 stroke-standard stroke-default">
-      <InlinePendingRequests transfers={transfers} pendingReferrals={pendingReferrals} />
+      <InlinePendingRequests
+        transfers={transfers}
+        pendingReferrals={pendingReferrals}
+        shouldDeeplinkToReferral={shouldDeeplinkToReferral}
+      />
     </div>
   ) : null;
 

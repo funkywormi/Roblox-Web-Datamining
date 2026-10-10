@@ -1,6 +1,5 @@
 import React from "react";
 import { IModalService } from "react-style-guide";
-import { useTranslation } from "react-utilities";
 import { authenticatedUser } from "header-scripts";
 import { FullTagDescription } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 import { UserProfileField, useUserProfiles } from "@rbx/user-profile-api-client";
@@ -30,6 +29,7 @@ import {
   getRequestSettingLabel,
   requestSettingLabels,
 } from "../../../userSettings/constants/contentConstants/consentTranslationConstants";
+import { useWrappedTranslation } from "../../../userSettings/hooks/useWrappedTranslation";
 
 type TCancelConsentRequestModalProps = {
   pendingConsent: TConsentResponse | undefined;
@@ -44,7 +44,7 @@ const useCancelConsentRequestModalV2 = ({
   canSeeChatTerminology = false,
 }: TCancelConsentRequestModalProps): [JSX.Element, IModalService] => {
   const { snackbarService } = useSnackbar();
-  const { translate } = useTranslation();
+  const { translate } = useWrappedTranslation();
 
   const dispatch = useAppDispatch();
 

@@ -1,6 +1,4 @@
 import React from "react";
-import { WithTranslationsProps, withTranslations } from "react-utilities";
-import { TRANSLATION_CONFIG } from "./app.config";
 import BiometricV1 from "./containers/biometricV1";
 import {
   OnChallengeCompletedCallback,
@@ -23,7 +21,7 @@ type Props = {
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
-} & WithTranslationsProps;
+};
 
 export const App: React.FC<Props> = ({
   challengeId,
@@ -32,7 +30,6 @@ export const App: React.FC<Props> = ({
   renderInline,
   eventService,
   metricsService,
-  translate,
   onChallengeDisplayed,
   onChallengeCompleted,
   onChallengeInvalidated,
@@ -46,7 +43,6 @@ export const App: React.FC<Props> = ({
       renderInline={renderInline}
       eventService={eventService}
       metricsService={metricsService}
-      translate={translate}
       onChallengeDisplayed={onChallengeDisplayed}
       onChallengeCompleted={onChallengeCompleted}
       onChallengeInvalidated={onChallengeInvalidated}
@@ -57,4 +53,4 @@ export const App: React.FC<Props> = ({
   );
 };
 
-export default withTranslations(App, TRANSLATION_CONFIG);
+export default App;

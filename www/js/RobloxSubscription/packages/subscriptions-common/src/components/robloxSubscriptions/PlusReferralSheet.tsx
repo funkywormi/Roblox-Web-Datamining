@@ -35,6 +35,8 @@ import type {
 } from "@rbx/client-subscriptions-api/v2";
 import type { FC, ReactNode } from "react";
 
+const REFERRAL_TERMS_URL = "https://en.help.roblox.com/hc/en-us/articles/52737229124628";
+
 /**
  * Centred pictogram, sized so the CTA and legal text stay above the fold on mobile. The sheet
  * caps at 90vh, so 320px (180px tall at 16:9) pushes the bottom off-screen on shorter viewports.
@@ -179,7 +181,21 @@ const PlusReferralSheetBody: FC<PlusReferralSheetBodyProps> = ({
     };
   }, [referralCode, referrerUserId, subscribeButtonProps]);
 
-  const termsLink = [
+  const referralTermsLink = [
+    {
+      opening: "linkStartRef",
+      closing: "linkEndRef",
+      render: (children: ReactNode) => (
+        <a
+          className="content-link underline"
+          href={REFERRAL_TERMS_URL}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          {children}
+        </a>
+      ),
+    },
     {
       opening: "linkStart",
       closing: "linkEnd",
@@ -331,7 +347,11 @@ const PlusReferralSheetBody: FC<PlusReferralSheetBodyProps> = ({
               {/* No free-trial variant: this sheet always sells at the recurring price, so trial
                   terms would describe an offer the CTA never makes. */}
               <span className="text-caption-medium content-muted">
-                {translateHtml(translate, "Description.SubscriptionLegal", termsLink)}
+                {translateHtml(
+                  translate,
+                  "Description.ReferralRecipientLegalDisclosure",
+                  referralTermsLink,
+                )}
               </span>
             </div>
           </SheetActions>

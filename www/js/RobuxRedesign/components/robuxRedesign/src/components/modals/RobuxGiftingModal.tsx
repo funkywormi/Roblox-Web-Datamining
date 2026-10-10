@@ -88,7 +88,7 @@ export function RobuxGiftingModal() {
               }}
             >
               <div className="width-[56px] height-[56px] bg-[var(--color-extended-white-100)]">
-                <span className="thumbnail-2d-container">
+                <span className="clip" style={{ float: "left" }}>
                   {giftingAvatarImageUrl && (
                     <img
                       className="width-full height-full"

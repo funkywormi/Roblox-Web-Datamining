@@ -1,4 +1,4 @@
-import type { SubscriptionOffer } from "@rbx/client-subscriptions-api/v1";
+import type { SubscriptionOffer } from "@rbx/client-subscriptions-api/v2";
 import { GetStripeCardIcon } from "../../../core/utils/paymentUtils";
 import { PremiumPurchasePlatform } from "../../../core/types/premiumEnums";
 import { PaymentProvider, PurchasePlatform } from "../../../core/types/subscriptionEnums";
@@ -89,7 +89,16 @@ export const isExpiring = (renewal: Date, expiration: Date): boolean => {
   return renewal.getTime() === 0 || expiration <= renewal;
 };
 
-export const hasFreeTrialOffer = (offers?: SubscriptionOffer[]): boolean =>
-  offers?.some(o => o.offerType === "FreeTrial") ?? false;
+export const getFreeTrialOffer = (offers?: SubscriptionOffer[]): SubscriptionOffer | null =>
+  offers?.find(o => o.offerType === "FreeTrial") ?? null;
 
-export default { getPaymentProfile, getPaymentIconClass, isExpiring, hasFreeTrialOffer };
+export const hasFreeTrialOffer = (offers?: SubscriptionOffer[]): boolean =>
+  getFreeTrialOffer(offers) !== null;
+
+export default {
+  getPaymentProfile,
+  getPaymentIconClass,
+  isExpiring,
+  getFreeTrialOffer,
+  hasFreeTrialOffer,
+};

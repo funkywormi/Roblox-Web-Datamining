@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import { Modal } from "react-style-guide";
 import * as TwoStepVerification from "../../../../common/request/types/twoStepVerification";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
-import { InlineChallengeFooter } from "../../../common/inlineChallengeFooter";
 import InputControl, { validateTrue } from "../../../common/inputControl";
-import { FooterButtonConfig, FragmentModalFooter } from "../../../common/modalFooter";
 import RememberDeviceCheckBox from "../components/rememberDeviceCheckBox";
+import VerificationFooter, { VerificationFooterButton } from "../components/verificationFooter";
 import SupportHelp from "../components/supportHelp";
 import {
   mapTwoStepVerificationErrorToChallengeErrorCode,
@@ -114,20 +113,14 @@ const PasswordInput: React.FC<Props> = ({
    * Render Properties
    */
 
-  const positiveButton: FooterButtonConfig = {
-    // Show a spinner as the button content when a request is in flight.
-    content: requestInFlight ? (
-      <span className="spinner spinner-xs spinner-no-margin" />
-    ) : (
-      resources.Action.Verify
-    ),
+  const positiveButton: VerificationFooterButton = {
     label: resources.Action.Verify,
     enabled: !requestInFlight,
+    loading: requestInFlight,
     action: verifyCode,
   };
 
   const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
-  const FooterElement = renderInline ? InlineChallengeFooter : FragmentModalFooter;
   const lockIconClassName = renderInline
     ? "inline-challenge-protection-shield-icon"
     : "modal-protection-shield-icon";
@@ -181,12 +174,11 @@ const PasswordInput: React.FC<Props> = ({
               className={marginBottomXLargeClassName}
             />
           )}
-
-          {children}
         </BodyElement>
-        <FooterElement positiveButton={positiveButton} negativeButton={null}>
+        <VerificationFooter positiveButton={positiveButton}>
+          {children}
           <SupportHelp className={marginBottomClassName} />
-        </FooterElement>
+        </VerificationFooter>
       </React.Fragment>
     )
   );

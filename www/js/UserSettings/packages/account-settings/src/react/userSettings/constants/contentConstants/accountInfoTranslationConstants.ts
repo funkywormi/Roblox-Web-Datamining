@@ -32,7 +32,6 @@ export default {
     birthdateSetByYourParentDescription: "Description.BirthdaySetByParent",
     birthdateSetByParentDescription: "Description.ParentSideBirthdaySetByParent",
     birthdayChangeTitle: "Title.UpdateBirthday",
-    underageChangeBirthdayDescription: "Description.UnderageChangeBirthday",
     addBirthdayMessage: "Label.AddBirthday",
     updateChildBirthdayMessage: "Label.UpdateChildBirthday",
     updateChildBirthdayWarningDescription: "Description.UpdateChildBirthdayText",

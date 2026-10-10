@@ -227,11 +227,6 @@ export default {
         successBody: "Response.Dialog.TimezoneUpdateSuccess",
         errorBody: "Response.Dialog.TimezoneUpdateError",
       },
-      verificationError: {
-        title: "Title.VerificationError",
-        body: "Description.VerificationNotComplete",
-        tryAgain: "Action.TryAgain",
-      },
     },
   },
   privateServerLinkJoin: {

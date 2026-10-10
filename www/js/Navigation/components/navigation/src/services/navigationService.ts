@@ -12,6 +12,7 @@ import {
   getRobuxBadgeUrl,
 } from "../constants/urlConstants";
 import layoutConstants from "../constants/layoutConstants";
+import { withApiMetrics } from "../topNav/observability";
 
 export const getUnreadPrivateMessagesCount = () => {
   const urlConfig = { url: getUnreadPrivateMessagesCountUrl(), withCredentials: true };
@@ -20,12 +21,14 @@ export const getUnreadPrivateMessagesCount = () => {
 
 export const getUserCurrency = (userId: number) => {
   const urlConfig = { url: getUserCurrencyUrl(userId), withCredentials: true };
-  return http.get<{ robux: number }>(urlConfig);
+  return withApiMetrics("UserCurrency", () => http.get<{ robux: number }>(urlConfig));
 };
 
 export const getGuacBehavior = () => {
-  return callBehaviour<{ shouldShowVng: boolean; notificationsCanAccessStream: boolean }>(
-    "navigation-header-ui",
+  return withApiMetrics("HeaderGuac", () =>
+    callBehaviour<{ shouldShowVng: boolean; notificationsCanAccessStream: boolean }>(
+      "navigation-header-ui",
+    ),
   );
 };
 
@@ -41,27 +44,31 @@ export const getFriendsRequestCount = () => {
 
 export const logout = () => {
   const urlConfig = { url: getLogoutUrl(), withCredentials: true };
-  return http.post(urlConfig);
+  return withApiMetrics("Logout", () => http.post(urlConfig));
 };
 
 export const getCreditBalanceForNavigation = () => {
   const urlConfig = { url: getCreditBalanceForNavigationUrl(), withCredentials: true };
-  return http.get<{
-    creditDisplayConfig: ValueOf<typeof layoutConstants.creditDisplayConfigVariants> | null;
-    creditBalance: number | null;
-    currencyCode: string | null;
-  }>(urlConfig);
+  return withApiMetrics("CreditBalance", () =>
+    http.get<{
+      creditDisplayConfig: ValueOf<typeof layoutConstants.creditDisplayConfigVariants> | null;
+      creditBalance: number | null;
+      currencyCode: string | null;
+    }>(urlConfig),
+  );
 };
 
 export const getVngShopSignedRedirectionUrl = () => {
   const urlConfig = { url: getSignedVngShopUrl(), withCredentials: true };
-  return http.get<{ vngShopRedirectUrl?: string }>(urlConfig);
+  return withApiMetrics("VngShopUrl", () => http.get<{ vngShopRedirectUrl?: string }>(urlConfig));
 };
 
 export const getRobuxBadge = () => {
   const urlConfig = { url: getRobuxBadgeUrl(), withCredentials: true };
-  return http.get<{
-    is_virtual_item_available: boolean;
-    active_virtual_item_start_time_seconds_utc: number;
-  }>(urlConfig);
+  return withApiMetrics("RobuxBadge", () =>
+    http.get<{
+      is_virtual_item_available: boolean;
+      active_virtual_item_start_time_seconds_utc: number;
+    }>(urlConfig),
+  );
 };

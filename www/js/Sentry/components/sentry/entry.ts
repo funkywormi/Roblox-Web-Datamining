@@ -20,6 +20,11 @@ import { getOtelCollectorTracesEndpoint } from "@rbx/www-common/sentry/otelEndpo
 import environmentUrls from "@rbx/environment-urls";
 import { reportWebVitals } from "@rbx/www-common/webVitals";
 import { buildTransport } from "@rbx/www-common/sentry/buildSentryTransport";
+import {
+  isNoiseEvent,
+  NOISE_DENY_URLS,
+  NOISE_IGNORE_ERRORS,
+} from "@rbx/www-common/sentry/noiseFilters";
 import type { SentryGlobal } from "@rbx/core-scripts/sentry";
 import { buildSampleRate } from "./src/utils/buildSampleRate";
 import {
@@ -102,6 +107,9 @@ initSentry({
   tracesSampler: isTransactionOff ? undefined : buildTracesSampler(perfBase, fullSample),
   sampleRate: buildSampleRate(parsedSampleRate),
   replaysOnErrorSampleRate: parsedSampleRate,
+  denyUrls: NOISE_DENY_URLS,
+  ignoreErrors: NOISE_IGNORE_ERRORS,
+  beforeSend: event => (isNoiseEvent(event) ? null : event),
   beforeSendTransaction: event => {
     // Full transaction to OTEL; filtered copy to Sentry for quota reduction.
     sendToOtel(otelEndpoint, event, tracingResources);

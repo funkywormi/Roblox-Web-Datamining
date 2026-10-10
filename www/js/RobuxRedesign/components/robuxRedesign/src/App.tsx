@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from "react";
 import localStorageService from "@rbx/core-scripts/local-storage";
-import { CurrentUser } from "@rbx/core-scripts/legacy/Roblox";
+import { getCurrentUser } from "@rbx/www-common/user";
 import { useFirstTimePurchaseConsent } from "@rbx/payments/firstTimePurchaseConsent";
 import {
   BuyRobuxPageContext,
@@ -21,7 +21,7 @@ import useRedirect from "./hooks/useRedirect";
 import { isRedirectPlatformEligible } from "./utils/isRedirectPlatformEligible";
 import { withApiMetrics } from "./utils/publishMetric";
 
-const PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2 = `paymentSession-${CurrentUser?.userId ?? "loggedout"}`;
+const PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2 = `paymentSession-${getCurrentUser()?.id ?? "loggedout"}`;
 const persistPaymentSessionToLocalStorage = (paymentSession: PaymentSession): void => {
   localStorageService.setLocalStorage(PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2, paymentSession);
 };
@@ -67,7 +67,7 @@ export const App = ({ enhancedBuyRobuxPageData, urlParams }: AppProps) => {
   const getPurchaseUrl = usePurchaseUrls(paymentSession);
   const robuxBalance = useRobuxBalance();
   const { shouldShowFirstTimePurchaseConsent, markConsentAcknowledged } =
-    useFirstTimePurchaseConsent(CurrentUser?.userId, withApiMetrics);
+    useFirstTimePurchaseConsent(getCurrentUser()?.id, withApiMetrics);
   const redirect = useRedirect({
     paymentSession,
     isEnabled:

@@ -1,7 +1,7 @@
-import { startWizard } from "@rbx/amp-v2-wizard";
 import baseApi from "../../apis/common/baseApi";
 import ApiCacheTag from "../../apis/common/cacheTagEnum";
 import { useAppDispatch } from "../../redux/hooks";
+import useStartOdpWizard from "./useStartOdpWizard";
 
 const odpFlowName = "ODP";
 const managePinRequestType = "ManagePin";
@@ -21,9 +21,10 @@ export type TManageParentPinAction =
  */
 const useManageParentPin = (): ((action: TManageParentPinAction) => void) => {
   const dispatch = useAppDispatch();
+  const startOdpWizard = useStartOdpWizard();
 
   return (action: TManageParentPinAction) => {
-    startWizard({
+    startOdpWizard({
       flow: {
         name: odpFlowName,
         props: {

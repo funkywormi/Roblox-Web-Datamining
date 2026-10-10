@@ -1,5 +1,4 @@
 import React from "react";
-import { startWizard } from "@rbx/amp-v2-wizard";
 import {
   buildRobuxTransferLimitsConsentValue,
   toRobuxTransferLimitsInputFromSetting,
@@ -11,6 +10,7 @@ import ApiCacheTag from "../../../../apis/common/cacheTagEnum";
 import { useGetCurrentUserTransferLimitCeilingsQuery } from "../../../../apis/transferLimitsApi";
 import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAndOptionsV2";
 import { useAppDispatch } from "../../../../redux/hooks";
+import useStartOdpWizard from "../../../hooks/useStartOdpWizard";
 import RobuxTransferLimitsForm from "../shared/RobuxTransferLimitsForm";
 
 const odpFlowName = "ODP";
@@ -23,6 +23,7 @@ const surface = "ParentalControlsSettings";
  */
 export const OdpRobuxTransferLimits = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
+  const startOdpWizard = useStartOdpWizard();
 
   const {
     data: ceilings,
@@ -33,7 +34,7 @@ export const OdpRobuxTransferLimits = (): React.JSX.Element => {
     useGetSettingsAndOptionsV2();
 
   const saveTransferLimitsHandler = async (limits: TRobuxTransferLimitsInput): Promise<void> => {
-    await startWizard({
+    await startOdpWizard({
       flow: {
         name: odpFlowName,
         props: {
@@ -45,8 +46,6 @@ export const OdpRobuxTransferLimits = (): React.JSX.Element => {
         },
       },
       surface,
-    }).catch(() => {
-      // startWizard resolves on every exit, so there is nothing to recover from here.
     });
 
     dispatch(baseApi.util.invalidateTags([ApiCacheTag.UserSettingsAndOptions]));
