@@ -1,6 +1,6 @@
 import React from 'react';
 import { userId } from '@rbx/core-scripts/meta/user';
-import { deviceMeta as DeviceMeta } from '@rbx/core-scripts/legacy/header-scripts';
+import * as DeviceMeta from '@rbx/core-scripts/meta/device';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
 import urlConstants from '../constants/urlConstants';
 import { SelfProvidedTranslate } from '../SelfProvidedTranslate';

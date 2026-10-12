@@ -4,22 +4,10 @@ import { useUserProfiles } from "@rbx/www-common/user-profiles";
 import { chatQueryKeys, FRIEND_PROFILE_FIELDS } from "../constants/queryKeys";
 import { fetchFriendsPage } from "../services/chatFriendsService";
 import { getUserPresences } from "../services/presenceService";
-import type { TChatParticipant, TPresenceType } from "../types/chat";
+import type { TChatParticipant } from "../types/chat";
+import { toPresence } from "../utils/chatTransforms";
 import { getCurrentUserId } from "../utils/currentUser";
 import { isQueryPending } from "../utils/queryStatus";
-
-const toPresence = (presenceValue?: number | string): TPresenceType => {
-  if (presenceValue === 1 || presenceValue === "Online") {
-    return "Online";
-  }
-  if (presenceValue === 2 || presenceValue === "InGame") {
-    return "InGame";
-  }
-  if (presenceValue === 3 || presenceValue === "InStudio") {
-    return "InStudio";
-  }
-  return "Offline";
-};
 
 const firstNonEmptyString = (...values: (string | undefined)[]): string | undefined =>
   values.find(value => value != null && value.length > 0);

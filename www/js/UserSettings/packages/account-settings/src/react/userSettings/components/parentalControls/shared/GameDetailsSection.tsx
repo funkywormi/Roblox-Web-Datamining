@@ -89,7 +89,7 @@ export const GameDetailsSection = ({
     onAction: () => runManageExperience(ManagementAction.Block),
   });
 
-  if (!game) {
+  if (!game || isLoading) {
     if (isLoading) {
       return (
         <SettingsSection>

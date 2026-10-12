@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,8 @@ type TUpsellModalProps = {
   onSecondaryButtonClick?: () => void;
   isModalOpen: boolean;
   onCloseModal: () => void;
+  hasCloseAffordance?: boolean;
+  orientButtonsVertically?: boolean;
 };
 
 /**
@@ -37,10 +40,34 @@ const UpsellModal = ({
   onSecondaryButtonClick,
   isModalOpen,
   onCloseModal,
+  hasCloseAffordance = true,
+  orientButtonsVertically = false,
 }: TUpsellModalProps): React.JSX.Element => {
   const sanitizedBodyLinkText = useSanitizedHtmlLinkText(bodyText, {
     shouldOpenLinksInNewTab: true,
   });
+  const primaryButton =
+    primaryButtonText && onPrimaryButtonClick ? (
+      <Button
+        variant="Emphasis"
+        size="Medium"
+        onClick={onPrimaryButtonClick}
+        className="grow basis-0"
+      >
+        {primaryButtonText}
+      </Button>
+    ) : null;
+  const secondaryButton =
+    secondaryButtonText && onSecondaryButtonClick ? (
+      <Button
+        variant="Standard"
+        size="Medium"
+        onClick={onSecondaryButtonClick}
+        className="grow basis-0"
+      >
+        {secondaryButtonText}
+      </Button>
+    ) : null;
 
   return (
     <Dialog
@@ -52,7 +79,7 @@ const UpsellModal = ({
       }}
       size="Medium"
       isModal
-      hasCloseAffordance
+      hasCloseAffordance={hasCloseAffordance}
       closeLabel={closeLabelText}
     >
       <DialogContent>
@@ -66,26 +93,19 @@ const UpsellModal = ({
             dangerouslySetInnerHTML={{ __html: sanitizedBodyLinkText }}
           />
         </DialogBody>
-        <DialogFooter className="flex gap-x-medium">
-          {secondaryButtonText && onSecondaryButtonClick && (
-            <Button
-              variant="Standard"
-              size="Medium"
-              onClick={onSecondaryButtonClick}
-              className="grow basis-0"
-            >
-              {secondaryButtonText}
-            </Button>
-          )}
-          {primaryButtonText && onPrimaryButtonClick && (
-            <Button
-              variant="Emphasis"
-              size="Medium"
-              onClick={onPrimaryButtonClick}
-              className="grow basis-0"
-            >
-              {primaryButtonText}
-            </Button>
+        <DialogFooter
+          className={orientButtonsVertically ? "flex flex-col gap-small" : "flex gap-x-medium"}
+        >
+          {orientButtonsVertically ? (
+            <Fragment>
+              {primaryButton}
+              {secondaryButton}
+            </Fragment>
+          ) : (
+            <Fragment>
+              {secondaryButton}
+              {primaryButton}
+            </Fragment>
           )}
         </DialogFooter>
       </DialogContent>

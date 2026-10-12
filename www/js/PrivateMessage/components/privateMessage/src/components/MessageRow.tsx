@@ -11,23 +11,31 @@ const UserName = ({
   translate,
   message,
   activeTab,
+  isUnread,
 }: {
   translate: Translate;
   message: MessageItem;
   activeTab: MessageTab;
+  isUnread: boolean;
 }) => {
   const user = activeTab === MESSAGE_TABS.sent ? message.recipient : message.sender;
-
   return (
-    <span className="flex items-center gap-xsmall min-width-0">
-      <span className="text-truncate-end text-no-wrap min-width-0">{user.displayName}</span>
+    <span className="flex items-center gap-xsmall text-truncate-end">
+      <span
+        className={classNames(
+          "text-truncate-end text-title-large",
+          isUnread ? "content-emphasis" : "content-muted",
+        )}
+      >
+        {user.displayName}
+      </span>
       {user.hasVerifiedBadge ? (
         <VerifiedBadgeIcon
           size="Medium"
           titleText={translate("Creator.VerifiedBadgeIconAccessibilityText")}
         />
       ) : null}
-      <span className="text-body-medium content-muted text-truncate-end text-no-wrap min-width-0">
+      <span className="text-truncate-end text-body-medium content-muted">
         {USER_HANDLE_PREFIX}
         {user.name}
       </span>
@@ -123,26 +131,26 @@ const MessageRow = ({
       />
       <button
         type="button"
-        className="bg-none stroke-none padding-none text-left min-width-0 clip flex flex-col gap-y-small"
+        className="bg-none stroke-none padding-none flex flex-col gap-y-small"
         onClick={handleOpen}
         aria-label={message.subject}
       >
-        <div className="flex items-center justify-between gap-small min-width-0">
-          <span
-            className={classNames(
-              "text-title-large min-width-0",
-              isUnread ? "content-emphasis" : "content-muted",
-            )}
-          >
-            <UserName translate={translate} message={message} activeTab={activeTab} />
-          </span>
-          <span className="text-caption-medium content-muted text-no-wrap">
+        <div className="flex items-center justify-between gap-small text-no-wrap">
+          <UserName
+            translate={translate}
+            message={message}
+            activeTab={activeTab}
+            isUnread={isUnread}
+          />
+          <span className="text-caption-medium content-muted">
             {formatListDate(message.created)}
           </span>
         </div>
-        <div className="private-message-row-preview text-body-large content-muted">
-          <span className={isUnread ? "content-emphasis" : "content-muted"}>{message.subject}</span>
-          <span>
+        <div className="flex text-no-wrap">
+          <span className="text-truncate-end text-body-large content-muted">
+            <span className={isUnread ? "content-emphasis" : "content-muted"}>
+              {message.subject}
+            </span>
             {PREVIEW_SEPARATOR}
             {htmlToPlainText(message.body)}
           </span>

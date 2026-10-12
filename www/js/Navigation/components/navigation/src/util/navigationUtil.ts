@@ -56,7 +56,7 @@ const subscribeToMessagesNotifications = (handleMessagesEvent: () => void) => {
   };
 };
 
-const isInMobileSize = () => window.innerWidth < 543; // breakpoint for mobile size
+const isInMobileSize = () => window.innerWidth < 601; // breakpoint for mobile size
 
 const getNewUniversalSearchLinks = (): UniversalSearchLink[] => {
   const urls = [...newUniversalSearchUrls];

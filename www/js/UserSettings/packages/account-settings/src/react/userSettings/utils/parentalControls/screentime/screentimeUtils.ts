@@ -25,7 +25,7 @@ const getAverageTimeLabel = (daysArray: number[], translate: TranslateFunction):
     (total, hours) => total + hours * dateTimes.minutesPerHour,
     0,
   );
-  const averageDailyMinutes = totalMinutesPlayed / daysArray.length;
+  const averageDailyMinutes = daysArray.length ? totalMinutesPlayed / daysArray.length : 0;
 
   return getCompactFormattedTime(averageDailyMinutes, translate);
 };

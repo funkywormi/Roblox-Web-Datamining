@@ -4,6 +4,14 @@ import useChatTranslate from "../../hooks/useChatTranslate";
 import { useChatMetadataConfig } from "../../hooks/useChatMetadataConfig";
 import type { TChatConversation, TRenameResult } from "../../types/chat";
 
+/**
+ * A rename that did not happen. The panel stays open and tells the user why. Like App Chat, the
+ * message stays while the user edits the name, so a failure keeps the names from its own attempt.
+ */
+type TRenameFailure =
+  | { kind: "moderated" }
+  | { kind: "failed"; existingName: string; attemptedName: string };
+
 type TChatGroupNamePanelProps = {
   conversation: TChatConversation;
   onBack: () => void;
@@ -24,7 +32,7 @@ const ChatGroupNamePanel = ({
   const canSave = trimmedGroupName.length > 0;
   const groupNameLengthLabel = `${groupName.length}/${maxConversationTitleLength}`;
   const [isSaving, setIsSaving] = useState(false);
-  const [isNameModerated, setIsNameModerated] = useState(false);
+  const [renameFailure, setRenameFailure] = useState<TRenameFailure | null>(null);
   const isMountedRef = useRef(true);
 
   useEffect(() => {
@@ -40,19 +48,36 @@ const ChatGroupNamePanel = ({
     }
 
     setIsSaving(true);
-    const result = await onRenameConversation(conversation.layoutId, trimmedGroupName);
+    // Like App Chat, the message goes away when the next request starts.
+    setRenameFailure(null);
+    const attemptedName = trimmedGroupName;
+    const result = await onRenameConversation(conversation.layoutId, attemptedName);
     if (!isMountedRef.current) {
       return;
     }
 
     setIsSaving(false);
-    // A moderated name keeps the panel open so the user sees why and can pick another name.
-    if (result === "moderated") {
-      setIsNameModerated(true);
+    if (result === "success") {
+      onBack();
       return;
     }
-    onBack();
+    // A blocked or failed rename keeps the panel open so the user sees why and can try again.
+    setRenameFailure(
+      result === "moderated"
+        ? { kind: "moderated" }
+        : { kind: "failed", existingName: conversation.title, attemptedName },
+    );
   };
+
+  // English fallbacks until the strings have the WebFrontend consumer in Translations Hub.
+  const getRenameFailureText = (failure: TRenameFailure) =>
+    failure.kind === "moderated"
+      ? translate("Response.ChatNameFullyModerated.V2", undefined, "Group name was moderated.")
+      : translate(
+          "Message.FailedToRenameConversation.V2",
+          { EXISTING_NAME: failure.existingName, NEW_NAME: failure.attemptedName },
+          `The group ${failure.existingName} could not be renamed to ${failure.attemptedName}.`,
+        );
 
   return (
     <div className="flex min-height-0 grow-1 flex-col">
@@ -88,7 +113,6 @@ const ChatGroupNamePanel = ({
             value={groupName}
             onChange={event => {
               setGroupName(event.currentTarget.value.slice(0, maxConversationTitleLength));
-              setIsNameModerated(false);
             }}
             rows={1}
             size="Small"
@@ -98,9 +122,9 @@ const ChatGroupNamePanel = ({
           <span className="react-chat-group-name-editor-count text-caption-medium content-muted">
             {groupNameLengthLabel}
           </span>
-          {isNameModerated && (
+          {renameFailure !== null && (
             <span role="alert" className="text-caption-medium content-system-alert">
-              {translate("Message.ConversationTitleModerated")}
+              {getRenameFailureText(renameFailure)}
             </span>
           )}
         </div>

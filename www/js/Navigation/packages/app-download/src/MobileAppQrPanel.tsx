@@ -1,5 +1,6 @@
 import React from "react";
 import type { TranslateFunction } from "@rbx/core-scripts/react";
+import { assetUrl } from "@rbx/www-common/asset";
 import qrCode from "./images/install-app-qr-code.png";
 
 type Props = {
@@ -17,7 +18,7 @@ function MobileAppQrPanel({ translate }: Props) {
       </div>
       <div className="flex grow justify-center items-center bg-shift-100 radius-medium padding-x-large">
         <div className="radius-medium padding-small bg-[white]">
-          <img className="size-2100" src={qrCode} alt="" />
+          <img className="size-2100" src={assetUrl(qrCode)} alt="" />
         </div>
       </div>
     </React.Fragment>

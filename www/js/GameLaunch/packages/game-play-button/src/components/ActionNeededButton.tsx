@@ -1,22 +1,27 @@
 import React from "react";
-import { Button } from "@rbx/core-ui/legacy/react-style-guide";
+import classNames from "classnames";
+import { Button } from "@rbx/foundation-ui";
 import { TranslateFunction, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
 import playButtonConstants from "../constants/playButtonConstants";
 import { translations } from "../constants/translations";
+import {
+  buttonWidths,
+  fuiButtonStyle,
+  fullWidthClassName,
+  TButtonWidth,
+} from "../constants/buttonWidths";
 
 const { playButtonTextTranslationMap } = playButtonConstants;
 
-type ValueOf<T> = T[keyof T];
-
 export type TActionNeededProps = {
   onButtonClick: (e: React.MouseEvent) => void;
-  buttonWidth?: ValueOf<typeof Button.widths>;
+  buttonWidth?: TButtonWidth;
   buttonClassName?: string;
 };
 
 const ActionNeededButton = ({
   onButtonClick,
-  buttonWidth = Button.widths.full,
+  buttonWidth = buttonWidths.full,
   buttonClassName = "btn-common-play-game-action-needed-lg",
   translate,
 }: TActionNeededProps & {
@@ -25,8 +30,9 @@ const ActionNeededButton = ({
   <React.Fragment>
     <Button
       data-testid="play-action-needed-button"
-      width={buttonWidth}
-      className={buttonClassName}
+      variant="Emphasis"
+      style={fuiButtonStyle}
+      className={classNames(fullWidthClassName(buttonWidth), buttonClassName)}
       onClick={onButtonClick}
     >
       {translate(playButtonTextTranslationMap.Unlock)}

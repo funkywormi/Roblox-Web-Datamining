@@ -1,6 +1,6 @@
 // Since the notification stream is angularjs code, the notification-stream-indicator below is for
 // notification stream code to engage with navigation component
-import { MouseEventHandler, useState, useEffect } from "react";
+import { MouseEventHandler, useState, useEffect, useRef } from "react";
 // @ts-expect-error TODO: remove this once React notification stream is ready
 import angular from "angular";
 import { ValueOf } from "@rbx/core-types";
@@ -40,6 +40,7 @@ export default function HeaderIconsGroup({
   const user = authenticatedUser();
   const userId = user?.id;
   const isFoundation = useIsTopNavFoundation();
+  const streamItemRef = useRef<HTMLLIElement>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
   const [accountNotificationCount, setAccountNotificationCount] = useState(0);
   const [isGetCurrencyCallDone, setGetCurrencyCallDone] = useState(false);
@@ -220,21 +221,36 @@ export default function HeaderIconsGroup({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  let notificationStream = (
-    <li id="navbar-stream" className="navbar-icon-item navbar-stream">
-      <span className="nav-robux-icon rbx-menu-item">
-        {/* eslint-disable-next-line react/no-unknown-property */}
-        <span id="notification-stream-icon-container" notification-stream-indicator="true" />
-      </span>
-    </li>
-  );
+  let hasStreamModules = false;
   try {
     angular.module("notificationStreamIcon");
     angular.module("notificationStream");
-    notificationStream = <NotificationStreamPopover />;
+    hasStreamModules = true;
   } catch (err) {
     console.error(err);
   }
+
+  // Keep this <li> mounted when the modules load late: BTRoblox detaches its sibling, so a remount throws NotFoundError.
+  const notificationStream = (
+    <li
+      id="navbar-stream"
+      ref={streamItemRef}
+      className={
+        hasStreamModules
+          ? "navbar-icon-item navbar-stream notification-margins"
+          : "navbar-icon-item navbar-stream"
+      }
+    >
+      {hasStreamModules ? (
+        <NotificationStreamPopover containerRef={streamItemRef} />
+      ) : (
+        <span className="nav-robux-icon rbx-menu-item">
+          {/* eslint-disable-next-line react/no-unknown-property */}
+          <span id="notification-stream-icon-container" notification-stream-indicator="true" />
+        </span>
+      )}
+    </li>
+  );
 
   return (
     <ul className="[&>li]:relative navbar-right rbx-navbar-icon-group">

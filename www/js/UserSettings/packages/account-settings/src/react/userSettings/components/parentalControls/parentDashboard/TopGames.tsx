@@ -47,7 +47,7 @@ const TopGames = ({
   const { translate } = useTranslation();
   const history = useHistory();
 
-  const { games, isLoading } = useTopWeeklyGames(child);
+  const { games, isLoading, isError } = useTopWeeklyGames(child);
 
   const { topGames, perExperienceScreentime } = parentalControlsTranslationConstants;
 
@@ -77,6 +77,14 @@ const TopGames = ({
             variant="Indeterminate"
           />
         </div>
+      </SettingsSection>
+    );
+  }
+
+  if (isError && games.length === 0) {
+    return (
+      <SettingsSection description={description}>
+        <div role="alert">{translate(commonTranslationConstants.unknownError)}</div>
       </SettingsSection>
     );
   }

@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { upsellUtil } from '@rbx/core-scripts/legacy/core-roblox-utilities';
-import { DeviceMeta } from '@rbx/legacy-webapp-types/Roblox';
+import { constants as upsellConstants } from '@rbx/core-scripts/util/upsell';
+import type { DeviceMeta } from '@rbx/core-scripts/meta/device';
 import { Button } from '@rbx/foundation-ui';
 
 type SubscriptionButtonProps = {
   productType: string;
   productId: string;
-  deviceMeta: ReturnType<typeof DeviceMeta>;
+  deviceMeta: DeviceMeta | null;
   isDisabled?: boolean;
   children: React.ReactNode;
   upsellUuid?: string;
@@ -36,7 +36,7 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
   }, [isDisabled, trackSubscriptionButtonClick]);
 
   const purchaseUrl = useMemo(() => {
-    if (deviceMeta.isDesktop) {
+    if (deviceMeta?.isDesktop) {
       const url = new URL('/upgrades/paymentmethods', window.location.origin);
       url.searchParams.append('ctx', 'subscription');
       url.searchParams.append('type', productType);
@@ -45,7 +45,7 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
         url.searchParams.append('returnUrl', redirectUrl);
       }
       if (upsellUuid) {
-        url.searchParams.append(upsellUtil.constants.UPSELL_QUERY_PARAM_KEY, upsellUuid);
+        url.searchParams.append(upsellConstants.UPSELL_QUERY_PARAM_KEY, upsellUuid);
       }
       if (paymentSessionId) {
         url.searchParams.append('paymentSessionId', paymentSessionId);
@@ -53,7 +53,7 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
       return url.toString();
     }
 
-    if (deviceMeta.isAndroidApp || deviceMeta.isIosApp) {
+    if (deviceMeta?.isAndroidApp || deviceMeta?.isIosApp) {
       const url = new URL('/mobile-app-upgrades/buy', window.location.origin);
       url.searchParams.append('ctx', 'subscription');
       url.searchParams.append('type', productType);
@@ -63,9 +63,9 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
 
     return undefined;
   }, [
-    deviceMeta.isDesktop,
-    deviceMeta.isAndroidApp,
-    deviceMeta.isIosApp,
+    deviceMeta?.isDesktop,
+    deviceMeta?.isAndroidApp,
+    deviceMeta?.isIosApp,
     productType,
     productId,
     upsellUuid,

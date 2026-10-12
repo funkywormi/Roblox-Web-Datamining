@@ -1,38 +1,13 @@
-/* eslint-disable @rbx/browser/no-browser-globals -- This is the guarded boundary for browser globals. */
+const globalWindow = globalThis.window;
+const globalDocument = globalThis.document;
+const globalNavigator = globalThis.navigator;
 
-/**
- * Browser globals that exist only when this code is running in a browser.
- *
- * Shared modules are imported during Next.js server rendering, where these globals do not exist.
- * Callers must handle `undefined` before reading them. Once this value is defined, `window` is the
- * remaining browser surface (`location`, `history`, `matchMedia`, and so on).
- */
-export type BrowserEnvironment = {
-  readonly window: Window;
-  readonly document: Document;
-  readonly navigator: Navigator;
-};
+export const window = typeof globalWindow === "undefined" ? undefined : globalWindow;
 
-/**
- * Returns the browser globals, or `undefined` during server rendering and other non-browser runtimes.
- *
- * ```
- * const browser = getBrowserEnvironment();
- * if (browser === undefined) {
- *   return;
- * }
- *
- * browser.document.documentElement.style.getPropertyValue("--container-main-margin-top");
- * ```
- */
-export const getBrowserEnvironment = (): BrowserEnvironment | undefined => {
-  if (typeof window === "undefined") {
-    return undefined;
-  }
+export const document = typeof globalDocument === "undefined" ? undefined : globalDocument;
 
-  return {
-    window,
-    document: window.document,
-    navigator: window.navigator,
-  };
-};
+// NodeJS exposes global `navigator`, but it does not have the full navigator API.
+// Instead, let's just hide it, since it doesn't seem to have any useful fields.
+// https://nodejs.org/api/globals.html#navigator
+export const navigator =
+  window == null || typeof globalNavigator === "undefined" ? undefined : globalNavigator;

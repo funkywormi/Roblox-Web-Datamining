@@ -19,6 +19,7 @@ export type TChatModerationType = (typeof CHAT_MODERATION_TYPE)[keyof typeof CHA
 export const CHAT_UPDATE_STATUS = {
   success: "success",
   moderated: "moderated",
+  failed: "failed",
 } as const;
 
 export const CHAT_CONVERSATION_SOURCE = {

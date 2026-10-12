@@ -20,6 +20,8 @@ import {
   requestSettingHeadings,
 } from "../../../constants/contentConstants/consentTranslationConstants";
 import { useWrappedTranslation } from "../../../hooks/useWrappedTranslation";
+import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
+import { btnClickPendingRequests } from "../../../services/eventServices/odpFamilyEventService";
 
 const PendingRequestPreviewListItem = ({
   consent,
@@ -36,6 +38,8 @@ const PendingRequestPreviewListItem = ({
 }): JSX.Element => {
   const { translate } = useWrappedTranslation();
   const intl = new Intl();
+  // Only the child side has linked parents to report.
+  const { data: parentInfo } = useGetParentInfoQuery(undefined, { skip: !isChildSide });
 
   const { parentalConsents } = parentalControlsTranslationConstants;
 
@@ -153,6 +157,7 @@ const PendingRequestPreviewListItem = ({
               size="Small"
               ariaLabel={translate(commonTranslationConstants.cancel)}
               onClick={() => {
+                btnClickPendingRequests(parentInfo?.parents);
                 cancelConsentRequestModalService.open();
               }}
             />

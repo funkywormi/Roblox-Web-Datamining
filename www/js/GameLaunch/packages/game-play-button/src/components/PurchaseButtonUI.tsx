@@ -1,12 +1,18 @@
 import React from "react";
-import { Button, Link } from "@rbx/core-ui/legacy/react-style-guide";
-import { ValueOf } from "../types/playButtonTypes";
+import classNames from "classnames";
+import { Button } from "@rbx/foundation-ui";
+import {
+  buttonWidths,
+  fuiButtonStyle,
+  fullWidthClassName,
+  TButtonWidth,
+} from "../constants/buttonWidths";
 
 type TPurchaseButtonUI = {
   buttonContent: number | string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   redirectUrl?: string;
-  buttonWidth?: ValueOf<typeof Button.widths>;
+  buttonWidth?: TButtonWidth;
   buttonClassName?: string;
   iconClassName?: string;
   hideButtonText?: boolean;
@@ -27,26 +33,28 @@ const PurchaseButtonUI = ({
 }: TPurchaseButtonUI): React.JSX.Element => {
   if (redirectUrl) {
     return (
-      <Link url={redirectUrl} className="purchase-button-link">
+      <a href={redirectUrl} className="purchase-button-link">
         <Button
           data-testid="play-purchase-button"
-          width={buttonWidth}
-          className={buttonClassName}
+          variant="Emphasis"
+          style={fuiButtonStyle}
+          className={classNames(fullWidthClassName(buttonWidth), buttonClassName)}
           onClick={() => null}
           isDisabled={isPurchasing}
         >
           {!hideButtonIcon && <span className={iconClassName} />}
           {!hideButtonText && <span className="btn-text">{buttonContent}</span>}
         </Button>
-      </Link>
+      </a>
     );
   }
   return (
     <Button
       data-testid="play-purchase-button"
-      width={buttonWidth}
-      className={buttonClassName}
-      onClick={e => {
+      variant="Emphasis"
+      style={fuiButtonStyle}
+      className={classNames(fullWidthClassName(buttonWidth), buttonClassName)}
+      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
         if (onClick && !isPurchasing) {
           onClick(e);
         }
@@ -61,7 +69,7 @@ const PurchaseButtonUI = ({
 
 PurchaseButtonUI.defaultProps = {
   hideButtonText: false,
-  buttonWidth: Button.widths.full,
+  buttonWidth: buttonWidths.full,
   buttonClassName: "btn-economy-robux-white-lg",
   iconClassName: "icon-robux-white",
   hideButtonIcon: false,

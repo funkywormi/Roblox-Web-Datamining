@@ -68,6 +68,9 @@ const Thumbnail2d = ({
       includeBackground,
       includeProfileFrame,
     ],
+    // Resolved thumbnails rarely change and a new version is a new key, so never refetch them on
+    // focus/mount/reconnect. Error and timed-out Pending results hold no data and still refetch.
+    staleTime: Infinity,
     // Only the Pending poll retries here; transient transport failures are retried in http.post.
     retry: (failureCount, err) => err === PENDING && failureCount < MAX_PENDING_POLLS,
     queryFn: async (): Promise<ResolvedThumbnail> => {

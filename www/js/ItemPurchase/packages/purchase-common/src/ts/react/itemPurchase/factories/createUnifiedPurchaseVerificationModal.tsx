@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { urlService } from '@rbx/core-scripts/legacy/core-utilities';
+import { getUrlWithLocale } from '@rbx/core-scripts/util/url';
 import { escapeHtml } from '@rbx/core-scripts/format/string';
 import type { SubscriptionProductInfo } from '@rbx/client-subscriptions-api/v2';
 import type { DiscountInformation } from '../../components/discountInformation';
@@ -130,7 +130,7 @@ export default function createUnifiedPurchaseVerificationModal(): [
     let resolvedFooterText: React.ReactNode = footerDisclaimerText || undefined;
     if (assetType === 'Subscription') {
       const locale = document.documentElement.lang || 'en-us';
-      const termsUrl = urlService.getUrlWithLocale(ROBLOX_TERMS_OF_USE_URL, locale);
+      const termsUrl = getUrlWithLocale(ROBLOX_TERMS_OF_USE_URL, locale);
       const linkStartMarker = '{{LINK_START}}';
       const linkEndMarker = '{{LINK_END}}';
       const rawText = translate('Description.SubscribeTermsAgreement', {

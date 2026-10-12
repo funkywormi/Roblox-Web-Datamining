@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import classNames from "classnames";
+import { getRestrictionIconClassName } from "@rbx/www-common/components/itemCard";
 import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 import AvatarAccoutrementService from "../../../../utils/avatarAccoutrementService";
 import { useAvatarTranslate } from "../../../../utils/translate";
@@ -85,6 +86,9 @@ function AvatarItemCard({
     : "";
 
   const licenseLabelKey = getLicenseBadgeLabelKey(item);
+  const restrictionIconClassName = getRestrictionIconClassName(
+    item.itemRestrictions?.itemRestrictionIcon,
+  );
 
   return (
     <div
@@ -145,10 +149,8 @@ function AvatarItemCard({
               />
             )}
           </div>
-          {item.itemRestrictions?.itemRestrictionIcon && (
-            <span
-              className={classNames("restriction-icon", item.itemRestrictions.itemRestrictionIcon)}
-            />
+          {restrictionIconClassName && (
+            <span className={classNames("restriction-icon", restrictionIconClassName)} />
           )}
         </a>
       </div>

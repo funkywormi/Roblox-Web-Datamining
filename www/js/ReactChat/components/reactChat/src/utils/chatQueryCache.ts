@@ -40,6 +40,30 @@ export function seedPendingConversation(
   );
 }
 
+// Replaces seeds with the server's current copy of the same conversation. A seed outside the loaded
+// list pages never gets the list's refreshes, so this is how a policy change (opt-in, OSA, moderation
+// type) reaches it. It only touches seeds that still exist, so a response that arrives after the list
+// returned the conversation (and the seed was pruned) cannot bring the seed back.
+export function refreshPendingConversations(
+  queryClient: Pick<QueryClient, "setQueryData">,
+  conversations: TChatApiConversation[],
+): void {
+  const freshById = new Map(
+    conversations.flatMap(conversation =>
+      conversation.id == null ? [] : [[conversation.id, conversation] as const],
+    ),
+  );
+  queryClient.setQueryData<TChatApiConversation[]>(
+    chatQueryKeys.pendingConversations(),
+    previous => {
+      if (!previous || previous.length === 0) {
+        return previous;
+      }
+      return previous.map(seed => (seed.id == null ? seed : (freshById.get(seed.id) ?? seed)));
+    },
+  );
+}
+
 // Drops seeded conversations once the server's list includes them, so the (fresher) server copy
 // wins and the seed store stays small.
 export function prunePendingConversations(

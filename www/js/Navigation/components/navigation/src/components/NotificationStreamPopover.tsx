@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { RefObject, useCallback, useEffect, useRef } from "react";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import { formatNumber } from "@rbx/core-scripts/format/number";
@@ -18,11 +18,14 @@ import { useIsTopNavFoundation } from "../util/topNavFoundationIxp";
 import { popoverDismissGuard } from "../util/popoverDismissGuard";
 import { trackOpenToVisible } from "../topNav/observability";
 
-export default function NotificationStreamPopover() {
+export default function NotificationStreamPopover({
+  containerRef,
+}: {
+  containerRef: RefObject<HTMLLIElement>;
+}) {
   const t = useTranslations("CommonUI.Features");
   const isFoundation = useIsTopNavFoundation();
 
-  const ref = useRef(null);
   const unreadCount = useUnreadNotificationCount();
   const isReactBell = getIsReactNotificationBellEnabled();
   const isReactStream = getIsReactNotificationStreamEnabled();
@@ -95,50 +98,42 @@ export default function NotificationStreamPopover() {
 
   const streamContent = isReactStream ? <NotificationStreamShell /> : <NotificationStreamBase />;
 
-  return (
-    <li
-      id="navbar-stream"
-      ref={ref}
-      className="navbar-icon-item navbar-stream notification-margins"
+  return isFoundation ? (
+    <FoundationPopover
+      onOpenChange={open => {
+        if (open) {
+          handleStreamOpen();
+        } else {
+          handleStreamClose();
+        }
+      }}
     >
-      {isFoundation ? (
-        <FoundationPopover
-          onOpenChange={open => {
-            if (open) {
-              handleStreamOpen();
-            } else {
-              handleStreamClose();
-            }
-          }}
-        >
-          <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-          {/* alignOffset is negative to shift right: with align="end" a positive value moves inward. */}
-          <PopoverContent
-            side="bottom"
-            align="end"
-            alignOffset={-108}
-            collisionPadding={12}
-            ariaLabel={ariaLabel}
-            {...popoverDismissGuard(ref)}
-          >
-            {streamContent}
-          </PopoverContent>
-        </FoundationPopover>
-      ) : (
-        <CoreUiPopover
-          id="notification-stream-popover"
-          trigger="click"
-          placement="bottom"
-          closeOnClick={false}
-          button={trigger}
-          container={ref.current}
-          onEnter={handleStreamOpen}
-          onExit={handleStreamClose}
-          role="menu"
-        >
-          {streamContent}
-        </CoreUiPopover>
-      )}
-    </li>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      {/* alignOffset is negative to shift right: with align="end" a positive value moves inward. */}
+      <PopoverContent
+        side="bottom"
+        align="end"
+        alignOffset={-108}
+        collisionPadding={12}
+        ariaLabel={ariaLabel}
+        {...popoverDismissGuard(containerRef)}
+      >
+        {streamContent}
+      </PopoverContent>
+    </FoundationPopover>
+  ) : (
+    <CoreUiPopover
+      id="notification-stream-popover"
+      trigger="click"
+      placement="bottom"
+      closeOnClick={false}
+      button={trigger}
+      container={containerRef.current}
+      onEnter={handleStreamOpen}
+      onExit={handleStreamClose}
+      role="menu"
+    >
+      {streamContent}
+    </CoreUiPopover>
   );
 }

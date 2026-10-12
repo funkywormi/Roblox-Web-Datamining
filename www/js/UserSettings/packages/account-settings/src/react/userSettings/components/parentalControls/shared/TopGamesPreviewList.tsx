@@ -18,10 +18,12 @@ export const topGamesPreviewCount = 3;
 export const TopGamesPreviewList = ({
   games,
   isLoading,
+  isError = false,
   onSelectGame,
 }: {
   games: TGameData[];
   isLoading: boolean;
+  isError?: boolean;
   onSelectGame: (game: TGameData) => void;
 }): JSX.Element => {
   const { translate } = useTranslation();
@@ -35,6 +37,14 @@ export const TopGamesPreviewList = ({
           variant="Indeterminate"
         />
       </div>
+    );
+  }
+
+  if (isError && games.length === 0) {
+    return (
+      <PreviewCardDescription
+        description={translate(parentalControlsTranslationConstants.errorLoadingList)}
+      />
     );
   }
 

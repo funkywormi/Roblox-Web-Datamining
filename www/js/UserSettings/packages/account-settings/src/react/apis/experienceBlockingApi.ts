@@ -92,6 +92,10 @@ export const experienceBlockingApi = baseApi.injectEndpoints({
             method: HttpMethod.POST,
           })) as QueryReturnValue<TBlockedExperiencesResponse>;
 
+          if (queryResult.error) {
+            return queryResult;
+          }
+
           const { data } = queryResult;
           blockedExperiences = [...blockedExperiences, ...(data?.blockedExperiences || [])];
           offset += blockedExperiencesPageSize;
@@ -107,7 +111,10 @@ export const experienceBlockingApi = baseApi.injectEndpoints({
           return undefined;
         };
 
-        await getBlockedExperiences();
+        const errorResult = await getBlockedExperiences();
+        if (errorResult) {
+          return errorResult;
+        }
 
         return {
           data: {

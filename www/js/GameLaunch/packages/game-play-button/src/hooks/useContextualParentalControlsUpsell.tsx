@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Endpoints } from "@rbx/core-scripts/legacy/Roblox";
+import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import {
   TSettingResponse,
   TAppsFlyerReferralProperties,
@@ -16,7 +16,8 @@ import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import useGuacPlayButtonUI from "./useGuacPlayButtonUI";
 
-const { counterEvents, unlockPlayIntentConstants, playButtonUpsellContexts } = playButtonConstants;
+const { counterEvents, unlockPlayIntentConstants, playButtonUpsellContexts, ampNamespaces } =
+  playButtonConstants;
 
 type TContextualParentalControlUpsell = {
   launchPlayButtonUpsell: (
@@ -161,6 +162,7 @@ const useContextualParentalControlsUpsell = (
               const upsellParams = guacData?.useExperienceApprovalForParentalConsent
                 ? {
                     featureName: "CanApproveExperience",
+                    namespace: ampNamespaces.accountManagement,
                     isAsyncCall: false,
                     usePrologue: true,
                     ampRecourseData: {
@@ -170,6 +172,7 @@ const useContextualParentalControlsUpsell = (
                   }
                 : {
                     featureName: "CanChangeSetting",
+                    namespace: ampNamespaces.settingChange,
                     isAsyncCall: false,
                     usePrologue: true,
                     ampRecourseData: {
@@ -240,7 +243,7 @@ const useContextualParentalControlsUpsell = (
   }, []);
 
   const navigateToAccountSettings = useCallback(() => {
-    const url = Endpoints.getAbsoluteUrl("/my/account#!/privacy");
+    const url = getAbsoluteUrl("/my/account#!/privacy");
     if (typeof window !== "undefined") {
       window.location.href = url;
       setIsSelfUpdateSettingModalOpen(false);

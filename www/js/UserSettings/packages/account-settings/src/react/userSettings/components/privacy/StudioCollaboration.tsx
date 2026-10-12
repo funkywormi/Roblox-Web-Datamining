@@ -63,6 +63,9 @@ export const StudioCollaboration = ({
     onAction: () => {
       invalidChildSettingsCache();
     },
+    onHide: () => {
+      invalidChildSettingsCache();
+    },
   });
 
   const shouldImmediatelyUpsellAgeVerificationRequirements = shouldDisplayInitialModal(

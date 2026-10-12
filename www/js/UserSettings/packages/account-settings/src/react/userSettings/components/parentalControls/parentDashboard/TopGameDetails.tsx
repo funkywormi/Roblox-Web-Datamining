@@ -26,7 +26,7 @@ const TopGameDetails = ({ child }: { child: TChildInfo }): JSX.Element | null =>
   const { universeId: universeIdParam } = useParams<{ universeId: string }>();
   const universeId = Number(universeIdParam);
 
-  const { games, isLoading } = useTopWeeklyGames(child);
+  const { games, isLoading, isBlockStatusError } = useTopWeeklyGames(child);
   const childPages = useAppSelector(selectChildPagesForChildUserId(child.userId));
 
   const game = useMemo(() => games.find(g => g.universeId === universeId), [games, universeId]);
@@ -71,7 +71,7 @@ const TopGameDetails = ({ child }: { child: TChildInfo }): JSX.Element | null =>
       game={game}
       isLoading={isLoading}
       listPath={childPages?.topGamesPage.path}
-      canManageExperiences={child.canParentManageChildsExperiences === true}
+      canManageExperiences={child.canParentManageChildsExperiences === true && !isBlockStatusError}
       manageExperience={manageExperience}
       onViewMoreClick={() => {
         if (!game) return;

@@ -147,7 +147,7 @@ export default {
     FraudChargeback: 'Label.AbuseType.Chargeback'
   },
   CacheKey: {
-    shouldShowUnifiedPurchaseModal: 'shouldShowUnifiedPurchaseModal'
+    shouldShowUnifiedPurchaseModal: 'shouldShowUnifiedPurchaseModal' as const
   },
   batchBuyMaxThumbnails: 3,
   maxBatchLoadRetries: 5,

@@ -1,6 +1,6 @@
 import { MouseEvent } from "react";
+import DownloadButton from "@rbx/app-download/DownloadButton";
 import {
-  DownloadButton,
   InstallInstructionsList,
   MobileAppQrPanel,
   appDownloadType,

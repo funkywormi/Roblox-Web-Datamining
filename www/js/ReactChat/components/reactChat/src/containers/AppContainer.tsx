@@ -22,6 +22,7 @@ import {
   addUsersToConversation,
   createGroupConversation,
   createOneToOneConversation,
+  getConversations,
   removeUsersFromConversation,
   renameGroupConversation,
 } from "../services/chatService";
@@ -40,17 +41,18 @@ import {
 import { CHAT_UPDATE_STATUS } from "../constants/chatPolicyConstants";
 import type { TChatConversation, TChatFeedback, TRenameResult } from "../types/chat";
 import { applyModerationTimeouts } from "../utils/chatTransforms";
+import { seedPendingConversation } from "../utils/chatQueryCache";
 import { clearAllPersistedChatLayouts } from "../utils/chatLayoutStorage";
 import { getCurrentUserId } from "../utils/currentUser";
 
 type TChatJQueryEventTarget = {
   on: (
     event: "Roblox.Chat.StartChat",
-    handler: (event: unknown, args: { userId?: number }) => void,
+    handler: (event: unknown, args?: { userId?: number }) => void,
   ) => void;
   off: (
     event: "Roblox.Chat.StartChat",
-    handler: (event: unknown, args: { userId?: number }) => void,
+    handler: (event: unknown, args?: { userId?: number }) => void,
   ) => void;
 };
 
@@ -59,6 +61,9 @@ type TChatJQuery = (selector: Document) => TChatJQueryEventTarget;
 declare global {
   interface Window {
     jQuery?: unknown;
+  }
+  interface DocumentEventMap {
+    "Roblox.Chat.StartChat": CustomEvent<{ userId?: number } | null>;
   }
 }
 
@@ -224,18 +229,35 @@ const AppContainer = () => {
   const webChatRenderedSentRef = useRef(false);
   const conversationsLoadedSentRef = useRef(false);
 
+  // Opens the 1:1 with `userId`, creating it if needed. A dialog only renders for a conversation that
+  // is in the list, and this one may sit on a list page that has not loaded yet — so seed it first
+  // (legacy chat likewise put the started conversation at the front of its list).
+  const startConversationWithUser = useCallback(
+    async (userId: number) => {
+      const created = await createOneToOneConversation(userId);
+      const conversationId = created.id;
+      if (!conversationId) {
+        return;
+      }
+      // create-conversations leaves out the OSA and pending status the dialog needs (the UK OSA card,
+      // for one), so read the conversation back before it opens. If that fails, the create response
+      // still opens the chat.
+      const [conversation = created] = await getConversations([conversationId]).catch(() => []);
+      seedPendingConversation(queryClient, conversation);
+      openConversation(`conv_${conversationId}`);
+      queryClient
+        .invalidateQueries({ queryKey: chatQueryKeys.conversations() })
+        .catch((): undefined => undefined);
+    },
+    [openConversation, queryClient],
+  );
+
   useEffect(() => {
     if (!isLiveData) {
       return;
     }
 
-    const $ = window.jQuery;
-    if (!isChatJQuery($)) {
-      return;
-    }
-
-    const handleStartChat = (_event: unknown, args: { userId?: number }) => {
-      const { userId } = args;
+    const startChat = (userId: number | undefined) => {
       if (!userId) {
         return;
       }
@@ -248,22 +270,28 @@ const AppContainer = () => {
         return;
       }
 
-      createOneToOneConversation(userId)
-        .then(async result => {
-          await queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() });
-          if (result.id) {
-            openConversation(`conv_${result.id}`);
-          }
-        })
-        .catch(() => undefined);
+      startConversationWithUser(userId).catch(() => undefined);
     };
 
-    const $doc = $(document);
-    $doc.on("Roblox.Chat.StartChat", handleStartChat);
-    return () => {
-      $doc.off("Roblox.Chat.StartChat", handleStartChat);
+    // Native event works without jQuery (Next.js); triggerHandler senders only reach $.on.
+    const handleNativeStartChat = (event: DocumentEventMap["Roblox.Chat.StartChat"]) => {
+      startChat(event.detail?.userId);
     };
-  }, [isLiveData, openConversation, queryClient]);
+    document.addEventListener("Roblox.Chat.StartChat", handleNativeStartChat);
+
+    const $ = window.jQuery;
+    const $doc = isChatJQuery($) ? $(document) : null;
+    // $.on also fires for native dispatches, without args; those are handled above.
+    const handleJQueryStartChat = (_event: unknown, args?: { userId?: number }) => {
+      startChat(args?.userId);
+    };
+    $doc?.on("Roblox.Chat.StartChat", handleJQueryStartChat);
+
+    return () => {
+      document.removeEventListener("Roblox.Chat.StartChat", handleNativeStartChat);
+      $doc?.off("Roblox.Chat.StartChat", handleJQueryStartChat);
+    };
+  }, [isLiveData, openConversation, startConversationWithUser]);
 
   useEffect(() => {
     if (!isLiveData) {
@@ -424,15 +452,19 @@ const AppContainer = () => {
 
     const consumeStartIntent = async () => {
       try {
-        const result = await createOneToOneConversation(intent.userId);
-        await queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() });
-        openConversation(`conv_${result.id}`);
+        await startConversationWithUser(intent.userId);
       } finally {
         replaceLocationRemovingChatDeepLinkParams();
       }
     };
     consumeStartIntent().catch(() => undefined);
-  }, [chatData.isLoading, chatData.isChatVisible, conversations, openConversation, queryClient]);
+  }, [
+    chatData.isLoading,
+    chatData.isChatVisible,
+    conversations,
+    openConversation,
+    startConversationWithUser,
+  ]);
 
   // webChatRendered — one-shot, once the chat has rendered and event sampling is configured off the
   // metadata (isMetadataLoaded). Skipped when hidden (U9 kids) so a chat that never renders isn't
@@ -622,25 +654,25 @@ const AppContainer = () => {
       }
       try {
         const updated = await renameGroupConversation(match.id, title);
-        // A moderated name is not an error: the server answers normally with status "moderated" and
-        // keeps the old title, so the panel shows why instead of the generic error toast.
+        // The server answers 200 with status "moderated" (name blocked) or "failed" (not renamed) and
+        // keeps the old title. The panel shows why, so only a real success changes the title.
         if (updated.status === CHAT_UPDATE_STATUS.moderated) {
           return "moderated";
+        }
+        if (updated.status === CHAT_UPDATE_STATUS.failed) {
+          return "failed";
         }
         const updatedTitle = updated.name ?? title;
         renameConversation(layoutId, updatedTitle);
         await queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() });
         return "success";
       } catch {
-        setFeedback({
-          id: Date.now(),
-          type: "warning",
-          message: translate("Message.Error"),
-        });
+        // Includes HTTP 429 from the server's per-group rename limit, which a moderated attempt uses
+        // up too. The panel shows the failure, so there is no toast here.
         return "failed";
       }
     },
-    [conversations, queryClient, renameConversation, translate],
+    [conversations, queryClient, renameConversation],
   );
 
   const handleAddFriends = useCallback(

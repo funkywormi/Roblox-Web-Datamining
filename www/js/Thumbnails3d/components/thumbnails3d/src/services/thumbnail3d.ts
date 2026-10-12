@@ -1,6 +1,6 @@
 import { AxiosPromise, AxiosResponse } from "@rbx/core-scripts/http";
 import * as httpService from "@rbx/core-scripts/http";
-import { logMeasurement } from "@rbx/thumbnails/metrics";
+import { logMeasurement } from "@rbx/www-common/components/thumbnail";
 import "../global";
 import { WebGLJson } from "../types";
 import {
@@ -222,16 +222,12 @@ const getThumbnail3dJson = (
           ThumbnailType: `${type}_3d`,
           Version: stats.version,
           Value: duration.toString(),
-        }).catch((e: unknown) => {
-          console.error(e);
         });
         if (stats.retriesDone === 0) {
           // load success without retry
           logMeasurement("ThumbnailNoRetrySuccessWebapp", {
             ThumbnailType: `${type}_3d`,
             Version: stats.version,
-          }).catch((e: unknown) => {
-            console.error(e);
           });
         } else {
           // log retry attempts by type
@@ -239,8 +235,6 @@ const getThumbnail3dJson = (
             ThumbnailType: `${type}_3d`,
             Version: stats.version,
             Value: stats.retriesDone.toString(),
-          }).catch((e: unknown) => {
-            console.error(e);
           });
         }
         resolve({ json, performance: { duration } });
@@ -251,8 +245,6 @@ const getThumbnail3dJson = (
         logMeasurement("ThumbnailTimeoutWebapp", {
           ThumbnailType: `${type}_3d`,
           Version: "TN3",
-        }).catch((e: unknown) => {
-          console.error(e);
         });
 
         // TODO: old, migrated code

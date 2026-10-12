@@ -114,3 +114,41 @@ export function resolveConversationTimeout(
     expiresAtMs,
   };
 }
+
+/** Epoch ms of a range's end. A range without a usable end ranks last. */
+function endTimeMs(range: TModerationTimeoutRange): number {
+  const ms = range.end_time == null ? Number.NaN : new Date(range.end_time).getTime();
+  return Number.isNaN(ms) ? Number.NEGATIVE_INFINITY : ms;
+}
+
+/**
+ * Parallel requests can see different user-level ranges (a timeout or nudge may change between
+ * them), so keep the most restrictive result: the range that ends last, plus an outstanding
+ * acknowledgement from any reply. This follows the blocking rule
+ * `end_time > now || requires_acknowledgement`.
+ */
+function mergeUserTimeoutRanges(
+  ranges: TModerationTimeoutRange[],
+): TModerationTimeoutRange | undefined {
+  if (ranges.length === 0) {
+    return undefined;
+  }
+  // Build on the range that ends last, so start_time and end_time stay a matching pair.
+  const latest = ranges.reduce((best, r) => (endTimeMs(r) > endTimeMs(best) ? r : best));
+  const needsAcknowledgement = ranges.some(r => Boolean(r.requires_acknowledgement));
+  return needsAcknowledgement && !latest.requires_acknowledgement
+    ? { ...latest, requires_acknowledgement: true }
+    : latest;
+}
+
+/** Merges the replies to several get-chat-moderation-statuses calls into one reply. */
+export function mergeChatModerationStatuses(
+  responses: TChatModerationStatusesResponse[],
+): TChatModerationStatusesResponse {
+  return {
+    user_timeout_range: mergeUserTimeoutRanges(
+      responses.flatMap(r => (r.user_timeout_range == null ? [] : [r.user_timeout_range])),
+    ),
+    conversation_timeout_ranges: responses.flatMap(r => r.conversation_timeout_ranges ?? []),
+  };
+}

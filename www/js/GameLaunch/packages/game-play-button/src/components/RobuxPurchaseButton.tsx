@@ -1,6 +1,5 @@
 import React, { useCallback, useRef } from "react";
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
-import { Button } from "@rbx/core-ui/legacy/react-style-guide";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import "@rbx/core-scripts/global";
 import {
@@ -9,7 +8,8 @@ import {
   ThumbnailFormat,
   ThumbnailTypes,
 } from "@rbx/thumbnails";
-import { TGetProductDetails, TGetProductInfo, ValueOf } from "../types/playButtonTypes";
+import { TGetProductDetails, TGetProductInfo } from "../types/playButtonTypes";
+import { TButtonWidth } from "../constants/buttonWidths";
 import PurchaseButtonUI from "./PurchaseButtonUI";
 
 const getPrice = (productInfo?: TGetProductInfo): string => productInfo?.price.toString() ?? "";
@@ -17,7 +17,7 @@ const getPrice = (productInfo?: TGetProductInfo): string => productInfo?.price.t
 interface RobuxPurchaseButtonProps {
   universeId: string;
   iconClassName?: string;
-  buttonWidth?: ValueOf<typeof Button.widths>;
+  buttonWidth?: TButtonWidth;
   buttonClassName?: string;
   hideButtonText?: boolean;
   redirectPurchaseUrl?: ValidHttpUrl;

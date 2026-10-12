@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from "react";
-import type { WithTranslationsProps } from "@rbx/core-scripts/react";
 import * as nextEventTracker from "@rbx/www-common/event-tracker";
 import { RequestServiceDefault } from "../../../common/request";
 import { App } from "./App";
@@ -7,9 +6,10 @@ import { ChallengeParameters } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
 
-// React 19 / Next.js version of renderChallenge: the Next host renders this and injects `translate`.
-// Client mount only (dynamic ssr: false). Not yet self-contained on Next — needs styles, a
-// twoStepVerificationApi env-urls shim, and the App graph de-globaled; see the PR for follow-ups.
+// React 19 / Next.js version of renderChallenge. The host must provide an i18n provider that
+// includes `Authentication.TwoStepVerification`. Client mount only (dynamic ssr: false). Not yet
+// self-contained on Next — needs styles, a twoStepVerificationApi env-urls shim, and the App graph
+// de-globaled; see the PR for follow-ups.
 
 // Distributive Omit so ChallengeParameters' renderInline/onModalChallengeAbandoned union survives;
 // a plain Omit collapses it and would allow modal mode with a null handler.
@@ -18,11 +18,9 @@ type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K>
 export type TwoStepVerificationChallengeProps = DistributiveOmit<
   ChallengeParameters,
   "containerId"
-> &
-  Pick<WithTranslationsProps, "translate">;
+>;
 
 export const TwoStepVerificationChallenge = ({
-  translate,
   userId,
   challengeId,
   appType,
@@ -64,10 +62,6 @@ export const TwoStepVerificationChallenge = ({
       eventService={eventService}
       metricsService={metricsService}
       requestService={requestService}
-      translate={translate}
-      // App requires `intl` but never reads it (formatting comes later).
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      intl={{} as WithTranslationsProps["intl"]}
       onChallengeCompleted={onChallengeCompleted}
       onChallengeInvalidated={onChallengeInvalidated}
       onModalChallengeAbandoned={onModalChallengeAbandoned}

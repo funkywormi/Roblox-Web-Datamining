@@ -15,6 +15,8 @@ import { TParentInfo } from "../../../../../types/parentInfoTypes";
 import { getProfileUrl } from "../../../constants/urlConstants";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import { useGetSettingsUiPolicyQuery } from "../../../../apis/universalAppConfigurationApi";
+import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
+import { btnClickLinkedParents } from "../../../services/eventServices/odpFamilyEventService";
 
 export const LinkedParentListItem = ({
   parent,
@@ -25,6 +27,7 @@ export const LinkedParentListItem = ({
 }): JSX.Element => {
   const { translate } = useTranslation();
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
+  const { data: parentInfo } = useGetParentInfoQuery();
 
   return (
     <ListItem
@@ -54,6 +57,7 @@ export const LinkedParentListItem = ({
       }
       trailing={<ListItemChevronTrailingAccessory />}
       onSelect={() => {
+        btnClickLinkedParents(parentInfo?.parents);
         // Profiles are outside this SPA, so use a full-page navigation.
         window.location.href = getProfileUrl(parent.userId);
       }}

@@ -5,6 +5,8 @@ import useLinkedParentsState from "../../../hooks/useLinkedParentsState";
 import useStartOnDeviceParentLinking from "../../../hooks/useStartOnDeviceParentLinking";
 import useStartRemoteParentLinking from "../../../hooks/useStartRemoteParentLinking";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
+import { btnClickCreatePin } from "../../../services/eventServices/odpFamilyEventService";
+import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
 
 /**
  * Upsell screen prompting users to add a parent. Shown for users without any linked parents.
@@ -17,8 +19,14 @@ export const ParentLinkEntrypointV2 = (): JSX.Element => {
   const startOnDeviceParentLinking = useStartOnDeviceParentLinking();
   const { addParentUpsellVariant, canAddOnDeviceParent, canAddRemoteParent } =
     useLinkedParentsState();
+  const { data: parentInfo } = useGetParentInfoQuery();
 
   const { addParentLink } = parentalControlsTranslationConstants;
+
+  const startOnDeviceParentLinkingWithEventTracking = (): void => {
+    btnClickCreatePin(parentInfo?.parents);
+    startOnDeviceParentLinking();
+  };
 
   const heading =
     addParentUpsellVariant !== undefined
@@ -41,7 +49,7 @@ export const ParentLinkEntrypointV2 = (): JSX.Element => {
               variant="Emphasis"
               size="Medium"
               className="width-full medium:basis-0 medium:grow-1"
-              onClick={startOnDeviceParentLinking}
+              onClick={startOnDeviceParentLinkingWithEventTracking}
             >
               {translate(addParentLink.addOnDeviceParentAction)}
             </Button>

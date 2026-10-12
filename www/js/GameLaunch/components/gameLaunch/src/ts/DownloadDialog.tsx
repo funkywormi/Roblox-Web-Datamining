@@ -17,7 +17,6 @@ import {
   MobileAppQrPanel,
   resolveAppDownload,
   sendPrimaryAppDownloadClickEvent,
-  useAppDownload,
 } from "@rbx/app-download";
 import { clientStatus } from "./api";
 
@@ -49,7 +48,6 @@ const DownloadDialog = ({
 }) => {
   const [downloaded, setDownloaded] = useState(false);
   const { translate } = useTranslation();
-  const { logExposure } = useAppDownload({});
   const { isLoading } = useQuery({
     queryKey: ["client-status"],
     queryFn: async () => {
@@ -99,7 +97,6 @@ const DownloadDialog = ({
                 // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onClick={async () => {
                   try {
-                    logExposure();
                     const resolvedDownload = resolveAppDownload();
                     if (resolvedDownload) {
                       sendPrimaryAppDownloadClickEvent(resolvedDownload.link.name);

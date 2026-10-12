@@ -14,14 +14,27 @@ import { TGameData } from "../components/parentalControls/parentDashboard/GameTi
  * Used by the parent dashboard preview, the standalone Top Games list page,
  * and individual game detail pages so they all stay in sync.
  */
-const useTopWeeklyGames = (child?: TChildInfo): { games: TGameData[]; isLoading: boolean } => {
+const useTopWeeklyGames = (
+  child?: TChildInfo,
+): {
+  games: TGameData[];
+  isLoading: boolean;
+  isError: boolean;
+  isBlockStatusError: boolean;
+} => {
   const {
     data: screentimeData,
     isLoading: isScreentimeLoading,
     isUninitialized: isScreentimeUninitialized,
+    isError: isScreentimeError,
   } = useGetTopWeeklyScreentimeByUniverseQuery(child?.userId);
 
-  const { data: blockedExperiencesResult } = useGetBlockedExperiencesQuery({
+  const {
+    data: blockedExperiencesResult,
+    isLoading: isBlockedExperiencesLoading,
+    isUninitialized: isBlockedExperiencesUninitialized,
+    isError: isBlockStatusError,
+  } = useGetBlockedExperiencesQuery({
     targetUserId: child?.userId ?? authenticatedUser.id!,
     limit: blockedExperiencesPageSize,
     offset: 0,
@@ -36,6 +49,7 @@ const useTopWeeklyGames = (child?: TChildInfo): { games: TGameData[]; isLoading:
     data: gamesDetails,
     isLoading: isDetailsLoading,
     isUninitialized: isDetailsUninitialized,
+    isError: isDetailsError,
   } = useGetGamesDetailsQuery(universeIds, {
     skip: universeIds.length === 0,
   });
@@ -73,7 +87,11 @@ const useTopWeeklyGames = (child?: TChildInfo): { games: TGameData[]; isLoading:
     isLoading:
       isScreentimeUninitialized ||
       isScreentimeLoading ||
+      isBlockedExperiencesUninitialized ||
+      isBlockedExperiencesLoading ||
       (universeIds.length > 0 && (isDetailsUninitialized || isDetailsLoading)),
+    isError: isScreentimeError || isDetailsError,
+    isBlockStatusError,
   };
 };
 

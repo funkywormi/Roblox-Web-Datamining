@@ -2,21 +2,29 @@ import environmentUrls from "@rbx/environment-urls";
 import chatHttpTransport from "./chatHttpTransport";
 import type {
   TChatApiConversation,
+  TCreatedChatApiConversation,
   TCreateConversationsResponse,
   TGetChatMetadataResponse,
   TGetConversationMessagesResponse,
   TGetConversationMetadataResponse,
   TGetConversationsParticipantsMetadataResponse,
+  TGetConversationsResponse,
   TGetModalSequenceResponse,
   TGetUserConversationsResponse,
   TSendMessageResponse,
   TUpdateConversationsResponse,
 } from "../types/api";
-import type { TChatModerationStatusesResponse } from "../adapters/chatModerationAdapters";
+import {
+  mergeChatModerationStatuses,
+  type TChatModerationStatusesResponse,
+} from "../adapters/chatModerationAdapters";
 import { getCurrentUserId } from "../utils/currentUser";
 
 const CHAT_API_BASE_URL = environmentUrls.chatApi;
 const DEFAULT_CONVERSATION_PAGE_SIZE = 20;
+// platform-chat-api answers a get-chat-moderation-statuses call with more than 10 ids with
+// 400 {"Error":"batch request size 11 is too large"} (ROACTCHAT-2671), so longer lists are split.
+const MODERATION_STATUSES_MAX_IDS = 10;
 
 const get = <TResponse>(
   path: string,
@@ -55,6 +63,19 @@ export const getUserConversations = async (
     cursor,
     pageSize: DEFAULT_CONVERSATION_PAGE_SIZE,
   });
+
+// Reads conversations by id, with the same flags as the legacy chat.
+export const getConversations = async (
+  conversationIds: string[],
+): Promise<TChatApiConversation[]> => {
+  const response = await post<TGetConversationsResponse>("/v1/get-conversations", {
+    ids: conversationIds,
+    include_messages: true,
+    include_participants: true,
+    include_user_data: true,
+  });
+  return response.conversations;
+};
 
 export const getConversationMessages = async (
   conversationId: string,
@@ -109,7 +130,7 @@ export const updateTypingStatus = async (conversationId: string): Promise<void> 
   });
 };
 
-const extractFirstConversation = (conversations: TChatApiConversation[]): TChatApiConversation => {
+const extractFirstConversation = <TConversation>(conversations: TConversation[]): TConversation => {
   const first = conversations[0];
   if (!first) {
     throw new Error("Server returned no conversations");
@@ -120,7 +141,7 @@ const extractFirstConversation = (conversations: TChatApiConversation[]): TChatA
 export const createGroupConversation = async (
   name: string,
   participantUserIds: number[],
-): Promise<TChatApiConversation> => {
+): Promise<TCreatedChatApiConversation> => {
   const response = await post<TCreateConversationsResponse>("/v1/create-conversations", {
     conversations: [{ type: "group", name, participant_user_ids: participantUserIds }],
     include_user_data: true,
@@ -130,7 +151,7 @@ export const createGroupConversation = async (
 
 export const createOneToOneConversation = async (
   participantUserId: number,
-): Promise<TChatApiConversation> => {
+): Promise<TCreatedChatApiConversation> => {
   const response = await post<TCreateConversationsResponse>("/v1/create-conversations", {
     conversations: [{ type: "one_to_one", participant_user_ids: [participantUserId] }],
     include_user_data: true,
@@ -170,10 +191,31 @@ export const removeUsersFromConversation = async (
 
 export const getChatModerationStatuses = async (
   conversationIds: string[],
-): Promise<TChatModerationStatusesResponse> =>
-  post<TChatModerationStatusesResponse>("/v1/get-chat-moderation-statuses", {
-    ids: conversationIds,
-  });
+): Promise<TChatModerationStatusesResponse> => {
+  const batches: string[][] = [];
+  for (let i = 0; i < conversationIds.length; i += MODERATION_STATUSES_MAX_IDS) {
+    batches.push(conversationIds.slice(i, i + MODERATION_STATUSES_MAX_IDS));
+  }
+  // An empty list is still one request: the user-level timeout comes back without any ids.
+  if (batches.length === 0) {
+    batches.push([]);
+  }
+
+  const results = await Promise.allSettled(
+    batches.map(ids =>
+      post<TChatModerationStatusesResponse>("/v1/get-chat-moderation-statuses", { ids }),
+    ),
+  );
+  const replies = results.flatMap(result => (result.status === "fulfilled" ? [result.value] : []));
+  const failure = results.find(result => result.status === "rejected");
+  if (replies.length === 0 && failure?.status === "rejected") {
+    // Every batch failed, so fail like a single request would.
+    throw failure.reason;
+  }
+  // A failed batch only costs the conversation-level timeouts of its own chats. The user-level
+  // timeout, which covers every chat, comes back in each of the other replies.
+  return mergeChatModerationStatuses(replies);
+};
 
 // Conversation-overlay modal sequence (Trusted Connections FTUX). Matches the legacy chat:
 // 1:1 friends conversations send `friend_id`, channel conversations send `conversation_id`

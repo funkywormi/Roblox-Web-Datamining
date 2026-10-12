@@ -10,10 +10,6 @@
     margin-right: calc(var(--padding-xxlarge)*-1)
 }
 
-.margin-bottom-\[-32px\] {
-    margin-bottom: -32px
-}
-
 .margin-bottom-\[-8px\] {
     margin-bottom: -8px
 }
@@ -75,6 +71,11 @@
 .\!size-1800 {
     width: var(--size-1800) !important;
     height: var(--size-1800) !important
+}
+
+.\!size-500 {
+    width: var(--size-500) !important;
+    height: var(--size-500) !important
 }
 
 .\!size-600 {
@@ -142,6 +143,10 @@
 
 .max-width-\[200px\] {
     max-width: 200px
+}
+
+.max-width-\[320px\] {
+    max-width: 320px
 }
 
 .max-width-\[calc\(var\(--size-100\)\*50\)\] {
@@ -528,6 +533,11 @@
     .medium\:\!size-2200 {
         width: var(--size-2200) !important;
         height: var(--size-2200) !important
+    }
+
+    .medium\:\!size-700 {
+        width: var(--size-700) !important;
+        height: var(--size-700) !important
     }
 
     .medium\:max-width-\[320px\] {

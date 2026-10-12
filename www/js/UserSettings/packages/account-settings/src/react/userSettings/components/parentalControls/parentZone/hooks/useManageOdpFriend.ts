@@ -49,6 +49,12 @@ const useManageOdpFriend = () => {
           { subscribe: false, forceRefetch: true },
         ),
       );
+      dispatch(
+        parentalControlsApi.endpoints.getChildFriendsCount.initiate(childUserId, {
+          subscribe: false,
+          forceRefetch: true,
+        }),
+      );
       isWizardActiveRef.current = false;
       setIsManaging(false);
     }

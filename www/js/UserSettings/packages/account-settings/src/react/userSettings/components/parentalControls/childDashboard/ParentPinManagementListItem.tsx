@@ -9,6 +9,8 @@ import {
 } from "@rbx/foundation-ui";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import { parentZonePages } from "../../../constants/parentalControls/parentZonePages";
+import { btnClickOdpParentSettings } from "../../../services/eventServices/odpFamilyEventService";
+import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
 
 // List component for managing a parent PIN
 export const ParentPinManagementListItem = ({
@@ -18,6 +20,7 @@ export const ParentPinManagementListItem = ({
 }): JSX.Element => {
   const { translate } = useTranslation();
   const history = useHistory();
+  const { data: parentInfo } = useGetParentInfoQuery();
 
   const { parentPinManagement } = parentalControlsTranslationConstants;
 
@@ -33,7 +36,10 @@ export const ParentPinManagementListItem = ({
         </ListItemLeadingAccessorySpacer>
       }
       trailing={<ListItemChevronTrailingAccessory />}
-      onSelect={() => history.push(parentZonePages.manageOnDeviceParentPage.path)}
+      onSelect={() => {
+        btnClickOdpParentSettings(parentInfo?.parents);
+        history.push(parentZonePages.manageOnDeviceParentPage.path);
+      }}
       className="items-stretch"
     />
   );

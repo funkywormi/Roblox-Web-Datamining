@@ -1,54 +1,8 @@
-.install-instructions {
-    max-width: 1140px
-}
-
-.install-instructions h3 {
-    padding: 15px
-}
-
-.install-instructions .col-xs-6 {
-    padding: 30px
-}
-
-.install-instructions .col-xs-6 .section-content {
-    background: #202227;
-    border-radius: 20px;
-    min-height: 380px;
-    padding: 32px
-}
-
-.install-instructions ol {
-    text-align: left
-}
-
-.install-instructions ol>li {
-    padding-bottom: 30px;
-    list-style: decimal
-}
-
-.install-instructions .qr-tagline {
-    margin-left: 15%;
-    margin-right: 15%
-}
-
-.install-instructions .qr-container {
-    background-color: #fff;
-    border-radius: 20px;
-    width: 180px;
-    height: 180px;
-    margin: 30px;
-    display: inline-block
-}
-
-.install-instructions .qr-container .qr-code {
-    width: 90%;
-    width: calc(100% - 24px);
-    height: 90%;
-    background-image: url(https://images.rbxcdn.com/6674b8e189bf79c6.png);
-    background-repeat: no-repeat;
-    background-size: cover;
-    height: calc(100% - 24px);
-    margin: 12px
+button.btn-common-play-game-lg,
+button.btn-economy-robux-white-lg,
+button.btn-common-play-game-action-needed-lg,
+button.btn-common-play-game-unplayable-lg {
+    height: auto
 }
 
 @media (max-width:543px) {
@@ -151,10 +105,6 @@
     height: var(--icon-size-xxlarge)
 }
 
-.min-width-\[240px\] {
-    min-width: 240px
-}
-
 .bg-\[white\] {
     background-color: #fff
 }
@@ -233,12 +183,6 @@ button.download-link-underline {
 
 .group\/interactable:disabled .group-disabled\/interactable\:bg-none {
     background-color: var(--color-none)
-}
-
-@media (min-width:601px) {
-    .medium\:min-width-\[400px\] {
-        min-width: 400px
-    }
 }
 
 .\[\&_a\]\:underline a {

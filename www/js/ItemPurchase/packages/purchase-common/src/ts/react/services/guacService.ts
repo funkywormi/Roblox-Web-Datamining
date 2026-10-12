@@ -3,7 +3,7 @@
  * Multiple copies of this file exist in the codebase given that there currently is not a way
  * to share code across WebApps. If updating this file, please update all copies in the codebase.
  */
-import { Guac } from '@rbx/legacy-webapp-types/Roblox';
+import { callBehaviour } from '@rbx/core-scripts/guac';
 
 type AppPolicyResponse = {
   /**
@@ -35,7 +35,7 @@ async function getDisableRobloxPlusEntrypoints(): Promise<boolean> {
 
   responsePromise = (async () => {
     try {
-      const data = await Guac.callBehaviour<AppPolicyResponse>('app-policy');
+      const data = await callBehaviour<AppPolicyResponse>('app-policy');
       return shouldDisableRobloxPlusEntrypointsFromAppPolicy(data);
     } catch {
       return false;

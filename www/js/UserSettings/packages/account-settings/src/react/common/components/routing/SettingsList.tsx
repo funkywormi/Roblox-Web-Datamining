@@ -11,6 +11,7 @@ interface SettingsListProps {
   routingPath?: string;
   description?: JSX.Element;
   isMainMenu?: boolean;
+  onSelectPage?: (pageName: string) => void;
 }
 
 const SettingsList: React.FC<SettingsListProps> = ({
@@ -18,6 +19,7 @@ const SettingsList: React.FC<SettingsListProps> = ({
   routingPath,
   description,
   isMainMenu,
+  onSelectPage,
 }) => {
   const { translate } = useWrappedTranslation();
 
@@ -28,7 +30,7 @@ const SettingsList: React.FC<SettingsListProps> = ({
     disabled,
     name,
   }: TSettingsPage): JSX.Element => (
-    <NavLink key={path} to={path}>
+    <NavLink key={path} to={path} onClick={onSelectPage && (() => onSelectPage(name))}>
       {isMainMenu ? (
         <SettingListItem
           id={`setting-list-${name}`}

@@ -21,7 +21,7 @@ export const OdpTopGameDetails = (): JSX.Element | null => {
   const universeId = Number(universeIdParam);
 
   const { data: odpChildContext } = useGetOdpChildContextQuery();
-  const { games, isLoading } = useTopWeeklyGames();
+  const { games, isLoading, isBlockStatusError } = useTopWeeklyGames();
 
   const game = useMemo(() => games.find(g => g.universeId === universeId), [games, universeId]);
 
@@ -37,7 +37,9 @@ export const OdpTopGameDetails = (): JSX.Element | null => {
       game={game}
       isLoading={isLoading}
       listPath={parentZonePages.topGamesPage.path}
-      canManageExperiences={odpChildContext?.canParentManageChildsExperiences === true}
+      canManageExperiences={
+        odpChildContext?.canParentManageChildsExperiences === true && !isBlockStatusError
+      }
       manageExperience={manageExperience}
     />
   );

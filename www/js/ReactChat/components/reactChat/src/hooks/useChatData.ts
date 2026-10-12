@@ -4,6 +4,7 @@ import { chatQueryKeys } from "../constants/queryKeys";
 import {
   getChatMetadata,
   getConversationMetadata,
+  getConversations,
   getUserConversations,
 } from "../services/chatService";
 import { getUserPresences } from "../services/presenceService";
@@ -17,7 +18,7 @@ import type {
   TPresenceResponse,
 } from "../types/api";
 import type { TChatConversation } from "../types/chat";
-import { prunePendingConversations } from "../utils/chatQueryCache";
+import { prunePendingConversations, refreshPendingConversations } from "../utils/chatQueryCache";
 import {
   applyPresences,
   filterRemovedFriendConversations,
@@ -162,6 +163,32 @@ export const useChatData = (): TUseChatDataResult => {
     prunePendingConversations(queryClient, serverConversationIds);
   }, [conversationPages, pendingConversations.length, queryClient]);
 
+  // A seed is a conversation outside the loaded list pages, so a list refetch never refreshes it.
+  // Realtime events that change policy (for example UserSettingsChanged for an opt-in) carry no
+  // conversation id and only invalidate the list, as do in-tab actions like accepting the consent
+  // modal. The list refetch is the one signal they share, so read the seeds back by id after each
+  // one. Declared after the prune effect so a seed the list just returned is not read.
+  const listUpdatedAt = conversationsQuery.dataUpdatedAt;
+  useEffect(() => {
+    const seeds =
+      queryClient.getQueryData<TChatApiConversation[]>(chatQueryKeys.pendingConversations()) ?? [];
+    const seedIds = seeds.flatMap(seed => (seed.id == null ? [] : [seed.id]));
+    if (seedIds.length === 0) {
+      return undefined;
+    }
+    let isCurrent = true;
+    getConversations(seedIds)
+      .then(conversations => {
+        if (isCurrent) {
+          refreshPendingConversations(queryClient, conversations);
+        }
+      })
+      .catch((): undefined => undefined);
+    return () => {
+      isCurrent = false;
+    };
+  }, [listUpdatedAt, queryClient]);
+
   const baseConversations = useMemo(() => {
     // Prepend the seeds so a newly created conversation is newest and wins de-dup over any
     // stale server copy; flattenConversationPages de-dupes by id (first occurrence wins).
@@ -242,15 +269,19 @@ export const useChatData = (): TUseChatDataResult => {
   );
   const moderationEligibleIds = useMemo(() => {
     const ids = new Set<string>();
-    for (const page of conversationPages ?? []) {
-      for (const conversation of page.conversations) {
-        if (conversation.id != null && canFetchModerationStatusesForConversation(conversation)) {
-          ids.add(conversation.id);
-        }
+    // Seeds count too: one that sits outside the loaded list pages would otherwise never have its
+    // conversation-level timeout fetched.
+    const apiConversations = [
+      ...pendingConversations,
+      ...(conversationPages ?? []).flatMap(page => page.conversations),
+    ];
+    for (const conversation of apiConversations) {
+      if (conversation.id != null && canFetchModerationStatusesForConversation(conversation)) {
+        ids.add(conversation.id);
       }
     }
     return ids;
-  }, [conversationPages]);
+  }, [conversationPages, pendingConversations]);
 
   const conversations = useMemo(
     () => applyPresences(visibleConversations, presencesByUserId),

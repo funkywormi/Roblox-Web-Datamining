@@ -1,6 +1,6 @@
 import React from "react";
 import { FormControl, FormGroup } from "react-style-guide";
-import "../../../css/common/inputFieldConcealed.scss";
+import "../../../css/common/inputFieldConcealed.css";
 import { RequestService } from "../../common/request";
 import {
   AccountSecurityPromptResources,

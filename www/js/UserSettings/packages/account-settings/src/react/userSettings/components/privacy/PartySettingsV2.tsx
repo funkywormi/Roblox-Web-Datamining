@@ -212,6 +212,9 @@ export const PartySettingsV2 = ({
     onAction: () => {
       invalidChildSettingsCache();
     },
+    onHide: () => {
+      invalidChildSettingsCache();
+    },
   });
 
   const getRequiredActions = (setting: UserSetting, value: PartySettingsValue) =>

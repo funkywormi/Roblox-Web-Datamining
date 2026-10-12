@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Endpoints } from "@rbx/core-scripts/legacy/Roblox";
+import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import {
   TSettingResponse,
   TAppsFlyerReferralProperties,
@@ -243,7 +243,7 @@ const useContextualParentalControlsUpsell = (
   }, []);
 
   const navigateToAccountSettings = useCallback(() => {
-    const url = Endpoints.getAbsoluteUrl("/my/account#!/privacy");
+    const url = getAbsoluteUrl("/my/account#!/privacy");
     if (typeof window !== "undefined") {
       window.location.href = url;
       setIsSelfUpdateSettingModalOpen(false);

@@ -73,6 +73,9 @@ export const ExperienceChatPrivacyV2 = ({
     onAction: () => {
       invalidChildSettingsCache();
     },
+    onHide: () => {
+      invalidChildSettingsCache();
+    },
   });
 
   const getRequiredActions = (setting: UserSetting, value: UserPrivacyLevel) =>

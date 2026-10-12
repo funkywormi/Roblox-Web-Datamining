@@ -68,6 +68,9 @@ export const SocialNetworkVisibility = ({
     onAction: () => {
       invalidChildSettingsCache();
     },
+    onHide: () => {
+      invalidChildSettingsCache();
+    },
   });
 
   const getRequiredActions = (setting: UserSetting, value: UserPrivacyLevel) =>

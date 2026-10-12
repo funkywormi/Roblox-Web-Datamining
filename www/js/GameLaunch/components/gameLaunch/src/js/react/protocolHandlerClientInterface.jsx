@@ -13,11 +13,13 @@ import {
 import { getCurrentBrowser } from "@rbx/core-scripts/legacy/core-utilities";
 import { isMac, isWindows } from "@rbx/core-scripts/meta/device";
 import { queryClient, renderWithErrorBoundary, TranslationProvider } from "@rbx/core-scripts/react";
+import { createGameLauncher } from "@rbx/www-common/game-launch";
 import { translations } from "../../../component.json";
 import GameLauncher from "../gameLauncher";
 import { getDeferredDeeplinkQueryParams } from "../../ts/deferredDeeplinks/deferredDeeplinkUtilities";
 import DownloadDialog from "../../ts/DownloadDialog";
 import { resetClientStatus, getAuthTicket } from "../../ts/api";
+import { createSharedGameLauncherHost } from "../../ts/sharedGameLauncherHost";
 
 const ProtocolHandlerClientInterface = {
   isInstalling: false,
@@ -285,26 +287,26 @@ function openDesktopUniversalApp() {
   return ret;
 }
 
-function getPlaceLauncherUrl(requestType, otherParams) {
+function getPlaceLauncherBaseUrl() {
   let absoluteUrl = " ";
   if (Endpoints && Endpoints.Urls) {
-    absoluteUrl = `${Endpoints.getAbsoluteUrl("/Game/PlaceLauncher.ashx")}?`;
+    absoluteUrl = Endpoints.getAbsoluteUrl("/Game/PlaceLauncher.ashx");
   }
 
   // if endpoints are turned off, or if the absolute url resolver returns a relative path, fallback on the old method
   if (absoluteUrl[0] !== "h") {
-    const domainUrl = `http://${window.location.host}`;
-    const domainPath = "/Game/PlaceLauncher.ashx?";
-    absoluteUrl = domainUrl + domainPath;
+    absoluteUrl = `http://${window.location.host}/Game/PlaceLauncher.ashx`;
   }
-  absoluteUrl = absoluteUrl.replace("placelauncher", "PlaceLauncher");
+  return absoluteUrl.replace("placelauncher", "PlaceLauncher");
+}
 
+function getPlaceLauncherUrl(requestType, otherParams) {
   const args = {
     request: requestType,
     browserTrackerId: Cookies.getBrowserTrackerId(),
   };
   $.extend(args, otherParams);
-  return absoluteUrl + $.param(args);
+  return `${getPlaceLauncherBaseUrl()}?${$.param(args)}`;
 }
 
 function getStudioScriptUrl(scriptHandlerName, placeId, universeId, allowUpload) {
@@ -539,7 +541,7 @@ function startStudioDownload() {
   iframe.src = "/download/studio";
 }
 
-function showDialog(gameLaunchParams) {
+function showDialog(gameLaunchParams, launchGame = () => startGameFlow(gameLaunchParams)) {
   const container = getDialogContainer();
   const unmount = () => ReactDOM.unmountComponentAtNode(container);
   const studio = isStudioMode(gameLaunchParams?.launchMode);
@@ -576,13 +578,38 @@ function showDialog(gameLaunchParams) {
               await startDownload();
             }
           }}
-          launchGame={async () => await startGameFlow(gameLaunchParams)}
+          launchGame={async () => await launchGame()}
           unmount={unmount}
         />
       </QueryClientProvider>
     </TranslationProvider>,
     container,
   );
+}
+
+// Play joins via the launcher Next.js uses; events re-fire on GameLauncher for gameLaunchLogger.
+function enableSharedGameLauncher() {
+  const launcher = createGameLauncher(
+    createSharedGameLauncherHost({
+      state: ProtocolHandlerClientInterface,
+      getPlaceLauncherBaseUrl,
+      triggerEvent: (name, event) => $(GameLauncher).trigger(GameLauncher[`${name}Event`], event),
+      logToConsole: message => GameLauncher.gameLaunchLogger?.logToConsole?.(message),
+      showDialog: (gameLaunchParams, launch) =>
+        ProtocolHandlerClientInterface.showDialog(gameLaunchParams, launch),
+      closeDialog: () => $.modal.close(),
+      showLaunchFailureDialog,
+      openProtocolUrl: setLocationHref,
+    }),
+  );
+
+  Object.assign(ProtocolHandlerClientInterface, {
+    joinMultiplayerGame: launcher.joinMultiplayerGame,
+    followPlayerIntoGame: launcher.followPlayerIntoGame,
+    joinGameInstance: launcher.joinGameInstance,
+    joinPrivateGame: launcher.joinPrivateGame,
+    playTogetherGame: launcher.playTogetherGame,
+  });
 }
 
 async function manualDownload() {
@@ -625,6 +652,7 @@ Object.assign(ProtocolHandlerClientInterface, {
   showLaunchFailureDialog,
   cleanUpAndLogSuccess,
   startGameWithDeepLinkUrl,
+  enableSharedGameLauncher,
 });
 
 function getProtocolNameForEnvironment(protocolName) {
@@ -685,6 +713,10 @@ $(document).ready(() => {
   ProtocolHandlerClientInterface.isOmitPlayerChannelForWinAndMacEnabled = placeLauncherPanel.data(
     "is-omit-player-channel-for-win-and-mac-enabled",
   );
+
+  if (placeLauncherPanel.data("is-www-common-game-launcher-enabled") === true) {
+    enableSharedGameLauncher();
+  }
 });
 
 // todo: set Roblox.ProtocolHandlerClientInterface to be this.

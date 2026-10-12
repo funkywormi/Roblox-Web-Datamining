@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-utilities";
+import { ProgressCircle } from "@rbx/foundation-ui";
 
 import { useGetWeeklyScreentimeQuery } from "../../../../apis/parentalControlsApi";
+import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import { dateTimes } from "../../../constants/screentimeConstants";
 import screentimeUtils from "../../../utils/parentalControls/screentime/screentimeUtils";
 import { getScreentimeChartYAxis } from "../../../utils/parentalControls/screentime/screentimeChartAxis";
 
 export const ScreentimeChart = ({ userId }: { userId: number }): JSX.Element => {
-  const { data: screentimeData, isError } = useGetWeeklyScreentimeQuery(userId);
+  const { data: screentimeData, isError, isLoading } = useGetWeeklyScreentimeQuery(userId);
   const { translate } = useTranslation();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
@@ -37,6 +39,18 @@ export const ScreentimeChart = ({ userId }: { userId: number }): JSX.Element => 
 
   const getTooltipText = (hours: number): string =>
     screentimeUtils.getCompactFormattedTime(hours * dateTimes.minutesPerHour, translate);
+
+  if (isLoading) {
+    return (
+      <div className="flex w-full justify-center padding-y-large">
+        <ProgressCircle
+          ariaLabel={translate(commonTranslationConstants.loading)}
+          size="Small"
+          variant="Indeterminate"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="screentime-chart-container">

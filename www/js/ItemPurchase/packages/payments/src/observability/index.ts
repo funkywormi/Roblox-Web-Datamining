@@ -6,6 +6,8 @@ import { captureException } from "@rbx/payments/error";
 import { createWithApiMetricsV2 } from "@rbx/payments/withApiMetrics";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 
+export { apiErrorStatusCode } from "./apiErrorStatus";
+
 export const observabilityRegistry = {
   featureName: "PaymentsPackage",
   team: "Economy > Payments & Fraud",
@@ -39,6 +41,14 @@ export const observabilityRegistry = {
         "GetBonusSessionByCheckoutSessionId",
         "GetThumbnails",
         "HandleGameJoinEvent",
+      ],
+    },
+    CreditConversion: {
+      errors: [{ name: "Error_CreditConversion_ApiFailed", dimensions: ["call", "statusCode"] }],
+    },
+    CreditBalancePayment: {
+      errors: [
+        { name: "Error_CreditBalancePayment_UpdateAddressFailed", dimensions: ["statusCode"] },
       ],
     },
   },

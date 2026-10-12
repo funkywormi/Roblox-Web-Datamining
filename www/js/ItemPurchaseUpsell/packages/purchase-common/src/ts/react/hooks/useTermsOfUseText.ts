@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { RobloxIntlInstance } from '@rbx/legacy-webapp-types/Roblox';
-import { urlService } from '@rbx/core-scripts/legacy/core-utilities';
-import { type PurchaseTranslate } from '../itemPurchase/useTranslate';
+import type { RobloxIntlInstance } from '@rbx/legacy-webapp-types/Roblox';
+import { getUrlWithLocale } from '@rbx/core-scripts/util/url';
 import { translateHtml } from '@rbx/translation-utils';
 import type { TranslateHtmlTag } from '@rbx/translation-utils';
+import { type PurchaseTranslate } from '../itemPurchase/useTranslate';
 import {
   ROBLOX_TERMS_OF_USE_URL,
   ROBLOX_TERMS_OF_USE_ANCHOR_FOR_DMCCA,
@@ -30,7 +30,7 @@ export default function useTermsOfUseText(
   }, []);
 
   const url =
-    urlService.getUrlWithLocale(ROBLOX_TERMS_OF_USE_URL, intl.getRobloxLocale()) +
+    getUrlWithLocale(ROBLOX_TERMS_OF_USE_URL, intl.getRobloxLocale()) +
     (isDmccaLegalTextFeature ? ROBLOX_TERMS_OF_USE_ANCHOR_FOR_DMCCA : '');
 
   const tags: TranslateHtmlTag[] = [

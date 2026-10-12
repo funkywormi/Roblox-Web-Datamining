@@ -28,14 +28,14 @@ const COPIED_LABEL_DURATION_MS = 2000;
  * Centred pictogram, sized so the copy-link CTA stays above the fold on mobile. From medium up
  * there is enough room for the full 320px canvas.
  */
-const PICTOGRAM_CLASS = "margin-x-auto width-full max-width-[200px] medium:max-width-[320px]";
+const PICTOGRAM_CLASS = "margin-x-auto width-full max-width-[320px]";
 
 /**
  * The artwork stops 16.5px short of the canvas bottom, and the heading below carries its own
  * leading, so the column gap reads far wider here than between the sections underneath. Cancels
  * both rather than shrinking the column gap, which also spaces every other section.
  */
-const PICTOGRAM_GAP_CLASS = "margin-bottom-[-32px]";
+const PICTOGRAM_GAP_CLASS = "";
 
 const REFERRAL_TERMS_URL = "https://en.help.roblox.com/hc/en-us/articles/52737229124628";
 
@@ -310,7 +310,7 @@ const DashboardBody: FC<DashboardBodyProps> = ({
     <main className="bg-surface-0 flex flex-col">
       {/* 48px top offset matches PurchaseView, so switching views does not shift the content. */}
       <div
-        className={`${CONTENT_COLUMN_CLASS} gap-y-large medium:gap-y-xxlarge margin-top-[48px] padding-bottom-large flex flex-col`}
+        className={`${CONTENT_COLUMN_CLASS} gap-y-large medium:gap-y-xxlarge margin-top-large padding-bottom-medium flex flex-col`}
       >
         {/* Foundation ships one pictogram per theme rather than a themeable component. */}
         <img
@@ -336,7 +336,11 @@ const DashboardBody: FC<DashboardBodyProps> = ({
           >
             {title}
             <span className="gap-x-xsmall flex items-center">
-              <Icon name="icon-regular-robux" size="XLarge" />
+              <Icon
+                className="!size-500 medium:!size-700"
+                name="icon-regular-robux"
+                size="XLarge"
+              />
               {rewardAmount}
             </span>
           </h1>

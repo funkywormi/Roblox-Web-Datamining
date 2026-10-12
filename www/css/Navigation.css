@@ -1,56 +1,3 @@
-.install-instructions {
-    max-width: 1140px
-}
-
-.install-instructions h3 {
-    padding: 15px
-}
-
-.install-instructions .col-xs-6 {
-    padding: 30px
-}
-
-.install-instructions .col-xs-6 .section-content {
-    background: var(--color-surface-100);
-    border-radius: 20px;
-    min-height: 380px;
-    padding: 32px
-}
-
-.install-instructions ol {
-    text-align: left
-}
-
-.install-instructions ol>li {
-    padding-bottom: 30px;
-    list-style: decimal
-}
-
-.install-instructions .qr-tagline {
-    margin-left: 15%;
-    margin-right: 15%
-}
-
-.install-instructions .qr-container {
-    background-color: #fff;
-    border-radius: 20px;
-    width: 180px;
-    height: 180px;
-    margin: 30px;
-    display: inline-block
-}
-
-.install-instructions .qr-container .qr-code {
-    width: 90%;
-    width: calc(100% - 24px);
-    height: 90%;
-    background-image: url(https://images.rbxcdn.com/6674b8e189bf79c6.png);
-    background-repeat: no-repeat;
-    background-size: cover;
-    height: calc(100% - 24px);
-    margin: 12px
-}
-
 .game-update-card p,
 .game-update-card span {
     overflow-wrap: anywhere
@@ -3731,7 +3678,7 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     }
 }
 
-@media (max-width:543px) {
+@media (max-width:600px) {
     .rbx-header .rbx-navbar-header {
         margin: 0
     }
@@ -3813,6 +3760,12 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     width: auto
 }
 
+.rbx-header .rbx-navbar #navigation-robux-container:empty,
+.rbx-header .rbx-navbar #navigation-robux-mobile-container:empty {
+    -ms-flex-preferred-size: 64px;
+    flex-basis: 64px
+}
+
 .rbx-header .rbx-navbar li .robux-menu-btn {
     text-align: center
 }
@@ -3873,6 +3826,12 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
 .rbx-header .rbx-navbar-right-nav,
 .rbx-header .rbx-navbar-icon-group {
     margin: 4px auto
+}
+
+.rbx-header .rbx-navbar-right-nav>li.signup-button-container,
+.rbx-header .rbx-navbar-right-nav>li.login-action {
+    padding-top: 1px;
+    padding-bottom: 1px
 }
 
 .rbx-header .rbx-navbar-right-nav li,
@@ -4331,8 +4290,20 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
 
 .rbx-header .rbx-navbar-icon-group {
     float: right;
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    -ms-flex-align: start;
+    align-items: flex-start;
     margin: 0;
-    line-height: 28px
+    line-height: 28px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.nav-robux-icon:not(.nav-credit) #nav-robux-amount {
+    text-overflow: ellipsis;
+    max-width: 10ch;
+    overflow: hidden
 }
 
 .rbx-header .rbx-navbar-icon-group .navbar-stream {
@@ -4385,14 +4356,9 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
 }
 
 .rbx-header .rbx-navbar-icon-group .age-bracket-label .age-bracket-label-username {
+    max-width: 105px;
     margin-right: 6px;
-    display: inline-block
-}
-
-@media (max-width:1400px) {
-    .rbx-header .rbx-navbar-icon-group .age-bracket-label .age-bracket-label-username {
-        max-width: 105px
-    }
+    display: inline
 }
 
 @media (max-width:1199px) {
@@ -4407,7 +4373,7 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     }
 }
 
-@media (max-width:543px) {
+@media (max-width:600px) {
     .rbx-header .rbx-navbar-icon-group .age-bracket-label .age-bracket-label-username {
         display: none
     }
@@ -4433,7 +4399,7 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     }
 }
 
-@media (max-width:543px) {
+@media (max-width:600px) {
     .rbx-header .rbx-navbar-icon-group .age-bracket-label .age-bracket-label-plus-badge {
         display: none
     }
@@ -4663,7 +4629,7 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     }
 }
 
-@media (max-width:543px) {
+@media (max-width:600px) {
     .rbx-header {
         height: 74px
     }
@@ -4752,7 +4718,7 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     }
 }
 
-@media (max-width:543px) {
+@media (max-width:600px) {
 
     #right-navigation-header,
     .rbx-navbar-header.has-age-badge~#right-navigation-header {
@@ -4794,25 +4760,89 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     }
 }
 
+.rbx-header {
+    container-type: inline-size
+}
+
+.rbx-header .navbar-search .input-group-btn {
+    display: block
+}
+
+@media (max-width:600px) {
+    .rbx-header .rbx-navbar.hidden-md.hidden-lg {
+        margin-bottom: 0
+    }
+}
+
+.rbx-header #right-navigation-header {
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    column-gap: 8px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.rbx-header #right-navigation-header>.navbar-search {
+    -ms-flex: 0 auto;
+    flex: 0 auto;
+    min-width: 0
+}
+
+.rbx-header #right-navigation-header>.navbar-right {
+    -ms-flex: none;
+    flex: none;
+    margin-left: auto
+}
+
+@media (min-width:992px) {
+    .rbx-header .navbar-search.col-md-2 {
+        width: 16.6667cqw
+    }
+}
+
+@media (min-width:1200px) {
+    .rbx-header .navbar-search.col-lg-3 {
+        width: 25cqw
+    }
+}
+
+.logged-out .rbx-header .rbx-nav-collapse .menu-button {
+    display: none
+}
+
 .left-nav-new-width .rbx-header .navbar-search {
     width: 40%
 }
 
 @media (min-width:601px) {
     .left-nav-new-width .rbx-header .navbar-search {
-        width: 50%
+        width: 30%
+    }
+}
+
+@media (min-width:651px) {
+    .left-nav-new-width .rbx-header .navbar-search {
+        width: 40%
     }
 }
 
 @media (min-width:991px) {
     .left-nav-new-width .rbx-header .navbar-search {
-        width: 16.6667%
+        width: 15%
+    }
+}
+
+@media (min-width:992px) {
+    .left-nav-new-width .rbx-header .navbar-search {
+        width: 15cqw
     }
 }
 
 @media (min-width:1521px) {
     .left-nav-new-width .rbx-header .navbar-search {
-        width: 25%
+        width: 25cqw
     }
 }
 
@@ -4954,7 +4984,7 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     }
 }
 
-@media (max-width:543px) {
+@media (max-width:600px) {
     .rbx-left-col {
         top: 74px
     }
@@ -5204,13 +5234,13 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     box-shadow: 0 4px 16px rgba(0, 0, 0, .4)
 }
 
-@media (max-width:543px) {
+@media (max-width:600px) {
     .rbx-header.light-theme .navbar-search .new-dropdown-menu {
         width: 95vw
     }
 }
 
-@media (min-width:543px) and (max-width:991px) {
+@media (min-width:601px) and (max-width:991px) {
     .rbx-header.light-theme .navbar-search .new-dropdown-menu {
         width: 80vw
     }
@@ -5339,13 +5369,13 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     box-shadow: 0 4px 16px rgba(0, 0, 0, .4)
 }
 
-@media (max-width:543px) {
+@media (max-width:600px) {
     .light-theme .rbx-header .navbar-search .new-dropdown-menu {
         width: 95vw
     }
 }
 
-@media (min-width:543px) and (max-width:991px) {
+@media (min-width:601px) and (max-width:991px) {
     .light-theme .rbx-header .navbar-search .new-dropdown-menu {
         width: 80vw
     }
@@ -5474,13 +5504,13 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     box-shadow: 0 4px 16px rgba(0, 0, 0, .4)
 }
 
-@media (max-width:543px) {
+@media (max-width:600px) {
     .rbx-header.dark-theme .navbar-search .new-dropdown-menu {
         width: 95vw
     }
 }
 
-@media (min-width:543px) and (max-width:991px) {
+@media (min-width:601px) and (max-width:991px) {
     .rbx-header.dark-theme .navbar-search .new-dropdown-menu {
         width: 80vw
     }
@@ -5609,13 +5639,13 @@ a.btn-uiblox-common-common-notification-bell-md .btn-text {
     box-shadow: 0 4px 16px rgba(0, 0, 0, .4)
 }
 
-@media (max-width:543px) {
+@media (max-width:600px) {
     .dark-theme .rbx-header .navbar-search .new-dropdown-menu {
         width: 95vw
     }
 }
 
-@media (min-width:543px) and (max-width:991px) {
+@media (min-width:601px) and (max-width:991px) {
     .dark-theme .rbx-header .navbar-search .new-dropdown-menu {
         width: 80vw
     }

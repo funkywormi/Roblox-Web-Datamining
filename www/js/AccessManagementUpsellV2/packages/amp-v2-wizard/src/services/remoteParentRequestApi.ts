@@ -12,12 +12,14 @@ export type RemoteParentRequestApi = {
   sendToAllParents: (
     requestType: string,
     requestDetails?: Record<string, unknown>,
+    analyticsSessionId?: string,
   ) => Promise<ParentRequestResponse>;
   sendToNewParent: (
     email: string,
     requestType: string,
     requestDetails: Record<string, unknown> | undefined,
     auditData: string,
+    analyticsSessionId?: string,
   ) => Promise<ParentRequestResponse>;
 };
 
@@ -61,23 +63,23 @@ export const remoteParentRequestApi: RemoteParentRequestApi = {
     return response.data.parentEmails ?? [];
   },
 
-  async sendToAllParents(requestType, requestDetails) {
+  async sendToAllParents(requestType, requestDetails, analyticsSessionId) {
     const response = await post<ParentRequestResponse>(
       { url: sendToAllParentsUrl, withCredentials: true },
-      { requestType, requestDetails },
+      { requestType, requestDetails, ...(analyticsSessionId ? { analyticsSessionId } : {}) },
     );
     rememberCooldown(requestDetails, response.data.lockedUntil);
     return response.data;
   },
 
-  async sendToNewParent(email, requestType, requestDetails, auditData) {
+  async sendToNewParent(email, requestType, requestDetails, auditData, analyticsSessionId) {
     const response = await post<ParentRequestResponse>(
       {
         url: sendToNewParentUrl,
         withCredentials: true,
         headers: { "rbx-audit-data": auditData },
       },
-      { email, requestType, requestDetails },
+      { email, requestType, requestDetails, ...(analyticsSessionId ? { analyticsSessionId } : {}) },
     );
     rememberCooldown(requestDetails, response.data.lockedUntil);
     return response.data;

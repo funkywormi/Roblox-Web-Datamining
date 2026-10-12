@@ -56,7 +56,7 @@ const formatMessageTimestamp = (date: Date) => {
   }).format(date)} | ${formatTime(date)}`;
 };
 
-const toPresence = (presenceValue?: number | string): TPresenceType => {
+export const toPresence = (presenceValue?: number | string): TPresenceType => {
   if (presenceValue === 1 || presenceValue === "Online") {
     return "Online";
   }

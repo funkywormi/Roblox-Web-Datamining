@@ -1,10 +1,10 @@
 import React from 'react';
 import { getFreeTrialDisplay } from '@rbx/payments/services/subscriptions';
-import { type PurchaseTranslate } from '../../itemPurchase/useTranslate';
-import { DeviceMeta } from '@rbx/legacy-webapp-types/Roblox';
+import { getDeviceMeta } from '@rbx/core-scripts/meta/device';
 import { translateHtml } from '@rbx/translation-utils';
 import { SheetRoot, SheetContent, SheetTitle, SheetBody, Icon, Link } from '@rbx/foundation-ui';
 import type { SubscriptionProductInfo } from '@rbx/client-subscriptions-api/v2';
+import { type PurchaseTranslate } from '../../itemPurchase/useTranslate';
 
 import BillingInfoDisplay from './BillingInfoDisplay';
 import BenefitList from './BenefitList';
@@ -54,7 +54,7 @@ const RobloxSubscriptionSheet: React.FC<RobloxSubscriptionSheetProps> = ({
   redirectUrl,
   trackSubscriptionButtonClick
 }) => {
-  const deviceMeta = DeviceMeta();
+  const deviceMeta = getDeviceMeta();
   const { type, id } = subscriptionProductInfo.productKey;
   const { periodType, localizedPrice, eligibleOffers } = subscriptionProductInfo;
   const featureConfig =

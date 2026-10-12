@@ -6,10 +6,13 @@ import parentalControlsTranslationConstants from "../../../constants/contentCons
 import useOdpSettingsAndPages from "./hooks/useOdpSettingsAndPages";
 import useWrappedTranslation from "../../../hooks/useWrappedTranslation";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
+import { btnClickOdpManagedSetting } from "../../../services/eventServices/odpFamilyEventService";
+import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
 
 const OdpSettingManagement = (): JSX.Element | null => {
   const { pages, isLoading, isError } = useOdpSettingsAndPages();
   const { translate } = useWrappedTranslation();
+  const { data: parentInfo } = useGetParentInfoQuery();
 
   if (isLoading) {
     return <Loading />;
@@ -26,7 +29,11 @@ const OdpSettingManagement = (): JSX.Element | null => {
       <PreviewCard
         title={translate(parentalControlsTranslationConstants.settingManagement.heading)}
       >
-        <SettingsList subPages={pages} isMainMenu />
+        <SettingsList
+          subPages={pages}
+          isMainMenu
+          onSelectPage={pageName => btnClickOdpManagedSetting(pageName, parentInfo?.parents)}
+        />
       </PreviewCard>
     </React.Fragment>
   );

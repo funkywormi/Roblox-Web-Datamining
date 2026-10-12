@@ -16,7 +16,7 @@ const TopGamesPreview = ({ child }: { child: TChildInfo }): JSX.Element => {
   const history = useHistory();
   const childPages = useAppSelector(selectChildPagesForChildUserId(child.userId));
 
-  const { games, isLoading } = useTopWeeklyGames(child);
+  const { games, isLoading, isError } = useTopWeeklyGames(child);
 
   const isEmpty = !isLoading && games.length === 0;
 
@@ -32,6 +32,7 @@ const TopGamesPreview = ({ child }: { child: TChildInfo }): JSX.Element => {
         <TopGamesPreviewList
           games={games}
           isLoading={isLoading}
+          isError={isError}
           onSelectGame={game => {
             parentalControlsEventService.authButtonClickSettingsPControlsTopExperiencesExperienceDetail(
               child,

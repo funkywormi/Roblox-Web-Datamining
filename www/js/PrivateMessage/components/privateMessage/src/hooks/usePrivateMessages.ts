@@ -22,6 +22,13 @@ import {
   updateMessages,
 } from "../services/privateMessagesService";
 import { useMessageRoute } from "./useMessageRoute";
+import {
+  host,
+  trackCounter,
+  trackCriticalError,
+  trackError,
+  type ErrorName,
+} from "../observability";
 import type {
   FeedbackState,
   MessageItem,
@@ -59,6 +66,14 @@ const getErrorMessage = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
+// Records the failure without changing the caller's rejection behaviour.
+const trackAndRethrow =
+  (name: ErrorName) =>
+  (error: unknown): never => {
+    trackError(name, null, error);
+    throw error;
+  };
+
 export const usePrivateMessages = ({ translate }: { translate: (key: string) => string }) => {
   const { route, setRoute } = useMessageRoute();
   const [rules, setRules] = useState<PrivateMessagesRules>({});
@@ -72,6 +87,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
   const [sendReplyState, setSendReplyState] = useState<SendReplyState>(initialSendReplyState);
   const [newsCount, setNewsCount] = useState(0);
   const skipNextRouteLoad = useRef(false);
+  const initialTab = useRef(route.tab);
 
   const tabs = useMemo(() => {
     const baseTabs: { name: MessageTab; label: string; count?: number }[] = [
@@ -99,8 +115,15 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
         setSendReplyState(initialSendReplyState);
         setModuleState(MESSAGE_MODULE_STATE.detail);
         if (!message.isRead) {
-          await markMessagesRead([message.id], true);
-          dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
+          // A mark-read failure shouldn't discard the message that already loaded.
+          await markMessagesRead([message.id], true).then(
+            () => {
+              dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
+            },
+            (markReadError: unknown) => {
+              trackError("MarkReadFailed", null, markReadError);
+            },
+          );
         }
       } else {
         const result = await updateMessages(route.tab, route.page - 1);
@@ -119,6 +142,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
         dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
       }
     } catch (loadError) {
+      trackCriticalError("LoadFailed", { host, tab: route.tab }, loadError);
       setPage(null);
       setSelectedMessage(null);
       setModuleState(MESSAGE_MODULE_STATE.list);
@@ -129,9 +153,12 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
   }, [route, translate]);
 
   useEffect(() => {
+    trackCounter("PageView", { host, tab: initialTab.current });
+
     getPrivateMessagesRules()
       .then(setRules)
-      .catch(() => {
+      .catch((rulesError: unknown) => {
+        trackError("RulesLoadFailed", null, rulesError);
         setRules({});
       });
 
@@ -139,7 +166,8 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
       .then(metadata => {
         setNewsCount(metadata.numOfAnnouncements ?? 0);
       })
-      .catch(() => {
+      .catch((metadataError: unknown) => {
+        trackError("NewsCountLoadFailed", null, metadataError);
         setNewsCount(0);
       });
   }, []);
@@ -155,6 +183,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
   }, [loadCurrentRoute]);
 
   const openTab = (tab: MessageTab) => {
+    trackCounter("OpenTab", { tab });
     if (tab === MESSAGE_TABS.notifications) {
       sendEventWithTarget(
         NEWS_OPEN_CONTENT_EVENT,
@@ -171,6 +200,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
   };
 
   const openMessage = async (message: MessageItem, index: number) => {
+    trackCounter("OpenMessage");
     setSelectedMessage(prepareMessageForDetail(message));
     setSelectedMessageIds(new Set([message.id]));
     setSendReplyState(initialSendReplyState);
@@ -189,7 +219,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
               ),
             },
       );
-      await markMessagesRead([message.id], true);
+      await markMessagesRead([message.id], true).catch(trackAndRethrow("MarkReadFailed"));
       dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
     }
   };
@@ -241,7 +271,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
           },
     );
     setSelectedMessageIds(new Set());
-    await markMessagesRead(ids, markAsRead);
+    await markMessagesRead(ids, markAsRead).catch(trackAndRethrow("MarkReadFailed"));
     dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
   };
 
@@ -257,7 +287,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
     }
 
     const wasViewingDetail = moduleState === MESSAGE_MODULE_STATE.detail;
-    await setArchiveMessages(ids, archive);
+    await setArchiveMessages(ids, archive).catch(trackAndRethrow("ArchiveFailed"));
     setSelectedMessageIds(new Set());
     setSelectedMessage(null);
     setSendReplyState(initialSendReplyState);
