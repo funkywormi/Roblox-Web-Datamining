@@ -69,7 +69,7 @@ export const useDialogRestrictionModel = ({
   analyticsEventId,
   translationsReady,
 }: UseDialogRestrictionModelOptions): DialogRestrictionModel => {
-  const mountTimeMsRef = useRef<number>();
+  const mountTimeMsRef = useRef<number | undefined>(undefined);
 
   const sendAnalyticsEvent = useSendAnalyticsEvent();
   const { translate } = useUniversalFeatureRestrictionsConfig();

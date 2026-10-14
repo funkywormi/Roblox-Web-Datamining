@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { V2GroupsGroupIdUsersGetLimitEnum } from '@rbx/client-groups/v2';
 import {
   Button,
@@ -17,9 +17,12 @@ import type { GroupUserWithRoles } from '../../clients/groups';
 import useDebouncedFunction from '../../hooks/useDebouncedFunction';
 import { useSearchGroupMembers } from '../../queries/groupMembersQueries';
 import { useGetGroupMembersInfinite } from '../../queries/rolesQueries';
+import useEarlyTesterEligibility from '../hooks/useEarlyTesterEligibility';
+import IneligibleEarlyTesterBadge from './IneligibleEarlyTesterBadge';
 
 export type GroupMemberPickerListProps = {
   groupId: number;
+  universeId: string;
   existingMemberIds: ReadonlySet<number>;
   selection: ReadonlyMap<number, GroupUserWithRoles>;
   remainingCapacity: number;
@@ -37,6 +40,7 @@ const SEARCH_WITH_CHIPS_CLASS_NAME =
 
 const GroupMemberPickerList: FunctionComponent<GroupMemberPickerListProps> = ({
   groupId,
+  universeId,
   existingMemberIds,
   selection,
   remainingCapacity,
@@ -105,6 +109,22 @@ const GroupMemberPickerList: FunctionComponent<GroupMemberPickerListProps> = ({
   const isLoading = hasQuery ? isWaitingToSearch || isSearching : isLoadingDefault;
   const isAtLimit = selection.size >= remainingCapacity;
   const selectedMembers = useMemo(() => Array.from(selection.values()), [selection]);
+  const eligibility = useEarlyTesterEligibility(
+    universeId,
+    [...results, ...selectedMembers].flatMap((member) =>
+      member.user?.userId == null ? [] : [member.user.userId],
+    ),
+    true,
+  );
+
+  // A member picked before their check returned is dropped once it comes back ineligible.
+  useEffect(() => {
+    for (const [userId, member] of selection) {
+      if (eligibility.get(userId) === false) {
+        onToggleMember(member);
+      }
+    }
+  }, [eligibility, selection, onToggleMember]);
 
   const handleClear = useCallback(() => {
     if (hasQuery) {
@@ -194,6 +214,8 @@ const GroupMemberPickerList: FunctionComponent<GroupMemberPickerListProps> = ({
               if (userId == null) {
                 return null;
               }
+              const isIneligible = eligibility.get(userId) === false;
+              const isDisabled = isAtLimit || isIneligible;
               return (
                 <ListItem
                   key={userId}
@@ -203,7 +225,10 @@ const GroupMemberPickerList: FunctionComponent<GroupMemberPickerListProps> = ({
                   title={result.user?.displayName ?? result.user?.username}
                   metadata={result.user?.username ? `@${result.user.username}` : undefined}
                   leading={
-                    <span className='flex shrink-0 radius-circle size-800 clip'>
+                    <span
+                      className={`flex shrink-0 radius-circle size-800 clip${
+                        isIneligible ? ' [opacity:0.5]' : ''
+                      }`}>
                       <Thumbnail2d
                         targetId={userId}
                         type={ThumbnailTypes.avatarHeadshot}
@@ -213,8 +238,9 @@ const GroupMemberPickerList: FunctionComponent<GroupMemberPickerListProps> = ({
                       />
                     </span>
                   }
+                  trailing={isIneligible ? <IneligibleEarlyTesterBadge /> : undefined}
                   onSelect={
-                    isAtLimit
+                    isDisabled
                       ? undefined
                       : () => {
                           onToggleMember(result);
@@ -223,6 +249,10 @@ const GroupMemberPickerList: FunctionComponent<GroupMemberPickerListProps> = ({
                   }
                   className={`radius-medium padding-x-small [&_.padding-y-large]:padding-y-medium${
                     isAtLimit ? ' opacity-[0.5] cursor-not-allowed' : ''
+                  }${
+                    isIneligible
+                      ? ' [&_.text-body-small]:[opacity:0.5] [&_.text-title-medium]:[opacity:0.5]'
+                      : ''
                   }`}
                 />
               );

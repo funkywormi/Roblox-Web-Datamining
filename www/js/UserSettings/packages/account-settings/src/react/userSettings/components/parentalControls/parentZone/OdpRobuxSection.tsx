@@ -19,9 +19,6 @@ export const OdpRobuxSection = (): React.JSX.Element | null => {
       ? parentZonePages.robuxPage.path
       : undefined;
 
-  const canAddRobux =
-    odpChildContext?.canParentGiftChildRobux === true && robuxBalance !== undefined;
-
   if (robuxBalance === undefined && robuxSettingsPath === undefined) {
     return null;
   }
@@ -36,7 +33,7 @@ export const OdpRobuxSection = (): React.JSX.Element | null => {
         }
         linkPath={robuxSettingsPath}
         action={
-          canAddRobux && (
+          robuxBalance !== undefined && (
             <Button as="a" href={buyRobuxUrl} variant="Standard" size="Medium" className="shrink-0">
               {translate(parentalControlsTranslationConstants.giftRobux.addRobuxAction)}
             </Button>

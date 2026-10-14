@@ -1,10 +1,19 @@
 import { useTranslation } from "react-utilities";
 import { List, ListItem, ListItemChevronTrailingAccessory } from "@rbx/foundation-ui";
 import SettingsSection from "../../../../common/components/SettingsSection";
-import { useGetOdpChildContextQuery } from "../../../../apis/parentalControlsApi";
+import {
+  useGetOdpChildContextQuery,
+  useGetParentInfoQuery,
+} from "../../../../apis/parentalControlsApi";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import useManageParentPin, { ManageParentPinAction } from "../../../hooks/useManageParentPin";
 import useOdpAccountUpgrade, { OdpAccountUpgradeAction } from "../../../hooks/useOdpAccountUpgrade";
+import {
+  btnClickOdpAddEmail,
+  btnClickOdpRemovePin,
+  btnClickOdpUpdateEmail,
+  btnClickOdpUpdatePin,
+} from "../../../services/eventServices/odpParentSettingsEventService";
 
 // Page for on-device parents to manage their parent PIN and odp > remote account upgrade requests
 export const ManageOnDeviceParentPage = (): JSX.Element => {
@@ -12,6 +21,8 @@ export const ManageOnDeviceParentPage = (): JSX.Element => {
   const manageParentPin = useManageParentPin();
   const startAccountUpgrade = useOdpAccountUpgrade();
   const { data: odpChildContext } = useGetOdpChildContextQuery();
+  const { data: parentInfo } = useGetParentInfoQuery();
+  const parents = parentInfo?.parents;
 
   const { parentPinManagement, odpAccountUpgrade } = parentalControlsTranslationConstants;
 
@@ -28,7 +39,10 @@ export const ManageOnDeviceParentPage = (): JSX.Element => {
           divider="Full"
           title={translate(parentPinManagement.updatePinAction)}
           trailing={<ListItemChevronTrailingAccessory />}
-          onSelect={() => manageParentPin(ManageParentPinAction.Update)}
+          onSelect={() => {
+            btnClickOdpUpdatePin(parents);
+            manageParentPin(ManageParentPinAction.Update);
+          }}
         />
         <ListItem
           isContained={false}
@@ -36,7 +50,10 @@ export const ManageOnDeviceParentPage = (): JSX.Element => {
           divider={canUpgradeAccount || canUpdateEmailOnUpgradeRequest ? "Full" : "None"}
           title={translate(parentPinManagement.removePinAction)}
           trailing={<ListItemChevronTrailingAccessory />}
-          onSelect={() => manageParentPin(ManageParentPinAction.Delete)}
+          onSelect={() => {
+            btnClickOdpRemovePin(parents);
+            manageParentPin(ManageParentPinAction.Delete);
+          }}
         />
         {canUpgradeAccount && (
           <ListItem
@@ -46,7 +63,10 @@ export const ManageOnDeviceParentPage = (): JSX.Element => {
             title={translate(odpAccountUpgrade.createAccountAction)}
             description={translate(odpAccountUpgrade.createAccountDescription)}
             trailing={<ListItemChevronTrailingAccessory />}
-            onSelect={() => startAccountUpgrade(OdpAccountUpgradeAction.Create)}
+            onSelect={() => {
+              btnClickOdpAddEmail(parents);
+              startAccountUpgrade(OdpAccountUpgradeAction.Create);
+            }}
           />
         )}
         {canUpdateEmailOnUpgradeRequest && (
@@ -57,7 +77,10 @@ export const ManageOnDeviceParentPage = (): JSX.Element => {
             title={translate(odpAccountUpgrade.updateEmailAction)}
             metadata={odpChildContext?.pendingAccountUpgradeEmail}
             trailing={<ListItemChevronTrailingAccessory />}
-            onSelect={() => startAccountUpgrade(OdpAccountUpgradeAction.Update)}
+            onSelect={() => {
+              btnClickOdpUpdateEmail(parents);
+              startAccountUpgrade(OdpAccountUpgradeAction.Update);
+            }}
           />
         )}
       </List>

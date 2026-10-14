@@ -5,7 +5,7 @@ import type {
 import { LikelyCollaboratorApi } from '@rbx/client-likely-collaborator-service/v1';
 import { createClientConfiguration } from './utils';
 
-export class LikelyCollaboratorsApiClient {
+class LikelyCollaboratorsApiClient {
   public likelyCollaboratorApi: LikelyCollaboratorApi;
 
   constructor() {

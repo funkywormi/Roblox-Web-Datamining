@@ -1,7 +1,12 @@
-import environmentUrls from "@rbx/environment-urls";
 import * as http from "@rbx/core-scripts/http";
+import environmentUrls from "@rbx/environment-urls";
+import { getAuthTicket as getAuthTicketNextJs } from "./getAuthTicket.nextjs";
 
-export const getAuthTicket = async () => {
+// Legacy Axios transport for .NET pages. The core-scripts http client attaches the bound-auth-token
+// per request (see core-scripts/src/http/service.ts), which the authentication-ticket endpoint
+// requires. On Next.js the sibling getAuthTicket.nextjs.ts (core-lib fetch) is selected instead,
+// where the bound-auth-token is attached by the globally-registered www-common interceptor.
+const getAuthTicketLegacy = async (): Promise<string | undefined> => {
   let clientAssertion: unknown;
   try {
     ({ data: clientAssertion } = await http.get({
@@ -33,3 +38,10 @@ export const getAuthTicket = async () => {
     return undefined;
   }
 };
+
+// NEXT_PUBLIC_IS_NEXTJS is inlined at build time by Next.js; it is undefined in the Rspack SCC build
+// for .NET, so the Axios transport is used there. The nextjs sibling is statically imported so the
+// .NET build resolves it — it never *executes* on the .NET path.
+const isNextJs = process.env.NEXT_PUBLIC_IS_NEXTJS === "true";
+
+export const getAuthTicket = isNextJs ? getAuthTicketNextJs : getAuthTicketLegacy;

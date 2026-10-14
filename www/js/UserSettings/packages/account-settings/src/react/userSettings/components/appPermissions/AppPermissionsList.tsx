@@ -1,5 +1,6 @@
 import React from "react";
 import { Loading } from "react-style-guide";
+import { List } from "@rbx/foundation-ui";
 import { useTranslation } from "react-utilities";
 import { TAuthorization } from "../../../../types/appPermissionsTypes";
 import appPermissionsTranslationConstants from "../../constants/contentConstants/appPermissionsTranslationConstants";
@@ -21,7 +22,7 @@ export const AppPermissionsList = ({
 
   if (!authorizations) {
     return (
-      <p className="app-table-empty section-content">
+      <p className="stroke-standard stroke-default radius-large padding-large margin-[0] text-body-medium content-default">
         {translate(appPermissionsTranslationConstants.errorLoadingAuthorizations)}
       </p>
     );
@@ -29,25 +30,22 @@ export const AppPermissionsList = ({
 
   if (authorizations.length === 0) {
     return (
-      <p className="app-table-empty section-content">
+      <p className="stroke-standard stroke-default radius-large padding-large margin-[0] text-body-medium content-default">
         {translate(appPermissionsTranslationConstants.noAuthorizations)}
       </p>
     );
   }
 
   return (
-    <div className="app-authorization-table">
-      <div className="section-content app-authorization-table-body">
-        {authorizations &&
-          authorizations.map(authorization => (
-            <AuthorizationRow
-              key={authorization.authorizationId}
-              authorization={authorization}
-              scopesConfiguration={scopesConfiguration}
-            />
-          ))}
-      </div>
-    </div>
+    <List className="stroke-standard stroke-default radius-large clip [&>li+li]:[border-top:var(--stroke-standard)_solid_var(--color-stroke-default)]">
+      {authorizations.map(authorization => (
+        <AuthorizationRow
+          key={authorization.authorizationId}
+          authorization={authorization}
+          scopesConfiguration={scopesConfiguration}
+        />
+      ))}
+    </List>
   );
 };
 

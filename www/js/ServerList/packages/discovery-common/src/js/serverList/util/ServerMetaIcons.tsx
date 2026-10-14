@@ -5,8 +5,8 @@ import {
   FRIEND_COUNT_BADGE,
   LANGUAGE_MATCH_BADGE,
   PING_SIGNAL_BADGES,
-  isPingSignalLevel,
   type PingSignalLevel,
+  type ServerMetaIconId,
 } from "./serverCardMeta";
 
 type TranslateFunction = (resource: string, params?: Record<string, unknown>) => string;
@@ -32,51 +32,55 @@ function ServerMetaBadge({ badge, id, translate, label }: ServerMetaBadgeProps) 
 }
 
 type ServerMetaIconsProps = {
-  pingSignalLevel: PingSignalLevel | null;
+  idPrefix: string;
+  icons: readonly ServerMetaIconId[];
   languageMatchCount: number | null;
   friendCount: number | null;
-  showPing: boolean;
-  showLanguage: boolean;
-  showFriends: boolean;
   translate: TranslateFunction;
 };
 
 function ServerMetaIcons({
-  pingSignalLevel,
+  idPrefix,
+  icons,
   languageMatchCount,
   friendCount,
-  showPing,
-  showLanguage,
-  showFriends,
   translate,
 }: ServerMetaIconsProps) {
-  return (
-    <div className="server-meta-icons">
-      {showPing && isPingSignalLevel(pingSignalLevel) && (
+  const renderBadge = (icon: ServerMetaIconId) => {
+    if (icon.startsWith("Ping.")) {
+      const level = icon.split(".")[1] as PingSignalLevel;
+      return (
         <ServerMetaBadge
-          badge={PING_SIGNAL_BADGES[pingSignalLevel]}
-          id="server-ping-tooltip"
+          key={icon}
+          badge={PING_SIGNAL_BADGES[level]}
+          id={`${idPrefix}-ping-tooltip`}
           translate={translate}
         />
-      )}
-      {showLanguage && languageMatchCount != null && languageMatchCount > 0 && (
+      );
+    }
+    if (icon === "LanguageMatch") {
+      return (
         <ServerMetaBadge
+          key={icon}
           badge={LANGUAGE_MATCH_BADGE}
-          id="server-language-tooltip"
+          id={`${idPrefix}-language-tooltip`}
           translate={translate}
           label={String(languageMatchCount)}
         />
-      )}
-      {showFriends && friendCount != null && friendCount > 0 && (
-        <ServerMetaBadge
-          badge={FRIEND_COUNT_BADGE}
-          id="server-friends-tooltip"
-          translate={translate}
-          label={String(friendCount)}
-        />
-      )}
-    </div>
-  );
+      );
+    }
+    return (
+      <ServerMetaBadge
+        key={icon}
+        badge={FRIEND_COUNT_BADGE}
+        id={`${idPrefix}-friends-tooltip`}
+        translate={translate}
+        label={String(friendCount)}
+      />
+    );
+  };
+
+  return <div className="server-meta-icons">{icons.map(renderBadge)}</div>;
 }
 
 export default ServerMetaIcons;

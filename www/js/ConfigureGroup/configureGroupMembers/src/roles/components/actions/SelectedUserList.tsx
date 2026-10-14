@@ -51,5 +51,3 @@ export const SelectedUserList: FunctionComponent<SelectedUserListProps> = ({
     </Grid>
   );
 };
-
-export default SelectedUserList;

@@ -176,9 +176,9 @@
     --config-text-inverse-scale: calc(1/var(--config-text-nominal-scale));
     --config-text-nominal-scale: var(--config-theme-text-nominal-scale);
     --config-text-scale: 1;
-    --config-uiinterval: 4;
-    --config-uiscale: 1px;
-    --config-uistroke-base: 1;
+    --config-uiinterval: 4px;
+    --config-uiscale: 1;
+    --config-uistroke-base: 1px;
     --ease-expressive-in: cubic-bezier(.25, 0, .5, -1);
     --ease-expressive-out: cubic-bezier(.25, 1.5, .5, 1);
     --ease-linear: cubic-bezier(0, 0, 1, 1);
@@ -264,10 +264,7 @@
     --padding-xsmall: var(--size-100);
     --padding-xxlarge: var(--size-600);
     --padding-xxsmall: var(--size-50);
-    --platform-base: var(--config-uiinterval);
-    --platform-rem: var(--size-200);
-    --platform-scale: var(--config-uiscale);
-    --radius-circle: calc(var(--config-uiscale)*9999);
+    --radius-circle: calc(var(--config-uiscale)*9999px);
     --radius-large: var(--size-400);
     --radius-medium: var(--size-200);
     --radius-none: var(--size-0);

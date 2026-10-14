@@ -6,6 +6,7 @@ import { parseGameLinkSegments } from "../../utils/gameLinkCard";
 import type { TChatConversation, TChatMessage } from "../../types/chat";
 import AvatarHeadshot from "../AvatarHeadshot";
 import GameCard from "./GameCard/GameCard";
+import HiddenMessage from "./HiddenMessage";
 
 type TMessageBubbleProps = {
   conversation: TChatConversation;
@@ -98,6 +99,7 @@ const MessageBubble = ({
           message.isClusterMaster &&
           isFirstInGroup &&
           sender && <span className="text-caption-small content-muted">{sender.displayName}</span>}
+        {message.isHidden && <HiddenMessage />}
         {hasBubbleContent && (
           <div className="flex items-center gap-xsmall">
             {showResend && (

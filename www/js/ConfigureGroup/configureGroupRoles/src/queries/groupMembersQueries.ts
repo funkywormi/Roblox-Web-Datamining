@@ -7,6 +7,7 @@ import groupsClient from '../clients/groups';
 
 const ORGANIZATIONS_GROUPS_KEY_PREFIX = 'organizationsApi_groups_';
 const GROUPS_MEMBERS_KEY_PREFIX = 'groupsApi_members_';
+const GROUPS_KEY_PREFIX = 'groupsApi_groups_';
 
 type TGroupInfo = {
   ownerId?: number;
@@ -30,6 +31,19 @@ export const useGetGroupInfo = (groupId?: string) => {
         memberCount: response.memberCount,
       };
       return groupInfo;
+    },
+  });
+};
+
+export const useGetGroupCreated = (groupId?: number) => {
+  return useQuery({
+    enabled: !!groupId,
+    queryKey: [`${GROUPS_KEY_PREFIX}created`, groupId],
+    queryFn: async () => {
+      if (!groupId) {
+        return null;
+      }
+      return groupsClient.getGroupCreated(groupId);
     },
   });
 };

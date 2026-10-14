@@ -55,7 +55,7 @@ const ConfirmNegativeAction = ({
           onClick={onClose}
         />
       </div>
-      <div className="flex min-height-0 grow-1 flex-col items-center justify-center gap-medium padding-large text-center">
+      <div className="flex min-height-0 grow-1 flex-col items-center justify-center gap-medium padding-large text-align-x-center">
         <div className="flex flex-col gap-xsmall">
           <span className="text-body-medium content-emphasis">{question}</span>
           {detail !== undefined && (

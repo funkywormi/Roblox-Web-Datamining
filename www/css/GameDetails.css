@@ -41,12 +41,10 @@
 }
 
 .install-instructions .qr-container .qr-code {
-    width: 90%;
-    width: calc(100% - 24px);
-    height: 90%;
     background-image: url(https://images.rbxcdn.com/6674b8e189bf79c6.png);
     background-repeat: no-repeat;
     background-size: cover;
+    width: calc(100% - 24px);
     height: calc(100% - 24px);
     margin: 12px
 }
@@ -5370,7 +5368,8 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     padding-bottom: 0
 }
 
-#game-details-play-button-container .stacked-play-buttons-container .demo-play-button {
+#game-details-play-button-container .stacked-play-buttons-container .demo-play-button,
+#game-details-play-button-container .stacked-play-buttons-container .play-on-web-button {
     margin-top: 8px
 }
 
@@ -5608,6 +5607,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     color: var(--inverse-surface-0)
 }
 
+.content-\[var\(--light-mode-content-emphasis\)\] {
+    color: var(--light-mode-content-emphasis)
+}
+
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-alert)r g b/.2)
 }
@@ -5618,6 +5621,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 
 .bg-\[rgb\(from_var\(--color-system-warning\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-warning)r g b/.2)
+}
+
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
 }
 
 .bg-\[white\] {
@@ -5708,12 +5715,82 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M24.5607 9.56066C25.1464 8.97487 25.1464 8.02513 24.5607 7.43934C23.9749 6.85355 23.0251 6.85355 22.4393 7.43934L16 13.8787L9.56066 7.43934C8.97487 6.85355 8.02513 6.85355 7.43934 7.43934C6.85355 8.02513 6.85355 8.97487 7.43934 9.56066L13.8787 16L7.43934 22.4393C6.85355 23.0251 6.85355 23.9749 7.43934 24.5607C8.02513 25.1464 8.97487 25.1464 9.56066 24.5607L16 18.1213L22.4393 24.5607C23.0251 25.1464 23.9749 25.1464 24.5607 24.5607C25.1464 23.9749 25.1464 23.0251 24.5607 22.4393L18.1213 16L24.5607 9.56066Z' fill='black'/%3E%3C/svg%3E")
 }
 
+.\[-ms-overflow-style\:none\] {
+    -ms-overflow-style: none
+}
+
+.\[-webkit-overflow-scrolling\:touch\] {
+    -webkit-overflow-scrolling: touch
+}
+
+.\[align-items\:center\] {
+    -ms-flex-align: center;
+    align-items: center
+}
+
+.\[background-color\:var\(--sdui-cc-arrow-bg\)\] {
+    background-color: var(--sdui-cc-arrow-bg)
+}
+
+.\[border-radius\:50\%\] {
+    border-radius: 50%
+}
+
+.\[box-shadow\:0px_0px_4px_0px_var\(--sdui-cc-arrow-shadow\)\] {
+    box-shadow: 0px 0px 4px 0px var(--sdui-cc-arrow-shadow)
+}
+
+.\[cursor\:pointer\] {
+    cursor: pointer
+}
+
+.\[height\:40px\] {
+    height: 40px
+}
+
+.\[justify-content\:center\] {
+    -ms-flex-pack: center;
+    justify-content: center
+}
+
+.\[left\:var\(--sdui-cc-arrow-offset\)\] {
+    left: var(--sdui-cc-arrow-offset)
+}
+
+.\[opacity\:0\.9\] {
+    opacity: .9
+}
+
+.\[overflow-x\:hidden\] {
+    overflow-x: hidden
+}
+
 .\[resize\:vertical\] {
     resize: vertical
 }
 
+.\[right\:var\(--sdui-cc-arrow-offset\)\] {
+    right: var(--sdui-cc-arrow-offset)
+}
+
+.\[scrollbar-width\:none\] {
+    scrollbar-width: none
+}
+
 .\[text-align\:inherit\] {
     text-align: inherit
+}
+
+.\[top\:calc\(50\%-20px\)\] {
+    top: calc(50% - 20px)
+}
+
+.\[width\:40px\] {
+    width: 40px
+}
+
+.\[z-index\:5\] {
+    z-index: 5
 }
 
 .placeholder\:text-body-large::-webkit-input-placeholder {
@@ -5794,6 +5871,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 
 .hover\:\[opacity\:0\.8\]:hover {
     opacity: .8
+}
+
+.hover\:\[opacity\:1\]:hover {
+    opacity: 1
 }
 
 .focus-visible\:outline-focus:focus-visible {
@@ -5917,6 +5998,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     }
 }
 
+.\[\&\:\:-webkit-scrollbar\]\:hidden::-webkit-scrollbar {
+    display: none
+}
+
 .\[\&\>\*\]\:\[scroll-margin\:var\(--padding-small\)\]>* {
     scroll-margin: var(--padding-small)
 }
@@ -5934,4 +6019,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 
 .\[\&_a\]\:\[font-weight\:700\] a {
     font-weight: 700
+}
+
+@media (pointer:coarse) and (not (any-pointer:fine)) {
+    .\[\@media\(pointer\:coarse\)_and_\(not_\(any-pointer\:fine\)\)\]\:\[overflow-x\:auto\] {
+        overflow-x: auto
+    }
 }

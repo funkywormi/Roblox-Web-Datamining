@@ -19,7 +19,11 @@ export type ManageEarlyTestersPanelProps = {
   canChangeRole?: boolean;
   canEditMembers?: boolean;
   readOnlyTooltip?: string;
+  /** Fails open: only members mapped to `false` are shown as ineligible. */
+  eligibility?: ReadonlyMap<number, boolean>;
 };
+
+const EMPTY_ELIGIBILITY: ReadonlyMap<number, boolean> = new Map();
 
 const ManageEarlyTestersPanel: FunctionComponent<ManageEarlyTestersPanelProps> = ({
   role,
@@ -31,6 +35,7 @@ const ManageEarlyTestersPanel: FunctionComponent<ManageEarlyTestersPanelProps> =
   canChangeRole = true,
   canEditMembers = true,
   readOnlyTooltip = '',
+  eligibility = EMPTY_ELIGIBILITY,
 }) => {
   const { translate } = useTranslation();
   const isAtCapacity = members.length >= maxMembers;
@@ -102,6 +107,9 @@ const ManageEarlyTestersPanel: FunctionComponent<ManageEarlyTestersPanelProps> =
             onRemove={onRemoveMember}
             canRemove={canEditMembers}
             readOnlyTooltip={readOnlyTooltip}
+            isIneligible={
+              member.user?.userId != null && eligibility.get(member.user.userId) === false
+            }
           />
         ))}
       </List>

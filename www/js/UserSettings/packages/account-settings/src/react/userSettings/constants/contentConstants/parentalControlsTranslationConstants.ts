@@ -355,6 +355,7 @@ export default {
   parentWelcome: {
     heading: "Heading.ManageYourChild",
     description: "Description.ManageYourChild",
+    descriptionWithPin: "Description.ManageYourChildWithPin",
   },
   teenWelcome: {
     heading: "Heading.TeenWelcome",

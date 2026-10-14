@@ -16,6 +16,9 @@ import { groupsConfig } from '../../translation.config';
 import { MessageContent } from '../../types';
 import { parseDocument } from '../../utils/messageContentUtils';
 import useViewportSize from '../../hooks/useViewportSize';
+import webLinkRenderer from './WebLink';
+
+const WEB_LINK_RENDERERS = [webLinkRenderer];
 
 export enum HotKeyType {
   Submit = 'HotKey:Submit'
@@ -57,6 +60,8 @@ export type EditableContentFieldInputProps = {
    * control row (e.g. an attachment chip). Rich-text mode only.
    */
   footer?: React.ReactNode;
+  /** When false, a URL the editor turns into a link stays plain text. Rich-text mode only. */
+  isLinkAuthoringEnabled?: boolean;
 };
 
 export type EditableContentFieldHandle = {
@@ -91,7 +96,8 @@ const EditableContentFieldInputInner = forwardRef<
       minHeight,
       editorRef,
       leadingControl,
-      footer
+      footer,
+      isLinkAuthoringEnabled = false
     } = props;
 
     const [slateValue, setSlateValue] = useState<Document | undefined>(undefined);
@@ -207,6 +213,8 @@ const EditableContentFieldInputInner = forwardRef<
             leadingControls={leadingControl}
             footer={footer}
             translate={translate}
+            renderers={WEB_LINK_RENDERERS}
+            isLinkAuthoringEnabled={isLinkAuthoringEnabled}
           />
         ) : (
           <textarea

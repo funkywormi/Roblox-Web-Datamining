@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, ReactNode, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import CategoryPill from '../components/CategoryPill';
 import CategoryPillSkeleton from '../components/skeletons/CategoryPillSkeleton';
@@ -12,13 +12,15 @@ export type CategoriesContainerProps = {
   onSetActiveCategory: (newCategoryId: string, newCategoryName: string) => void;
   locked?: boolean;
   categoryFilter?: (category: ForumCategory) => boolean;
+  leadingContent?: ReactNode;
 };
 
 const CategoriesList: FC<CategoriesContainerProps> = ({
   onSetActiveCategory,
   locked,
   activeCategoryId,
-  categoryFilter
+  categoryFilter,
+  leadingContent
 }) => {
   const stateCategoryId = useForumStore.use.categoryShortId();
   const categories = useForumStore.use.categories();
@@ -57,7 +59,8 @@ const CategoriesList: FC<CategoriesContainerProps> = ({
 
   if (!categoriesLoaded) {
     return (
-      <div className='group-forums-categories-list group-posts-destination-list list-vignette'>
+      <div className='group-forums-categories-list list-vignette'>
+        {leadingContent}
         <CategoryPillSkeleton size={StyleSize.Small} />
         <CategoryPillSkeleton size={StyleSize.Large} />
         <CategoryPillSkeleton size={StyleSize.Medium} />
@@ -69,10 +72,11 @@ const CategoriesList: FC<CategoriesContainerProps> = ({
 
   return (
     <div
-      className={classNames('group-forums-categories-list group-posts-destination-list', {
+      className={classNames('group-forums-categories-list', {
         'group-forums-categories-list-locked': locked
       })}
       ref={listRef}>
+      {leadingContent}
       {categories.map(category => {
         return (
           (!categoryFilter || categoryFilter(category)) && (

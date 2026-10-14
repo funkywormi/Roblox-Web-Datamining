@@ -8,10 +8,12 @@ import {
   useSettingsInfoModal,
   IModalService,
 } from "@rbx/user-settings";
+import usePasswordPolicyMsgShownEvent from "@rbx/authentication-common/hooks/usePasswordPolicyMsgShownEvent";
 import { TUpdatePasswordBody } from "../../../../types/accountInformationTypes";
 import accountInfoTranslationConstants from "../../../userSettings/constants/contentConstants/accountInfoTranslationConstants";
 import commonTranslationConstants from "../../../userSettings/constants/contentConstants/commonTranslationConstants";
 import { useChangePasswordMutation } from "../../../apis/authApi";
+import accountInfoEventService from "../../../userSettings/services/eventServices/accountInfoEventService";
 
 const { generateSecureAuthIntentV2 } = cryptoUtil;
 
@@ -22,7 +24,9 @@ const useSetPasswordModal = (): [React.JSX.Element, IModalService] => {
   const [oldPassword, setOldPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>();
+  const [errorMessageKey, setErrorMessageKey] = useState<string>();
+  const errorMessage = errorMessageKey ? translate(errorMessageKey) : errorMessageKey;
+  usePasswordPolicyMsgShownEvent(errorMessageKey, accountInfoEventService.passwordPolicyMsgShown);
 
   const actionDisabled =
     !oldPassword || !newPassword || !confirmNewPassword || newPassword !== confirmNewPassword;
@@ -39,7 +43,7 @@ const useSetPasswordModal = (): [React.JSX.Element, IModalService] => {
     setOldPassword("");
     setNewPassword("");
     setConfirmNewPassword("");
-    setErrorMessage("");
+    setErrorMessageKey("");
   }, []);
 
   const actionHandler = async (): Promise<void> => {
@@ -57,7 +61,7 @@ const useSetPasswordModal = (): [React.JSX.Element, IModalService] => {
     } catch (error) {
       // Ignore challenge abandons for errors.
       if (error !== ChallengeAbandonedError) {
-        setErrorMessage(translate(error as string));
+        setErrorMessageKey(error as string);
       }
       return;
     }
@@ -76,9 +80,7 @@ const useSetPasswordModal = (): [React.JSX.Element, IModalService] => {
 
   useEffect(() => {
     if (newPassword && confirmNewPassword && newPassword !== confirmNewPassword) {
-      setErrorMessage(
-        translate(accountInfoTranslationConstants.changePassword.changePasswordNoMatch),
-      );
+      setErrorMessageKey(accountInfoTranslationConstants.changePassword.changePasswordNoMatch);
     }
   }, [newPassword, confirmNewPassword]);
 
@@ -88,7 +90,7 @@ const useSetPasswordModal = (): [React.JSX.Element, IModalService] => {
         type="password"
         value={oldPassword}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          setErrorMessage("");
+          setErrorMessageKey("");
           setOldPassword(event.target.value);
         }}
         onKeyDown={handleKeyDown}
@@ -101,7 +103,7 @@ const useSetPasswordModal = (): [React.JSX.Element, IModalService] => {
         type="password"
         value={newPassword}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          setErrorMessage("");
+          setErrorMessageKey("");
           setNewPassword(event.target.value);
         }}
         onKeyDown={handleKeyDown}
@@ -114,7 +116,7 @@ const useSetPasswordModal = (): [React.JSX.Element, IModalService] => {
         type="password"
         value={confirmNewPassword}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          setErrorMessage("");
+          setErrorMessageKey("");
           setConfirmNewPassword(event.target.value);
         }}
         onKeyDown={handleKeyDown}

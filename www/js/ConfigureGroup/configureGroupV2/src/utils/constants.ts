@@ -153,10 +153,6 @@ export const DefaultMemberRoleIdNumber = 12884901889;
 // Guest role can only be identified by rank of 0. Guest role will be deprecated in the future.
 export const GuestRoleRank = 0;
 
-export const DefaultMemberIdPlaceholder = '-1';
-
-export const noResultsIconPath = `${process.env.assetPathPrefix}/group/no_results.svg`;
-
 export const MaximumRoles = 100;
 
 export const DefaultRoleNameMaxLength = 100;
@@ -170,14 +166,15 @@ export const RoleVisibility = {
   Private: 'private',
 } as const;
 
-export const InviteQueryKey = 'invitationGroupId';
-
 export enum GroupMembersMenuState {
   Members = 'Members',
   Invited = 'Invited',
 }
 
 export const MAX_EARLY_TESTERS = 10;
+
+/** Display only; core-content's AMP check enforces the requirement. */
+export const EARLY_TESTER_MIN_OWNER_AGE = 9;
 
 export const EARLY_TESTER_PERMISSION_ID = 'Universe.EarlyTester';
 

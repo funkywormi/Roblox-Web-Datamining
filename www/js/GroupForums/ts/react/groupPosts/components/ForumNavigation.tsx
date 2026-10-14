@@ -4,9 +4,12 @@ import type { CategoriesNavigationProps } from '../../groupForums/containers/Cat
 import PostsDestinationNavigation from './PostsDestinationNavigation';
 
 const ForumNavigation = ({ onSetActiveCategory }: CategoriesNavigationProps): JSX.Element => (
-  <PostsDestinationNavigation isAnnouncementsArchiveEnabled={false}>
-    <CategoriesList onSetActiveCategory={onSetActiveCategory} />
-  </PostsDestinationNavigation>
+  <CategoriesList
+    leadingContent={
+      <PostsDestinationNavigation isAnnouncementsArchiveEnabled={false} showDivider />
+    }
+    onSetActiveCategory={onSetActiveCategory}
+  />
 );
 
 export default ForumNavigation;

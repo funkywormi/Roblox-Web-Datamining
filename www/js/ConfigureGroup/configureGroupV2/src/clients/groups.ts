@@ -11,7 +11,6 @@ import type {
   RobloxWebWebAPIModelsApiPageResponseRobloxGroupsApiUserGroupRoleResponse,
   V1GroupsGroupIdUsersGetRequest,
   RobloxGroupsApiGroupMigrationStatusResponse,
-  RobloxGroupsApiGroupMigrationBreakingChangesResponse,
   RobloxGroupsApiPropertiesCommunityProductFeatures,
 } from '@rbx/client-groups/v1';
 import {
@@ -35,6 +34,7 @@ import type {
   RobloxGroupsApiModelsResponseApiSearchPageResponseRobloxGroupsApiUserGroupRolesResponse,
 } from '@rbx/client-groups/v2';
 import {
+  GroupsV2Api,
   MembershipV2Api,
   PermissionsV2Api,
   RolesetsV2Api,
@@ -47,6 +47,7 @@ import { createClientConfiguration } from './utils';
 const configuration = createClientConfiguration('groups', 'bedev1');
 
 const groupApi = new GroupsApi(configuration);
+const groupsV2Api = new GroupsV2Api(configuration);
 const membershipApi = new MembershipApi(configuration);
 const membershipV2Api = new MembershipV2Api(configuration);
 const rolesetsApi = new RoleSetsApi(configuration);
@@ -75,14 +76,13 @@ export type GroupRolePermissions = Record<string, ResolvedPermissions>;
 export type GroupRolePermissionsPage =
   RobloxWebWebAPIModelsApiPageResponseRobloxGroupsApiModelsResponseResolvedPermissionsForEntityPageItemResponse;
 export type GroupMigrationStatusResponse = RobloxGroupsApiGroupMigrationStatusResponse;
-export type GroupMigrationBreakingChangesResponse =
-  RobloxGroupsApiGroupMigrationBreakingChangesResponse;
 export type EarlyTesterAssignmentResponse = RobloxGroupsApiEarlyTesterAssignmentResponse;
 export type GroupMembersSearchResponse =
   RobloxGroupsApiModelsResponseApiSearchPageResponseRobloxGroupsApiUserGroupRolesResponse;
 
 interface GroupsClient {
   getGroupInfo(groupId: number): Promise<RobloxGroupsApiGroupDetailResponse>;
+  getGroupCreated(groupId: number): Promise<Date | null>;
   getGroupRolesSetsInfo(groupId: number): Promise<GroupAllRolesResponse>;
   getGroupMembers(params: V1GroupsGroupIdUsersGetRequest): Promise<GroupMembersResponse>;
   getUsersGroupRoles(
@@ -136,10 +136,6 @@ interface GroupsClient {
     request: RobloxGroupsApiModelsRequestUpdateRolePermissionsForEntityRequest,
   ): Promise<RobloxGroupsApiRolePermissionsForEntityResponse>;
   getGroupMigrationStatus(groupId: number): Promise<RobloxGroupsApiGroupMigrationStatusResponse>;
-  getGroupMigrationBreakingChanges(
-    groupId: number,
-  ): Promise<RobloxGroupsApiGroupMigrationBreakingChangesResponse>;
-  migrateGroup(groupId: number): Promise<void>;
   getGroupProductFeatures(groupId: number): Promise<CommunityProductFeatures>;
   getUniverseEarlyTester(
     groupId: number,
@@ -156,6 +152,10 @@ interface GroupsClient {
 const groupsClient: GroupsClient = {
   getGroupInfo(groupId: number) {
     return groupApi.v1GroupsGroupIdGet({ groupId });
+  },
+  async getGroupCreated(groupId: number) {
+    const response = await groupsV2Api.v2GroupsGet({ groupIds: [groupId] });
+    return response.data?.[0]?.created ?? null;
   },
   getGroupRolesSetsInfo(groupId: number) {
     return membershipApi.v1GroupsGroupIdRolesGet({ groupId, includePrivate: true });
@@ -278,12 +278,6 @@ const groupsClient: GroupsClient = {
   },
   getGroupMigrationStatus(groupId: number) {
     return migrationApi.v1GroupsGroupIdMigrationGet({ groupId });
-  },
-  getGroupMigrationBreakingChanges(groupId: number) {
-    return migrationApi.v1GroupsGroupIdMigrationBreakingChangesGet({ groupId });
-  },
-  migrateGroup(groupId: number) {
-    return migrationApi.v1GroupsGroupIdMigrationMigratePost({ groupId });
   },
   getGroupProductFeatures(groupId: number) {
     return groupApi.v1GroupsGroupIdProductFeaturesGet({ groupId });

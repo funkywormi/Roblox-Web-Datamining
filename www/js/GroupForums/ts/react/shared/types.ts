@@ -433,6 +433,7 @@ interface CommunityProductFeatures {
   CommunityCompletionCarousel: boolean;
   ForumConcealment: boolean;
   ForumPreventSimilar: boolean;
+  ForumsLinksCreate: boolean;
 }
 
 enum CommunityFeatureFreezeName {

@@ -1,36 +1,47 @@
 import React from 'react';
-import type { ReactNode } from 'react';
 import classNames from 'classnames';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-utilities';
+import { Chip } from '@rbx/foundation-ui';
 import announcementRoutes from '../../groupShouts/constants/announcementRoutes';
 
 type PostsDestinationNavigationProps = {
   isAnnouncementsArchiveEnabled: boolean;
-  children?: ReactNode;
+  showDivider: boolean;
 };
 
 const PostsDestinationNavigation = ({
   isAnnouncementsArchiveEnabled,
-  children
+  showDivider
 }: PostsDestinationNavigationProps): JSX.Element => {
+  const history = useHistory();
   const { translate } = useTranslation();
 
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+
+    event.preventDefault();
+    history.push(announcementRoutes.announcementsRoute);
+  };
+
   return (
-    <div className='group-posts-destinations'>
-      <Link
-        className={classNames(
-          'content-action-forum-category group-posts-destination-pill group-posts-announcements-pill',
-          isAnnouncementsArchiveEnabled && 'active',
-          'clickable'
-        )}
+    <React.Fragment>
+      <Chip
+        as='a'
         aria-current={isAnnouncementsArchiveEnabled ? 'page' : undefined}
-        to={announcementRoutes.announcementsRoute}>
-        {translate('Heading.Announcements')}
-      </Link>
-      {children && <span className='group-posts-destinations-divider' aria-hidden='true' />}
-      {children}
-    </div>
+        className={classNames(
+          'group-posts-destination-chip',
+          isAnnouncementsArchiveEnabled && 'active'
+        )}
+        href={`#!${announcementRoutes.announcementsRoute}`}
+        onClick={handleClick}
+        size='Medium'
+        text={translate('Heading.Announcements')}
+      />
+      {showDivider && <span className='group-posts-destinations-divider' aria-hidden='true' />}
+    </React.Fragment>
   );
 };
 

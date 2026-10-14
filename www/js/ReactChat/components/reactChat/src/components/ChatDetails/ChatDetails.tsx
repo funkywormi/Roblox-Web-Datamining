@@ -125,7 +125,7 @@ const ChatDetails = ({
             <button
               type="button"
               aria-label={translate("Label.ChatGroupName")}
-              className="react-chat-details-row flex width-full shrink-0 items-center gap-small bg-none stroke-none padding-x-small padding-y-small text-left cursor-pointer hover:bg-shift-100"
+              className="react-chat-details-row flex width-full shrink-0 items-center gap-small bg-none stroke-none padding-x-small padding-y-small text-align-x-left cursor-pointer hover:bg-shift-100"
               onClick={() => {
                 setIsEditingGroupName(true);
               }}
@@ -147,7 +147,7 @@ const ChatDetails = ({
         {canAddFriends && (
           <button
             type="button"
-            className="react-chat-details-row flex width-full shrink-0 items-center gap-small bg-none stroke-none padding-x-small padding-y-small text-left cursor-pointer hover:bg-shift-100"
+            className="react-chat-details-row flex width-full shrink-0 items-center gap-small bg-none stroke-none padding-x-small padding-y-small text-align-x-left cursor-pointer hover:bg-shift-100"
             onClick={() => {
               setIsAddingFriends(true);
             }}

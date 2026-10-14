@@ -26,7 +26,10 @@ export interface GroupManagementContextValue {
   isOrganizationLoading: boolean;
   studio?: GroupManagementStudio;
   unifiedLogger?: GroupManagementLogger;
-  isOwnerAgeVerified?: boolean | null;
+  /** Core-content `canInvitePlaytesters` for the universe owner: age checked and old enough. */
+  ownerCanInvitePlaytesters?: boolean | null;
+  /** Core-content `isAgeEstimationVerified` for the universe owner: age checked at any age. */
+  isOwnerAgeEstimationVerified?: boolean | null;
   isOwnerAgeVerifiedError?: boolean;
   retryOwnerAgeVerification?: () => void;
 }

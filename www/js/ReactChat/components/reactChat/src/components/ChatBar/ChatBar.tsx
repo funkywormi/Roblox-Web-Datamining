@@ -113,7 +113,7 @@ const ChatBar = ({
       </div>
       {!isCollapsed && chatDisabledReason !== null && (
         <div
-          className="flex min-height-0 grow-1 flex-col items-center justify-center gap-small bg-surface-100 padding-large text-center"
+          className="flex min-height-0 grow-1 flex-col items-center justify-center gap-small bg-surface-100 padding-large text-align-x-center"
           data-testid="react-chat-disabled"
         >
           {chatDisabledReason === "region" ? (
@@ -199,7 +199,7 @@ const ChatBar = ({
                 // An active search that matches nothing shows a blank list (legacy parity); the
                 // "make friends" copy is only for a genuinely empty roster, not empty search results.
                 searchTerm.trim() === "" ? (
-                  <div className="flex flex-col items-center gap-small padding-large text-center">
+                  <div className="flex flex-col items-center gap-small padding-large text-align-x-center">
                     <span className="text-body-medium content-muted">
                       {translate("Message.MakeFriendsToChatNPlay")}
                     </span>

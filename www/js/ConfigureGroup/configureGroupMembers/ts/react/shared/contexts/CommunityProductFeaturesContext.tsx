@@ -30,7 +30,8 @@ export const defaultCommunityProductFeatures: CommunityProductFeatures = {
   IsUnifiedUIEnabled: false,
   CommunityCompletionCarousel: false,
   ForumConcealment: false,
-  ForumPreventSimilar: false
+  ForumPreventSimilar: false,
+  ForumsLinksCreate: false
 };
 
 const SafeDefaultState: CommunityProductFeaturesState = {

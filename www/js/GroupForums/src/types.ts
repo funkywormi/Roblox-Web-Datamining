@@ -22,7 +22,11 @@ export const MarkdownInlineTokenType = {
     Codespan: 'codespan',
     Underline: 'underline',
     Del: 'del',
-    Br: 'br'
+    Br: 'br',
+    /** marked's built-in `url` / `autolink` tokenizers */
+    Link: 'link',
+    /** `urlExtension`'s own rule for a scheme-less host, which the built-ins do not match */
+    BareUrl: 'bare-url'
 };
 /**
  * Slate element type constants for serialization
@@ -34,6 +38,13 @@ export const SlateElementType = {
     OrderedList: 'ordered-list',
     UnorderedList: 'unordered-list',
     ListItem: 'list-item'
+};
+/**
+ * Slate inline element type constants for serialization
+ * These correspond to the inline plugin keys used in the richtext editor
+ */
+export const SlateInlineType = {
+    Link: 'link'
 };
 /**
  * Slate mark type constants for serialization
@@ -55,6 +66,8 @@ export const TOKEN_TO_PLUGIN_KEY = {
     [MarkdownInlineTokenType.Codespan]: SlateMarkType.Codespan,
     [MarkdownInlineTokenType.Underline]: SlateMarkType.Underline,
     [MarkdownInlineTokenType.Del]: SlateMarkType.Linethrough,
+    [MarkdownInlineTokenType.BareUrl]: SlateInlineType.Link,
+    [MarkdownInlineTokenType.Link]: SlateInlineType.Link,
     [MarkdownBlockTokenType.Blockquote]: SlateElementType.Blockquote
 };
 //# sourceMappingURL=types.js.map

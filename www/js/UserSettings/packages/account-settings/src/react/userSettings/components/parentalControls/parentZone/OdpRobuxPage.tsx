@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-utilities";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { Icon } from "@rbx/foundation-ui";
@@ -13,12 +13,19 @@ import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAnd
 import SettingsList from "../../../../common/components/routing/SettingsList";
 import { parentZonePages } from "../../../constants/parentalControls/parentZonePages";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
+import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
+import { trackCounter } from "./observability";
+import { ParentZoneCounter } from "./observability/eventConstants";
 
 // Robux settings viewed by an on-device parent
 export const OdpRobuxPage = (): React.JSX.Element => {
   const { translate } = useTranslation();
   const { robuxTransferLimits } = parentalControlsTranslationConstants;
   const { robuxTransferLimitsPage } = parentZonePages;
+
+  useEffect(() => {
+    trackCounter(ParentZoneCounter.PageShown, { page: SettingCategoryPageName.Robux });
+  }, []);
 
   // An on-device parent is signed in on the child's account, so both reads are self-reads.
   const { data: ceilings } = useGetCurrentUserTransferLimitCeilingsQuery();

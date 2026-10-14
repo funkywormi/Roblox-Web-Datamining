@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   buildRobuxTransferLimitsConsentValue,
   toRobuxTransferLimitsInputFromSetting,
@@ -12,6 +12,9 @@ import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAnd
 import { useAppDispatch } from "../../../../redux/hooks";
 import useStartOdpWizard from "../../../hooks/useStartOdpWizard";
 import RobuxTransferLimitsForm from "../shared/RobuxTransferLimitsForm";
+import RobuxSettingName from "../../../../../enums/RobuxSettingName";
+import { trackCounter } from "./observability";
+import { ParentZoneCounter } from "./observability/eventConstants";
 
 const odpFlowName = "ODP";
 const updateUserSettingRequestType = "UpdateUserSetting";
@@ -32,6 +35,18 @@ export const OdpRobuxTransferLimits = (): React.JSX.Element => {
   } = useGetCurrentUserTransferLimitCeilingsQuery();
   const [childSettings, isChildSettingsLoading, isChildSettingsError] =
     useGetSettingsAndOptionsV2();
+
+  useEffect(() => {
+    trackCounter(ParentZoneCounter.PageShown, { page: RobuxSettingName.TransferLimits });
+  }, []);
+  const isLoadError = isCeilingsError || isChildSettingsError;
+  useEffect(() => {
+    if (isLoadError) {
+      trackCounter(ParentZoneCounter.SettingsPageLoadFailed, {
+        page: RobuxSettingName.TransferLimits,
+      });
+    }
+  }, [isLoadError]);
 
   const saveTransferLimitsHandler = async (limits: TRobuxTransferLimitsInput): Promise<void> => {
     await startOdpWizard({

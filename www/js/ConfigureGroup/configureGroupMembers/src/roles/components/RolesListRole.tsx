@@ -25,6 +25,9 @@ const useRolesSidebarStyles = makeStyles()((theme) => ({
       minWidth: 0,
       [`& > span:nth-child(1)`]: {
         width: '100%',
+        whiteSpace: 'normal',
+        overflow: 'visible',
+        textOverflow: 'clip',
       },
     },
   },
@@ -39,9 +42,9 @@ const useRolesSidebarStyles = makeStyles()((theme) => ({
   },
   textContainer: {
     display: 'block',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    whiteSpace: 'normal',
+    overflowWrap: 'anywhere',
+    minWidth: 0,
     flexGrow: 1,
     flexShrink: 1,
     textAlign: 'left',
@@ -126,12 +129,14 @@ const RolesListRole: React.FC<TRolesListRoleProps> = ({
       )}>
       <Grid container className={buttonContentContainer}>
         <div className='flex grow-1 flex-row items-center width-full'>
-          <RoleIcon
-            roleId={roleId === '' ? null : Number(roleId)}
-            color={roleColor}
-            isPrivate={isPrivate}
-            size='Medium'
-          />
+          <span className='flex shrink-0 self-start'>
+            <RoleIcon
+              roleId={roleId === '' ? null : Number(roleId)}
+              color={roleColor}
+              isPrivate={isPrivate}
+              size='Medium'
+            />
+          </span>
           <span className={textContainer}>{roleName}</span>
           {!!dragHandleProps && (
             <span

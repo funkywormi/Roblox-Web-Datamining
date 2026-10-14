@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-utilities";
-import { Button, Tooltip } from "react-style-guide";
+import { Badge, Button, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
 import { useSnackbar } from "@rbx/user-settings";
 import appPermissionsConstants, { OIDCScopeTypes } from "../../constants/appPermissionsConstants";
 import appPermissionsTranslationConstants from "../../constants/contentConstants/appPermissionsTranslationConstants";
@@ -93,55 +93,53 @@ export const AuthorizationRow = ({
     <React.Fragment>
       {removeAuthorizationModal}
       {reportAuthorizationModal}
-      <div className="border-top app-authorization-row">
-        <div className="authorization-info">
-          <div className="app-info">
-            <span className="text-lead text-overflow">{authorization.application.name}</span>
-            <Tooltip
-              id="permissions-tooltip"
-              placement="bottom"
-              content={getScopeAuthorizationsDescription()}
-            >
-              <span className="authorization-info-chip-wrapper">
-                <button type="button" className="btn-cta-xs authorization-info-chip" disabled>
-                  {translate(appPermissionsTranslationConstants.permissionsCountLabel, {
+      <li className="flex flex-col gap-medium padding-large medium:flex-row medium:items-center medium:justify-between">
+        <div className="flex flex-col gap-xsmall min-width-0">
+          <div className="flex items-center gap-small min-width-0">
+            <span className="text-title-medium content-emphasis text-truncate-end">
+              {authorization.application.name}
+            </span>
+            <Tooltip position="bottom-center" title={getScopeAuthorizationsDescription()}>
+              <TooltipTrigger asChild>
+                <Badge
+                  tabIndex={0}
+                  className="shrink-0 cursor-pointer focus-visible:outline-focus"
+                  variant="Neutral"
+                  size="Small"
+                  label={translate(appPermissionsTranslationConstants.permissionsCountLabel, {
                     permissionCount: authorization.scopes.length,
                   })}
-                </button>
-              </span>
+                />
+              </TooltipTrigger>
             </Tooltip>
           </div>
-          <p className="text-overflow font-subheader-2">
+          <span className="text-body-medium content-default text-truncate-end">
             {authorization.application.summary ||
               translate(appPermissionsTranslationConstants.noDescriptionLabel)}
-          </p>
-          <p className="text-description font-caption-body">
+          </span>
+          <span className="text-caption-medium content-muted">
             {translate(appPermissionsTranslationConstants.authorizedOn, {
               date: authorizedOnDate,
             })}
-          </p>
+          </span>
         </div>
-        <div>
+        <div className="flex gap-small shrink-0">
           <Button
-            size={Button.sizes.small}
-            className="app-authorization-action-btn"
-            variant={Button.variants.control}
-            width=""
+            size="Small"
+            variant="Standard"
             onClick={() => removeAuthorizationModalService.open()}
           >
             {translate(appPermissionsTranslationConstants.removeLabel)}
           </Button>
           <Button
-            size={Button.sizes.small}
-            className="app-authorization-action-btn"
-            variant={Button.variants.control}
-            width=""
+            size="Small"
+            variant="Standard"
             onClick={() => reportAuthorizationModalService.open()}
           >
             {translate(appPermissionsTranslationConstants.reportLabel)}
           </Button>
         </div>
-      </div>
+      </li>
     </React.Fragment>
   );
 };

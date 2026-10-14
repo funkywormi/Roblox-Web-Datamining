@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { Loading } from "react-style-guide";
 import { UserSetting } from "@rbx/user-settings";
@@ -9,6 +9,7 @@ import { TSettingsUIPolicyBody } from "../../../../../types/policyTypes";
 import { baseParentalControlsPath } from "../../../constants/parentalControls/parentalControlsConstants";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
 import useWrappedTranslation from "../../../hooks/useWrappedTranslation";
+import InformationalScreen from "../../../../common/components/InformationalScreen";
 import PrivacySettingName from "../../../../../enums/privacy/PrivacySettingName";
 import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
 import ChildContentRestrictionsRoutes from "../routes/ChildContentRestrictionsRoutes";
@@ -26,6 +27,8 @@ import useManageOdpSetting from "./hooks/useManageOdpSetting";
 import useOdpSettingsAndPages from "./hooks/useOdpSettingsAndPages";
 import useOdpChildInfo from "./hooks/useOdpChildInfo";
 import useManageOdpExperience from "./hooks/useManageOdpExperience";
+import { trackCounter } from "./observability";
+import { ParentZoneCounter } from "./observability/eventConstants";
 
 export const OdpSettingsList = ({
   page,
@@ -111,8 +114,22 @@ const OdpSettingsPage = ({ name }: { name: string }): React.JSX.Element => {
   const { manageSetting, isManaging, revision } = useManageOdpSetting();
   const { manageExperience, isManaging: isManagingExperience } = useManageOdpExperience();
   const { translate } = useWrappedTranslation();
-  if (isError || childQuery.isError) {
-    return <div role="alert">{translate(commonTranslationConstants.unknownError)}</div>;
+  const isLoadError = isError || childQuery.isError;
+  useEffect(() => {
+    if (isLoadError) {
+      trackCounter(ParentZoneCounter.SettingsPageLoadFailed, { page: name });
+    }
+  }, [isLoadError, name]);
+  const isPageReady = !isLoading && !childQuery.isLoading && !!pages[name] && !!childQuery.child;
+  useEffect(() => {
+    if (isPageReady) {
+      trackCounter(ParentZoneCounter.PageShown, { page: name });
+    }
+  }, [isPageReady, name]);
+  if (isLoadError) {
+    return (
+      <InformationalScreen descriptionTranslationKey={commonTranslationConstants.unknownError} />
+    );
   }
   if (isLoading || childQuery.isLoading) {
     return <Loading />;

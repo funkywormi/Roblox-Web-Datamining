@@ -16,6 +16,7 @@ import MemberCountChip from './MemberCountChip';
 export type AddEarlyTesterMembersDialogProps = {
   open: boolean;
   groupId: number;
+  universeId: string;
   roleName: string;
   memberCount: number;
   maxMembers: number;
@@ -28,6 +29,7 @@ export type AddEarlyTesterMembersDialogProps = {
 const AddEarlyTesterMembersDialog: FunctionComponent<AddEarlyTesterMembersDialogProps> = ({
   open,
   groupId,
+  universeId,
   roleName,
   memberCount,
   maxMembers,
@@ -98,6 +100,7 @@ const AddEarlyTesterMembersDialog: FunctionComponent<AddEarlyTesterMembersDialog
           </div>
           <GroupMemberPickerList
             groupId={groupId}
+            universeId={universeId}
             existingMemberIds={existingMemberIds}
             selection={selection}
             remainingCapacity={remainingCapacity}

@@ -23,11 +23,13 @@ import {
   GuestRoleRank,
   MAX_EARLY_TESTERS,
 } from '../../utils/constants';
+import useEarlyTesterEligibility from '../hooks/useEarlyTesterEligibility';
 import { useEarlyTesterRoleAccess } from '../hooks/useEarlyTesterRoleAccess';
 import { useSaveEarlyTesters } from '../hooks/useSaveEarlyTesters';
 import AddEarlyTesterMembersDialog from './AddEarlyTesterMembersDialog';
 import ChooseEarlyTestersPanel from './ChooseEarlyTestersPanel';
 import DisabledPermissionTooltip from './DisabledPermissionTooltip';
+import EarlyTestersAgeBlockedState from './EarlyTestersAgeBlockedState';
 import ManageEarlyTestersPanel from './ManageEarlyTestersPanel';
 import RolePickerDialog from './RolePickerDialog';
 import RolePickerPanel from './RolePickerPanel';
@@ -40,10 +42,11 @@ export type EarlyTestersPanelProps = {
 
 const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }) => {
   const { translate } = useTranslation();
-  const { translate: translatePermission } = usePermissionsTranslation();
+  const { translate: translatePermission, displayMessage } = usePermissionsTranslation();
   const {
     organization,
-    isOwnerAgeVerified,
+    ownerCanInvitePlaytesters,
+    isOwnerAgeEstimationVerified,
     isOwnerAgeVerifiedError,
     retryOwnerAgeVerification,
     showToast,
@@ -60,7 +63,13 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
     isError: isAssignmentError,
     refetch: refetchAssignment,
   } = useEarlyTesterAssignment(groupId, universeId);
-  const { data: allRoles } = useGetGroupsRoles(organization?.groupId);
+  const {
+    data: allRoles,
+    isPending: isRolesPending,
+    isError: isRolesError,
+    isPlaceholderData: isRolesPlaceholderData,
+    refetch: refetchRoles,
+  } = useGetGroupsRoles(organization?.groupId);
   const eligibleRoles = useMemo(
     () =>
       (allRoles ?? [])
@@ -186,9 +195,17 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
   }, [roleMembers, roleMembersReady]);
   const pendingMemberList = useMemo(() => Array.from(pendingMembers.values()), [pendingMembers]);
   const existingMemberIds = useMemo(() => new Set(pendingMembers.keys()), [pendingMembers]);
+  const memberEligibility = useEarlyTesterEligibility(
+    universeId,
+    Array.from(pendingMembers.keys()),
+    pendingRole != null,
+  );
 
   const canAdd =
     canEditAssignment &&
+    !isRolesPending &&
+    !isRolesError &&
+    !isRolesPlaceholderData &&
     pendingRole === null &&
     pendingMembers.size > 0 &&
     pendingMembers.size <= MAX_EARLY_TESTERS;
@@ -228,12 +245,16 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
   }, []);
 
   const handleCreateDraft = useCallback(() => {
-    const roleName = translate('Label.EarlyTesterRole', { experienceName: entity.name ?? '' });
+    const experienceName = entity.name ?? '';
+    const defaultRoleName = translate('Label.EarlyTesterRole', { experienceName });
+    const roleName = allRoles?.some((role) => role.name === defaultRoleName)
+      ? translate('Label.EarlyTesterRoleCopy', { experienceName, universeId })
+      : defaultRoleName;
     setPendingRole({
       name: roleName,
       isPrivate: true,
     });
-  }, [translate, entity.name]);
+  }, [translate, entity.name, universeId, allRoles]);
 
   const handleSave = useCallback(async () => {
     if (groupId === undefined || pendingRole === null) {
@@ -262,6 +283,7 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
           isPrivate: true,
         });
         if (targetRole.id != null) {
+          setMembersRoleId(targetRole.id);
           setPendingRole(targetRole);
         }
       }
@@ -288,6 +310,7 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
       if (pendingRole.id == null) {
         setSavedDraftRoleId(targetRole.id);
       }
+      displayMessage(translatePermission('Messages.PermissionsSaved'));
     } catch {
       showToast(translate('Response.UnknownError'), true);
     }
@@ -309,6 +332,8 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
     pendingMemberList,
     showToast,
     translate,
+    displayMessage,
+    translatePermission,
   ]);
 
   const handleCancel = useCallback(() => {
@@ -330,7 +355,15 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
     return <ErrorState onRetry={retryOwnerAgeVerification} />;
   }
 
-  if (canEditAssignment && isOwnerAgeVerified === false) {
+  if (
+    canEditAssignment &&
+    ownerCanInvitePlaytesters === false &&
+    isOwnerAgeEstimationVerified === true
+  ) {
+    return <EarlyTestersAgeBlockedState />;
+  }
+
+  if (canEditAssignment && ownerCanInvitePlaytesters === false) {
     return (
       <EmptyState
         illustration={VERIFY_AGE_ILLUSTRATION}
@@ -353,7 +386,7 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
     );
   }
 
-  if ((canEditAssignment && isOwnerAgeVerified == null) || isAssignmentPending) {
+  if ((canEditAssignment && ownerCanInvitePlaytesters == null) || isAssignmentPending) {
     return (
       <div className='flex justify-center padding-large'>
         <ProgressCircle
@@ -367,6 +400,10 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
 
   if (isAssignmentError) {
     return <ErrorState onRetry={refetchAssignment} />;
+  }
+
+  if (isRolesError && pendingRole === null) {
+    return <ErrorState onRetry={refetchRoles} />;
   }
 
   const isSavePending = isSaving || isCreatingRole;
@@ -391,12 +428,14 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
           canChangeRole={canEditAssignment}
           canEditMembers={canEditMembers}
           readOnlyTooltip={readOnlyTooltip}
+          eligibility={memberEligibility}
         />
       ) : (
         canEditAssignment &&
         groupId !== undefined && (
           <ChooseEarlyTestersPanel
             groupId={groupId}
+            universeId={universeId}
             selection={pendingMembers}
             onToggleMember={handleToggleMember}
             onOpenRolePicker={handleOpenRolePicker}
@@ -469,6 +508,7 @@ const EarlyTestersPanel: FunctionComponent<EarlyTestersPanelProps> = ({ entity }
         <AddEarlyTesterMembersDialog
           open={isAddMembersOpen}
           groupId={groupId}
+          universeId={universeId}
           roleName={pendingRole.name ?? ''}
           memberCount={pendingMembers.size}
           maxMembers={MAX_EARLY_TESTERS}

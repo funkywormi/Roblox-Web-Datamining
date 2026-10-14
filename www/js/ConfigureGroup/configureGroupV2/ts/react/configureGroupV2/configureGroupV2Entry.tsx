@@ -1,4 +1,4 @@
-import Roblox, { CurrentUser, EnvironmentUrls } from 'Roblox';
+import Roblox, { CurrentUser } from 'Roblox';
 import {
   GroupManagementRootProviders,
   GroupManagementSurface,
@@ -20,7 +20,6 @@ import {
 } from '../shared/contexts/CommunityProductFeaturesContext';
 
 const UNIFICATION_OPT_IN_MODAL_ROOT_ID = 'unification-opt-in-modal-root';
-const { domain, websiteUrl } = EnvironmentUrls as { domain: string; websiteUrl: string };
 const translationResourceProvider = new RobloxIntlTranslationProvider({
   locale: Locale.English,
   nativeName: NativeName.English
@@ -52,17 +51,7 @@ const UnificationOptInModalRoot = ({ groupId }: { groupId: number }): JSX.Elemen
         translationProvider={translationResourceProvider}
         queryClient={queryClient}
         showToast={message => systemFeedbackService.success(message)}>
-        <UnificationOptInModal
-          groupId={groupId}
-          userId={currentUserId}
-          getCreatorHubRoleUrl={(roleId: string) =>
-            `https://create.${domain}/dashboard/group/roles/${roleId}?groupId=${groupId}&activeTab=GroupRolesTab`
-          }
-          getLegacyRolesUrl={(groupIdString: string) =>
-            `${websiteUrl}/communities/configure?id=${groupIdString}#!/roles`
-          }
-          showToast={message => systemFeedbackService.success(message)}
-        />
+        <UnificationOptInModal groupId={groupId} userId={currentUserId} />
       </GroupManagementRootProviders>
       <SystemFeedbackComponent />
     </React.Fragment>

@@ -29,6 +29,7 @@ import {
   trackError,
   type ErrorName,
 } from "../observability";
+import { getStatusCode } from "../utils/getStatusCode";
 import type {
   FeedbackState,
   MessageItem,
@@ -70,7 +71,7 @@ const getErrorMessage = (error: unknown, fallback: string): string => {
 const trackAndRethrow =
   (name: ErrorName) =>
   (error: unknown): never => {
-    trackError(name, null, error);
+    trackError(name, { statusCode: getStatusCode(error) }, error);
     throw error;
   };
 
@@ -121,7 +122,11 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
               dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
             },
             (markReadError: unknown) => {
-              trackError("MarkReadFailed", null, markReadError);
+              trackError(
+                "MarkReadFailed",
+                { statusCode: getStatusCode(markReadError) },
+                markReadError,
+              );
             },
           );
         }
@@ -142,7 +147,11 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
         dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
       }
     } catch (loadError) {
-      trackCriticalError("LoadFailed", { host, tab: route.tab }, loadError);
+      trackCriticalError(
+        "LoadFailed",
+        { host, tab: route.tab, statusCode: getStatusCode(loadError) },
+        loadError,
+      );
       setPage(null);
       setSelectedMessage(null);
       setModuleState(MESSAGE_MODULE_STATE.list);
@@ -158,7 +167,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
     getPrivateMessagesRules()
       .then(setRules)
       .catch((rulesError: unknown) => {
-        trackError("RulesLoadFailed", null, rulesError);
+        trackError("RulesLoadFailed", { statusCode: getStatusCode(rulesError) }, rulesError);
         setRules({});
       });
 
@@ -167,7 +176,11 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
         setNewsCount(metadata.numOfAnnouncements ?? 0);
       })
       .catch((metadataError: unknown) => {
-        trackError("NewsCountLoadFailed", null, metadataError);
+        trackError(
+          "NewsCountLoadFailed",
+          { statusCode: getStatusCode(metadataError) },
+          metadataError,
+        );
         setNewsCount(0);
       });
   }, []);

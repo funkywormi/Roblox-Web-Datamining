@@ -217,5 +217,3 @@ export const AddUserToRoleDialog: FunctionComponent<
     </Dialog>
   );
 };
-
-export default AddUserToRoleDialog;

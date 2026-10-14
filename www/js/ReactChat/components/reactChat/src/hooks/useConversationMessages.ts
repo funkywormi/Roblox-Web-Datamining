@@ -1,11 +1,14 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { chatQueryKeys } from "../constants/queryKeys";
 import { getConversationMessages } from "../services/chatService";
 import type { TChatApiMessage, TGetConversationMessagesResponse } from "../types/api";
 import type { TChatMessage } from "../types/chat";
-import { toChatMessages } from "../utils/chatTransforms";
+import { isHiddenMessage, toChatMessages } from "../utils/chatTransforms";
 import { isQueryPending } from "../utils/queryStatus";
+
+// An older page together with the cursor that loaded it, so the page can be loaded again.
+type TOlderPage = { cursor: string; page: TGetConversationMessagesResponse };
 
 export type TUseConversationMessagesResult = {
   messages: TChatMessage[];
@@ -48,7 +51,9 @@ export const useConversationMessages = (
   enabled = true,
 ): TUseConversationMessagesResult => {
   const normalizedConversationId = conversationId ?? "";
-  const [olderPages, setOlderPages] = useState<TGetConversationMessagesResponse[]>([]);
+  const [olderPages, setOlderPages] = useState<TOlderPage[]>([]);
+  const olderPagesRef = useRef(olderPages);
+  olderPagesRef.current = olderPages;
   const isFetchingNextPageRef = useRef(false);
 
   const messagesQuery = useQuery<TGetConversationMessagesResponse, Error>({
@@ -56,6 +61,37 @@ export const useConversationMessages = (
     queryFn: () => getConversationMessages(normalizedConversationId),
     enabled: enabled && normalizedConversationId.length > 0,
   });
+
+  // The server decides a message's visibility when it is read, so a hidden message can become
+  // readable later, for example when the two users become Trusted Friends. The latest page refetches
+  // with its query, but older pages load once. Whenever the server answers again for the latest page,
+  // load again the older pages that still hold a hidden message, in place, so scrolled-back history
+  // stays. dataUpdatedAt marks that answer only if every client-side write to this cache keeps it,
+  // which setConversationMessagesCache does.
+  const latestPageUpdatedAt = messagesQuery.dataUpdatedAt;
+  useEffect(() => {
+    const hiddenPageCursors = olderPagesRef.current
+      .filter(({ page }) => page.messages.some(isHiddenMessage))
+      .map(({ cursor }) => cursor);
+    if (hiddenPageCursors.length === 0 || !normalizedConversationId) {
+      return undefined;
+    }
+    let isCurrent = true;
+    hiddenPageCursors.forEach(cursor => {
+      getConversationMessages(normalizedConversationId, cursor)
+        .then(page => {
+          if (isCurrent) {
+            setOlderPages(currentPages =>
+              currentPages.map(entry => (entry.cursor === cursor ? { cursor, page } : entry)),
+            );
+          }
+        })
+        .catch(() => undefined);
+    });
+    return () => {
+      isCurrent = false;
+    };
+  }, [latestPageUpdatedAt, normalizedConversationId]);
 
   // Client-only moderated messages ("###" placeholders). They live in their own cache key
   // (written by useSendMessage) so message refetches never drop them. enabled: false — this
@@ -81,7 +117,7 @@ export const useConversationMessages = (
       return;
     }
 
-    const lastPage = olderPages.at(-1);
+    const lastPage = olderPages.at(-1)?.page;
     const nextCursor = lastPage?.next_cursor ?? messagesQuery.data?.next_cursor;
     if (!nextCursor || !normalizedConversationId) {
       return;
@@ -90,7 +126,7 @@ export const useConversationMessages = (
     isFetchingNextPageRef.current = true;
     getConversationMessages(normalizedConversationId, nextCursor)
       .then(page => {
-        setOlderPages(currentPages => [...currentPages, page]);
+        setOlderPages(currentPages => [...currentPages, { cursor: nextCursor, page }]);
       })
       .catch(() => undefined)
       .finally(() => {
@@ -106,7 +142,7 @@ export const useConversationMessages = (
     const baseMessages = messagesQuery.data
       ? toChatMessages(
           stabilizeSystemMessageTimestamps(
-            [...olderPages.flatMap(page => page.messages), ...messagesQuery.data.messages],
+            [...olderPages.flatMap(({ page }) => page.messages), ...messagesQuery.data.messages],
             normalizedConversationId,
           ),
           normalizedConversationId,
@@ -144,7 +180,9 @@ export const useConversationMessages = (
     failedMessages,
   ]);
 
-  const hasNextPage = Boolean(olderPages.at(-1)?.next_cursor ?? messagesQuery.data?.next_cursor);
+  const hasNextPage = Boolean(
+    olderPages.at(-1)?.page.next_cursor ?? messagesQuery.data?.next_cursor,
+  );
 
   return {
     messages,

@@ -9,7 +9,6 @@ import GameDescription from "./GameDescription";
 import GameDescriptionTable from "./GameDescriptionTable";
 import GameDescriptionFooter from "./GameDescriptionFooter";
 import AgeRecommendationTitle from "../../gameGuidelines/containers/AgeRecommendationTitle";
-import isBuildExperience from "../utils/isBuildExperience";
 import "../../../css/gameDetails/_description.scss";
 
 export type TGameDescriptionSectionProps = {
@@ -89,7 +88,6 @@ export const GameDescriptionSection = ({
         placeId={placeId}
         universeId={universeId}
         copyingAllowed={gameDetails.copyingAllowed}
-        showBuildDisclaimer={isBuildExperience(gameDetails.creationSource)}
         translate={translate}
       />
     </div>

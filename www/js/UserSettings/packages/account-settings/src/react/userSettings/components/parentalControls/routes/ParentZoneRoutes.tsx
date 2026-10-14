@@ -1,8 +1,9 @@
 import React from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
+import { matchPath, Redirect, Route, Switch, useLocation } from "react-router-dom";
 import { baseParentalControlsPath } from "../../../constants/parentalControls/parentalControlsConstants";
 import {
   getParentZoneTopGameDetailsPath,
+  parentZonePageList,
   parentZonePages,
 } from "../../../constants/parentalControls/parentZonePages";
 import { useGetOdpChildContextQuery } from "../../../../apis/parentalControlsApi";
@@ -15,12 +16,16 @@ import { odpSettingsPageList } from "../parentZone/odpSettingsPages";
 import OdpRobuxPage from "../parentZone/OdpRobuxPage";
 import OdpRobuxTransferLimits from "../parentZone/OdpRobuxTransferLimits";
 import OdpScreentimeLimitPage from "../parentZone/OdpScreentimeLimitPage";
+import useSettingsJourneyScreen from "../../../hooks/useSettingsJourneyScreen";
 
 // Parent Zone subpages. A page is only reachable while its flag is on, so a link to a page the
 // server has turned off redirects back to the landing page instead.
 export const ParentZoneRoutes = (): JSX.Element => {
   const { data: odpChildContext, isLoading, isUninitialized } = useGetOdpChildContextQuery();
   const isChildContextSettled = !isLoading && !isUninitialized;
+  const { pathname } = useLocation();
+  const page = parentZonePageList.find(p => matchPath(pathname, { path: p.path, exact: true }));
+  useSettingsJourneyScreen("parental-controls", page?.name, pathname, isChildContextSettled);
 
   return (
     <Switch>

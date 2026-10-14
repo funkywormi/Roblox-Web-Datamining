@@ -1,4 +1,3 @@
-import { GameLauncher } from "@rbx/core-scripts/legacy/Roblox";
 import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import "@rbx/core-scripts/global";
@@ -44,8 +43,12 @@ type TJoinAttemptProperties = {
   joinAttemptOrigin?: string | number;
 };
 
+const isJoinAttemptIdEnabled = (): boolean =>
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- window.Roblox is absent on Next.js
+  window.Roblox?.GameLauncher?.isJoinAttemptIdEnabled() ?? false;
+
 function getJoinAttemptProperties(eventProperties: TEventProperties): TJoinAttemptProperties {
-  if (!GameLauncher?.isJoinAttemptIdEnabled()) {
+  if (!isJoinAttemptIdEnabled()) {
     return {};
   }
 
@@ -78,7 +81,7 @@ function sendPlayGameClickedEvent(
 function getEncodedUniversalLink(placeId: string, eventProperties: TEventProperties = {}): string {
   let universalLink = `${environmentUrls.websiteUrl}/games/start?placeid=${placeId}`;
 
-  if (GameLauncher?.isJoinAttemptIdEnabled()) {
+  if (isJoinAttemptIdEnabled()) {
     const { joinAttemptId, joinAttemptOrigin } = getJoinAttemptProperties(eventProperties);
 
     if (typeof joinAttemptId === "string" && joinAttemptId.length > 0) {

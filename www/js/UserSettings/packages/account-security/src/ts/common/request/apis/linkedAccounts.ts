@@ -1,4 +1,4 @@
-import * as http from "@rbx/core-scripts/http";
+import transport from "../requestTransport";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as LinkedAccounts from "../types/linkedAccounts";
@@ -11,7 +11,7 @@ export const getLinkedAccounts = (
   Result<LinkedAccounts.GetLinkedAccountsResponse, LinkedAccounts.LinkedAccountsError | null>
 > =>
   toResult(
-    http.get(LinkedAccounts.GET_LINKED_ACCOUNTS_CONFIG, {
+    transport.get(LinkedAccounts.GET_LINKED_ACCOUNTS_CONFIG, {
       ...request,
       linkType: LinkedAccounts.LinkedAccountsLinkType.LinkedRecoveryAccount,
     }),
@@ -24,7 +24,7 @@ export const requestAccountLink = (
   Result<LinkedAccounts.AccountLinkUpdateIntentResponse, LinkedAccounts.LinkedAccountsError | null>
 > =>
   toResult(
-    http.post(LinkedAccounts.REQUEST_ACCOUNT_LINK_CONFIG, request),
+    transport.post(LinkedAccounts.REQUEST_ACCOUNT_LINK_CONFIG, request),
     LinkedAccounts.LinkedAccountsError,
   );
 
@@ -34,7 +34,7 @@ export const cancelAccountLink = (
   Result<LinkedAccounts.AccountLinkUpdateIntentResponse, LinkedAccounts.LinkedAccountsError | null>
 > =>
   toResult(
-    http.post(LinkedAccounts.CANCEL_ACCOUNT_LINK_CONFIG, request),
+    transport.post(LinkedAccounts.CANCEL_ACCOUNT_LINK_CONFIG, request),
     LinkedAccounts.LinkedAccountsError,
   );
 
@@ -44,7 +44,7 @@ export const getPendingAccountLink = (
   Result<LinkedAccounts.GetPendingAccountLinkResponse, LinkedAccounts.LinkedAccountsError | null>
 > =>
   toResult(
-    http.get(LinkedAccounts.GET_PENDING_ACCOUNT_LINK_CONFIG, { ownerUserId }),
+    transport.get(LinkedAccounts.GET_PENDING_ACCOUNT_LINK_CONFIG, { ownerUserId }),
     LinkedAccounts.LinkedAccountsError,
   );
 
@@ -54,7 +54,7 @@ export const acceptAccountLink = (
   Result<LinkedAccounts.AcceptAccountLinkResponse, LinkedAccounts.LinkedAccountsError | null>
 > =>
   toResult(
-    http.post(LinkedAccounts.ACCEPT_ACCOUNT_LINK_CONFIG, request),
+    transport.post(LinkedAccounts.ACCEPT_ACCOUNT_LINK_CONFIG, request),
     LinkedAccounts.LinkedAccountsError,
   );
 
@@ -62,6 +62,6 @@ export const deleteAccountLink = (
   request: LinkedAccounts.DeleteAccountLinkRequest,
 ): Promise<Result<void, LinkedAccounts.LinkedAccountsError | null>> =>
   toResult(
-    http.post(LinkedAccounts.DELETE_ACCOUNT_LINK_CONFIG, request),
+    transport.post(LinkedAccounts.DELETE_ACCOUNT_LINK_CONFIG, request),
     LinkedAccounts.LinkedAccountsError,
   );

@@ -4,18 +4,24 @@ import { useTranslation } from "react-utilities";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
 import { parentDashboardHelpPageUrl } from "../../../constants/urlConstants";
+import { useGetSettingsUiPolicyQuery } from "../../../../apis/universalAppConfigurationApi";
 
 export const ParentDashboardWelcomeScreen = (): JSX.Element => {
   const { translate } = useTranslation();
   const { parentWelcome } = parentalControlsTranslationConstants;
+  const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
+  const isOdpEnabled = uiPolicy?.onDeviceParentalControlsEnabled === true;
   return (
     <div className="parental-controls-welcome">
       <h3 className="welcome-header font-header-2">{translate(parentWelcome.heading)}</h3>
       <p
         dangerouslySetInnerHTML={{
-          __html: translate(parentWelcome.description, {
-            lineBreak: "<br><br>",
-          }),
+          __html: translate(
+            isOdpEnabled ? parentWelcome.descriptionWithPin : parentWelcome.description,
+            {
+              lineBreak: "<br><br>",
+            },
+          ),
         }}
       />
       <div className="welcome-btn-wrapper">

@@ -1,7 +1,6 @@
 import classNames from "classnames";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Thumbnail2d, ThumbnailGameIconSize } from "@rbx/www-common/components/thumbnail";
-import { DefaultPlayButton, usePlayabilityStatus } from "@rbx/game-play-button";
 import { useGamePlaceDetails } from "../../../hooks/useGamePlaceDetails";
 import {
   sendClickGameLinkCardEvent,
@@ -9,6 +8,7 @@ import {
   sendGameLinkCardImpressionEvent,
   sendLoadGameLinkCardEvent,
 } from "../../../utils/gameCardEventStream";
+import GameCardPlayButtonContext from "./GameCardPlayButtonContext";
 
 type TGameCardProps = {
   placeId: string;
@@ -30,15 +30,13 @@ const IMPRESSION_DEBOUNCE_MS = 500;
 /**
  * Renders a Roblox game link as a game card (thumbnail + title + description + play button). Falls
  * back to the plain link when place details can't be fetched (invalid/moderated place).
- * Play/purchase/launch is handled by @rbx/game-play-button's DefaultPlayButton. Fires
- * load/impression/click eventstream events.
+ * Play/purchase/launch is handled by the host's GameCardPlayButtonContext (no play button without
+ * one). Fires load/impression/click eventstream events.
  */
 const GameCard = ({ placeId, url, conversationId, privateServerLinkCode }: TGameCardProps) => {
   const { data: place } = useGamePlaceDetails(placeId);
   const universeId = place?.universeId;
-  const { playabilityStatus, refetchPlayabilityData } = usePlayabilityStatus(
-    universeId != null ? String(universeId) : "",
-  );
+  const PlayButton = useContext(GameCardPlayButtonContext);
 
   const cardRef = useRef<HTMLDivElement>(null);
   const impressionSentRef = useRef(false);
@@ -132,24 +130,23 @@ const GameCard = ({ placeId, url, conversationId, privateServerLinkCode }: TGame
           )}
         </span>
       </a>
-      {/* DefaultPlayButton owns the launch + its own game-play intent; capture the click here to
+      {/* The play button owns the launch + its own game-play intent; capture the click here to
           also fire the chat-specific play eventstream event. */}
-      <span
-        className="react-chat-game-card-play"
-        onClickCapture={() => {
-          sendClickPlayFromGameLinkCardEvent(placeId, conversationId);
-        }}
-      >
-        <DefaultPlayButton
-          placeId={String(place.placeId)}
-          rootPlaceId={place.rootPlaceId != null ? String(place.rootPlaceId) : undefined}
-          universeId={String(universeId)}
-          privateServerLinkCode={privateServerLinkCode}
-          playabilityStatus={playabilityStatus}
-          refetchPlayabilityStatus={refetchPlayabilityData}
-          pageContext="UNKNOWN"
-        />
-      </span>
+      {PlayButton != null && (
+        <span
+          className="react-chat-game-card-play"
+          onClickCapture={() => {
+            sendClickPlayFromGameLinkCardEvent(placeId, conversationId);
+          }}
+        >
+          <PlayButton
+            placeId={String(place.placeId)}
+            rootPlaceId={place.rootPlaceId != null ? String(place.rootPlaceId) : undefined}
+            universeId={String(universeId)}
+            privateServerLinkCode={privateServerLinkCode}
+          />
+        </span>
+      )}
     </div>
   );
 };

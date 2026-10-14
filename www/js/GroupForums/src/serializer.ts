@@ -1,22 +1,60 @@
 /**
  * Serializer that converts markdown tokens to Slate nodes
  */
-import { MarkdownInlineTokenType, MarkdownBlockTokenType, SlateElementType, SlateMarkType } from './types.js';
+/* eslint-disable @typescript-eslint/no-use-before-define */
+import { Text } from 'slate';
+import { MarkdownInlineTokenType, MarkdownBlockTokenType, SlateElementType, SlateInlineType, SlateMarkType } from './types.js';
 /**
- * Apply marks to all leaves in an array
+ * The matched text and href of a URL token. The pill shows `href`, so they may differ only by a
+ * leading `https://`. Anything else, such as marked's `mailto:` or `http://www.`, stays text.
  */
-function applyMarksToLeaves(leaves, marks) {
-    return leaves.map(leaf => ({
-        ...leaf,
-        ...marks
-    }));
+export function linkTokenParts(token) {
+    const text = token.text || '';
+    const href = token.href || text;
+    if (!text || (href !== text && href !== `https://${text}`)) {
+        return undefined;
+    }
+    return { text, href };
 }
 /**
- * Convert a single inline token to Slate text leaf(ves)
+ * Apply marks to all leaves in an array. Inline elements are passed through:
+ * a mark belongs on a text leaf, not on an element.
  */
-function inlineTokenToLeaf(token, availableMarks) {
+function applyMarksToLeaves(leaves, marks) {
+    return leaves.map(leaf => Text.isText(leaf)
+        ? {
+            ...leaf,
+            ...marks
+        }
+        : leaf);
+}
+/**
+ * Convert a single inline token to Slate text leaf(ves) or an inline element
+ */
+function inlineTokenToLeaf(token, plugins) {
+    const { marks: availableMarks } = plugins;
     const marks = {};
     switch (token.type) {
+        case MarkdownInlineTokenType.Link:
+        case MarkdownInlineTokenType.BareUrl: {
+            const parts = linkTokenParts(token);
+            if (!parts || !plugins.inlines?.has(SlateInlineType.Link) || !plugins.acceptsUrl?.(parts.href)) {
+                return [{ text: token.raw || token.text || '' }];
+            }
+            // An `<...>` autolink's brackets stay as plain text around the link
+            const textStart = Math.max(token.raw.indexOf(parts.text), 0);
+            const before = token.raw.slice(0, textStart);
+            const after = token.raw.slice(textStart + parts.text.length);
+            return [
+                ...(before ? [{ text: before }] : []),
+                {
+                    type: SlateInlineType.Link,
+                    url: parts.href,
+                    children: [{ text: '' }]
+                },
+                ...(after ? [{ text: after }] : [])
+            ];
+        }
         case MarkdownInlineTokenType.Text:
             return [{ text: token.text || '', ...marks }];
         case MarkdownInlineTokenType.Strong:
@@ -24,7 +62,7 @@ function inlineTokenToLeaf(token, availableMarks) {
                 marks[SlateMarkType.Bold] = true;
             }
             if (token.tokens) {
-                return applyMarksToLeaves(inlineTokensToLeaves(token.tokens, availableMarks), marks);
+                return applyMarksToLeaves(inlineTokensToLeaves(token.tokens, plugins), marks);
             }
             return [{ text: token.text || '', ...marks }];
         case MarkdownInlineTokenType.Em:
@@ -32,7 +70,7 @@ function inlineTokenToLeaf(token, availableMarks) {
                 marks[SlateMarkType.Italic] = true;
             }
             if (token.tokens) {
-                return applyMarksToLeaves(inlineTokensToLeaves(token.tokens, availableMarks), marks);
+                return applyMarksToLeaves(inlineTokensToLeaves(token.tokens, plugins), marks);
             }
             return [{ text: token.text || '', ...marks }];
         case MarkdownInlineTokenType.Codespan:
@@ -45,7 +83,7 @@ function inlineTokenToLeaf(token, availableMarks) {
                 marks[SlateMarkType.Underline] = true;
             }
             if (token.tokens) {
-                return applyMarksToLeaves(inlineTokensToLeaves(token.tokens, availableMarks), marks);
+                return applyMarksToLeaves(inlineTokensToLeaves(token.tokens, plugins), marks);
             }
             return [{ text: token.text || '', ...marks }];
         case MarkdownInlineTokenType.Del:
@@ -53,23 +91,22 @@ function inlineTokenToLeaf(token, availableMarks) {
                 marks[SlateMarkType.Linethrough] = true;
             }
             if (token.tokens) {
-                return applyMarksToLeaves(inlineTokensToLeaves(token.tokens, availableMarks), marks);
+                return applyMarksToLeaves(inlineTokensToLeaves(token.tokens, plugins), marks);
             }
             return [{ text: token.text || '', ...marks }];
         case MarkdownInlineTokenType.Br:
             return [{ text: '\n' }];
         default:
-            // For unknown inline types, just render as text
             return [{ text: token.raw || token.text || '' }];
     }
 }
 /**
- * Convert inline tokens to Slate text leaves with marks
+ * Convert inline tokens to Slate text leaves with marks, plus inline elements
  */
-function inlineTokensToLeaves(tokens, availableMarks) {
+function inlineTokensToLeaves(tokens, plugins) {
     const leaves = [];
     for (let i = 0; i < tokens.length; i += 1) {
-        const leaf = inlineTokenToLeaf(tokens[i], availableMarks);
+        const leaf = inlineTokenToLeaf(tokens[i], plugins);
         if (leaf) {
             leaves.push(...leaf);
         }
@@ -105,22 +142,21 @@ function isSlateNode(node) {
  * Convert a single markdown token to a Slate node
  */
 function tokenToNode(token, availablePlugins) {
-    const { blocks: availableBlocks, marks: availableMarks } = availablePlugins;
+    const { blocks: availableBlocks } = availablePlugins;
     switch (token.type) {
         case MarkdownBlockTokenType.Paragraph:
             return {
                 type: SlateElementType.BlockText,
                 children: token.tokens
-                    ? inlineTokensToLeaves(token.tokens, availableMarks)
+                    ? inlineTokensToLeaves(token.tokens, availablePlugins)
                     : [{ text: token.text || '' }]
             };
         case MarkdownBlockTokenType.Blockquote:
-            // If blockquote plugin is not available, render as a plain paragraph
             if (!availableBlocks.has(SlateElementType.Blockquote)) {
                 return {
                     type: SlateElementType.BlockText,
                     children: token.tokens
-                        ? inlineTokensToLeaves(token.tokens.flatMap(t => t.tokens || []), availableMarks)
+                        ? inlineTokensToLeaves(token.tokens.flatMap(t => t.tokens || []), availablePlugins)
                         : [{ text: token.text || '' }]
                 };
             }
@@ -146,7 +182,7 @@ function tokenToNode(token, availablePlugins) {
                     type: SlateElementType.BlockText,
                     children: items.flatMap(item => {
                         if (item.tokens) {
-                            return inlineTokensToLeaves(item.tokens.flatMap(t => t.tokens || []), availableMarks);
+                            return inlineTokensToLeaves(item.tokens.flatMap(t => t.tokens || []), availablePlugins);
                         }
                         return [{ text: item.text || '' }];
                     })

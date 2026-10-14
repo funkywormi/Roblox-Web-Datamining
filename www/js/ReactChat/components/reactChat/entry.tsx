@@ -4,8 +4,10 @@ import { queryClient, renderWithErrorBoundary } from "@rbx/core-scripts/react";
 import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import type { Namespace } from "@rbx/www-common/i18n";
 import App from "./src/App";
+import GameCardPlayButton from "./src/components/ChatDialog/GameCard/GameCardPlayButton";
+import GameCardPlayButtonContext from "./src/components/ChatDialog/GameCard/GameCardPlayButtonContext";
 import { translations as rawTranslations } from "./component.json";
-import "./src/main.scss";
+import "./src/main.css";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- CI narrows Namespace; component.json is always valid
 const translations = rawTranslations as unknown as readonly Namespace[];
@@ -19,7 +21,9 @@ ready(() => {
   renderWithErrorBoundary(
     <QueryClientProvider client={queryClient}>
       <TranslationProviderSCC namespaces={translations}>
-        <App />
+        <GameCardPlayButtonContext.Provider value={GameCardPlayButton}>
+          <App />
+        </GameCardPlayButtonContext.Provider>
       </TranslationProviderSCC>
     </QueryClientProvider>,
     container,

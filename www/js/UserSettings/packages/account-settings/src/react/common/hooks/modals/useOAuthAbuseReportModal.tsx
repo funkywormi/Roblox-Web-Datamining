@@ -77,29 +77,29 @@ const useOAuthAbuseReportModal = (authorization: TAuthorization): [JSX.Element, 
     <NativeDropdown
       selectionItems={abuseReasonDropdownOptions}
       selectedItemvalue={selectedAbuseReason ?? translate(reportModal.dropdownPlaceholder)}
-      className="input-group-btn col-xs-12 col-sm-6 app-abuse-report-dropdown"
       onChange={e => setSelectedAbuseReason(e.target.value as OAuthAbuseCategory)}
       placeholder={translate(reportModal.dropdownPlaceholder)}
     />
   );
 
   const body = (
-    <form className="form-horizontal" autoComplete="off" name="oauthAppAbuseReportForm">
-      <div className="input-group-btn">{abuseReasonDropdown}</div>
-
-      <div className="form-group">
-        <textarea
-          id="userReportMessage"
-          placeholder={translate(reportModal.textPlaceholder)}
-          name="message"
-          className="form-control input-field authorization-report-reason"
-          maxLength={1000}
-          rows={10}
-          onChange={e => setReportDetails(e.target.value)}
-        >
-          {reportDetails}
-        </textarea>
-      </div>
+    <form
+      className="flex flex-col gap-medium margin-y-medium"
+      autoComplete="off"
+      name="oauthAppAbuseReportForm"
+    >
+      {abuseReasonDropdown}
+      <textarea
+        id="userReportMessage"
+        placeholder={translate(reportModal.textPlaceholder)}
+        name="message"
+        className="form-control input-field authorization-report-reason"
+        maxLength={1000}
+        rows={10}
+        onChange={e => setReportDetails(e.target.value)}
+      >
+        {reportDetails}
+      </textarea>
     </form>
   );
 

@@ -151,7 +151,7 @@ const AnnouncementDisplay = ({
     [groupId, id, messageId, systemFeedbackService, translate, trackReactionToggled]
   );
 
-  // Only signed-in users can react. Anyone else sees the row in view-only mode.
+  // Only signed-in users can react. Anyone else sees view-only mode.
   const reactionsViewOnly = !CurrentUser?.isAuthenticated;
 
   const canRenderRichText = features.AnnouncementsRichTextRead && !!content.slate;

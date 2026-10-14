@@ -52,6 +52,7 @@ export type TextContentEditorProps = {
   contentLeadingControl?: React.ReactNode;
   /** Flow content rendered below the content editor's text, above its control row. */
   contentFooter?: React.ReactNode;
+  isLinkAuthoringEnabled?: boolean;
 } & WithTranslationsProps;
 
 const VALIDATION_DEBOUNCE_MS = 500;
@@ -89,6 +90,7 @@ const TextContentEditor = ({
   footerControls,
   contentLeadingControl,
   contentFooter,
+  isLinkAuthoringEnabled,
   translate
 }: TextContentEditorProps): JSX.Element => {
   const [title, setTitle] = useState<MessageContent>(
@@ -275,6 +277,7 @@ const TextContentEditor = ({
                 minHeight={hasTitle ? 'Medium' : undefined}
                 leadingControl={contentLeadingControl}
                 footer={contentFooter}
+                isLinkAuthoringEnabled={isLinkAuthoringEnabled}
                 validationError={
                   countdown?.isActive
                     ? translate('Error.RetryAfterSeconds', {

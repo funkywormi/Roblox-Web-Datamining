@@ -13,6 +13,7 @@ import {
   ProgressCircle,
 } from "@rbx/foundation-ui";
 import SettingsSection from "../../../../common/components/SettingsSection";
+import InformationalScreen from "../../../../common/components/InformationalScreen";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import {
@@ -84,7 +85,7 @@ const TopGames = ({
   if (isError && games.length === 0) {
     return (
       <SettingsSection description={description}>
-        <div role="alert">{translate(commonTranslationConstants.unknownError)}</div>
+        <InformationalScreen descriptionTranslationKey={commonTranslationConstants.unknownError} />
       </SettingsSection>
     );
   }

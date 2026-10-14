@@ -62,7 +62,9 @@ const MessageList = ({
     if (timelineItem.type === "Timestamp" || timelineItem.type === "System") {
       return (
         <li key={timelineItem.id} className="flex justify-center padding-x-medium">
-          <span className="text-caption-small content-muted text-center">{timelineItem.label}</span>
+          <span className="text-caption-small content-muted text-align-x-center">
+            {timelineItem.label}
+          </span>
         </li>
       );
     }

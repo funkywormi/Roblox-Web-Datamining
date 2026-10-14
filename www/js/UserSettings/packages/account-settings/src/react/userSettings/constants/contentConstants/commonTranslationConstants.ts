@@ -3,6 +3,8 @@ export default {
   successDialogButtonText: "Action.SuccessDialogButtonText",
   unknownError: "MessageUnknownError",
   rateLimitedError: "Message.Error.TooManyRequests",
+  previous: "Action.Previous",
+  next: "Action.Next",
   modal: {
     closeBtn: "Action.Dialog.Close",
     positiveBtnText: "Action.Dialog.Yes",

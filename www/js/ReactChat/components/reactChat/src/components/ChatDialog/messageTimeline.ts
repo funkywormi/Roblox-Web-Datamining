@@ -58,7 +58,11 @@ export const createTimelineItems = (messages: TChatMessage[]): TMessageTimelineI
     const currentGroupFirstMessage = currentMessageGroup?.messages[0];
     const shouldStartNewGroup =
       currentGroupFirstMessage === undefined ||
-      getSenderKey(currentGroupFirstMessage) !== getSenderKey(message);
+      getSenderKey(currentGroupFirstMessage) !== getSenderKey(message) ||
+      // App Chat parity: a hidden message never shares a group with its neighbours, so each one
+      // keeps its own avatar and fully rounded bubble.
+      message.isHidden === true ||
+      currentMessageGroup?.messages.at(-1)?.isHidden === true;
 
     if (shouldStartNewGroup) {
       currentMessageGroup = {

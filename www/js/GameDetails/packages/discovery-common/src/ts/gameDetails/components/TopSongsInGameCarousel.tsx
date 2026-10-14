@@ -61,6 +61,7 @@ export const TopSongsInGameCarousel = ({
           actionType: SduiActionType.OpenSongDetails,
           actionParams: {
             itemId: song.assetId,
+            openInNewTab: true,
           },
         },
       },

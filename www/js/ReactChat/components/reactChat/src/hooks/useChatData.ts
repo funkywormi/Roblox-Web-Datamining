@@ -88,7 +88,9 @@ export const useChatData = (): TUseChatDataResult => {
   const conversationsQuery = useInfiniteQuery<TGetUserConversationsResponse, Error>({
     queryKey: chatQueryKeys.conversations(),
     queryFn: ({ pageParam }: { pageParam?: string | null }) => getUserConversations(pageParam),
-    getNextPageParam: lastPage => lastPage.next_cursor ?? undefined,
+    // The API ends the list with an empty cursor, and requesting it returns the first page again.
+    getNextPageParam: lastPage =>
+      lastPage.next_cursor === "" ? undefined : (lastPage.next_cursor ?? undefined),
     // The shared queryClient disables retries; without this a flaky cold-boot fetch strands the
     // list on the loading state forever. Retry transient failures, but back off hard on a 429 and
     // never hammer a rate-limited endpoint (ROACTCHAT-2678) — see conversationsRetry.

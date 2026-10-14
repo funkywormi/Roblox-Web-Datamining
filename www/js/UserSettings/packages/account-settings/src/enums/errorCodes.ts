@@ -54,6 +54,8 @@ export enum ChangePasswordErrorCode {
   InvalidPassword = 7,
   InvalidCurrentPassword = 8,
   PinLocked = 9,
+  PasswordLowComplexity = 17,
+  PasswordTooSimilarToUsername = 18,
 }
 
 export enum UsernameValidateErrorCode {

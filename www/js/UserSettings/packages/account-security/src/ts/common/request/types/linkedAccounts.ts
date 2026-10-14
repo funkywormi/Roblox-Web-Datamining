@@ -1,5 +1,5 @@
-import { UrlConfig } from "@rbx/core-scripts/http";
 import environmentUrls from "@rbx/environment-urls";
+import type { RequestConfig } from "../requestConfig";
 
 const LINKED_ACCOUNTS_SERVICE_URL = `${environmentUrls.apiGatewayUrl}/linked-accounts-service/v1`;
 const REQUEST_TIMEOUT = 10000;
@@ -80,13 +80,13 @@ export type AcceptAccountLinkResponse = AccountLinkUpdateIntentResponse & {
 
 export type GetPendingAccountLinkResponse = AccountLinkUpdateIntentResponse;
 
-export const GET_LINKED_ACCOUNTS_CONFIG: UrlConfig = {
+export const GET_LINKED_ACCOUNTS_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${LINKED_ACCOUNTS_SERVICE_URL}/linked-accounts`,
   timeout: REQUEST_TIMEOUT,
 };
 
-const linkedAccountsConfig = (path: string): UrlConfig => ({
+const linkedAccountsConfig = (path: string): RequestConfig => ({
   withCredentials: true,
   url: `${LINKED_ACCOUNTS_SERVICE_URL}/${path}`,
   timeout: REQUEST_TIMEOUT,

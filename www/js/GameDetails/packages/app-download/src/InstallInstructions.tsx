@@ -6,7 +6,7 @@ import {
 import { appDownloadTranslationConfig, downloadPageStrings } from "./constants";
 import type { AppDownloadLink } from "./constants";
 import { getInstallInstructions } from "./appDownloadService";
-import "./InstallInstructions.scss";
+import "./InstallInstructions.css";
 
 type Props = {
   translate: TranslateFunction;

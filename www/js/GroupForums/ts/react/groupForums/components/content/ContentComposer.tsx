@@ -1,5 +1,5 @@
 /* eslint-disable user-communities/no-large-components */
-import React, { ReactNode, useCallback, useState, useMemo, useRef } from 'react';
+import React, { ReactNode, useCallback, useContext, useState, useMemo, useRef } from 'react';
 import { withTranslations, WithTranslationsProps } from 'react-utilities';
 import classNames from 'classnames';
 import { Button } from '@rbx/foundation-ui';
@@ -15,6 +15,7 @@ import useForumsRateLimitCountdown from '../../hooks/useForumsRateLimitCountdown
 import { MessageContent } from '../../../shared/types';
 import useStatefulForm from '../../../shared/hooks/useStatefulForm';
 import useValidationError from '../../../shared/hooks/useValidationError';
+import { CommunityProductFeaturesContext } from '../../../shared/contexts/CommunityProductFeaturesContext';
 
 const VALIDATION_DEBOUNCE_MS = 500;
 
@@ -60,6 +61,8 @@ const ContentComposer = ({
 }: ContentComposerProps): JSX.Element => {
   const [content, setContent] = useState<MessageContent | undefined>(defaultContent);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  // Not the throwing hook: some hosts render the composer outside the provider. Links stay off there.
+  const { features } = useContext(CommunityProductFeaturesContext);
 
   const { updateFormItem, resetForm, formStatus } = useStatefulForm([
     {
@@ -175,6 +178,7 @@ const ContentComposer = ({
           isCollapsedInitially={isCollapsedInitially}
           leadingControl={contentLeadingControl}
           footer={contentFooter}
+          isLinkAuthoringEnabled={features.ForumsLinksCreate}
           autoResize
         />
         <div className='content-composer-footer'>

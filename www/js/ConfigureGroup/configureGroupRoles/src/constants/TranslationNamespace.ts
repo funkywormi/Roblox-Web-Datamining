@@ -4,6 +4,7 @@ enum TranslationNamespace {
   Home = 'CreatorDashboard.Home',
   Organization = 'CreatorDashboard.Organization',
   Permissions = 'CreatorDashboard.Permissions',
+  Publishing = 'CreatorDashboard.Publishing',
   GroupManagement = 'Feature.GroupManagement',
   Groups = 'Feature.Groups',
   StudioManageCollaborators = 'Studio.ManageCollaborators',

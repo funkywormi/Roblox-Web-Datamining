@@ -3,7 +3,7 @@ import type { ResolvedPermissions } from '../clients/groups';
 export const canAssignRole = (permissions: ResolvedPermissions | undefined): boolean =>
   permissions?.canAssign === true;
 
-export const canEditRoleMetadata = (permissions: ResolvedPermissions | undefined): boolean =>
+const canEditRoleMetadata = (permissions: ResolvedPermissions | undefined): boolean =>
   permissions?.canEditMetadata === true;
 
 export const canEditRolePermissions = (permissions: ResolvedPermissions | undefined): boolean =>

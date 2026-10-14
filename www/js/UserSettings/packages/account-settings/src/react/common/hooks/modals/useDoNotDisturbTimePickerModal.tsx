@@ -1,14 +1,13 @@
-import React, { useState } from "react";
-import { IModalService } from "react-style-guide";
+import React from "react";
 import {
+  type IModalService,
   TUpdateUserSettingValueRequest,
   UserSetting,
   TDoNotDisturbTimeWindow,
   useSnackbar,
+  useDoNotDisturbTimePickerModal as useDndTimePickerModal,
 } from "@rbx/user-settings";
 import { useUpdateUserSettingValueMutation } from "../../../apis/userSettingsApi";
-import useSettingsModal from "./useSettingsModal";
-import useTimeSelector from "../../../userSettings/hooks/useTimeSelector";
 import useWrappedTranslation from "../../../userSettings/hooks/useWrappedTranslation";
 import commonTranslationConstants from "../../../userSettings/constants/contentConstants/commonTranslationConstants";
 import parentalControlsTranslationConstants from "../../../userSettings/constants/contentConstants/parentalControlsTranslationConstants";
@@ -29,26 +28,6 @@ const useDoNotDisturbTimePickerModal = (
   const { notifications } = parentalControlsTranslationConstants;
 
   const [updateSettingValue, { isLoading }] = useUpdateUserSettingValueMutation();
-
-  // Start time modal selector
-  const [selectedStartTime, startTimeSelector, resetStartTime, isStartTimeValid] = useTimeSelector(
-    currentTimeWindow?.startTimeMinutes ?? 0,
-    translate(notifications.doNotDisturb.timeLabels.hour),
-    translate(notifications.doNotDisturb.timeLabels.minute),
-    translate(notifications.doNotDisturb.timeLabels.ampm),
-    translate(notifications.doNotDisturb.timeLabels.am),
-    translate(notifications.doNotDisturb.timeLabels.pm),
-  );
-
-  // End time modal selector
-  const [selectedEndTime, endTimeSelector, resetEndTime, isEndTimeValid] = useTimeSelector(
-    currentTimeWindow?.endTimeMinutes ?? 0,
-    translate(notifications.doNotDisturb.timeLabels.hour),
-    translate(notifications.doNotDisturb.timeLabels.minute),
-    translate(notifications.doNotDisturb.timeLabels.ampm),
-    translate(notifications.doNotDisturb.timeLabels.am),
-    translate(notifications.doNotDisturb.timeLabels.pm),
-  );
 
   const updateTimeWindow = async (startTimeMinutes: number, endTimeMinutes: number) => {
     const newTimeWindow: TDoNotDisturbTimeWindow = {
@@ -81,72 +60,41 @@ const useDoNotDisturbTimePickerModal = (
     }
   };
 
-  // Start time modal definition
-  const startTimeBody = (
-    <div className="do-not-disturb-time-container">
-      <div className="text-description modal-description">
-        {translate(notifications.doNotDisturb.startTimePickerDescription)}
-      </div>
-      {startTimeSelector}
-      {selectedStartTime === selectedEndTime && (
-        <div className="text-error">{translate(notifications.doNotDisturb.timeWindowTooShort)}</div>
-      )}
-    </div>
-  );
-
-  const [startTimeModal, startTimeModalService] = useSettingsModal({
-    titleResourceId: notifications.doNotDisturb.startTime,
-    translatedBody: startTimeBody,
-    actionButtonTextResourceId: commonTranslationConstants.continue,
-    neutralButtonTextResourceId: commonTranslationConstants.cancel,
-    shouldCloseModalOnActionButton: true,
-    onAction: async () => {
+  const labels = {
+    actionButtonText: translate(commonTranslationConstants.continue),
+    cancelButtonText: translate(commonTranslationConstants.cancel),
+    closeLabel: translate(commonTranslationConstants.modal.closeBtn),
+    errorText: translate(notifications.doNotDisturb.timeWindowTooShort),
+    hourLabel: translate(notifications.doNotDisturb.timeLabels.hour),
+    minuteLabel: translate(notifications.doNotDisturb.timeLabels.minute),
+    ampmLabel: translate(notifications.doNotDisturb.timeLabels.ampm),
+    amLabel: translate(notifications.doNotDisturb.timeLabels.am),
+    pmLabel: translate(notifications.doNotDisturb.timeLabels.pm),
+    isDisabled: isLoading,
+  };
+  const [startTimeModal, startTimeModalService] = useDndTimePickerModal({
+    ...labels,
+    titleText: translate(notifications.doNotDisturb.startTime),
+    bodyText: translate(notifications.doNotDisturb.startTimePickerDescription),
+    initTimeMinutes: currentTimeWindow?.startTimeMinutes ?? 0,
+    invalidTimeMinutes: currentTimeWindow?.endTimeMinutes ?? 0,
+    onAction: async selectedTime => {
       if (currentTimeWindow) {
-        await updateTimeWindow(selectedStartTime, currentTimeWindow.endTimeMinutes);
+        await updateTimeWindow(selectedTime, currentTimeWindow.endTimeMinutes);
       }
     },
-    onNeutral: () => {
-      resetStartTime(currentTimeWindow?.startTimeMinutes ?? 0);
-    },
-    onHide: () => {
-      resetStartTime(currentTimeWindow?.startTimeMinutes ?? 0);
-    },
-    disableActionButton: !isStartTimeValid || isLoading || selectedStartTime === selectedEndTime,
-    size: "sm",
   });
-
-  // End time modal definition
-  const endTimeBody = (
-    <div className="do-not-disturb-time-container">
-      <div className="text-description modal-description">
-        {translate(notifications.doNotDisturb.endTimePickerDescription)}
-      </div>
-      {endTimeSelector}
-      {selectedStartTime === selectedEndTime && (
-        <div className="text-error">{translate(notifications.doNotDisturb.timeWindowTooShort)}</div>
-      )}
-    </div>
-  );
-
-  const [endTimeModal, endTimeModalService] = useSettingsModal({
-    titleResourceId: notifications.doNotDisturb.endTime,
-    translatedBody: endTimeBody,
-    actionButtonTextResourceId: commonTranslationConstants.continue,
-    neutralButtonTextResourceId: commonTranslationConstants.cancel,
-    shouldCloseModalOnActionButton: true,
-    onAction: async () => {
+  const [endTimeModal, endTimeModalService] = useDndTimePickerModal({
+    ...labels,
+    titleText: translate(notifications.doNotDisturb.endTime),
+    bodyText: translate(notifications.doNotDisturb.endTimePickerDescription),
+    initTimeMinutes: currentTimeWindow?.endTimeMinutes ?? 0,
+    invalidTimeMinutes: currentTimeWindow?.startTimeMinutes ?? 0,
+    onAction: async selectedTime => {
       if (currentTimeWindow) {
-        await updateTimeWindow(currentTimeWindow.startTimeMinutes, selectedEndTime);
+        await updateTimeWindow(currentTimeWindow.startTimeMinutes, selectedTime);
       }
     },
-    onNeutral: () => {
-      resetEndTime(currentTimeWindow?.endTimeMinutes ?? 0);
-    },
-    onHide: () => {
-      resetEndTime(currentTimeWindow?.endTimeMinutes ?? 0);
-    },
-    disableActionButton: !isEndTimeValid || isLoading || selectedStartTime === selectedEndTime,
-    size: "sm",
   });
 
   const modals = (

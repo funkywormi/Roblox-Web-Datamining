@@ -25,6 +25,7 @@ import { MessageContent } from '../../shared/types';
 import { logGroupForumsClickEvent } from '../../shared/utils/logging';
 import { getPlainText, hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import usePostComposerAttachments from '../hooks/usePostComposerAttachments';
+import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
 import { CreateSupportTicketRequest, TicketCategory } from '../types/supportTicket';
 import { getPostErrorKey, MODERATION_ERROR_KEY, NETWORK_ERROR_KEY } from '../utils/postErrorUtils';
 
@@ -49,6 +50,7 @@ const PostComposer = ({
   const [activeCategoryId, setActiveCategoryId] = useState(defaultCategoryId);
   const [submitErrorKey, setSubmitErrorKey] = useState<string | null>(null);
   const { canCreatePost, canEditPost, canCreatePostInCategory } = useForumPermissions();
+  const { features } = useCommunityProductFeatures();
 
   const { systemFeedbackService } = useSystemFeedback();
   const setPostRateLimitExpiresAt = useForumStore.use.setPostRateLimitExpiresAt();
@@ -304,6 +306,7 @@ const PostComposer = ({
         isRichTextEnabled
         contentLeadingControl={attachmentLeadingControl}
         contentFooter={attachmentFooter}
+        isLinkAuthoringEnabled={features.ForumsLinksCreate}
       />
       {supportTicketModal}
       {imageUploadInput}

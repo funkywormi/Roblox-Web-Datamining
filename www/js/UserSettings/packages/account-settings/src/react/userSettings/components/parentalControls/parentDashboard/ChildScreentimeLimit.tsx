@@ -1,17 +1,22 @@
 import React from "react";
+import { QueryStatus } from "@reduxjs/toolkit/query";
 import { useTranslation } from "react-utilities";
+import { Loading } from "react-style-guide";
 import { TUpdateUserSettingValueRequest, UserSetting, useSnackbar } from "@rbx/user-settings";
 import { useUpdateUserSettingValueMutation } from "../../../../apis/userSettingsApi";
 import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOptions";
 import { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
 import { handleChildSettingsUpdateError } from "../../../utils/successMessageUtils";
+import InformationalScreen from "../../../../common/components/InformationalScreen";
 import ScreentimeLimitControl from "../shared/ScreentimeLimitControl";
 
 const ChildScreentimeLimit = ({ child }: { child: TChildInfo }): JSX.Element => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
-  const [childSettings] = useGetSettingsAndOptions(child.userId);
+  const [childSettings, status] = useGetSettingsAndOptions(child.userId, {
+    showErrorSnackbar: false,
+  });
   const [updateChildSettings] = useUpdateUserSettingValueMutation();
 
   const saveScreentimeLimitHandler = async (newValue: number) => {
@@ -31,6 +36,14 @@ const ChildScreentimeLimit = ({ child }: { child: TChildInfo }): JSX.Element => 
     }
   };
 
+  if (status === QueryStatus.rejected) {
+    return (
+      <InformationalScreen descriptionTranslationKey={commonTranslationConstants.unknownError} />
+    );
+  }
+  if (status === QueryStatus.pending && !childSettings) {
+    return <Loading />;
+  }
   return (
     <ScreentimeLimitControl
       currentLimitMinutes={childSettings?.dailyScreenTimeLimit?.currentValue}

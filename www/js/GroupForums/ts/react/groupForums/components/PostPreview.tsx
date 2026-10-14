@@ -12,7 +12,9 @@ import PostPreviewReactions from './PostPreviewReactions';
 import PostPreviewInlineReactions, {
   REACTION_PICKER_POPOVER_CLASS
 } from './PostPreviewInlineReactions';
-import AnimatedAbbreviatedCount from '../../shared/components/AnimatedAbbreviatedCount';
+import AnimatedAbbreviatedCount, {
+  getAbbreviatedCountText
+} from '../../shared/components/AnimatedAbbreviatedCount';
 import groupForumsConstants, { FOCUS_COMMENT_PARAM } from '../constants/groupForumsConstants';
 import PostMenu, { POST_MENU_CLASS } from './PostMenu';
 import {
@@ -302,6 +304,7 @@ const PostPreview = ({
   const hasStatuses = isUnread || (showPinned && isPinned) || isLocked;
   const renderReplyArea = () => {
     if (showReplyButton) {
+      const replyCountDisplay = getAbbreviatedCountText(replyCount, 'reply');
       return (
         <div
           className={`${POST_PREVIEW_REPLY_AREA_CLASS} flex-shrink-0`}
@@ -334,7 +337,7 @@ const PostPreview = ({
                 onPointerUp={e => e.stopPropagation()}
                 onClick={replyState.disabled ? undefined : onPressReply}>
                 <span className='group-forums-comment-reply-icon' />
-                {translate('Action.Reply')}
+                {translate('Action.ReplyWithCount', { replyCount: replyCountDisplay })}
               </AccessibleDivButton>
             </AgeCheckWrapper>
           </ConditionalTooltip>

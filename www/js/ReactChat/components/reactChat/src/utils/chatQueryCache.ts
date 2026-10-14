@@ -1,6 +1,10 @@
 import type { InfiniteData, QueryClient } from "@tanstack/react-query";
 import { chatQueryKeys } from "../constants/queryKeys";
-import type { TChatApiConversation, TGetUserConversationsResponse } from "../types/api";
+import type {
+  TChatApiConversation,
+  TGetConversationMessagesResponse,
+  TGetUserConversationsResponse,
+} from "../types/api";
 
 // Tombstones unfriended/blocked users so useChatData filters their 1:1 out of the list until the
 // server stops returning it (see removedFriendUserIds). De-duped.
@@ -116,4 +120,21 @@ export function patchConversationInListCache(
       };
     },
   );
+}
+
+// Writes a conversation's cached messages without moving dataUpdatedAt. useConversationMessages
+// reads dataUpdatedAt as "the server last answered for the latest page", and every setQueryData
+// moves it unless it is told otherwise. A client-only write, such as the optimistic send or its
+// removal, is not a server answer and must not reload the older pages.
+export function setConversationMessagesCache(
+  queryClient: Pick<QueryClient, "setQueryData" | "getQueryState">,
+  conversationId: string,
+  updater: (
+    current: TGetConversationMessagesResponse | undefined,
+  ) => TGetConversationMessagesResponse | undefined,
+): void {
+  const queryKey = chatQueryKeys.conversationMessages(conversationId);
+  queryClient.setQueryData<TGetConversationMessagesResponse>(queryKey, updater, {
+    updatedAt: queryClient.getQueryState(queryKey)?.dataUpdatedAt,
+  });
 }

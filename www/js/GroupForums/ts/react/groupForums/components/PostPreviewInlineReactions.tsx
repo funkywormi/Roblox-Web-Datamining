@@ -26,7 +26,6 @@ import '../../../../css/tailwind.css';
 
 export const REACTION_PICKER_POPOVER_CLASS = 'group-forums-inline-reaction-picker';
 
-const PICKER_HOVER_CLOSE_DELAY_MS = 300;
 const PICKER_LAYOUT_PROPERTY = '--inline-reaction-picker-layout';
 // Mirror the chip gap and overflow chip width from _commentReactions.scss.
 const CHIP_GAP_PX = 8;
@@ -80,9 +79,7 @@ const PostPreviewInlineReactions = ({
   const [reactions, setReactions] = useState<Reaction[]>(initialReactions);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const hasReactionsContent = canToggleReactions || reactions.length > 0;
-  const triggerRef = useRef<HTMLDivElement>(null);
   const pendingReactionIds = useRef(new Set<string>());
-  const hoverCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setReactions(initialReactions);
@@ -248,18 +245,6 @@ const PostPreviewInlineReactions = ({
     [handleToggleReaction]
   );
 
-  const cancelHoverClose = useCallback(() => {
-    if (hoverCloseTimeout.current) {
-      clearTimeout(hoverCloseTimeout.current);
-      hoverCloseTimeout.current = null;
-    }
-  }, []);
-
-  const openPicker = useCallback(() => {
-    cancelHoverClose();
-    setIsPickerOpen(true);
-  }, [cancelHoverClose]);
-
   // A div takes no key press of its own, and the card opens the post on the same keys.
   const handleTriggerKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -267,42 +252,6 @@ const PostPreviewInlineReactions = ({
     event.stopPropagation();
     setIsPickerOpen(current => !current);
   }, []);
-
-  const scheduleHoverClose = useCallback(() => {
-    if (hoverCloseTimeout.current) return;
-    hoverCloseTimeout.current = setTimeout(() => {
-      hoverCloseTimeout.current = null;
-      setIsPickerOpen(false);
-    }, PICKER_HOVER_CLOSE_DELAY_MS);
-  }, []);
-
-  // The picker is portaled out of the card, so it is not a descendant of the trigger and CSS :hover
-  // cannot span both. Hit testing natively also covers the gap left by the popover's side offset.
-  useEffect(() => {
-    if (!isPickerOpen || showBottomSheet) return undefined;
-
-    const handlePointerOver = (event: PointerEvent) => {
-      const target = event.target as Node | null;
-      if (!target || event.pointerType === 'touch') return;
-
-      const pickerId = triggerRef.current?.getAttribute('aria-controls');
-      const isPointerOnTriggerOrPicker =
-        triggerRef.current?.contains(target) ||
-        (pickerId && document.getElementById(pickerId)?.contains(target));
-
-      if (isPointerOnTriggerOrPicker) {
-        cancelHoverClose();
-      } else {
-        scheduleHoverClose();
-      }
-    };
-
-    document.addEventListener('pointerover', handlePointerOver);
-    return () => {
-      document.removeEventListener('pointerover', handlePointerOver);
-      cancelHoverClose();
-    };
-  }, [isPickerOpen, showBottomSheet, cancelHoverClose, scheduleHoverClose]);
 
   if (!hasReactionsContent) {
     return null;
@@ -320,7 +269,6 @@ const PostPreviewInlineReactions = ({
             }}>
             {showBottomSheet ? (
               <div
-                ref={triggerRef}
                 role='button'
                 tabIndex={0}
                 className='group-forums-comment-reactions-add-new outline-none'
@@ -338,24 +286,17 @@ const PostPreviewInlineReactions = ({
               <Popover open={isPickerOpen} onOpenChange={setIsPickerOpen}>
                 <PopoverTrigger asChild>
                   <div
-                    ref={triggerRef}
                     role='button'
                     tabIndex={0}
                     className='group-forums-comment-reactions-add-new outline-none'
                     aria-label={translate('Action.React')}
                     onPointerDown={e => e.stopPropagation()}
-                    onPointerEnter={e => {
-                      if (e.pointerType !== 'touch') openPicker();
-                    }}
                     onKeyDown={handleTriggerKeyDown}
-                    onPointerUp={e => {
-                      if (e.pointerType !== 'touch') return;
-                      e.stopPropagation();
-                      setIsPickerOpen(current => !current);
-                    }}
+                    onPointerUp={e => e.stopPropagation()}
                     onClick={e => {
                       e.preventDefault();
                       e.stopPropagation();
+                      setIsPickerOpen(current => !current);
                     }}>
                     <span className='group-forums-comment-reactions-add-new-icon' />
                   </div>

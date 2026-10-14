@@ -346,7 +346,7 @@ const ChatDialog = ({
           onRemoveTrustedConnection={onRemoveTrustedConnection}
         />
       ) : (
-        <div className="flex grow-1 items-center justify-center padding-large text-center">
+        <div className="flex grow-1 items-center justify-center padding-large text-align-x-center">
           <span className="text-body-medium content-muted">
             {translate(fallbackScreenTranslationKeys[conversation.currentScreen])}
           </span>

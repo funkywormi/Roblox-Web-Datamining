@@ -42,6 +42,10 @@ function configureGroupPageController(
   ctrl.loadGroup = function (groupId) {
     return groupsService.getGroup(groupId).then(
       function (result) {
+        if (result?.isDeactivated === true) {
+          groupUtilityService.redirectToPage(groupsConstants.absoluteUrls.forbidden);
+          return;
+        }
         if (result) {
           ctrl.group.description = result.description;
           ctrl.group.memberCount = result.memberCount;

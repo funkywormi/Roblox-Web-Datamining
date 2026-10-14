@@ -196,6 +196,10 @@ button.btn-common-play-game-unplayable-lg {
     min-width: min(100% - max(2*var(--margin-small), env(safe-area-inset-left) + env(safe-area-inset-right)), 393px)
 }
 
+.width-\[180px\] {
+    width: 180px
+}
+
 .width-\[260px\] {
     width: 260px
 }
@@ -296,6 +300,10 @@ button.btn-common-play-game-unplayable-lg {
 
 .icon-filled-globe-simplified {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M29.9775 16.877C29.5998 23.8515 24.1187 29.4664 17.2021 30.0547C20.1032 25.9051 21.8113 21.8518 21.999 17.0391C21.9995 17.026 21.9995 17.013 22 17H29.5C29.6733 17 29.8355 16.9545 29.9775 16.877ZM10 17.0391C10.1855 21.7964 11.511 25.8359 14.2959 30.0039C7.65797 29.1983 2.45381 23.7483 2.0293 17H9.99902C9.99951 17.013 9.99949 17.026 10 17.0391ZM19.999 17C19.8275 21.1928 18.3894 24.7988 15.7725 28.6172C13.3043 24.8349 12.1708 21.2255 12 17H19.999ZM17.457 2.18164C24.1792 2.87672 29.4882 8.32927 29.9639 15.1143C29.8252 15.0415 29.6675 15 29.5 15H22.0068C21.7996 8.89324 19.5187 5.31708 17.457 2.18164ZM14.54 2.18262C12.4788 5.31763 10.2002 8.89441 9.99316 15H2.04395C2.57081 8.26914 7.85702 2.87509 14.54 2.18262ZM15.999 3.61035C17.9391 6.58133 19.814 9.70194 20.0049 15H11.9941C12.1849 9.70212 14.0591 6.58119 15.999 3.61035Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-lock-closed {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M16 3C19.3137 3 22 5.68629 22 9V11H24C25.6569 11 27 12.3431 27 14V25.7637C27 26.5212 26.5688 27.2098 25.8555 27.4648L25.1543 27.7002C23.3318 28.2767 20.208 29 16 29C11.1906 29 7.79732 28.0557 6.14453 27.4648C5.43124 27.2098 5 26.5212 5 25.7637V14C5 12.3431 6.34315 11 8 11H10V9C10 5.68629 12.6863 3 16 3ZM8 13C7.44772 13 7 13.4477 7 14V25.6426C8.5414 26.1739 11.6332 27 16 27C20.3668 27 23.4586 26.1739 25 25.6426V14C25 13.4477 24.5523 13 24 13H8ZM16 17C16.5523 17 17 17.4477 17 18V22C17 22.5523 16.5523 23 16 23C15.4477 23 15 22.5523 15 22V18C15 17.4477 15.4477 17 16 17ZM16 5C13.7909 5 12 6.79086 12 9V11H20V9C20 6.79086 18.2091 5 16 5Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-filled-magnifying-glass {
@@ -461,8 +469,17 @@ button.btn-common-play-game-unplayable-lg {
     align-self: flex-end
 }
 
-.react-chat-details-action-footer button,
-.react-chat-group-name-editor-footer button {
+:-webkit-any(.react-chat-details-action-footer, .react-chat-group-name-editor-footer) button {
+    -ms-flex: 1 1 0;
+    flex: 1 1 0
+}
+
+:-moz-any(.react-chat-details-action-footer, .react-chat-group-name-editor-footer) button {
+    -ms-flex: 1 1 0;
+    flex: 1 1 0
+}
+
+:is(.react-chat-details-action-footer, .react-chat-group-name-editor-footer) button {
     -ms-flex: 1 1 0;
     flex: 1 1 0
 }
@@ -764,30 +781,45 @@ button.btn-common-play-game-unplayable-lg {
     overflow-x: hidden
 }
 
-.react-chat-thread-list::-webkit-scrollbar {
+:-webkit-any(.react-chat-thread-list, .react-chat-dialog-scroll)::-webkit-scrollbar {
     width: var(--size-100)
 }
 
-.react-chat-dialog-scroll::-webkit-scrollbar {
+:-moz-any(.react-chat-thread-list, .react-chat-dialog-scroll)::-webkit-scrollbar {
     width: var(--size-100)
 }
 
-.react-chat-thread-list::-webkit-scrollbar-track {
+:is(.react-chat-thread-list, .react-chat-dialog-scroll)::-webkit-scrollbar {
+    width: var(--size-100)
+}
+
+:-webkit-any(.react-chat-thread-list, .react-chat-dialog-scroll)::-webkit-scrollbar-track {
     background: 0 0
 }
 
-.react-chat-dialog-scroll::-webkit-scrollbar-track {
+:-moz-any(.react-chat-thread-list, .react-chat-dialog-scroll)::-webkit-scrollbar-track {
     background: 0 0
 }
 
-.react-chat-thread-list::-webkit-scrollbar-thumb {
+:is(.react-chat-thread-list, .react-chat-dialog-scroll)::-webkit-scrollbar-track {
+    background: 0 0
+}
+
+:-webkit-any(.react-chat-thread-list, .react-chat-dialog-scroll)::-webkit-scrollbar-thumb {
     background-color: var(--color-stroke-emphasis);
     border: var(--size-50)solid transparent;
     background-clip: content-box;
     border-radius: 999px
 }
 
-.react-chat-dialog-scroll::-webkit-scrollbar-thumb {
+:-moz-any(.react-chat-thread-list, .react-chat-dialog-scroll)::-webkit-scrollbar-thumb {
+    background-color: var(--color-stroke-emphasis);
+    border: var(--size-50)solid transparent;
+    background-clip: content-box;
+    border-radius: 999px
+}
+
+:is(.react-chat-thread-list, .react-chat-dialog-scroll)::-webkit-scrollbar-thumb {
     background-color: var(--color-stroke-emphasis);
     border: var(--size-50)solid transparent;
     background-clip: content-box;

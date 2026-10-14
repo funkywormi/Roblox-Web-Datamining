@@ -85,6 +85,8 @@ export const changePasswordErrorCodeToStringKeys: {
   [ChangePasswordErrorCode.InvalidCurrentPassword]:
     "Response.Dialog.ChangePasswordIncorrectPassword",
   [ChangePasswordErrorCode.PinLocked]: "MessagePinLockedError",
+  [ChangePasswordErrorCode.PasswordLowComplexity]: "Response.PasswordLowComplexity",
+  [ChangePasswordErrorCode.PasswordTooSimilarToUsername]: "Response.PasswordTooSimilarToUsername",
 };
 
 export const usernameValidateErrorCodeToStringKeys: {

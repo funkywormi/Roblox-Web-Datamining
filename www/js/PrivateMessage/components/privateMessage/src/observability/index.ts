@@ -6,15 +6,22 @@ import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 export const observabilityRegistry = {
   featureName: "PrivateMessage",
   team: "User > Communication > Communication Platform",
+  // Matches .NET PageNameProvider.Messages and the Next.js route's pageName.
+  internalPageName: "Messages",
 
   features: {
     health: {
       counters: [{ name: "PageView", dimensions: ["host", "tab"] }],
-      criticalErrors: [{ name: "LoadFailed", dimensions: ["host", "tab"] }],
+      criticalErrors: [{ name: "LoadFailed", dimensions: ["host", "tab", "statusCode"] }],
     },
     messages: {
       counters: [{ name: "OpenTab", dimensions: ["tab"] }, "OpenMessage"],
-      errors: ["MarkReadFailed", "ArchiveFailed", "RulesLoadFailed", "NewsCountLoadFailed"],
+      errors: [
+        { name: "MarkReadFailed", dimensions: ["statusCode"] },
+        { name: "ArchiveFailed", dimensions: ["statusCode"] },
+        { name: "RulesLoadFailed", dimensions: ["statusCode"] },
+        { name: "NewsCountLoadFailed", dimensions: ["statusCode"] },
+      ],
     },
   },
 } as const satisfies RegistryInput;

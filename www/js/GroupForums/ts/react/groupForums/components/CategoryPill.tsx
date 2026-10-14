@@ -1,11 +1,9 @@
 import React, { useCallback } from 'react';
 import classNames from 'classnames';
-import { Icon } from '@rbx/foundation-ui';
+import { Chip } from '@rbx/foundation-ui';
 import { ForumCategory } from '../types';
 import groupForumsConstants from '../constants/groupForumsConstants';
 import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
-
-// TODO: replace custom-styled anchor element with foundation-web Chip component once it has href support
 
 export type CategoryPillProps = {
   category: ForumCategory;
@@ -29,39 +27,22 @@ const CategoryPill = ({ category, isActive, onClick }: CategoryPillProps): JSX.E
     [isActive, category.shortId, category.name, onClick]
   );
 
-  // Handle keyboard interactions
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLAnchorElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleClick();
-    }
-  };
-
   return (
-    <a
-      role='button'
-      tabIndex={0}
-      className={classNames(
-        'content-action-forum-category group-posts-destination-pill',
-        isActive && 'active',
-        !!onClick && 'clickable'
-      )}
+    <Chip
+      as='a'
+      aria-current={isActive ? 'page' : undefined}
+      className={classNames('group-posts-destination-chip', isActive && 'active')}
+      data-testid='forum-category-pill'
       href={groupForumsConstants.deepLinks.groupForumCategoryUrl(
         category.groupId,
         category.shortId,
         category.name
       )}
+      leadingIconName={showRestrictedIndicator ? 'icon-filled-lock-closed' : undefined}
       onClick={handleClick}
-      onKeyDown={handleKeyDown}>
-      {showRestrictedIndicator && (
-        <Icon
-          name='icon-filled-lock-closed'
-          size='Small'
-          className='group-posts-destination-pill-lock-icon'
-        />
-      )}
-      {category.name}
-    </a>
+      size='Medium'
+      text={category.name}
+    />
   );
 };
 

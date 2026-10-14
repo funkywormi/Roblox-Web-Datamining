@@ -107,6 +107,13 @@ const getMessageContent = (message: TChatApiMessage): string =>
   message.pieces?.map(piece => piece.content ?? "").join("") ??
   "";
 
+/** `visibility: "hidden"` means the server withheld the message from this viewer (age check, age
+ * band, chat settings, ...) and blanked its content. The UI shows a lock bubble in its place. */
+const HIDDEN_MESSAGE_VISIBILITY = "hidden";
+
+export const isHiddenMessage = (message: TChatApiMessage): boolean =>
+  message.visibility === HIDDEN_MESSAGE_VISIBILITY;
+
 export const toChatMessage = (
   message: TChatApiMessage,
   conversationId: string,
@@ -121,31 +128,38 @@ export const toChatMessage = (
     (previousCreatedAt == null ||
       Number.isNaN(previousCreatedAt.getTime()) ||
       createdAt.getTime() - previousCreatedAt.getTime() > timestampBreakMs);
+  const isHidden = isHiddenMessage(message);
 
   return {
     id: String(message.id ?? `${conversationId}-${message.created_at ?? Date.now()}`),
     conversationId,
     senderUserId: message.sender_user_id,
     timestampLabel: shouldShowTimestamp ? formatMessageTimestamp(createdAt) : undefined,
-    pieces: message.pieces?.map((piece, index) => ({
-      id: piece.id ?? `${message.id ?? conversationId}-piece-${index}`,
-      content: piece.content ?? "",
-    })) ?? [{ id: `${message.id ?? conversationId}-piece`, content: getMessageContent(message) }],
+    // A hidden message never carries content into the UI model. The server blanks it (for example
+    // to " "), and even a blank piece would render an empty text bubble beside the lock bubble.
+    pieces: isHidden
+      ? []
+      : (message.pieces?.map((piece, index) => ({
+          id: piece.id ?? `${message.id ?? conversationId}-piece-${index}`,
+          content: piece.content ?? "",
+        })) ?? [
+          { id: `${message.id ?? conversationId}-piece`, content: getMessageContent(message) },
+        ]),
     isSystemMessage: message.type === "system",
     isSending: String(message.id ?? "").startsWith("optimistic-"),
+    isHidden,
     isClusterMaster:
       previousMessage == null ||
       previousMessage.senderUserId !== message.sender_user_id ||
-      shouldShowTimestamp,
+      shouldShowTimestamp ||
+      // App Chat parity: a hidden message never shares a cluster with its neighbours.
+      isHidden ||
+      previousMessage.isHidden === true,
     hasLinkCard: message.hasLinkCard,
-    contentToDisplay: message.content_to_display,
+    contentToDisplay: isHidden ? undefined : message.content_to_display,
     createdAt: message.created_at,
   };
 };
-
-/** A moderated/removed message is returned with `visibility: "hidden"` and blanked content;
- * rendering it would show an empty bubble, so it is dropped from the timeline. */
-const HIDDEN_MESSAGE_VISIBILITY = "hidden";
 
 export const toChatMessages = (
   messages: TChatApiMessage[] | undefined,
@@ -153,7 +167,6 @@ export const toChatMessages = (
   timestampBreakMs: number = TIMESTAMP_BREAK_MS,
 ): TChatMessage[] =>
   (messages ?? [])
-    .filter(message => message.visibility !== HIDDEN_MESSAGE_VISIBILITY)
     .toSorted((firstMessage, secondMessage) => {
       const firstTime = new Date(firstMessage.created_at ?? 0).getTime();
       const secondTime = new Date(secondMessage.created_at ?? 0).getTime();
@@ -216,6 +229,7 @@ export const toChatConversation = (
     `friends-${(conversation.participant_user_ids ?? []).toSorted((a, b) => a - b).join("-")}`;
   const participants = getParticipantUsers(conversation, currentUserId).map(toChatParticipant);
   const previewMessage = getPreviewMessage(conversation);
+  const isPreviewHidden = previewMessage != null && isHiddenMessage(previewMessage);
   const dialogType = conversation.type === "group" ? "Group" : "Direct";
   const fallbackTitle = participants.map(participant => participant.displayName).join(", ");
   const title =
@@ -234,7 +248,10 @@ export const toChatConversation = (
     title,
     participants,
     messages: toChatMessages(conversation.messages, conversationId, timestampBreakMs),
-    preview: previewMessage ? getMessageContent(previewMessage) : "",
+    // As in App Chat, a hidden preview message shows the "not available" caption (`isPreviewHidden`)
+    // and never its text, even if the server sends one.
+    preview: previewMessage && !isPreviewHidden ? getMessageContent(previewMessage) : "",
+    isPreviewHidden,
     lastUpdatedLabel: formatBriefTimestamp(previewMessage?.created_at ?? conversation.updated_at),
     unreadCount: conversation.unread_message_count ?? 0,
     isOpen: false,

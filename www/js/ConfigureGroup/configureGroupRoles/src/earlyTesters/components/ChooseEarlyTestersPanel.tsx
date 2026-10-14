@@ -11,6 +11,7 @@ const EMPTY_MEMBER_IDS: ReadonlySet<number> = new Set();
 
 export type ChooseEarlyTestersPanelProps = {
   groupId: number;
+  universeId: string;
   selection: ReadonlyMap<number, GroupUserWithRoles>;
   onToggleMember: (member: GroupUserWithRoles) => void;
   onOpenRolePicker: () => void;
@@ -22,6 +23,7 @@ export type ChooseEarlyTestersPanelProps = {
  */
 const ChooseEarlyTestersPanel: FunctionComponent<ChooseEarlyTestersPanelProps> = ({
   groupId,
+  universeId,
   selection,
   onToggleMember,
   onOpenRolePicker,
@@ -48,6 +50,7 @@ const ChooseEarlyTestersPanel: FunctionComponent<ChooseEarlyTestersPanelProps> =
       </div>
       <GroupMemberPickerList
         groupId={groupId}
+        universeId={universeId}
         existingMemberIds={EMPTY_MEMBER_IDS}
         selection={selection}
         remainingCapacity={MAX_EARLY_TESTERS}

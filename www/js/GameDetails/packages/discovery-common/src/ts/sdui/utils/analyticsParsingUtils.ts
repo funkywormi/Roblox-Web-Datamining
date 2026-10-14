@@ -149,8 +149,8 @@ export const getSessionInfoKey = (
     case PageContext.HomePage:
       return SessionInfo.HomePageSessionInfo;
     case PageContext.GamesPage:
-      return SessionInfo.DiscoverPageSessionInfo;
     case PageContext.SongListPage:
+    case PageContext.SortDetailPageDiscover:
       return SessionInfo.DiscoverPageSessionInfo;
     case PageContext.SpotlightPage:
       return SessionInfo.SpotlightPageSessionInfo;
@@ -198,6 +198,7 @@ export const getEventContext = (pageContext: TSduiPageContext): EventContext | n
     case PageContext.HomePage:
       return EventContext.Home;
     case PageContext.GamesPage:
+    case PageContext.SortDetailPageDiscover:
       return EventContext.Games;
     case PageContext.SpotlightPage:
       return EventContext.Spotlight;

@@ -8,7 +8,7 @@ import { createClientConfiguration } from './utils';
 const configuration = createClientConfiguration('creator-settings', 'bedev2');
 const creatorSettingsApi = new CreatorSettingsAPIApi(configuration);
 
-export const GROUP_UNIFIED_ACKNOWLEDGEMENT_SETTING_TYPE =
+const GROUP_UNIFIED_ACKNOWLEDGEMENT_SETTING_TYPE =
   GenericCreatorSettingType.GroupUnifiedAcknowledgement;
 
 interface CreatorSettingsClient {

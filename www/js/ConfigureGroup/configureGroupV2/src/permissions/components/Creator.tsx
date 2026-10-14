@@ -50,12 +50,14 @@ export const Creator: FunctionComponent<CreatorProps> = ({
   const { showMobileView } = usePermissionsUiConfig();
 
   let startIcon;
+  let isRole = false;
 
   switch (creatorDetails.type) {
     case CreatorTypes.MEMBER_ROLE:
     case CreatorTypes.LEGACY_ROLE:
     case CreatorTypes.GUEST_ROLE:
     case CreatorTypes.ROLE:
+      isRole = true;
       startIcon = (
         <RoleIcon
           roleId={
@@ -106,6 +108,8 @@ export const Creator: FunctionComponent<CreatorProps> = ({
       className={cx(
         'flex width-full !height-fit !grow-1 justify-start text-align-x-left [text-transform:none] [&>span:nth-child(2)]:grow-1 [&>span:nth-child(2)]:max-width-full [&>span:nth-child(2)]:min-width-0 [&>span:nth-child(2)>span:nth-child(1)]:width-full',
         { [selectedClass]: selected, [ownerClass]: isOwner },
+        isRole &&
+          '[&>span:nth-child(2)>span:nth-child(1)]:text-wrap [&>span:nth-child(2)>span:nth-child(1)]:text-truncate-none',
       )}
       data-testid={`creator-button-${creatorDetails.id}`}
       aria-selected={selected}
@@ -115,9 +119,13 @@ export const Creator: FunctionComponent<CreatorProps> = ({
         container
         className='flex width-full max-width-full no-wrap justify-between items-center padding-y-xsmall'>
         <div className='flex grow-1 flex-row items-center width-full'>
-          <span className='flex grow-0 shrink-0'>{startIcon}</span>
-          <span className='block text-no-wrap clip text-truncate-end grow-1 shrink-1 text-align-x-left padding-left-small'>
-            <span className={clipText}>{creatorDetails.name}</span>
+          <span className={cx('flex grow-0 shrink-0', isRole && 'self-start')}>{startIcon}</span>
+          <span
+            className={cx(
+              'block grow-1 shrink-1 min-width-0 text-align-x-left padding-left-small',
+              isRole ? 'text-wrap [overflow-wrap:anywhere]' : 'text-no-wrap clip text-truncate-end',
+            )}>
+            <span className={isRole ? 'block width-full' : clipText}>{creatorDetails.name}</span>
             <Typography variant='body2' className={cx(clipText, subText)}>
               {creatorDetails.subtext}
             </Typography>

@@ -1,6 +1,13 @@
 @font-face {
-    font-family: Comic Neue Angular;
-    src: url(https://css.rbxcdn.com/b3a872b70b067e30.woff2)format("woff2");
+    font-family: Comic Neue;
+    src: url(https://css.rbxcdn.com/7a41d8172d76c558.woff2)format("woff2");
+    font-weight: 400;
+    font-style: normal
+}
+
+@font-face {
+    font-family: Comic Neue;
+    src: url(https://css.rbxcdn.com/7a22b12771b98d4d.woff2)format("woff2");
     font-weight: 700;
     font-style: normal
 }
@@ -627,4 +634,4 @@
     font-weight: var(--font-weight-700)
 }
 
-/*# sourceMappingURL=https://sourcemaps.rbxcdn.com/builder-2052d071ce544022.css.map*/
+/*# sourceMappingURL=https://sourcemaps.rbxcdn.com/builder-e3f53096fe970658.css.map*/

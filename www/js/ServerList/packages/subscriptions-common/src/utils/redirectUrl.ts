@@ -1,10 +1,12 @@
+import { window } from "@rbx/core-lib/browser";
+
 const REDIRECT_URL_KEY = "roblox_subscription_redirect_url";
 const TTL_MS = 30 * 60 * 1000; // 30 minutes
 
 export function saveSubscriptionRedirectUrl(url: string): void {
   try {
     const payload = JSON.stringify({ url, ts: Date.now() });
-    sessionStorage.setItem(REDIRECT_URL_KEY, payload);
+    window?.sessionStorage.setItem(REDIRECT_URL_KEY, payload);
   } catch {
     // sessionStorage may be unavailable (e.g. incognito, disabled)
   }
@@ -12,10 +14,10 @@ export function saveSubscriptionRedirectUrl(url: string): void {
 
 export function consumeSubscriptionRedirectUrl(): string | null {
   try {
-    const raw = sessionStorage.getItem(REDIRECT_URL_KEY);
+    const raw = window?.sessionStorage.getItem(REDIRECT_URL_KEY);
     if (!raw) return null;
 
-    sessionStorage.removeItem(REDIRECT_URL_KEY);
+    window?.sessionStorage.removeItem(REDIRECT_URL_KEY);
 
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== "object" || parsed === null) return null;

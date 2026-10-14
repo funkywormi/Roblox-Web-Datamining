@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { authenticatedUser } from "header-scripts";
 import { FindFriendsTypes, FindFriendsUserSort } from "../../../../../types/friendsTypes";
 import OdpFriendListItem from "./OdpFriendListItem";
@@ -6,9 +6,16 @@ import FriendsListSection from "../shared/FriendsListSection";
 import useChildFriendsList from "../../../hooks/useChildFriendsList";
 import { useGetOdpChildContextQuery } from "../../../../apis/parentalControlsApi";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
+import ParentalControlsPageName from "../../../../../enums/parentalControls/ParentalControlsPageName";
+import { trackCounter } from "./observability";
+import { ParentZoneCounter } from "./observability/eventConstants";
 
 export const OdpTopFriendsPage = (): JSX.Element => {
   const { data: odpChildContext } = useGetOdpChildContextQuery();
+
+  useEffect(() => {
+    trackCounter(ParentZoneCounter.PageShown, { page: ParentalControlsPageName.FriendManagement });
+  }, []);
 
   const list = useChildFriendsList({
     userId: authenticatedUser.id!,

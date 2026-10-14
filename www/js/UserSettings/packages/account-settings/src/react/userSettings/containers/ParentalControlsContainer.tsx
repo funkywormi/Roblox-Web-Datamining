@@ -28,9 +28,12 @@ import {
   selectAllChildPages,
   selectChildDetailLandingPages,
 } from "../../apis/slices/childPagesSlice";
-import { useGetChildrenInfoQuery } from "../../apis/parentalControlsApi";
+import { useGetChildrenInfoQuery, useGetParentInfoQuery } from "../../apis/parentalControlsApi";
 import useParentalControlsActor from "../hooks/useParentalControlsActor";
-import { sendParentalControlsParentPageloadEvent } from "../services/eventServices/parentalControlsEventService";
+import {
+  sendParentalControlsOdpPageloadEvent,
+  sendParentalControlsParentPageloadEvent,
+} from "../services/eventServices/parentalControlsEventService";
 import useSettingsJourneyScreen from "../hooks/useSettingsJourneyScreen";
 
 export const ParentalControlsContainer = (): JSX.Element => {
@@ -42,6 +45,9 @@ export const ParentalControlsContainer = (): JSX.Element => {
   const { data: childrenInfo, status: childrenInfoStatus } = useGetChildrenInfoQuery();
   const { actor, isChild, isLoading, hasError: hasActorError } = useParentalControlsActor();
   const isOnDeviceParent = actor === ParentalControlsActor.OnDeviceParent;
+  const { data: parentInfo, isLoading: isParentInfoLoading } = useGetParentInfoQuery(undefined, {
+    skip: !isOnDeviceParent,
+  });
 
   useEffect(() => {
     // Error handling
@@ -127,6 +133,17 @@ export const ParentalControlsContainer = (): JSX.Element => {
       );
     }
   }, [pathNameNoTrailingSlash, currentChild, allParentalControlsPages]);
+
+  useEffect(() => {
+    if (isOnDeviceParent && !isParentInfoLoading) {
+      // Parent zone event tracking
+      sendParentalControlsOdpPageloadEvent(
+        pathNameNoTrailingSlash,
+        parentInfo?.parents,
+        parentZonePageList,
+      );
+    }
+  }, [pathNameNoTrailingSlash, isOnDeviceParent, isParentInfoLoading, parentInfo]);
 
   const getParentalControlsInnerComponent = (): JSX.Element => {
     if (isLoading) {

@@ -2,9 +2,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useChatTranslate from "./useChatTranslate";
 import { chatQueryKeys } from "../constants/queryKeys";
 import { markConversationsAsRead, sendMessage } from "../services/chatService";
-import type { TGetConversationMessagesResponse } from "../types/api";
 import type { TChatMessage } from "../types/chat";
-import { patchConversationInListCache } from "../utils/chatQueryCache";
+import {
+  patchConversationInListCache,
+  setConversationMessagesCache,
+} from "../utils/chatQueryCache";
 import { buildModeratedMessage, isModeratedSendResponse } from "../utils/chatModeration";
 import { buildFailedMessage, classifySendFailure } from "../utils/chatSendFailure";
 import { sendConversationMessageSent } from "../utils/chatAnalytics";
@@ -85,7 +87,7 @@ export const useSendMessage = () => {
         },
       });
 
-      queryClient.setQueryData<TGetConversationMessagesResponse>(queryKey, current => ({
+      setConversationMessagesCache(queryClient, conversationId, current => ({
         messages: [
           ...(current?.messages ?? []),
           {
@@ -100,7 +102,6 @@ export const useSendMessage = () => {
       }));
 
       return {
-        queryKey,
         optimisticId,
         optimisticContent,
         optimisticSenderUserId,
@@ -123,7 +124,7 @@ export const useSendMessage = () => {
       // Like moderated placeholders, it is moved into a dedicated cache key so the onSettled refetch
       // — which would not return this never-persisted message — can't drop it.
       if (context) {
-        queryClient.setQueryData<TGetConversationMessagesResponse>(context.queryKey, current =>
+        setConversationMessagesCache(queryClient, variables.conversationId, current =>
           current
             ? {
                 ...current,
@@ -179,7 +180,7 @@ export const useSendMessage = () => {
         return;
       }
 
-      queryClient.setQueryData<TGetConversationMessagesResponse>(context.queryKey, current =>
+      setConversationMessagesCache(queryClient, conversationId, current =>
         current
           ? {
               ...current,

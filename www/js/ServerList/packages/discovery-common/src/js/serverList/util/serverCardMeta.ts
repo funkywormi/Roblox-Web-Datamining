@@ -52,3 +52,40 @@ export const FRIEND_COUNT_BADGE: BadgeConfig = {
 export function isPingSignalLevel(value: unknown): value is PingSignalLevel {
   return value === "Low" || value === "Medium" || value === "High";
 }
+
+export type ServerMetaIconId =
+  | "Ping.Low"
+  | "Ping.Medium"
+  | "Ping.High"
+  | "LanguageMatch"
+  | "Friends";
+
+type VisibleIconsParams = {
+  pingSignalLevel: PingSignalLevel | null;
+  languageMatchCount: number | null;
+  friendCount: number | null;
+  showPing: boolean;
+  showLanguage: boolean;
+  showFriends: boolean;
+};
+
+export const getVisibleServerMetaIcons = ({
+  pingSignalLevel,
+  languageMatchCount,
+  friendCount,
+  showPing,
+  showLanguage,
+  showFriends,
+}: VisibleIconsParams): ServerMetaIconId[] => {
+  const icons: ServerMetaIconId[] = [];
+  if (showPing && isPingSignalLevel(pingSignalLevel)) {
+    icons.push(`Ping.${pingSignalLevel}` as ServerMetaIconId);
+  }
+  if (showLanguage && languageMatchCount != null && languageMatchCount > 0) {
+    icons.push("LanguageMatch");
+  }
+  if (showFriends && friendCount != null && friendCount > 0) {
+    icons.push("Friends");
+  }
+  return icons;
+};

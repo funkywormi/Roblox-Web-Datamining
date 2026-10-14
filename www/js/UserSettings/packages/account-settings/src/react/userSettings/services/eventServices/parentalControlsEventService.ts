@@ -7,6 +7,7 @@ import {
 } from "@rbx/user-settings";
 import wrapEventServiceWithTryCatch from "../../../../core/utils/eventUtils";
 import { TChildInfo, TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
+import type { TParentInfo } from "../../../../types/parentInfoTypes";
 import SpendSettingName from "../../../../enums/SpendSettingName";
 import ParentalControlsPageName from "../../../../enums/parentalControls/ParentalControlsPageName";
 import SettingCategoryPageName from "../../../../enums/SettingCategoryPageName";
@@ -16,6 +17,9 @@ import { getEventParams } from "../../constants/eventConstants";
 import birthdayUtils from "../../utils/birthdayUtils";
 import { optionToString } from "../../utils/parentalControls/parentalConsentUtils";
 import settingsJourneyService from "../journeys/settingsJourneyService";
+import { pageLoadOdpParentSettings } from "./odpParentSettingsEventService";
+import { pageLoadOdpParentZoneLandingPage } from "./odpFamilyEventService";
+import { baseParentalControlsPath } from "../../constants/parentalControls/parentalControlsConstants";
 
 const parentalControlsChildState = (child: TChildSettingsInfo): string => {
   const age = birthdayUtils.calculateAgeFromISO(child.birthDate);
@@ -665,6 +669,24 @@ export const sendParentalControlsParentPageloadEvent = (
         break;
       default:
     }
+  }
+};
+
+export const sendParentalControlsOdpPageloadEvent = (
+  pathname: string,
+  parents: TParentInfo[] | undefined,
+  parentZonePages: TSettingsPage[],
+): void => {
+  if (pathname === baseParentalControlsPath) {
+    pageLoadOdpParentZoneLandingPage(parents);
+    return;
+  }
+  const page = parentZonePages.find(p => matchPath(pathname, { path: p.path, exact: true }));
+  switch (page?.name) {
+    case ParentalControlsPageName.ManageOnDeviceParent:
+      pageLoadOdpParentSettings(parents);
+      break;
+    default:
   }
 };
 

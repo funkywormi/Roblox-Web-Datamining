@@ -1224,5 +1224,6 @@
     "Label.Metric.ExperienceLaunchTime": "Experience Launch Time",
     "Label.Dimension.MetricResultType": "Result type",
     "Label.Dimension.MetricResultType.CIUpper": "CI upper bound",
-    "Label.Dimension.MetricResultType.Mean": "Mean"
+    "Label.Dimension.MetricResultType.Mean": "Mean",
+    "Label.Dimension.AdRewardId": "Reward item"
 }

@@ -133,6 +133,9 @@ const translationConstants = {
   /** Recommended experiences · API: ExperienceRecommendation */
   recommendedExperiencesLabel: "Label.RecommendedExperiences",
 
+  /** Recommended experience events · API: VirtualEventRecommendation */
+  recommendedExperienceEventsLabel: "Label.RecommendedExperienceEvents",
+
   /** My experiences */
   myExperiences: "Label.MyExperiences",
   myExperiencesDescription: "Description.MyExperiences",
@@ -254,6 +257,9 @@ export const notificationTypePresentationByApiValue: Record<string, { labelKey: 
   },
   ExperienceRecommendation: {
     labelKey: translationConstants.recommendedExperiencesLabel,
+  },
+  VirtualEventRecommendation: {
+    labelKey: translationConstants.recommendedExperienceEventsLabel,
   },
   // Marketplace
   SpecialItem: {

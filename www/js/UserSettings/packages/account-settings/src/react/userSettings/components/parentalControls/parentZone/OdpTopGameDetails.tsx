@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useGetOdpChildContextQuery } from "../../../../apis/parentalControlsApi";
 import { ManagementAction } from "../../../../../types/parentConsentsTypes";
@@ -9,6 +9,9 @@ import GameDetailsSection, {
   TManageExperienceOutcome,
 } from "../shared/GameDetailsSection";
 import useManageOdpExperience from "./hooks/useManageOdpExperience";
+import ParentalControlsPageName from "../../../../../enums/parentalControls/ParentalControlsPageName";
+import { trackCounter } from "./observability";
+import { ParentZoneCounter } from "./observability/eventConstants";
 
 /**
  * One of the child's top experiences as their on-device parent sees it. Same page a remote parent
@@ -19,6 +22,10 @@ export const OdpTopGameDetails = (): JSX.Element | null => {
   const { manageExperience: manageOdpExperience } = useManageOdpExperience();
   const { universeId: universeIdParam } = useParams<{ universeId: string }>();
   const universeId = Number(universeIdParam);
+
+  useEffect(() => {
+    trackCounter(ParentZoneCounter.PageShown, { page: ParentalControlsPageName.TopGameDetails });
+  }, [universeId]);
 
   const { data: odpChildContext } = useGetOdpChildContextQuery();
   const { games, isLoading, isBlockStatusError } = useTopWeeklyGames();

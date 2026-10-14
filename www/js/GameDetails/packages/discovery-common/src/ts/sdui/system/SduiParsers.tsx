@@ -196,6 +196,7 @@ export const parseCallback = (
     onActivated: () =>
       executeActionWithAnalytics(parsedAction, input, analyticsContext, sduiContext),
     linkPath: parsedAction.linkPath,
+    openInNewTab: parsedAction.openInNewTab,
   };
 };
 

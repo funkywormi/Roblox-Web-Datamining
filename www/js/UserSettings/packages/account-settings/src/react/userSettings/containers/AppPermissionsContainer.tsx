@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-utilities";
-import { Pagination } from "react-style-guide";
+import { Pagination } from "@rbx/foundation-ui";
 import { EnabledStatusValue, UserSetting } from "@rbx/user-settings";
 import SettingsSection from "../../common/components/SettingsSection";
 import appPermissionsTranslationConstants from "../constants/contentConstants/appPermissionsTranslationConstants";
 import navigationTranslationConstants from "../constants/contentConstants/navigationTranslationConstants";
+import commonTranslationConstants from "../constants/contentConstants/commonTranslationConstants";
 import AppPermissionsList from "../components/appPermissions/AppPermissionsList";
 import { useGetAuthorizationsQuery, useLazyGetAuthorizationsQuery } from "../../apis/oauthApi";
 import appPermissionsConstants from "../constants/appPermissionsConstants";
@@ -36,6 +37,7 @@ export const AppPermissionsContainer = (): JSX.Element => {
   );
 
   const lastPage = Math.ceil((data?.authorizations.length ?? 1) / pageSize);
+  const hasNextPage = data?.nextPageCursor !== undefined || currentPage !== lastPage;
 
   useEffect(() => {
     // If currentpage > lastPage, then user deleted everything from the last page
@@ -48,13 +50,21 @@ export const AppPermissionsContainer = (): JSX.Element => {
   const appPermissions = (
     <React.Fragment>
       <AppPermissionsList authorizations={currentPageAuthorizations} />
-      {data?.authorizations && data?.authorizations?.length > 0 && (
-        <Pagination
-          current={currentPage}
-          onChange={handlePagination}
-          hasNext={data?.nextPageCursor !== undefined || currentPage !== lastPage}
-        />
-      )}
+      {data?.authorizations &&
+        data?.authorizations?.length > 0 &&
+        (hasNextPage || currentPage > 1) && (
+          <div className="flex justify-center margin-top-large">
+            <Pagination
+              aria-label={translate(appPermissionsTranslationConstants.thirdPartyApplications)}
+              navType="SinglePage"
+              currentPage={currentPage}
+              totalPages={hasNextPage ? currentPage + 1 : currentPage}
+              onPageChange={handlePagination}
+              previousPageLabel={translate(commonTranslationConstants.previous)}
+              nextPageLabel={translate(commonTranslationConstants.next)}
+            />
+          </div>
+        )}
     </React.Fragment>
   );
 
@@ -78,7 +88,11 @@ export const AppPermissionsContainer = (): JSX.Element => {
       </div>
       <SettingsSection
         title={translate(appPermissionsTranslationConstants.thirdPartyApplications)}
-        description={translate(appPermissionsTranslationConstants.descriptionV2)}
+        description={
+          <span className="text-body-medium content-default">
+            {translate(appPermissionsTranslationConstants.descriptionV2)}
+          </span>
+        }
       />
       {appPermissionsWithParentalConsent}
     </div>

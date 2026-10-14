@@ -366,6 +366,17 @@ export const getEventParams = {
       },
     };
   },
+  passwordPolicyMsgShown: (state: string): TEventParams => {
+    return {
+      name: authEventNames.authMsgShown,
+      type: authEventNames.authMsgShown,
+      context: "settingsAccountInfo",
+      params: {
+        state,
+        field: "password",
+      },
+    };
+  },
   birthdayUpdateBtnClick: (state: string): TEventParams => {
     return {
       name: authEventNames.authButtonClick,

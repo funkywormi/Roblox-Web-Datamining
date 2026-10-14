@@ -11,7 +11,7 @@ export const getEarlyTesterAssignmentQueryKey = (groupId?: number, universeId?: 
   universeId,
 ];
 
-export const getRoleEarlyTesterAssignmentQueryKey = (groupId?: number, roleId?: number) => [
+const getRoleEarlyTesterAssignmentQueryKey = (groupId?: number, roleId?: number) => [
   EARLY_TESTER_KEY_PREFIX,
   'role',
   groupId,
@@ -25,7 +25,11 @@ export function isEarlyTesterRole(
   if (roleId == null || assignment == null) {
     return false;
   }
-  return assignment.universeRole?.id === roleId || assignment.groupRole?.id === roleId;
+  return (
+    assignment.universeRole?.id === roleId ||
+    assignment.groupRole?.id === roleId ||
+    assignment.isAssignedAtAnyGroupUniverse === true
+  );
 }
 
 /**

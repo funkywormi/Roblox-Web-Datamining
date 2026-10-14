@@ -66,7 +66,7 @@ const AbuseReportConfirmation = ({
           }}
         />
       </div>
-      <div className="flex min-height-0 grow-1 flex-col items-center justify-center gap-medium padding-large text-center">
+      <div className="flex min-height-0 grow-1 flex-col items-center justify-center gap-medium padding-large text-align-x-center">
         <span className="text-body-medium content-emphasis">
           {translate("Heading.ContinueToReport")}
         </span>

@@ -63,6 +63,10 @@ const accountInfoEventService = {
     const params = getEventParams.authPageLoad(changeBirthdayState(isVerified, above13));
     eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
   }),
+  passwordPolicyMsgShown: wrapEventServiceWithTryCatch((state: string): void => {
+    const params = getEventParams.passwordPolicyMsgShown(state);
+    eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
+  }),
   birthdayUpdateBtnClick: wrapEventServiceWithTryCatch(
     (isVerified: boolean, above13: boolean): void => {
       const params = getEventParams.birthdayUpdateBtnClick(

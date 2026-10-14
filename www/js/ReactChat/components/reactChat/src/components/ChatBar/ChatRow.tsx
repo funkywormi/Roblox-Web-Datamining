@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import type { ReactNode } from "react";
+import useChatTranslate from "../../hooks/useChatTranslate";
 import type { TChatConversation } from "../../types/chat";
 
 type TChatRowProps = {
@@ -10,6 +11,7 @@ type TChatRowProps = {
 };
 
 const ChatRow = ({ conversation, avatar, ariaLabel, onOpenConversation }: TChatRowProps) => {
+  const translate = useChatTranslate();
   const isUnread = conversation.unreadCount > 0;
   const secondaryTextClassName = classNames(
     "text-caption-medium text-truncate-end",
@@ -19,7 +21,7 @@ const ChatRow = ({ conversation, avatar, ariaLabel, onOpenConversation }: TChatR
   return (
     <button
       type="button"
-      className="react-chat-row flex width-full shrink-0 items-center gap-medium padding-x-medium padding-y-xsmall text-left bg-none stroke-none cursor-pointer hover:bg-shift-100"
+      className="react-chat-row flex width-full shrink-0 items-center gap-medium padding-x-medium padding-y-xsmall text-align-x-left bg-none stroke-none cursor-pointer hover:bg-shift-100"
       onClick={() => {
         onOpenConversation(conversation.layoutId);
       }}
@@ -46,7 +48,9 @@ const ChatRow = ({ conversation, avatar, ariaLabel, onOpenConversation }: TChatR
           </span>
         </div>
         <span className={classNames("react-chat-row-preview", secondaryTextClassName)}>
-          {conversation.preview}
+          {conversation.isPreviewHidden
+            ? translate("Label.MessageNotAvailable", undefined, "This message is not available")
+            : conversation.preview}
         </span>
       </div>
     </button>

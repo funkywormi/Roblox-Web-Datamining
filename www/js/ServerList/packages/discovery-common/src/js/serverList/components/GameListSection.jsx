@@ -26,7 +26,7 @@ function getSectionDefaultOptions(isPublic, isAuthenticated) {
   };
 }
 
-function GameListSection({
+export function GameListSection({
   gameInstances,
   handleGameInstanceShutdownAtIndex,
   headerTitle,
@@ -77,6 +77,7 @@ function GameListSection({
   // once with it (firing a second refresh while the first is in flight makes
   // useServerList throw).
   const [options, setOptions] = useState(() => getSectionDefaultOptions(isPublic, isAuthenticated));
+  const sortOption = isPublic ? (options.orderBy ?? "NotDisplayed") : "NotDisplayed";
 
   useEffect(() => {
     if (deferFetch) {
@@ -194,6 +195,8 @@ function GameListSection({
                         price,
                         creatorName,
                         universeId,
+                        position: index,
+                        sortOption,
                       }}
                     />
                   );

@@ -12,20 +12,22 @@ const AnnouncementNavigation = ({
   showForumCategories
 }: AnnouncementNavigationProps): JSX.Element => {
   const history = useHistory();
+  const leadingContent = (
+    <PostsDestinationNavigation isAnnouncementsArchiveEnabled showDivider={showForumCategories} />
+  );
+
+  if (!showForumCategories) {
+    return <div className='group-forums-categories-list'>{leadingContent}</div>;
+  }
 
   return (
-    <PostsDestinationNavigation isAnnouncementsArchiveEnabled>
-      {showForumCategories && (
-        <CategoriesList
-          activeCategoryId={null}
-          onSetActiveCategory={(categoryShortId, categoryName) =>
-            history.push(
-              groupForumsConstants.router.getCategoryRoute(categoryShortId, categoryName)
-            )
-          }
-        />
-      )}
-    </PostsDestinationNavigation>
+    <CategoriesList
+      activeCategoryId={null}
+      leadingContent={leadingContent}
+      onSetActiveCategory={(categoryShortId, categoryName) =>
+        history.push(groupForumsConstants.router.getCategoryRoute(categoryShortId, categoryName))
+      }
+    />
   );
 };
 
