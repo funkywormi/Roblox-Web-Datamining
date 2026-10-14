@@ -3,13 +3,17 @@ import type React from "react";
 import { clsx } from "clsx";
 import {
   buildFoundationTokenCss,
+  buildUIFlexModeCss,
   getSduiNumeric,
   getSduiToken,
+  parseUIFlexMode,
   toHtmlElement,
+  type SduiResolvedAction,
   type SduiRendererInjectedProps,
   type SduiTokenOrLiteral,
 } from "@rbx/sdui-core";
 import { SDUI_TILE_FOOTER_DEFAULTS } from "../../consts/defaults";
+import { ActionWrapper } from "../primitives/ActionWrapper";
 
 export interface SduiTileFooterProps extends SduiRendererInjectedProps {
   // TODO: Support the remaining TileFooter schema features
@@ -20,7 +24,10 @@ export interface SduiTileFooterProps extends SduiRendererInjectedProps {
   leftIcon?: string;
   leftIconComponent?: React.ReactNode;
   leftText?: string;
+  leftTextFlexMode?: string;
+  onActivated?: SduiResolvedAction;
   rightIcon?: string;
+  rightTextFlexMode?: string;
   rightIconComponent?: React.ReactNode;
   rightText?: string;
   textColor?: string;
@@ -39,9 +46,12 @@ export function SduiTileFooter({
   leftIcon,
   leftIconComponent,
   leftText = "",
+  leftTextFlexMode,
+  onActivated,
   rightIcon,
   rightIconComponent,
   rightText,
+  rightTextFlexMode,
   textColor = SDUI_TILE_FOOTER_DEFAULTS.textColor,
   leftHeadingLevel,
   rightHeadingLevel,
@@ -98,6 +108,8 @@ export function SduiTileFooter({
       />
     ));
 
+  const parsedLeftFlexMode = parseUIFlexMode(leftTextFlexMode) ?? "none";
+  const leftFlexClassName = buildUIFlexModeCss(parsedLeftFlexMode);
   const leftSection = (
     <div
       className={clsx(
@@ -105,11 +117,11 @@ export function SduiTileFooter({
         "flex-row",
         "items-center",
         "min-width-0",
-        "shrink-0",
-        "width-fit",
         "max-width-full",
+        leftFlexClassName,
         textIconGapClassName,
       )}
+      data-testid="tile-footer-left"
       style={{ ...(textIconGapPx != null ? { gap: textIconGapPx } : {}) }}
     >
       {leftIconNode}
@@ -119,6 +131,8 @@ export function SduiTileFooter({
     </div>
   );
 
+  const parsedRightFlexMode = parseUIFlexMode(rightTextFlexMode) ?? "shrink";
+  const rightFlexClassName = buildUIFlexModeCss(parsedRightFlexMode);
   const rightSection =
     rightText != null || rightIcon != null || rightIconComponent != null ? (
       <div
@@ -127,9 +141,11 @@ export function SduiTileFooter({
           "flex-row",
           "items-center",
           "min-width-0",
-          "shrink",
+          "max-width-full",
+          rightFlexClassName,
           textIconGapClassName,
         )}
+        data-testid="tile-footer-right"
         style={{ ...(textIconGapPx != null ? { gap: textIconGapPx } : {}) }}
       >
         {rightIconNode}
@@ -156,13 +172,15 @@ export function SduiTileFooter({
   );
 
   return (
-    <div
+    <ActionWrapper
+      href={onActivated?.href}
+      clientNavigation={onActivated?.clientNavigation}
+      onClick={onActivated?.onActivated}
       className={containerClassName}
       style={{ ...(sectionGapPx != null ? { gap: sectionGapPx } : {}) }}
-      aria-label={leftText}
     >
       {leftSection}
       {rightSection}
-    </div>
+    </ActionWrapper>
   );
 }

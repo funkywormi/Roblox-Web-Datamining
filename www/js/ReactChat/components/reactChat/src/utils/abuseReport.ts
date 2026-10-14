@@ -19,7 +19,7 @@ const getRobloxGlobals = (): TRobloxAbuseReportGlobals =>
   (window as unknown as { Roblox?: TRobloxAbuseReportGlobals }).Roblox ?? {};
 
 /**
- * Revamp abuse-report URL: the new /report-abuse/ flow. Signature is relied on by App.test.tsx.
+ * Revamp abuse-report URL: the new /report-abuse/ flow. Signature is relied on by tests/app/chatDialog.test.tsx.
  */
 export const getReportUrl = (conversation: TChatConversation, participant: TChatParticipant) => {
   const params = new URLSearchParams({

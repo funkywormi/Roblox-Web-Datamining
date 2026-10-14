@@ -3057,57 +3057,57 @@ button.btn-common-play-game-unplayable-lg {
     height: 100%
 }
 
-.install-instructions {
-    max-width: 1140px
-}
-
-.install-instructions h3 {
-    padding: 15px
-}
-
-.install-instructions .col-xs-6 {
-    padding: 30px
-}
-
-.install-instructions .col-xs-6 .section-content {
-    background: var(--color-surface-100);
-    border-radius: 20px;
-    min-height: 380px;
-    padding: 32px
-}
-
-.install-instructions ol {
-    text-align: left
-}
-
-.install-instructions ol>li {
-    padding-bottom: 30px;
-    list-style: decimal
-}
-
-.install-instructions .qr-tagline {
-    margin-left: 15%;
-    margin-right: 15%
-}
-
-.install-instructions .qr-container {
-    background-color: #fff;
-    border-radius: 20px;
-    width: 180px;
-    height: 180px;
-    margin: 30px;
-    display: inline-block
-}
-
-.install-instructions .qr-container .qr-code {
-    width: 90%;
-    width: calc(100% - 24px);
-    height: 90%;
-    background-image: url(https://images.rbxcdn.com/6674b8e189bf79c6.png);
+.thumbnail-2d-container.sdui-thumbnail-image-container[class*=icon-] {
+    background-position: 50%;
     background-repeat: no-repeat;
-    background-size: cover;
-    height: calc(100% - 24px);
-    margin: 12px
+    background-size: contain;
+    padding-top: 0
+}
+
+.thumbnail-2d-container.sdui-thumbnail-image-container img.object-fit-fill {
+    object-fit: fill
+}
+
+.thumbnail-2d-container.sdui-thumbnail-image-container img.object-fit-contain {
+    object-fit: contain
+}
+
+.thumbnail-2d-container.sdui-thumbnail-image-container img.object-fit-cover {
+    object-fit: cover
+}
+
+@media (hover:hover) and (pointer:fine) {
+    .sdui-tile:hover .sdui-tile-image:after {
+        content: "";
+        border-radius: inherit;
+        background: var(--color-state-hover);
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0
+    }
+}
+
+.sdui-tile-visual :-webkit-any(a, button, [role=button], [role=link]) {
+    pointer-events: auto
+}
+
+.sdui-tile-visual :-moz-any(a, button, [role=button], [role=link]) {
+    pointer-events: auto
+}
+
+.sdui-tile-visual :is(a, button, [role=button], [role=link]) {
+    pointer-events: auto
+}
+
+.sdui-tile-overlay .foundation-web-icon-button.bg-over-media-0 {
+    background-color: var(--inverse-over-media-0)
+}
+
+.sdui-tile-overlay .foundation-web-icon-button.bg-over-media-0 .icon {
+    color: var(--inverse-content-emphasis)
 }
 
 .sdui-tile-image-container:before {
@@ -3152,18 +3152,6 @@ button.btn-common-play-game-unplayable-lg {
     overflow: hidden
 }
 
-.thumbnail-2d-container.sdui-thumbnail-image-container {
-    width: 100%;
-    height: 100%
-}
-
-.thumbnail-2d-container.sdui-thumbnail-image-container[class*=icon-] {
-    background-position: 50%;
-    background-repeat: no-repeat;
-    background-size: contain;
-    padding-top: 0
-}
-
 .thumbnail-2d-container.sdui-thumbnail-image-container img {
     opacity: 1;
     width: 100%;
@@ -3175,16 +3163,55 @@ button.btn-common-play-game-unplayable-lg {
     opacity: 0
 }
 
-.thumbnail-2d-container.sdui-thumbnail-image-container img.object-fit-fill {
-    object-fit: fill
+.install-instructions {
+    max-width: 1140px
 }
 
-.thumbnail-2d-container.sdui-thumbnail-image-container img.object-fit-contain {
-    object-fit: contain
+.install-instructions h3 {
+    padding: 15px
 }
 
-.thumbnail-2d-container.sdui-thumbnail-image-container img.object-fit-cover {
-    object-fit: cover
+.install-instructions .col-xs-6 {
+    padding: 30px
+}
+
+.install-instructions .col-xs-6 .section-content {
+    background: var(--color-surface-100);
+    border-radius: 20px;
+    min-height: 380px;
+    padding: 32px
+}
+
+.install-instructions ol {
+    text-align: left
+}
+
+.install-instructions ol>li {
+    padding-bottom: 30px;
+    list-style: decimal
+}
+
+.install-instructions .qr-tagline {
+    margin-left: 15%;
+    margin-right: 15%
+}
+
+.install-instructions .qr-container {
+    background-color: #fff;
+    border-radius: 20px;
+    width: 180px;
+    height: 180px;
+    margin: 30px;
+    display: inline-block
+}
+
+.install-instructions .qr-container .qr-code {
+    background-image: url(https://images.rbxcdn.com/6674b8e189bf79c6.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: calc(100% - 24px);
+    height: calc(100% - 24px);
+    margin: 12px
 }
 
 @keyframes sdui-skeleton-shimmer {
@@ -6469,6 +6496,49 @@ button.btn-common-play-game-unplayable-lg {
     padding: 2px
 }
 
+.filters-container .filter-items-container .sdui-filter-select {
+    min-height: 32px;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 16px
+}
+
+.light-theme .filters-container .filter-items-container .sdui-filter-select {
+    background-color: var(--color-surface-300);
+    color: var(--color-content-default)
+}
+
+.light-theme .filters-container .filter-items-container .sdui-filter-select:hover {
+    background-color: var(--color-extended-black-10)
+}
+
+.light-theme .filters-container .filter-items-container .sdui-filter-select.sdui-filter-select-active {
+    background-color: var(--color-extended-gray-900);
+    color: var(--color-extended-white-100)
+}
+
+.light-theme .filters-container .filter-items-container .sdui-filter-select.sdui-filter-select-active:hover {
+    background-color: var(--color-extended-gray-900)
+}
+
+.dark-theme .filters-container .filter-items-container .sdui-filter-select {
+    background-color: var(--color-surface-300);
+    color: var(--color-content-default)
+}
+
+.dark-theme .filters-container .filter-items-container .sdui-filter-select:hover {
+    background-color: var(--color-extended-white-10)
+}
+
+.dark-theme .filters-container .filter-items-container .sdui-filter-select.sdui-filter-select-active {
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-900)
+}
+
+.dark-theme .filters-container .filter-items-container .sdui-filter-select.sdui-filter-select-active:hover {
+    background-color: var(--color-extended-white-100)
+}
+
 .filters-container .filter-items-container .filters-modal-container {
     z-index: 6;
     -ms-flex-direction: column;
@@ -6656,6 +6726,34 @@ button.btn-common-play-game-unplayable-lg {
     color: var(--color-extended-gray-900)
 }
 
+.sdui-filter-menu-popover.filters-container {
+    width: calc(100vw - 20px);
+    max-width: 360px;
+    box-shadow: none;
+    background: 0 0;
+    border: 0;
+    margin: 0;
+    padding: 0
+}
+
+.sdui-filter-menu-popover.filters-container .filter-items-container {
+    display: block
+}
+
+.sdui-filter-menu-popover.filters-container .filters-modal-container {
+    z-index: auto;
+    width: 100%;
+    margin-top: 0;
+    position: static;
+    left: auto;
+    right: auto
+}
+
+.sdui-filter-menu-popover.filters-container .apply-button {
+    width: 100%;
+    font-size: 16px
+}
+
 .charts-sdui-page {
     --sdui-sticky-offset: 82px;
     padding-left: 10px
@@ -6688,7 +6786,7 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .charts-sdui-page .filters-container {
-    margin-bottom: 0;
+    margin-bottom: -10px;
     margin-left: 0
 }
 
@@ -6697,6 +6795,7 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .charts-sdui-page .sdui-vertical-feed-sticky .filters-container {
+    margin-bottom: 0;
     margin-left: 10px
 }
 
@@ -6781,7 +6880,8 @@ body {
     margin: 0 10px
 }
 
-.inset-\[0\] {
+.inset-\[0\],
+.inset-\[0px\] {
     top: 0;
     bottom: 0;
     left: 0;
@@ -6899,6 +6999,10 @@ body {
     min-width: min(100% - max(2*var(--margin-small), env(safe-area-inset-left) + env(safe-area-inset-right)), 393px)
 }
 
+.min-width-\[min\(200px\,100\%\)\] {
+    min-width: min(200px, 100%)
+}
+
 .width-\[fit-content\] {
     width: -webkit-fit-content;
     width: -moz-fit-content;
@@ -6955,6 +7059,10 @@ body {
 
 .bg-\[rgb\(from_var\(--color-system-warning\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-warning)r g b/.2)
+}
+
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
 }
 
 .bg-\[var\(--light-mode-surface-100\)\] {
@@ -7170,16 +7278,74 @@ body {
     -webkit-overflow-scrolling: touch
 }
 
+.\[align-items\:center\] {
+    -ms-flex-align: center;
+    align-items: center
+}
+
+.\[background-color\:var\(--sdui-cc-arrow-bg\)\] {
+    background-color: var(--sdui-cc-arrow-bg)
+}
+
+.\[border-radius\:50\%\] {
+    border-radius: 50%
+}
+
+.\[border-radius\:inherit\] {
+    border-radius: inherit
+}
+
+.\[box-shadow\:0px_0px_4px_0px_var\(--sdui-cc-arrow-shadow\)\] {
+    box-shadow: 0px 0px 4px 0px var(--sdui-cc-arrow-shadow)
+}
+
+.\[box-sizing\:border-box\] {
+    box-sizing: border-box
+}
+
+.\[cursor\:pointer\] {
+    cursor: pointer
+}
+
+.\[height\:40px\] {
+    height: 40px
+}
+
+.\[justify-content\:center\] {
+    -ms-flex-pack: center;
+    justify-content: center
+}
+
+.\[left\:var\(--sdui-cc-arrow-offset\)\] {
+    left: var(--sdui-cc-arrow-offset)
+}
+
 .\[object-fit\:cover\] {
     object-fit: cover
+}
+
+.\[opacity\:0\.9\] {
+    opacity: .9
+}
+
+.\[overflow-wrap\:anywhere\] {
+    overflow-wrap: anywhere
 }
 
 .\[overflow-wrap\:break-word\] {
     overflow-wrap: break-word
 }
 
+.\[overflow-x\:hidden\] {
+    overflow-x: hidden
+}
+
 .\[resize\:vertical\] {
     resize: vertical
+}
+
+.\[right\:var\(--sdui-cc-arrow-offset\)\] {
+    right: var(--sdui-cc-arrow-offset)
 }
 
 .\[scroll-snap-type\:x_mandatory\] {
@@ -7192,6 +7358,26 @@ body {
 
 .\[text-align\:inherit\] {
     text-align: inherit
+}
+
+.\[top\:calc\(50\%-20px\)\] {
+    top: calc(50% - 20px)
+}
+
+.\[width\:40px\] {
+    width: 40px
+}
+
+.\[z-index\:1\] {
+    z-index: 1
+}
+
+.\[z-index\:2\] {
+    z-index: 2
+}
+
+.\[z-index\:5\] {
+    z-index: 5
 }
 
 .placeholder\:text-body-large::-webkit-input-placeholder {
@@ -7274,6 +7460,10 @@ body {
     opacity: .8
 }
 
+.hover\:\[opacity\:1\]:hover {
+    opacity: 1
+}
+
 .focus-visible\:outline-focus:focus-visible {
     outline: var(--stroke-thicker)solid var(--color-selection-start);
     outline-offset: var(--stroke-thicker)
@@ -7283,12 +7473,20 @@ body {
     outline-color: var(--color-system-emphasis)
 }
 
+.focus-visible\:\[outline-offset\:var\(--gap-xsmall\)\]:focus-visible {
+    outline-offset: var(--gap-xsmall)
+}
+
 .focus-visible\:\[outline-style\:solid\]:focus-visible {
     outline-style: solid
 }
 
 .focus-visible\:\[outline-width\:var\(--stroke-standard\)\]:focus-visible {
     outline-width: var(--stroke-standard)
+}
+
+.focus-visible\:\[outline\:var\(--stroke-thick\)_solid_var\(--color-action-emphasis-background\)\]:focus-visible {
+    outline: var(--stroke-thick)solid var(--color-action-emphasis-background)
 }
 
 .focus-visible\:hover\:outline-none:hover:focus-visible {
@@ -7396,36 +7594,36 @@ body {
 }
 
 @media (prefers-color-scheme:dark) {
-    .dark\:block:where(:not(:-webkit-any(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:-webkit-any(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:block:where(:not(:-moz-any(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:-moz-any(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:block:where(:not(:is(.light-theme, .light-theme *))) {
+    .dark\:block:where(:not(:is(.color-mode-light, .color-mode-light *))) {
         display: block
     }
 
-    .dark\:hidden:where(:not(:-webkit-any(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:-webkit-any(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 
-    .dark\:hidden:where(:not(:-moz-any(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:-moz-any(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 
-    .dark\:hidden:where(:not(:is(.light-theme, .light-theme *))) {
+    .dark\:hidden:where(:not(:is(.color-mode-light, .color-mode-light *))) {
         display: none
     }
 }
 
-.dark\:block:where(.dark-theme, .dark-theme *) {
+.dark\:block:where(.color-mode-dark, .color-mode-dark *) {
     display: block
 }
 
-.dark\:hidden:where(.dark-theme, .dark-theme *) {
+.dark\:hidden:where(.color-mode-dark, .color-mode-dark *) {
     display: none
 }
 
@@ -7461,6 +7659,10 @@ body {
 }
 
 @media (pointer:coarse) and (not (any-pointer:fine)) {
+    .\[\@media\(pointer\:coarse\)_and_\(not_\(any-pointer\:fine\)\)\]\:\[overflow-x\:auto\] {
+        overflow-x: auto
+    }
+
     .\[\@media\(pointer\:coarse\)_and_\(not_\(any-pointer\:fine\)\)\]\:\[scroll-snap-type\:none\] {
         scroll-snap-type: none
     }

@@ -1,4 +1,3 @@
-import { GameLauncher } from "@rbx/core-scripts/legacy/Roblox";
 import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import "@rbx/core-scripts/global";
@@ -7,13 +6,16 @@ import {
   launchGame as launchPlayGame,
   buildPlayGameProperties,
 } from "@rbx/core-scripts/game";
-import { eventStreamService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
-import * as urlService from "@rbx/core-scripts/util/url";
-import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
 import {
-  deviceMeta as DeviceMeta,
-  jsClientDeviceIdentifier,
-} from "@rbx/core-scripts/legacy/header-scripts";
+  eventTypes,
+  sendEvent,
+  sendEventWithTarget,
+  targetTypes,
+} from "@rbx/core-scripts/event-stream";
+import { composeQueryString } from "@rbx/core-scripts/util/url";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
+import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import {
@@ -44,15 +46,18 @@ type TJoinAttemptProperties = {
   joinAttemptOrigin?: string | number;
 };
 
+const isJoinAttemptIdEnabled = (): boolean =>
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- window.Roblox is absent on Next.js
+  window.Roblox?.GameLauncher?.isJoinAttemptIdEnabled() ?? false;
+
 function getJoinAttemptProperties(eventProperties: TEventProperties): TJoinAttemptProperties {
-  if (!GameLauncher?.isJoinAttemptIdEnabled()) {
+  if (!isJoinAttemptIdEnabled()) {
     return {};
   }
 
   const { joinAttemptOrigin } = eventProperties;
   let { joinAttemptId } = eventProperties;
-  joinAttemptId =
-    typeof joinAttemptId === "string" ? joinAttemptId : uuidService.generateRandomUuid();
+  joinAttemptId = typeof joinAttemptId === "string" ? joinAttemptId : generateRandomUuid();
   return { joinAttemptId, joinAttemptOrigin };
 }
 
@@ -70,7 +75,7 @@ function sendPlayGameClickedEvent(
     ...(actionType == null ? {} : { actionType }),
   };
 
-  eventStreamService.sendEventWithTarget("playGameClicked", "click", mergedProperties);
+  sendEventWithTarget("playGameClicked", "click", mergedProperties);
 
   return mergedProperties;
 }
@@ -78,7 +83,7 @@ function sendPlayGameClickedEvent(
 function getEncodedUniversalLink(placeId: string, eventProperties: TEventProperties = {}): string {
   let universalLink = `${environmentUrls.websiteUrl}/games/start?placeid=${placeId}`;
 
-  if (GameLauncher?.isJoinAttemptIdEnabled()) {
+  if (isJoinAttemptIdEnabled()) {
     const { joinAttemptId, joinAttemptOrigin } = getJoinAttemptProperties(eventProperties);
 
     if (typeof joinAttemptId === "string" && joinAttemptId.length > 0) {
@@ -112,11 +117,11 @@ export const launchGame = (
   appsFlyerReferralProperties: TAppsFlyerReferralProperties = {},
   actionType?: string,
 ): void => {
-  const deviceMeta = DeviceMeta.getDeviceMeta();
+  const deviceMeta = getDeviceMeta();
   if (
     deviceMeta?.isIosDevice ||
     deviceMeta?.isAndroidDevice ||
-    jsClientDeviceIdentifier.isIos13Ipad ||
+    isIos13Ipad() ||
     deviceMeta?.isChromeOs
   ) {
     const playGameClickedEventProperties = sendPlayGameClickedEvent(
@@ -127,7 +132,7 @@ export const launchGame = (
     );
 
     const encodedUniversalLink = getEncodedUniversalLink(placeId, playGameClickedEventProperties);
-    const afDeeplinkParams = urlService.composeQueryString({
+    const afDeeplinkParams = composeQueryString({
       ...defaultAfReferralProperties,
       ...appsFlyerReferralProperties,
     });
@@ -175,16 +180,16 @@ export const launchLogin = (
   placeId: string,
   appsFlyerReferralProperties: TAppsFlyerReferralProperties = {},
 ): void => {
-  const deviceMeta = DeviceMeta.getDeviceMeta();
+  const deviceMeta = getDeviceMeta();
   if (
     deviceMeta?.isIosDevice ||
     deviceMeta?.isAndroidDevice ||
-    jsClientDeviceIdentifier.isIos13Ipad ||
+    isIos13Ipad() ||
     deviceMeta?.isChromeOs
   ) {
     const playGameClickedEventProperties = sendPlayGameClickedEvent({}, placeId, {});
     const encodedUniversalLink = getEncodedUniversalLink(placeId, playGameClickedEventProperties);
-    const afDeeplinkParams = urlService.composeQueryString({
+    const afDeeplinkParams = composeQueryString({
       ...defaultAfReferralProperties,
       ...appsFlyerReferralProperties,
     });
@@ -270,8 +275,7 @@ export const startAgeCheckAccessManagementUpsellFlow = async ({
       false
     );
   } catch (e) {
-    const { fireEvent } = window.EventTracker ?? {};
-    fireEvent?.(counterEvents.PlayButtonUpsellAgeRestrictionVerificationError);
+    fireEvent(counterEvents.PlayButtonUpsellAgeRestrictionVerificationError);
     // re-throw the error to allow clients to handle their specific requirements
     // when an error happens
     throw e;
@@ -280,24 +284,22 @@ export const startAgeCheckAccessManagementUpsellFlow = async ({
 
 export const handleShareLinkEventLogging = (placeId: string, universeId: string): void => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const shareLinkSourceType = window.Roblox.UrlParser?.getParameterValueByName(
-      "shareLinkSourceType",
-      false,
-    );
+    // The param name matches case-insensitively, like the legacy UrlParser lookup.
+    const shareLinkSourceType = [...new URLSearchParams(window.location.search)].find(
+      ([name]) => name.toLowerCase() === "sharelinksourcetype",
+    )?.[1];
     if (shareLinkSourceType?.toLowerCase() !== "experiencedetails") {
       return;
     }
 
-    const { EventStream } = window.Roblox;
-    EventStream?.SendEventWithTarget(
+    sendEventWithTarget(
       "shareLinkGameJoin",
       "GamePlayButtonWeb",
       {
         placeId,
         universeId,
       },
-      EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   } catch {
     // ignore
@@ -351,11 +353,11 @@ export const sendUnlockPlayIntentEvent = (
     pg: pageContext,
   };
 
-  eventStreamService.sendEvent(
+  sendEvent(
     {
       name: unlockPlayIntentConstants.eventName,
       type: unlockPlayIntentConstants.eventName,
-      context: eventStreamService.eventTypes.formInteraction,
+      context: eventTypes.formInteraction,
     },
     eventParams,
   );

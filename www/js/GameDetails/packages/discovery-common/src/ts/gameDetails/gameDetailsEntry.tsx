@@ -1,6 +1,8 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ShareLinks } from "@rbx/core-scripts/deep-link";
 import { renderWithErrorBoundary, queryClient } from "@rbx/core-scripts/react";
+import { appDownloadNamespaces } from "@rbx/app-download";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { gameDetailsPage } from "../common/constants/configConstants";
 import InviteLinkInvalidModal from "./components/InviteLinkInvalidModal";
 import CarouselContainer from "./containers/CarouselContainer";
@@ -83,7 +85,9 @@ export default (): void => {
   if (playButtonConstants.gameDetailsPlayButtonContainer()) {
     renderWithErrorBoundary(
       <QueryClientProvider client={queryClient}>
-        <PlayButton attributionId={attributionId} />
+        <TranslationProviderSCC namespaces={appDownloadNamespaces}>
+          <PlayButton attributionId={attributionId} />
+        </TranslationProviderSCC>
       </QueryClientProvider>,
       playButtonConstants.gameDetailsPlayButtonContainer(),
     );

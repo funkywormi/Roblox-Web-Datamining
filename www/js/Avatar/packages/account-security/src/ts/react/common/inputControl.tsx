@@ -145,7 +145,7 @@ type Props = {
   // eslint-disable-next-line react/require-default-props
   label?: string;
   // eslint-disable-next-line react/require-default-props
-  bottomLabel?: string | JSX.Element;
+  bottomLabel?: string | React.ReactElement;
   // eslint-disable-next-line react/require-default-props
   inputMode?: FormControl.FormControlProps["inputMode"];
   // eslint-disable-next-line react/require-default-props

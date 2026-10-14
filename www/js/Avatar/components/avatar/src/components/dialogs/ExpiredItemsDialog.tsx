@@ -24,6 +24,7 @@ import { TDetailEntry } from "@rbx/catalog/itemDetailsHydrationService/constants
 import { getCurrentUserId } from "../../utils/currentUser";
 import { sendAXTracking, AXAnalyticsConstants } from "../../utils/axAnalyticsService";
 import { getExpiredItemDetails } from "../../services/expiredItemDetails";
+import { trackCounter, trackError } from "../../observability";
 import BatchBuyPriceContainer from "@rbx/purchase-common/ts/react/itemPurchase/components/BatchBuyPriceContainer";
 import { Asset } from "../../avatar.types";
 import AvatarAPIService from "../../services/avatarAPIService";
@@ -122,6 +123,7 @@ function ExpiredItemsDialog({
   // Fetch user currency when dialog opens
   useEffect(() => {
     if (isOpen) {
+      trackCounter("BatchBuyOpened");
       AvatarAPIService.getUserCurrency(getCurrentUserId())
         .then(response => {
           setUserBalance(response.robux);
@@ -387,6 +389,11 @@ function ExpiredItemsDialog({
           window.location.reload();
         }, REPURCHASE_RELOAD_DELAY_MS);
         return;
+      }
+
+      // Every line item came back without a Success reason.
+      if (results.length > 0) {
+        trackError("BatchBuyFailed");
       }
 
       // Call the optional onRepurchase callback with selections

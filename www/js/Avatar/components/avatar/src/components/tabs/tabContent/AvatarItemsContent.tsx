@@ -6,6 +6,11 @@ import { isBlackbirdUser } from "@rbx/core-scripts/meta/user";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import { mapItemRestrictionIcons } from "@rbx/www-common/components/itemCard";
 import { reportAXError } from "../../../utils/axAnalyticsService";
+import {
+  trackItemsLoadFailed,
+  trackItemsLoadRequested,
+  trackItemsLoaded,
+} from "../../../observability";
 import AvatarAccoutrementService from "../../../utils/avatarAccoutrementService";
 import AvatarRecommendations, {
   RecommendationsData,
@@ -334,6 +339,8 @@ function AvatarItemsContent({
       requestSequenceRef.current += 1;
       const currentRequestId = requestSequenceRef.current;
 
+      const itemsRequest = isLoadMore ? "nextPage" : "firstPage";
+      trackItemsLoadRequested(itemsRequest);
       AvatarAPIService.getAvatarInventory(
         sortOption,
         itemCategories,
@@ -341,6 +348,7 @@ function AvatarItemsContent({
         availabilityStatus,
       ).then(
         response => {
+          trackItemsLoaded(itemsRequest);
           // Check for race condition - ignore stale responses
           if (currentRequestId !== requestSequenceRef.current) {
             setLoading(false); // Important: Clear loading state even for stale requests
@@ -678,6 +686,7 @@ function AvatarItemsContent({
             counterName: "AvatarEditorError",
             log: parseError(e),
           });
+          trackItemsLoadFailed(itemsRequest, e);
 
           const defaultEmptyMessage =
             config.dataSource?.emptyMessage || translate("Message.FailedLoadAssets");

@@ -16,6 +16,7 @@ import {
   SduiChip,
   SduiSkeleton,
   SduiButton,
+  SduiToggle,
   SduiView,
   SduiLogo,
   SduiFeedbackBanner,
@@ -107,11 +108,15 @@ export const DEFAULT_COMPONENTS: Partial<Record<UiComponentType, SduiComponentDe
   [UiComponentType.BUTTON]: {
     component: SduiButton,
   },
+  [UiComponentType.TOGGLE]: {
+    component: SduiToggle,
+  },
   [UiComponentType.VIEW]: {
     component: SduiView,
     doesManageChildren: true,
     propParsers: {
       maxWidth: makeTokenOrLiteralPropParser(),
+      backgroundStyle: makeTokenOrLiteralPropParser(),
     },
   },
   [UiComponentType.LOGO]: {

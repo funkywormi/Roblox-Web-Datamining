@@ -1,16 +1,16 @@
-import type {
-  AnalyticsContext,
-  CollectionAnalyticsData,
-  FilterPillsInputDataFilterGroup,
-  ItemAnalyticsData,
-  SduiPageContext,
+import {
+  findAnalyticsFieldInAncestors,
+  type AnalyticsContext,
+  type CollectionAnalyticsData,
+  type FilterPillsInputDataFilterGroup,
+  type ItemAnalyticsData,
+  type SduiPageContext,
 } from "@rbx/sdui-core";
 import {
   EventStreamMetadata,
   type TFilterImpressions,
 } from "../../../common/constants/eventStreamConstants";
 import { parseMaybeStringNumberField, parseStringField } from "../../utils/analyticsParsingUtils";
-import { findAnalyticsFieldInAncestors } from "./findAnalyticsFieldInAncestors";
 import {
   buildSessionAnalyticsData,
   getSessionInfoKey,

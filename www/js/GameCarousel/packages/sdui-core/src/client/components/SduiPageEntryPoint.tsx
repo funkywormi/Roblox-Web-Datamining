@@ -93,6 +93,7 @@ function SduiPageEntryPointInner({
   const { rootConfig, hasContent, hasErrored, isLoading } = resolveEntryPointState(
     entry,
     identifiers.rootIdentifier,
+    { isContentAllowedWhileLoading: requestConfig.enableStreaming === true },
   );
   const titleConfig = identifiers.titleIdentifier
     ? pickRootConfig(entry, identifiers.titleIdentifier)

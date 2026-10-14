@@ -139,6 +139,8 @@ export interface ApiRequestConfig {
    * a pre-decoded response (SSR hydration).
    */
   protoSchema?: DescMessage;
+  /** Processes a varint-framed protobuf response incrementally when enabled. */
+  enableStreaming?: boolean;
   isPaginated?: boolean;
   /**
    * Per-field strategy for continuation merges. Mirrors lua-apps'

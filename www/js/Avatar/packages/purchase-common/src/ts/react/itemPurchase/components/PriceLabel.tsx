@@ -1,4 +1,5 @@
 import React from 'react';
+import { Icon } from '@rbx/foundation-ui';
 import { formatNumber } from '@rbx/core-scripts/format/number';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
 import { SelfProvidedTranslate } from '../SelfProvidedTranslate';
@@ -20,13 +21,18 @@ function PriceLabel({
   useFreeText = true
 }: PriceLabelProps & { translate: PurchaseTranslate }) {
   if (price === 0 && useFreeText) {
-    return <span className='text-robux text-free'>{translate(resources.freeLabel)}</span>;
+    return <span>{translate(resources.freeLabel)}</span>;
   }
   return (
-    <React.Fragment>
-      <span className={`icon-robux${color ? `-${color}` : ''}-16x16`} />
-      <span className='text-robux'>{formatNumber(price)}</span>
-    </React.Fragment>
+    // Plain inline (not flex) so the number stays on the surrounding text's baseline.
+    <span className='text-no-wrap'>
+      <Icon
+        name='icon-regular-robux'
+        size='Small'
+        className={`text-align-y-center margin-right-[2px]${color === 'gray' ? ' content-muted' : ''}`}
+      />
+      <span>{formatNumber(price)}</span>
+    </span>
   );
 }
 

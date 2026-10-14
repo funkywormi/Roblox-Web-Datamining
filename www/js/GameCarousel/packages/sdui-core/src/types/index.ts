@@ -30,6 +30,7 @@ export {
   AutomaticSizeSchema,
   ScaleTypeSchema,
   TextTruncateSchema,
+  TextXAlignmentSchema,
 } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/prop_types_engine_pb.js";
 export { UiComponentType, UiComponentTypeSchema };
 export type {
@@ -488,6 +489,19 @@ export type SduiScaleType = (typeof SDUI_SCALE_TYPE_VALUES)[number];
 /** Parsed value of a `ScaleBasisProp` — prefix-stripped proto enum name. */
 export const SDUI_SCALE_BASIS_VALUES = ["parent", "viewport"] as const;
 export type SduiScaleBasis = (typeof SDUI_SCALE_BASIS_VALUES)[number];
+
+export const SDUI_UI_FLEX_MODE_VALUES = ["none", "grow", "shrink", "fill"] as const;
+export type SduiUIFlexMode = (typeof SDUI_UI_FLEX_MODE_VALUES)[number];
+
+export const SDUI_TEXT_X_ALIGNMENT_VALUES = ["left", "center", "right"] as const;
+export type SduiTextXAlignment = (typeof SDUI_TEXT_X_ALIGNMENT_VALUES)[number];
+
+export const SDUI_TEXT_Y_ALIGNMENT_VALUES = ["top", "center", "bottom"] as const;
+export type SduiTextYAlignment = (typeof SDUI_TEXT_Y_ALIGNMENT_VALUES)[number];
+
+/** Prefix-stripped `TextTruncate` names. `"atEnd"` and `"splitWord"` keep their camelCase. */
+export const SDUI_TEXT_TRUNCATE_MODE_VALUES = ["none", "atEnd", "splitWord"] as const;
+export type SduiTextTruncateMode = (typeof SDUI_TEXT_TRUNCATE_MODE_VALUES)[number];
 
 export type SduiTextTruncate = "text-truncate-none" | "text-truncate-end" | "text-truncate-split";
 

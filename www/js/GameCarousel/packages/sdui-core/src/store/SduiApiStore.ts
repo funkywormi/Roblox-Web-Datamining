@@ -59,6 +59,12 @@ export interface SduiApiStoreDeps {
   pageContext: SduiPageContext;
 }
 
+export type SduiApplyResponseOptions = {
+  shouldDeferCacheSettling?: boolean;
+  shouldMergeStreamingResponse?: boolean;
+  streamingInputIdentifiers?: Set<string>;
+};
+
 const EMPTY_CACHE_ENTRY: CacheEntry = {
   configs: new Map(),
   status: CacheStatus.Idle,
@@ -248,9 +254,20 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
     response: SduiApiResponse,
     requestConfig: ApiRequestConfig,
     loadTimer: SduiLoadTimer,
+    options?: SduiApplyResponseOptions,
   ): void {
+    const {
+      shouldDeferCacheSettling = false,
+      shouldMergeStreamingResponse: mergeStreamingResponse = false,
+      streamingInputIdentifiers,
+    } = options ?? {};
     const configKey = getConfigKey(requestConfig);
     const paginateResponse = requestConfig.isPaginated === true;
+    const enableStreaming = requestConfig.enableStreaming === true;
+    // For now, the ability to set `merge=true` is not available in
+    // `ApiRequestConfig`, and it is derived internally when these
+    // conditions are met.
+    const enableInternalMerge = paginateResponse || mergeStreamingResponse;
 
     batch(() => {
       const newlyBuiltEntries = handleSduiApiResponse(response, {
@@ -262,6 +279,8 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
         pageContext: deps.pageContext,
         errorReporter: deps.errorReporter,
         paginateResponse,
+        enableStreaming: mergeStreamingResponse,
+        streamingInputIdentifiers,
         mergeStrategy: requestConfig.mergeStrategy,
         getInputDataSignal: identifier => getOrCreateInputDataSignal(configKey, identifier),
         hasComponentConfig: identifier =>
@@ -273,7 +292,8 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
       });
 
       if (
-        !paginateResponse &&
+        !enableInternalMerge &&
+        !enableStreaming &&
         newlyBuiltEntries.length === 0 &&
         requestConfig.allowNoConfigsBuilt !== true
       ) {
@@ -288,11 +308,11 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
 
       const isEmpty = response.pageEntries.length === 0;
       const shouldClear =
-        !paginateResponse && isEmpty && requestConfig.clearOnEmptyResponse === true;
+        !enableInternalMerge && isEmpty && requestConfig.clearOnEmptyResponse === true;
 
       updateCache(configKey, previous => {
         let cachedResponse = response;
-        if (paginateResponse) {
+        if (enableInternalMerge) {
           cachedResponse = mergePaginatedSduiResponse(
             previous.response,
             response,
@@ -314,7 +334,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
           };
         }
 
-        const shouldPreserveEntries = paginateResponse || (!shouldClear && isEmpty);
+        const shouldPreserveEntries = enableInternalMerge || (!shouldClear && isEmpty);
         const configs = shouldPreserveEntries
           ? new Map(previous.configs)
           : new Map<string, SduiComponentConfig>();
@@ -325,10 +345,12 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
           ...previous,
           response: cachedResponse,
           configs,
-          status: "loaded",
+          status: shouldDeferCacheSettling ? previous.status : "loaded",
           error: undefined,
           nextPageUrl,
-          dataUpdatedTimestamp: Date.now(),
+          dataUpdatedTimestamp: shouldDeferCacheSettling
+            ? previous.dataUpdatedTimestamp
+            : Date.now(),
         };
       });
     });
@@ -468,6 +490,8 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
             pageContext: deps.pageContext,
             errorReporter: deps.errorReporter,
             paginateResponse: false,
+            // TODO: Support streaming a targetted refresh
+            enableStreaming: false,
             getInputDataSignal: identifier => getOrCreateInputDataSignal(configKey, identifier),
           });
         } finally {
@@ -527,6 +551,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
       response: SduiApiResponse,
       requestConfig: ApiRequestConfig,
       loadTimer: SduiLoadTimer,
+      options: SduiApplyResponseOptions,
     ) => TResult,
     cacheStatePolicy: CacheStatePolicy = "update",
   ): Promise<SduiFetchOutcome<TResult>> {
@@ -542,16 +567,49 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
     }
 
     try {
-      const decodedResponse = await executeSduiRequest(requestConfig, url, {
+      const responses = executeSduiRequest(requestConfig, url, {
         loadTimer,
         isRequestCurrent,
         reportPageAnalytics: true,
         invalidationSignal,
       });
-      if (!isRequestCurrent()) {
-        return { status: "canceled" };
+      // TODO: The returned result is mainly used for targeted refresh which is
+      // not supported for streaming yet. In the streaming case, there can be
+      // multiple results
+      let result!: TResult;
+      const shouldDeferCacheSettling = requestConfig.enableStreaming;
+      let isFirstResponse = true;
+      let streamingInputIdentifiers: Set<string> | undefined;
+      for await (const decodedResponse of responses) {
+        if (!isRequestCurrent()) {
+          return { status: "canceled" };
+        }
+
+        // A content-first stream replaces prior-request input once per identifier.
+        // Hydration-first streams retain their existing cross-request merge behavior.
+        if (
+          isFirstResponse &&
+          requestConfig.enableStreaming === true &&
+          requestConfig.isPaginated !== true &&
+          decodedResponse.pageEntries.length > 0
+        ) {
+          streamingInputIdentifiers = new Set();
+        }
+        result = applyDecodedResponse(decodedResponse, requestConfig, loadTimer, {
+          shouldDeferCacheSettling,
+          shouldMergeStreamingResponse: requestConfig.enableStreaming === true && !isFirstResponse,
+          streamingInputIdentifiers,
+        });
+        isFirstResponse = false;
       }
-      const result = applyDecodedResponse(decodedResponse, requestConfig, loadTimer);
+      if (shouldDeferCacheSettling) {
+        updateCache(configKey, previous => ({
+          ...previous,
+          status: CacheStatus.Loaded,
+          error: undefined,
+          dataUpdatedTimestamp: Date.now(),
+        }));
+      }
       if (cacheStatePolicy === "paginate") {
         updateCache(configKey, clearLoadingMore);
       }

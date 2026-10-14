@@ -1,7 +1,7 @@
 import React from "react";
 
 export type InlineFooterButtonConfig = {
-  content: JSX.Element | string;
+  content: React.ReactElement | string;
   /** Used primarily for accessibility labeling. */
   label: string;
   enabled: boolean;

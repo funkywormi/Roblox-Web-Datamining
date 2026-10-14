@@ -447,7 +447,7 @@ const TwoStepVerification: React.FC = () => {
    * Rendering Helpers
    */
 
-  const renderMediaTypeWithChildren = (children: React.ReactFragment) => {
+  const renderMediaTypeWithChildren = (children: React.ReactNode) => {
     return (
       <Switch>
         <Route path={mediaTypeToPath(MediaType.Authenticator)}>

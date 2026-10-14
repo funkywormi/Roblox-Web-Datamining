@@ -4324,7 +4324,7 @@
         },
         {
             "name": "Avatar",
-            "url": "https://js.rbxcdn.com/a9907f5ae604bfb96bd989cc2e7de05fd0eba8bb5bede0a5a8dea304fbf6d8e4-Avatar.js",
+            "url": "https://js.rbxcdn.com/6bdf65ba66bd2cc86b793fc92e658bc706a3e53d88744dc0d04d11e17fe753ea-Avatar.js",
             "sources": [
                 "/my/avatar"
             ]
@@ -4970,7 +4970,7 @@
         },
         {
             "name": "GameCarousel",
-            "url": "https://js.rbxcdn.com/fd3e887e985f180b07f13cbd574c02b9be46783c6671a0c2058ecae3fc90a726-GameCarousel.js",
+            "url": "https://js.rbxcdn.com/77327ea6bae354296d06154f2f8fe93148ee98a60c3ab8ae64aabf7d46551003-GameCarousel.js",
             "sources": [
                 "/charts"
             ]
@@ -4984,7 +4984,7 @@
         },
         {
             "name": "GameDetails",
-            "url": "https://js.rbxcdn.com/d7e99104d0e7ba53d2960ffa6d0972478f4646ed74eb424dc0416e8b23e42466-GameDetails.js",
+            "url": "https://js.rbxcdn.com/ea081b089a83f40762936106ec52ccaf619f9bc9022004aa1fa2e8a89c33a235-GameDetails.js",
             "sources": [
                 "/games/1818"
             ]
@@ -4998,7 +4998,7 @@
         },
         {
             "name": "GameLaunch",
-            "url": "https://js.rbxcdn.com/eb5216da4e5157fba9edbebb8d1c829c700fc96da3e14324bb0e425370b8a658-GameLaunch.js",
+            "url": "https://js.rbxcdn.com/407077c6ca8c490e63ca1deb9a548a8c4d28e105a35057a3ff0f3f8ddf1e6436-GameLaunch.js",
             "sources": [
                 "/home",
                 "/",
@@ -5976,7 +5976,7 @@
         },
         {
             "name": "ReactChat",
-            "url": "https://js.rbxcdn.com/e8f904074d566d8bf6863f1aa1eb6e9e0efdc1a6fcbb83df43140b19f1cba59a-ReactChat.js",
+            "url": "https://js.rbxcdn.com/3c326956a49c0c9e315581f06fb10cedd49e11e327a60d31aef54606e20d9406-ReactChat.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -6514,7 +6514,7 @@
         },
         {
             "name": "SupportCenter",
-            "url": "https://js.rbxcdn.com/d41589f1cec28eacad3d83ff5c21f5706f787f446224f3ea41d731001f3641e4-SupportCenter.js",
+            "url": "https://js.rbxcdn.com/dd70d407235723a8a8b0f42f4417a95613810a3f0162fef5f5e289ef4e4ae443-SupportCenter.js",
             "sources": [
                 "/support-center"
             ]
@@ -6803,7 +6803,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/6784e3dfc5672355bc40f81be35c6f22f3033e7fa2178287f8ceefa1c5e9b240-UserSettings.js",
+            "url": "https://js.rbxcdn.com/627fa3e19645ba5522312239f318d48f36b7975ab71925416215d9e91f5bf0e4-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -7181,7 +7181,7 @@
         },
         {
             "name": "Avatar",
-            "url": "https://css.rbxcdn.com/82128ee569f186d2cb72d32e177974a142b2147d3a20e568dfd4ba1a6438d884-Avatar.css",
+            "url": "https://css.rbxcdn.com/49622307ded19d20356785f9da3f5c13f9d2cddce6312626ba2e2817462e2000-Avatar.css",
             "sources": [
                 "/my/avatar"
             ]
@@ -7623,7 +7623,7 @@
         },
         {
             "name": "FoundationCss",
-            "url": "https://css.rbxcdn.com/5143f402558cc8f067eedd141f93f63f84a3eb853afbc93a4d99f5d8b06c67f9-FoundationCss.css",
+            "url": "https://css.rbxcdn.com/161e292cedda1994a4f776fd987faeae2ede0f79b194c126c1a9f30436f14eb0-FoundationCss.css",
             "sources": [
                 "ALL"
             ]
@@ -7652,7 +7652,7 @@
         },
         {
             "name": "GameCarousel",
-            "url": "https://css.rbxcdn.com/4c5530641c187f9fa349a3dd69d5202840b05917b3b952f0e7e588fe09abe94b-GameCarousel.css",
+            "url": "https://css.rbxcdn.com/c60c671bd25954d75302322cf04c304486bfd98cbfcee0f89309cf0486fb6f91-GameCarousel.css",
             "sources": [
                 "/charts"
             ]
@@ -8752,7 +8752,7 @@
         },
         {
             "name": "SupportCenter",
-            "url": "https://css.rbxcdn.com/9f2ebde908f8909a38d9f0fad21cb691866d4e594048422b41d3d3b361185b5f-SupportCenter.css",
+            "url": "https://css.rbxcdn.com/b6964bc39d546b2f0cf3fb7a18a54fd8b6637024f84ca0c58784d166ae1ed478-SupportCenter.css",
             "sources": [
                 "/support-center"
             ]

@@ -1,6 +1,8 @@
 import { useCallback, type ReactNode } from "react";
-import { InstallInstructionsWithTranslation, TokenizedDownloadButton } from "@rbx/app-download";
-import type { DownloadButtonProps, ResolvedAppDownload } from "@rbx/app-download";
+import { InstallInstructionsWithTranslation } from "@rbx/app-download/InstallInstructions";
+import TokenizedDownloadButton from "@rbx/app-download/TokenizedDownloadButton";
+import type { ResolvedAppDownload } from "@rbx/app-download";
+import type { DownloadButtonProps } from "@rbx/app-download/DownloadButton";
 import type { SduiRendererInjectedProps, SduiResolvedAction } from "@rbx/sdui-core";
 
 export interface SduiDownloadButtonProps extends SduiRendererInjectedProps {

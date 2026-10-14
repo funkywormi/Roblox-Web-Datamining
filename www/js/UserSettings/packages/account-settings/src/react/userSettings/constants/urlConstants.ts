@@ -139,7 +139,7 @@ export const getConsentDetailsPageUrl = (consentId: string): string =>
   )}`;
 
 export const getTrustedConnectionReviewPageUrl = (consentId: string, sessionId: string): string =>
-  `/parental-requests?requestType=AddTrustedConnection&sessionId=${sessionId}&consentId=${consentId}&redirectUrl=${encodeURIComponent(
+  `/parental-requests?requestType=AddTrustedConnection&sessionId=${sessionId}&analyticsSessionId=${sessionId}&consentId=${consentId}&redirectUrl=${encodeURIComponent(
     window.location.href,
   )}`;
 

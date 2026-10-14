@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type React from "react";
-import { Button } from "@rbx/core-ui";
+import { Button, Popover, PopoverAnchor, PopoverContent } from "@rbx/foundation-ui";
 import type { FilterPillsInputDataFilterGroup } from "@rbx/sdui-core";
 import FilterMenu from "./FilterMenu";
 
@@ -35,7 +35,7 @@ export function FilterPill({
   onFilterClick,
   onApplyFilter,
 }: FilterPillProps): React.JSX.Element {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [draftOptionId, setDraftOptionId] = useState(effectiveSelectedOptionId);
 
@@ -62,16 +62,21 @@ export function FilterPill({
     );
   }, [draftOptionId, effectiveSelectedOptionId, filterGroup, isActive, onFilterClick]);
 
-  const toggleMenu = useCallback(() => {
-    if (isMenuOpen) {
-      closeMenu();
-      return;
-    }
+  const handleOpenChange = useCallback(
+    (nextIsOpen: boolean) => {
+      if (!nextIsOpen) {
+        if (isMenuOpen) {
+          closeMenu();
+        }
+        return;
+      }
 
-    onFilterClick?.(filterGroup, "OpenDropdown", effectiveSelectedOptionId, undefined, isActive);
-    setDraftOptionId(effectiveSelectedOptionId);
-    setIsMenuOpen(true);
-  }, [closeMenu, effectiveSelectedOptionId, filterGroup, isActive, isMenuOpen, onFilterClick]);
+      onFilterClick?.(filterGroup, "OpenDropdown", effectiveSelectedOptionId, undefined, isActive);
+      setDraftOptionId(effectiveSelectedOptionId);
+      setIsMenuOpen(true);
+    },
+    [closeMenu, effectiveSelectedOptionId, filterGroup, isActive, isMenuOpen, onFilterClick],
+  );
 
   const applySelection = useCallback(() => {
     onFilterClick?.(filterGroup, "Apply", draftOptionId, effectiveSelectedOptionId, isActive);
@@ -86,32 +91,63 @@ export function FilterPill({
     onFilterClick,
   ]);
 
+  const preventAnchorDismissal = useCallback((event: CustomEvent<{ originalEvent: Event }>) => {
+    const { target } = event.detail.originalEvent;
+    if (target instanceof Node && anchorRef.current?.contains(target)) {
+      event.preventDefault();
+    }
+  }, []);
+
   return (
-    <div ref={containerRef}>
-      <Button
-        onClick={toggleMenu}
-        variant={isActive || isMenuOpen ? Button.variants.primary : Button.variants.secondary}
-        size={Button.sizes.medium}
-        className="filter-select"
-        aria-expanded={isMenuOpen}
+    <Popover open={isMenuOpen} onOpenChange={handleOpenChange}>
+      <PopoverAnchor asChild>
+        <div ref={anchorRef}>
+          <Button
+            onClick={() => handleOpenChange(!isMenuOpen)}
+            variant={isActive || isMenuOpen ? "Emphasis" : "Standard"}
+            size="Medium"
+            className={
+              isActive || isMenuOpen
+                ? "filter-select sdui-filter-select sdui-filter-select-active"
+                : "filter-select sdui-filter-select"
+            }
+            aria-expanded={isMenuOpen}
+            aria-haspopup="dialog"
+          >
+            <span className="filter-display-text">{selectedOption?.displayName}</span>
+            <span
+              className={
+                isActive || isMenuOpen ? "icon-expand-arrow-selected" : "icon-expand-arrow"
+              }
+            />
+          </Button>
+        </div>
+      </PopoverAnchor>
+      <PopoverContent
+        side="bottom"
+        align="start"
+        sideOffset={8}
+        collisionPadding={10}
+        ariaLabel={filterGroup.displayName}
+        className="filters-container sdui-filter-menu-popover"
+        // Foundation forwards these Radix dismissal props but does not expose them in its type.
+        {...({
+          onPointerDownOutside: preventAnchorDismissal,
+          onInteractOutside: preventAnchorDismissal,
+        } as Record<string, unknown>)}
       >
-        <span className="filter-display-text">{selectedOption?.displayName}</span>
-        <span
-          className={isActive || isMenuOpen ? "icon-expand-arrow-selected" : "icon-expand-arrow"}
-        />
-      </Button>
-      {isMenuOpen ? (
-        <FilterMenu
-          filterGroup={filterGroup}
-          selectedOptionId={draftOptionId}
-          committedOptionId={effectiveSelectedOptionId}
-          containerRef={containerRef}
-          onOptionSelected={setDraftOptionId}
-          onApply={applySelection}
-          onClose={closeMenu}
-        />
-      ) : null}
-    </div>
+        <div className="filter-items-container">
+          <FilterMenu
+            filterGroup={filterGroup}
+            selectedOptionId={draftOptionId}
+            committedOptionId={effectiveSelectedOptionId}
+            onOptionSelected={setDraftOptionId}
+            onApply={applySelection}
+            onClose={closeMenu}
+          />
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 

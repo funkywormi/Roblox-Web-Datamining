@@ -1,4 +1,5 @@
 import type { MouseEvent } from "react";
+import { window as browserWindow } from "@rbx/core-lib/browser";
 import DownloadButton from "./DownloadButton";
 import type { DownloadButtonProps } from "./DownloadButton";
 import { downloadSourceType } from "./deferredDeeplinkConstants";
@@ -19,7 +20,7 @@ export type TokenizedDownloadButtonProps = Omit<DownloadButtonProps, "onClick"> 
  * If token creation fails, navigation falls back to the original URL; store links are not intercepted.
  */
 function TokenizedDownloadButton({
-  linkId = window.location.href,
+  linkId,
   downloadSource = downloadSourceType.Installer,
   onClick,
   ...downloadButtonProps
@@ -42,7 +43,8 @@ function TokenizedDownloadButton({
       return;
     }
 
-    const params = await getDownloadLinkParams({ linkId, downloadSource });
+    const resolvedLinkId = linkId ?? browserWindow?.location.href;
+    const params = await getDownloadLinkParams({ linkId: resolvedLinkId, downloadSource });
     const url = download.href.withSearchParamsAppended(params);
     window.location.assign(url.toString());
   };

@@ -2,6 +2,7 @@ import type { ComponentProps } from "react";
 import type { ValueOf } from "@rbx/core-types";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import type { Icon } from "@rbx/foundation-ui";
+import type { Namespace } from "@rbx/www-common/i18n";
 
 type FoundationIconName = ComponentProps<typeof Icon>["name"];
 
@@ -19,7 +20,11 @@ export const pageName = "downloadV2";
 
 export const installInstructionsDelayMs = 1000;
 
-export const appDownloadTranslationConfig = ["Feature.DownloadLanding", "Common.VisitGame"];
+/** The namespaces app-download's keys come from; every entry that renders its components provides them. */
+export const appDownloadNamespaces = [
+  "Feature.DownloadLanding",
+  "Common.VisitGame",
+] as const satisfies readonly Namespace[];
 
 export const downloadPageStrings = {
   downloadPageHeader: "Heading.DownloadPage",

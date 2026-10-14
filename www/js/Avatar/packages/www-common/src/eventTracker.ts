@@ -5,12 +5,15 @@ import { Url } from "@rbx/core-lib/url";
 // Next-clean drop-in for the legacy window.EventTracker global: same report-event counters and
 // report-stats timings, same endpoints, for use on both .NET and Next.js.
 
-const metricsUrl = Url.parse(environmentUrls.metricsApi).getOrThrow();
+// Parsed on first use, so importing this module never throws.
+const getReportEventUrl = () =>
+  Url.parse(environmentUrls.metricsApi).getOrThrow().withPath("/v1/games/report-event");
 
 // report-stats lives on the asset/game host, not metrics.
-const reportStatsUrl = Url.parse(`https://assetgame.${environmentUrls.domain}`)
-  .getOrThrow()
-  .withPath("/game/report-stats");
+const getReportStatsUrl = () =>
+  Url.parse(`https://assetgame.${environmentUrls.domain}`)
+    .getOrThrow()
+    .withPath("/game/report-stats");
 
 // Fire-and-forget: core-lib captures errors in the Result; keepalive survives a page transition.
 const post = (url: Url, name: string, extraParams?: Record<string, string>): void => {
@@ -23,7 +26,7 @@ const post = (url: Url, name: string, extraParams?: Record<string, string>): voi
 
 export const fireEvent = (...names: string[]): void => {
   names.forEach(name => {
-    post(metricsUrl.withPath("/v1/games/report-event"), name);
+    post(getReportEventUrl(), name);
   });
 };
 
@@ -44,7 +47,7 @@ const end = (reason: "Success" | "Cancel" | "Failure", statSequenceNames: string
       return;
     }
     startTimes.delete(name);
-    post(reportStatsUrl, `${name}_${reason}`, { value: String(now - startedAt) });
+    post(getReportStatsUrl(), `${name}_${reason}`, { value: String(now - startedAt) });
   });
 };
 

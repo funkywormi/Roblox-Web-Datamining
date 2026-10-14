@@ -5,6 +5,7 @@ import {
   ScaleBasisSchema,
   ScaleTypeSchema,
   TextTruncateSchema,
+  TextXAlignmentSchema,
 } from "../../types";
 import { reportBindingError, SduiErrorName } from "../../errors";
 import { enumNumberToName, jsonEnumToString } from "../../utils/protoEnum";
@@ -22,6 +23,7 @@ import {
   parseScaleTypeProp,
   parseStringArrayProp,
   parseTextTruncateProp,
+  parseTextAlignmentProp,
   parseUDimProp,
   parseUDim2Prop,
   parseVector2Prop,
@@ -84,6 +86,7 @@ const PROP_BUILDERS: Partial<Record<PropDescriptorName, PropBuilder>> = {
   TypographyProp: buildDefaultProp,
   TypographyFontProp: buildDefaultProp,
   TextTruncateProp: withEnumParser(TextTruncateSchema, parseTextTruncateProp),
+  TextXAlignmentProp: withEnumParser(TextXAlignmentSchema, parseTextAlignmentProp),
   FillBehaviorProp: buildDefaultProp,
   InputSizeProp: buildDefaultProp,
   IconProp: withDefaultParser(parseIconProp),

@@ -16,6 +16,7 @@ import getItemThumbnailAndLink from "../../../utils/assetManager.helpers";
 import { useSystemFeedback } from "../../../contexts/SystemFeedbackContext";
 import { useAssetManagerContext } from "../../../contexts/AssetManagerContext";
 import parseError from "../../../utils/parseErrorUtil";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../../../observability";
 import { trackAvatarEditorClick, AvatarEditorTrackingEvents } from "../../../utils/axTracking";
 
 type UpdateOutfitDialogProps = {
@@ -41,6 +42,7 @@ function UpdateOutfitDialog({
 
     const outfitCostumeMessage = avatarConstants.outfits.characterMessages;
 
+    trackEditAttempted("outfitUpdate");
     // TODO provide handles for getting body colors and asset IDs instead of requesting again
     const getAvatarRequest = AvatarAPIService.getAvatarV2(false);
     getAvatarRequest
@@ -69,6 +71,7 @@ function UpdateOutfitDialog({
               version: (outfit.version ?? 0) + 1,
             };
             updateOutfitInDataList(updatedItem);
+            trackEditSucceeded("outfitUpdate");
             trackAvatarEditorClick(AvatarEditorTrackingEvents.OutfitEdited, {
               action: "update",
               outfitId: outfit.id,
@@ -88,6 +91,7 @@ function UpdateOutfitDialog({
                 counterName: "AvatarEditorError",
                 log: parseError(data),
               });
+              trackEditFailed("outfitUpdate", data);
               setErrorMessage(outfitCostumeMessage.errorUpdatingOutfit);
             }
           },
@@ -99,6 +103,7 @@ function UpdateOutfitDialog({
           counterName: "AvatarEditorError",
           log: parseError(e),
         });
+        trackEditFailed("outfitUpdate", e);
         setErrorMessage(outfitCostumeMessage.errorUpdatingOutfit);
       });
   }, [

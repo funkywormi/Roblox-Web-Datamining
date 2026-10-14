@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useQuery, QueryClientProvider } from "@tanstack/react-query";
 import classNames from "classnames";
-import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
+import { getCurrentUser } from "@rbx/www-common/user";
 import { Button } from "@rbx/foundation-ui";
 import { queryClient } from "@rbx/core-scripts/react";
 import * as NavigationService from "@rbx/navigation";
 import ExperimentationService from "@rbx/experimentation";
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import {
@@ -36,6 +37,7 @@ import ExperienceApprovalActionNeededButton from "./ExperienceApprovalActionNeed
 import ParentalControlsActionNeededButton from "./ParentalControlsActionNeededButton";
 import PurchaseButton from "./PurchaseButtonContainer";
 import { DemoButton } from "./DemoButton";
+import { PlayOnWebButton } from "./PlayOnWebButton";
 import UnplayableButton from "./UnplayableButton";
 import useLaunchGameWithPlayableUxTreatment from "../hooks/useLaunchGameWithPlayableUxTreatment";
 import usePurchaseProductData from "../hooks/usePurchaseProductData";
@@ -53,7 +55,7 @@ const getShowIdentityVerificationFlow = async (
     isUniverseEnabledForAvatarVideo: false,
   };
 
-  if (!authenticatedUser.isAuthenticated) {
+  if (getCurrentUser() === undefined) {
     return {
       elegibleToSeeVoiceUpsell: false,
       universePlaceVoiceEnabledSettings: defaultUniverseSettings,
@@ -140,6 +142,21 @@ const getJoindata = (launchDataFromProps?: string) => {
   };
 };
 
+// Stack the primary button and a secondary button
+const withSecondaryButton = (
+  primaryButton: React.JSX.Element,
+  secondaryButton: React.JSX.Element | null,
+  showSecondary = true,
+): React.JSX.Element =>
+  secondaryButton ? (
+    <div className="stacked-play-buttons-container">
+      {primaryButton}
+      {showSecondary && secondaryButton}
+    </div>
+  ) : (
+    primaryButton
+  );
+
 const EMPTY_OBJECT = {} as const;
 
 export type TPlayButtonProps = {
@@ -220,7 +237,7 @@ const PlayButtonContents = ({
         setUseCameraU13Design(showIdentityVerificationFlow.useCameraU13Design);
         setUseVoiceUpsellV2Design(showIdentityVerificationFlow.useVoiceUpsellV2Design);
       } catch {
-        window.EventTracker?.fireEvent(counterEvents.PlayButtonShowIdentificationError);
+        fireEvent(counterEvents.PlayButtonShowIdentificationError);
         setElegibleToSeeVoiceUpsell(false);
         setIsExperienceVoiceEnabled(false);
         setShowVerification(false);
@@ -379,6 +396,7 @@ export type TDefaultPlayButtonProps = {
     >
   >;
   pageContext: TPlayButtonPageContext;
+  playOnWebEnabled?: boolean;
 };
 
 export const DefaultPlayButton = ({
@@ -400,9 +418,8 @@ export const DefaultPlayButton = ({
   shouldShowVpcPlayButtonUpsells,
   playabilityStatusCtaOverrides,
   pageContext,
+  playOnWebEnabled,
 }: TDefaultPlayButtonProps): React.JSX.Element => {
-  const { fireEvent } = window.EventTracker ?? {};
-
   // Share the purchase button's product-data loading (react-query dedupes the
   // fetch) so Play Demo is withheld until the purchase button is ready, rather
   // than showing next to a spinner.
@@ -427,18 +444,7 @@ export const DefaultPlayButton = ({
     />
   ) : null;
 
-  // Stack the primary button and Play Demo button when a demo is available.
-  // showDemo=false keeps the container but holds Play Demo back until the
-  // primary button has loaded.
-  const withDemoButton = (primaryButton: React.JSX.Element, showDemo = true): React.JSX.Element =>
-    demoButton ? (
-      <div className="stacked-play-buttons-container">
-        {primaryButton}
-        {showDemo && demoButton}
-      </div>
-    ) : (
-      primaryButton
-    );
+  const playOnWebButton = playOnWebEnabled ? <PlayOnWebButton placeId={placeId} /> : null;
 
   switch (playabilityStatus) {
     case undefined:
@@ -467,10 +473,10 @@ export const DefaultPlayButton = ({
     case PlayabilityStatus.Playable: {
       const ctaOverride = playabilityStatusCtaOverrides?.[playabilityStatus];
       if (ctaOverride !== undefined) {
-        return ctaOverride;
+        return playOnWebEnabled ? withSecondaryButton(ctaOverride, playOnWebButton) : ctaOverride;
       }
 
-      return (
+      const button = (
         <PlayButton
           universeId={universeId}
           placeId={placeId}
@@ -485,10 +491,12 @@ export const DefaultPlayButton = ({
           pageContext={pageContext}
         />
       );
+
+      return playOnWebEnabled ? withSecondaryButton(button, playOnWebButton) : button;
     }
     case PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser:
     case PlayabilityStatus.ContextualPlayabilityAgeCheckRequired:
-      fireEvent?.(counterEvents.ActionNeeded);
+      fireEvent(counterEvents.ActionNeeded);
       return (
         <AgeCheckNeededButton
           universeId={universeId}
@@ -507,14 +515,15 @@ export const DefaultPlayButton = ({
           : Boolean(productInfo?.isForSale);
 
       if (!isPurchaseProductLoading && !hasAdequatePurchaseData) {
-        fireEvent?.(counterEvents.Unplayable);
+        fireEvent(counterEvents.Unplayable);
 
-        return withDemoButton(
+        return withSecondaryButton(
           <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />,
+          demoButton,
         );
       }
 
-      return withDemoButton(
+      return withSecondaryButton(
         <PurchaseButton
           refetchPlayabilityStatus={refetchPlayabilityStatus}
           universeId={universeId}
@@ -526,19 +535,21 @@ export const DefaultPlayButton = ({
           showDefaultPurchaseText={showDefaultPurchaseText}
           pageContext={pageContext}
         />,
+        demoButton,
         !isPurchaseProductLoading,
       );
     }
     case PlayabilityStatus.FiatPurchaseDeviceRestricted:
     case PlayabilityStatus.ContextualPlayabilityRegionalAvailability:
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
-      return withDemoButton(
+      return withSecondaryButton(
         <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />,
+        demoButton,
       );
     case PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls:
       if (shouldShowVpcPlayButtonUpsells) {
-        fireEvent?.(counterEvents.ActionNeeded);
+        fireEvent(counterEvents.ActionNeeded);
 
         return (
           <ParentalControlsActionNeededButton
@@ -556,12 +567,12 @@ export const DefaultPlayButton = ({
       }
 
       // If policy is false, fall back to unplayable behavior
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
       return <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />;
     case PlayabilityStatus.ContextualPlayabilityRequireParentApproval:
       if (shouldShowVpcPlayButtonUpsells) {
-        fireEvent?.(counterEvents.ActionNeeded);
+        fireEvent(counterEvents.ActionNeeded);
 
         return (
           <ExperienceApprovalActionNeededButton
@@ -572,7 +583,7 @@ export const DefaultPlayButton = ({
         );
       }
 
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
       return <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />;
     case PlayabilityStatus.UnplayableOtherReason:
@@ -596,7 +607,7 @@ export const DefaultPlayButton = ({
     case PlayabilityStatus.ContextualPlayabilityPlaytestDisabled:
     case PlayabilityStatus.ContextualPlayabilityTrustedFriendRequired:
     default:
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
       return <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />;
   }

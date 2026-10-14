@@ -10,6 +10,7 @@ import AvatarAccoutrementService from "../utils/avatarAccoutrementService";
 import { Tab, SubCategoryMenu, CategoryRow } from "../types";
 import { CatalogSettings } from "../catalogMetadataRequest";
 import avatarEditorTabs from "../utils/avatarTab.constants";
+import { trackCounter } from "../observability";
 
 interface AvatarTabsContextType {
   tabs: Tab[];
@@ -98,6 +99,10 @@ export function AvatarTabsProvider({ children }: AvatarTabsProviderProps): React
 
   const onTabClick = useCallback(
     (tab: Tab) => {
+      // Clicking the open tab again only closes its menu.
+      if (clickedTab !== tab) {
+        trackCounter("OpenTab", { tab: tab.name });
+      }
       if (tab.noSubCategoryMenu) {
         // The user has clicked on a tab with no subcategory menu, so just select that tab
         selectOption(tab, undefined);

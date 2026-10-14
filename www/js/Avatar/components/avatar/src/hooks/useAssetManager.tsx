@@ -15,6 +15,7 @@ import parseError from "../utils/parseErrorUtil";
 import { getSlotConfig } from "../constants/slotConfigurations";
 import { isAvatarEditingDisabledError } from "../utils/avatarEditingError.utils";
 import { sendAXTracking, reportAXError, AXAnalyticsConstants } from "../utils/axAnalyticsService";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../observability";
 
 const useAssetManager = () => {
   const [avatarCallLimiterItemCardsDisabled, setAvatarCallLimiterItemCardsDisabled] =
@@ -200,6 +201,10 @@ const useAssetManager = () => {
 
       setCurrentlyWornAssets(assets);
 
+      // Callers passing `false` are a step of a larger edit and track their own outcome.
+      if (reportRefusedAssets) {
+        trackEditAttempted("wear");
+      }
       const request = setWearingAssetsFromIdsV2(assets);
       request.then(
         response => {
@@ -209,6 +214,9 @@ const useAssetManager = () => {
           // avatar that is not wearing them.
           const invalidAssetIds = getInvalidAssetIds(response);
           if (invalidAssetIds.length === 0) {
+            if (reportRefusedAssets) {
+              trackEditSucceeded("wear");
+            }
             return;
           }
 
@@ -229,6 +237,7 @@ const useAssetManager = () => {
             counterName: "AvatarEditorError",
             log: JSON.stringify({ message: "HasInvalidAssets", invalidAssetIds }),
           });
+          trackEditFailed("wear", undefined, "refused");
         },
         e => {
           reportAXError({
@@ -240,6 +249,9 @@ const useAssetManager = () => {
           if (isAvatarEditingDisabledError(e)) {
             systemFeedback.info(avatarConstants.page.avatarEditingDisabled);
           } else {
+            if (reportRefusedAssets) {
+              trackEditFailed("wear", e);
+            }
             systemFeedback.error(avatarConstants.assets.errorUpdatingItems);
           }
           // Undo local selection back to what it was before

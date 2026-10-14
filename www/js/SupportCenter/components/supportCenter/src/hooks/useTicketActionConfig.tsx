@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { TTailwindIconClass } from "@rbx/foundation-tailwind/classes";
 import { useTranslation } from "@rbx/core-scripts/react";
@@ -8,6 +8,7 @@ import TicketTextInputControl from "../components/controls/TicketTextInputContro
 import TicketAcceptDeclineControl from "../components/controls/TicketAcceptDeclineControl";
 import { commentIcon } from "../constants/icons";
 import useTicketActions from "./useTicketActions";
+import { sendEvent, SupportCenterMetrics } from "../utils/eventStream";
 
 const MAX_USER_REPLIES_BEFORE_CREATOR_ACTION = 5;
 
@@ -26,6 +27,9 @@ export type TicketActionConfig = {
 const useTicketActionConfig = (ticket: UserTicket): TicketActionConfig | null => {
   const { translate } = useTranslation();
   const { submitResponse, acceptShareUserInfo, declineShareUserInfo } = useTicketActions(ticket);
+  const hasLoggedReplyStartedRef = useRef(false);
+
+  const { universeId, id: ticketId } = ticket.summary;
 
   const lastComment = ticket.comments.at(-1);
 
@@ -40,7 +44,27 @@ const useTicketActionConfig = (ticket: UserTicket): TicketActionConfig | null =>
         minLength={10}
         maxLength={1000}
         placeholder={translate("Label.EnterMessage")}
-        onSubmit={submitResponse}
+        onChange={value => {
+          if (!hasLoggedReplyStartedRef.current && value.length > 0) {
+            hasLoggedReplyStartedRef.current = true;
+            sendEvent(
+              SupportCenterMetrics.SupportCenterTicketReplyStarted({
+                universeId,
+                ticketId,
+              }),
+            );
+          }
+        }}
+        onSubmit={async message => {
+          await submitResponse(message);
+          sendEvent(
+            SupportCenterMetrics.SupportCenterTicketReplySubmitted({
+              universeId,
+              ticketId,
+              characterCount: message.length,
+            }),
+          );
+        }}
       />
     ),
   };

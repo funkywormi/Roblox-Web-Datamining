@@ -2,6 +2,7 @@ import {
   ActionType,
   SduiErrorName,
   actionTypeName,
+  findAnalyticsFieldInAncestors,
   type AnalyticsContext,
   type SduiActionContext,
   type SduiPageContext,
@@ -20,7 +21,6 @@ import { getGameSetTargetIdMetadata } from "../../../common/utils/gameSetTargetI
 import { getChartsFilterQueryParamsFromSearch } from "../../../gameCarousel/sduiV2/chartsPageConfiguration";
 import { parseMaybeStringNumberField, parseStringField } from "../../utils/analyticsParsingUtils";
 import { filterInvalidEventParams } from "../utils/filterInvalidEventParams";
-import { findAnalyticsFieldInAncestors } from "../utils/findAnalyticsFieldInAncestors";
 import { getCommonReferralParams } from "../utils/getCommonReferralParams";
 import { buildSessionAnalyticsData, getSessionInfoKey } from "../utils/pageReferralUtils";
 import { readSortIdFromAction } from "../utils/readSortIdFromAction";

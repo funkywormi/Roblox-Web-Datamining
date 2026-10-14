@@ -10,6 +10,7 @@ import {
 } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../../../utils/translate";
 import { reportAXError } from "../../../utils/axAnalyticsService";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../../../observability";
 import avatarConstants from "../../../constants/avatarConstants";
 import AvatarAPIService from "../../../services/avatarAPIService";
 import { CatalogOutfitItem } from "../../../avatar.types";
@@ -49,6 +50,7 @@ function RenameOutfitDialog({
           counterName: "AvatarEditorError",
           log: parseError(e),
         });
+        trackEditFailed("outfitRename", e);
 
         setError(translate(outfitCostumeMessage.errorRenamingOutfit));
       }
@@ -70,6 +72,7 @@ function RenameOutfitDialog({
     const outfitCostumeMessage = avatarConstants.outfits.characterMessages;
     const outfitContents = { name: newName };
 
+    trackEditAttempted("outfitRename");
     try {
       const patchAvatarRequest = AvatarAPIService.patchOutfitV3(outfit.id, outfitContents);
       patchAvatarRequest
@@ -79,6 +82,7 @@ function RenameOutfitDialog({
             // Otherwise, use the new name inputted by the user
             const updatedName: string = result.name || newName;
             updateOutfitNameInDataList(outfit.id, updatedName);
+            trackEditSucceeded("outfitRename");
 
             trackAvatarEditorClick(AvatarEditorTrackingEvents.OutfitEdited, {
               action: "rename",

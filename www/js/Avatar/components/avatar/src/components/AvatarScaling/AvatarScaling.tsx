@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { Icon, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
 import { reportAXError } from "../../utils/axAnalyticsService";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../../observability";
 import AvatarScalingScale from "./AvatarScalingScale";
 import avatarConstants from "../../constants/avatarConstants";
 import { AvatarType, Scales, ScalesKeys } from "../../constants/types";
@@ -32,8 +33,10 @@ function AvatarScaling({ scales, updateScale }: AvatarScalingProps): React.React
       if (newAvatarType === "R6") {
         setIsBodyTypeWarningOpen(true);
       } else {
+        trackEditAttempted("avatarType");
         AvatarAPIService.setAvatarType(newAvatarType)
           .then(() => {
+            trackEditSucceeded("avatarType");
             setAvatarType(newAvatarType);
           })
           .catch(e => {
@@ -42,6 +45,7 @@ function AvatarScaling({ scales, updateScale }: AvatarScalingProps): React.React
               counterName: "AvatarEditorError",
               log: parseError(e),
             });
+            trackEditFailed("avatarType", e);
 
             systemFeedback.error(avatarConstants.avatarType.failedToUpdate);
           });

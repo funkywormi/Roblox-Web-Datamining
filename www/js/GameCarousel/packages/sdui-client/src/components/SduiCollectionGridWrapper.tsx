@@ -4,6 +4,7 @@ import { useTokens } from "@rbx/core-scripts/react";
 import { CollectionGrid, CollectionItemSize } from "@rbx/discovery-sdui-components";
 import {
   expandManagedList,
+  SduiDim,
   type SduiManagedChildList,
   type SduiRendererInjectedProps,
   type SduiResolvedAction,
@@ -21,6 +22,8 @@ export interface SduiCollectionGridProps extends SduiRendererInjectedProps {
   headerComponent?: React.ReactNode | SduiManagedChildList;
   items?: SduiManagedChildList;
   numColumnsOverride?: number;
+  itemHeightFromWidth?: SduiDim;
+  maxNumRows?: number;
   /**
    * When defined, looks up in `registry`; otherwise falls back to default item
    * impression log.
@@ -38,6 +41,8 @@ export function SduiCollectionGrid({
   headerComponent,
   items,
   numColumnsOverride,
+  itemHeightFromWidth,
+  maxNumRows,
   impressionEventName,
   skipItemImpressionsLog,
 }: SduiCollectionGridProps) {
@@ -64,6 +69,8 @@ export function SduiCollectionGrid({
         renderItem={renderItem}
         collectionItemSize={toV1CollectionItemSize(collectionItemSize) ?? CollectionItemSize.Small}
         updateItemsPerRow={setItemsPerRow}
+        itemHeightFromWidth={itemHeightFromWidth}
+        maxNumRows={maxNumRows}
         headerComponent={resolvedHeader}
         layoutOverrides={resolvedLayoutOverrides}
         gapBetweenHeaderAndItems={tokens.Gap.Large}

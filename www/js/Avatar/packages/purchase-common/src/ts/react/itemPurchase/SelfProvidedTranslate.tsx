@@ -1,7 +1,12 @@
-import { createContext, useContext, type ReactElement } from 'react';
+import { createContext, useContext, type ReactElement, type ReactNode } from 'react';
 import { TranslationProviderSCC } from '@rbx/www-common/i18n/scc';
 import type { Namespace } from '@rbx/www-common/i18n';
-import type { PurchaseTranslate } from './useTranslate';
+import {
+  useItemModelTranslate,
+  useItemTranslate,
+  usePurchasingTranslate,
+  type PurchaseTranslate
+} from './useTranslate';
 
 /**
  * Carries a host-injected translator (the Next.js path) down to nested `SelfProvidedTranslate`
@@ -12,6 +17,21 @@ import type { PurchaseTranslate } from './useTranslate';
  * self-sources its own correctly-scoped config.
  */
 const InjectedTranslateContext = createContext<PurchaseTranslate | undefined>(undefined);
+
+/**
+ * Next.js hosts: wrap the itemPurchase tree once, inside the page's next-intl provider, so every
+ * boundary reads the page's messages. The page must load all three namespace configs.
+ */
+export const PurchaseTranslateProvider = ({ children }: { children: ReactNode }): ReactElement => {
+  const purchasing = usePurchasingTranslate();
+  const item = useItemTranslate();
+  const itemModel = useItemModelTranslate();
+  const translate: PurchaseTranslate = (key, params) =>
+    purchasing(key, params) || item(key, params) || itemModel(key, params);
+  return (
+    <InjectedTranslateContext.Provider value={translate}>{children}</InjectedTranslateContext.Provider>
+  );
+};
 
 type FromContextProps = {
   useTranslate: () => PurchaseTranslate;

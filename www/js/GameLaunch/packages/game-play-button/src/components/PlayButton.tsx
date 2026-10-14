@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useQuery, QueryClientProvider } from "@tanstack/react-query";
 import classNames from "classnames";
-import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
+import { getCurrentUser } from "@rbx/www-common/user";
 import { Button } from "@rbx/foundation-ui";
 import { queryClient } from "@rbx/core-scripts/react";
 import * as NavigationService from "@rbx/navigation";
 import ExperimentationService from "@rbx/experimentation";
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import {
@@ -54,7 +55,7 @@ const getShowIdentityVerificationFlow = async (
     isUniverseEnabledForAvatarVideo: false,
   };
 
-  if (!authenticatedUser.isAuthenticated) {
+  if (getCurrentUser() === undefined) {
     return {
       elegibleToSeeVoiceUpsell: false,
       universePlaceVoiceEnabledSettings: defaultUniverseSettings,
@@ -236,7 +237,7 @@ const PlayButtonContents = ({
         setUseCameraU13Design(showIdentityVerificationFlow.useCameraU13Design);
         setUseVoiceUpsellV2Design(showIdentityVerificationFlow.useVoiceUpsellV2Design);
       } catch {
-        window.EventTracker?.fireEvent(counterEvents.PlayButtonShowIdentificationError);
+        fireEvent(counterEvents.PlayButtonShowIdentificationError);
         setElegibleToSeeVoiceUpsell(false);
         setIsExperienceVoiceEnabled(false);
         setShowVerification(false);
@@ -419,8 +420,6 @@ export const DefaultPlayButton = ({
   pageContext,
   playOnWebEnabled,
 }: TDefaultPlayButtonProps): React.JSX.Element => {
-  const { fireEvent } = window.EventTracker ?? {};
-
   // Share the purchase button's product-data loading (react-query dedupes the
   // fetch) so Play Demo is withheld until the purchase button is ready, rather
   // than showing next to a spinner.
@@ -497,7 +496,7 @@ export const DefaultPlayButton = ({
     }
     case PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser:
     case PlayabilityStatus.ContextualPlayabilityAgeCheckRequired:
-      fireEvent?.(counterEvents.ActionNeeded);
+      fireEvent(counterEvents.ActionNeeded);
       return (
         <AgeCheckNeededButton
           universeId={universeId}
@@ -516,7 +515,7 @@ export const DefaultPlayButton = ({
           : Boolean(productInfo?.isForSale);
 
       if (!isPurchaseProductLoading && !hasAdequatePurchaseData) {
-        fireEvent?.(counterEvents.Unplayable);
+        fireEvent(counterEvents.Unplayable);
 
         return withSecondaryButton(
           <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />,
@@ -542,7 +541,7 @@ export const DefaultPlayButton = ({
     }
     case PlayabilityStatus.FiatPurchaseDeviceRestricted:
     case PlayabilityStatus.ContextualPlayabilityRegionalAvailability:
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
       return withSecondaryButton(
         <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />,
@@ -550,7 +549,7 @@ export const DefaultPlayButton = ({
       );
     case PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls:
       if (shouldShowVpcPlayButtonUpsells) {
-        fireEvent?.(counterEvents.ActionNeeded);
+        fireEvent(counterEvents.ActionNeeded);
 
         return (
           <ParentalControlsActionNeededButton
@@ -568,12 +567,12 @@ export const DefaultPlayButton = ({
       }
 
       // If policy is false, fall back to unplayable behavior
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
       return <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />;
     case PlayabilityStatus.ContextualPlayabilityRequireParentApproval:
       if (shouldShowVpcPlayButtonUpsells) {
-        fireEvent?.(counterEvents.ActionNeeded);
+        fireEvent(counterEvents.ActionNeeded);
 
         return (
           <ExperienceApprovalActionNeededButton
@@ -584,7 +583,7 @@ export const DefaultPlayButton = ({
         );
       }
 
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
       return <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />;
     case PlayabilityStatus.UnplayableOtherReason:
@@ -608,7 +607,7 @@ export const DefaultPlayButton = ({
     case PlayabilityStatus.ContextualPlayabilityPlaytestDisabled:
     case PlayabilityStatus.ContextualPlayabilityTrustedFriendRequired:
     default:
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
       return <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />;
   }

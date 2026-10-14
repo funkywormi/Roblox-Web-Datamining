@@ -119,8 +119,13 @@ export function buildPageLoadFields(input: PageLoadFieldInput): Record<string, s
     durationBetween(
       input.timestamps,
       SduiLoadTimerMilestone.RequestQueued,
-      SduiLoadTimerMilestone.ResponseReceived,
-    ),
+      SduiLoadTimerMilestone.StreamFirstChunkReceived,
+    ) ??
+      durationBetween(
+        input.timestamps,
+        SduiLoadTimerMilestone.RequestQueued,
+        SduiLoadTimerMilestone.ResponseReceived,
+      ),
   );
   setFinite(
     "responseDecodeDurationMs",

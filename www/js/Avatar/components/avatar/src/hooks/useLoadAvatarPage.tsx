@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ThumbnailType } from "@rbx/www-common/components/thumbnail";
+import { logFinalThumbnailTime, logThumbnailTimeout } from "@rbx/www-common/components/thumbnail";
 import { ThumbnailAvatarsSize } from "../constants/thumbnailConstants";
 import { reportAXError } from "../utils/axAnalyticsService";
 import AvatarAccoutrementService from "../utils/avatarAccoutrementService";
-import { getThumbnailMetrics } from "../utils/thumbnailMetrics";
 import useAvatarTypeService, { AvatarTypeService } from "./useAvatarTypeService";
 import { AvatarConfigV2 } from "../avatarRequest";
 import { PlayerAvatarConfig, WearableAssetType } from "../avatarRules";
@@ -16,6 +16,8 @@ import { useSystemFeedback } from "../contexts/SystemFeedbackContext";
 import { useAvatarTabsContext } from "../contexts/AvatarTabsContext";
 import { useCurrentlyWearingAssetsStoreContext } from "../contexts/CurrentlyWearingAssetsStoreContext";
 import parseError from "../utils/parseErrorUtil";
+import { getStatusCode } from "../utils/getStatusCode";
+import { host, trackCriticalError, trackError } from "../observability";
 
 export type HeadShape = AvatarInventoryItem["headShape"];
 
@@ -87,13 +89,14 @@ const useLoadAvatarPage = () => {
 
   const getAvatarThumbnailSuccessCallback = useCallback((thumbailType: string) => {
     return ({ duration }: AvatarThumbnailSuccessCallbackPayload) => {
-      getThumbnailMetrics()?.logFinalThumbnailTime(duration, thumbailType);
+      logFinalThumbnailTime(duration, thumbailType);
     };
   }, []);
 
   const getAvatarThumbnailFailureCallback = useCallback((thumbailType: string) => {
     return () => {
-      getThumbnailMetrics()?.logThumbnailTimeout(thumbailType);
+      logThumbnailTimeout(thumbailType);
+      trackError("ThumbnailLoadFailed", { type: thumbailType });
     };
   }, []);
 
@@ -273,6 +276,7 @@ const useLoadAvatarPage = () => {
           counterName: "AvatarEditorError",
           log: parseError(error),
         });
+        trackCriticalError("EditorLoadFailed", { host, statusCode: getStatusCode(error) }, error);
 
         systemFeedback.error(avatarConstants.page.errorLoadingPage);
       }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { reportAXError } from "../utils/axAnalyticsService";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../observability";
 
 import { BodyColorsStateV2 } from "../types";
 import { useSystemFeedback } from "../contexts/SystemFeedbackContext";
@@ -28,8 +29,10 @@ const useAvatarBodyColorsController = (): {
 
     trackAvatarEdit(AvatarEditorTrackingEvents.BodyColorChange);
 
+    trackEditAttempted("bodyColor");
     AvatarAPIService.setBodyColors(bodyColors)
       .then(() => {
+        trackEditSucceeded("bodyColor");
         setShouldUpdateAvatarBodyColors(false);
       })
       .catch((e: unknown) => {
@@ -42,6 +45,7 @@ const useAvatarBodyColorsController = (): {
         if (isAvatarEditingDisabledError(e)) {
           systemFeedback.info(avatarConstants.page.avatarEditingDisabled);
         } else {
+          trackEditFailed("bodyColor", e);
           systemFeedback.error(avatarConstants.bodyColors.failedToUpdate);
         }
       });

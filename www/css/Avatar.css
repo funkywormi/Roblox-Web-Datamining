@@ -2160,6 +2160,26 @@ thumbnail-3d,
     right: 0
 }
 
+.left-\[0\] {
+    left: 0
+}
+
+.left-\[6px\] {
+    left: 6px
+}
+
+.top-\[0\] {
+    top: 0
+}
+
+.top-\[6px\] {
+    top: 6px
+}
+
+.margin-right-\[2px\] {
+    margin-right: 2px
+}
+
 .gap-\[var\(--size-150\)\] {
     gap: var(--size-150)
 }
@@ -2203,6 +2223,10 @@ thumbnail-3d,
     height: var(--icon-size-xxlarge)
 }
 
+.height-\[183px\] {
+    height: 183px
+}
+
 .max-width-\[480px\] {
     max-width: 480px
 }
@@ -2211,12 +2235,20 @@ thumbnail-3d,
     max-width: calc(var(--size-100)*50)
 }
 
+.min-height-\[174px\] {
+    min-height: 174px
+}
+
 .min-height-\[48px\] {
     min-height: 48px
 }
 
 .min-width-\[min\(100\%-max\(2_\*_var\(--margin-small\)\,env\(safe-area-inset-left\)\+env\(safe-area-inset-right\)\)\,393px\)\] {
     min-width: min(100% - max(2*var(--margin-small), env(safe-area-inset-left) + env(safe-area-inset-right)), 393px)
+}
+
+.width-\[284px\] {
+    width: 284px
 }
 
 .width-\[fit-content\] {
@@ -2405,6 +2437,10 @@ thumbnail-3d,
 
 .\[text-align\:inherit\] {
     text-align: inherit
+}
+
+.\[u\:�_\15 �l����\] {
+    u: ��l����
 }
 
 .placeholder\:text-body-large::-webkit-input-placeholder {

@@ -11,6 +11,7 @@ import { useAvatarTranslate } from "../../../utils/translate";
 import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 import { ThumbnailTypes } from "../../../constants/thumbnailConstants";
 import { reportAXError } from "../../../utils/axAnalyticsService";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../../../observability";
 import avatarConstants from "../../../constants/avatarConstants";
 import AvatarAPIService, { InventoryEmote } from "../../../services/avatarAPIService";
 import { EmoteRequestModel } from "../../../types/updateAvatarV4.types";
@@ -147,8 +148,10 @@ function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): React.ReactE
   }, [canLoadNextPage, loading, getNextPage]);
 
   const equipEmote = async (assetId: number, positionIndex: number) => {
+    trackEditAttempted("emoteEquip");
     try {
       await AvatarAPIService.equipEmote(assetId, positionIndex, getEquippedEmotes(radialSlices));
+      trackEditSucceeded("emoteEquip");
       trackAvatarEdit(AvatarEditorTrackingEvents.EmoteChange, {
         action: "equip",
         assetId,
@@ -166,6 +169,7 @@ function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): React.ReactE
         counterName: "AvatarEditorError",
         log: parseError(error),
       });
+      trackEditFailed("emoteEquip", error);
 
       systemFeedback.error(emoteConstants.errorUpdatingEmote);
     }
@@ -173,8 +177,10 @@ function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): React.ReactE
 
   const confirmDelete = async () => {
     if (selectedPositionIndex !== null) {
+      trackEditAttempted("emoteUnequip");
       try {
         await AvatarAPIService.unequipEmote(selectedPositionIndex, getEquippedEmotes(radialSlices));
+        trackEditSucceeded("emoteUnequip");
         trackAvatarEdit(AvatarEditorTrackingEvents.EmoteChange, {
           action: "unequip",
           position: selectedPositionIndex,
@@ -194,6 +200,7 @@ function EmotesRadialMenu({ selectedItem }: EmotesRadialMenuProps): React.ReactE
           counterName: "AvatarEditorError",
           log: parseError(error),
         });
+        trackEditFailed("emoteUnequip", error);
 
         systemFeedback.error(emoteConstants.errorDeletingEmote);
       }

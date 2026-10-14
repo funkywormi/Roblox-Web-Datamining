@@ -32,6 +32,7 @@ import useOutfitHelpers from "../hooks/useOutfitHelpers";
 import { useAvatarBodyColorsContext } from "../contexts/AvatarBodyColorsContext";
 import { trackAvatarEditorClick, AvatarEditorTrackingEvents } from "../utils/axTracking";
 import { sendAXTracking, AXAnalyticsConstants } from "../utils/axAnalyticsService";
+import { host, trackCounter } from "../observability";
 
 function AvatarPage(): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
@@ -68,6 +69,7 @@ function AvatarPage(): React.ReactElement {
 
   useEffect(() => {
     sendAXTracking({ itemName: AXAnalyticsConstants.AvatarEditorView });
+    trackCounter("PageView", { host });
   }, []);
 
   useEffect(() => {
@@ -177,6 +179,7 @@ function AvatarPage(): React.ReactElement {
               trackAvatarEditorClick(AvatarEditorTrackingEvents.GetMoreClick, {
                 destination: "catalog",
               });
+              trackCounter("GetMoreClicked");
             }}
           >
             {translate("Action.GetMore")}

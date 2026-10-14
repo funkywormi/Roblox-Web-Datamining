@@ -4,15 +4,27 @@ import {
   type SduiComponentDefinition,
 } from "@rbx/sdui-core";
 import { SduiCard } from "../components/SduiCard";
+import { SduiBadgeTile } from "../components/SduiBadgeTile";
 import { SduiCollectionCarousel } from "../components/SduiCollectionCarouselWrapper";
 import { SduiCollectionGrid } from "../components/SduiCollectionGridWrapper";
 import { SduiGameTile } from "../components/SduiGameTile";
+import { SduiTile } from "../components/sduiTile/SduiTile";
 import { SduiImage } from "../components/SduiImage";
 import { SduiText } from "../components/SduiText";
 import { SduiDownloadButton } from "../components/SduiDownloadButton";
 import { SduiDialog } from "../components/SduiDialog";
 import { SduiVideoPlayer } from "../components/sduiVideoPlayer/SduiVideoPlayer";
 import { SduiVerticalFeed } from "../components/SduiVerticalFeedWrapper";
+
+const TILE_PROP_PARSERS = {
+  containmentPadding: makeTokenOrLiteralPropParser("Padding.Small"),
+  cornerRadius: makeTokenOrLiteralPropParser("Radius.Medium"),
+  imageCornerRadius: makeTokenOrLiteralPropParser(),
+  imagePadding: makeTokenOrLiteralPropParser(),
+  thumbnailBackgroundStyle: makeTokenOrLiteralPropParser(),
+  thumbnailPadding: makeTokenOrLiteralPropParser(),
+  titleFont: makeTokenOrLiteralPropParser("Typography.TitleMedium"),
+};
 
 /**
  * Client component contributions.
@@ -78,6 +90,14 @@ export const DEFAULT_CLIENT_COMPONENTS: Partial<Record<UiComponentType, SduiComp
       propParsers: {
         cornerRadius: makeTokenOrLiteralPropParser("Radius.Medium"),
       },
+    },
+    [UiComponentType.TILE]: {
+      component: SduiTile,
+      propParsers: TILE_PROP_PARSERS,
+    },
+    [UiComponentType.BADGE_TILE]: {
+      component: SduiBadgeTile,
+      propParsers: TILE_PROP_PARSERS,
     },
     [UiComponentType.VIDEO_PLAYER]: {
       component: SduiVideoPlayer,

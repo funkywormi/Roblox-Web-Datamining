@@ -249,6 +249,11 @@ export function createSduiLoadTimer(
       logTimestamp(SduiLoadTimerMilestone.RequestSent);
     },
 
+    logUiStreamFirstChunkReceived() {
+      if (timestamps.has(SduiLoadTimerMilestone.StreamFirstChunkReceived)) return;
+      logTimestamp(SduiLoadTimerMilestone.StreamFirstChunkReceived);
+    },
+
     logUiResponseReceived() {
       logTimestamp(SduiLoadTimerMilestone.ResponseReceived);
     },

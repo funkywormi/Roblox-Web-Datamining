@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { ValidHttpUrl, isValidStripeCheckoutUrl } from "@rbx/core-scripts/util/url";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import playButtonService from "../services/playButtonService";
@@ -62,7 +63,7 @@ const FiatPurchaseButton: React.FC<TFiatPurchaseButtonProps> = ({
           window.location.href = stripeUrl;
         }
       } catch {
-        window.EventTracker?.fireEvent(counterEvents.PreparePurchaseUrlError);
+        fireEvent(counterEvents.PreparePurchaseUrlError);
         console.error("Error preparing purchase url");
       } finally {
         setIsPurchasing(false);

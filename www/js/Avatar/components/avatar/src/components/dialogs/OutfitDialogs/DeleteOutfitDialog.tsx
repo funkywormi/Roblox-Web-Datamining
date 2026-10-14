@@ -9,6 +9,7 @@ import {
 } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../../../utils/translate";
 import { reportAXError } from "../../../utils/axAnalyticsService";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../../../observability";
 import { CatalogOutfitItem } from "../../../avatar.types";
 import avatarConstants from "../../../constants/avatarConstants";
 import AvatarAPIService from "../../../services/avatarAPIService";
@@ -34,6 +35,7 @@ function DeleteOutfitDialog({
 
   const handleDeleteOutfitError = useCallback((e: any) => {
     console.error(e);
+    trackEditFailed("outfitDelete", e);
     reportAXError({
       itemName: "DeleteOutfitError",
       counterName: "AvatarEditorError",
@@ -52,10 +54,12 @@ function DeleteOutfitDialog({
       return;
     }
 
+    trackEditAttempted("outfitDelete");
     try {
       AvatarAPIService.deleteOutfit(outfit.id)
         .then(
           () => {
+            trackEditSucceeded("outfitDelete");
             trackAvatarEditorClick(AvatarEditorTrackingEvents.OutfitDeleted, {
               outfitId: outfit.id,
               outfitType: outfit.outfitType,

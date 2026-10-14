@@ -15,6 +15,13 @@ export const SDUI_VERTICAL_FEED_STICKY_DIVIDER_BORDER = "1px solid var(--color-s
 /** Above tile SlotOverlay slot wrappers (z-index 10 in @rbx/discovery-sdui-components). */
 export const SDUI_VERTICAL_FEED_STICKY_Z_INDEX = 11;
 
+/**
+ * Config index marker on each `display: contents` feed-entry sentinel. Read by
+ * the client feed-impression hook — DOM position alone is unreliable because a
+ * filtered or unregistered entry renders nothing and would shift later sections.
+ */
+export const SDUI_FEED_ITEM_INDEX_ATTRIBUTE = "data-sdui-feed-index" as const;
+
 export type SduiStyleProps = {
   className?: string;
   style?: CSSProperties;

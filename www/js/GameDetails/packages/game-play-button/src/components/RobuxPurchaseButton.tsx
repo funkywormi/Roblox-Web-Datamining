@@ -2,6 +2,7 @@ import React, { useCallback, useRef } from "react";
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import "@rbx/core-scripts/global";
+import { createItemPurchase } from "@rbx/purchase-common/item-purchase";
 import {
   DefaultThumbnailSize,
   Thumbnail2d,
@@ -39,8 +40,8 @@ const RobuxPurchaseButton: React.FC<RobuxPurchaseButtonProps> = ({
   translate,
   refetchPlayabilityStatus,
 }) => {
-  const itemPurchaseRef = useRef<ReturnType<typeof window.RobloxItemPurchase.createItemPurchase>>();
-  itemPurchaseRef.current ??= window.RobloxItemPurchase.createItemPurchase();
+  const itemPurchaseRef = useRef<ReturnType<typeof createItemPurchase>>();
+  itemPurchaseRef.current ??= createItemPurchase();
   const [ItemPurchase, itemPurchaseService] = itemPurchaseRef.current;
 
   const startRobuxPurchase = useCallback(

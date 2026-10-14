@@ -2,6 +2,7 @@ import {
   ActionType,
   SduiErrorName,
   actionTypeName,
+  findAnalyticsFieldInAncestors,
   type AnalyticsContext,
   type SduiActionContext,
   type SduiPageContext,
@@ -19,7 +20,6 @@ import { getAppliedFiltersMetadataForUrlReferral } from "../../../common/utils/a
 import { getGameSetTargetIdMetadata } from "../../../common/utils/gameSetTargetIdUtils";
 import { parseMaybeStringNumberField } from "../../utils/analyticsParsingUtils";
 import { filterInvalidEventParams } from "../utils/filterInvalidEventParams";
-import { findAnalyticsFieldInAncestors } from "../utils/findAnalyticsFieldInAncestors";
 import { getCommonReferralParams } from "../utils/getCommonReferralParams";
 import { readPlaceId } from "../utils/readPlaceId";
 import { readUniverseId } from "../utils/readUniverseId";

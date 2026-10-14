@@ -2,6 +2,7 @@ import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { Icon, ListItem } from "@rbx/foundation-ui";
 import { getAbsoluteTime } from "../utils/timeHelper";
+import { sendEvent, SupportCenterMetrics } from "../utils/eventStream";
 import routes from "../constants/routes";
 
 interface TicketListItemProps {
@@ -32,6 +33,12 @@ const TicketListItem: React.FC<TicketListItemProps> = ({
       pathname: routes.getTicketRoute(universeId, id),
       search,
     });
+    sendEvent(
+      SupportCenterMetrics.SupportCenterTicketClicked({
+        universeId,
+        ticketId: id,
+      }),
+    );
   };
 
   return (

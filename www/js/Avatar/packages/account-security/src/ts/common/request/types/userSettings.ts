@@ -1,5 +1,5 @@
-import { UrlConfig } from "@rbx/core-scripts/http";
 import EnvironmentUrls from "@rbx/environment-urls";
+import type { RequestConfig } from "../requestConfig";
 
 export enum UserSettingsApiError {
   UNKNOWN = 0,
@@ -19,7 +19,7 @@ export type UserSettingsReturnType = {
   eppEnrollmentStatus: EppEnrollmentStatus;
 };
 
-export const USER_SETTINGS_URL_CONFIG: UrlConfig = {
+export const USER_SETTINGS_URL_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${EnvironmentUrls?.userSettingsApi}/v1/user-settings`,
   timeout: 10000,

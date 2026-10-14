@@ -73,6 +73,7 @@ const SduiTile = ({
       thumbnailOverlayComponent={thumbnailOverlayComponent}
       onActivated={onActivated?.onActivated}
       linkPath={onActivated?.linkPath}
+      openInNewTab={onActivated?.openInNewTab}
       isContained={isContained ?? false}
       containmentBackgroundColor={tokens.Color.Surface.Surface_100}
       containmentPadding={containmentPadding ?? tokens.Padding.Small}

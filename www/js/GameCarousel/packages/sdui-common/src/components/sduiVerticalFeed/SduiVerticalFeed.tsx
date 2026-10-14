@@ -3,13 +3,18 @@ import React from "react";
 import {
   expandManagedList,
   isSduiManagedChildList,
+  resolveManagedChildList,
   SDUI_MANAGED_CHILDREN_PROP,
   wrapFeedManagedChildList,
   type SduiManagedChildList,
   type SduiRendererInjectedProps,
   type SduiTokenOrLiteral,
 } from "@rbx/sdui-core";
-import { buildFeedColumnStyles, getVerticalFeedStyles } from "./verticalFeedStyleUtils";
+import {
+  buildFeedColumnStyles,
+  getVerticalFeedStyles,
+  SDUI_FEED_ITEM_INDEX_ATTRIBUTE,
+} from "./verticalFeedStyleUtils";
 
 export interface SduiVerticalFeedProps extends SduiRendererInjectedProps {
   // TODO: Support the remaining VerticalFeed schema features (e.g. thresholdFromEnd, onScrollToEnd)
@@ -23,6 +28,27 @@ export interface SduiVerticalFeedProps extends SduiRendererInjectedProps {
   stickyPaddingTop?: SduiTokenOrLiteral;
   stickyPaddingBottom?: SduiTokenOrLiteral;
   maxWidth?: SduiTokenOrLiteral;
+  feedColumnRef?: React.Ref<HTMLDivElement>;
+}
+
+/**
+ * Expands the scrolling feed lane with one index sentinel per config. The
+ * sentinel is `display: contents`, so the entry's own root stays the flex item
+ * and feed gap/layout is unchanged; an entry that renders nothing adds no box.
+ */
+function expandFeedItemsWithIndexMarkers(list: SduiManagedChildList): React.ReactNode {
+  return list.configs.map((childConfig, index) => {
+    const key = childConfig.reactKey ?? childConfig.identifier ?? `${index}`;
+    return (
+      <div
+        key={key}
+        style={{ display: "contents" }}
+        {...{ [SDUI_FEED_ITEM_INDEX_ATTRIBUTE]: index }}
+      >
+        {list.renderItem(childConfig, index, key)}
+      </div>
+    );
+  });
 }
 
 /**
@@ -40,14 +66,12 @@ export function SduiVerticalFeed({
   stickyPaddingTop,
   stickyPaddingBottom,
   maxWidth,
+  feedColumnRef,
   [SDUI_MANAGED_CHILDREN_PROP]: sduiManagedChildren,
 }: SduiVerticalFeedProps) {
-  let managedFeedList: SduiManagedChildList | undefined;
-  if (isSduiManagedChildList(feedItems)) {
-    managedFeedList = feedItems;
-  } else if (isSduiManagedChildList(sduiManagedChildren)) {
-    managedFeedList = sduiManagedChildren;
-  }
+  // Same inputs as SduiVerticalFeedWrapper in sdui-client, which resolves this list for impressions.
+  // Keep both calls. This feed also renders without that wrapper.
+  const managedFeedList = resolveManagedChildList(feedItems, sduiManagedChildren);
 
   let stickyContent: React.ReactNode | null = null;
   let stickyCollectionCount = 0;
@@ -64,7 +88,9 @@ export function SduiVerticalFeed({
   }
 
   const content = managedFeedList
-    ? expandManagedList(wrapFeedManagedChildList(managedFeedList, stickyCollectionCount))
+    ? expandFeedItemsWithIndexMarkers(
+        wrapFeedManagedChildList(managedFeedList, stickyCollectionCount),
+      )
     : (feedItems ?? sduiManagedChildren ?? children);
   const { containerStyles, contentStyles, stickyStyles, stickyItemsStyles } = getVerticalFeedStyles(
     {
@@ -82,7 +108,11 @@ export function SduiVerticalFeed({
     gapBetweenFeedItems,
     hasSticky ? undefined : maxWidth,
   );
-  const feedColumn = <div {...feedColumnProps}>{content}</div>;
+  const feedColumn = (
+    <div ref={feedColumnRef} {...feedColumnProps}>
+      {content}
+    </div>
+  );
 
   return (
     <div {...containerStyles}>

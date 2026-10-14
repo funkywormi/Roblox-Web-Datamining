@@ -6,6 +6,7 @@ import AvatarAPIService, { ErrorData } from "../services/avatarAPIService";
 import { useSystemFeedback } from "../contexts/SystemFeedbackContext";
 import avatarConstants from "../constants/avatarConstants";
 import parseError from "../utils/parseErrorUtil";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../observability";
 
 interface RedrawThumbnailButtonProps {
   forceRefreshThumbnail: () => void;
@@ -20,8 +21,10 @@ function RedrawThumbnailButton({
   const [redrawFloodchecked, setRedrawFloodchecked] = useState(false);
 
   const redrawThumbnail = useCallback(() => {
+    trackEditAttempted("redraw");
     AvatarAPIService.redrawThumbnail().then(
       () => {
+        trackEditSucceeded("redraw");
         forceRefreshThumbnail();
       },
       response => {
@@ -46,6 +49,7 @@ function RedrawThumbnailButton({
             counterName: "AvatarEditorError",
             log: parseError(response),
           });
+          trackEditFailed("redraw", response);
           systemFeedback.error(avatarConstants.thumbnail.redrawThumbnailFailed);
         }
       },

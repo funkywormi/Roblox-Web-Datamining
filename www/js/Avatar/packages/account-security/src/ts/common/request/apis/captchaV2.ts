@@ -1,4 +1,4 @@
-import * as http from "@rbx/core-scripts/http";
+import transport from "../requestTransport";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as CaptchaV2 from "../types/captchaV2";
@@ -16,7 +16,7 @@ export const submitCaptcha = (
   mode?: CaptchaV2.CaptchaMode,
 ): Promise<Result<CaptchaV2.SubmitCaptchaV2ReturnType, CaptchaV2.CaptchaV2Error | null>> =>
   toResult(
-    http.post(CaptchaV2.getSubmitCaptchaV2Config(mode), {
+    transport.post(CaptchaV2.getSubmitCaptchaV2Config(mode), {
       // eslint-disable-next-line camelcase
       challenge_id: challengeId,
     } as CaptchaV2.SubmitCaptchaV2Request),

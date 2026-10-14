@@ -28,7 +28,7 @@ const SupportCenterTicket: React.FC<TicketRouteParams> = ({ universeId, ticketId
       >
         <Icon name="icon-filled-chevron-small-left" />
         <span className="text-label-medium padding-left-small">
-          {translate("Label.SupportCenter")}
+          {translate("Label.SupportCenter2")}
         </span>
       </Link>
       <TicketDetails universeId={Number.parseInt(universeId, 10)} ticketId={ticketId} />
@@ -59,11 +59,11 @@ const SupportCenterHome: React.FC = () => {
               <a href="/help-safety">{translate("Label.HelpAndSafety")}</a>
               {BREADCRUMB_SEPARATOR}
             </span>
-            <span className="text-title-medium">{translate("Label.SupportCenter")}</span>
+            <span className="text-title-medium">{translate("Label.SupportCenter2")}</span>
           </div>
         )}
         <div className="flex items-center">
-          <h1 className="text-heading-medium">{translate("Label.SupportCenter")}</h1>
+          <h1 className="text-heading-medium">{translate("Label.SupportCenter2")}</h1>
           <Badge className="margin-left-[10px]" label={translate("Label.Beta")} />
         </div>
         <p className="text-body-medium">{translate("Description.SupportCenterIntro")}</p>

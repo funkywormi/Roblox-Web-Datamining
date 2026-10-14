@@ -1,4 +1,4 @@
-import * as http from "@rbx/core-scripts/http";
+import transport from "../requestTransport";
 import { toResult } from "../common";
 import {
   LegacyAccountInfoError,
@@ -9,4 +9,4 @@ import { Result } from "../../result";
 
 export const getAccountInfo = (): Promise<
   Result<LegacyAccountInfoResponse, LegacyAccountInfoError | null>
-> => toResult(http.get(LegacyAccountInfoUrlConfig), LegacyAccountInfoError);
+> => toResult(transport.get(LegacyAccountInfoUrlConfig), LegacyAccountInfoError);

@@ -16,6 +16,7 @@ import hasInvalidOutfitName from "../../../utils/outfitsMenu.utils";
 import { useSystemFeedback } from "../../../contexts/SystemFeedbackContext";
 import { useAssetManagerContext } from "../../../contexts/AssetManagerContext";
 import parseError from "../../../utils/parseErrorUtil";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../../../observability";
 import { trackAvatarEditorClick, AvatarEditorTrackingEvents } from "../../../utils/axTracking";
 
 type CreateOutfitDialogProps = {
@@ -62,6 +63,7 @@ function CreateOutfitDialog({
             counterName: "AvatarEditorError",
             log: parseError(error),
           });
+          trackEditFailed("outfitCreate", e);
 
           setError(translate(outfitCostumeMessage.errorCreatingOutfit));
         }
@@ -79,6 +81,7 @@ function CreateOutfitDialog({
   const createOutfit = useCallback(() => {
     const outfitCostumeMessage = avatarConstants.outfits.characterMessages;
 
+    trackEditAttempted("outfitCreate");
     // TODO provide handles for getting body colors and asset IDs instead of requesting again
     const getAvatarRequest = AvatarAPIService.getAvatarV2(false);
     getAvatarRequest
@@ -100,6 +103,7 @@ function CreateOutfitDialog({
         )
           .then(
             () => {
+              trackEditSucceeded("outfitCreate");
               trackAvatarEditorClick(AvatarEditorTrackingEvents.OutfitCreated, {
                 avatarType: playerAvatarType,
               });

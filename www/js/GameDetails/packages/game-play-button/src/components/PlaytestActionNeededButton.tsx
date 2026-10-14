@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from "react";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import playButtonConstants from "../constants/playButtonConstants";
 import { usePlaytestUpsellFlow } from "../hooks/usePlaytestUpsellFlow";
 import type { TPlayButtonPageContext, TPrivatePlaytestInfo } from "../types/playButtonTypes";
@@ -30,7 +31,7 @@ export const PlaytestActionNeededButton = ({
   buttonClassName,
 }: TPlaytestActionNeededButtonProps): React.JSX.Element => {
   useEffect(() => {
-    window.EventTracker?.fireEvent(counterEvents.ActionNeeded);
+    fireEvent(counterEvents.ActionNeeded);
   }, []);
 
   const {

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { SduiTokenOrLiteral } from "../types";
-import { buildFoundationTokenCss } from "./foundationToCss";
+import { buildFoundationColorCssVar, buildFoundationTokenCss } from "./foundationToCss";
 
 export function getSduiNumeric(value: SduiTokenOrLiteral | undefined): number | undefined {
   return value?.kind === "numeric" ? value.value : undefined;
@@ -24,4 +24,9 @@ export function buildSduiTokenClass(
   usageKey?: string,
 ): string | undefined {
   return buildFoundationTokenCss(getSduiToken(value), usageKey);
+}
+
+export function resolveSduiColor(value: SduiTokenOrLiteral | null | undefined): string | undefined {
+  const token = getSduiToken(value ?? undefined);
+  return token == null ? undefined : (buildFoundationColorCssVar(token) ?? token);
 }

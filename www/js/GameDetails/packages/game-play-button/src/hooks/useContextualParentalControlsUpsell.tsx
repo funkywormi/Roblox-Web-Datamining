@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import {
   TSettingResponse,
   TAppsFlyerReferralProperties,
@@ -88,11 +89,10 @@ const useContextualParentalControlsUpsell = (
         );
       };
 
-      const { fireEvent } = window.EventTracker ?? {};
       if (hasError || contentAgeRestriction === undefined || contentMaturityRating === undefined) {
         launchGameFallback();
 
-        fireEvent?.(counterEvents.PlayButtonUpsellUnknownSettingOrAge);
+        fireEvent(counterEvents.PlayButtonUpsellUnknownSettingOrAge);
 
         sendUnlockPlayIntent(unlockPlayIntentConstants.gameLaunchFallbackUpsellName);
         return;
@@ -103,7 +103,7 @@ const useContextualParentalControlsUpsell = (
         // the game should be playable. show an error counter and fallback to game launch
         launchGameFallback();
 
-        fireEvent?.(counterEvents.PlayButtonUpsellMinimalMaturityRating);
+        fireEvent(counterEvents.PlayButtonUpsellMinimalMaturityRating);
 
         sendUnlockPlayIntent(unlockPlayIntentConstants.gameLaunchFallbackUpsellName);
         return;
@@ -126,7 +126,7 @@ const useContextualParentalControlsUpsell = (
       if (!requestedSettingValue) {
         launchGameFallback();
 
-        fireEvent?.(counterEvents.PlayButtonUpsellAgeNotInMapping);
+        fireEvent(counterEvents.PlayButtonUpsellAgeNotInMapping);
 
         sendUnlockPlayIntent(unlockPlayIntentConstants.gameLaunchFallbackUpsellName);
         return;
@@ -143,18 +143,18 @@ const useContextualParentalControlsUpsell = (
           case "SelfUpdateSetting": {
             setIsSelfUpdateSettingModalOpen(true);
 
-            fireEvent?.(counterEvents.PlayButtonUpsellSelfUpdateSettingTriggered);
+            fireEvent(counterEvents.PlayButtonUpsellSelfUpdateSettingTriggered);
 
             sendUnlockPlayIntent(requirement);
             break;
           }
           case "ParentalConsent": {
-            fireEvent?.(counterEvents.PlayButtonUpsellAskYourParentTriggered);
+            fireEvent(counterEvents.PlayButtonUpsellAskYourParentTriggered);
 
             sendUnlockPlayIntent(requirement);
 
             if (!window.Roblox.AccessManagementUpsellV2Service) {
-              fireEvent?.(counterEvents.PlayButtonUpsellParentalConsentError);
+              fireEvent(counterEvents.PlayButtonUpsellParentalConsentError);
               break;
             }
 
@@ -186,7 +186,7 @@ const useContextualParentalControlsUpsell = (
             } catch {
               launchGameFallback();
 
-              fireEvent?.(counterEvents.PlayButtonUpsellParentalConsentError);
+              fireEvent(counterEvents.PlayButtonUpsellParentalConsentError);
 
               sendUnlockPlayIntent(unlockPlayIntentConstants.gameLaunchFallbackUpsellName);
             }
@@ -195,7 +195,7 @@ const useContextualParentalControlsUpsell = (
           }
           case "ContentAgeRestrictionVerification": {
             try {
-              fireEvent?.(counterEvents.PlayButtonUpsellAgeRestrictionVerificationTriggered);
+              fireEvent(counterEvents.PlayButtonUpsellAgeRestrictionVerificationTriggered);
 
               sendUnlockPlayIntent(requirement);
 
@@ -218,7 +218,7 @@ const useContextualParentalControlsUpsell = (
           default: {
             launchGameFallback();
 
-            fireEvent?.(counterEvents.PlayButtonUpsellUnknownRequirement);
+            fireEvent(counterEvents.PlayButtonUpsellUnknownRequirement);
 
             sendUnlockPlayIntent(unlockPlayIntentConstants.gameLaunchFallbackUpsellName);
           }
@@ -226,7 +226,7 @@ const useContextualParentalControlsUpsell = (
       } else {
         setIsRestrictedUnplayableModalOpen(true);
 
-        fireEvent?.(counterEvents.PlayButtonUpsellRestrictedUnplayableTriggered);
+        fireEvent(counterEvents.PlayButtonUpsellRestrictedUnplayableTriggered);
 
         sendUnlockPlayIntent(unlockPlayIntentConstants.restrictedUnplayableUpsellName);
       }

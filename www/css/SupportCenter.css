@@ -95,6 +95,10 @@
     min-height: 96px
 }
 
+.min-width-\[min\(200px\,100\%\)\] {
+    min-width: min(200px, 100%)
+}
+
 .width-\[115px\] {
     width: 115px
 }
@@ -141,6 +145,10 @@
     color: var(--dark-mode-content-emphasis)
 }
 
+.content-\[var\(--light-mode-content-emphasis\)\] {
+    color: var(--light-mode-content-emphasis)
+}
+
 .bg-\[rgb\(from_var\(--color-system-alert\)_r_g_b_\/_0\.2\)\] {
     background-color: rgb(from var(--color-system-alert)r g b/.2)
 }
@@ -155,6 +163,10 @@
 
 .bg-\[var\(--color-extended-blue-600\)\] {
     background-color: var(--color-extended-blue-600)
+}
+
+.bg-\[var\(--light-mode-over-media-0\)\] {
+    background-color: var(--light-mode-over-media-0)
 }
 
 .opacity-\[0\.5\] {
@@ -231,6 +243,10 @@
 
 .icon-filled-x {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M24.5607 9.56066C25.1464 8.97487 25.1464 8.02513 24.5607 7.43934C23.9749 6.85355 23.0251 6.85355 22.4393 7.43934L16 13.8787L9.56066 7.43934C8.97487 6.85355 8.02513 6.85355 7.43934 7.43934C6.85355 8.02513 6.85355 8.97487 7.43934 9.56066L13.8787 16L7.43934 22.4393C6.85355 23.0251 6.85355 23.9749 7.43934 24.5607C8.02513 25.1464 8.97487 25.1464 9.56066 24.5607L16 18.1213L22.4393 24.5607C23.0251 25.1464 23.9749 25.1464 24.5607 24.5607C25.1464 23.9749 25.1464 23.0251 24.5607 22.4393L18.1213 16L24.5607 9.56066Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.\[overflow-wrap\:anywhere\] {
+    overflow-wrap: anywhere
 }
 
 .content {

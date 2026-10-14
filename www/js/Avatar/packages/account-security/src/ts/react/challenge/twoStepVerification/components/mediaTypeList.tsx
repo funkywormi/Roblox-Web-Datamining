@@ -220,8 +220,8 @@ const MediaTypeList: React.FC<Props> = ({
   const renderMediaType = (
     mediaType: MediaType,
     key: number,
-    rowRef: React.RefObject<HTMLLIElement> | null,
-  ): JSX.Element | null => {
+    rowRef: React.RefObject<HTMLLIElement | null> | null,
+  ): React.ReactElement | null => {
     const mediaTypeLabel = getMediaTypeLabel(mediaType);
     if (!mediaTypeLabel) {
       return null;

@@ -1,4 +1,9 @@
-import { getZeroBasedPosition, type AnalyticsContext, type SduiPageContext } from "@rbx/sdui-core";
+import {
+  findAnalyticsFieldInAncestors,
+  getZeroBasedPosition,
+  type AnalyticsContext,
+  type SduiPageContext,
+} from "@rbx/sdui-core";
 
 import {
   EventStreamMetadata,
@@ -10,7 +15,6 @@ import {
   parseMaybeStringNumberField,
   parseStringField,
 } from "../../utils/analyticsParsingUtils";
-import { findAnalyticsFieldInAncestors } from "./findAnalyticsFieldInAncestors";
 import {
   buildSessionAnalyticsData,
   getSessionInfoKey,

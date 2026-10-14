@@ -18,6 +18,40 @@ export function findAnalyticsField(
   return defaultValue;
 }
 
+// Server-provided analytics maps can carry null/undefined at runtime even though
+// `AnalyticsFieldMap` types every value as present.
+function readField(
+  data: Record<string, AnalyticsFieldMap[string] | null | undefined> | undefined,
+  key: string,
+): AnalyticsFieldMap[string] | undefined {
+  return data?.[key] ?? undefined;
+}
+
+/**
+ * Looks up a field on the node's own analytics data first, then its ancestors'.
+ * Returns `defaultValue` when the key is absent (or null) in both.
+ */
+export function findAnalyticsFieldInAncestors(
+  key: string,
+  analyticsContext: AnalyticsContext | undefined,
+): AnalyticsFieldMap[string] | undefined;
+export function findAnalyticsFieldInAncestors<T>(
+  key: string,
+  analyticsContext: AnalyticsContext | undefined,
+  defaultValue: T,
+): AnalyticsFieldMap[string] | T;
+export function findAnalyticsFieldInAncestors<T>(
+  key: string,
+  analyticsContext: AnalyticsContext | undefined,
+  defaultValue?: T,
+): AnalyticsFieldMap[string] | T | undefined {
+  return (
+    readField(analyticsContext?.analyticsData, key) ??
+    readField(analyticsContext?.ancestorAnalyticsData, key) ??
+    defaultValue
+  );
+}
+
 /**
  * Coerces a template-bound analytics scalar to match the `fallback` type.
  * A string fallback stringifies number/boolean inputs; a number fallback

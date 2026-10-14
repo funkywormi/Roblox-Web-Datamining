@@ -31,6 +31,7 @@ import {
 import parseError from "../utils/parseErrorUtil";
 import { isAvatarEditingDisabledError } from "../utils/avatarEditingError.utils";
 import { useAvatarTabsContext } from "../contexts/AvatarTabsContext";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../observability";
 import {
   trackAvatarEdit,
   AvatarEditorTrackingEvents,
@@ -120,6 +121,7 @@ const useOutfitHelpers = (
 
   const wearPackageAsset = useCallback(
     (item: CatalogAssetItem) => {
+      trackEditAttempted("wearPackage");
       AvatarAPIService.wearAsset(item.id).then(
         data => {
           forceRefreshThumbnail();
@@ -138,8 +140,11 @@ const useOutfitHelpers = (
               counterName: "AvatarEditorError",
               log: JSON.stringify({ message: "HasInvalidAssets" }),
             });
+            trackEditFailed("wearPackage", undefined, "refused");
 
             systemFeedback.error(message);
+          } else {
+            trackEditSucceeded("wearPackage");
           }
         },
         e => {
@@ -151,6 +156,7 @@ const useOutfitHelpers = (
           if (isAvatarEditingDisabledError(e)) {
             systemFeedback.info(avatarConstants.page.avatarEditingDisabled);
           } else {
+            trackEditFailed("wearPackage", e);
             systemFeedback.error(avatarConstants.packages.errorWearingPackage);
           }
         },
@@ -167,8 +173,10 @@ const useOutfitHelpers = (
       // reload reconciles with the server, and we revert on failure. 0 clears the background.
       const previousBackgroundId = equippedBackgroundId;
       setEquippedBackgroundId(backgroundAssetId || undefined);
+      trackEditAttempted("background");
       AvatarAPIService.equipBackground(backgroundAssetId).then(
         () => {
+          trackEditSucceeded("background");
           forceRefreshThumbnail();
           loadAvatarDetails();
         },
@@ -182,6 +190,7 @@ const useOutfitHelpers = (
           if (isAvatarEditingDisabledError(e)) {
             systemFeedback.info(avatarConstants.page.avatarEditingDisabled);
           } else {
+            trackEditFailed("background", e);
             systemFeedback.error(avatarConstants.assets.errorUpdatingItems);
           }
         },
@@ -339,6 +348,7 @@ const useOutfitHelpers = (
   const wearOutfitUsingIds = useCallback(
     (outfit: CatalogOutfitItem) => {
       sendOutfitClickEvent(outfit.id, outfit.outfitType);
+      trackEditAttempted("wearOutfit");
       AvatarAPIService.getOutfitDetailsV3(outfit.id).then(
         response => {
           const data = response;
@@ -423,8 +433,10 @@ const useOutfitHelpers = (
               if (invalidAssetCount > 0) {
                 const count = invalidAssetCount.toString();
                 const message = translate("Message.MissingItemsFromOutfit", { number: count });
+                trackEditFailed("wearOutfit", undefined, "refused");
                 systemFeedback.error(message);
               } else if (resultSuccess) {
+                trackEditSucceeded("wearOutfit");
                 systemFeedback.success(OUTFIT_COSTUME_MESSAGES.successfulWear);
               } else {
                 reportAXError({
@@ -432,6 +444,15 @@ const useOutfitHelpers = (
                   counterName: "AvatarEditorError",
                   log: JSON.stringify({ message: "Unknown Error" }),
                 });
+                // A step can answer `success: false` without throwing, leaving no error to read.
+                const failedError: unknown = result.find(
+                  callResult => callResult && !callResult.success,
+                )?.error;
+                trackEditFailed(
+                  "wearOutfit",
+                  failedError,
+                  failedError === undefined ? "unknown" : undefined,
+                );
                 systemFeedback.error(OUTFIT_COSTUME_MESSAGES.errorWearingOutfit);
               }
             },
@@ -441,6 +462,7 @@ const useOutfitHelpers = (
                 counterName: "AvatarEditorError",
                 log: parseError(e),
               });
+              trackEditFailed("wearOutfit", e);
               systemFeedback.error(OUTFIT_COSTUME_MESSAGES.errorWearingOutfit);
             },
           );
@@ -451,6 +473,7 @@ const useOutfitHelpers = (
             counterName: "AvatarEditorError",
             log: parseError(e),
           });
+          trackEditFailed("wearOutfit", e);
           systemFeedback.error(OUTFIT_COSTUME_MESSAGES.errorWearingOutfit);
         },
       );

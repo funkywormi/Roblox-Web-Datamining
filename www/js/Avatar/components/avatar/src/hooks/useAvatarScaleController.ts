@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { reportAXError } from "../utils/axAnalyticsService";
+import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../observability";
 import DEFAULT_AVATAR_SCALES from "../utils/avatarScale.constants";
 import AvatarScaleUtils from "../utils/avatarScale.utils";
 import { AvatarConfig, AvatarConfigV2 } from "../avatarRequest";
@@ -41,9 +42,11 @@ const useAvatarScaleController = (
             bodyType: updatedScales.bodyType.value / 100,
           }),
       };
+      trackEditAttempted("scale");
       AvatarAPIService.setScales(updatedScaleValues).then(
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        () => {},
+        () => {
+          trackEditSucceeded("scale");
+        },
         e => {
           reportAXError({
             itemName: "UpdateScalesError",
@@ -54,6 +57,7 @@ const useAvatarScaleController = (
           if (isAvatarEditingDisabledError(e)) {
             systemFeedback.info(avatarConstants.page.avatarEditingDisabled);
           } else {
+            trackEditFailed("scale", e);
             systemFeedback.error(avatarConstants.scales.failedToUpdate);
           }
         },

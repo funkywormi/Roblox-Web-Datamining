@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { sendUnlockPlayIntentEvent } from "../utils/playButtonUtils";
 import ActionNeededButton from "./ActionNeededButton";
 import playButtonConstants from "../constants/playButtonConstants";
@@ -23,8 +24,7 @@ const ExperienceApprovalActionNeededButton = ({
       e.preventDefault();
       e.stopPropagation();
 
-      const { fireEvent } = window.EventTracker ?? {};
-      fireEvent?.(counterEvents.PlayButtonUpsellExperienceApprovalTriggered);
+      fireEvent(counterEvents.PlayButtonUpsellExperienceApprovalTriggered);
 
       sendUnlockPlayIntentEvent(
         universeId,
@@ -34,7 +34,7 @@ const ExperienceApprovalActionNeededButton = ({
       );
 
       if (!window.Roblox.AccessManagementUpsellV2Service) {
-        fireEvent?.(counterEvents.PlayButtonUpsellExperienceApprovalError);
+        fireEvent(counterEvents.PlayButtonUpsellExperienceApprovalError);
         return;
       }
 
@@ -48,7 +48,7 @@ const ExperienceApprovalActionNeededButton = ({
           experienceManagementAction: "Approve",
         },
       }).catch(() => {
-        fireEvent?.(counterEvents.PlayButtonUpsellExperienceApprovalError);
+        fireEvent(counterEvents.PlayButtonUpsellExperienceApprovalError);
       });
     },
     [universeId, pageContext],

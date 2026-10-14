@@ -9,6 +9,7 @@ export type SduiRequestStatus = "LoadedFromNetwork" | "FailedToLoad";
 export enum SduiLoadTimerMilestone {
   RequestQueued = "request_queued",
   RequestSent = "request_sent",
+  StreamFirstChunkReceived = "stream_first_chunk_received",
   ResponseReceived = "response_received",
   ResponseDecodeBegin = "response_decode_begin",
   ResponseDecodeEnd = "response_decode_end",
@@ -84,6 +85,7 @@ export interface SduiLoadTimer {
   dispose(): void;
   logUiRequestQueued(): void;
   logUiRequestSent(): void;
+  logUiStreamFirstChunkReceived(): void;
   logUiResponseReceived(): void;
   logResponseDecodeBegin(): void;
   logResponseDecodeEnd(): void;

@@ -10,6 +10,7 @@ interface TicketTextInputControlProps {
   minLength?: number;
   maxLength: number;
   submitText?: string;
+  onChange?: (value: string) => void;
   onSubmit: (message: string) => Promise<void>;
 }
 
@@ -18,6 +19,7 @@ const TicketTextInputControl: React.FC<TicketTextInputControlProps> = ({
   minLength,
   maxLength,
   submitText,
+  onChange,
   onSubmit,
 }) => {
   const { translate } = useTranslation();
@@ -49,6 +51,7 @@ const TicketTextInputControl: React.FC<TicketTextInputControlProps> = ({
     if (e.target.value.length <= maxLength) {
       setText(e.target.value);
       setErrorMessage("");
+      onChange?.(e.target.value);
     }
   };
 
