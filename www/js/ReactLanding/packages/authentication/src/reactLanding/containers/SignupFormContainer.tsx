@@ -87,6 +87,7 @@ import {
   sendClickVPCLogoutPopupLogoutEvent,
   sendSignupUsernameKeystrokeEvent,
   sendSchematizedSignupCheckboxToggledEvent,
+  sendPasswordPolicyMsgShownEvent,
 } from "../services/eventService";
 import { getMetadataV2, getUserAgreements } from "../services/signupService";
 import { submitSignup } from "../services/signupSubmissionService";
@@ -141,6 +142,7 @@ import useOtpMetadata from "@rbx/authentication-common/hooks/useOtpMetadata";
 import useIntlAuthCompliance from "@rbx/authentication-common/hooks/useIntlAuthCompliance";
 import useInfoModal from "@rbx/authentication-common/hooks/useInfoModal";
 import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
+import usePasswordPolicyMsgShownEvent from "@rbx/authentication-common/hooks/usePasswordPolicyMsgShownEvent";
 
 import TosCheckbox from "../components/TosCheckbox";
 import PrivacyPolicyCheckbox from "../components/PrivacyPolicyCheckbox";
@@ -260,6 +262,9 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
   const [passwordStatus, setPasswordStatus] = useState(FormFieldStatus.Incomplete);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
   const [passwordThatFailedServerCheck, setPasswordThatFailedServerCheck] = useState("");
+  usePasswordPolicyMsgShownEvent(passwordErrorMessage, state =>
+    sendPasswordPolicyMsgShownEvent(EVENT_CONSTANTS.context.schematizedSignupForm, state),
+  );
 
   // gender state
   const [gender, setGender] = useState(Gender.unknown);

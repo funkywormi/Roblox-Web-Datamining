@@ -46,7 +46,7 @@ type Props = {
   buttonType: HeaderButtonType;
   buttonAction: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   buttonEnabled: boolean;
-  headerInfo: JSX.Element | null;
+  headerInfo: React.ReactElement | null;
 };
 
 /**

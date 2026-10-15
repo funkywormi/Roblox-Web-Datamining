@@ -29,6 +29,7 @@ import getInvalidPasswordMessage from "@rbx/authentication-common/utils/password
 import { parseErrorCode } from "@rbx/authentication-common/utils/requestUtils";
 import { getUrlParamValue, navigateToPage } from "@rbx/authentication-common/utils/browserUtils";
 import { cleanupIdentityVerificationResultToken } from "./identityVerificationUtils";
+import { buildSignupBirthday } from "./signupRequestUtils";
 import {
   incrementEphemeralCounter,
   sendConversionEvent,
@@ -100,9 +101,9 @@ export const getUsernameValidationResult = async (
     context: validateUsernameContext,
   };
 
-  const birthday = new Date(Date.parse(`${birthdayMonth!} ${birthdayDay!}, ${birthdayYear!}`));
+  const birthday = buildSignupBirthday(birthdayDay!, birthdayMonth!, birthdayYear!);
 
-  if (!Number.isNaN(birthday.getMilliseconds())) {
+  if (!Number.isNaN(birthday.getTime())) {
     validateUsernameParams.birthday = birthday;
   }
 

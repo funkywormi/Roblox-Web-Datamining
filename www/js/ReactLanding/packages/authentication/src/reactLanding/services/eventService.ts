@@ -528,6 +528,10 @@ export const sendAuthMsgShownEvent = (
   });
 };
 
+export const sendPasswordPolicyMsgShownEvent = (ctx: string, state: string): void => {
+  sendAuthMsgShownEvent(ctx, EVENT_CONSTANTS.field.signupPassword, "", state);
+};
+
 /**
  * `elapsedTime` is an int64 on the proto; stringified here like every other
  * parameter and re-typed during schematization.

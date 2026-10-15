@@ -4,6 +4,7 @@ import { Intl } from "@rbx/core-scripts/legacy/Roblox";
 import { WithTranslationsProps } from "@rbx/core-scripts/react";
 import "@rbx/core-types";
 import "./index.css";
+import { assetUrl } from "@rbx/www-common/asset";
 import amazon_en_us from "./images/amazon-badge-en_us.png";
 import amazon_ja_jp from "./images/amazon-badge-ja_jp.png";
 import apple_en_us from "./images/apple-badge-en_us.svg";
@@ -132,7 +133,7 @@ export const AppStoreContainer = ({
                 : undefined
             }
           >
-            <img src={image[locale]} alt={translate(title)} className="height-1200" />
+            <img src={assetUrl(image[locale])} alt={translate(title)} className="height-1200" />
           </a>
         </li>
       ))}

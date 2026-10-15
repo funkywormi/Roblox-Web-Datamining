@@ -1,6 +1,7 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference -- .d.ts reference, not a runtime import, so the Next bundler doesn't try to resolve it as a module
+/// <reference path="./eventStream.d.ts" />
 import { arrayIncludes } from "@rbx/core-types";
 import "../global";
-import "./eventStream";
 
 export const eventTypes = {
   formInteraction: "formInteraction",
@@ -17,7 +18,8 @@ export const targetTypes = {
   WWW: 1,
   STUDIO: 2,
   DIAGNOSTIC: 3,
-  ...(window.Roblox.EventStream?.TargetTypes ?? {}),
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- window is typed as always defined but is undefined during Next SSR at module load
+  ...(typeof window === "undefined" ? {} : window.Roblox?.EventStream?.TargetTypes),
 } as const;
 
 export const sendEventWithTarget = (

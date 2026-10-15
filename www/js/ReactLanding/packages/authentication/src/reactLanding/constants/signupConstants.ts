@@ -161,6 +161,8 @@ export const validationMessages = {
   useDifferentPassword: "Response.DifferentPasswordRequired",
   passwordContainsUsernameError: "Response.PasswordContainsUsernameError",
   passwordTooSimple: "Response.PasswordComplexity",
+  passwordLowComplexity: "Response.PasswordLowComplexity",
+  passwordTooSimilarToUsername: "Response.PasswordTooSimilarToUsername",
   passwordInvalid: "Response.InvalidPassword",
   birthdayInvalid: "Response.InvalidBirthday",
   javascriptRequired: "Response.JavaScriptRequired",
@@ -227,6 +229,8 @@ export const errorCodes = {
   maxLoggedInAccountsLimitReached: 22,
   parentEmptyAccountSwitchBlobRequired: 23,
   passkeyRegistrationFailed: 27,
+  passwordLowComplexity: 36,
+  passwordTooSimilarToUsername: 37,
 };
 
 export const experimentVariables = {

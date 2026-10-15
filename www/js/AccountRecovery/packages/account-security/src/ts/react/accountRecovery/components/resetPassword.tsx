@@ -9,6 +9,9 @@ import { cryptoUtil, hybridResponseService } from "core-roblox-utilities";
 import { urlService, httpService } from "core-utilities";
 import getInvalidPasswordMessage from "@rbx/authentication-common/utils/passwordValidationUtils";
 import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
+import usePasswordPolicyMsgShownEvent, {
+  getPasswordPolicyMsgState,
+} from "@rbx/authentication-common/hooks/usePasswordPolicyMsgShownEvent";
 import AUTH_EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 import ModernCardHeader from "../../common/modernCardComponent/modernCardHeader";
 import ModernCardBody from "../../common/modernCardComponent/modernCardBody";
@@ -21,6 +24,7 @@ import ComponentState from "../store/componentState";
 import VariableInputControl from "../../common/variableInputControl";
 import { InputValidator, validateEmailAddress } from "../../common/inputControl";
 import {
+  getPasswordResetErrorMessageKey,
   mapPasswordErrorToResource,
   mapPasswordResetErrorToResource,
 } from "../constants/resources";
@@ -82,7 +86,10 @@ const ResetPassword: React.FC = () => {
    * Component State
    */
   const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordErrorKey, setPasswordErrorKey] = useState<string | null>(null);
+  usePasswordPolicyMsgShownEvent(passwordErrorKey, state =>
+    eventService.sendPasswordPolicyMsgShown(state),
+  );
 
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
@@ -212,7 +219,7 @@ const ResetPassword: React.FC = () => {
       return null;
     }
     const translationKey = await getInvalidPasswordMessage(value, username ?? undefined);
-    return translationKey === "" ? null : mapPasswordErrorToResource(resources, translationKey);
+    return translationKey === "" ? null : translationKey;
   };
   const validateConfirmPassword = (newPasswordRepeated: string, newPassword: string) => {
     if (newPasswordRepeated === newPassword) {
@@ -349,6 +356,12 @@ const ResetPassword: React.FC = () => {
       );
       setRequestInFlight(false);
       setRequestError(mapPasswordResetErrorToResource(resources, resetPasswordResult.error));
+      const passwordPolicyState = getPasswordPolicyMsgState(
+        getPasswordResetErrorMessageKey(resetPasswordResult.error),
+      );
+      if (passwordPolicyState) {
+        eventService.sendPasswordPolicyMsgShown(passwordPolicyState);
+      }
       return;
     }
     eventService.sendPasswordResetSucceeded(AUTH_EVENT_CONSTANTS.recoveryResetFlow.control);
@@ -425,7 +438,7 @@ const ResetPassword: React.FC = () => {
   if (componentStateAndProps.componentState === ComponentState.RESET_PASSWORD) {
     shouldAddContactMethod = componentStateAndProps.additionalComponentProps.shouldAddContactMethod;
   }
-  const passwordValid = password.length > 0 && passwordError === null;
+  const passwordValid = password.length > 0 && passwordErrorKey === null;
   const confirmPasswordValid = confirmPassword.length > 0 && confirmPasswordError === null;
   const newEmailValid = !shouldAddContactMethod || (newEmail.length > 0 && emailError === null);
   const canSubmit = !requestInFlight && passwordValid && confirmPasswordValid && newEmailValid;
@@ -462,8 +475,12 @@ const ResetPassword: React.FC = () => {
           disabled={requestInFlight}
           value={password}
           setValue={setPassword}
-          error={passwordError}
-          setError={setPasswordError}
+          error={
+            passwordErrorKey === null
+              ? null
+              : mapPasswordErrorToResource(resources, passwordErrorKey)
+          }
+          setError={setPasswordErrorKey}
           validate={validatePassword}
           canSubmit={canSubmit}
           handleSubmit={handleUpdatePassword}

@@ -11,6 +11,8 @@ export const passwordValidatorErrorMessages = {
   PasswordComplexity: "Response.PasswordComplexity",
   PasswordContainsUsernameError: "Response.PasswordContainsUsernameError",
   PasswordKISAComplexity: "Response.PasswordKISAComplexity",
+  PasswordLowComplexity: "Response.PasswordLowComplexity",
+  PasswordTooSimilarToUsername: "Response.PasswordTooSimilarToUsername",
 };
 
 export const weakPasswords = [

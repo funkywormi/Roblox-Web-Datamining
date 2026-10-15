@@ -2,7 +2,7 @@ import React from "react";
 import { Modal } from "react-style-guide";
 
 export type FooterButtonConfig = {
-  content: JSX.Element | string;
+  content: React.ReactElement | string;
   /** Used primarily for accessibility labeling. */
   label: string;
   enabled: boolean;

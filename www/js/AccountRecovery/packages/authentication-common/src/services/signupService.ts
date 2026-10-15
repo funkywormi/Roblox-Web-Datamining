@@ -55,6 +55,7 @@ export const validatePassword = async (
   params: TValidatePasswordParams,
 ): Promise<TValidatePasswordResponse> => {
   const urlConfig = {
+    withCredentials: true,
     url: urlConstants.validatePassword,
   };
   const { data } = await httpService.post<TValidatePasswordResponse>(urlConfig, params);

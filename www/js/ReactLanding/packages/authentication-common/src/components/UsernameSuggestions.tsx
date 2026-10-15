@@ -35,8 +35,12 @@ const UsernameSuggestions = ({
             variant="Standard"
             isChecked={false}
             isDisabled={isDisabled}
-            onMouseDown={(event: React.MouseEvent<HTMLButtonElement>) => event.preventDefault()}
-            onCheckedChange={() => onSelect(suggestion)}
+            onMouseDown={(event: React.MouseEvent<HTMLButtonElement>) => {
+              event.preventDefault();
+            }}
+            onCheckedChange={() => {
+              onSelect(suggestion);
+            }}
           />
         ))}
       </div>

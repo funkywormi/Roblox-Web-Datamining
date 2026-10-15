@@ -1,4 +1,4 @@
-import React from "react";
+import type { JSX } from "react";
 import { Icon } from "@rbx/foundation-ui";
 import { UsernameRequirementId } from "../utils/usernameRequirementUtils";
 

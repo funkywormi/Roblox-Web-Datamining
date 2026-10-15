@@ -3,44 +3,71 @@ import { TValidatePasswordParams } from "../types/signupTypes";
 import { validatePassword } from "../services/signupService";
 
 const KOREA = "Korea";
-const isPasswordBadLength = (password: string): boolean =>
+
+// `/v2/passwords/validate` codes (PasswordValidationStatus in the Authentication API)
+const validationResultCodes = {
+  forbiddenPassword: 4,
+  dumbStrings: 5,
+  passwordLowComplexity: 6,
+  passwordTooSimilarToUsername: 7,
+};
+
+export const isPasswordBadLength = (password: string): boolean =>
   password.length < 8 || password.length > 200;
 
-const isPasswordSameAsUsername = (password: string, username?: string): boolean =>
+export const isPasswordSameAsUsername = (password: string, username?: string): boolean =>
   password === username;
 
 // requirement from Korean Information Security Agency
 const isPasswordWeakForKISA = (password: string): boolean =>
   // A minimum 8 digits passowrd containing a combination of uppercase and lowercase letter and number
   !/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(password);
-const isPasswordWeak = async (username: string, password: string): Promise<boolean> => {
-  const lowerCasePassword = password.toLowerCase();
+
+// The server owns the complexity and similarity rules and only applies them to requests in
+// the strict password policy experiment, so they are never re-derived here.
+const getServerPasswordMessage = async (
+  username: string,
+  password: string,
+  shouldRejectForbiddenPasswords: boolean,
+): Promise<string> => {
   const validatePasswordParams: TValidatePasswordParams = {
     username,
     password,
   };
 
   try {
-    const validatePasswordResponse = await validatePassword(validatePasswordParams);
-    if (validatePasswordResponse.code === 5) {
-      return true;
+    const { code } = await validatePassword(validatePasswordParams);
+    if (code === validationResultCodes.passwordLowComplexity) {
+      return passwordValidatorErrorMessages.PasswordLowComplexity;
+    }
+    if (code === validationResultCodes.passwordTooSimilarToUsername) {
+      return passwordValidatorErrorMessages.PasswordTooSimilarToUsername;
+    }
+    if (
+      code === validationResultCodes.dumbStrings ||
+      (shouldRejectForbiddenPasswords && code === validationResultCodes.forbiddenPassword)
+    ) {
+      return passwordValidatorErrorMessages.PasswordComplexity;
     }
   } catch (_) {
     console.error("Error validating password");
     // fail open, signup will validate
   }
 
-  if (/^[\s]*$/.test(lowerCasePassword)) {
+  if (/^[\s]*$/.test(password)) {
     // if the password only contains whitespace characters, consider it weak
-    return true;
+    return passwordValidatorErrorMessages.PasswordComplexity;
   }
-  return false;
+  return "";
 };
 
 const getInvalidPasswordMessage = async (
   password: string,
   username?: string,
   country?: string,
+  // Only signup V2 surfaces a blocklisted password to the user; the older forms leave it
+  // to the signup call so their behavior does not change under them.
+  shouldRejectForbiddenPasswords = false,
 ): Promise<string> => {
   if (isPasswordBadLength(password)) {
     return passwordValidatorErrorMessages.PasswordBadLength;
@@ -51,8 +78,8 @@ const getInvalidPasswordMessage = async (
   if (country === KOREA && isPasswordWeakForKISA(password)) {
     return passwordValidatorErrorMessages.PasswordKISAComplexity;
   }
-  if (username != null && (await isPasswordWeak(username, password))) {
-    return passwordValidatorErrorMessages.PasswordComplexity;
+  if (username != null) {
+    return getServerPasswordMessage(username, password, shouldRejectForbiddenPasswords);
   }
   return "";
 };

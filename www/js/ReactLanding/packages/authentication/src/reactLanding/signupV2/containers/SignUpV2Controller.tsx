@@ -19,7 +19,15 @@ import {
 import { parseCaptchaData } from "@rbx/authentication-common/utils/errorParsingUtils";
 import CaptchaComponent from "@rbx/authentication-common/components/CaptchaComponent";
 import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
+import usePasswordPolicyMsgShownEvent from "@rbx/authentication-common/hooks/usePasswordPolicyMsgShownEvent";
 import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
+import {
+  getUsernameRequirements,
+  isUsernameUnavailable,
+  UsernameAvailability,
+  usernameRequirementErrorMessages,
+  usernameRequirementLabels,
+} from "@rbx/authentication-common/utils/usernameRequirementUtils";
 import { experimentLayer } from "../../constants/landingConstants";
 import {
   reactSignupCaptchaContainer,
@@ -54,6 +62,7 @@ import { getMetadataV2, getUserAgreements } from "../../services/signupService";
 import {
   sendAuthButtonClickEvent,
   sendAuthFormInteractionEvent,
+  sendPasswordPolicyMsgShownEvent,
   sendPasswordValidationEvent,
   sendSignupErrorShownEvent,
   sendSignupPasskeyRegistrationOutcomeEvent,
@@ -74,19 +83,13 @@ import {
   createAuthFlowTelemetry,
 } from "../../../shared/telemetry/authFlowTelemetry";
 import useSignupAbandonmentBeacon from "../hooks/useSignupAbandonmentBeacon";
-import useUsernameSuggestions from "../hooks/useUsernameSuggestions";
+import useUsernameSuggestions from "@rbx/authentication-common/hooks/useUsernameSuggestions";
 import { SignUpFormV2BirthdayFieldName } from "../components/SignUpFormV2";
 import {
   getPasswordRequirements,
   PasswordRequirement,
   passwordRequirementLabels,
 } from "../utils/passwordRequirementUtils";
-import {
-  getUsernameRequirements,
-  UsernameAvailability,
-  usernameRequirementErrorMessages,
-  usernameRequirementLabels,
-} from "../utils/usernameRequirementUtils";
 import SignUpContainerV2, {
   SignUpContainerV2FormProps,
   SignUpV2Treatment,
@@ -103,10 +106,6 @@ const { birthdayDay, birthdayMonth, birthdayYear, signupUsername, signupPassword
   EVENT_CONSTANTS.field;
 const { genderMale, genderFemale, signIn, usernameSuggestion } = EVENT_CONSTANTS.btn;
 const formInteractionCtx = EVENT_CONSTANTS.context.signupForm;
-
-const isUsernameUnavailable = (message: string): boolean =>
-  message === validationMessages.usernameAlreadyInUse ||
-  message === validationMessages.usernameNotAvailable;
 
 const birthdayInteractionField: Record<SignUpFormV2BirthdayFieldName, string> = {
   day: birthdayDay,
@@ -172,6 +171,9 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
   // Not the container: this component owns every path that can complete signup,
   // including the post-captcha retry.
   const { markSignupCompleted } = useSignupAbandonmentBeacon(telemetry);
+  usePasswordPolicyMsgShownEvent(password ? passwordError : null, state =>
+    sendPasswordPolicyMsgShownEvent(EVENT_CONSTANTS.context.schematizedSignupForm, state),
+  );
   const signupSilentUpgradeBrowserCheck =
     (experiments.signupSilentUpgradeBrowserCheck as SilentPasskeyUpgradeVariant | undefined) ??
     SilentPasskeyUpgradeVariant.NotEnrolled;
@@ -482,8 +484,6 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
       password: translate(signupFormStrings.Password),
       passwordPlaceholder: translate(signupFormStrings.PasswordPlaceholder),
       gender: translate(signupFormStrings.Gender),
-      female: translate("Label.Female"),
-      male: translate("Label.Male"),
       continue: translate("Action.Continue"),
       createAccount: translate(signupFormStrings.CreateAccountSentenceCase),
       showPassword: translate("Label.ShowPassword"),

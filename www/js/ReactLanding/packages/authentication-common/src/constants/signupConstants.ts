@@ -250,6 +250,8 @@ export const defaultLandingBackgroundClass = "default-background";
 export const signupCustomEvent = "Roblox.Signup";
 
 export const usernameMinLength = 3;
+export const signupUsernameMaxLength = 21;
+export const loginUsernameMaxLength = 320;
 export const usernameMaxLength = 20;
 
 export const passwordMinLength = 8;

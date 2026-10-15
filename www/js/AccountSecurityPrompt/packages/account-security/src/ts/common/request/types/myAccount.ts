@@ -2,7 +2,7 @@
  * My Account
  */
 
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const mySettingsUrl = "/my/settings/json";
 
@@ -21,7 +21,7 @@ export type GetMySettingsInfoReturnType = {
 /**
  * Request Type: `GET`.
  */
-export const GET_MY_SETTINGS_INFO_CONFIG: UrlConfig = {
+export const GET_MY_SETTINGS_INFO_CONFIG: RequestConfig = {
   withCredentials: true,
   url: mySettingsUrl,
   timeout: 10000,

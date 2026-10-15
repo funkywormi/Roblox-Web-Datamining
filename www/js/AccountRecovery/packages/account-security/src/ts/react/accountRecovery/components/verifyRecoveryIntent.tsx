@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Loading } from "react-style-guide";
 import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
+import { parseErrorCode } from "@rbx/core-scripts/http";
 import ModernCardHeader from "../../common/modernCardComponent/modernCardHeader";
 import ModernCardBody from "../../common/modernCardComponent/modernCardBody";
 import {
@@ -14,6 +15,7 @@ import ComponentState from "../store/componentState";
 import {
   isRetryableRecoveryIntentRequestError,
   isRetryableRecoveryIntentVerifyError,
+  RECOVERY_INTENT_VERIFICATION_OUTCOMES,
 } from "../constants/config";
 import { mapAccountRecoveryErrorToResource } from "../constants/resources";
 
@@ -146,6 +148,10 @@ const VerifyRecoveryIntent: React.FC = () => {
       // Stop polling if we exceeded max retries.
       if (shouldPollRecoveryIntent && pollAttemptRef.current >= MAX_POLL_RETRIES) {
         finishApprovalCheck();
+        eventService.sendRecoveryIntentVerificationEvent(
+          recoverySessionId,
+          RECOVERY_INTENT_VERIFICATION_OUTCOMES.pollingTimeout,
+        );
         setRequestError(resources.Message.UnknownError);
         return;
       }
@@ -170,6 +176,18 @@ const VerifyRecoveryIntent: React.FC = () => {
         }
         // Else return error
         finishApprovalCheck();
+        const rawErrorCode = parseErrorCode(statusResult.errorRaw);
+        let errorCode = "";
+        if (rawErrorCode !== null) {
+          errorCode = String(rawErrorCode);
+        } else if (statusResult.errorStatusCode !== null) {
+          errorCode = `http_${statusResult.errorStatusCode}`;
+        }
+        eventService.sendRecoveryIntentVerificationEvent(
+          recoverySessionId,
+          RECOVERY_INTENT_VERIFICATION_OUTCOMES.statusRequestFailure,
+          errorCode,
+        );
         setRequestError(mapAccountRecoveryErrorToResource(resources, statusResult.error));
         return;
       }
@@ -195,6 +213,18 @@ const VerifyRecoveryIntent: React.FC = () => {
               return;
             }
             finishApprovalCheck();
+            const rawErrorCode = parseErrorCode(verifyResult.errorRaw);
+            let errorCode = "";
+            if (rawErrorCode !== null) {
+              errorCode = String(rawErrorCode);
+            } else if (verifyResult.errorStatusCode !== null) {
+              errorCode = `http_${verifyResult.errorStatusCode}`;
+            }
+            eventService.sendRecoveryIntentVerificationEvent(
+              recoverySessionId,
+              RECOVERY_INTENT_VERIFICATION_OUTCOMES.verifyFailure,
+              errorCode,
+            );
             setRequestError(mapAccountRecoveryErrorToResource(resources, verifyResult.error));
             return;
           }
@@ -206,6 +236,10 @@ const VerifyRecoveryIntent: React.FC = () => {
           }
 
           stopPolling();
+          eventService.sendRecoveryIntentVerificationEvent(
+            recoverySessionId,
+            RECOVERY_INTENT_VERIFICATION_OUTCOMES.approved,
+          );
           try {
             await continueAfterVerification();
           } finally {
@@ -217,10 +251,18 @@ const VerifyRecoveryIntent: React.FC = () => {
         case RecoveryIntentStatus.Denied:
         case RecoveryIntentStatus.Invalid:
           finishApprovalCheck();
+          eventService.sendRecoveryIntentVerificationEvent(
+            recoverySessionId,
+            RECOVERY_INTENT_VERIFICATION_OUTCOMES.deniedOrInvalid,
+          );
           setRequestError(resources.Message.Error.RecoveryIntentDenied);
           return;
         default:
           finishApprovalCheck();
+          eventService.sendRecoveryIntentVerificationEvent(
+            recoverySessionId,
+            RECOVERY_INTENT_VERIFICATION_OUTCOMES.unexpectedStatus,
+          );
           setRequestError(resources.Message.UnknownError);
       }
     }

@@ -1,15 +1,8 @@
-import { create } from "@bufbuild/protobuf";
-import environmentUrls from "@rbx/environment-urls";
-import { EngineTelemetryBatchEventSchema } from "@rbx/event-stream-proto/eventstream/enginetelemetry/engine_telemetry_batch_event_pb";
-import { EngineTelemetryHistogramMetricEventSchema } from "@rbx/event-stream-proto/eventstream/enginetelemetry/engine_telemetry_histogram_metric_event_pb";
-import { EventStreamClient } from "@rbx/event-stream-v2";
-
-import { toEngineTelemetryAttributes } from "./attributes";
-import type { Attributes, FireTelemetryHistogramFn } from "./types";
-import { isValidIdentifier } from "./validate";
+import { sendHistogramBatch, sendHistogramBatchSync, type HistogramEventData } from "./proto";
+import type { Attributes, FireTelemetryHistogramFn } from "../types";
+import { isValidIdentifier } from "../validate";
 
 const DEFAULT_FLUSH_INTERVAL_MS = 5000;
-const BATCH_EVENT_VERSION = BigInt(1);
 
 function newBatchUuid(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -50,6 +43,7 @@ type Accumulator = {
 
 const flushCallbacks: (() => void)[] = [];
 let listenersInstalled = false;
+let isTearingDown = false;
 
 function flushAll(): void {
   for (const cb of flushCallbacks) {
@@ -69,7 +63,10 @@ function installLifecycleListeners(): void {
     });
   }
   if (typeof window !== "undefined") {
-    window.addEventListener("beforeunload", flushAll);
+    window.addEventListener("beforeunload", () => {
+      isTearingDown = true;
+      flushAll();
+    });
   }
   listenersInstalled = true;
 }
@@ -109,7 +106,6 @@ export function createFireTelemetryHistogram(
     return () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
   }
 
-  const client = new EventStreamClient({ baseUrl: environmentUrls.apiGatewayUrl });
   let accumulators = new Map<string, Accumulator>();
   let flushTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -128,14 +124,12 @@ export function createFireTelemetryHistogram(
   } {
     const bucketIndices: number[] = [];
     const countsInBuckets: bigint[] = [];
-
     for (const [index, count] of bucketCounts) {
       if (count > 0) {
         bucketIndices.push(index);
         countsInBuckets.push(BigInt(count));
       }
     }
-
     return { bucketIndices, countsInBuckets };
   }
 
@@ -148,36 +142,28 @@ export function createFireTelemetryHistogram(
     accumulators = new Map();
     const nowMs = BigInt(Date.now());
 
-    // Ingest expects histograms nested under EngineTelemetryBatchEvent.stats
-    // (engine envelope), not as top-level HistogramMetricEvent sources.
-    const stats = Array.from(snapshot.values(), acc =>
-      create(EngineTelemetryHistogramMetricEventSchema, {
+    const histograms: HistogramEventData[] = Array.from(snapshot.values(), acc => {
+      const { bucketIndices, countsInBuckets } = buildSparseBuckets(acc.bucketCounts);
+      return {
         name: acc.name,
         sum: acc.sum,
         count: BigInt(acc.count),
-        ...buildSparseBuckets(acc.bucketCounts),
-        eventTimestampMillisecond: nowMs,
-        attributes: acc.attributes ? toEngineTelemetryAttributes(acc.attributes) : undefined,
-      }),
-    );
+        bucketIndices,
+        countsInBuckets,
+        timestampMs: nowMs,
+        attributes: acc.attributes,
+      };
+    });
 
-    client
-      .sendBatch([
-        {
-          schema: EngineTelemetryBatchEventSchema,
-          msg: create(EngineTelemetryBatchEventSchema, {
-            version: BATCH_EVENT_VERSION,
-            uuid: newBatchUuid(),
-            batchTimestampMilliseconds: nowMs,
-            stats,
-            counters: [],
-            points: [],
-          }),
-        },
-      ])
-      .catch((err: unknown) => {
-        console.error("@rbx/web-telemetry: histogram flush failed", err);
-      });
+    const version = BigInt(1);
+    const uuid = newBatchUuid();
+    const useSync =
+      isTearingDown || (typeof document !== "undefined" && document.visibilityState === "hidden");
+    if (useSync) {
+      sendHistogramBatchSync(histograms, nowMs, version, uuid);
+    } else {
+      sendHistogramBatch(histograms, nowMs, version, uuid);
+    }
   }
 
   function scheduleFlush(): void {
@@ -235,4 +221,4 @@ export function createFireTelemetryHistogram(
   return fireTelemetryHistogram;
 }
 
-export type { Attributes, FireTelemetryHistogramFn } from "./types";
+export type { Attributes, FireTelemetryHistogramFn } from "../types";

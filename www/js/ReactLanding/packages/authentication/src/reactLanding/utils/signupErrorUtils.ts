@@ -57,6 +57,20 @@ export const classifySignupError = (
         message: validationMessages.usernameAlreadyInUse,
         shouldRememberRejectedPassword: false,
       };
+    case errorCodes.passwordLowComplexity:
+      return {
+        type: "field",
+        field: "password",
+        message: validationMessages.passwordLowComplexity,
+        shouldRememberRejectedPassword: true,
+      };
+    case errorCodes.passwordTooSimilarToUsername:
+      return {
+        type: "field",
+        field: "password",
+        message: validationMessages.passwordTooSimilarToUsername,
+        shouldRememberRejectedPassword: true,
+      };
     case errorCodes.invalidPassword:
       return {
         type: "field",

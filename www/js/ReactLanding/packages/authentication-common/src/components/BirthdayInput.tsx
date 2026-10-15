@@ -1,17 +1,20 @@
-/* eslint-disable @typescript-eslint/no-shadow */
 import React, { useMemo } from "react";
-import { useTranslation } from "@rbx/core-scripts/legacy/react-utilities";
 import classNames from "classnames";
+import Intl from "@rbx/core-scripts/intl";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { Dropdown, Menu, MenuSection, MenuItem, TMenuItemProps } from "@rbx/foundation-ui";
 import {
   maxSignUpAge,
   minSignUpAge,
   monthStrings,
   signupFormStrings,
-} from "../../constants/signupConstants";
-import { Birthday } from "../signUpState";
-import { intl } from "../utils";
-import { daysInMonthYear } from "../utils/date";
+} from "../constants/signupConstants";
+import { Birthday, daysInMonthYear } from "../utils/birthdayUtils";
+
+const intl = new Intl();
+
+// Not translated: Foundation's TextInput renders the same asterisk for required fields.
+const REQUIRED_MARKER = "*";
 
 const dayList = (year?: number, month?: number, day?: number) => {
   const numberOfDays = month == null ? 31 : daysInMonthYear(month, year);
@@ -48,6 +51,10 @@ export type BirthdayInputProps = {
   hasError?: boolean;
   error?: string;
   isDisabled?: boolean;
+  /** Adds the required-field asterisk to the label, as Foundation's `TextInput` does. */
+  isRequired?: boolean;
+  /** Reserves the error line's height when there is no error, so the layout does not shift. */
+  reserveErrorSpace?: boolean;
   onChangeYear: (year: number) => void;
   onChangeMonth: (month: number) => void;
   onChangeDay: (day: number) => void;
@@ -80,7 +87,9 @@ const DatePartDropdown = ({
     ariaLabel={label}
     hasError={hasError}
     isDisabled={isDisabled}
-    onValueChange={v => onChange(parseInt(v, 10))}
+    onValueChange={v => {
+      onChange(parseInt(v, 10));
+    }}
     onOpenChange={onOpenChange}
   >
     <Menu>
@@ -98,13 +107,15 @@ const BirthdayInput = ({
   hasError,
   error,
   isDisabled,
+  isRequired = false,
+  reserveErrorSpace = true,
   onChangeYear,
   onChangeMonth,
   onChangeDay,
   onOpenChangeYear,
   onOpenChangeMonth,
   onOpenChangeDay,
-}: BirthdayInputProps): JSX.Element => {
+}: BirthdayInputProps): React.JSX.Element => {
   const { year, month, day } = birthday;
   const isError = hasError === true || error != null;
   const { translate } = useTranslation();
@@ -164,17 +175,20 @@ const BirthdayInput = ({
       >
         {/* translate(isVPCSignup ? signupFormStrings.BirthdayRequired : signupFormStrings.Birthday) */}
         {translate(signupFormStrings.Birthday)}
+        {isRequired && (
+          <React.Fragment>
+            {" "}
+            <span className="content-default">{REQUIRED_MARKER}</span>
+          </React.Fragment>
+        )}
       </span>
       <div className="grid gap-small" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
         {parts.map(([key, part]) => (
           <React.Fragment key={key}>{part}</React.Fragment>
         ))}
       </div>
-      {error == null ? (
-        <span className="height-350" />
-      ) : (
-        <span className="text-caption-small content-system-alert">{error}</span>
-      )}
+      {error != null && <span className="text-caption-small content-system-alert">{error}</span>}
+      {error == null && reserveErrorSpace && <span className="height-350" />}
     </div>
   );
 };

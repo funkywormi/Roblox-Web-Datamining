@@ -207,6 +207,10 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUserUnd
       UseAUniquePassword: translate("Label.UseAUniquePassword"),
       YourEmail: translate(isUserUnder13 ? "Label.YourEmailUnder13" : "Label.YourEmail"),
     },
+    Response: {
+      PasswordLowComplexity: translate("Response.PasswordLowComplexity"),
+      PasswordTooSimilarToUsername: translate("Response.PasswordTooSimilarToUsername"),
+    },
   }) as const;
 
 export type AccountSecurityPromptResources = ReturnType<typeof getPersonalizedResources>;
@@ -240,6 +244,10 @@ export const mapPasswordErrorToResource = (
       return resources.Message.Error.Passwords.InvalidPassword;
     case Passwords.PasswordsError.INVALID_CURRENT_PASSWORD:
       return resources.Message.Error.Passwords.InvalidCurrentPassword;
+    case Passwords.PasswordsError.PASSWORD_LOW_COMPLEXITY:
+      return resources.Response.PasswordLowComplexity;
+    case Passwords.PasswordsError.PASSWORD_TOO_SIMILAR_TO_USERNAME:
+      return resources.Response.PasswordTooSimilarToUsername;
     default:
       return resources.Message.Error.Passwords.Default;
   }
@@ -274,6 +282,10 @@ export const mapPasswordValidationStatusToResource = (
       return resources.Message.Error.PasswordValidation.ForbiddenPassword;
     case Passwords.ValidationStatus.DUMB_STRINGS:
       return resources.Message.Error.PasswordValidation.DumbStrings;
+    case Passwords.ValidationStatus.PASSWORD_LOW_COMPLEXITY:
+      return resources.Response.PasswordLowComplexity;
+    case Passwords.ValidationStatus.PASSWORD_TOO_SIMILAR_TO_USERNAME:
+      return resources.Response.PasswordTooSimilarToUsername;
     default:
       return resources.Message.Error.PasswordValidation.Default;
   }

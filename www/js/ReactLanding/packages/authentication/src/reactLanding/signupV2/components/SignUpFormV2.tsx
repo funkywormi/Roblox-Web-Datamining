@@ -1,7 +1,6 @@
 import React, { FormEvent, ReactNode, Ref, useEffect, useRef, useState } from "react";
 import {
   Button,
-  Chip,
   Dropdown,
   IconButton,
   Menu,
@@ -10,9 +9,12 @@ import {
   TextInput,
 } from "@rbx/foundation-ui";
 import { Gender } from "@rbx/authentication-common/types/signupTypes";
+import GenderChips from "@rbx/authentication-common/components/GenderChips";
+import UsernameRequirementList, {
+  UsernameRequirementItem,
+} from "@rbx/authentication-common/components/UsernameRequirementList";
 import signupV2CardClassName from "../constants/signupV2Styles";
-import UsernameRequirementList, { UsernameRequirementItem } from "./UsernameRequirementList";
-import UsernameSuggestions from "./UsernameSuggestions";
+import UsernameSuggestions from "@rbx/authentication-common/components/UsernameSuggestions";
 
 // Hoisted out of the JSX because `react/jsx-no-literals` rejects bare strings there.
 const requiredFieldMarker = "*";
@@ -47,8 +49,6 @@ export type SignUpFormV2Labels = {
   password: string;
   passwordPlaceholder: string;
   gender: string;
-  female: string;
-  male: string;
   continue: string;
   createAccount: string;
   showPassword: string;
@@ -177,10 +177,6 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
     if (!isSubmitting && !isSubmitDisabled) {
       onSubmit();
     }
-  };
-
-  const handleGenderChange = (nextGender: Gender): void => {
-    onGenderChange?.(gender === nextGender ? Gender.unknown : nextGender);
   };
 
   const isUsernameRequirementListVisible = isUsernameFocused && usernameRequirements.length > 0;
@@ -385,39 +381,19 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
           {passwordInput}
 
           {onGenderChange && (
-            <div className="width-[212px]" role="group" aria-labelledby="signup-v2-gender-label">
-              {/* Legacy `.dark-theme p` outranks Foundation content tokens, so this label
-                  uses `span` to keep its color. */}
-              <span
-                id="signup-v2-gender-label"
-                className="content-emphasis text-title-medium padding-bottom-small block"
-              >
-                {labels.gender}
-              </span>
-              <div className="flex gap-small">
-                <Chip
-                  text={labels.female}
-                  size="Medium"
-                  variant="Standard"
-                  leadingIconName="icon-regular-head-female"
-                  isChecked={gender === Gender.female}
-                  isDisabled={isSubmitting}
-                  onCheckedChange={isChecked =>
-                    handleGenderChange(isChecked ? Gender.female : Gender.unknown)
-                  }
-                />
-                <Chip
-                  text={labels.male}
-                  size="Medium"
-                  variant="Standard"
-                  leadingIconName="icon-regular-head-male"
-                  isChecked={gender === Gender.male}
-                  isDisabled={isSubmitting}
-                  onCheckedChange={isChecked =>
-                    handleGenderChange(isChecked ? Gender.male : Gender.unknown)
-                  }
-                />
-              </div>
+            <div className="width-[212px]">
+              <GenderChips
+                gender={gender ?? Gender.unknown}
+                isDisabled={isSubmitting}
+                labelId="signup-v2-gender-label"
+                // GenderChips' wrapper gap-small already spaces the label above the chips;
+                // padding-bottom-small here would double it.
+                labelClassName="content-emphasis text-title-medium block"
+                label={labels.gender}
+                onChange={nextGender => {
+                  onGenderChange?.(nextGender);
+                }}
+              />
             </div>
           )}
         </div>

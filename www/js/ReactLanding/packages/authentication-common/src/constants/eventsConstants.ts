@@ -324,6 +324,11 @@ const EVENT_CONSTANTS = {
       // has to ride here to stay separable.
       unknownTooManyAttempts: "unknown:tooManyAttempts",
     },
+    // A strict password-policy message was shown on a password field (authMsgShown).
+    passwordPolicy: {
+      lowComplexity: "passwordPolicy:lowComplexity",
+      tooSimilarToUsername: "passwordPolicy:tooSimilarToUsername",
+    },
     focused: "focused",
     unfocused: "unfocused",
     selected: "selected",

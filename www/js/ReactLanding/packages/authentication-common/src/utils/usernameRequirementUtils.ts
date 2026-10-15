@@ -1,10 +1,10 @@
-import { usernameValidatorErrorMessages } from "@rbx/authentication-common/constants/validationConstants";
+import { usernameValidatorErrorMessages } from "../constants/validationConstants";
 import {
   areUsernameCharactersValid,
   isUsernameLengthValid,
   isUsernameUnderscorePlacementValid,
-} from "@rbx/authentication-common/utils/usernameValidationUtils";
-import { validationMessages } from "../../constants/signupConstants";
+} from "./usernameValidationUtils";
+import { validationMessages } from "../constants/signupConstants";
 
 export enum UsernameRequirementId {
   Length = "length",
@@ -45,6 +45,11 @@ export const usernameRequirementErrorMessages = new Set<string>([
   validationMessages.usernameAlreadyInUse,
   validationMessages.usernameNotAvailable,
 ]);
+
+/** Whether a username validation message means the name is taken or otherwise unavailable. */
+export const isUsernameUnavailable = (message: string): boolean =>
+  message === validationMessages.usernameAlreadyInUse ||
+  message === validationMessages.usernameNotAvailable;
 
 export const getUsernameRequirements = (
   username: string,

@@ -4143,7 +4143,7 @@
         },
         {
             "name": "AccountRecovery",
-            "url": "https://js.rbxcdn.com/d2314f4f3f8906765d755524377103d3f889de82543472f7634be8db388a2d36-AccountRecovery.js",
+            "url": "https://js.rbxcdn.com/cb6dec594c73e7dba973a92c4344777a0e7838cde03aa1ba8d1eac9a0fc7a4a3-AccountRecovery.js",
             "sources": [
                 "/login/forgot-password-or-username"
             ]
@@ -4157,7 +4157,7 @@
         },
         {
             "name": "AccountSecurityPrompt",
-            "url": "https://js.rbxcdn.com/88f80fb19324cfdefd0273b8f482e47d1de17e2c69d508ffb86724bbac53035f-AccountSecurityPrompt.js",
+            "url": "https://js.rbxcdn.com/8cab61cbce3e27ab581db90f443725c268378e315e78ec169289cf353e30f04b-AccountSecurityPrompt.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -6030,7 +6030,7 @@
         },
         {
             "name": "ReactLanding",
-            "url": "https://js.rbxcdn.com/e678160abc53380b3ac67607eb665fd8d0a3335ed4c3ca43491b162e4d21fe2d-ReactLanding.js",
+            "url": "https://js.rbxcdn.com/da75ca917a5835e48642a9bd51b4aba8088783466b036771baa07be483123914-ReactLanding.js",
             "sources": [
                 "/",
                 "/CreateAccount"
@@ -7058,7 +7058,7 @@
         },
         {
             "name": "AccountRecovery",
-            "url": "https://css.rbxcdn.com/30533c6f8c638b12ac35ee61360048baf8ab809ae7d774d6dfa3d11ad63abd0d-AccountRecovery.css",
+            "url": "https://css.rbxcdn.com/de0daad4191d9073556480825d0468706dd6f41d48f2bb57251d13845d847a25-AccountRecovery.css",
             "sources": [
                 "/login/forgot-password-or-username"
             ]

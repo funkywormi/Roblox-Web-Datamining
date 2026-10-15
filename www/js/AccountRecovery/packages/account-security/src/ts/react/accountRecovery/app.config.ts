@@ -19,6 +19,7 @@ export const EVENT_CONSTANTS = {
     contactMethodSent: "contactMethodSent",
     userSelected: "userSelected",
     passwordReset: "passwordReset",
+    recoveryIntentVerification: "recoveryIntentVerification",
   },
 } as const;
 
@@ -150,6 +151,8 @@ export const ACCOUNT_RECOVERY_LANGUAGE_RESOURCES = [
   "Response.PasswordBadLength",
   "Response.PasswordComplexity",
   "Response.PasswordContainsUsernameError",
+  "Response.PasswordLowComplexity",
+  "Response.PasswordTooSimilarToUsername",
   "Heading.EnterSecondMethod",
   "Heading.PasskeyUpsellTitle",
   "Heading.PasskeyUpsellSubtitle",

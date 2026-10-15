@@ -3,7 +3,7 @@
  */
 
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 
@@ -28,7 +28,7 @@ export type UserInfo = {
 /**
  * Request Type: `GET`.
  */
-export const GET_USER_BY_ID_CONFIG: (userId: string) => UrlConfig = userId => ({
+export const GET_USER_BY_ID_CONFIG: (userId: string) => RequestConfig = userId => ({
   withCredentials: true,
   url: `${usersApiUrl}/v1/users/${userId}`,
   timeout: USERS_API_TIMEOUT,
@@ -48,7 +48,7 @@ export type UserInfoListResponse = {
 /**
  * Request Type: `POST`.
  */
-export const GET_USER_BY_USERNAME_CONFIG: UrlConfig = {
+export const GET_USER_BY_USERNAME_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${usersApiUrl}/v1/usernames/users`,
   timeout: USERS_API_TIMEOUT,
@@ -57,7 +57,7 @@ export const GET_USER_BY_USERNAME_CONFIG: UrlConfig = {
 /**
  * Request Type: `POST`.
  */
-export const GET_USERS_BY_IDS_CONFIG: UrlConfig = {
+export const GET_USERS_BY_IDS_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${usersApiUrl}/v1/users`,
   timeout: USERS_API_TIMEOUT,

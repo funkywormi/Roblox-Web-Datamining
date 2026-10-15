@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { usernameMinLength } from "../../constants/signupConstants";
-import { postUsernameSuggestions } from "../../services/signupService";
+import { usernameMinLength } from "../constants/signupConstants";
+import { postUsernameSuggestions } from "../services/signupService";
 
 export type UseUsernameSuggestionsParams = {
   username: string;

@@ -63,11 +63,11 @@ export const buildSignupBirthday = (day: string, month: string, year: string): D
     return invalidDate();
   }
 
-  const birthday = new Date(yearNumber, monthIndex, dayNumber);
+  const birthday = new Date(Date.UTC(yearNumber, monthIndex, dayNumber));
   if (
-    birthday.getFullYear() !== yearNumber ||
-    birthday.getMonth() !== monthIndex ||
-    birthday.getDate() !== dayNumber
+    birthday.getUTCFullYear() !== yearNumber ||
+    birthday.getUTCMonth() !== monthIndex ||
+    birthday.getUTCDate() !== dayNumber
   ) {
     return invalidDate();
   }

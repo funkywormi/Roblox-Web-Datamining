@@ -18,8 +18,8 @@ import {
   validationMessages,
   USER_AGREEMENTS,
 } from "../constants/signupConstants";
-import BirthdayInput from "./components/BirthdayInput";
-import UsernameInput from "./components/UsernameInput";
+import BirthdayInput from "@rbx/authentication-common/components/BirthdayInput";
+import UsernameInput from "@rbx/authentication-common/components/UsernameInput";
 import UsernameSuggestions from "./components/UsernameSuggestions";
 import PasswordInput from "./components/PasswordInput";
 import GenderInput from "./components/GenderInput";
@@ -27,7 +27,6 @@ import LegalText from "./components/LegalText";
 import ExitSignupConfirmationDialog from "./components/ExitSignupConfirmationDialog";
 import {
   useSignup,
-  usernameValidationMessage,
   setBirthdayYear,
   setBirthdayMonth,
   setBirthdayDay,
@@ -36,8 +35,9 @@ import {
   setGender,
   setAgreementIds,
   setMetadataV2,
-  constructValidUTCBirthdate,
 } from "./signUpState";
+import { constructValidUTCBirthdate } from "@rbx/authentication-common/utils/birthdayUtils";
+import { usernameValidationMessage } from "@rbx/authentication-common/utils/signupUsernameValidation";
 import { intl } from "./utils";
 import { signupWithParams } from "./api";
 import {
@@ -56,8 +56,10 @@ import {
   sendAuthFormInteractionEvent,
   sendAuthMsgShownEvent,
   sendExitSignupConfirmationShownEvent,
+  sendPasswordPolicyMsgShownEvent,
 } from "../services/eventService";
 import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
+import usePasswordPolicyMsgShownEvent from "@rbx/authentication-common/hooks/usePasswordPolicyMsgShownEvent";
 import { parseErrorCode } from "@rbx/authentication-common/utils/requestUtils";
 import { navigateToLogin, navigateToPage } from "@rbx/authentication-common/utils/browserUtils";
 import {
@@ -128,6 +130,18 @@ const extractSignupRequestError = (error: unknown): SignupError | null => {
         displayMethod: "field",
         field: "username",
         message: validationMessages.usernameAlreadyInUse,
+      };
+    case errorCodes.passwordLowComplexity:
+      return {
+        displayMethod: "field",
+        field: "password",
+        message: validationMessages.passwordLowComplexity,
+      };
+    case errorCodes.passwordTooSimilarToUsername:
+      return {
+        displayMethod: "field",
+        field: "password",
+        message: validationMessages.passwordTooSimilarToUsername,
       };
     case errorCodes.invalidPassword:
       return {
@@ -364,10 +378,13 @@ const SignUpForm = (): JSX.Element => {
       : null);
 
   const passwordError =
-    passwordValidationErrorMessage ??
+    passwordValidationErrorMessage ||
     (signupRequestError?.displayMethod === "field" && signupRequestError.field === "password"
       ? signupRequestError.message
       : null);
+  usePasswordPolicyMsgShownEvent(password !== "" ? passwordError : null, state =>
+    sendPasswordPolicyMsgShownEvent(lrSignupForm, state),
+  );
 
   const generalError =
     signupRequestError?.displayMethod === "general" ? signupRequestError.message : null;
@@ -501,7 +518,10 @@ const SignUpForm = (): JSX.Element => {
           id="signup-password"
           name="signupPassword"
           value={password}
-          onChange={setPassword}
+          onChange={(newPassword: string) => {
+            resetSignupResponseErrorState();
+            setPassword(newPassword);
+          }}
           error={password !== "" && passwordError ? translate(passwordError) : undefined}
           isDisabled={isPendingOrSuccess}
           onFocus={() => sendAuthFormInteractionEvent(lrSignupForm, signupPassword, focused)}

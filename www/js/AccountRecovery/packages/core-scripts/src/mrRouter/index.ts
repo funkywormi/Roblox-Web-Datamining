@@ -1,5 +1,15 @@
-import { getMrRouterConfig, getMrRouterEnvName, setMrRouterEnvName } from "./config";
+import {
+  getMrRouterConfig,
+  getMrRouterEnvName,
+  setMrRouterEnvName,
+  SSR_COOKIE_NAME,
+} from "./config";
 import { mergeMrRouterTracestate, TRACESTATE_HEADER } from "./tracestate";
+
+const readme = `# MrRouter
+Questions? Ask in #ee-tft
+- setMrRouterEnvName({env name}): set MrRouter env name to use on all requests. Also sets a cookie (${SSR_COOKIE_NAME}) for SSR to use the same env name.
+- getMrRouterEnvName(): returns current MrRouter env name`;
 
 const TRACEPARENT_HEADER = "traceparent";
 
@@ -41,6 +51,7 @@ const setMrRouterHeaders = (headers: Record<string, string | number | undefined>
 };
 
 export {
+  readme,
   getMrRouterConfig,
   getMrRouterEnvName,
   setMrRouterEnvName,

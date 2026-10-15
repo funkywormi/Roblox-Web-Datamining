@@ -9,6 +9,9 @@ import { cryptoUtil, fido2Util, hybridResponseService } from "core-roblox-utilit
 import { urlService, httpService } from "core-utilities";
 import getInvalidPasswordMessage from "@rbx/authentication-common/utils/passwordValidationUtils";
 import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
+import usePasswordPolicyMsgShownEvent, {
+  getPasswordPolicyMsgState,
+} from "@rbx/authentication-common/hooks/usePasswordPolicyMsgShownEvent";
 import AUTH_EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 import useAccountRecoveryContext from "./useAccountRecoveryContext";
 import { isPasskeyCompatible } from "../../common/compatibility";
@@ -19,6 +22,7 @@ import {
 } from "../../../common/request/apis/auth";
 import { PasswordResetError } from "../../../common/request/types/auth";
 import {
+  getPasswordResetErrorMessageKey,
   mapPasswordErrorToResource,
   mapPasswordResetErrorToResource,
 } from "../constants/resources";
@@ -381,7 +385,12 @@ const useRecoveryActions = () => {
   // --- Password reset state & logic ---
 
   const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordErrorKey, setPasswordErrorKey] = useState<string | null>(null);
+  const passwordError =
+    passwordErrorKey === null ? null : mapPasswordErrorToResource(resources, passwordErrorKey);
+  usePasswordPolicyMsgShownEvent(passwordErrorKey, state =>
+    eventService.sendPasswordPolicyMsgShown(state),
+  );
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
   const [newEmail, setNewEmail] = useState("");
@@ -403,7 +412,7 @@ const useRecoveryActions = () => {
   const validatePassword = async (value: string): Promise<string | null> => {
     if (value === "") return null;
     const translationKey = await getInvalidPasswordMessage(value, username ?? undefined);
-    return translationKey === "" ? null : mapPasswordErrorToResource(resources, translationKey);
+    return translationKey === "" ? null : translationKey;
   };
 
   const validateConfirmPassword = (repeated: string, original: string): string | null => {
@@ -414,8 +423,8 @@ const useRecoveryActions = () => {
   const handlePasswordChange = async (value: string) => {
     setPassword(value);
     setRequestError(null);
-    const error = await validatePassword(value);
-    setPasswordError(error);
+    const errorKey = await validatePassword(value);
+    setPasswordErrorKey(errorKey);
     if (confirmPassword) {
       setConfirmPasswordError(validateConfirmPassword(confirmPassword, value));
     }
@@ -561,6 +570,12 @@ const useRecoveryActions = () => {
       );
       setRequestInFlight(false);
       setRequestError(mapPasswordResetErrorToResource(resources, result.error));
+      const passwordPolicyState = getPasswordPolicyMsgState(
+        getPasswordResetErrorMessageKey(result.error),
+      );
+      if (passwordPolicyState) {
+        eventService.sendPasswordPolicyMsgShown(passwordPolicyState);
+      }
       return;
     }
 

@@ -1,6 +1,7 @@
 import Roblox from "Roblox";
-import { EVENT_CONSTANTS } from "../app.config";
 import AUTH_EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
+import { EVENT_CONSTANTS } from "../app.config";
+import type { RecoveryIntentVerificationOutcome } from "../constants/config";
 
 function sendAuthEvent(schematizedEventType: string, state: string): void {
   Roblox.EventStream.SendEventWithTarget(
@@ -74,6 +75,24 @@ export class EventServiceDefault {
     );
   }
 
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/class-methods-use-this
+  sendRecoveryIntentVerificationEvent(
+    recoverySessionId: string,
+    outcome: RecoveryIntentVerificationOutcome,
+    errorCode?: string,
+  ): void {
+    Roblox.EventStream.SendEventWithTarget(
+      EVENT_CONSTANTS.eventName,
+      EVENT_CONSTANTS.context.recoveryIntentVerification,
+      {
+        recoverySessionId,
+        outcome,
+        errorCode,
+      },
+      Roblox.EventStream.TargetTypes.WWW,
+    );
+  }
+
   // eslint-disable-next-line class-methods-use-this
   sendUserSelectedEvent(recoverySessionId: string): void {
     Roblox.EventStream.SendEventWithTarget(
@@ -112,6 +131,16 @@ export class EventServiceDefault {
   // eslint-disable-next-line class-methods-use-this
   sendAuthMsgShown(state: string): void {
     sendAuthEvent(AUTH_EVENT_CONSTANTS.schematizedEventTypes.authMsgShown, state);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  sendPasswordPolicyMsgShown(state: string): void {
+    Roblox.EventStream.SendEventWithTarget(
+      AUTH_EVENT_CONSTANTS.schematizedEventTypes.authMsgShown,
+      AUTH_EVENT_CONSTANTS.context.resetPasswordPage,
+      { state, field: AUTH_EVENT_CONSTANTS.field.recoveryPassword },
+      Roblox.EventStream.TargetTypes.WWW,
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this

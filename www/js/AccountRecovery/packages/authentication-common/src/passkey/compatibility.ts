@@ -24,6 +24,7 @@ export const defaultNotInApp = (): PasskeyRelevantMeta => ({
 export type PasskeyCompatibleProps = {
   producer?: PasskeyRelevantMetaProducer;
   hybridCallback: () => Promise<string | null>;
+  platformAuthenticatorCheck?: () => Promise<boolean>;
 };
 
 export const isPasskeyCompatible = ({
@@ -31,6 +32,7 @@ export const isPasskeyCompatible = ({
   // We default to something that is always defined to simplify the containing logic.
   producer = defaultNotInApp,
   hybridCallback,
+  platformAuthenticatorCheck,
 }: PasskeyCompatibleProps): Promise<boolean> => {
   const deviceMetadata = producer();
   const inApp = deviceMetadata.isInApp;
@@ -41,7 +43,11 @@ export const isPasskeyCompatible = ({
   // PublicKeyCredential and we don't want to pre-emptively prune the support. But this is here
   // for parity with our existing implementations.
   if (inWeb && hasPublicKeyCredential) {
-    return Promise.resolve(true);
+    if (!platformAuthenticatorCheck) {
+      return Promise.resolve(true);
+    }
+    // Unknown capability should not exclude a client that may still succeed.
+    return platformAuthenticatorCheck().catch(() => true);
   }
 
   const isIosOrAndroidApp = deviceMetadata.isIosApp || deviceMetadata.isAndroidApp;

@@ -168,6 +168,8 @@ export const getResources = (translate: TranslateFunction) =>
       PasswordBadLength: translate("Response.PasswordBadLength"),
       PasswordComplexity: translate("Response.PasswordComplexity"),
       PasswordContainsUsernameError: translate("Response.PasswordContainsUsernameError"),
+      PasswordLowComplexity: translate("Response.PasswordLowComplexity"),
+      PasswordTooSimilarToUsername: translate("Response.PasswordTooSimilarToUsername"),
     },
   }) as const;
 
@@ -209,8 +211,26 @@ export const mapPasswordErrorToResource = (
       return resources.Response.PasswordComplexity;
     case "Response.PasswordContainsUsernameError":
       return resources.Response.PasswordContainsUsernameError;
+    case "Response.PasswordLowComplexity":
+      return resources.Response.PasswordLowComplexity;
+    case "Response.PasswordTooSimilarToUsername":
+      return resources.Response.PasswordTooSimilarToUsername;
     default:
       return resources.Message.UnknownError;
+  }
+};
+
+/** The password validation message a reset rejection corresponds to, if any. */
+export const getPasswordResetErrorMessageKey = (
+  error: PasswordResetError | null,
+): string | null => {
+  switch (error) {
+    case PasswordResetError.PASSWORD_LOW_COMPLEXITY:
+      return "Response.PasswordLowComplexity";
+    case PasswordResetError.PASSWORD_TOO_SIMILAR_TO_USERNAME:
+      return "Response.PasswordTooSimilarToUsername";
+    default:
+      return null;
   }
 };
 
@@ -227,6 +247,10 @@ export const mapPasswordResetErrorToResource = (
       return resources.Message.Error.InvalidPassword;
     case PasswordResetError.PASSWORDS_DO_NOT_MATCH:
       return resources.Message.PasswordsDoNotMatch;
+    case PasswordResetError.PASSWORD_LOW_COMPLEXITY:
+      return resources.Response.PasswordLowComplexity;
+    case PasswordResetError.PASSWORD_TOO_SIMILAR_TO_USERNAME:
+      return resources.Response.PasswordTooSimilarToUsername;
     default:
       return resources.Message.UnknownError;
   }
