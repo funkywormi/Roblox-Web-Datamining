@@ -1,3 +1,5 @@
+import { navigator } from "@rbx/core-lib/browser";
+
 /**
  * Returns the iOS/iPadOS major version from the user agent, or null when the
  * UA is not iPhone/iPad. Covers Safari, in-app browsers, and Roblox Hybrid
@@ -5,6 +7,10 @@
  * token, which Hybrid UAs omit.
  */
 export const getIosMajorVersion = (): number | null => {
+  if (navigator === undefined) {
+    return null;
+  }
+
   const match = /(?:iPhone OS|CPU OS) (\d+)[._]/.exec(navigator.userAgent);
   if (match?.[1] == null) {
     return null;

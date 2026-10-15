@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { window } from "@rbx/core-lib/browser";
 
 // Tailwind-based breakpoints as per: https://github.rbx.com/Roblox/web-foundation-packages/blob/master/packages/%40rbx/foundation-tailwind/generated/foundation-tailwind.css
 export const breakpoints = {
@@ -27,7 +28,7 @@ export type BreakpointResult = {
 };
 
 function getCurrentBreakpoint(): Breakpoint {
-  const width = typeof window !== "undefined" ? window.innerWidth : breakpoints.xlarge;
+  const width = window?.innerWidth ?? breakpoints.xlarge;
 
   if (width >= breakpoints.xxlarge) return "xxlarge";
   if (width >= breakpoints.xlarge) return "xlarge";
@@ -55,11 +56,11 @@ export function useBreakpoint(): BreakpointResult {
   }, []);
 
   useEffect(() => {
-    window.addEventListener("resize", onResize);
+    window?.addEventListener("resize", onResize);
     onResize();
 
     return () => {
-      window.removeEventListener("resize", onResize);
+      window?.removeEventListener("resize", onResize);
     };
   }, [onResize]);
 

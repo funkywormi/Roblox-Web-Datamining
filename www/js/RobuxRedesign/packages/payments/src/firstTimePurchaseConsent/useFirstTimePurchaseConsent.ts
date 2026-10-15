@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import localStorageService from "@rbx/core-scripts/local-storage";
+import { getItem, setItem } from "@rbx/core-lib/local-storage";
 import type { WithApiMetricsFn } from "../withApiMetrics/withApiMetrics";
 import { getFeatureMetadata } from "./getFeatureMetadata";
 
@@ -26,8 +26,8 @@ export function useFirstTimePurchaseConsent(
       return undefined;
     }
 
-    const alreadyConsented =
-      localStorageService.getLocalStorage(getConsentStorageKey(userId)) === "true";
+    // @ts-expect-error -- This per-user key is generated dynamically and is not declared in LocalStorageRegistry.
+    const alreadyConsented = getItem(getConsentStorageKey(userId)) === "true";
     if (alreadyConsented) {
       setShouldShowFirstTimePurchaseConsent(false);
       return undefined;
@@ -50,7 +50,8 @@ export function useFirstTimePurchaseConsent(
 
   const markConsentAcknowledged = useCallback(() => {
     if (userId) {
-      localStorageService.setLocalStorage(getConsentStorageKey(userId), "true");
+      // @ts-expect-error -- This per-user key is generated dynamically and is not declared in LocalStorageRegistry.
+      setItem(getConsentStorageKey(userId), "true");
     }
   }, [userId]);
 

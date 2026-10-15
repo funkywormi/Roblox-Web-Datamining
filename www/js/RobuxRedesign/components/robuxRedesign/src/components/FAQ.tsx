@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { getAbsoluteUrl } from "@rbx/core-scripts/util/url";
 import { Icon } from "@rbx/foundation-ui";
@@ -6,16 +6,19 @@ import { translateHtml, type TranslateHtmlTag } from "@rbx/translation-utils";
 import { Section, SectionHeader } from "./sections/Section";
 import { isOnDesktop } from "../utils/platform";
 
-const FAQ_BASE_KEYS = [
-  "Action.WhatAreRobux",
-  "Action.WhereAreMyRobux",
-  "Action.DoRobuxExpire",
-  ...(isOnDesktop ? ["Action.HowToRedeemGiftCard"] : []),
-];
+const FAQ_BASE_KEYS = ["Action.WhatAreRobux", "Action.WhereAreMyRobux", "Action.DoRobuxExpire"];
+const DESKTOP_FAQ_BASE_KEY = "Action.HowToRedeemGiftCard";
 
 export function FAQ() {
   const { translate } = useTranslation();
   const [openIds, setOpenIds] = useState<Set<string>>(() => new Set());
+  const [showDesktopFaq, setShowDesktopFaq] = useState(false);
+
+  useEffect(() => {
+    setShowDesktopFaq(isOnDesktop);
+  }, []);
+
+  const faqKeys = showDesktopFaq ? [...FAQ_BASE_KEYS, DESKTOP_FAQ_BASE_KEY] : FAQ_BASE_KEYS;
 
   const toggleItem = useCallback((id: string) => {
     setOpenIds(prev => {
@@ -40,7 +43,7 @@ export function FAQ() {
     <Section>
       <SectionHeader>{translate("Heading.FAQ")}</SectionHeader>
       <div className="self-stretch flex flex-col items-stretch gap-medium large:gap-large">
-        {FAQ_BASE_KEYS.map(baseKey => {
+        {faqKeys.map(baseKey => {
           const questionKey = `${baseKey}Question`;
           const answerKey = `${baseKey}Answer`;
           const question = translate(questionKey);
@@ -66,7 +69,7 @@ export function FAQ() {
                 ),
               },
             ];
-          } else if (baseKey === "Action.HowToRedeemGiftCard") {
+          } else if (baseKey === DESKTOP_FAQ_BASE_KEY) {
             answerTags = [
               {
                 opening: "redeemLinkStart",

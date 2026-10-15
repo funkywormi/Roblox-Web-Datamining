@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
-import { useTheme } from "@rbx/core-scripts/react";
+import { useResolvedColorMode } from "@rbx/foundation-ui";
 import { Carousel } from "@rbx/payments/components/carousel";
 
 import type { TrackSubscriptionV2SubscribeClickArgs } from "../../hooks/subscriptionV2/useSubscriptionV2Tracking";
@@ -36,7 +36,9 @@ export function BundleCarousel({
   const { products } = subscriptionV2;
 
   const inverseThemeClass =
-    useTheme() === "dark" ? "color-mode-light light-theme" : "color-mode-dark dark-theme";
+    useResolvedColorMode() === "dark"
+      ? "color-mode-light light-theme"
+      : "color-mode-dark dark-theme";
 
   // Section-shown fires once per carousel mount and avoids
   // double-counting impressions when the user swipes between tiers.

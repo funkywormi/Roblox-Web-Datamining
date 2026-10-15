@@ -1,3 +1,5 @@
+import { window } from "@rbx/core-lib/browser";
+
 const DEV_PUBLIC_KEY =
   "pk_test_51LNOeQHDRNiW7vlLcKH8TGCpJ7zhaidLdSegE22GCuvQbVUX2xDiGJY6WYaldYyo6qgVxmy1SnSVpSdaqyjfqclU00NQwWntIe";
 const STAGING_PUBLIC_KEY =
@@ -6,6 +8,10 @@ const PROD_PUBLIC_KEY =
   "pk_live_51LKpO9C8tJWGhK4HEHtny9Dg7xXiQJ1i349cq6KBDusbl8bRHO7QmCKKhX18LPjSirMNTvj3tesq6mhIQuPioeAd0062ZCgoF3";
 
 export function getStripePublicAPIKeyForEnv(): string {
+  if (window === undefined) {
+    throw new Error("Stripe public API key selection requires a browser environment");
+  }
+
   if (window.location.href.includes("sitetest1")) {
     return STAGING_PUBLIC_KEY;
   }

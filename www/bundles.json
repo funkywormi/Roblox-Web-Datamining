@@ -1102,6 +1102,14 @@
             ]
         },
         {
+            "name": "Feature.AddFriends",
+            "url": "https://js.rbxcdn.com/586b7c22125721cf634efe928a063fdb692cb5d00a893e96eab606879e09ed0c.js",
+            "sources": [
+                "/users/friends",
+                "/users/1/friends"
+            ]
+        },
+        {
             "name": "Feature.AgeVerificationUpsell",
             "url": "https://js.rbxcdn.com/458e4db7e6e243b2dc68967195eefe76d8329aa041cc0144cc28962e7ee3ea60.js",
             "sources": [
@@ -4948,7 +4956,7 @@
         },
         {
             "name": "Friends",
-            "url": "https://js.rbxcdn.com/0cf45afe6f3787d7eb8ddcc77a95e9d66c2e1624cc9dd9867d0efab87dcd0a76-Friends.js",
+            "url": "https://js.rbxcdn.com/e7a6857771c52b13d996edc5a59c5e588d445941857b6d92faa96081c3467e8f-Friends.js",
             "sources": [
                 "/users/friends",
                 "/users/1/friends"
@@ -6198,7 +6206,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/f9feb54a26fa69b4a557fb368cb94827733e7faf7f8905c65ee0f5bd4a4a9014-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/57c7f7f4745f681974a84320fa0a5d95914226b75c9df8a9f0c89305d107fae7-RobuxRedesign.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -6803,7 +6811,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/a250e6d92a5765a466cd1e8b661a696d5623b2b6ddb30910af580aad69620104-UserSettings.js",
+            "url": "https://js.rbxcdn.com/6f31fc6dc08aed0076cac4c1223591187cb50d607d50edd5e8479b8fcd0d3ed3-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -7630,7 +7638,7 @@
         },
         {
             "name": "Friends",
-            "url": "https://css.rbxcdn.com/776470c23467c43abe13189e40437aade23ca405adbde4b686810c3df4836219-Friends.css",
+            "url": "https://css.rbxcdn.com/7fca44c402eefed31462a88b9e72bf5eedb1a22277fee8484fbb09fa2a66a487-Friends.css",
             "sources": [
                 "/users/friends",
                 "/users/1/friends"
@@ -8549,7 +8557,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://css.rbxcdn.com/74aeaef86a0239d92b4f1b03dc8ef7ca9c66157898532b8b9593663ca20bca99-RobuxRedesign.css",
+            "url": "https://css.rbxcdn.com/f2fbbf77696d6da15e9344d33998fc5d037ef99b8a759cb91a3e4320993edc32-RobuxRedesign.css",
             "sources": [
                 "/upgrades/robux"
             ]

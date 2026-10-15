@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 // prettier-ignore
 // @ts-expect-error - Legacy Roblox module types
 import { EmailVerificationService } from "@rbx/core-scripts/legacy/Roblox";
+import { document } from "@rbx/core-lib/browser";
 
 export const DATASET_ELEMENT_ID = "robux-container-base";
 
@@ -14,7 +15,7 @@ export function useEmailVerification(): {
   const [isVerificationUpsellEnabled, setIsVerificationUpsellEnabled] = useState<boolean>(false);
 
   useEffect(() => {
-    const rootDataset = document.getElementById(DATASET_ELEMENT_ID)?.dataset;
+    const rootDataset = document?.getElementById(DATASET_ELEMENT_ID)?.dataset;
 
     if (rootDataset) {
       setIsVerificationUpsellEnabled(rootDataset.isVerificationUpsellEnabled === "true");

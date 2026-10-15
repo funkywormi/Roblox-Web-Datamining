@@ -1,5 +1,6 @@
 import { useCallback, useContext } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
+import { window } from "@rbx/core-lib/browser";
 import { SectionBase, SectionGiftCard } from "../../types/buyRobuxPageData";
 import { BaseSectionProps, Section, SectionBody, SectionHeader } from "../sections/Section";
 import { SectionBodySimpleCTA } from "../sections/SectionBodySimpleCTA";
@@ -20,7 +21,7 @@ export function GiftCard({ isPrimary, sectionBase, giftCard }: GiftCardProps) {
     trackGiftCardClick();
     // The Android app (2.728+) loads target="_blank" popups in a hidden WebView, so window.open does
     // nothing (MOBAPP-3220). Navigating in place lets the app's domain allow-list hand off to the browser.
-    window.location.assign(giftCard.redirectUrl);
+    window?.location.assign(giftCard.redirectUrl);
   }, [trackGiftCardClick, giftCard.redirectUrl]);
 
   return (

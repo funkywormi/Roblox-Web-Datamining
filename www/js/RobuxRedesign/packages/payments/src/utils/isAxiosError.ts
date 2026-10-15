@@ -1,4 +1,4 @@
-import type { AxiosError } from "@rbx/core-scripts/http";
+import type { AxiosError } from "axios";
 
 /**
  * Type guard for axios/httpService errors thrown from @rbx/core-scripts.

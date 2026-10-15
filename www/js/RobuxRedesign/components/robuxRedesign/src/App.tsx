@@ -1,5 +1,5 @@
 import { useMemo, useEffect } from "react";
-import localStorageService from "@rbx/core-scripts/local-storage";
+import { setItem } from "@rbx/core-lib/local-storage";
 import { getCurrentUser } from "@rbx/www-common/user";
 import { useFirstTimePurchaseConsent } from "@rbx/payments/firstTimePurchaseConsent";
 import {
@@ -21,9 +21,11 @@ import useRedirect from "./hooks/useRedirect";
 import { isRedirectPlatformEligible } from "./utils/isRedirectPlatformEligible";
 import { withApiMetrics } from "./utils/publishMetric";
 
-const PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2 = `paymentSession-${getCurrentUser()?.id ?? "loggedout"}`;
+const PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2 =
+  `paymentSession-${getCurrentUser()?.id ?? "loggedout"}` as const;
 const persistPaymentSessionToLocalStorage = (paymentSession: PaymentSession): void => {
-  localStorageService.setLocalStorage(PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2, paymentSession);
+  // @ts-expect-error -- This per-user key is generated dynamically and is not declared in LocalStorageRegistry.
+  setItem(PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2, paymentSession);
 };
 
 type AppProps = {

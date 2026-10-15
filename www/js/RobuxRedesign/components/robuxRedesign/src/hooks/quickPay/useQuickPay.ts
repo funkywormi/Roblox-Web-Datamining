@@ -4,6 +4,7 @@ import { loadStripe } from "@stripe/stripe-js/pure";
 import { captureException } from "@rbx/payments/error";
 import { isAxiosError } from "@rbx/payments/utils";
 import Intl from "@rbx/core-scripts/intl";
+import { window } from "@rbx/core-lib/browser";
 import { getStripePublicAPIKeyForEnv } from "../../constants/stripe";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 import { TrackingContext } from "../../contexts/TrackingContext";
@@ -218,6 +219,10 @@ export function useQuickPay({
   }, [urlParams.product_id, firePaymentMethodSelectedCounter]);
 
   const fetchStripe = useCallback(async () => {
+    if (window === undefined) {
+      return;
+    }
+
     try {
       const stripePublicKey = getStripePublicAPIKeyForEnv();
       const response = await loadStripe(stripePublicKey);
@@ -239,6 +244,10 @@ export function useQuickPay({
       isSub: boolean,
       updatedPaymentProfile?: PaymentProfile,
     ) => {
+      if (window === undefined) {
+        return;
+      }
+
       setPreparePaymentProviderPayload(undefined);
       setCheckoutSessionId(undefined);
       setIsBonusItem(isBonus);
@@ -300,7 +309,9 @@ export function useQuickPay({
 
           // For any kinds of error, we send the user to the non-quick-pay flow
           const purchaseUrl = getPurchaseUrl(product, isSub);
-          window.location.href = purchaseUrl;
+          if (window !== undefined) {
+            window.location.href = purchaseUrl;
+          }
           return { data: undefined, isError: true };
         });
 
@@ -347,6 +358,10 @@ export function useQuickPay({
     async (
       providerPayload: PreparePaymentProviderPayload,
     ): Promise<{ error?: string; isLoading: boolean }> => {
+      if (window === undefined) {
+        return { isLoading: false };
+      }
+
       trackQuickPayClick();
 
       // Determine payment provider type based on selected payment profile
@@ -549,6 +564,10 @@ export function useQuickPay({
 
   const process3DSForQuickPay = useCallback(
     async (ev: MessageEvent<QuickPayIframeMessage>): Promise<string | undefined> => {
+      if (window === undefined) {
+        return;
+      }
+
       // This handler will receive many events. So we early return if the event is not the one we want.
       if (ev.data.type !== "3DS-authentication-complete" || !ev.data.url || !stripe) {
         return;

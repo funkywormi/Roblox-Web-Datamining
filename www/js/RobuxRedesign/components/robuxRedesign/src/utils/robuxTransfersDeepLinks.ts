@@ -1,4 +1,5 @@
 import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
+import { window } from "@rbx/core-lib/browser";
 import { trackCounter } from "../observability";
 import { isInApp } from "./platform";
 
@@ -16,6 +17,10 @@ function getAppsFlyerUrl(deepLinkUrl: string): string {
 }
 
 export function navigateToDeepLink(deepLinkUrl: string): void {
+  if (window === undefined) {
+    return;
+  }
+
   const deviceMeta = getDeviceMeta();
   if (isInApp) {
     window.location.href = deepLinkUrl;

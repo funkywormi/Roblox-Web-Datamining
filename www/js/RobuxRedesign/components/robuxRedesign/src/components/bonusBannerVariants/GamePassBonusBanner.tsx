@@ -1,6 +1,7 @@
 import { useCallback, useContext } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { IconButton, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
+import { window } from "@rbx/core-lib/browser";
 import { GamePassMetadata } from "../../types/buyRobuxPageData";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 import { isInApp, isOnDesktop } from "../../utils/platform";
@@ -14,6 +15,10 @@ export function GamePassBonusBanner({ metadata }: BannerProps) {
   const { bonusItemBannerImageUrl, bonusItemImageUrl } = useContext(BuyRobuxPageContext);
 
   const iconReportHandler = useCallback(() => {
+    if (window === undefined) {
+      return;
+    }
+
     if (isInApp || isOnDesktop) {
       window.location.href = "/support";
     } else {

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import "../stylesheets/styleOverrides.scss";
+import { document } from "@rbx/core-lib/browser";
 
 // You are encouraged to neither extend nor re-use this pattern
 
@@ -17,14 +18,14 @@ const STYLE_OVERRIDES: string[] = [
 export function useStyleOverrides(ctx?: string): void {
   useEffect(() => {
     if (getDeviceMeta()?.isInApp) {
-      document.documentElement.style.setProperty(
+      document?.documentElement.style.setProperty(
         "--container-main-margin-top",
         "var(--container-main-margin-top-mobile-var",
       );
       // only hide the 2nd row of the header if the user came through a redirect flow
     } else if (ctx === "redirect") {
       STYLE_OVERRIDES.forEach(override => {
-        document.documentElement.style.setProperty(`--${override}`, `var(--${override}-var`);
+        document?.documentElement.style.setProperty(`--${override}`, `var(--${override}-var`);
       });
     }
   }, [ctx]);

@@ -1,5 +1,6 @@
 /* eslint-disable no-void */
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { window } from "@rbx/core-lib/browser";
 import { trackCounter, trackError } from "../../observability";
 import { TrackingContext } from "../../contexts/TrackingContext";
 import { Product } from "../../types/buyRobuxPageData";
@@ -64,6 +65,10 @@ export function usePurchase(
 
   const purchaseProductPostPurchaseWarning = useCallback(
     (_product: Product, _isSub: boolean, url: string) => {
+      if (window === undefined) {
+        return;
+      }
+
       if (isOnDesktop) {
         trackCounter("DesktopPurchaseRedirect");
         window.location.href = url;

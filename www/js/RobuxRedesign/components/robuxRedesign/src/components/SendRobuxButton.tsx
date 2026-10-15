@@ -3,6 +3,7 @@ import { ErrorBoundary } from "@sentry/react";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { Button, SheetRoot } from "@rbx/foundation-ui";
+import { window } from "@rbx/core-lib/browser";
 import { SendRobuxSheet } from "./modals/SendRobuxSheet";
 import { TrackingContext } from "../contexts/TrackingContext";
 import { trackCriticalError } from "../observability";
@@ -48,6 +49,10 @@ export function SendRobuxButton({
 
   const handleClick = useCallback(() => {
     if (!isAuthed) {
+      if (window === undefined) {
+        return;
+      }
+
       const returnUrl = `${window.location.pathname}${window.location.search}`;
       window.location.href = `${UNAUTH_LOGIN_PATH}?ReturnUrl=${encodeURIComponent(returnUrl)}`;
       return;

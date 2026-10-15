@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { Alert, type TAlertSeverity } from "@rbx/foundation-ui";
+import { window } from "@rbx/core-lib/browser";
 
 export type ToastOptions = {
   shouldAutoDismiss?: boolean;
@@ -80,7 +81,7 @@ export const ToastProvider = ({ children, closeLabel }: ToastProviderProps) => {
   }, []);
 
   useEffect(() => {
-    if (!message?.shouldAutoDismiss) {
+    if (!message?.shouldAutoDismiss || !window) {
       return undefined;
     }
 
@@ -90,7 +91,7 @@ export const ToastProvider = ({ children, closeLabel }: ToastProviderProps) => {
     }, AUTO_DISMISS_MS);
 
     return () => {
-      window.clearTimeout(timeoutId);
+      window?.clearTimeout(timeoutId);
     };
   }, [message]);
 

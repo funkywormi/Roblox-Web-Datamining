@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { observeChildrenVisibility } from "@rbx/core-scripts/util/element-visibility";
+import { document } from "@rbx/core-lib/browser";
 import { ROOT_ELEMENT_ID } from "../constants";
 import { SectionBase } from "../types/buyRobuxPageData";
 
@@ -214,7 +215,7 @@ export function useScrollTracking(): ImpressionData {
     // Scope to the page's React root so we cover both the body sections and
     // anything the Header renders (e.g., a tagged RobuxGift button), while
     // avoiding any unrelated `data-...` usage elsewhere in the app.
-    const root = document.getElementById(ROOT_ELEMENT_ID);
+    const root = document?.getElementById(ROOT_ELEMENT_ID);
     if (!root) {
       return;
     }

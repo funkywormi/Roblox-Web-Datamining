@@ -1,9 +1,10 @@
 import { useContext, useEffect, useMemo } from "react";
-import localStorageService from "@rbx/core-scripts/local-storage";
+import { removeItem, setItem } from "@rbx/core-lib/local-storage";
+import "@rbx/payments/types";
 import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
 
-export const BUY_ROBUX_CTX_LOCAL_STORAGE_KEY = "buyRobuxCtx";
-export const BUY_ROBUX_PRODUCT_ID_LOCAL_STORAGE_KEY = "buyRobuxProductId";
+export const BUY_ROBUX_CTX_LOCAL_STORAGE_KEY = "buyRobuxCtx" as const;
+export const BUY_ROBUX_PRODUCT_ID_LOCAL_STORAGE_KEY = "buyRobuxProductId" as const;
 
 export function useBonusItem(): void {
   const { urlParams } = useContext(BuyRobuxPageContext);
@@ -14,20 +15,17 @@ export function useBonusItem(): void {
 
   useEffect(() => {
     if (ctxUrlParam) {
-      localStorageService.setLocalStorage(BUY_ROBUX_CTX_LOCAL_STORAGE_KEY, ctxUrlParam);
+      setItem(BUY_ROBUX_CTX_LOCAL_STORAGE_KEY, ctxUrlParam);
     } else {
-      localStorageService.removeLocalStorage(BUY_ROBUX_CTX_LOCAL_STORAGE_KEY);
+      removeItem(BUY_ROBUX_CTX_LOCAL_STORAGE_KEY);
     }
   }, [ctxUrlParam]);
 
   useEffect(() => {
     if (productIdUrlParam) {
-      localStorageService.setLocalStorage(
-        BUY_ROBUX_PRODUCT_ID_LOCAL_STORAGE_KEY,
-        productIdUrlParam,
-      );
+      setItem(BUY_ROBUX_PRODUCT_ID_LOCAL_STORAGE_KEY, productIdUrlParam);
     } else {
-      localStorageService.removeLocalStorage(BUY_ROBUX_PRODUCT_ID_LOCAL_STORAGE_KEY);
+      removeItem(BUY_ROBUX_PRODUCT_ID_LOCAL_STORAGE_KEY);
     }
   }, [productIdUrlParam]);
 }

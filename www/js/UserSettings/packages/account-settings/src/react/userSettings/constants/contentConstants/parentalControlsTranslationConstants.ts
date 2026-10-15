@@ -199,6 +199,7 @@ export default {
   },
   approvedExperiences: {
     noApprovedExperiences: "Description.NoApprovedExperiences",
+    noApprovedExperiencesChildSide: "Description.NoApprovedExperiencesChildSide",
     removeFromApproved: "Action.RemoveFromApproved",
     confirmRevoke: "Heading.ConfirmRevoke",
     confirmRevokeExperience: "Description.ConfirmRevokeExperience",

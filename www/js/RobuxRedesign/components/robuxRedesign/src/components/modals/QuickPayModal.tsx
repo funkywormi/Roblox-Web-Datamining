@@ -19,8 +19,10 @@ import {
   DialogFooter,
   DialogBody,
   Divider,
+  Icon,
 } from "@rbx/foundation-ui";
 import { FullScreenLoading } from "@rbx/payments/components";
+import { window } from "@rbx/core-lib/browser";
 import { isIconVariant } from "../../utils/iconVariants";
 import { resolveBonusRobuxTagLabelKey } from "../../utils/bonusRobuxTag";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
@@ -151,20 +153,20 @@ function QuickPayModal({
   );
 
   useEffect(() => {
-    window.addEventListener("message", eventListener3DS);
+    window?.addEventListener("message", eventListener3DS);
 
     return () => {
-      window.removeEventListener("message", eventListener3DS);
+      window?.removeEventListener("message", eventListener3DS);
     };
   }, [eventListener3DS]);
 
   useEffect(() => {
-    if (!isQuickPayModalOpen) {
+    if (window === undefined || !isQuickPayModalOpen) {
       return;
     }
 
     window.dispatchEvent(
-      new CustomEvent("price-tag:render", {
+      new window.CustomEvent("price-tag:render", {
         detail: {
           targetSelector: ".quick-pay-price-tag",
         },
@@ -197,7 +199,11 @@ function QuickPayModal({
           <Divider className="margin-y-small" />
           <div className="product">
             <div className="icon-wrapper">
-              <div className="icon-robux-redesign" />
+              <Icon
+                name="icon-filled-robux"
+                size="XXLarge"
+                style={{ height: 60, width: 60, color: "var(--color-content-emphasis)" }}
+              />
               <div className="product-detail">
                 <div className="product-name">
                   {translate("Label.RobuxQuantity", {
@@ -229,7 +235,7 @@ function QuickPayModal({
             </div>
             {shouldShowPersonalizedBonusItems && (
               <Fragment>
-                <span className="icon-plus" />
+                <Icon name="icon-filled-plus-large" size="XXLarge" />
                 <div className="bonus-item-card-small">
                   {ltbItemMetadata ? (
                     <img
@@ -333,7 +339,7 @@ function QuickPayModal({
               loadingAnimation
             )}
           </div>
-          <div className="divider" />
+          <Divider style={{ margin: "8px 0" }} />
           <div className="space-between-container">
             <div className="total-due">{translate("Message.OneClickPay.TotalDue")}</div>
             {preparePaymentProviderPayload ? (
@@ -346,8 +352,8 @@ function QuickPayModal({
               loadingAnimation
             )}
           </div>
-          <div className="payment-method-info">
-            {translate("Message.OneClickPay.AmountChargedTo")}
+          <div className="payment-method-info flex flex-col gap-small">
+            <span>{translate("Message.OneClickPay.AmountChargedTo")}</span>
             <QuickPaySelectCardDropdown
               error={quickPayError}
               onSelectPaymentProfile={selectPaymentProfile}
@@ -361,7 +367,7 @@ function QuickPayModal({
               {translate("Message.OneClickPay.RedirectToOldFlow")}
             </div>
           </div>
-          <div className="divider" />
+          <Divider style={{ margin: "8px 0" }} />
           <div className="margin-top-small">
             <QuickPayLegalDisclosure translationKey={legalDisclosureTranslationKey} />
           </div>

@@ -60,7 +60,11 @@ export const ApprovedExperiences = ({
     if (!isLoading && approvedExperiencesResult?.approvedExperiences.length === 0) {
       return (
         <div className="text-description approved-experiences-empty-state">
-          {translate(approvedExperiences.noApprovedExperiences)}
+          {translate(
+            child || onManageExperience
+              ? approvedExperiences.noApprovedExperiences
+              : approvedExperiences.noApprovedExperiencesChildSide,
+          )}
         </div>
       );
     }

@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { toDataURL } from "qrcode";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import { window, navigator } from "@rbx/core-lib/browser";
 import { trackCounter, trackError } from "../../observability";
 
 type RobuxGifting = {
@@ -35,7 +36,7 @@ export function useRobuxGifting(giftingUrl: string): RobuxGifting {
   }, [giftingUrl]);
 
   const handleCopyUrl = useCallback(() => {
-    if (!giftingUrl) {
+    if (navigator === undefined || !giftingUrl) {
       return;
     }
 
@@ -45,9 +46,10 @@ export function useRobuxGifting(giftingUrl: string): RobuxGifting {
   }, [giftingUrl]);
 
   const handleShareLink = useCallback(() => {
-    if (!giftingUrl) {
+    if (window === undefined || navigator === undefined || !giftingUrl) {
       return;
     }
+    const { DOMException } = window;
 
     const deviceMeta = getDeviceMeta();
     if (deviceMeta?.isIosDevice || deviceMeta?.isAndroidDevice || deviceMeta?.isUniversalApp) {

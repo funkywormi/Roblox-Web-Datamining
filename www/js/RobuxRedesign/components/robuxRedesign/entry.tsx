@@ -1,5 +1,6 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "react-dom";
+import { window, document } from "@rbx/core-lib/browser";
 import dataStores from "@rbx/core-scripts/data-store";
 import { registerReferrerLookup } from "@rbx/subscriptions-common";
 import { PaymentsTranslationProvider } from "@rbx/payments";
@@ -32,7 +33,7 @@ const ToastWrapper = ({ children }: { children: React.ReactNode }) => {
 };
 
 const getUrlParams = () => {
-  if (typeof window === "undefined") {
+  if (window === undefined) {
     return {};
   }
 
@@ -45,6 +46,10 @@ const getUrlParams = () => {
 };
 
 ready(() => {
+  if (document === undefined) {
+    return;
+  }
+
   reportPageLoad();
 
   const isSubscriber = isPremiumUser();

@@ -4,6 +4,7 @@ import { useTranslation } from "@rbx/core-scripts/react";
 import { Button } from "@rbx/foundation-ui";
 import { SubscriptionButton } from "@rbx/subscriptions-common";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
+import { window } from "@rbx/core-lib/browser";
 import { getSubscriptionProductTrackingProps } from "../../hooks/useScrollTracking";
 
 import type { SectionSubscriptionV2Product } from "../../types/buyRobuxPageData";
@@ -77,7 +78,7 @@ export const SubscriptionTile: FC<SubscriptionTileProps> = ({
   // - Overrides ctx to subscription
   // - Appends type and id
   const redirectHref = useMemo(() => {
-    if (!redirect?.url) {
+    if (window === undefined || !redirect?.url) {
       return "";
     }
     const url = new URL(redirect.url, window.location.origin);

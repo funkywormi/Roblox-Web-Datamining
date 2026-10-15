@@ -38,7 +38,7 @@ export function QuickPayLegalDisclosure({ translationKey }: QuickPayLegalDisclos
 
   return (
     <div className="legal-disclosure-container">
-      <p className="text-footer legal-text-holder">
+      <p className="text-footer legal-text-holder content-default" style={{ fontSize: 10 }}>
         {translateHtml(
           translate,
           translationKey ?? DEFAULT_TRANSLATION_KEY,
