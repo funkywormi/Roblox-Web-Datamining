@@ -16,11 +16,7 @@ export default function UniverseSearchIcon({
         aria-label={t("Label.sSearch")}
         onClick={toggleUniverseSearch}
       >
-        <NavIcon
-          legacyClass="icon-nav-search-white"
-          name="icon-regular-magnifying-glass"
-          size="XLarge"
-        />
+        <NavIcon name="icon-regular-magnifying-glass" size="XLarge" />
       </button>
     </li>
   );

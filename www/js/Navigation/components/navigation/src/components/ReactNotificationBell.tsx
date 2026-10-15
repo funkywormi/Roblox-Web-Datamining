@@ -49,12 +49,7 @@ export default function ReactNotificationBell({ unreadCount = 0 }: ReactNotifica
     <span className="nav-robux-icon rbx-menu-item">
       <div className="notification-stream-indicator">
         <span id="nav-ns-icon" className="rbx-menu-item notification-stream-icon">
-          <NavIcon
-            legacyClass="icon-common-notification-bell"
-            name="icon-regular-bell"
-            size="XLarge"
-            id="common-notification-bell"
-          />
+          <NavIcon name="icon-regular-bell" size="XLarge" id="common-notification-bell" />
           {unreadCount > 0 && (
             <span
               className="notification-red notification bell-red-badge"

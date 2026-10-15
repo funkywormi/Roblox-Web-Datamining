@@ -9,8 +9,6 @@ import links from "../../constants/linkConstants";
 import layoutConstants from "../../constants/layoutConstants";
 import RobuxBadgeType from "../../constants/robuxBadgeConstants";
 import { mapRobuxBadgeTypeToStr, setRobuxBadgeLocalStorage } from "../../util/robuxBadgeUtil";
-import Link from "../NavLink";
-import { useIsTopNavFoundation } from "../../util/topNavFoundationIxp";
 
 const { buyRobuxUrl, redeemUrl } = links;
 
@@ -38,7 +36,6 @@ export default function RobuxMenu({
   const tAlerts = useTranslations("Common.AlertsAndOptions");
   const tFeatures = useTranslations("CommonUI.Features");
   const tRedeem = useTranslations("Purchasing.RedeemGameCard");
-  const isFoundation = useIsTopNavFoundation();
   const [isWalletDisplayed, setIsWalletDisplayed] = useState(true);
 
   const robuxAmountValue = robuxError
@@ -93,133 +90,62 @@ export default function RobuxMenu({
   // where the header itself stops showing the balance.
   const walletClassName = isWalletDisplayed ? undefined : "wallet-hidden";
 
-  if (isFoundation) {
-    return (
-      <Menu size="Large" className="nav-foundation-menu">
-        <Fragment>
+  return (
+    <Menu size="Large" className="nav-foundation-menu">
+      <Fragment>
+        <MenuLabel
+          className={walletClassName}
+          title={robuxAmountValue}
+          leading={<Icon name="icon-regular-robux" id="nav-robux" />}
+        />
+        {creditDisplayConfig !== layoutConstants.creditDisplayConfigVariants.control && (
           <MenuLabel
             className={walletClassName}
-            title={robuxAmountValue}
-            leading={<Icon name="icon-regular-robux" id="nav-robux" />}
+            title=""
+            leading={
+              <Fragment>
+                <Icon name="icon-regular-wallet" />
+                {creditError ? (
+                  layoutConstants.robuxOnEconomySystemOutage
+                ) : (
+                  // PriceTag mounts onto this selector via the price-tag:render event.
+                  <span
+                    className="dropdown-credit-balance"
+                    data-amount={creditAmount}
+                    data-currency-code={currencyCode}
+                  />
+                )}
+              </Fragment>
+            }
           />
-          {creditDisplayConfig !== layoutConstants.creditDisplayConfigVariants.control && (
-            <MenuLabel
-              className={walletClassName}
-              title=""
-              leading={
-                <Fragment>
-                  <Icon name="icon-regular-wallet" />
-                  {creditError ? (
-                    layoutConstants.robuxOnEconomySystemOutage
-                  ) : (
-                    // PriceTag mounts onto this selector via the price-tag:render event.
-                    <span
-                      className="dropdown-credit-balance"
-                      data-amount={creditAmount}
-                      data-currency-code={currencyCode}
-                    />
-                  )}
-                </Fragment>
-              }
-            />
-          )}
-          <MenuSeparator className={walletClassName} />
-        </Fragment>
-        <MenuSection>
-          {isEligibleForVng ? (
-            <MenuItem
-              value="buyRobuxExternal"
-              title={tAlerts(buyRobuxUrl.buyRobux.label)}
-              onSelect={onBuyRobuxExternalClick}
-            />
-          ) : (
-            <MenuItem
-              value="buyRobux"
-              as="a"
-              href={buyRobuxUrl.buyRobux.url}
-              title={tAlerts(buyRobuxUrl.buyRobux.label)}
-              trailing={tAlerts.has(robuxBadgeStr) ? tAlerts(robuxBadgeStr) : undefined}
-              onSelect={onBuyRobuxClicked}
-            />
-          )}
-          <MenuItem
-            value="myTransactions"
-            as="a"
-            href={buyRobuxUrl.myTransactions.url}
-            title={tFeatures(buyRobuxUrl.myTransactions.label)}
-          />
-          <MenuItem value="redeem" as="a" href={redeemUrl.url} title={tRedeem(redeemUrl.label)} />
-        </MenuSection>
-      </Menu>
-    );
-  }
-
-  return (
-    <Fragment>
-      <div className={isWalletDisplayed ? "" : "wallet-hidden"}>
-        <li className="dropdown-wallet">
-          <Link className="dropdown-wallet-section">
-            <span className="icon-robux-28x28" id="nav-robux" />
-            <span id="nav-robux-balance">{robuxAmountValue}</span>
-          </Link>
-        </li>
-        {/* credit balance not displayed in control variant */}
-        {creditDisplayConfig !== layoutConstants.creditDisplayConfigVariants.control && (
-          <li className="dropdown-wallet">
-            <Link className="dropdown-wallet-section">
-              <span className="icon-menu-wallet" />
-              {!creditError ? (
-                <span
-                  className="dropdown-credit-balance"
-                  data-amount={creditAmount}
-                  data-currency-code={currencyCode}
-                />
-              ) : (
-                layoutConstants.robuxOnEconomySystemOutage
-              )}
-            </Link>
-          </li>
         )}
-        <li className="rbx-divider" />
-      </div>
-      {isEligibleForVng ? (
-        <li>
-          <button type="button" className="rbx-menu-item" onClick={onBuyRobuxExternalClick}>
-            {tAlerts(buyRobuxUrl.buyRobux.label)}
-          </button>
-        </li>
-      ) : (
-        <li className="rbx-menu-item-container">
-          <Link
-            cssClasses="rbx-menu-item buy-robux-button"
-            url={buyRobuxUrl.buyRobux.url}
-            onClick={onBuyRobuxClicked}
-          >
-            <span className="buy-robux-link-container">
-              {tAlerts(buyRobuxUrl.buyRobux.label)}
-              {robuxBadgeStr && (
-                <div className="new-item-pill small">
-                  <span className="new-item-pill-text">
-                    {tAlerts.has(robuxBadgeStr) ? tAlerts(robuxBadgeStr) : ""}
-                  </span>
-                </div>
-              )}
-            </span>
-          </Link>
-        </li>
-      )}
-
-      <li>
-        <Link cssClasses="rbx-menu-item" url={buyRobuxUrl.myTransactions.url}>
-          {tFeatures(buyRobuxUrl.myTransactions.label)}
-        </Link>
-      </li>
-
-      <li>
-        <Link cssClasses="rbx-menu-item" url={redeemUrl.url}>
-          {tRedeem(redeemUrl.label)}
-        </Link>
-      </li>
-    </Fragment>
+        <MenuSeparator className={walletClassName} />
+      </Fragment>
+      <MenuSection>
+        {isEligibleForVng ? (
+          <MenuItem
+            value="buyRobuxExternal"
+            title={tAlerts(buyRobuxUrl.buyRobux.label)}
+            onSelect={onBuyRobuxExternalClick}
+          />
+        ) : (
+          <MenuItem
+            value="buyRobux"
+            as="a"
+            href={buyRobuxUrl.buyRobux.url}
+            title={tAlerts(buyRobuxUrl.buyRobux.label)}
+            trailing={tAlerts.has(robuxBadgeStr) ? tAlerts(robuxBadgeStr) : undefined}
+            onSelect={onBuyRobuxClicked}
+          />
+        )}
+        <MenuItem
+          value="myTransactions"
+          as="a"
+          href={buyRobuxUrl.myTransactions.url}
+          title={tFeatures(buyRobuxUrl.myTransactions.label)}
+        />
+        <MenuItem value="redeem" as="a" href={redeemUrl.url} title={tRedeem(redeemUrl.label)} />
+      </MenuSection>
+    </Menu>
   );
 }

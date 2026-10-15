@@ -9,6 +9,8 @@ export const mapRobuxBadgeTypeToLocalStorageKey = (robuxBadgeType: string): stri
       return `prevLocalVirtualItemStartTimeSeconds${authenticatedUser()?.id ?? ""}`;
     case RobuxBadgeType.UPDATE:
       return "hasSeenRobuxUpdate";
+    case RobuxBadgeType.BONUS_ROBUX_2026_10:
+      return "hasSeenRobuxBonusRobux2026_10";
     default:
       return "";
   }
@@ -20,6 +22,8 @@ export const mapRobuxBadgeTypeToStr = (robuxBadgeType: string): string => {
       return "Labels.NewItem";
     case RobuxBadgeType.UPDATE:
       return "Labels.NewUpdate";
+    case RobuxBadgeType.BONUS_ROBUX_2026_10:
+      return "Labels.LimitedTimeBonus";
     default:
       return "";
   }
@@ -33,6 +37,7 @@ export const setRobuxBadgeLocalStorage = (robuxBadgeType: string): void => {
       localStorageService.setLocalStorage(localStorageKey, Math.floor(Date.now() / 1000));
       break;
     case RobuxBadgeType.UPDATE:
+    case RobuxBadgeType.BONUS_ROBUX_2026_10:
       localStorageService.setLocalStorage(localStorageKey, "true");
       break;
     default:
@@ -50,6 +55,9 @@ export const shouldShowRobuxUpdateBadge = (): ValueOf<typeof RobuxBadgeType> | n
   // There should only be one local storage field checked here at a time per label,
   // otherwise the red dot will not dismiss until the user clicks multiple times
 
-  // No badge is currently offered, so this returns null.
+  if (getRobuxBadgeLocalStorage(RobuxBadgeType.BONUS_ROBUX_2026_10) !== "true") {
+    return RobuxBadgeType.BONUS_ROBUX_2026_10;
+  }
+
   return null;
 };

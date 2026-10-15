@@ -1,5 +1,5 @@
 import { useTranslations } from "@rbx/www-common/i18n";
-import { isLoginLinkAvailable, getLoginLinkUrl } from "../util/authUtil";
+import { isLoginLinkAvailable, getLoginLinkUrl } from "../util/authLinkUtil";
 import Link from "./NavLink";
 
 export default function HeaderLoginLink() {

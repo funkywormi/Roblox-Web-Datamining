@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import UniversalSearchContainer from "./UniversalSearch";
 import HeaderRightNav from "../components/HeaderRightNav";
 import { isInMobileSize as isInMobileSizeNow } from "../util/navigationUtil";
-import { logTopNavFoundationExposureIfEnrolled } from "../util/topNavFoundationIxp";
 import { trackRendered } from "../topNav/observability";
 
 export default function NavigationRightHeader() {
@@ -24,7 +23,6 @@ export default function NavigationRightHeader() {
 
   // Not in NavigationRobux: it mounts twice and would double-log.
   useEffect(() => {
-    logTopNavFoundationExposureIfEnrolled();
     trackRendered();
   }, []);
 

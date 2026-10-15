@@ -136,6 +136,9 @@ const translationConstants = {
   /** Recommended experience events · API: VirtualEventRecommendation */
   recommendedExperienceEventsLabel: "Label.RecommendedExperienceEvents",
 
+  /** Recommended moments · API: TrendingMomentRecommendation */
+  recommendedMomentsLabel: "Label.RecommendedMoments",
+
   /** My experiences */
   myExperiences: "Label.MyExperiences",
   myExperiencesDescription: "Description.MyExperiences",
@@ -261,11 +264,17 @@ export const notificationTypePresentationByApiValue: Record<string, { labelKey: 
   VirtualEventRecommendation: {
     labelKey: translationConstants.recommendedExperienceEventsLabel,
   },
+  TrendingMomentRecommendation: {
+    labelKey: translationConstants.recommendedMomentsLabel,
+  },
   // Marketplace
   SpecialItem: {
     labelKey: translationConstants.recommendedItemsLabel,
   },
   CampaignOfferAvailable: {
+    labelKey: translationConstants.recommendedOffersLabel,
+  },
+  CampaignOfferAvailableV2: {
     labelKey: translationConstants.recommendedOffersLabel,
   },
   // RobloxPlatform (platform news)

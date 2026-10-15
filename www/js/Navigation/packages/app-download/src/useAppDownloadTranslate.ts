@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { TranslateFunction } from "@rbx/core-scripts/react";
 import { useTranslations } from "@rbx/www-common/i18n";
+import { appDownloadNamespaces } from "./constants";
 
 type TranslationValues = Record<string, string | number | Date>;
 
@@ -13,10 +14,15 @@ const toTranslationValues = (parameters?: Record<string, unknown>): TranslationV
     ),
   );
 
-// @rbx/app-download still takes the legacy merged translate; its keys span these two namespaces.
+/**
+ * The merged `translate` app-download's components take, read from the nearest `use-intl` provider,
+ * which must include `appDownloadNamespaces`. Feature.DownloadLanding wins over Common.VisitGame,
+ * like the legacy merged map.
+ */
 export const useAppDownloadTranslate = (): TranslateFunction => {
-  const tDownload = useTranslations("Feature.DownloadLanding");
-  const tVisitGame = useTranslations("Common.VisitGame");
+  const [downloadLanding, visitGame] = appDownloadNamespaces;
+  const tDownload = useTranslations(downloadLanding);
+  const tVisitGame = useTranslations(visitGame);
 
   return useMemo<TranslateFunction>(
     () => (key, parameters, fallbackString) => {

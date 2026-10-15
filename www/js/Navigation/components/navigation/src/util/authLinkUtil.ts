@@ -6,7 +6,7 @@ import {
   getNewLoginUrl,
   getAccountSwitchingSignUpUrl,
 } from "../constants/urlConstants";
-import { getIntAuthCompliancePolicy } from "../services/complianceService";
+import { getNavCapability } from "./navCapabilities";
 
 const getQueryParam = (paramName: string) =>
   UrlSearchParams.parse(window.location.search).get(paramName);
@@ -55,9 +55,10 @@ export const isLoginLinkAvailable = () => {
 };
 
 export const getIsVNGLandingRedirectEnabled = async () => {
+  const getIntAuthCompliancePolicy = getNavCapability("getIntAuthCompliancePolicy");
   try {
-    const intAuth = await getIntAuthCompliancePolicy();
-    return intAuth.isVNGComplianceEnabled ?? false;
+    const intAuth = await getIntAuthCompliancePolicy?.();
+    return intAuth?.isVNGComplianceEnabled ?? false;
   } catch {
     return false;
   }

@@ -7,6 +7,7 @@ import { queryClient, renderWithErrorBoundary, TranslationProvider } from "@rbx/
 import { Browser, currentBrowser } from "@rbx/core-scripts/util/current-browser";
 import { addExternal } from "@rbx/externals";
 import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
+import "./src/registerDotnetCapabilities";
 import { ageBadgeControl } from "./src/util/ageBadgeUtil";
 import LeftNavigation from "./src/leftNav";
 import NavigationRightHeader from "./src/containers/NavigationRightHeader";

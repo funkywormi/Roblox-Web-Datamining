@@ -1,7 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Should be removed / fixed once React Chat is out
 import angular from "angular";
-import { MouseEventHandler } from "react";
 import localStorageService from "@rbx/core-scripts/local-storage";
 import * as http from "@rbx/core-scripts/http";
 import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
@@ -106,12 +105,6 @@ const openAccountSwitcher = () => {
   tryOpenAccountSwitcherModal();
 };
 
-const switchAccount: MouseEventHandler = e => {
-  e.stopPropagation();
-  e.preventDefault();
-  openAccountSwitcher();
-};
-
 export {
   getSignupUrl,
   getLoginLinkUrl,
@@ -119,7 +112,6 @@ export {
   logoutAndRedirect,
   refreshCurrentSession,
   isLoginLinkAvailable,
-  switchAccount,
   openAccountSwitcher,
   getIsVNGLandingRedirectEnabled,
   navigateToLoginWithRedirect,

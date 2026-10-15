@@ -7,15 +7,23 @@ const NAV_ITEMS: { ids: string[]; navItem: string }[] = [
   { ids: ["header-develop-md-link", "header-develop-sm-link"], navItem: "create" },
 ];
 
-export const initNavClickEvents = () => {
+export const initNavClickEvents = (): (() => void) => {
+  const bound: [HTMLElement, () => void][] = [];
   NAV_ITEMS.forEach(({ ids, navItem }) => {
     ids.forEach(id => {
       const element = document.getElementById(id);
       if (element) {
-        element.addEventListener("click", () => {
+        const onClick = () => {
           sendEventWithTarget("navBarClick", "click", { nav_item: navItem }, targetTypes.WWW);
-        });
+        };
+        element.addEventListener("click", onClick);
+        bound.push([element, onClick]);
       }
     });
   });
+  return () => {
+    bound.forEach(([element, onClick]) => {
+      element.removeEventListener("click", onClick);
+    });
+  };
 };

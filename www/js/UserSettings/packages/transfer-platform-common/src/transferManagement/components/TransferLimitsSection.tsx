@@ -225,7 +225,7 @@ const TransferLimitsSection = ({
   higherLimitsIneligibilityReason,
   askParentRequest,
 }: TransferLimitsSectionProps): React.JSX.Element => {
-  const { translate } = useTranslation();
+  const { translate, intl } = useTranslation();
   const ineligibilityTranslationKey = getHigherLimitsIneligibilityTranslationKey(
     higherLimitsIneligibilityReason,
   );
@@ -250,7 +250,7 @@ const TransferLimitsSection = ({
           <span className="text-title-medium">{translate(translationConstants.dailyLimit)}</span>
           <div className="flex items-center gap-xsmall">
             <Icon name="icon-regular-robux" size="Small" />
-            <span className="text-body-medium">{dailyLimit.toLocaleString()}</span>
+            <span className="text-body-medium">{intl.n(dailyLimit)}</span>
           </div>
         </div>
         <div className="rbx-divider margin-none" />
@@ -258,7 +258,7 @@ const TransferLimitsSection = ({
           <span className="text-title-medium">{translate(translationConstants.monthlyLimit)}</span>
           <div className="flex items-center gap-xsmall">
             <Icon name="icon-regular-robux" size="Small" />
-            <span className="text-body-medium">{monthlyLimit.toLocaleString()}</span>
+            <span className="text-body-medium">{intl.n(monthlyLimit)}</span>
           </div>
         </div>
       </div>

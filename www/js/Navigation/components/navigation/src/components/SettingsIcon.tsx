@@ -11,12 +11,7 @@ export default function SettingsIcon({
   });
   return (
     <span id="settings-icon" className="nav-settings-icon rbx-menu-item" aria-hidden="true">
-      <NavIcon
-        legacyClass="icon-nav-settings roblox-popover-close"
-        name="icon-regular-gear"
-        size="XLarge"
-        id="nav-settings"
-      />
+      <NavIcon name="icon-regular-gear" size="XLarge" id="nav-settings" />
       <span className={notificationClasses}>{accountNotificationCount}</span>
     </span>
   );

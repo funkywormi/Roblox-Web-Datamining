@@ -23,9 +23,9 @@ import {
   sendPrimaryAppDownloadClickEvent,
   getDownloadLinkParams,
 } from "@rbx/app-download";
+import { useAppDownloadTranslate } from "@rbx/app-download/useAppDownloadTranslate";
 import { logDownloadModalExposure, useDownloadModalIxp } from "../util/postSignupDownloadModalIxp";
 import { sendSignupDownloadModalEvent } from "../util/postSignupDownloadModalEvent";
-import { useAppDownloadTranslate } from "../hooks/useAppDownloadTranslate";
 
 const headingTranslationKey = "Heading.GetTheRobloxApp";
 const subtitleTranslationKey = "Description.PlayExploreBuildAndMore";

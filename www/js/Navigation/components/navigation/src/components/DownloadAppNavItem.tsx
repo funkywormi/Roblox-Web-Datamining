@@ -13,8 +13,8 @@ import {
 import { DialogTitle } from "@rbx/foundation-ui";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import { useAppDownloadTranslate } from "@rbx/app-download/useAppDownloadTranslate";
 import { useTopNavDownloadButton } from "../util/topNavDownloadButtonIxp";
-import { useAppDownloadTranslate } from "../hooks/useAppDownloadTranslate";
 
 export default function DownloadAppNavItem() {
   const t = useTranslations("Feature.DownloadLanding");

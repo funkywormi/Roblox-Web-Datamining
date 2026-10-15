@@ -6,7 +6,6 @@ import { TIconProps } from "@rbx/foundation-ui";
 type BaseUniversalSearchLink = {
   url: string;
   pageSort: string[];
-  icon: string;
   foundationIcon: TIconProps["name"];
 };
 
@@ -19,14 +18,12 @@ const gameSearchLink = {
   url: getAbsoluteUrl("/discover/?keyword="),
   label: "Label.Games",
   pageSort: ["home", "games", "discover"],
-  icon: "icon-menu-games-off",
   foundationIcon: "icon-regular-circle-play",
 } satisfies UniversalSearchLink;
 
 const topSearchLink = {
   url: getAbsoluteUrl("/discover/?searchType=top&keyword="),
   pageSort: [],
-  icon: "icon-menu-games-off",
   foundationIcon: "icon-regular-circle-play",
   isTopSearchResult: true,
 } satisfies UniversalSearchLink;
@@ -35,7 +32,6 @@ const avatarSearchLink = {
   url: getAbsoluteUrl("/catalog?CatalogContext=1&keyword="),
   label: "Heading.Marketplace",
   pageSort: ["catalog", "inventory", "bundles", "my/avatar", "trades"],
-  icon: "icon-menu-shop",
   foundationIcon: "icon-regular-shopping-basket",
 } satisfies UniversalSearchLink;
 
@@ -43,7 +39,6 @@ const playersSearchLink = {
   url: getAbsoluteUrl("/search/users?keyword="),
   label: "Label.Players",
   pageSort: ["users"],
-  icon: "icon-menu-profile",
   foundationIcon: "icon-regular-person",
 } satisfies UniversalSearchLink;
 
@@ -54,7 +49,6 @@ const miscSearchLink: UniversalSearchLink[] = [
     url: getAbsoluteUrl("/search/communities?keyword="),
     label: "Label.sGroups",
     pageSort: ["groups"],
-    icon: "icon-menu-groups",
     foundationIcon: "icon-regular-three-people",
   },
   {
@@ -62,7 +56,6 @@ const miscSearchLink: UniversalSearchLink[] = [
     label: "Label.CreatorStore",
     pageSort: ["develop"],
     // Deviation: no foundation bookshelf glyph, so this follows the row's label.
-    icon: "icon-menu-library",
     foundationIcon: "icon-regular-building-store",
   },
 ];

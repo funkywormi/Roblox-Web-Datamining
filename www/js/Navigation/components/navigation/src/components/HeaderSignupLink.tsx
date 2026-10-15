@@ -2,24 +2,23 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { useTranslations } from "@rbx/www-common/i18n";
-import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
-import dataStores from "@rbx/core-scripts/data-store";
-import { getSignupUrl, getIsVNGLandingRedirectEnabled } from "../util/authUtil";
+import { getSignupUrl, getIsVNGLandingRedirectEnabled } from "../util/authLinkUtil";
 import { isAccountExperienceRevampEnabled } from "../util/accountExperienceUtils";
+import { getNavCapability } from "../util/navCapabilities";
 import Link from "./NavLink";
+
+const useNoAccountSwitcher = (): [boolean, boolean] => [false, false];
 
 export default function HeaderSignupLink() {
   const t = useTranslations("CommonUI.Features");
 
-  const [isAccountSwitchingEnabledForBrowser] =
-    AccountSwitcherService.useIsAccountSwitcherAvailableForBrowser();
+  const useIsAccountSwitcherAvailableForBrowser =
+    getNavCapability("useIsAccountSwitcherAvailableForBrowser") ?? useNoAccountSwitcher;
+  const [isAccountSwitchingEnabledForBrowser] = useIsAccountSwitcherAvailableForBrowser();
 
   useEffect(() => {
     try {
-      const {
-        authIntentDataStore: { saveGameIntentFromCurrentUrl },
-      } = dataStores;
-      saveGameIntentFromCurrentUrl();
+      getNavCapability("saveGameIntentFromCurrentUrl")?.();
     } catch (e) {
       console.error("Failed to save game intent from current url", e);
     }

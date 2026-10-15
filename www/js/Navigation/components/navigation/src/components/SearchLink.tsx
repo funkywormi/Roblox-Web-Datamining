@@ -45,7 +45,6 @@ export function AutocompleteSearchLink({
           onClick={onClick}
         >
           <NavIcon
-            legacyClass={gameSearchLink.icon}
             name={gameSearchLink.foundationIcon}
             size="Medium"
             className="navbar-list-option-icon"
@@ -86,7 +85,6 @@ export function AutocompleteSearchLink({
         onClick={onClick}
       >
         <NavIcon
-          legacyClass={gameSearchLink.icon}
           name={gameSearchLink.foundationIcon}
           size="Medium"
           className="navbar-list-option-icon"
@@ -125,7 +123,6 @@ export function AvatarAutocompleteSearchLink({
         onClick={onClick}
       >
         <NavIcon
-          legacyClass={avatarSearchLink.icon}
           name={avatarSearchLink.foundationIcon}
           size="Medium"
           className="navbar-list-option-icon"
@@ -154,7 +151,7 @@ export function SearchLink({
 }) {
   const t = useTranslations("CommonUI.Features");
 
-  const { url, label, icon, foundationIcon, isTopSearchResult } = suggestion;
+  const { url, label, foundationIcon, isTopSearchResult } = suggestion;
 
   const listClass = ClassNames("navbar-search-option rbx-clickable-li", {
     "new-selected": selected,
@@ -166,12 +163,7 @@ export function SearchLink({
         url={url + encodeURIComponent(searchInput)}
         onClick={onClick}
       >
-        <NavIcon
-          legacyClass={icon}
-          name={foundationIcon}
-          size="Medium"
-          className="navbar-list-option-icon"
-        />
+        <NavIcon name={foundationIcon} size="Medium" className="navbar-list-option-icon" />
         <span className="navbar-list-option-text">{searchInput.toLowerCase()}</span>
         {!isTopSearchResult && (
           <span className="navbar-list-option-suffix">

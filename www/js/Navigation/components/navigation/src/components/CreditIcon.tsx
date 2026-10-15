@@ -13,12 +13,7 @@ export default function CreditIcon({
 }) {
   const icon = (
     <Fragment>
-      <NavIcon
-        legacyClass="icon-menu-wallet roblox-popover-close"
-        name="icon-regular-wallet"
-        size="XLarge"
-        id="nav-credit-icon"
-      />
+      <NavIcon name="icon-regular-wallet" size="XLarge" id="nav-credit-icon" />
       <span className="rbx-text-navbar-right text-header" id="nav-robux-amount">
         {!creditError ? (
           <div

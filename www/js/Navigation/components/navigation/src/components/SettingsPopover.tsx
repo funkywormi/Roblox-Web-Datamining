@@ -2,16 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@rbx/core-scripts/react";
 import { useTranslations } from "@rbx/www-common/i18n";
-import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
 import { formatNumber } from "@rbx/core-scripts/format/number";
-import { Popover as CoreUiPopover } from "@rbx/core-ui";
 import { Popover as FoundationPopover, PopoverContent, PopoverTrigger } from "@rbx/foundation-ui";
 import SettingsIcon from "./SettingsIcon";
 import SettingsMenu from "./SettingsMenu";
-import { navNamespaces } from "../constants/translationNamespaces";
 import { sendAccountSwitcherBlobPresentOnPageLoadEvent } from "../services/eventService";
-import { useIsTopNavFoundation } from "../util/topNavFoundationIxp";
 import { popoverDismissGuard } from "../util/popoverDismissGuard";
 import { trackOpenToVisible } from "../topNav/observability";
 // disabling the metadata call since this is fully released.
@@ -24,7 +20,6 @@ export default function SettingsPopover({
   accountNotificationCount?: number;
 }) {
   const t = useTranslations("CommonUI.Features");
-  const isFoundation = useIsTopNavFoundation();
   const [isCrossDeviceLoginCodeValidationDisplayed, setCrossDeviceLoginCodeValidationDisplayed] =
     useState(false);
   const ref = useRef(null);
@@ -58,25 +53,10 @@ export default function SettingsPopover({
 
   const menu = (
     <QueryClientProvider client={queryClient}>
-      {isFoundation ? (
-        <SettingsMenu
-          isCrossDeviceLoginCodeValidationDisplayed={isCrossDeviceLoginCodeValidationDisplayed}
-          accountNotificationCount={accountNotificationCount}
-        />
-      ) : (
-        <TranslationProviderSCC namespaces={navNamespaces}>
-          <div>
-            <ul id="settings-popover-menu" className="dropdown-menu">
-              <SettingsMenu
-                isCrossDeviceLoginCodeValidationDisplayed={
-                  isCrossDeviceLoginCodeValidationDisplayed
-                }
-                accountNotificationCount={accountNotificationCount}
-              />
-            </ul>
-          </div>
-        </TranslationProviderSCC>
-      )}
+      <SettingsMenu
+        isCrossDeviceLoginCodeValidationDisplayed={isCrossDeviceLoginCodeValidationDisplayed}
+        accountNotificationCount={accountNotificationCount}
+      />
     </QueryClientProvider>
   );
 
@@ -91,46 +71,25 @@ export default function SettingsPopover({
     </button>
   );
 
-  if (isFoundation) {
-    return (
-      <li id="navbar-settings" ref={ref} className="navbar-icon-item">
-        <FoundationPopover
-          onOpenChange={open => {
-            if (open) {
-              trackOpenToVisible("Settings");
-            }
-          }}
-        >
-          <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-          <PopoverContent
-            side="bottom"
-            align="end"
-            ariaLabel={triggerLabel}
-            {...popoverDismissGuard(ref)}
-          >
-            {menu}
-          </PopoverContent>
-        </FoundationPopover>
-      </li>
-    );
-  }
-
   return (
     <li id="navbar-settings" ref={ref} className="navbar-icon-item">
-      <CoreUiPopover
-        id="settings-popover"
-        trigger="click"
-        placement="bottom"
-        containerPadding={20}
-        button={trigger}
-        container={ref.current}
-        onEnter={() => {
-          trackOpenToVisible("Settings");
+      <FoundationPopover
+        onOpenChange={open => {
+          if (open) {
+            trackOpenToVisible("Settings");
+          }
         }}
-        role="menu"
       >
-        {menu}
-      </CoreUiPopover>
+        <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+        <PopoverContent
+          side="bottom"
+          align="end"
+          ariaLabel={triggerLabel}
+          {...popoverDismissGuard(ref)}
+        >
+          {menu}
+        </PopoverContent>
+      </FoundationPopover>
     </li>
   );
 }

@@ -7,7 +7,6 @@ import { ValueOf } from "@rbx/core-types";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { useTranslations } from "@rbx/www-common/i18n";
 import localStorageService from "@rbx/core-scripts/local-storage";
-import { createSystemFeedback } from "@rbx/core-ui";
 import { Snackbar } from "@rbx/foundation-ui";
 import {
   getUserCurrency,
@@ -25,9 +24,6 @@ import AgeBracketDisplay from "../components/AgeBracketDisplay";
 import layoutConstants from "../constants/layoutConstants";
 import RobuxBadgeType from "../constants/robuxBadgeConstants";
 import { shouldShowRobuxUpdateBadge } from "../util/robuxBadgeUtil";
-import { useIsTopNavFoundation } from "../util/topNavFoundationIxp";
-
-const [SystemFeedback, systemFeedbackService] = createSystemFeedback();
 
 export default function HeaderIconsGroup({
   toggleUniverseSearch,
@@ -39,7 +35,6 @@ export default function HeaderIconsGroup({
   const tFeatures = useTranslations("CommonUI.Features");
   const user = authenticatedUser();
   const userId = user?.id;
-  const isFoundation = useIsTopNavFoundation();
   const streamItemRef = useRef<HTMLLIElement>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
   const [accountNotificationCount, setAccountNotificationCount] = useState(0);
@@ -201,15 +196,7 @@ export default function HeaderIconsGroup({
             layoutConstants.accountSwitchConfirmationKeys.accountSwitchedMessage,
             { accountName: user.name ?? "" },
           );
-          if (isFoundation) {
-            setSnackbarMessage(accountSwitchedMessage);
-          } else {
-            systemFeedbackService.success(
-              accountSwitchedMessage,
-              0 /* show delay */,
-              5000 /* banner duration */,
-            );
-          }
+          setSnackbarMessage(accountSwitchedMessage);
           localStorageService.removeLocalStorage(
             layoutConstants.accountSwitchConfirmationKeys.accountSwitchedFlag,
           );
@@ -254,21 +241,17 @@ export default function HeaderIconsGroup({
 
   return (
     <ul className="[&>li]:relative navbar-right rbx-navbar-icon-group">
-      {isFoundation ? (
-        snackbarMessage != null && (
-          <Snackbar
-            title={snackbarMessage}
-            icon="icon-filled-check"
-            shouldAutoDismiss
-            autoDismissDurationMs={5000}
-            onClose={() => {
-              setSnackbarMessage(null);
-            }}
-            closeIconAriaLabel={tFeatures("Action.Close")}
-          />
-        )
-      ) : (
-        <SystemFeedback />
+      {snackbarMessage != null && (
+        <Snackbar
+          title={snackbarMessage}
+          icon="icon-filled-check"
+          shouldAutoDismiss
+          autoDismissDurationMs={5000}
+          onClose={() => {
+            setSnackbarMessage(null);
+          }}
+          closeIconAriaLabel={tFeatures("Action.Close")}
+        />
       )}
       <DownloadAppNavItem />
       <AgeBracketDisplay />

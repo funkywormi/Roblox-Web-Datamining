@@ -8,7 +8,6 @@ import { isAuthenticated } from "@rbx/core-scripts/meta/user";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import { createFireTelemetryHistogram } from "@rbx/web-telemetry/v2/histogram";
 import { createWithApiMetrics } from "../../util/apiMetrics";
-import { getIsTopNavFoundationEnabled } from "../../util/topNavFoundationIxp";
 
 export const observabilityRegistry = {
   featureName: "TopNav",
@@ -57,7 +56,7 @@ export const TopNavErrorBoundary = createObsErrorBoundary({
 });
 
 export const getDimensions = () => ({
-  variant: getIsTopNavFoundationEnabled() ? "FOUNDATION" : "CORE_UI",
+  variant: "FOUNDATION",
   authState: isAuthenticated() ? "LOGGED_IN" : "LOGGED_OUT",
   deviceType: getDeviceMeta()?.deviceType || "unknown",
 });
