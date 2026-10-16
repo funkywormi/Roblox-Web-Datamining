@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { createModal, Button } from "react-style-guide";
 import { withTranslations, WithTranslationsProps } from "react-utilities";
 import { paymentFlowAnalyticsService } from "core-roblox-utilities";
+import { window } from "@rbx/core-lib/browser";
 import { BillingInfoForm, type Address } from "@rbx/payments/billingAddress";
 import { apiErrorStatusCode, trackError } from "../../../observability";
 import { TRANSLATION_KEYS } from "../../constants/redeemConstants";
@@ -62,8 +63,8 @@ const ConvertCreditModal: React.FC<ConvertCreditModalProps> = ({ translate }) =>
   }, [isConvertModalOpen, isTaxFlowEnabled]);
 
   const triggerFiatCreditRendering = useCallback(() => {
-    window.dispatchEvent(
-      new CustomEvent("price-tag:render", {
+    window?.dispatchEvent(
+      new window.CustomEvent("price-tag:render", {
         detail: {
           targetSelector: ".fiat-price-tag",
         },

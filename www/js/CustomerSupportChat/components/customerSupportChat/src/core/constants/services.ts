@@ -7,7 +7,9 @@ export type APIMethod =
   | "fetchAccountSettingsV1"
   | "validateUsername"
   | "fetchChatConfigPayload"
-  | "fetchC3ChatConfigPayload";
+  | "fetchC3ChatConfigPayload"
+  | "askQuestion"
+  | "startAskChat";
 export type APISet = { url: string; retryable: boolean; withCredentials: boolean };
 export type APISets = Record<APIMethod, APISet>;
 
@@ -46,5 +48,15 @@ export const apiSet: APISets = {
     url: `${EnvironmentUrls.apiGatewayUrl}/chatbot-api/v1/chat-config-payload`,
     retryable: true,
     withCredentials: false,
+  },
+  askQuestion: {
+    url: "/support/ask",
+    retryable: false,
+    withCredentials: true,
+  },
+  startAskChat: {
+    url: "/support/ask/chat",
+    retryable: false,
+    withCredentials: true,
   },
 };

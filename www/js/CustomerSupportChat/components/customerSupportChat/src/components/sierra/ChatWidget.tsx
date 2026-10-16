@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import classNames from "classnames";
 import { WithTranslationsProps, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
 
 import { supportChatTranslationConfig } from "../../app.config";
@@ -13,7 +12,6 @@ const ChatWidget: React.FC<WithTranslationsProps> = ({ translate: t }) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const guardianApprovalId = (queryParams.get("guardianApprovalId") || "").trim();
-  const [isParentScrollDisabled, setIsParentScrollDisabled] = useState(false);
 
   // Custom hook for Sierra SDK state management
   const { setIsSDKLoaded, isLoading, hasSDKLoadError } = useSierra(guardianApprovalId);
@@ -27,11 +25,7 @@ const ChatWidget: React.FC<WithTranslationsProps> = ({ translate: t }) => {
   useSierraChatRouteRedirect(guardianApprovalId, hasSDKLoadError);
 
   return (
-    <div
-      className={classNames("mx-0 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-64", {
-        "overflow-hidden": isParentScrollDisabled,
-      })}
-    >
+    <div className="mx-0 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-64">
       <SDKLoader
         onLoad={() => {
           setIsSDKLoaded(true);
@@ -50,26 +44,9 @@ const ChatWidget: React.FC<WithTranslationsProps> = ({ translate: t }) => {
           <br className="mt-6" />
           <div
             id="chatParentWrapper"
-            className={classNames(
-              "section-content m-0 min-h-[50vh] chat-parent-container animate-fadeIn rounded-md",
-              {
-                "overflow-y-scroll": isParentScrollDisabled,
-              },
-            )}
-            // Disable parent scrollbar when hovering over the chat window
-            onMouseEnter={() => {
-              setIsParentScrollDisabled(true);
-            }}
-            onMouseLeave={() => {
-              setIsParentScrollDisabled(false);
-            }}
+            className="section-content m-0 min-h-[50vh] chat-parent-container animate-fadeIn rounded-md"
           >
-            <div
-              id="chatWrapper"
-              className={classNames("chat-container rounded-md", {
-                "overflow-y-scroll": isParentScrollDisabled,
-              })}
-            />
+            <div id="chatWrapper" className="chat-container rounded-md" />
           </div>
         </div>
       </div>

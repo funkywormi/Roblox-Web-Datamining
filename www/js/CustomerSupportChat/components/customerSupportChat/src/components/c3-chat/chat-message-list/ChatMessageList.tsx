@@ -13,21 +13,24 @@ type ChatMessageListProps = {
   c3Messages: C3ChatMessage[];
   isProccessingResponse?: boolean;
   removeRbxLogo?: boolean;
+  children?: React.ReactNode;
 };
 
 const ChatMessageList: React.FC<ChatMessageListProps> = ({
   c3Messages,
   isProccessingResponse,
   removeRbxLogo,
+  children,
 }) => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const hasTrailingContent = Boolean(children);
 
   useEffect(() => {
     // Scroll to the bottom when messages change
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [c3Messages]); // Depend on messages to scroll on update
+  }, [c3Messages, isProccessingResponse, hasTrailingContent]);
 
   return (
     <div className="c3-chat-messages-container">
@@ -62,6 +65,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
             removeParticipantLogo={removeRbxLogo}
           />
         )}
+        {children}
       </div>
     </div>
   );

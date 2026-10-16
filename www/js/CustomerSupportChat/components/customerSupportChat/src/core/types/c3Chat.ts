@@ -15,6 +15,12 @@ export type C3ChatMessage = C3Interaction & {
 
 export type C3GetChatMessagesResponse = C3Interaction[];
 
+export type C3FeedbackRating = 1 | 2 | 3 | 4 | 5;
+
+export type C3ConversationUpdate = {
+  feedbackRating?: C3FeedbackRating;
+};
+
 export type C3ChatMetadataPayload = {
   firstUserInteraction: C3Interaction;
   conversationId: string;

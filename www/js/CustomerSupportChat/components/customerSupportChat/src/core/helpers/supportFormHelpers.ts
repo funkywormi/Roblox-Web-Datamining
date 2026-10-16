@@ -49,7 +49,10 @@ export const isUsernameRequiredForCategory = (helpCategoryType?: string): boolea
   return USERNAME_REQUIRED_CATEGORIES.includes(helpCategoryType);
 };
 
-const emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+// Dots must separate non-empty labels. EmailAddressesAPI rejects addresses
+// like "user..name@example.com" after the form would otherwise submit them.
+const emailRegex =
+  "^[a-zA-Z0-9_%+-]+(?:\\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$";
 
 export const isValidEmail = (email: string): boolean => {
   const re = new RegExp(emailRegex);

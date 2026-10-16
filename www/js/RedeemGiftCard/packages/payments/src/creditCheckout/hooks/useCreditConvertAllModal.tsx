@@ -4,6 +4,14 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button, createModal, IModalService, TSystemFeedbackService } from "react-style-guide";
 import { paymentFlowAnalyticsService } from "core-roblox-utilities";
 import { urlService } from "core-utilities";
+import { usePaymentSession } from "@rbx/payments/services/paymentSession";
+import { BillingInfoForm, type Address } from "@rbx/payments/billingAddress";
+import {
+  createTaxData,
+  processPaymentWithCommonHandling,
+  PaymentResult,
+} from "@rbx/payments/utils";
+import { window } from "@rbx/core-lib/browser";
 import {
   COUNTER_METRICS,
   SYSTEM_FEEDBACK_CONFIG,
@@ -17,14 +25,7 @@ import {
   sendProcessPaymentStatusEvent,
   sendUpdateAddressForCheckoutSessionStatusEvent,
 } from "../services/redeemGiftCardService";
-import { usePaymentSession } from "@rbx/payments/services/paymentSession";
 import type { Money } from "../constants/typeDefinitions";
-import { BillingInfoForm, type Address } from "@rbx/payments/billingAddress";
-import {
-  createTaxData,
-  processPaymentWithCommonHandling,
-  PaymentResult,
-} from "@rbx/payments/utils";
 import PriceTag from "../../priceTag/components/PriceTag";
 import { TaxDisplay } from "../components/HeuristicConvertedToCredit/TaxDisplay";
 import {
@@ -226,7 +227,7 @@ const createCreditConvertAllModal = (): [
           SYSTEM_FEEDBACK_CONFIG.TIMEOUT_HIDE_MS,
         );
         modalService.close();
-        if (redirect) {
+        if (redirect && window) {
           window.location.href = urlService.getAbsoluteUrl("/upgrades/robux");
         }
       },

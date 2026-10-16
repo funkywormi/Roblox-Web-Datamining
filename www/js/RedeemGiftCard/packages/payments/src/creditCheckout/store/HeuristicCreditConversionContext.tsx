@@ -12,6 +12,14 @@ import React, {
 import { TranslateFunction } from "react-utilities";
 import { TSystemFeedbackService } from "react-style-guide";
 import { urlService } from "core-utilities";
+import type { Address } from "@rbx/payments/billingAddress";
+import { usePaymentSession } from "@rbx/payments/services/paymentSession";
+import {
+  createTaxData,
+  processPaymentWithCommonHandling,
+  PaymentResult,
+} from "@rbx/payments/utils";
+import { window } from "@rbx/core-lib/browser";
 import {
   getNextPurchasableMetadata,
   processPayment as redeemProcessPayment,
@@ -24,8 +32,6 @@ import {
   updateAddressForCheckoutSession,
   processPayment,
 } from "../services/CreditBalancePaymentService";
-import type { Address } from "@rbx/payments/billingAddress";
-import { usePaymentSession } from "@rbx/payments/services/paymentSession";
 import Constants from "../constants/Constants";
 import {
   COUNTER_METRICS,
@@ -37,11 +43,6 @@ import {
   isEconomicRestrictionError,
   getEconomicRestrictionErrorMsg,
 } from "../utils/economicRestrictionError";
-import {
-  createTaxData,
-  processPaymentWithCommonHandling,
-  PaymentResult,
-} from "@rbx/payments/utils";
 import { TProcessPayment, TNextPurchasableMetadata } from "../constants/redeemTypeDefinitions";
 import { ErrorUtils } from "../utils/errorUtils";
 import { createApiCaller } from "../utils/paymentsApiCaller";
@@ -220,7 +221,7 @@ export const HeuristicCreditConversionContext: FC<
       );
       setIsPurchaseModalOpen(false);
       setIsConvertModalOpen(false);
-      if (redirect) {
+      if (redirect && window) {
         window.location.href = urlService.getAbsoluteUrl("/upgrades/robux");
       }
     },

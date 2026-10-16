@@ -4,6 +4,8 @@ import {
   REDEMPTION_STATUS_REQUEST_TIMEOUT_MS,
   REDEMPTION_STATUS_POLL_TIMEOUT_MS,
   REDEMPTION_STATUS_POLL_INTERVAL_MS,
+  REDEMPTION_STATUS_FAST_POLLS,
+  REDEMPTION_STATUS_MAX_POLL_INTERVAL_MS,
   REDEMPTION_POLL_OUTCOMES,
   REDEMPTION_STATUS_FAILURE_REASONS,
 } from "./redemptionStatusConstants";
@@ -46,6 +48,12 @@ const delay = (ms: number): Promise<void> =>
   new Promise(resolve => {
     setTimeout(resolve, ms);
   });
+
+const getPollIntervalMs = (polls: number): number =>
+  Math.min(
+    REDEMPTION_STATUS_POLL_INTERVAL_MS * 2 ** Math.max(0, polls - REDEMPTION_STATUS_FAST_POLLS),
+    REDEMPTION_STATUS_MAX_POLL_INTERVAL_MS,
+  );
 
 export const isTerminalRedemptionState = (state: RedemptionState | null): boolean =>
   state === null || TERMINAL_REDEMPTION_STATES.includes(state);
@@ -196,7 +204,7 @@ export const pollRedemptionStatus = async ({
     const pollRemainingMs = deadline - Date.now();
     if (pollRemainingMs > 0) {
       // eslint-disable-next-line no-await-in-loop
-      await delay(Math.min(REDEMPTION_STATUS_POLL_INTERVAL_MS, pollRemainingMs));
+      await delay(Math.min(getPollIntervalMs(polls), pollRemainingMs));
     }
   }
 

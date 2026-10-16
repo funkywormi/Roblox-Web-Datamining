@@ -119,4 +119,11 @@ export type SupportMetaData = {
   usernameCheckUrl?: string | null;
   isRobloxEmployee?: boolean;
   isEmailVerificationRequired?: boolean;
+  /** Whether the user gets the new support experience. Always true for employees. */
+  isNewSupportExperienceEnabled?: boolean;
+  /**
+   * Main-category names that can continue in a chatbot. From a subsite setting.
+   * Missing or empty means no category offers a chat.
+   */
+  chatbotFlowCategories?: string[];
 };

@@ -4,7 +4,7 @@ import { TranslateFunction } from "react-utilities";
 import { Modal } from "react-style-guide";
 import { Button } from "@rbx/foundation-ui";
 import { scanGiftCard, trackCounter, trackError } from "@rbx/payments/creditCheckout";
-import cutoutBorderSvg from "@rbx/payments/src/assets/images/redeemGiftCard/cutout-border.svg";
+import cutoutBorderSvg from "@rbx/payments-legacy/assets/images/redeemGiftCard/cutout-border.svg";
 import { redeemGiftCardURL } from "../constants/redeemGiftCardConstants";
 
 const HORIZONTAL_OFFSET_PX = 29;

@@ -2,6 +2,7 @@
 
 import { arrayIncludes } from "@rbx/core-types";
 import * as cookie from "@rbx/core-lib/cookie";
+import type { LocalStorageRegistry } from "@rbx/core-lib/local-storage";
 import "@rbx/www-common/global";
 
 // Note: "modes" used to be called "themes". So for legacy reasons, some things still refer to "themes":
@@ -14,11 +15,9 @@ export type Mode = (typeof modes)[number];
 
 export const defaultMode = "light" as const satisfies Mode;
 
-// [user id, mode index, flags?] — flags is optional for entries written before it existed.
-type ModeEntry = [number, number] | [number, number, number];
-type ModeData = ModeEntry[];
-
-type LocalStorageData = { version: 0; data: ModeData } | { version: 1; data: unknown };
+type LocalStorageData = LocalStorageRegistry["theme"];
+type ModeData = (LocalStorageData & { version: 0 })["data"];
+type ModeEntry = ModeData[number];
 
 const maxUsers = 100;
 
@@ -187,7 +186,7 @@ export type InitializeOptions = {
 
 export const initialize = (currentUserId: number, options: InitializeOptions = {}): void => {
   const { classList } = document.body;
-  if (classList.contains("color-mode-system")) {
+  if (classList.contains("color-mode-system") || classList.contains("system-theme")) {
     setModeWithoutLocalStorage("system");
     return;
   }

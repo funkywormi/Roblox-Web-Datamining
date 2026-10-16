@@ -3,8 +3,9 @@ export const REDEMPTION_STATUS_REQUEST_TIMEOUT_MS = 1000;
 
 export const REDEMPTION_STATUS_POLL_INTERVAL_MS = 250;
 
-// Show the pending-redemption message after at most 7s, including request time.
-export const REDEMPTION_STATUS_POLL_TIMEOUT_MS = 7000;
+export const REDEMPTION_STATUS_FAST_POLLS = 5;
+export const REDEMPTION_STATUS_MAX_POLL_INTERVAL_MS = 1000;
+export const REDEMPTION_STATUS_POLL_TIMEOUT_MS = 15000;
 
 export const REDEMPTION_STATUS_FAILURE_REASONS = {
   BadRequest: "bad_request",

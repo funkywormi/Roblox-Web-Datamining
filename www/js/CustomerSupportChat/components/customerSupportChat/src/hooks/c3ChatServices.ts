@@ -1,11 +1,24 @@
-import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query";
+import { UseMutationResult, UseQueryResult, useMutation, useQuery } from "@tanstack/react-query";
 import EnvironmentUrls from "@rbx/environment-urls";
 import { httpService, uuidService } from "@rbx/core-scripts/legacy/core-utilities";
 import type { UrlConfig } from "@rbx/core-scripts/http";
-import { C3GetChatMessagesResponse, C3Interaction } from "../core/types/c3Chat";
+import {
+  C3ConversationUpdate,
+  C3GetChatMessagesResponse,
+  C3Interaction,
+} from "../core/types/c3Chat";
 
 const CHAT_MESSAGES_REFETCH_INTERVAL = 500;
 const CHAT_MESSAGE_POST_RETRIES = 3;
+const CONVERSATION_PATCH_RETRIES = 1;
+
+// httpService rejects with the HTTP response, or undefined when no response was received.
+const isTransientHttpError = (error: unknown): boolean =>
+  typeof error !== "object" ||
+  error === null ||
+  !("status" in error) ||
+  typeof error.status !== "number" ||
+  error.status >= 500;
 
 const buildGetMessageUrlConfig = (conversationId: string): UrlConfig => {
   return {
@@ -19,6 +32,14 @@ const buildPostMessageUrlConfig = (conversationId: string): UrlConfig => {
   return {
     url: `${EnvironmentUrls.apiGatewayUrl}/chatbot-api/v1/conversations/${conversationId}/interaction`,
     retryable: true,
+    withCredentials: false,
+  };
+};
+
+const buildPatchConversationUrlConfig = (conversationId: string): UrlConfig => {
+  return {
+    url: `${EnvironmentUrls.apiGatewayUrl}/chatbot-api/v1/conversations/${conversationId}`,
+    retryable: false,
     withCredentials: false,
   };
 };
@@ -73,4 +94,21 @@ export const usePostChatMessage = (
   };
 };
 
-export { buildGetMessageUrlConfig, buildPostMessageUrlConfig };
+export const usePatchConversation = (
+  conversationId: string,
+  conversationAuthToken: string,
+): UseMutationResult<unknown, Error, C3ConversationUpdate> => {
+  return useMutation({
+    mutationFn: async (update: C3ConversationUpdate) => {
+      const { data } = await httpService.patch(buildPatchConversationUrlConfig(conversationId), {
+        ...update,
+        conversationAuthToken,
+      });
+      return data;
+    },
+    retry: (failureCount, error) =>
+      failureCount < CONVERSATION_PATCH_RETRIES && isTransientHttpError(error),
+  });
+};
+
+export { buildGetMessageUrlConfig, buildPostMessageUrlConfig, buildPatchConversationUrlConfig };

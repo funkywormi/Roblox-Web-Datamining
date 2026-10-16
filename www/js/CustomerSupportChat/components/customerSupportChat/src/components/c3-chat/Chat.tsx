@@ -9,6 +9,7 @@ import { SupportContext } from "../../providers/SupportContextProvider";
 import { C3ChatMetadataPayload } from "../../core/types/c3Chat";
 import useChat from "../../hooks/useC3Chat";
 import ChatInput from "./chat-input/ChatInput";
+import ChatFeedback from "./chat-feedback/ChatFeedback";
 import "./Chat.scss";
 import useGetC3ChatConfigPayload from "../../hooks/useGetC3ChatConfigPayload";
 
@@ -32,6 +33,7 @@ type ChatProps = {
  */
 const Chat: React.FC<ChatProps> = ({ c3ChatConfig: chatConfig, removeRbxLogo }) => {
   const { translate: t } = useTranslation();
+  const { metadata } = useContext(SupportContext);
 
   const { messages, handleSendMessage, isChatEnded, waitingForResponse } = useChat(chatConfig);
   const headerText = isChatEnded ? t("Chat.Description.ThankYou") : t("Chat.Header.CTATitle");
@@ -44,7 +46,16 @@ const Chat: React.FC<ChatProps> = ({ c3ChatConfig: chatConfig, removeRbxLogo }) 
             c3Messages={messages}
             isProccessingResponse={waitingForResponse}
             removeRbxLogo={removeRbxLogo}
-          />
+          >
+            {isChatEnded && (
+              <ChatFeedback
+                conversationId={chatConfig.conversationId}
+                conversationAuthToken={chatConfig.conversationAuthToken}
+                isRobloxEmployee={metadata?.isRobloxEmployee}
+                removeRbxLogo={removeRbxLogo}
+              />
+            )}
+          </ChatMessageList>
           {isChatEnded ? (
             <div className="c3-chat-ended-message-container">
               {t("Chat.Description.ConversationEnded")}
@@ -54,6 +65,9 @@ const Chat: React.FC<ChatProps> = ({ c3ChatConfig: chatConfig, removeRbxLogo }) 
           )}
         </div>
       </div>
+      <p className="c3-chat-ai-disclaimer" data-testid="c3-chat-ai-disclaimer">
+        {t("Chat.Disclaimer.AIConversationMayMakeMistakes")}
+      </p>
     </SupportPageContainer>
   );
 };

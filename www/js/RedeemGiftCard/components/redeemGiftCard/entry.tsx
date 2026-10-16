@@ -2,9 +2,9 @@ import ready from "@rbx/core-scripts/util/ready";
 import { renderWithErrorBoundary } from "@rbx/core-scripts/react";
 
 import "./src/main.css";
-import "@rbx/payments/styles/redeemGiftCard/redeemGiftCard.scss";
-import "@rbx/payments/styles/redeemGiftCard/convertCredit.scss";
-import "@rbx/payments/styles/redeemGiftCard/giftCardCurrencyConversion.scss";
+import "@rbx/payments-legacy/styles/redeemGiftCard/redeemGiftCard.scss";
+import "@rbx/payments-legacy/styles/redeemGiftCard/convertCredit.scss";
+import "@rbx/payments-legacy/styles/redeemGiftCard/giftCardCurrencyConversion.scss";
 import { trackCriticalError } from "@rbx/payments/creditCheckout";
 import App from "./src/App";
 

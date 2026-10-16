@@ -63,9 +63,14 @@ function isFirstPartyHost(hostWithPort: string): boolean {
 }
 
 type NoiseEvent = {
+  message?: string;
   breadcrumbs?: { message?: string; data?: JsonSerializable }[];
   exception?: {
-    values?: { type?: string; value?: string }[];
+    values?: {
+      type?: string;
+      value?: string;
+      stacktrace?: { frames?: { filename?: string; function?: string }[] };
+    }[];
   };
 };
 
@@ -101,4 +106,44 @@ export function isNoiseEvent(event: NoiseEvent): boolean {
     return true;
   }
   return isThirdPartyNetworkError(event);
+}
+
+/** Events kept per distinct error; a render-loop bug otherwise sends one per occurrence. */
+const MAX_EVENTS_PER_ERROR = 3;
+/** Events kept per page load across all errors. */
+const MAX_EVENTS_PER_PAGE = 50;
+
+function errorKey(event: NoiseEvent): string {
+  const values = event.exception?.values;
+  const exception = values?.[values.length - 1];
+  if (exception == null) return event.message ?? "";
+  // Sentry lists frames oldest first, so the last one is where the error was thrown. Including
+  // it keeps the same message from different code as separate errors.
+  const frames = exception.stacktrace?.frames;
+  const frame = frames?.[frames.length - 1];
+  const location = frame == null ? "" : ` @ ${frame.filename ?? ""}:${frame.function ?? ""}`;
+  return `${exception.type ?? ""}: ${exception.value ?? ""}${location}`;
+}
+
+/**
+ * Returns a check that is true once an error repeats past the per-error cap, or once the
+ * page has sent its total budget. Counts live for the page (one per Sentry init), so each
+ * issue still records the users it affects but not every repeat from the same page.
+ * Call from `beforeSend` after the noise checks and return null when true.
+ */
+export function createRepeatCap(
+  maxPerError = MAX_EVENTS_PER_ERROR,
+  maxPerPage = MAX_EVENTS_PER_PAGE,
+): (event: NoiseEvent) => boolean {
+  const counts = new Map<string, number>();
+  let total = 0;
+  return event => {
+    if (total >= maxPerPage) return true;
+    const key = errorKey(event);
+    const count = counts.get(key) ?? 0;
+    if (count >= maxPerError) return true;
+    counts.set(key, count + 1);
+    total += 1;
+    return false;
+  };
 }

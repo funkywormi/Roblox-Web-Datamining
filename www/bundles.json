@@ -286,7 +286,7 @@
         },
         {
             "name": "Authentication.Login",
-            "url": "https://js.rbxcdn.com/53bbea54ead72f241da4fc9e3e3ee413bfba9855afe0c2c1556561e0acb58493.js",
+            "url": "https://js.rbxcdn.com/e2bf41b9b72c275c556241dd5fc804cb29f5183e6255a49509d535e672b08091.js",
             "sources": [
                 "/home",
                 "/",
@@ -3259,7 +3259,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/cb2f51a6cae46a5386da2ca3b6877ca0514ccaa0978ea8712157628bfce69565.js",
+            "url": "https://js.rbxcdn.com/d73752a7787317b81a27f5b6fefebcc89d5b264925d57147d72abc4c84b80c5e.js",
             "sources": [
                 "/home",
                 "/",
@@ -3371,7 +3371,7 @@
         },
         {
             "name": "Feature.SafetyDashboard",
-            "url": "https://js.rbxcdn.com/027d4792a12a28a483edb3fff9d29988977fe24ce726daf3fc5fef40516bd920.js",
+            "url": "https://js.rbxcdn.com/b2a197e567631ae3378fee577af35cebe80593f372b8dd643d916df50f43f34c.js",
             "sources": [
                 "/help-safety",
                 "/safety-dashboard"
@@ -4761,7 +4761,7 @@
         },
         {
             "name": "CustomerSupportChat",
-            "url": "https://js.rbxcdn.com/efd9847951071850c671ef6dee095e9e229e1cce3c2d80019b90cbc245e20cec-CustomerSupportChat.js",
+            "url": "https://js.rbxcdn.com/231929ee421610329f96885f49c6af702236056080ac94d50f5cfea8e6d89cd8-CustomerSupportChat.js",
             "sources": [
                 "/support"
             ]
@@ -6131,7 +6131,7 @@
         },
         {
             "name": "RedeemGiftCard",
-            "url": "https://js.rbxcdn.com/a24ced3ac57e19b79d6f26b40fa694051efd0691b53098839c55b4ec0249591c-RedeemGiftCard.js",
+            "url": "https://js.rbxcdn.com/76bcc1ab19f86f4bf3dc4b19f4fbb37d7395a75f1722e337a4a67f9c36e97212-RedeemGiftCard.js",
             "sources": [
                 "/redeem"
             ]
@@ -6353,7 +6353,7 @@
         },
         {
             "name": "Sentry",
-            "url": "https://js.rbxcdn.com/4700f336c23b9b7698bcf476db8b075d7376d115ccad9468f219a84a792f0bae-Sentry.js",
+            "url": "https://js.rbxcdn.com/61835f7b25c66e6463cc3e247c6c06759099f39808aee1a9f87dc9fa05f2c0da-Sentry.js",
             "sources": [
                 "/home",
                 "/",
@@ -6556,7 +6556,7 @@
         },
         {
             "name": "Theme",
-            "url": "https://js.rbxcdn.com/72eb37c4500a109d17fb01e17a587eca0458cb66f115dd7ac2acc2d76dd4d722-Theme.js",
+            "url": "https://js.rbxcdn.com/5d8d12e4aa148f8e3c9d3fbc66c922e54e2354d4fbe3a1237fb7c6d7491fae40-Theme.js",
             "sources": [
                 "/home",
                 "/",
@@ -7450,7 +7450,7 @@
         },
         {
             "name": "CustomerSupportChat",
-            "url": "https://css.rbxcdn.com/f450cb7c94d14a99e46bc6ac391251157a138c58ff20f619245048de3e424c06-CustomerSupportChat.css",
+            "url": "https://css.rbxcdn.com/cf8574139e6a1a2a0e40c7dd3f9a5c0bb5ee36520244d658bd5d60d5a61c0dd5-CustomerSupportChat.css",
             "sources": [
                 "/support"
             ]
