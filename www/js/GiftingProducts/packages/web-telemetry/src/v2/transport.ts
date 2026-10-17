@@ -1,7 +1,14 @@
 /* eslint-disable no-restricted-globals -- raw fetch for keepalive + binary protobuf */
 import environmentUrls from "@rbx/environment-urls";
 
-export const BASE_URL = `${environmentUrls.apiGatewayUrl.replace(/\/$/, "")}/experience-signals-ingest/public`;
+let baseUrl: string | undefined;
+
+// Resolved on first send, not at import: consumers are imported before the
+// environment URLs global is populated.
+function getBaseUrl(): string {
+  baseUrl ??= `${environmentUrls.apiGatewayUrl.replace(/\/$/, "")}/experience-signals-ingest/public`;
+  return baseUrl;
+}
 
 const noop = (): void => undefined;
 
@@ -35,7 +42,7 @@ export async function compress(
 }
 
 export function sendRaw(path: string, body: ArrayBuffer): void {
-  fetch(`${BASE_URL}${path}`, {
+  fetch(`${getBaseUrl()}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/x-protobuf" },
     body,
@@ -51,7 +58,7 @@ export function sendCompressed(path: string, data: Uint8Array): void {
       if (compressed) {
         headers["Content-Encoding"] = "gzip";
       }
-      return fetch(`${BASE_URL}${path}`, {
+      return fetch(`${getBaseUrl()}${path}`, {
         method: "POST",
         headers,
         body,

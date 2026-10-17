@@ -80,15 +80,13 @@ export function getFormattedAmount({
     formattedAmount = Intl.NumberFormat(locale, formatOptions as Intl.NumberFormatOptions).format(
       amountAbs,
     );
-  } catch (e) {
-    trackCriticalError(
-      "PriceTag_NumberFormatLocaleException",
-      {
-        currencyCode: getCurrencyCodeDimension(currencyCode),
-        internalPageName: getInternalPageName() ?? "unknown",
-      },
-      e,
-    );
+  } catch {
+    // These caught formatting errors are flooding Sentry. Omit the exception to
+    // keep critical-severity metrics and dimensions in Grafana without Sentry capture.
+    trackCriticalError("PriceTag_NumberFormatLocaleException", {
+      currencyCode: getCurrencyCodeDimension(currencyCode),
+      internalPageName: getInternalPageName() ?? "unknown",
+    });
   }
   return {
     formattedAmount,

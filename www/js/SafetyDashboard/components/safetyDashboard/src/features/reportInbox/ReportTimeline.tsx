@@ -12,10 +12,10 @@ const ReportTimeline = ({ details }: { details: Details }) => {
           <TimelineItem
             key={activity.id}
             title={activity.title}
-            description={activity.metadata}
+            description={activity.description}
             icon="icon-regular-middle-dot"
           >
-            <span className="text-body-small">{activity.description}</span>
+            <span className="text-body-small">{activity.date}</span>
           </TimelineItem>
         );
       })}

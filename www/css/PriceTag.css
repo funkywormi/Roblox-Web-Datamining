@@ -3,10 +3,12 @@
 }
 
 .d-flex {
+    display: -ms-flexbox;
     display: flex
 }
 
 .d-flex-inline {
+    display: -ms-inline-flexbox;
     display: inline-flex
 }
 
@@ -15,14 +17,17 @@
 }
 
 .justify-content-between {
+    -ms-flex-pack: justify;
     justify-content: space-between
 }
 
 .justify-content-start {
+    -ms-flex-pack: start;
     justify-content: flex-start
 }
 
 .align-items-center {
+    -ms-flex-align: center;
     align-items: center
 }
 

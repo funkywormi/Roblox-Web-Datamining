@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getSupportCenterEnabled } from '../services/guacService';
+import { useState, useEffect } from "react";
+import { getSupportCenterEnabled } from "../services/guacService";
 
 interface UseSupportCenterVisibilityResult {
   isVisible: boolean;

@@ -4,7 +4,9 @@ import { createTrackers } from "@rbx/observability-framework/trackers";
 import { createObsErrorBoundary } from "@rbx/observability-framework/react";
 import { captureException } from "@rbx/payments/error";
 import { createWithApiMetricsV2 } from "@rbx/payments/withApiMetrics";
-import { createFireTelemetryCounter } from "@rbx/web-telemetry/fire";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
+
+export { apiErrorStatusCode } from "./apiErrorStatus";
 
 export const observabilityRegistry = {
   featureName: "PaymentsPackage",
@@ -14,12 +16,43 @@ export const observabilityRegistry = {
     PriceTag: {
       counters: [{ name: "PriceTag_ArabicLocaleTriggered" }],
       criticalErrors: [
-        { name: "PriceTag_NumberFormatLocaleException" },
+        {
+          name: "PriceTag_NumberFormatLocaleException",
+          dimensions: ["currencyCode", "internalPageName"],
+        },
         { name: "PriceTag_DataNotValid", dimensions: ["currencyCode"] },
       ],
     },
     RobuxBalance: {
       counters: [{ name: "RobuxBalance_UpdatedOnRefetch" }],
+      apiCalls: ["GetRobuxBalance"],
+    },
+    PaymentSession: {
+      apiCalls: [
+        "CreatePaymentSession",
+        "GetPaymentSession",
+        "GetPaymentSessionByCheckoutSessionId",
+      ],
+    },
+    Metadata: {
+      apiCalls: ["GetMetadata"],
+    },
+    PersonalizedBonusItem: {
+      apiCalls: [
+        "CreateOrGetBonusSessionByPaymentSessionId",
+        "GetDisplayableBonusForProduct",
+        "GetBonusSessionByCheckoutSessionId",
+        "GetThumbnails",
+        "HandleGameJoinEvent",
+      ],
+    },
+    CreditConversion: {
+      errors: [{ name: "Error_CreditConversion_ApiFailed", dimensions: ["call", "statusCode"] }],
+    },
+    CreditBalancePayment: {
+      errors: [
+        { name: "Error_CreditBalancePayment_UpdateAddressFailed", dimensions: ["statusCode"] },
+      ],
     },
   },
 } as const satisfies RegistryInput;

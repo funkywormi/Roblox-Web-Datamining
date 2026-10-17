@@ -1,17 +1,18 @@
-import { useTranslation } from '@rbx/core-scripts/react';
-import { Badge, Icon, List, ListItem, ProgressCircle } from '@rbx/foundation-ui';
-import type { TTailwindIconClass } from '@rbx/foundation-tailwind/classes';
+import { useTranslation } from "@rbx/core-scripts/react";
+import { Badge, Icon, List, ListItem, ProgressCircle } from "@rbx/foundation-ui";
+import type { TTailwindIconClass } from "@rbx/foundation-tailwind/classes";
 import {
   accountStatusUrl,
   helpUrl,
   supportUrl,
   supportCenterUrl,
-  reportInboxUrl
-} from '../../utils/urls';
-import useContactUsVisibility from '../../hooks/useContactUsVisibility';
-import useSupportCenterVisibility from '../../hooks/useSupportCenterVisibility';
-import ProfileHeader from './ProfileHeader';
-import useSafetyDashboardIxp from '../../hooks/useSafetyDashboardIxp';
+  reportInboxUrl,
+} from "../../utils/urls";
+import useContactUsVisibility from "../../hooks/useContactUsVisibility";
+import useSupportCenterVisibility from "../../hooks/useSupportCenterVisibility";
+import { sendEvent, SupportCenterMetrics } from "../../utils/eventStream";
+import ProfileHeader from "./ProfileHeader";
+import useSafetyDashboardIxp from "../../hooks/useSafetyDashboardIxp";
 
 interface SupportLinkListItemProps {
   href: string;
@@ -19,6 +20,7 @@ interface SupportLinkListItemProps {
   title: string;
   description: string;
   trailing?: React.ReactNode;
+  onClick?: () => void;
 }
 
 /**
@@ -32,20 +34,21 @@ const SupportLinkListItem = ({
   iconName,
   title,
   description,
-  trailing
+  trailing,
+  onClick,
 }: SupportLinkListItemProps) => (
-  <a href={href} rel='noopener noreferrer'>
+  <a href={href} rel="noopener noreferrer" onClick={onClick}>
     <ListItem
-      leading={<Icon name={iconName} size='Large' className='margin-right-[8px]' />}
+      leading={<Icon name={iconName} size="Large" className="margin-right-[8px]" />}
       title={title}
       description={description}
       trailing={
-        <div className='flex items-center gap-small'>
+        <div className="flex items-center gap-small">
           {trailing}
-          <Icon name='icon-regular-chevron-large-right' size='Medium' className='shrink-0' />
+          <Icon name="icon-regular-chevron-large-right" size="Medium" className="shrink-0" />
         </div>
       }
-      divider='Inset'
+      divider="Inset"
       isContained
       // We need to provide a dummy onSelect to enable the hover state styling for the ListItem.
       // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -66,55 +69,58 @@ const MainPage = () => {
   const isReportInboxEnabled = safetyDashboardIxpQuery.data?.EnableReportInbox === true;
 
   return (
-    <div className='flex flex-col gap-xxlarge'>
-      <h1 className='text-heading-large'>{translate('Heading.HelpAndSafety')}</h1>
+    <div className="flex flex-col gap-xxlarge">
+      <h1 className="text-heading-large">{translate("Heading.HelpAndSafety")}</h1>
       <ProfileHeader />
 
       {isLoading || safetyDashboardIxpQuery.isLoading ? (
-        <div className='flex items-center justify-center padding-large'>
+        <div className="flex items-center justify-center padding-large">
           <ProgressCircle
-            ariaLabel={translate('Label.Loading')}
-            size='Medium'
-            variant='Indeterminate'
+            ariaLabel={translate("Label.Loading")}
+            size="Medium"
+            variant="Indeterminate"
           />
         </div>
       ) : (
         <List>
           <SupportLinkListItem
             href={accountStatusUrl}
-            iconName='icon-regular-circle-person'
-            title={translate('Heading.AccountStatus.Upper')}
-            description={translate('Description.AccountStatus')}
+            iconName="icon-regular-circle-person"
+            title={translate("Heading.AccountStatus")}
+            description={translate("Description.AccountStatus")}
           />
           {isReportInboxEnabled && (
             <SupportLinkListItem
               href={reportInboxUrl}
-              iconName='icon-regular-flag'
-              title='Your reports' // TODO: @andrewxu localize
-              description='Report inbox description' // TODO: @andrewxu localize
+              iconName="icon-regular-flag"
+              title={translate("Heading.ReportHistory")}
+              description={translate("Description.ReportHistory")}
             />
           )}
           <SupportLinkListItem
             href={helpUrl}
-            iconName='icon-regular-circle-question'
-            title={translate('Label.HelpCenter')}
-            description={translate('Label.HelpCenterSub')}
+            iconName="icon-regular-circle-question"
+            title={translate("Label.HelpCenter2")}
+            description={translate("Label.HelpCenterSub")}
           />
           {isSupportCenterVisible && (
             <SupportLinkListItem
               href={supportCenterUrl}
-              iconName='icon-regular-file-box'
-              title={translate('Label.SupportCenter')}
-              description={translate('Label.SupportCenterSub')}
-              trailing={<Badge label={translate('Label.Beta')} />}
+              iconName="icon-regular-file-box"
+              title={translate("Label.SupportCenter2")}
+              description={translate("Label.SupportCenterSub")}
+              trailing={<Badge label={translate("Label.Beta")} />}
+              onClick={() => {
+                sendEvent(SupportCenterMetrics.SupportCenterWebEntryPointClicked({}));
+              }}
             />
           )}
           {isContactUsVisible && (
             <SupportLinkListItem
               href={supportUrl}
-              iconName='icon-regular-envelope'
-              title={translate('Label.ContactUs')}
-              description={translate('Label.ContactUsSub')}
+              iconName="icon-regular-envelope"
+              title={translate("Label.ContactUs2")}
+              description={translate("Label.ContactUsSub")}
             />
           )}
         </List>

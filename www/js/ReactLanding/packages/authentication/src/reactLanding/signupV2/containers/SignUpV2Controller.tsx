@@ -83,6 +83,7 @@ import {
   createAuthFlowTelemetry,
 } from "../../../shared/telemetry/authFlowTelemetry";
 import useSignupAbandonmentBeacon from "../hooks/useSignupAbandonmentBeacon";
+import useSignUpV2Compliance from "../hooks/useSignUpV2Compliance";
 import useUsernameSuggestions from "@rbx/authentication-common/hooks/useUsernameSuggestions";
 import { SignUpFormV2BirthdayFieldName } from "../components/SignUpFormV2";
 import {
@@ -196,6 +197,18 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
     birthday: suggestionBirthdate,
     isEnabled: usernameError === validationMessages.usernameAlreadyInUse,
     onSuggestionsShown: handleSuggestionsShown,
+  });
+  const compliance = useSignUpV2Compliance({
+    locale,
+    translate,
+    defaultLegalContent: (
+      <LegalText
+        translationKey={signupFormStrings.SignUpAgreementCreateAnAccount}
+        locale={locale}
+        translate={translate}
+        usesInlineLinkTags
+      />
+    ),
   });
   const usesUsernameRequirements = treatment !== SignUpV2Treatment.FoundationControl;
   const usernameRequirements = usesUsernameRequirements
@@ -502,14 +515,7 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
     passwordError: passwordError ? translate(passwordError) : undefined,
     isPasswordVisible,
     gender,
-    legalContent: (
-      <LegalText
-        translationKey={signupFormStrings.SignUpAgreementCreateAnAccount}
-        locale={locale}
-        translate={translate}
-        usesInlineLinkTags
-      />
-    ),
+    legalContent: compliance.legalContent,
     signInContent:
       treatment === SignUpV2Treatment.FoundationControl
         ? undefined
@@ -597,7 +603,9 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
   };
 
   const isBaseFormValid =
-    birthdayStatus === FormFieldStatus.Valid && usernameStatus === FormFieldStatus.Valid;
+    birthdayStatus === FormFieldStatus.Valid &&
+    usernameStatus === FormFieldStatus.Valid &&
+    compliance.areAgreementsAccepted;
   const isPasswordValid = passwordStatus === FormFieldStatus.Valid;
 
   return (

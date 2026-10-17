@@ -6,6 +6,7 @@ import PageHeader from "../shared/components/PageHeader";
 import Timeline from "../features/reportInbox/ReportTimeline";
 import { HELP_SAFETY_URL } from "../shared/url";
 import ReportEducation from "../features/reportInbox/ReportEducation";
+import { useTranslation } from "@rbx/core-scripts/react";
 
 const ReportDetailPage = (): ReactElement => {
   // Report inbox should always fall back to the Help & Safety page. Although the report inbox page is in the safety dashboard
@@ -15,16 +16,15 @@ const ReportDetailPage = (): ReactElement => {
   });
   const { id } = useParams<{ id: string }>();
   const { reports } = useReports();
+  const { translate } = useTranslation();
   const report = reports.find(r => r.id === id);
   const details = report?.details;
-
-  const errorMessage = "The report you are looking for does not exist."; // TODO: @andrewxu localize
 
   if (!report || !details) {
     return (
       <div className="flex flex-col gap-xxlarge padding-x-large max-width-[850px] width-full margin-x-auto">
-        <PageHeader title="Report Not Found" onBack={onBack} />
-        <p>{errorMessage}</p>
+        <PageHeader title={translate("Label.SomethingWentWrong")} onBack={onBack} />
+        <p>{translate("Label.LoadingReportsError")}</p>
       </div>
     );
   }

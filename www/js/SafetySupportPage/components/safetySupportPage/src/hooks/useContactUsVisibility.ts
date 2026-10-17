@@ -1,4 +1,4 @@
-import { CurrentUser } from '@rbx/core-scripts/legacy/Roblox';
+import { CurrentUser } from "@rbx/core-scripts/legacy/Roblox";
 
 /**
  * The percentage of users that can see the "Contact Us" link.

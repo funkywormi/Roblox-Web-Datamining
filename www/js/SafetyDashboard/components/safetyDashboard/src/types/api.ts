@@ -55,7 +55,7 @@ export interface RecommendedRule {
 export interface Activity {
   id: string;
   title: string;
-  metadata?: string;
+  date?: string;
   description?: string;
 }
 

@@ -45,6 +45,7 @@ import {
   getDataToken,
   getActiveUserBirthdayToPrefill,
   handleEmptyAccountSwitchBlobRequired,
+  getVPCAnalyticsSessionId,
 } from "../utils/signupUtils";
 import { isUnderThresholdAge } from "../utils/identityVerificationUtils";
 import { isValidEmail } from "@rbx/authentication-common/utils/formUtils";
@@ -107,7 +108,6 @@ import {
   reactSignupAccountLimitContainer,
   complianceConstants,
   requestTypeParam,
-  sessionIdParam,
   settingNameParam,
   arbitraryLargePrimeNumber,
   maxKeystrokeDataLength,
@@ -240,7 +240,7 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
   const requestType = urlService.getQueryParam(
     requestTypeParam,
   ) as VerifiedParentalConsentRequestType;
-  const vpcSessionId = urlService.getQueryParam(sessionIdParam) as string;
+  const vpcSessionId = getVPCAnalyticsSessionId();
   const settingName =
     requestType === VerifiedParentalConsentRequestType.UpdateUserSetting
       ? (urlService.getQueryParam(settingNameParam) as string)

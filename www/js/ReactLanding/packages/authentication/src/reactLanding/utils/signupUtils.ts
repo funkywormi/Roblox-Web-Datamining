@@ -21,6 +21,8 @@ import {
   validateUsernameContext,
   accountSwitcherConfirmationModalContainer,
   signupCustomEvent,
+  sessionIdParam,
+  analyticsSessionIdParam,
 } from "../constants/signupConstants";
 import { validateUsername } from "../services/signupService";
 import { qualifiedSignup } from "../services/affiliateLinksService";
@@ -339,6 +341,14 @@ export const getDataToken = (): string => {
 export const isVerifiedParentConsentSignup = (): boolean => {
   const dataToken = getDataToken();
   return !!dataToken;
+};
+
+// Older email links only carry `sessionId`; drop the fallback once those links have expired.
+export const getVPCAnalyticsSessionId = (
+  search: string = window.location.search,
+): string | undefined => {
+  const params = new URLSearchParams(search);
+  return params.get(analyticsSessionIdParam) ?? params.get(sessionIdParam) ?? undefined;
 };
 
 export const getBirthdayToPrefill = (): string => {

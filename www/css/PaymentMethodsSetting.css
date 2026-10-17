@@ -204,8 +204,8 @@
 }
 
 #convert-credit-modal .modal-header .modal-title {
-    text-align: left;
-    font-weight: 700
+    font-weight: var(--font-weight-700);
+    text-align: left
 }
 
 .light-theme #convert-credit-modal .modal-header .modal-title,
@@ -692,13 +692,13 @@
 }
 
 #confirmation-modal .modal-header {
-    border-bottom-color: rgba(39, 41, 48, .2);
+    border-bottom-color: color-mix(in srgb, var(--color-extended-gray-900)20%, transparent);
     padding: 15px 32px
 }
 
 #confirmation-modal .modal-header .modal-title {
-    text-align: left;
-    font-weight: 700
+    font-weight: var(--font-weight-700);
+    text-align: left
 }
 
 .light-theme #confirmation-modal .modal-header .modal-title,
@@ -786,8 +786,8 @@
 }
 
 #purchase-product-modal .modal-header .modal-title {
-    text-align: left;
-    font-weight: 700
+    font-weight: var(--font-weight-700);
+    text-align: left
 }
 
 .light-theme #purchase-product-modal .modal-header .modal-title,
@@ -816,7 +816,7 @@
 }
 
 #purchase-product-modal .purchase-prompt .robux-amount-inline {
-    font-weight: 700
+    font-weight: var(--font-weight-700)
 }
 
 #purchase-product-modal .purchase-prompt .robux-amount-inline .icon-robux-16x16 {
@@ -897,15 +897,6 @@
     color: var(--color-content-emphasis)
 }
 
-#purchase-product-modal .purchase-summary .tax-line .tax-info-icon {
-    margin-left: 4px
-}
-
-.light-theme #purchase-product-modal .purchase-summary .tax-line .tax-info-icon,
-.dark-theme #purchase-product-modal .purchase-summary .tax-line .tax-info-icon {
-    color: var(--color-content-muted)
-}
-
 #purchase-product-modal .modal-footer {
     display: none
 }
@@ -940,8 +931,8 @@
 }
 
 .purchase-banner .purchase-text {
-    font-size: 16px;
-    font-weight: 700
+    font-weight: var(--font-weight-700);
+    font-size: 16px
 }
 
 .light-theme .purchase-banner .purchase-text,
@@ -955,9 +946,9 @@
 }
 
 .purchase-banner .robux-amount-container .robux-amount .low-cogs-robux-amount-inline {
+    font-weight: var(--font-weight-700);
     margin-right: 6px;
-    font-size: 20px;
-    font-weight: 700
+    font-size: 20px
 }
 
 .purchase-banner .robux-amount-container .robux-amount .low-cogs-robux-amount-inline .icon-robux-28x28 {
@@ -1073,31 +1064,6 @@
     position: absolute
 }
 
-#purchase-product-modal .tax-line .tooltip-container,
-#convert-credit-modal .tax-line .tooltip-container {
-    vertical-align: middle;
-    height: 0;
-    margin-left: 4px;
-    line-height: 0;
-    display: inline-block;
-    position: relative;
-    overflow: visible
-}
-
-#purchase-product-modal .tax-line .tax-info-icon,
-#convert-credit-modal .tax-line .tax-info-icon {
-    width: .9em;
-    height: .9em;
-    display: block;
-    position: relative;
-    top: -.45em
-}
-
-.price-breakdown .tax-line .tax-info-icon {
-    vertical-align: middle;
-    margin-left: 4px
-}
-
 #tax-info-tooltip .tooltip-inner {
     text-align: left;
     border-radius: 6px;
@@ -1106,6 +1072,151 @@
     font-size: 12px;
     line-height: 1.3;
     box-shadow: 0 4px 12px rgba(0, 0, 0, .15), 0 1px 3px rgba(0, 0, 0, .1)
+}
+
+#scan-gift-card-tooltip {
+    border-radius: 5px;
+    margin-top: -24px;
+    margin-left: -6px;
+    padding: 0
+}
+
+#scan-gift-card-tooltip .tooltip-arrow {
+    border: none;
+    width: 12px;
+    height: 6px;
+    top: 31px
+}
+
+.light-theme #scan-gift-card-tooltip .tooltip-arrow {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSI2IiBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMTIgNiI+PHBhdGggZmlsbD0iIzEyMTIxNSIgZD0ibTAgMCA0LjU4NiA0LjU4NmEyIDIgMCAwIDAgMi44MjggMEwxMiAweiIvPjwvc3ZnPg==)
+}
+
+.dark-theme #scan-gift-card-tooltip .tooltip-arrow {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSI2IiBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMTIgNiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0ibTAgMCA0LjU4NiA0LjU4NmEyIDIgMCAwIDAgMi44MjggMEwxMiAweiIvPjwvc3ZnPg==)
+}
+
+#scan-gift-card-tooltip .tooltip-inner {
+    border-radius: 4px;
+    padding: 3.5px 6px
+}
+
+.light-theme #scan-gift-card-tooltip .tooltip-inner {
+    background-color: #121215
+}
+
+.dark-theme #scan-gift-card-tooltip .tooltip-inner {
+    background-color: #fff
+}
+
+.light-theme #scan-gift-card-tooltip .tooltip-inner p {
+    color: #f7f7f8
+}
+
+.dark-theme #scan-gift-card-tooltip .tooltip-inner p {
+    color: #202227
+}
+
+#scan-gift-card-modal {
+    padding: 0
+}
+
+#scan-gift-card-modal .modal-dialog {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    margin: 0
+}
+
+.light-theme #scan-gift-card-modal .modal-dialog .modal-content,
+.dark-theme #scan-gift-card-modal .modal-dialog .modal-content {
+    background-color: var(--color-surface-0)
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content {
+    border: none;
+    height: 100dvh
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content .modal-header {
+    border: none;
+    -ms-flex-align: center;
+    align-items: center;
+    max-width: 600px;
+    height: 64px;
+    margin-left: auto;
+    margin-right: auto;
+    display: -ms-flexbox;
+    display: flex
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content .modal-header button {
+    margin-left: auto
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content .modal-body {
+    height: calc(100dvh - 64px);
+    padding: 20px
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content .modal-body a.get-help-link {
+    color: #528bff;
+    text-decoration: underline
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content .modal-body button {
+    width: 100%
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content .modal-body .scan-gift-card-video-container {
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 21px auto 16px;
+    display: -ms-flexbox;
+    display: flex;
+    position: relative;
+    overflow: hidden
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content .modal-body .scan-gift-card-video-container canvas {
+    display: none
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content .modal-body .scan-gift-card-video-container .scan-gift-card-video-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content .modal-body .scan-gift-card-video-container .scan-gift-card-pin-window {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOTciIGhlaWdodD0iNTIiIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyOTcgNTIiPjxwYXRoIHN0cm9rZT0iI2ZmZDUwYiIgc3Ryb2tlLXdpZHRoPSIyIiBkPSJNMTYuNTYyIDFINWE0IDQgMCAwIDAtNCA0djguNU0xNi41NjIgNTFINWE0IDQgMCAwIDEtNC00di04LjVNMjgwLjQzOCA1MUgyOTJhNCA0IDAgMCAwIDQtNHYtOC41TTI4MC40MzggMUgyOTJhNCA0IDAgMCAxIDQgNHY4LjUiLz48L3N2Zz4=);
+    background-repeat: no-repeat;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    width: 297px;
+    height: 52px;
+    display: -ms-flexbox;
+    display: flex;
+    position: absolute;
+    top: calc(50% - 26px);
+    left: calc(50% - 148.5px)
+}
+
+#scan-gift-card-modal .modal-dialog .modal-content .modal-body .scan-gift-card-video-container .scan-gift-card-pin-window p {
+    opacity: 1;
+    color: #ffd50b;
+    text-align: center;
+    letter-spacing: 1.198px;
+    font-size: 13.309px;
+    font-weight: 700;
+    line-height: 120%;
+    transition: opacity 2s ease-out 2s
 }
 
 @media (max-width:768px) {
@@ -1519,7 +1630,7 @@
 }
 
 .light-theme #update-payment-method-modal .modal-dialog .modal-content .footer-divider {
-    border-top: 1px solid #353741;
+    border-top: 1px solid var(--color-extended-gray-800);
     margin: 0
 }
 
@@ -1639,7 +1750,7 @@
 }
 
 .dark-theme #update-payment-method-modal .modal-dialog .modal-content .footer-divider {
-    border-top: 1px solid #353741;
+    border-top: 1px solid var(--color-extended-gray-800);
     margin: 0
 }
 
@@ -1840,7 +1951,7 @@
 .light-theme .postal-code-input-container input,
 .light-theme .postal-code-input-container select.rbx-select {
     color: var(--color-content-default);
-    border-color: #bcbec8
+    border-color: var(--color-extended-gray-500)
 }
 
 .dark-theme .state-select-container input,
@@ -1852,7 +1963,7 @@
 .dark-theme .postal-code-input-container input,
 .dark-theme .postal-code-input-container select.rbx-select {
     color: var(--color-content-default);
-    border-color: #494d5a
+    border-color: var(--color-extended-gray-700)
 }
 
 .state-select-container input:focus,
@@ -1890,8 +2001,8 @@
 .light-theme .postal-code-input-container input:hover,
 .light-theme .postal-code-input-container select.rbx-select:focus,
 .light-theme .postal-code-input-container select.rbx-select:hover {
-    border-color: rgba(0, 0, 0, .3);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, .25)
+    border-color: var(--color-extended-black-30);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-extended-black-30)25%, transparent)
 }
 
 .dark-theme .state-select-container input:focus,
@@ -1910,8 +2021,8 @@
 .dark-theme .postal-code-input-container input:hover,
 .dark-theme .postal-code-input-container select.rbx-select:focus,
 .dark-theme .postal-code-input-container select.rbx-select:hover {
-    border-color: rgba(255, 255, 255, .3);
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, .25)
+    border-color: var(--color-extended-white-30);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-extended-white-30)25%, transparent)
 }
 
 .light-theme .state-select-container input.error,
@@ -2173,4 +2284,42 @@
 
 .\!visible {
     visibility: visible !important
+}
+
+.size-\[var\(--icon-size-large\)\] {
+    width: var(--icon-size-large);
+    height: var(--icon-size-large)
+}
+
+.size-\[var\(--icon-size-medium\)\] {
+    width: var(--icon-size-medium);
+    height: var(--icon-size-medium)
+}
+
+.size-\[var\(--icon-size-small\)\] {
+    width: var(--icon-size-small);
+    height: var(--icon-size-small)
+}
+
+.size-\[var\(--icon-size-xlarge\)\] {
+    width: var(--icon-size-xlarge);
+    height: var(--icon-size-xlarge)
+}
+
+.size-\[var\(--icon-size-xsmall\)\] {
+    width: var(--icon-size-xsmall);
+    height: var(--icon-size-xsmall)
+}
+
+.size-\[var\(--icon-size-xxlarge\)\] {
+    width: var(--icon-size-xxlarge);
+    height: var(--icon-size-xxlarge)
+}
+
+.icon-regular-circle-i {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M17 21H19.5V23H12.5V21H15V14H13V12H17V21Z' fill='black'/%3E %3Cpath d='M17 10H15V8H17V10Z' fill='black'/%3E %3Cpath d='M16 2C23.732 2 30 8.26801 30 16C30 23.732 23.732 30 16 30C8.26801 30 2 23.732 2 16C2 8.26801 8.26801 2 16 2ZM16 4C9.37258 4 4 9.37258 4 16C4 22.6274 9.37258 28 16 28C22.6274 28 28 22.6274 28 16C28 9.37258 22.6274 4 16 4Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-regular-pencil {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M21.5852 2.69816C22.3541 1.94182 23.5849 1.93146 24.3665 2.67473L29.2737 7.34172C30.0812 8.10976 30.1056 9.39064 29.3274 10.1884L11.6292 28.3261C11.1129 28.8044 10.4444 29.0865 9.74146 29.122L4.65063 29.1152C3.70929 29.0197 2.96122 28.2713 2.86548 27.33L2.85474 27.1259V22.3827C2.85474 21.6289 3.13905 20.9047 3.64673 20.3525L21.5852 2.69816ZM5.15356 21.6698C4.96262 21.8578 4.85474 22.1148 4.85474 22.3827V27.1259H9.59009C9.8594 27.1259 10.1177 27.0168 10.3059 26.8241L24.0491 12.7343L19.1819 7.86711L5.15356 21.6698ZM20.6077 6.46477L25.4456 11.3027L27.8958 8.79094L22.9875 4.12395L20.6077 6.46477Z' fill='black'/%3E%3C/svg%3E")
 }

@@ -1,0 +1,144 @@
+import { get, post, delete as httpDelete } from "@rbx/core-scripts/http";
+import type { AxiosError, AxiosResponse, UrlConfig } from "@rbx/core-scripts/http";
+import type { FireTelemetryCounterFn } from "@rbx/web-telemetry/v2/fire";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isAxiosError(error: any): error is AxiosError {
+  return typeof error === "object" && "config" in error;
+}
+
+type EventCounterProps<C> = {
+  call: C;
+};
+
+type CommonRequestConfig<C extends string = string> = {
+  url: string;
+  config?: Omit<UrlConfig, "url">;
+  eventCounterProps: EventCounterProps<C>;
+};
+
+export type GETRequestConfig<C extends string = string> = CommonRequestConfig<C> & {
+  method: "GET";
+};
+
+export type POSTRequestConfig<C extends string = string> = CommonRequestConfig<C> & {
+  method: "POST";
+  data: object;
+};
+
+type RequestData<C extends string = string> = GETRequestConfig<C> | POSTRequestConfig<C>;
+
+type V2RequestData<C extends string = string> =
+  | RequestData<C>
+  | (CommonRequestConfig<C> & { method: "DELETE"; data: object });
+
+export type WithApiMetricsFn<C extends string = string> = <T>(
+  requestData: RequestData<C>,
+) => Promise<T | undefined>;
+
+export type WithApiMetricsV2Result<T> = {
+  data: T;
+  headers: Record<string, string>;
+};
+
+export type WithApiMetricsV2Fn<C extends string = string> = <T>(
+  requestData: V2RequestData<C>,
+) => Promise<WithApiMetricsV2Result<T>>;
+
+type CaptureExceptionFn = (error: unknown, tags?: Record<string, string>) => void;
+
+function statusCodeFromError(error: unknown): string {
+  if (isAxiosError(error)) {
+    return error.code ?? error?.response?.status.toString() ?? "UnknownAxiosError";
+  }
+  return "UnknownError";
+}
+
+/** Server errors (5xx), network failures, and non-HTTP errors are sent to Sentry. */
+function shouldCaptureException(error: unknown): boolean {
+  if (!isAxiosError(error)) return true;
+  const status = error.response?.status;
+  if (status === undefined) return true;
+  return status >= 500;
+}
+
+export function createWithApiMetrics<C extends string = string>(
+  publishMetric: FireTelemetryCounterFn,
+): WithApiMetricsFn<C> {
+  return async <T>(requestData: RequestData<C>) => {
+    const { call } = requestData.eventCounterProps;
+    const metricName = `${call}_API`;
+
+    publishMetric(metricName, { statusCode: "Throughput" });
+
+    try {
+      const { data } = await (requestData.method === "GET"
+        ? get<T>(
+            { url: requestData.url, fullError: true, ...requestData.config },
+            requestData.config?.params,
+          )
+        : post<T>(
+            { url: requestData.url, fullError: true, ...requestData.config },
+            requestData.data,
+          ));
+
+      publishMetric(metricName, { statusCode: "200" });
+      return data;
+    } catch (error) {
+      let statusCode: string;
+
+      if (isAxiosError(error)) {
+        statusCode = error.code ?? error?.response?.status.toString() ?? "UnknownAxiosError";
+      } else {
+        statusCode = "UnknownError";
+        console.error(error);
+      }
+
+      publishMetric(metricName, { statusCode });
+      return undefined;
+    }
+  };
+}
+
+/**
+ * Like `createWithApiMetrics`, but does not swallow failures: 5xx, network, and
+ * non-HTTP errors are captured to Sentry and rethrown; expected 4xx responses are
+ * rethrown without Sentry. Callers must handle errors (return a proper error
+ * state / let them bubble), and the success value is `T` rather than
+ * `T | undefined`. Throughput / status-code metrics are published identically.
+ */
+export function createWithApiMetricsV2<C extends string = string>(
+  publishMetric: FireTelemetryCounterFn,
+  captureException: CaptureExceptionFn,
+): WithApiMetricsV2Fn<C> {
+  return async <T>(requestData: V2RequestData<C>) => {
+    const { call } = requestData.eventCounterProps;
+    const metricName = `${call}_API`;
+
+    publishMetric(metricName, { statusCode: "Throughput" });
+
+    try {
+      const urlConfig = { url: requestData.url, fullError: true, ...requestData.config };
+      let response: AxiosResponse<T>;
+      if (requestData.method === "GET") {
+        response = await get<T>(urlConfig, requestData.config?.params);
+      } else if (requestData.method === "POST") {
+        response = await post<T>(urlConfig, requestData.data);
+      } else {
+        response = await httpDelete<T>(urlConfig, requestData.data);
+      }
+
+      const { data, headers } = response;
+
+      publishMetric(metricName, { statusCode: "200" });
+      return { data, headers };
+    } catch (error) {
+      const statusCode = statusCodeFromError(error);
+      publishMetric(metricName, { statusCode });
+      if (shouldCaptureException(error)) {
+        captureException(error, { call, statusCode });
+      }
+      throw error;
+    }
+  };
+}

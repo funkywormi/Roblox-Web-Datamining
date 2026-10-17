@@ -53,8 +53,8 @@ export const urlConstants = {
   homePageNewUser: "/home?nu=true",
   termsOfUse: `${EnvironmentUrls.websiteUrl}/info/terms`,
   privacy: `${EnvironmentUrls.websiteUrl}/info/privacy`,
-  koreaComplianceTermsOfService: `https://en.help.roblox.com/hc/articles/15685174241172-Roblox-Terms-of-Use-Republic-of-Korea-`,
-  koreaCompliancePrivacyPolicy: `https://en.help.roblox.com/hc/articles/15685139483924-Additional-Information-for-users-in-Korea`,
+  koreaComplianceTermsOfService: `https://en.help.roblox.com/hc/ko/articles/115004647846`,
+  koreaCompliancePrivacyPolicy: `https://en.help.roblox.com/hc/ko/articles/115004630823`,
   koreaCompliancePersonalInformationPolicy: `https://en.help.roblox.com/hc/ko/articles/20308349061268`,
   koreaComplianceThirdPartyPersonalInformationPolicy: `https://en.help.roblox.com/hc/ko/articles/20308327256596`,
   koreaComplianceTransferPersonalInformationPolicy: `https://en.help.roblox.com/hc/ko/articles/20308327256596`,
@@ -282,6 +282,7 @@ export const PARENTALCONSENT = "ParentalConsent";
 export const OPTIONAL_PERSONAL_INFORMATION_POLICY = "OptionalPersonalInformationPolicy";
 export const requestTypeParam = "requestType";
 export const sessionIdParam = "sessionId";
+export const analyticsSessionIdParam = "analyticsSessionId";
 export const settingNameParam = "target";
 export const defaultLandingBackgroundClass = "default-background";
 export const signupCustomEvent = "Roblox.Signup";

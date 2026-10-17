@@ -45,6 +45,9 @@ export const COMMUNITY_STANDARDS_URL = "https://about.roblox.com/community-stand
 /** Help page article for all knowledge and disclosures related to appeals. */
 export const CONTENT_MODERATION_HELP_URL = `${helpSite}/hc/articles/360000245263`;
 
+/** How to report rule violations article. */
+export const HOW_TO_REPORT_URL = `${helpSite}/hc/en-us/articles/203312410-How-to-Report-Rule-Violations`;
+
 /**
  * Customer support / chat support form - surfaced to users to allow them to appeal through the
  * Support Form if they can't see the violation that they want to appeal.

@@ -1,7 +1,7 @@
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import ExperimentationService from '@rbx/experimentation';
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import ExperimentationService from "@rbx/experimentation";
 
-export const IXP_LAYER_NAME = 'UserSafety.SafetyDashboard.UserID';
+export const IXP_LAYER_NAME = "UserSafety.SafetyDashboard.UserID";
 
 export interface IxpConfig {
   EnableReportInbox?: boolean;
@@ -21,7 +21,7 @@ const useSafetyDashboardIxp = (): UseQueryResult<IxpConfig> => {
       }
     },
     // IXP data shouldn't change frequently so we can cache it indefinitely
-    staleTime: Infinity
+    staleTime: Infinity,
   });
 };
 

@@ -7,6 +7,8 @@ export type countryRatingLogosProps = {
   shouldDisplayBrazilRatingLogo: boolean;
   shouldDisplayItalyRatingLogo: boolean;
   onContentRatingLogoClick?: () => void;
+  onBrazilContentRatingLogoClick?: () => void;
+  onItalyContentRatingLogoClick?: () => void;
   translate: WithTranslationsProps["translate"];
 };
 
@@ -14,8 +16,13 @@ const CountryRatingLogos = ({
   shouldDisplayBrazilRatingLogo,
   shouldDisplayItalyRatingLogo,
   onContentRatingLogoClick,
+  onBrazilContentRatingLogoClick,
+  onItalyContentRatingLogoClick,
   translate,
 }: countryRatingLogosProps): JSX.Element => {
+  const brazilClick = onBrazilContentRatingLogoClick ?? onContentRatingLogoClick;
+  const italyClick = onItalyContentRatingLogoClick ?? onContentRatingLogoClick;
+
   return (
     <div>
       {shouldDisplayBrazilRatingLogo && (
@@ -29,7 +36,7 @@ const CountryRatingLogos = ({
               tabIndex={0}
               id="brazil-icon"
               aria-label="brazil-content-rating"
-              onClick={onContentRatingLogoClick}
+              onClick={brazilClick}
             />
             <div id="brazil-logo-text-container">
               <div className="brazil-logo-content-text">
@@ -52,7 +59,7 @@ const CountryRatingLogos = ({
         </div>
       )}
       {shouldDisplayItalyRatingLogo && (
-        <div role="button" tabIndex={0} id="italy-rating-logo" onClick={onContentRatingLogoClick}>
+        <div role="button" tabIndex={0} id="italy-rating-logo" onClick={italyClick}>
           <div id="italy-icon-container">
             <div id="pegi-icon" />
             <div id="fear-icon" />

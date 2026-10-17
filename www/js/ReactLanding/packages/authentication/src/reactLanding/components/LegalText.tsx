@@ -1,78 +1,31 @@
 import React, { useMemo } from "react";
-import { useTranslation, WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
-import { signupTranslationConfig } from "../translation.config";
-import {
-  signupFormStrings,
-  urlConstants,
-  anchorOpeningTag,
-  anchorOpeningTagEnd,
-  anchorClosingTag,
-} from "../constants/signupConstants";
-import { buildLinkWithLocale } from "../utils/signupUtils";
+import { signupFormStrings } from "../constants/signupConstants";
 import useSignupAuditContent from "../hooks/useSignupAuditContent";
+import LegalTextBase, {
+  buildLegalTextTranslationParameters,
+  legalTextProps,
+} from "@rbx/authentication-common/components/LegalText";
 
-export type legalTextProps = {
-  translationKey?: string | null;
-  locale: string;
-  translate: WithTranslationsProps["translate"];
-  /** Set for copy parameterised with `{startTermsTag}`/`{startPrivacyTag}` rather than whole anchors. */
-  usesInlineLinkTags?: boolean;
-};
+export type { legalTextProps };
 
-const LegalText = ({
-  translationKey,
-  locale,
-  translate,
-  usesInlineLinkTags = false,
-}: legalTextProps): JSX.Element => {
-  const termsOfUseLocalizedLink = buildLinkWithLocale(urlConstants.termsOfUse, locale);
-  const privacyLocalizedLink = buildLinkWithLocale(urlConstants.privacy, locale);
-  const termsOfUseLinkElement = `${
-    anchorOpeningTag + termsOfUseLocalizedLink + anchorOpeningTagEnd
-  }${translate(signupFormStrings.TermsOfUse)}${anchorClosingTag}`;
-  const privacyLinkElement = `${
-    anchorOpeningTag + privacyLocalizedLink + anchorOpeningTagEnd
-  }${translate(signupFormStrings.Privacy)}${anchorClosingTag}`;
-
-  const translationParameters = useMemo<Record<string, string>>(
-    () =>
-      usesInlineLinkTags
-        ? {
-            startTermsTag: anchorOpeningTag + termsOfUseLocalizedLink + anchorOpeningTagEnd,
-            endTermsTag: anchorClosingTag,
-            startPrivacyTag: anchorOpeningTag + privacyLocalizedLink + anchorOpeningTagEnd,
-            endPrivacyTag: anchorClosingTag,
-          }
-        : ({
-            termsOfUseLink: termsOfUseLinkElement,
-            privacyPolicyLink: privacyLinkElement,
-          } as Record<string, string>),
-    [
-      usesInlineLinkTags,
-      termsOfUseLocalizedLink,
-      privacyLocalizedLink,
-      termsOfUseLinkElement,
-      privacyLinkElement,
-    ],
+/**
+ * The shared LegalText plus signup audit-content capture: the signup flows report the
+ * agreement text they displayed; the birthday compliance modal renders the base component
+ * directly so it does not emit signup audit content.
+ */
+const LegalText = (props: legalTextProps): JSX.Element => {
+  const { locale, translate, usesInlineLinkTags } = props;
+  // Memoized because the audit hook re-fires whenever its parameters object changes.
+  const translationParameters = useMemo(
+    () => buildLegalTextTranslationParameters(locale, translate, usesInlineLinkTags),
+    [locale, translate, usesInlineLinkTags],
   );
 
-  const effectiveTranslationKey = translationKey ?? signupFormStrings.ComplianceFullCopy;
-  const translatedText = translate(effectiveTranslationKey, translationParameters);
+  const effectiveTranslationKey = props.translationKey ?? signupFormStrings.ComplianceFullCopy;
 
-  useSignupAuditContent(effectiveTranslationKey, translate, {
-    translationParameters,
-  });
+  useSignupAuditContent(effectiveTranslationKey, translate, { translationParameters });
 
-  return (
-    <div className="legal-text-container legal-text-container-top-margin">
-      <div
-        className="terms-agreement"
-        dangerouslySetInnerHTML={{
-          __html: translatedText,
-        }}
-      />
-    </div>
-  );
+  return <LegalTextBase {...props} />;
 };
 
 export default LegalText;

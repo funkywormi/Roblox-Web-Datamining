@@ -1,17 +1,19 @@
 import { useHistory } from "react-router-dom";
 import { Icon, List, ListItem } from "@rbx/foundation-ui";
+import { useTranslation } from "@rbx/core-scripts/react";
+import protectionShieldDark from "@rbx/foundation-images/pictograms/protection_shield_dark.svg";
+import protectionShieldLight from "@rbx/foundation-images/pictograms/protection_shield_light.svg";
 import type { Report } from "../../types/api";
 import { getReportDetailPath } from "../../shared/utils/navigation";
+import { HOW_TO_REPORT_URL } from "../../shared/url";
 
 interface ReportListProps {
   reports: Report[];
 }
 
 const ReportList = ({ reports }: ReportListProps) => {
+  const { translate } = useTranslation();
   const history = useHistory();
-
-  const emptyStateTitle = "No reports"; // TODO: @andrewxu localize
-  const emptyStateDescription = "Any reports you send will appear here."; // TODO: @andrewxu localize
 
   return reports.length > 0 ? (
     <List>
@@ -43,9 +45,18 @@ const ReportList = ({ reports }: ReportListProps) => {
     </List>
   ) : (
     <div className="flex flex-col items-center justify-center gap-small">
-      <Icon name="icon-regular-page" size="Large" />
-      <span className="text-title-medium">{emptyStateTitle}</span>
-      <span className="text-body-medium">{emptyStateDescription}</span>
+      <img src={protectionShieldLight} alt="" className="dark:hidden" />
+      <img src={protectionShieldDark} alt="" className="hidden dark:block" />
+      <span className="text-heading-medium">{translate("Heading.NoReportsYet")}</span>
+      <span className="text-body-medium">{translate("Description.NoReportsYet")}</span>
+      <a
+        className="content-link text-body-medium"
+        href={HOW_TO_REPORT_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {translate("Link.ViewReportingInstructions")}
+      </a>
     </div>
   );
 };

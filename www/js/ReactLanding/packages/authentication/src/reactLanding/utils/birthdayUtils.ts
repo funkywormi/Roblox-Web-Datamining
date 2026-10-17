@@ -12,7 +12,6 @@ import {
   monthStrings,
   signupFormStrings,
   requestTypeParam,
-  sessionIdParam,
   settingNameParam,
 } from "../constants/signupConstants";
 import {
@@ -24,7 +23,7 @@ import {
   sendYearOffFocusEvent,
   sendVPCSignupBirthdateFieldInteractedEvent,
 } from "../services/eventService";
-import { isVerifiedParentConsentSignup } from "./signupUtils";
+import { getVPCAnalyticsSessionId, isVerifiedParentConsentSignup } from "./signupUtils";
 import VerifiedParentalConsentRequestType from "../enums/VerifiedParentalConsentRequestType";
 
 const intl = new Intl();
@@ -34,7 +33,7 @@ const isVPCSignup = isVerifiedParentConsentSignup();
 const requestType = urlService.getQueryParam(
   requestTypeParam,
 ) as VerifiedParentalConsentRequestType | null;
-const sessionId = urlService.getQueryParam(sessionIdParam) as string;
+const sessionId = getVPCAnalyticsSessionId();
 const settingName =
   requestType === VerifiedParentalConsentRequestType.UpdateUserSetting
     ? (urlService.getQueryParam(settingNameParam) as string)
