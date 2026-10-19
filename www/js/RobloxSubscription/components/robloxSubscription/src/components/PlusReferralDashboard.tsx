@@ -60,13 +60,13 @@ const REFERRAL_TERMS_LINK = [
  * surfaces — widen at breakpoints rather than stretching edge-to-edge.
  */
 const CONTENT_COLUMN_CLASS =
-  "padding-x-xlarge margin-x-auto width-full medium:max-width-[600px] large:max-width-[792px] xlarge:max-width-[840px]";
+  "padding-x-large medium:padding-x-xlarge margin-x-auto width-full medium:max-width-[600px] large:max-width-[792px] xlarge:max-width-[840px]";
 
 /**
  * Fixed 200px so the button does not resize between "Copy link" and "Link copied". `shrink-0`
  * keeps the link field, not the button, absorbing a long URL.
  */
-const COPY_BUTTON_WIDTH_CLASS = "width-[200px] shrink-0";
+const COPY_BUTTON_WIDTH_CLASS = "width-[150px] medium:width-[200px] shrink-0";
 
 /**
  * Two per row on phones, so a third card wraps below. From medium up every card shares one row, so
@@ -247,12 +247,13 @@ const DashboardBody: FC<DashboardBodyProps> = ({
     const footer = document.getElementById("footer-container");
     const containerMain = document.querySelector<HTMLElement>(".container-main");
     const viewContainer = document.getElementById("roblox-subscription-container")?.parentElement;
+    const mainEl = document.querySelector<HTMLElement>("#roblox-subscription-container main");
+    const wrapperEl = mainEl?.parentElement;
     const footerDisplay = footer?.style.display;
     const bodyMarginBottom = document.body.style.marginBottom;
     const containerPaddingBottom = containerMain?.style.paddingBottom;
     const containerMinHeight = containerMain?.style.minHeight;
     const viewContainerMarginBottom = viewContainer?.style.marginBottom;
-
     if (footer) {
       footer.style.display = "none";
     }
@@ -263,6 +264,15 @@ const DashboardBody: FC<DashboardBodyProps> = ({
     }
     if (viewContainer) {
       viewContainer.style.marginBottom = "0px";
+    }
+    const removedClasses: string[] = [];
+    if (wrapperEl) {
+      for (const cls of [...wrapperEl.classList]) {
+        if (cls.startsWith("margin-bottom") || cls.startsWith("large:margin-bottom")) {
+          wrapperEl.classList.remove(cls);
+          removedClasses.push(cls);
+        }
+      }
     }
 
     return () => {
@@ -276,6 +286,11 @@ const DashboardBody: FC<DashboardBodyProps> = ({
       }
       if (viewContainer) {
         viewContainer.style.marginBottom = viewContainerMarginBottom ?? "";
+      }
+      if (wrapperEl) {
+        for (const cls of removedClasses) {
+          wrapperEl.classList.add(cls);
+        }
       }
     };
   }, []);
@@ -381,8 +396,8 @@ const DashboardBody: FC<DashboardBodyProps> = ({
         />
       </div>
 
-      <div className="padding-y-medium shrink-0">
-        <div className={`${CONTENT_COLUMN_CLASS} gap-y-small flex flex-col`}>
+      <div className="padding-top-small padding-bottom-medium medium:padding-y-medium shrink-0">
+        <div className={`${CONTENT_COLUMN_CLASS} gap-y-xsmall flex flex-col`}>
           {/* Tops align rather than centers, so the copy button stays level with the field when an
               error message extends it. */}
           <div className="gap-x-small flex items-start">

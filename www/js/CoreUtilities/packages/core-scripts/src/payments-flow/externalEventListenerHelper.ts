@@ -2,6 +2,13 @@
 // eslint-disable-next-line import-x/no-cycle
 import { PaymentFlowAnalyticsService } from "./index";
 
+/**
+ * `@rbx/payments/payments-flow-analytics` binds these same buttons. The first
+ * library to run owns the listeners so one click does not send two events.
+ * Remove this once callers no longer load both libraries.
+ */
+const LISTENERS_ATTACHED_KEY = "__rbxPaymentsFlowListenersAttached";
+
 const BUY_ROBUX_MENU_BUTTON_SELECTOR = "#header li a.robux-menu-btn";
 const REACT_BUY_BUTTON_CONTAINER_ELEMENT_ID = "display-price-container";
 const GET_PREMIUM_BUTTON_ON_ITEM_DETAIL_SELECTOR = "#item-details #upgrade-button";
@@ -64,16 +71,35 @@ const setupPremiumUpsellBtnOnItemDetailPage = (
  *
  * @param paymentFlowAnalyticsService
  */
+const claimExternalEventListeners = (): boolean => {
+  const currentWindow = window as Window & { __rbxPaymentsFlowListenersAttached?: boolean };
+  if (currentWindow[LISTENERS_ATTACHED_KEY] === true) {
+    return false;
+  }
+  currentWindow[LISTENERS_ATTACHED_KEY] = true;
+  return true;
+};
+
 const setupExternalEventListeners = (
   paymentFlowAnalyticsService: PaymentFlowAnalyticsService,
 ): void => {
-  // add event listeners for pure html buttons after document is ready
-  document.addEventListener("DOMContentLoaded", () => {
+  if (!claimExternalEventListeners()) {
+    return;
+  }
+  const setup = (): void => {
     setupBuyRobuxMenuBtn(paymentFlowAnalyticsService);
     if (isCsHtmlBuyButtonLoaded()) {
       setupPremiumUpsellBtnOnItemDetailPage(paymentFlowAnalyticsService);
     }
-  });
+  };
+
+  // DOMContentLoaded does not fire again if this bundle loads after the document
+  // is ready. Attach immediately in that case, matching @rbx/payments.
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setup);
+  } else {
+    setup();
+  }
 };
 
 export default setupExternalEventListeners;

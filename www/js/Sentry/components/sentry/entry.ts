@@ -21,7 +21,6 @@ import environmentUrls from "@rbx/environment-urls";
 import { reportWebVitals } from "@rbx/www-common/webVitals";
 import { buildTransport } from "@rbx/www-common/sentry/buildSentryTransport";
 import {
-  createRepeatCap,
   isNoiseEvent,
   NOISE_DENY_URLS,
   NOISE_IGNORE_ERRORS,
@@ -79,7 +78,6 @@ const isTransactionOff = parsedTracesSampleRate === 0;
 const fullSample = !isTransactionOff && isTestSite();
 const perfBase = fullSample ? 1 : Math.min(parsedTracesSampleRate, 0.008);
 const SENTRY_BASE = 0.0005;
-const isOverRepeatCap = createRepeatCap();
 
 // Derived once and reused by beforeSendTransaction and the DOMContentLoaded handler.
 const user = authenticatedUser as typeof authenticatedUser | undefined;
@@ -111,7 +109,7 @@ initSentry({
   replaysOnErrorSampleRate: parsedSampleRate,
   denyUrls: NOISE_DENY_URLS,
   ignoreErrors: NOISE_IGNORE_ERRORS,
-  beforeSend: event => (isNoiseEvent(event) || isOverRepeatCap(event) ? null : event),
+  beforeSend: event => (isNoiseEvent(event) ? null : event),
   beforeSendTransaction: event => {
     // Full transaction to OTEL; filtered copy to Sentry for quota reduction.
     sendToOtel(otelEndpoint, event, tracingResources);

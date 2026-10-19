@@ -71,4 +71,5 @@ export const isStringEnum = <E extends Readonly<Record<string, string>>>(
  * ```
  */
 export const recordGet = <T>(record: Readonly<Record<string, T>>, key: string): T | undefined =>
-  record[key];
+  // Own keys only, so inputs like "toString" or "__proto__" don't resolve to Object.prototype.
+  Object.hasOwn(record, key) ? record[key] : undefined;

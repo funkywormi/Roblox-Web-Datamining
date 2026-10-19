@@ -21,6 +21,7 @@ export const getReports = async ({
     {
       pageSize: page_size,
       pageToken: page_token,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
   );
   return req.data;

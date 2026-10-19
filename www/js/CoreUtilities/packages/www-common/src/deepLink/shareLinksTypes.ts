@@ -1,0 +1,151 @@
+/* eslint-disable @typescript-eslint/naming-convention -- member names are public API */
+import ExperienceInviteStatus from "./enums/ExperienceInviteStatus";
+import FriendInviteStatus from "./enums/FriendInviteStatus";
+import PrivateServerLinkStatus from "./enums/PrivateServerLinkStatus";
+import ProfileShareFriendshipSourceType from "./enums/ProfileShareFriendshipSourceType";
+import ProfileShareStatus from "./enums/ProfileShareStatus";
+import ScreenshotInviteStatus from "./enums/ScreenshotInviteStatus";
+import ExperienceDetailsStatus from "./enums/ExperienceDetailsStatus";
+import AvatarItemDetailsStatus from "./enums/AvatarItemDetailsStatus";
+import ExperienceAffiliateStatus from "./enums/ExperienceAffiliateStatus";
+import ContentPostStatus from "./enums/ContentPostStatus";
+import ExperienceEventStatus from "./enums/ExperienceEventStatus";
+import ExperienceAffiliateDeepLinkFallbackType from "./enums/ExperienceAffiliateDeepLinkFallbackType";
+
+enum ShareLinksType {
+  AVATAR_ITEM_DETAILS = "AvatarItemDetails",
+  AVATAR_ITEM_AFFILIATE = "AvatarItemAffiliate",
+  CONTENT_POST = "ContentPost",
+  EXPERIENCE_INVITE = "ExperienceInvite",
+  EXPERIENCE_AFFILIATE = "ExperienceAffiliate",
+  FRIEND_INVITE = "FriendInvite",
+  NOTIFICATION_EXPERIENCE_INVITE = "NotificationExperienceInvite",
+  PROFILE = "Profile",
+  SCREENSHOT_INVITE = "ScreenshotInvite",
+  SERVER = "Server",
+  EXPERIENCE_DETAILS = "ExperienceDetails",
+  EXPERIENCE_EVENT = "ExperienceEvent",
+}
+
+enum ShareLinksTypeV2 {
+  EXPERIENCE_V2 = "ExperienceV2",
+  USER_TRUSTED_CONNECTION = "UserTrustedConnection",
+  STUDIO_TRUSTED_CONNECTION = "StudioTrustedConnection",
+  MOMENTS = "Moments",
+  SCHOOL_INVITE = "SchoolInvite",
+  REFERRAL = "Referral",
+}
+
+type ExperienceInviteData = {
+  status: ExperienceInviteStatus;
+  inviterId: number;
+  placeId: number;
+  instanceId: string;
+  launchData?: string;
+};
+
+type FriendInviteData = {
+  status: FriendInviteStatus;
+  senderUserId: number;
+  friendingToken: string;
+};
+
+type PrivateServerLinkData = {
+  status: PrivateServerLinkStatus;
+  ownerUserId: number;
+  universeId: number;
+  privateServerId: number;
+  linkCode: string;
+};
+
+type ProfileData = {
+  status: ProfileShareStatus;
+  userId: number;
+};
+
+type ScreenshotInviteData = {
+  status: ScreenshotInviteStatus;
+  inviterId: number;
+  placeId: number;
+  instanceId: string;
+  launchData: string;
+};
+
+type ExperienceDetailsData = {
+  status: ExperienceDetailsStatus;
+  universeId: number;
+};
+
+type AvatarItemDetailsData = {
+  status: AvatarItemDetailsStatus;
+  itemId: string;
+  itemType: string;
+};
+
+type ExperienceJoinData = {
+  experienceEventId?: string;
+  launchData?: string;
+};
+
+type ExperienceAffiliateData = {
+  status: ExperienceAffiliateStatus;
+  universeId: number;
+  joinData?: ExperienceJoinData;
+  fallbackType?: ExperienceAffiliateDeepLinkFallbackType;
+  fallbackId?: number;
+};
+
+type ContentPostData = {
+  status: ContentPostStatus;
+  postId: number;
+  postCreatorId: number;
+};
+
+type ExperienceEventData = {
+  status: ExperienceEventStatus;
+  universeId: number;
+  placeId: number;
+  joinData: ExperienceJoinData;
+};
+
+type MomentsData = {
+  postId: string;
+  postCreatorId: string;
+};
+
+export type ResolveShareLinksResponse = {
+  avatarItemDetailsData?: AvatarItemDetailsData;
+  contentPostData?: ContentPostData;
+  experienceInviteData?: ExperienceInviteData;
+  friendInviteData?: FriendInviteData;
+  notificationExperienceInviteData?: ExperienceInviteData;
+  profileLinkResolutionResponseData?: ProfileData;
+  experienceAffiliateData?: ExperienceAffiliateData;
+  screenshotInviteData?: ScreenshotInviteData;
+  privateServerInviteData?: PrivateServerLinkData;
+  experienceDetailsInviteData?: ExperienceDetailsData;
+  experienceEventData?: ExperienceEventData;
+};
+
+export type ResolveShareLinksV2Response = {
+  linkType: string;
+  targetId: string;
+  customData: string | null;
+  status: "Valid" | "Invalid" | "Expired";
+};
+
+export { ProfileShareFriendshipSourceType, ShareLinksType, ShareLinksTypeV2 };
+export type {
+  AvatarItemDetailsData,
+  ContentPostData,
+  ExperienceInviteData,
+  FriendInviteData,
+  MomentsData,
+  PrivateServerLinkData,
+  ProfileData,
+  ScreenshotInviteData,
+  ExperienceDetailsData,
+  ExperienceAffiliateData,
+  ExperienceEventData,
+  ExperienceJoinData,
+};

@@ -1,24 +1,64 @@
 import { getClient, startInactiveSpan } from "@sentry/browser";
-import { arrayIncludes, AsyncResult, errAsync } from "@rbx/core-lib";
+import { arrayIncludes, AsyncResult, errAsync, type Result } from "@rbx/core-lib";
 import * as http from "@rbx/core-lib/http";
 import { HttpError } from "@rbx/core-lib/http";
 import { retryInterceptor } from "@rbx/core-lib/http/retry";
-import { interceptChallenge, Migrate } from "@rbx/generic-challenges";
+import { withResolvers } from "@rbx/core-lib/promise";
+import {
+  interceptChallenge,
+  Migrate,
+  parseChallengeSpecificProperties,
+  renderChallenge,
+} from "@rbx/generic-challenges";
+import type {
+  InterceptChallengeParameters,
+  ParseChallengeSpecificProperties,
+  RenderChallenge,
+} from "@rbx/generic-challenge-types";
+import { buildConfigBoundAuthToken, type UrlConfigForBat } from "./auth/boundAuth";
+import { isHbaUnauthorizedError } from "./auth/hbaUnauthorized";
 import { UserId } from "./user";
 import { Locale, localeToUppercaseDash } from "./locale";
+
+export type LegacyInterceptChallenge = <T>(
+  parameters: Omit<InterceptChallengeParameters<T>, "legacyGenericRender"> & {
+    newRenderChallenge: RenderChallenge;
+    newParseChallenge: ParseChallengeSpecificProperties;
+  },
+) => Promise<T>;
+
+export type LegacyRenderChallenge = RenderChallenge;
+
+// Challenge interceptors reject when the challenge is abandoned or fails.
+const settleChallenge = (
+  challenge: Promise<Result<Response, http.FetchError>>,
+  error: http.FetchError,
+): AsyncResult<Response, http.FetchError> =>
+  AsyncResult.fromPromise(challenge, reason => (reason instanceof Error ? reason : error)).andThen(
+    result => result,
+  );
 
 export const setClientInterceptors = ({
   getUserId,
   getLocale,
   challengeContainerId,
+  onHbaUnauthorized,
+  legacyInterceptChallenge,
+  legacyRenderChallenge,
 }: {
   getUserId: () => UserId | null;
   getLocale: () => Locale;
   challengeContainerId: string;
+  // Returns whether a sign-in prompt took the 401; the request is held only then.
+  onHbaUnauthorized?: () => boolean;
+  legacyInterceptChallenge?: LegacyInterceptChallenge;
+  legacyRenderChallenge?: LegacyRenderChallenge;
 }): void => {
   let csrfToken: string | null = null;
+  let hbaUnauthorizedReported = false;
 
   const csrfTokenHeader = "x-csrf-token";
+  const boundAuthTokenHeader = "x-bound-auth-token";
   const xsrfMethods = ["POST", "PATCH", "PUT", "DELETE"] as const;
 
   http.setInterceptors([
@@ -28,8 +68,6 @@ export const setClientInterceptors = ({
         if (csrfToken != null && arrayIncludes(xsrfMethods, options.method)) {
           options.headers.set(csrfTokenHeader, csrfToken);
         }
-
-        // TODO: x-bound-auth-token
 
         const isFirstParty =
           url.host.endsWith(".roblox.com") || url.host.endsWith(".robloxlabs.com");
@@ -45,6 +83,17 @@ export const setClientInterceptors = ({
             // eslint-disable-next-line no-param-reassign
             url = url.withSearchParamsAppended({ urlLocale: locale });
           }
+        }
+
+        const batConfig: UrlConfigForBat = {
+          url: url.href,
+          method: options.method,
+          data: typeof options.body === "string" ? options.body : undefined,
+        };
+        const { headers: batHeaders } = await buildConfigBoundAuthToken(batConfig, userId != null);
+        const boundAuthToken = batHeaders?.[boundAuthTokenHeader];
+        if (boundAuthToken != null) {
+          options.headers.set(boundAuthTokenHeader, String(boundAuthToken));
         }
 
         let sentrySpan;
@@ -65,7 +114,10 @@ export const setClientInterceptors = ({
           options.headers.set("traceparent", traceparent);
         }
 
-        const result = await next(url, options).orElse(error => {
+        const requestOptions =
+          onHbaUnauthorized == null ? options : { ...options, includeBodyOnError: true };
+
+        const result = await next(url, requestOptions).orElse(error => {
           // Extract this block into a helper function so that when a CSRF token is generated
           // from a response and populated, it correctly renders a generic challenge using
           // the error callback handler
@@ -86,30 +138,60 @@ export const setClientInterceptors = ({
                 challengeTypeRaw != null &&
                 challengeMetadataJsonBase64 != null
               ) {
+                const retryRequest = (
+                  challengeIdInner: string,
+                  redemptionMetadataJsonBase64: string,
+                ) => {
+                  options.headers.set(genericChallengeIdHeader, challengeIdInner);
+                  options.headers.set(genericChallengeTypeHeader, challengeTypeRaw);
+                  options.headers.set(genericChallengeMetadataHeader, redemptionMetadataJsonBase64);
+                  return next(url, requestOptions);
+                };
+
                 if (Migrate.isSupportedByGrasshopper(challengeTypeRaw)) {
-                  return interceptChallenge({
-                    retryRequest: (challengeIdInner, redemptionMetadataJsonBase64) => {
-                      options.headers.set(genericChallengeIdHeader, challengeIdInner);
-                      options.headers.set(genericChallengeTypeHeader, challengeTypeRaw);
-                      options.headers.set(
-                        genericChallengeMetadataHeader,
-                        redemptionMetadataJsonBase64,
-                      );
-                      return next(url, options);
-                    },
-                    containerId: challengeContainerId,
-                    nonce: document.querySelector<HTMLScriptElement>("script[nonce]")?.nonce,
-                    challengeId,
-                    challengeTypeRaw,
-                    challengeMetadataJsonBase64,
-                  });
-                } else {
-                  // TODO: use legacy Roblox.AccountSecurity
+                  return settleChallenge(
+                    interceptChallenge({
+                      retryRequest,
+                      containerId: challengeContainerId,
+                      nonce: document.querySelector<HTMLScriptElement>("script[nonce]")?.nonce,
+                      challengeId,
+                      challengeTypeRaw,
+                      challengeMetadataJsonBase64,
+                      legacyGenericRender: legacyRenderChallenge,
+                    }),
+                    error,
+                  );
+                }
+                if (legacyInterceptChallenge != null) {
+                  return settleChallenge(
+                    legacyInterceptChallenge({
+                      retryRequest,
+                      containerId: challengeContainerId,
+                      challengeId,
+                      challengeTypeRaw,
+                      challengeMetadataJsonBase64,
+                      newRenderChallenge: renderChallenge,
+                      newParseChallenge: parseChallengeSpecificProperties,
+                    }),
+                    error,
+                  );
                 }
               }
             }
 
             return errAsync(error);
+          };
+
+          const handleHbaOrChallengeResponse = (error: http.FetchError) => {
+            if (
+              onHbaUnauthorized != null &&
+              isHbaUnauthorizedError(error) &&
+              (hbaUnauthorizedReported || onHbaUnauthorized())
+            ) {
+              hbaUnauthorizedReported = true;
+              return AsyncResult.fromPromise(withResolvers<Response>().promise, () => error);
+            }
+            return handleChallengeResponse(error);
           };
 
           if (
@@ -121,11 +203,11 @@ export const setClientInterceptors = ({
             if (newCsrfToken != null) {
               csrfToken = newCsrfToken;
               options.headers.set(csrfTokenHeader, csrfToken);
-              return next(url, options).orElse(handleChallengeResponse);
+              return next(url, requestOptions).orElse(handleHbaOrChallengeResponse);
             }
           }
 
-          return handleChallengeResponse(error);
+          return handleHbaOrChallengeResponse(error);
         });
 
         if (sentrySpan != null) {

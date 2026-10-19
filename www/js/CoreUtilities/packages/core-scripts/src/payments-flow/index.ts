@@ -17,7 +17,7 @@ import {
 // TODO: old, migrated code
 // eslint-disable-next-line import-x/no-cycle
 import setupExternalEventListeners from "./externalEventListenerHelper";
-import { sendEventWithTarget, targetTypes } from "../event-stream";
+import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
 
 // eslint-disable-next-line no-console
 const fireEvent = window.EventTracker?.fireEvent ?? console.log;
@@ -58,13 +58,18 @@ export class PaymentFlowAnalyticsService {
       if (!this.purchaseFlowUuid) {
         this.tryLoadPreExistingCtx();
       }
-      // If no existing session or no pre-existing ctx, then we should start a new flow
+      // `@rbx/payments/payments-flow-analytics` also writes RBXPaymentsFlowContext at import.
+      // On a fresh visit each singleton would mint a uuid and the later save would split
+      // the funnel. Share this page's id, and still ignore a stale cookie.
       if (!this.purchaseFlowUuid) {
-        // No existing flow Uuid, starting a new flow
+        this.adoptSharedFlowUuid();
+      }
+      if (!this.purchaseFlowUuid) {
         const urlAnalyticId = PaymentFlowAnalyticsService.getUrlAnalyticId();
         this.purchaseFlowUuid = urlAnalyticId ?? uuidService.generateRandomUuid();
         this.writePaymentFlowContextIntoCookie();
       }
+      this.publishSharedFlowUuid();
     } catch {
       fireEvent(COUNTER_EVENTS.START_FLOW_ERROR);
     }
@@ -74,6 +79,7 @@ export class PaymentFlowAnalyticsService {
    * Returns the payment flow uuid
    */
   public getPaymentFlowUuid(): string {
+    this.adoptSharedFlowUuid();
     return this.purchaseFlowUuid;
   }
 
@@ -83,6 +89,7 @@ export class PaymentFlowAnalyticsService {
    */
   public setPaymentFlowUuid(id: string): void {
     this.purchaseFlowUuid = id;
+    this.publishSharedFlowUuid();
     this.writePaymentFlowContextIntoCookie();
   }
 
@@ -223,6 +230,7 @@ export class PaymentFlowAnalyticsService {
         fireEvent(COUNTER_EVENTS.WRONG_USAGE_OF_METHOD);
         return;
       }
+      this.adoptSharedTriggerContext();
       if (!this.triggerContext) {
         this.triggerContext = sanitziedTriggerContext;
         this.writePaymentFlowContextIntoCookie();
@@ -262,6 +270,7 @@ export class PaymentFlowAnalyticsService {
         fireEvent(COUNTER_EVENTS.WRONG_USAGE_OF_METHOD);
         return;
       }
+      this.adoptSharedTriggerContext();
       if (!this.triggerContext) {
         this.triggerContext = sanitziedTriggerContext;
         this.writePaymentFlowContextIntoCookie();
@@ -277,7 +286,38 @@ export class PaymentFlowAnalyticsService {
     }
   }
 
+  private adoptSharedTriggerContext(): void {
+    if (this.triggerContext) {
+      return;
+    }
+    this.adoptSharedFlowUuid();
+    const existing = PaymentFlowContext.loadFromCookie();
+    if (
+      existing?.triggeringContext != null &&
+      existing.purchaseFlowUuid === this.purchaseFlowUuid
+    ) {
+      this.triggerContext = existing.triggeringContext;
+    }
+  }
+
+  private adoptSharedFlowUuid(): void {
+    const sharedFlowUuid = (window as Window & { __rbxPaymentsFlowUuid?: string })
+      .__rbxPaymentsFlowUuid;
+    if (sharedFlowUuid) {
+      this.purchaseFlowUuid = sharedFlowUuid;
+    }
+  }
+
+  private publishSharedFlowUuid(): void {
+    if (!this.purchaseFlowUuid) {
+      return;
+    }
+    (window as Window & { __rbxPaymentsFlowUuid?: string }).__rbxPaymentsFlowUuid =
+      this.purchaseFlowUuid;
+  }
+
   private writePaymentFlowContextIntoCookie() {
+    this.adoptSharedFlowUuid();
     const flowCtx = new PaymentFlowContext(this.purchaseFlowUuid, this.triggerContext);
     flowCtx.save();
   }
@@ -290,6 +330,7 @@ export class PaymentFlowAnalyticsService {
     status?: PURCHASE_STATUS,
     eventPros: Record<string, unknown> = {},
   ) {
+    this.adoptSharedFlowUuid();
     if (!this.purchaseFlowUuid || !this.triggerContext) {
       fireEvent(COUNTER_EVENTS.SEND_EVENT_WITHOUT_UUID_OR_CTX);
       return;

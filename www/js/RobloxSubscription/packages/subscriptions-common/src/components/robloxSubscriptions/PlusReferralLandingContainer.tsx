@@ -1,3 +1,4 @@
+import { window } from "@rbx/core-lib/browser";
 import { useMemo, useState } from "react";
 
 import PlusReferralSheet from "./PlusReferralSheet";
@@ -62,7 +63,7 @@ const PlusReferralLandingContainer: FC<PlusReferralLandingContainerProps> = ({
   subscribeFeatureConfig,
   subscribeEligibleOffers,
 }) => {
-  const landing = useMemo(() => readPlusReferralLanding(window.location.search), []);
+  const landing = useMemo(() => readPlusReferralLanding(window?.location.search ?? ""), []);
   const [open, setOpen] = useState(landing.kind !== "none");
 
   if (landing.kind === "none") {

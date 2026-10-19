@@ -1,3 +1,8 @@
+/**
+ * When adding a catalog value, also update
+ * `packages/payments/src/paymentsFlowAnalytics/constants.ts`.
+ * Enforced by `@rbx/payments` `constants.parity.test.ts`.
+ */
 export const COOKIE_NAME = "RBXPaymentsFlowContext";
 export const COOKIE_TIMESPAN = 600;
 

@@ -1,98 +1,101 @@
 import "../global";
+import {
+  createDeepLinkNavigator,
+  ItemType,
+  parseDeepLink,
+  ShareLinks,
+  ShareLinksType,
+  type StudioLinkData,
+} from "@rbx/www-common/deep-link";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
-import { DeepLink, DeepLinkParams, ItemType, PathPart } from "./deepLinkConstants";
-import deepLinkNavigate from "./deepLinkNavigate";
-import deepLinkGameJoin from "./deepLinkGameJoin";
-import deepLinkFollowUserToExperience from "./deepLinkFollowUserToExperience";
-import AvatarItemDetailsStatus from "./enums/AvatarItemDetailsStatus";
-import ContentPostStatus from "./enums/ContentPostStatus";
-import ExperienceInviteStatus from "./enums/ExperienceInviteStatus";
-import FriendInviteStatus from "./enums/FriendInviteStatus";
-import ProfileShareStatus from "./enums/ProfileShareStatus";
-import PrivateServerLinkStatus from "./enums/PrivateServerLinkStatus";
-import ExperienceAffiliateStatus from "./enums/ExperienceAffiliateStatus";
-import { ShareLinksType } from "./shareLinksTypes";
-import deepLinkGroup from "./deepLinkGroup";
-import ExperienceEventStatus from "./enums/ExperienceEventStatus";
+import { launchGame } from "../game";
+import { startDesktopAndMobileWebChat } from "../util/chat";
+import { sendEventWithTarget } from "../event-stream";
+import { getQueryParam, getHelpDeskUrl } from "../util/url";
+import getPlaceIdFromUniverseId from "./getPlaceIdFromUniverseId";
+import getUniverseIdFromPlaceId from "./getUniverseIdFromPlaceId";
+import { resolveShareLinks, resolveShareLinksV2 } from "./resolveShareLinks";
 
 const { Hybrid } = window.Roblox;
+const fireEvent = window.EventTracker?.fireEvent;
 
-const firstUriSegmentToHandler: Record<string, (target: DeepLink) => Promise<boolean>> = {
-  [PathPart.Navigation]: deepLinkNavigate,
-  [PathPart.PlaceId]: deepLinkGameJoin,
-  [PathPart.UserId]: deepLinkFollowUserToExperience,
-  [PathPart.Group]: deepLinkGroup,
-};
-
-const pathRegex = /\/(\w+)/g; // matches: /(pathSegment)
-const paramRegex = /(\w+)=([^&=]+)/g; // matches: (param)=(value)
-
-const HYBRID_TARGET_KEY = "feature";
-const HYBRID_TARGET_VALUE = "DeepLink";
-const HYBRID_TARGET_PARAM_KEY = "deepLinkUrlPath";
-
-const parseDeepLink = (deepLinkString: string): DeepLink => {
-  const path: PathPart[] = [];
-  const params: DeepLinkParams = {};
-  const url: string = deepLinkString;
-
-  let pathPart = pathRegex.exec(deepLinkString);
-  while (pathPart != null) {
-    // TODO: old, migrated code
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    path.push(pathPart[1] as PathPart);
-    pathPart = pathRegex.exec(deepLinkString);
-  }
-
-  let paramPart = paramRegex.exec(deepLinkString);
-  while (paramPart != null) {
-    const [, key, value] = paramPart;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    params[key!] = value!;
-    paramPart = paramRegex.exec(deepLinkString);
-  }
-
-  return {
-    path,
-    params,
-    url,
-  };
-};
-
-const navigateToDeepLink = (deepLinkUrl: string): Promise<boolean> => {
-  if (getDeviceMeta()?.isIosApp && Hybrid) {
-    Hybrid.Navigation?.navigateToFeature(
-      {
-        [HYBRID_TARGET_KEY]: HYBRID_TARGET_VALUE,
-        [HYBRID_TARGET_PARAM_KEY]: deepLinkUrl,
-      },
-      () => true,
+const launchStudio = ({
+  placeId,
+  universeId,
+  startTeamTest,
+  instanceId,
+  annotationId,
+}: StudioLinkData): void => {
+  const { GameLauncher } = window.Roblox;
+  if (GameLauncher && placeId && universeId) {
+    // checking of whether or not Team Create is actually enabled should be done in Studio if needed
+    // this is done to be consistent with how Studio share link errors should show up in Studio if possible
+    GameLauncher.editGameInStudio(
+      placeId,
+      universeId,
+      true, // allowUpload
+      true, // isTeamCreateEnabled
+      false, // enableTeamCreatePreemptiveStart
+      startTeamTest,
+      instanceId,
+      annotationId,
     );
-    return Promise.resolve(true);
   }
-  if (getDeviceMeta()?.isInApp) {
-    // use lua deeplinks map to resolve url if in universal app
-    // https://github.com/Roblox/lua-apps/blob/master/src/internal/LuaApp/Modules/LuaApp/DeepLinks/DeepLinkMap.lua
-    window.location.href = deepLinkUrl;
-    return Promise.resolve(true);
-  }
-  const target = parseDeepLink(deepLinkUrl);
-  // TODO: old, migrated code
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const path = target.path[0]!;
-  const handler = firstUriSegmentToHandler[path];
-  return handler ? handler(target) : Promise.resolve(false);
 };
 
-const ShareLinks = {
-  AvatarItemDetailsStatus,
-  ContentPostStatus,
-  ExperienceInviteStatus,
-  FriendInviteStatus,
-  ProfileShareStatus,
-  PrivateServerLinkStatus,
-  ExperienceAffiliateStatus,
-  ExperienceEventStatus,
-};
+const { navigateToDeepLink } = createDeepLinkNavigator({
+  getDeviceMeta: () => getDeviceMeta(),
+  navigateToHybridFeature: Hybrid
+    ? feature => {
+        Hybrid.Navigation?.navigateToFeature(feature, () => true);
+      }
+    : undefined,
+  sendEvent: (type, context, params) => {
+    sendEventWithTarget(type, context, params);
+  },
+  fireCounter: name => {
+    fireEvent?.(name);
+  },
+  resolveShareLinks: (linkId, linkType) => resolveShareLinks(linkId, linkType),
+  resolveShareLinksV2: linkId => resolveShareLinksV2(linkId),
+  getPlaceIdFromUniverseId: universeId => getPlaceIdFromUniverseId(universeId),
+  getUniverseIdFromPlaceId: placeId => getUniverseIdFromPlaceId(placeId),
+  launchGame: (properties, event) => {
+    launchGame(properties, event);
+  },
+  joinMultiplayerGame: placeId => {
+    // TODO: old, migrated code
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    window.Roblox.GameLauncher!.joinMultiplayerGame(placeId, true, false);
+  },
+  startGameWithDeepLinkUrl: (deepLinkUrl, placeId) => {
+    // TODO: old, migrated code
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    window.Roblox.ProtocolHandlerClientInterface!.startGameWithDeepLinkUrl(deepLinkUrl, placeId);
+  },
+  startDeepLinkFlow: deepLinkUrl => {
+    if (window.Roblox.ProtocolHandlerClientInterface?.startDeepLinkFlow) {
+      window.Roblox.ProtocolHandlerClientInterface.startDeepLinkFlow(deepLinkUrl);
+      return true;
+    }
+    return false;
+  },
+  openStudio: data => {
+    // Check if ShareLinks WebApp has registered a custom handler for Studio links
+    const { studioLinkHandler } = window.Roblox;
+    if (studioLinkHandler && typeof studioLinkHandler === "function") {
+      studioLinkHandler(data);
+      return;
+    }
+    launchStudio(data);
+  },
+  startAccessManagementUpsell: params =>
+    window.Roblox.AccessManagementUpsellV2Service?.startAccessManagementUpsell(params) ?? null,
+  startChat: userId => {
+    startDesktopAndMobileWebChat({ userId });
+  },
+  getQueryParam: name => getQueryParam(name),
+  getHelpDeskUrl: (locale, articleId) => getHelpDeskUrl(locale, articleId),
+});
 
 export { parseDeepLink, navigateToDeepLink, ShareLinksType, ShareLinks, ItemType };

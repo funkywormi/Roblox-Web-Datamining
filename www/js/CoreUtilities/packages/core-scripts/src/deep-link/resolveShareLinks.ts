@@ -1,18 +1,12 @@
 import environmentUrls from "@rbx/environment-urls";
 import { post } from "../http";
 import {
-  AvatarItemDetailsData,
-  ContentPostData,
-  ExperienceInviteData,
-  FriendInviteData,
-  PrivateServerLinkData,
-  ProfileData,
-  ScreenshotInviteData,
-  ExperienceDetailsData,
-  ExperienceAffiliateData,
-  ExperienceEventData,
   ShareLinksType,
-} from "./shareLinksTypes";
+  type ResolveShareLinksResponse,
+  type ResolveShareLinksV2Response,
+} from "@rbx/www-common/deep-link";
+
+export type { ResolveShareLinksResponse, ResolveShareLinksV2Response };
 
 const ResolveShareLinksUrlConfig = {
   url: `${environmentUrls.shareLinksApi}/v1/resolve-link`,
@@ -22,27 +16,6 @@ const ResolveShareLinksUrlConfig = {
 const ResolveShareLinksUrlV2Config = {
   url: `${environmentUrls.shareLinksApiV2}/v2/resolve`,
   withCredentials: true,
-};
-
-export type ResolveShareLinksResponse = {
-  avatarItemDetailsData?: AvatarItemDetailsData;
-  contentPostData?: ContentPostData;
-  experienceInviteData?: ExperienceInviteData;
-  friendInviteData?: FriendInviteData;
-  notificationExperienceInviteData?: ExperienceInviteData;
-  profileLinkResolutionResponseData?: ProfileData;
-  experienceAffiliateData?: ExperienceAffiliateData;
-  screenshotInviteData?: ScreenshotInviteData;
-  privateServerInviteData?: PrivateServerLinkData;
-  experienceDetailsInviteData?: ExperienceDetailsData;
-  experienceEventData?: ExperienceEventData;
-};
-
-export type ResolveShareLinksV2Response = {
-  linkType: string;
-  targetId: string;
-  customData: string | null;
-  status: "Valid" | "Invalid" | "Expired";
 };
 
 export const resolveShareLinks = (

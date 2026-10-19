@@ -6,6 +6,7 @@ import protectionShieldLight from "@rbx/foundation-images/pictograms/protection_
 import type { Report } from "../../types/api";
 import { getReportDetailPath } from "../../shared/utils/navigation";
 import { HOW_TO_REPORT_URL } from "../../shared/url";
+import { formatReportDate } from "./util/dateTime";
 
 interface ReportListProps {
   reports: Report[];
@@ -25,7 +26,7 @@ const ReportList = ({ reports }: ReportListProps) => {
           <ListItem
             title={report.title}
             metadata={report.metadata}
-            description={report.description}
+            description={formatReportDate(report.description)}
             key={report.id}
             divider={divider}
             isContained={false}

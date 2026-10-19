@@ -11,6 +11,7 @@ import {
   type MutableRefObject,
   type ReactNode,
 } from "react";
+import { window } from "@rbx/core-lib/browser";
 
 import { CarouselContext, type CarouselContextValue } from "./CarouselContext";
 
@@ -118,6 +119,7 @@ export function Carousel({ children, className, ariaLabel }: CarouselRootProps) 
   // Items observe themselves on registration so order-of-mount doesn't matter.
   useEffect(() => {
     const root = trackRef.current;
+    const IntersectionObserver = window?.IntersectionObserver;
     if (root == null || typeof IntersectionObserver === "undefined") {
       return undefined;
     }

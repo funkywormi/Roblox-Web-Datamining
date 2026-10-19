@@ -1,5 +1,6 @@
 import { Timeline, TimelineItem } from "@rbx/foundation-ui";
 import { Details } from "../../types/api";
+import { formatReportDate } from "./util/dateTime";
 
 const ReportTimeline = ({ details }: { details: Details }) => {
   const { activities } = details;
@@ -15,7 +16,9 @@ const ReportTimeline = ({ details }: { details: Details }) => {
             description={activity.description}
             icon="icon-regular-middle-dot"
           >
-            <span className="text-body-small">{activity.date}</span>
+            <span className="text-body-small">
+              {activity.date && formatReportDate(activity.date)}
+            </span>
           </TimelineItem>
         );
       })}

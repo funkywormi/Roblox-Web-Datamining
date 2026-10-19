@@ -4,7 +4,6 @@ import "@rbx/www-common/global";
 import { AppTheme, appThemes, PlusTheme, FreeTheme } from "./constants";
 
 const appThemeClass = (theme: Exclude<AppTheme, "default">) => `theme-${theme}`;
-const legacyAppThemeClass = (theme: Exclude<AppTheme, "default">) => `${theme}-theme`;
 
 const initialTheme = () => {
   // For CS site which loads CoreUtilities before document body
@@ -17,8 +16,7 @@ const initialTheme = () => {
 
   const appTheme = appThemes.find(
     (theme): theme is Exclude<AppTheme, "default"> =>
-      theme !== "default" &&
-      (classList.contains(appThemeClass(theme)) || classList.contains(legacyAppThemeClass(theme))),
+      theme !== "default" && classList.contains(appThemeClass(theme)),
   );
 
   return appTheme ?? "default";
@@ -32,14 +30,14 @@ const themeListeners = new Set<(theme: AppTheme) => void>();
 
 const addAppThemeClass = (theme: AppTheme) => {
   if (theme !== "default") {
-    document.body.classList.add(appThemeClass(theme), legacyAppThemeClass(theme));
+    document.body.classList.add(appThemeClass(theme));
   }
 };
 
 const clearTheme = () => {
   const theme = previewTheme ?? accountTheme;
   if (theme !== "default") {
-    document.body.classList.remove(appThemeClass(theme), legacyAppThemeClass(theme));
+    document.body.classList.remove(appThemeClass(theme));
   }
 };
 

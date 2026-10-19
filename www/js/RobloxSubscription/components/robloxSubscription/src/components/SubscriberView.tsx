@@ -1,6 +1,7 @@
 import { isReferralEnabled as isPlusReferralRolloutEnabled } from "@rbx/core-scripts/meta/subscription";
 import { useTranslation } from "@rbx/core-scripts/react";
 import {
+  PendingPlanChangeBanner,
   RobloxPlusHeading,
   RobloxPlusGiftItemUpsellBanner,
   RobloxPlusFreeTrialBanner,
@@ -138,17 +139,26 @@ const SubscriberView: FC<SubscriberViewProps> = ({
             hasFreeTrial={hasFreeTrial}
             nextRenewalTimestampMs={robloxSubscriptionMembership.nextRenewalTimestampMs}
           />
-          <DiscountTierProgressCard
-            activationTimestampMs={robloxSubscriptionMembership.activationTimestampMs}
-            currentDiscountPercent={currentDiscountPercent}
-            isCancelled={
-              robloxSubscriptionMembership.nextRenewalTimestampMs === null ||
-              robloxSubscriptionMembership.nextRenewalTimestampMs === 0
-            }
-            nextDiscount={discountTier.next}
-            periodType={robloxSubscriptionMembership.periodType}
-            trialEndTimestampMs={paidTenureStartTimestampMs}
-          />
+          {
+            // Keep the existing 8px gap when the banner is hidden.
+            <div className="width-full gap-xlarge flex flex-col">
+              <PendingPlanChangeBanner
+                nextRenewalTimestampMs={robloxSubscriptionMembership.nextRenewalTimestampMs}
+                subscriptionId={robloxSubscriptionMembership.subscriptionId}
+              />
+              <DiscountTierProgressCard
+                activationTimestampMs={robloxSubscriptionMembership.activationTimestampMs}
+                currentDiscountPercent={currentDiscountPercent}
+                isCancelled={
+                  robloxSubscriptionMembership.nextRenewalTimestampMs === null ||
+                  robloxSubscriptionMembership.nextRenewalTimestampMs === 0
+                }
+                nextDiscount={discountTier.next}
+                periodType={robloxSubscriptionMembership.periodType}
+                trialEndTimestampMs={paidTenureStartTimestampMs}
+              />
+            </div>
+          }
         </div>
         <div className="flex flex-col gap-y-[32px]">
           {/* The invite card is the rail's only item today, so the whole section goes away with

@@ -43,6 +43,7 @@ import * as webTelemetry from "@rbx/web-telemetry/fire";
 
 import Intl from "@rbx/core-scripts/intl";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
+import { hbaUnauthorizedEventName } from "@rbx/www-common/auth";
 import { setClientInterceptors } from "@rbx/www-common/http";
 import { defaultLocale, locales } from "@rbx/www-common/locale";
 import { userIdFromNumber } from "@rbx/www-common/user";
@@ -68,6 +69,8 @@ try {
       return coreLib.arrayIncludes(locales, locale) ? locale : defaultLocale;
     },
     challengeContainerId: "generic-challenge-container",
+    onHbaUnauthorized: () =>
+      !document.dispatchEvent(new Event(hbaUnauthorizedEventName, { cancelable: true })),
   });
 } catch {
   // do nothing for now

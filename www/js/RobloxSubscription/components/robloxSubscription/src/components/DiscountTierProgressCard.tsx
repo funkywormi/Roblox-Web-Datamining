@@ -148,7 +148,7 @@ const DiscountTierProgressCard: FC<DiscountTierProgressCardProps> = ({
 
   // TODO(SUBS-4954): make the card dismissable when the max discount is reached
   return (
-    <div className="radius-medium padding-large bg-shift-200 width-full gap-x-small flex items-center justify-between [overflow:clip]">
+    <div className="radius-medium stroke-standard stroke-emphasis padding-large width-full gap-x-small flex items-center justify-between [overflow:clip]">
       <div className="gap-y-small min-width-0 flex flex-col items-start justify-center">
         <span className="text-title-medium content-default">{renderTopLine()}</span>
         <span className="text-heading-large content-emphasis">{renderHeading()}</span>
