@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { ErrorBoundary } from "@sentry/react";
 import React, { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 import { createSystemFeedback } from "react-style-guide";
 import { CurrentUser } from "Roblox";
@@ -40,6 +41,7 @@ import type { RedemptionStatusResponse } from "@rbx/payments/gift-card";
 import { getRobloxPlusProductIdFromTargetKey } from "@rbx/payments/services/subscriptions";
 import { redeemPromoCode } from "@rbx/payments-legacy/promoCodes";
 import HeuristicConvertToCredit from "./HeuristicConvertToCredit";
+import { GET_PLUS_PRODUCTS_QUERY_KEY } from "../hooks/useGetPlusProducts";
 import {
   CREDIT_CONVERSION_REQUIRED_ERROR_CODE,
   eventTypes,
@@ -106,6 +108,7 @@ function RedeemGiftCardForm({
   showTwentyPercentMoreRobux,
   onShowRedeemedItemBanner,
 }: RedeemGiftCardFormProps): React.ReactElement {
+  const queryClient = useQueryClient();
   const [pinValue, setPinValue] = useState("");
   const [error, setError] = useState<GiftCardFormError>();
   const [loading, setLoading] = useState(false);
@@ -201,6 +204,9 @@ function RedeemGiftCardForm({
 
     setConfirmationData(result);
     setLoading(false);
+    if (!creditBalance) {
+      queryClient.resetQueries({ queryKey: GET_PLUS_PRODUCTS_QUERY_KEY });
+    }
     setShouldAutoOpenGetPlusModal(isRobloxPlusRedemption);
     setPreferredGetPlusSubscriptionTargetKey(
       isRobloxPlusRedemption

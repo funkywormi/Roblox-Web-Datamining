@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { createModal, Button } from "react-style-guide";
 import { withTranslations, WithTranslationsProps } from "react-utilities";
-import { paymentFlowAnalyticsService } from "core-roblox-utilities";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { BillingInfoForm, type Address } from "@rbx/payments/billingAddress";
 import { apiErrorStatusCode, trackError } from "../../../observability";
 import { TRANSLATION_KEYS, LOW_COGS_ROBUX_PACKAGE_MAP } from "../../constants/redeemConstants";
@@ -48,14 +48,14 @@ const PurchasePackageModal: React.FC<PurchasePackageModalProps> = ({ translate }
   useEffect(() => {
     if (isPurchaseModalOpen) {
       modalService.open();
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-        true,
-        isTaxFlowEnabled
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+        isMidPurchaseStep: true,
+        viewName: isTaxFlowEnabled
           ? paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_PACKAGE_PURCHASE_MODAL_WITH_TAX
           : paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_PACKAGE_PURCHASE_MODAL_WITHOUT_TAX,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
-      );
+        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
+      });
     } else {
       modalService.close();
     }

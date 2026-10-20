@@ -4,7 +4,7 @@
 import React, { FC, useCallback, useState, useEffect, useMemo, useRef } from "react";
 import { NativeDropdown, Button } from "react-style-guide";
 import { withTranslations, WithTranslationsProps } from "react-utilities";
-import { paymentFlowAnalyticsService } from "core-roblox-utilities";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { Icon } from "@rbx/foundation-ui";
 import { TRIGGERING_CONTEXT } from "../constants/triggeringContext";
 import Constants from "../constants/Constants";
@@ -87,17 +87,16 @@ const EditableForm: React.FC<EditableFormProps> = ({
   const showSaveButton = hasSavedAddress;
 
   useEffect(() => {
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      triggeringContext,
-      true, // isMidPurchaseStep
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_BALANCE_BIILLING_ADDRESS_FORM, // viewName
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN, // purchaseEventType
-      undefined, // viewMessage
-      {
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: triggeringContext,
+      isMidPurchaseStep: true,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_BALANCE_BIILLING_ADDRESS_FORM,
+      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
+      eventMetadata: {
         initial_address_available: initialAddress ? "true" : "false",
         has_saved_address: hasSavedAddress ? "true" : "false",
-      }, // eventMetadata
-    );
+      },
+    });
   }, [hasSavedAddress, initialAddress, triggeringContext]);
 
   const handleEditButtonClick = useCallback(() => {

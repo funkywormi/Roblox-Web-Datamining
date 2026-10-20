@@ -13,11 +13,13 @@ export type TUseGetPlusProducts = {
   isLoading: boolean;
 };
 
+export const GET_PLUS_PRODUCTS_QUERY_KEY = ["redeemGiftCard", "getPlusProducts"];
+
 /** Credit-purchasable Roblox Plus SKUs, fetched on mount. Empty for already-subscribed users. */
 export default function useGetPlusProducts(): TUseGetPlusProducts {
   const { isAuthenticated } = CurrentUser;
   const { data: products = [], isLoading } = useQuery({
-    queryKey: ["redeemGiftCard", "getPlusProducts"],
+    queryKey: GET_PLUS_PRODUCTS_QUERY_KEY,
     enabled: isAuthenticated,
     queryFn: async () => {
       const response = await listAvailableSubscriptionProductsV2(

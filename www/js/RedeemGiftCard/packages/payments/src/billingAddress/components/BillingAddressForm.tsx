@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { withTranslations, WithTranslationsProps } from "react-utilities";
-import { paymentFlowAnalyticsService } from "core-roblox-utilities";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { TRIGGERING_CONTEXT } from "../constants/triggeringContext";
 import translationConfig from "../translation.config";
 import EditableForm from "./EditableForm";
@@ -74,12 +74,12 @@ const BillingAddressForm: React.FC<BillingAddressFormProps> = ({
         const {
           data: { countryCode, subdivision, city, postalCode },
         } = await getApproximateUserLocation();
-        paymentFlowAnalyticsService.sendUserPurchaseStatusEvent(
-          triggeringContext,
-          paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.PASSED_GET_APPROXIMATE_USER_LOCATION,
-          undefined,
-          paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_BALANCE_BIILLING_ADDRESS_FORM,
-        );
+        paymentFlowAnalyticsService.sendUserPurchaseStatusEvent({
+          triggerContext: triggeringContext,
+          status:
+            paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.PASSED_GET_APPROXIMATE_USER_LOCATION,
+          viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_BALANCE_BIILLING_ADDRESS_FORM,
+        });
         // check to see if the country code and subdivision are supported
         if (
           supportedCountries.some(supportedCountry => supportedCountry.code === countryCode) &&
@@ -94,12 +94,12 @@ const BillingAddressForm: React.FC<BillingAddressFormProps> = ({
         }
       } catch (error: unknown) {
         // ignore error since this approximate user location is nice to have.
-        paymentFlowAnalyticsService.sendUserPurchaseStatusEvent(
-          triggeringContext,
-          paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.FAILED_GET_APPROXIMATE_USER_LOCATION,
-          undefined,
-          paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_BALANCE_BIILLING_ADDRESS_FORM,
-        );
+        paymentFlowAnalyticsService.sendUserPurchaseStatusEvent({
+          triggerContext: triggeringContext,
+          status:
+            paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.FAILED_GET_APPROXIMATE_USER_LOCATION,
+          viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_BALANCE_BIILLING_ADDRESS_FORM,
+        });
       }
     };
 

@@ -4,78 +4,81 @@ import { arrayIncludes } from "@rbx/core-types";
 import * as cookie from "@rbx/core-lib/cookie";
 import type { LocalStorageRegistry } from "@rbx/core-lib/local-storage";
 import "@rbx/www-common/global";
+import { UserId, userIdToNumber } from "@rbx/www-common/user";
 
-// Note: "modes" used to be called "themes". So for legacy reasons, some things still refer to "themes":
-// - The legacy mode classes are named as `{light,dark,system}-theme`.
-// - The local storage key for modes is `theme`, but this actually stores the mode per user.
-// - The webview mode override cookie is `RBXThemeOverride`.
+// Note: "color modes" used to be called "themes". So for legacy reasons, some things still refer to "themes":
+// - The legacy color mode classes are named as `{light,dark,system}-theme`.
+// - The local storage key for color modes is `theme`, but this actually stores the color mode per user.
+// - The webview color mode override cookie is `RBXThemeOverride`.
 
-export const modes = ["light", "dark", "system"] as const;
-export type Mode = (typeof modes)[number];
+export const colorModes = ["light", "dark", "system"] as const;
+export type ColorMode = (typeof colorModes)[number];
 
-export const defaultMode = "light" as const satisfies Mode;
+export const defaultColorMode = "light" as const satisfies ColorMode;
 
 type LocalStorageData = LocalStorageRegistry["theme"];
-type ModeData = (LocalStorageData & { version: 0 })["data"];
-type ModeEntry = ModeData[number];
+type ColorModeData = (LocalStorageData & { version: 0 })["data"];
+type ColorModeEntry = ColorModeData[number];
 
 const maxUsers = 100;
 
 export const flagDefaultApplied = 1 << 0;
 
-let userId = -1;
-let currentMode: Mode = defaultMode;
+let userId: number | null = null;
+let userColorMode: ColorMode = defaultColorMode;
+let colorModeOverride: ColorMode | null = null;
+
+export const getColorMode = (): ColorMode => colorModeOverride ?? userColorMode;
 
 const prefersDarkMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-const setLegacyLightMode = () => {
+const setLegacyLightColorModeClasses = () => {
   const { classList } = document.body;
   classList.add("light-theme");
   classList.remove("dark-theme");
 };
 
-const setLegacyDarkMode = () => {
+const setLegacyDarkColorModeClasses = () => {
   const { classList } = document.body;
   classList.add("dark-theme");
   classList.remove("light-theme");
 };
 
-const updateLegacyMode = (dark: boolean) => {
+const updateLegacyColorModeClasses = (dark: boolean) => {
   if (dark) {
-    setLegacyDarkMode();
+    setLegacyDarkColorModeClasses();
   } else {
-    setLegacyLightMode();
+    setLegacyLightColorModeClasses();
   }
 };
 
-const modeEventListener = (e: MediaQueryListEvent) => {
-  updateLegacyMode(e.matches);
+const colorModeEventListener = (e: MediaQueryListEvent) => {
+  updateLegacyColorModeClasses(e.matches);
 };
 
-const setModeWithoutLocalStorage = (mode: Mode): void => {
-  currentMode = mode;
+const applyColorModeClasses = (colorMode: ColorMode) => {
   const { classList } = document.body;
   classList.remove("color-mode-system", "color-mode-light", "color-mode-dark");
-  switch (mode) {
+  switch (colorMode) {
     case "system":
       classList.add("color-mode-system");
-      updateLegacyMode(prefersDarkMediaQuery.matches);
-      prefersDarkMediaQuery.addEventListener("change", modeEventListener);
+      updateLegacyColorModeClasses(prefersDarkMediaQuery.matches);
+      prefersDarkMediaQuery.addEventListener("change", colorModeEventListener);
       break;
     case "light":
       classList.add("color-mode-light");
-      prefersDarkMediaQuery.removeEventListener("change", modeEventListener);
-      setLegacyLightMode();
+      prefersDarkMediaQuery.removeEventListener("change", colorModeEventListener);
+      setLegacyLightColorModeClasses();
       break;
     case "dark":
       classList.add("color-mode-dark");
-      prefersDarkMediaQuery.removeEventListener("change", modeEventListener);
-      setLegacyDarkMode();
+      prefersDarkMediaQuery.removeEventListener("change", colorModeEventListener);
+      setLegacyDarkColorModeClasses();
       break;
   }
 };
 
-const getModeData = (): ModeData | null | undefined => {
+const getColorModeData = (): ColorModeData | null | undefined => {
   try {
     const json = localStorage.getItem("theme");
     if (json == null) {
@@ -84,50 +87,68 @@ const getModeData = (): ModeData | null | undefined => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const { version, data } = JSON.parse(json) as LocalStorageData;
     // If version is not 0, then another tab is probably on a more up-to-date version.
-    // Let's use the default mode for this tab and do not write to local storage.
+    // Let's use the default color mode for this tab and do not write to local storage.
     return version === 0 ? data : undefined;
   } catch (e) {
-    console.error(`Failed to get mode data: ${e instanceof Error ? e : String(e)}`);
-    // Most likely failed to parse mode data. New versions should still follow the same schema and
+    console.error(`Failed to get color mode data: ${e instanceof Error ? e : String(e)}`);
+    // Most likely failed to parse color mode data. New versions should still follow the same schema and
     // succeed parsing. If we failed here, the data is likely corrupted. Reset to the default value.
     return null;
   }
 };
 
-const findUserEntry = (modeData: ModeData): ModeEntry | undefined =>
-  modeData.find(([id]) => id === userId);
+const findUserEntry = (colorModeData: ColorModeData): ColorModeEntry | undefined =>
+  colorModeData.find(([id]) => id === userId);
 
-const getUserFlags = (modeData: ModeData): number => findUserEntry(modeData)?.[2] ?? 0;
+const getUserFlags = (colorModeData: ColorModeData): number =>
+  findUserEntry(colorModeData)?.[2] ?? 0;
 
-const getUserMode = (modeData: ModeData): Mode | null | undefined => {
-  const entry = findUserEntry(modeData);
-  const modeIndex = entry?.[1];
-  return modeIndex == null ? null : modes[modeIndex];
+const getUserColorMode = (colorModeData: ColorModeData): ColorMode | null | undefined => {
+  const entry = findUserEntry(colorModeData);
+  const colorModeIndex = entry?.[1];
+  return colorModeIndex == null ? null : colorModes[colorModeIndex];
+};
+
+const updateColorModeOverride = (colorMode: ColorMode) => {
+  colorModeOverride = colorMode;
+  applyColorModeClasses(colorMode);
+};
+
+const updateUserColorMode = (colorMode: ColorMode) => {
+  userColorMode = colorMode;
+  if (colorModeOverride == null) {
+    applyColorModeClasses(colorMode);
+  }
 };
 
 // Note: last write to local storage wins which should suffice.
-const setModeWithLocalStorage = (mode: Mode, extraFlags = 0): void => {
-  setModeWithoutLocalStorage(mode);
+const setUserColorModeWithLocalStorage = (colorMode: ColorMode, extraFlags = 0) => {
+  updateUserColorMode(colorMode);
 
-  const modeData = getModeData();
-  if (modeData === undefined) {
+  if (userId == null) {
     return;
   }
-  const existingFlags = modeData == null ? 0 : getUserFlags(modeData);
-  const newmodeData = modeData?.filter(([id]) => id !== userId) ?? [];
-  if (newmodeData.length >= maxUsers) {
-    newmodeData.shift();
+  const colorModeData = getColorModeData();
+  if (colorModeData === undefined) {
+    return;
+  }
+  const existingFlags = colorModeData == null ? 0 : getUserFlags(colorModeData);
+  const newColorModeData = colorModeData?.filter(([id]) => id !== userId) ?? [];
+  if (newColorModeData.length >= maxUsers) {
+    newColorModeData.shift();
   }
   const flags = existingFlags | extraFlags;
-  newmodeData.push(
-    flags === 0 ? [userId, modes.indexOf(mode)] : [userId, modes.indexOf(mode), flags],
+  newColorModeData.push(
+    flags === 0
+      ? [userId, colorModes.indexOf(colorMode)]
+      : [userId, colorModes.indexOf(colorMode), flags],
   );
   try {
-    const localStorageData: LocalStorageData = { version: 0, data: newmodeData };
+    const localStorageData: LocalStorageData = { version: 0, data: newColorModeData };
     localStorage.setItem("theme", JSON.stringify(localStorageData));
   } catch (e) {
     console.error(
-      `Could not set mode. Local storage is likely full: ${e instanceof Error ? e : String(e)}`,
+      `Could not set color mode. Local storage is likely full: ${e instanceof Error ? e : String(e)}`,
     );
   }
 };
@@ -135,126 +156,141 @@ const setModeWithLocalStorage = (mode: Mode, extraFlags = 0): void => {
 const storageEventListener = ({ key, newValue }: StorageEvent) => {
   // If `newValue == null`, then localstorage was cleared, presumably because the user cleared
   // their browser state. In that case, do nothing and wait for a tab reload or new tab load.
-  // That new tab will set the new mode and the other tabs will receive the updated mode
+  // That new tab will set the new color mode and the other tabs will receive the updated color mode
   // from another storage event.
   if (key === "theme" && newValue != null) {
-    const modeData = getModeData();
-    // If `modeData === undefined`, then a new data version is being used and a page reload is needed.
-    // If `modeData === null`, then our data got deleted or is corrupted. A page reload is needed to reset.
-    // In the mean time, we will keep this tab on the old, out of sync mode.
-    if (modeData == null) {
+    const colorModeData = getColorModeData();
+    // If `colorModeData === undefined`, then a new data version is being used and a page reload is needed.
+    // If `colorModeData === null`, then our data got deleted or is corrupted. A page reload is needed to reset.
+    // In the mean time, we will keep this tab on the old, out of sync color mode.
+    if (colorModeData == null) {
       return;
     }
-    const mode = getUserMode(modeData);
-    // If `mode === undefined`, then we might have added a new mode and a page reload is
+    const colorMode = getUserColorMode(colorModeData);
+    // If `colorMode === undefined`, then we might have added a new color mode and a page reload is
     // needed for the new styles to be loaded on this tab. In the mean time, we will keep this
-    // tab on the old, out of sync mode.
+    // tab on the old, out of sync color mode.
     //
-    // Additionally, if `mode === null` then that means the data for our user was somehow
+    // Additionally, if `colorMode === null` then that means the data for our user was somehow
     // deleted (e.g., we hit the `maxUsers` limit). Let's not do anything in this case either.
-    if (mode == null) {
+    if (colorMode == null) {
       return;
     }
-    setModeWithoutLocalStorage(mode);
+    updateUserColorMode(colorMode);
   }
 };
 
-// If the `RBXThemeOverride` cookie is provided, we disable reading and writing from local storage
-// as well the ability to change mode. Currently used for webviews.
-const initializeUsingOverride = (mode: string) => {
-  switch (mode) {
+const initializeFromWebview = (colorMode: string) => {
+  switch (colorMode) {
     case "system":
     case "light":
     case "dark":
-      setModeWithoutLocalStorage(mode);
+      updateUserColorMode(colorMode);
       break;
     case "none":
     case "": {
-      setModeWithoutLocalStorage("system");
+      updateUserColorMode("system");
       break;
     }
     default:
-      console.warn(`Unknown mode: ${mode}`);
-      setModeWithoutLocalStorage("system");
+      console.warn(`Unknown color mode: ${colorMode}`);
+      updateUserColorMode("system");
       break;
   }
 };
 
 export type InitializeOptions = {
-  defaultMode?: Mode;
+  defaultColorMode?: ColorMode;
 };
 
-export const initialize = (currentUserId: number, options: InitializeOptions = {}): void => {
+export const initialize = (currentUserId: UserId | null, options: InitializeOptions = {}): void => {
   const { classList } = document.body;
+  // First, check for color mode classes added by the backend.
   if (classList.contains("color-mode-system") || classList.contains("system-theme")) {
-    setModeWithoutLocalStorage("system");
+    updateColorModeOverride("system");
     return;
   }
   if (classList.contains("color-mode-light") || classList.contains("light-theme")) {
-    setModeWithoutLocalStorage("light");
+    updateColorModeOverride("light");
     return;
   }
   if (classList.contains("color-mode-dark") || classList.contains("dark-theme")) {
-    setModeWithoutLocalStorage("dark");
+    updateColorModeOverride("dark");
+    return;
+  }
+  // Next, check for cookie from webview.
+  const webviewColorMode = cookie.get("RBXThemeOverride");
+  if (webviewColorMode != null) {
+    initializeFromWebview(webviewColorMode.value);
+    return;
+  }
+  if (currentUserId == null) {
+    updateUserColorMode(defaultColorMode);
     return;
   }
 
-  const override = cookie.get("RBXThemeOverride");
-  if (override != null) {
-    initializeUsingOverride(override.value);
-    return;
-  }
+  userId = userIdToNumber(currentUserId);
 
-  userId = currentUserId;
+  const colorModeData = getColorModeData();
+  const colorMode = colorModeData == null ? colorModeData : getUserColorMode(colorModeData);
 
-  const modeData = getModeData();
-  const mode = modeData == null ? modeData : getUserMode(modeData);
-
-  // Apply `defaultMode` once per (user, browser), tracked via `flagDefaultApplied`.
-  // This intentionally takes precedence over any server-rendered body-class mode:
-  // e.g. kids pages render light by default, but we want to flip them to dark on
-  // first visit. Subsequent visits fall through to the normal local storage path.
-  if (options.defaultMode != null && modeData !== undefined) {
-    const userFlags = modeData == null ? 0 : getUserFlags(modeData);
+  // Apply `defaultColorMode` once per (user, browser), tracked via `flagDefaultApplied`.
+  // Default color mode is light by default, but we want to flip them to dark on first visit.
+  // Subsequent visits fall through to the normal local storage path.
+  if (options.defaultColorMode != null && colorModeData !== undefined) {
+    const userFlags = colorModeData == null ? 0 : getUserFlags(colorModeData);
     if ((userFlags & flagDefaultApplied) === 0) {
-      setModeWithLocalStorage(options.defaultMode, flagDefaultApplied);
+      setUserColorModeWithLocalStorage(options.defaultColorMode, flagDefaultApplied);
       window.addEventListener("storage", storageEventListener);
       return;
     }
   }
 
-  if (mode === null) {
-    // No mode is in local storage, so we'll initialize to the default mode.
-    setModeWithLocalStorage(defaultMode);
-  } else if (mode === undefined) {
+  if (colorMode === null) {
+    // No color mode is in local storage, so we'll initialize to the default color mode.
+    setUserColorModeWithLocalStorage(defaultColorMode);
+  } else if (colorMode === undefined) {
     // We encountered either:
     // - A new data version in local storage. A page reload is needed to get the new logic.
-    // - An unexpected mode in local storage. We might have added a new mode and a page reload is
+    // - An unexpected color mode in local storage. We might have added a new color mode and a page reload is
     //   needed to get the new styles and logic.
-    // Let's use the default mode without saving to local storage.
-    setModeWithoutLocalStorage(defaultMode);
+    // Let's use the default color mode without saving to local storage.
+    updateUserColorMode(defaultColorMode);
   } else {
-    setModeWithoutLocalStorage(mode);
+    updateUserColorMode(colorMode);
   }
 
   window.addEventListener("storage", storageEventListener);
 };
 
-export const getMode = (): Mode => currentMode;
-
-export const setMode = (mode: Mode): void => {
-  if (!arrayIncludes(modes, mode)) {
+export const setColorMode = (colorMode: ColorMode): void => {
+  if (!arrayIncludes(colorModes, colorMode)) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.warn(`Unknown mode: ${mode}`);
+    console.warn(`Unknown color mode: ${colorMode}`);
     return;
   }
-  if (mode === currentMode) {
+  if (colorMode === userColorMode) {
     return;
   }
-  setModeWithLocalStorage(mode);
+  setUserColorModeWithLocalStorage(colorMode);
 };
 
-export const resetData = (): void => {
-  currentMode = defaultMode;
-  userId = -1;
+export const setColorModeOverride = (colorMode: ColorMode | null): void => {
+  if (colorMode != null && !arrayIncludes(colorModes, colorMode)) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.warn(`Unknown color mode: ${colorMode}`);
+    return;
+  }
+  const previous = getColorMode();
+  colorModeOverride = colorMode;
+  const current = getColorMode();
+  if (current !== previous) {
+    applyColorModeClasses(current);
+  }
+};
+
+export const resetData = (id: UserId): void => {
+  userColorMode = defaultColorMode;
+  colorModeOverride = null;
+  userId = userIdToNumber(id);
 };

@@ -2,7 +2,10 @@
 import type { AxiosResponse } from "axios";
 import { ExperimentationService } from "Roblox";
 import { httpService } from "core-utilities";
-import { paymentFlowAnalyticsService } from "core-roblox-utilities";
+import {
+  paymentFlowAnalyticsService,
+  type PurchaseStatus,
+} from "@rbx/payments/payments-flow-analytics";
 import { EnvironmentUrls } from "@rbx/environment-urls";
 import { PaymentSession } from "@rbx/payments/services/paymentSession";
 import type { Address } from "@rbx/payments/billingAddress";
@@ -116,7 +119,7 @@ export const sendPreparePaymentStatusEvent = (
   isProductPurchase: boolean | undefined,
   taxRateAvailable?: boolean,
 ): void => {
-  let purchaseStatus = success
+  let purchaseStatus: PurchaseStatus = success
     ? paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.PASSED_PREPARE_PAYMENT_REQUEST
     : paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.FAILED_PREPARE_PAYMENT_REQUEST;
   if (taxRateAvailable) {
@@ -131,12 +134,11 @@ export const sendPreparePaymentStatusEvent = (
     : isTaxFlowEnabled
       ? paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_CONVERSION_MODAL_WITH_TAX
       : paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_CONVERSION_MODAL_WITHOUT_TAX;
-  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-    purchaseStatus,
-    undefined,
+  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+    status: purchaseStatus,
     viewName,
-  );
+  });
 };
 
 const scanGiftCardConfig = () => ({
@@ -162,14 +164,12 @@ export const scanGiftCard = async (
 };
 
 export const sendGetNextPurchasableMetadataStatusEvent = (success: boolean): void => {
-  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-    success
+  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+    status: success
       ? paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.PASSED_GET_NEXT_PURCHASABLE_METADATA
       : paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.FAILED_GET_NEXT_PURCHASABLE_METADATA,
-    undefined,
-    undefined,
-  );
+  });
 };
 
 export const sendUpdateAddressForCheckoutSessionStatusEvent = (
@@ -184,14 +184,13 @@ export const sendUpdateAddressForCheckoutSessionStatusEvent = (
     : isTaxFlowEnabled
       ? paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_CONVERSION_MODAL_WITH_TAX
       : paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_CONVERSION_MODAL_WITHOUT_TAX;
-  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-    success
+  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+    status: success
       ? paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.PASSED_UPDATE_ADDRESS_FOR_CHECKOUT_SESSION
       : paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.FAILED_UPDATE_ADDRESS_FOR_CHECKOUT_SESSION,
-    undefined,
     viewName,
-  );
+  });
 };
 
 export const sendProcessPaymentStatusEvent = (
@@ -206,14 +205,13 @@ export const sendProcessPaymentStatusEvent = (
     : isTaxFlowEnabled
       ? paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_CONVERSION_MODAL_WITH_TAX
       : paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_CONVERSION_MODAL_WITHOUT_TAX;
-  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-    success
+  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+    status: success
       ? paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.PASSED_PROCESS_PAYMENT
       : paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.FAILED_PROCESS_PAYMENT,
-    undefined,
     viewName,
-  );
+  });
 };
 
 export const getRedeemMetadata = () => {

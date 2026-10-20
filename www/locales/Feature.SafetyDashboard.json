@@ -100,5 +100,8 @@
     "Label.Type.MarketplaceItem": "Marketplace item",
     "Label.SomethingWentWrong": "Something went wrong",
     "Heading.ViolationFound": "We took action",
-    "Description.ViolationFound": "We reviewed your report and found that the content you reported broke a rule in our Community Standards."
+    "Description.ViolationFound": "We reviewed your report and found that the content you reported broke a rule in our Community Standards.",
+    "Description.NoReportsYetIllegal": "Recent reports will appear here. You can track illegal content reports in your email.",
+    "Heading.Reviewing": "We're reviewing your report",
+    "Description.Reviewing": "We'll update this when we have a decision."
 }

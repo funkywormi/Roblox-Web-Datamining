@@ -2,8 +2,8 @@
 import { TranslateFunction } from "react-utilities";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button, createModal, IModalService, TSystemFeedbackService } from "react-style-guide";
-import { paymentFlowAnalyticsService } from "core-roblox-utilities";
 import { urlService } from "core-utilities";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { usePaymentSession } from "@rbx/payments/services/paymentSession";
 import { BillingInfoForm, type Address } from "@rbx/payments/billingAddress";
 import {
