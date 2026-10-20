@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from 'react';
-import type { RobloxIntlInstance } from '@rbx/legacy-webapp-types/Roblox';
 import {
   Button,
   Checkbox,
@@ -46,7 +45,6 @@ export type UnifiedRobuxUpsellModalProps = {
   open?: boolean;
   robuxPackageAmount?: number;
   robuxPackagePrice?: string;
-  intl: RobloxIntlInstance;
   priceSuffix?: string;
   title?: string;
   discountInformation?: DiscountInformation | null;
@@ -76,7 +74,6 @@ const UnifiedRobuxUpsellModalInner: React.FC<
   open = false,
   robuxPackageAmount,
   robuxPackagePrice,
-  intl,
   priceSuffix,
   title,
   discountInformation,
@@ -133,7 +130,7 @@ const UnifiedRobuxUpsellModalInner: React.FC<
   useModalShownTracking('UnifiedRobuxUpsellModal', open);
   const titleText = title ?? translate(LANG_KEYS.buyRobuxAndItemAction);
   const actionButtonText = translate(LANG_KEYS.buy);
-  const termsOfUseText = useTermsOfUseText(translate, intl);
+  const termsOfUseText = useTermsOfUseText(translate);
 
   const handleAction = useCallback(() => {
     const params: UnifiedRobuxUpsellActionParams = {

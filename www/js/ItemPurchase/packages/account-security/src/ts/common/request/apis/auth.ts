@@ -1,5 +1,5 @@
-import * as http from "@rbx/core-scripts/http";
 import type { TSecureAuthIntent } from "@rbx/core-scripts/auth/crypto";
+import transport from "../requestTransport";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as AuthApi from "../types/auth";
@@ -17,7 +17,7 @@ export {
 export const listAllCredentials = (
   options: { all: boolean } = { all: true },
 ): Promise<Result<AuthApi.ListCredentialsReturnType, AuthApi.AuthApiError | null>> =>
-  toResult(http.post(AuthApi.LIST_CREDENTIALS_CONFIG, options), AuthApi.AuthApiError);
+  toResult(transport.post(AuthApi.LIST_CREDENTIALS_CONFIG, options), AuthApi.AuthApiError);
 
 export const resetPassword = (
   targetType: string,
@@ -34,7 +34,7 @@ export const resetPassword = (
   newEmail?: string,
 ): Promise<Result<AuthApi.ResetPasswordReturnType, AuthApi.PasswordResetError | null>> =>
   toResult(
-    http.post(AuthApi.RESET_PASSWORD_CONFIG, {
+    transport.post(AuthApi.RESET_PASSWORD_CONFIG, {
       targetType,
       ticket,
       userId,
@@ -57,4 +57,4 @@ export const resetPassword = (
  */
 export const invalidateTicketsForEppEnrollment = (): Promise<
   Result<AuthApi.InvalidateTicketsReturnType, AuthApi.AuthApiError | null>
-> => toResult(http.post(AuthApi.INVALIDATE_TICKETS_CONFIG, {}), AuthApi.AuthApiError);
+> => toResult(transport.post(AuthApi.INVALIDATE_TICKETS_CONFIG, {}), AuthApi.AuthApiError);

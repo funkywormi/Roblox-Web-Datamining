@@ -27,6 +27,7 @@ export interface SduiTileProps extends SduiRendererInjectedProps {
   thumbnailOverlayComponent?: React.ReactNode;
   thumbnailPadding?: SduiTokenOrLiteral | null;
   titleFont?: SduiTokenOrLiteral | null;
+  titleLines?: number;
   titleText?: string;
   titleTextXAlignment?: SduiTextXAlignment;
   ariaLabel?: string;
@@ -47,6 +48,7 @@ export function SduiTile({
   thumbnailOverlayComponent,
   thumbnailPadding,
   titleFont,
+  titleLines = 1,
   titleText,
   titleTextXAlignment,
   ariaLabel,
@@ -97,6 +99,7 @@ export function SduiTile({
             footerComponent={footerComponent}
             isContained={isContained}
             titleFont={titleFont}
+            titleLines={titleLines}
             titleText={titleText}
             titleTextXAlignment={titleTextXAlignment}
           />

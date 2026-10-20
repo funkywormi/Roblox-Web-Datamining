@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import type { MouseEvent } from "react";
+import type { KeyboardEvent, MouseEvent } from "react";
 import { Badge, IconButton } from "@rbx/foundation-ui";
 import {
   DisplayNameBadges,
@@ -16,8 +16,13 @@ import AvatarHeadshot from "../AvatarHeadshot";
 type TDialogHeaderProps = {
   conversation: TChatConversation;
   onClose: (layoutId: string) => void;
-  onToggleCollapsed: (layoutId: string) => void;
+  /** Omit to make the header static: not a collapse button, and no unread badge. */
+  onToggleCollapsed?: (layoutId: string) => void;
   onOpenDetails: (layoutId: string) => void;
+  /** Shows a back arrow at the start instead of the close button. */
+  onBack?: (layoutId: string) => void;
+  /** Shows a Minimize button, for a window whose own Minimize is hidden behind this chat. */
+  onMinimize?: () => void;
 };
 
 const DialogHeader = ({
@@ -25,6 +30,8 @@ const DialogHeader = ({
   onClose,
   onToggleCollapsed,
   onOpenDetails,
+  onBack,
+  onMinimize,
 }: TDialogHeaderProps) => {
   const translate = useChatTranslate();
   const primaryParticipant = conversation.participants[0];
@@ -40,26 +47,48 @@ const DialogHeader = ({
   const unfilteredChatLabel = showUnfilteredChatIndicator
     ? translate("Label.UnfilteredChat")
     : undefined;
+  const headerLabel = unfilteredChatLabel
+    ? `${conversation.title}, ${unfilteredChatLabel}`
+    : conversation.title;
+  const collapseButtonProps = onToggleCollapsed
+    ? {
+        role: "button",
+        tabIndex: 0,
+        onClick: () => {
+          onToggleCollapsed(conversation.layoutId);
+        },
+        onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onToggleCollapsed(conversation.layoutId);
+          }
+        },
+        "aria-label": headerLabel,
+        "aria-expanded": conversation.isCollapsed !== true,
+      }
+    : { role: "group", "aria-label": headerLabel };
 
   return (
     <div
-      className="react-chat-dialog-header react-chat-top-radius flex width-full shrink-0 items-center gap-small overflow-hidden bg-surface-100 padding-x-small padding-y-small cursor-pointer"
-      role="button"
-      tabIndex={0}
-      onClick={() => {
-        onToggleCollapsed(conversation.layoutId);
-      }}
-      onKeyDown={event => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          onToggleCollapsed(conversation.layoutId);
-        }
-      }}
-      aria-label={
-        unfilteredChatLabel ? `${conversation.title}, ${unfilteredChatLabel}` : conversation.title
-      }
-      aria-expanded={conversation.isCollapsed !== true}
+      className={classNames(
+        "react-chat-dialog-header react-chat-top-radius flex width-full shrink-0 items-center gap-small overflow-hidden bg-surface-100 padding-x-small padding-y-small",
+        { "cursor-pointer": onToggleCollapsed },
+      )}
+      {...collapseButtonProps}
     >
+      {onBack && (
+        <IconButton
+          ariaLabel={translate("Action.Back")}
+          icon="icon-regular-chevron-large-left"
+          size="Small"
+          variant="Utility"
+          isCircular
+          onClick={(event: MouseEvent<HTMLButtonElement>) => {
+            event.stopPropagation();
+            onBack(conversation.layoutId);
+          }}
+        />
+      )}
       <div
         className="react-chat-dialog-header-main flex min-width-0 grow-1 items-center gap-small overflow-hidden"
         aria-hidden="true"
@@ -108,7 +137,7 @@ const DialogHeader = ({
         </span>
       </div>
       <div className="react-chat-dialog-header-actions flex shrink-0 items-center gap-xsmall">
-        {conversation.unreadCount > 0 && (
+        {onToggleCollapsed && conversation.unreadCount > 0 && (
           <span className="react-chat-dialog-unread-badge shrink-0">
             <Badge label={String(conversation.unreadCount)} variant="Emphasis" />
           </span>
@@ -124,17 +153,32 @@ const DialogHeader = ({
             onOpenDetails(conversation.layoutId);
           }}
         />
-        <IconButton
-          ariaLabel={translate("Action.Close")}
-          icon="icon-regular-x"
-          size="Small"
-          variant="Utility"
-          isCircular
-          onClick={(event: MouseEvent<HTMLButtonElement>) => {
-            event.stopPropagation();
-            onClose(conversation.layoutId);
-          }}
-        />
+        {onMinimize && (
+          <IconButton
+            ariaLabel={translate("Label.MinimizeChat", undefined, "Minimize chat")}
+            icon="icon-regular-chevron-large-down"
+            size="Small"
+            variant="Utility"
+            isCircular
+            onClick={(event: MouseEvent<HTMLButtonElement>) => {
+              event.stopPropagation();
+              onMinimize();
+            }}
+          />
+        )}
+        {!onBack && (
+          <IconButton
+            ariaLabel={translate("Action.Close")}
+            icon="icon-regular-x"
+            size="Small"
+            variant="Utility"
+            isCircular
+            onClick={(event: MouseEvent<HTMLButtonElement>) => {
+              event.stopPropagation();
+              onClose(conversation.layoutId);
+            }}
+          />
+        )}
       </div>
     </div>
   );

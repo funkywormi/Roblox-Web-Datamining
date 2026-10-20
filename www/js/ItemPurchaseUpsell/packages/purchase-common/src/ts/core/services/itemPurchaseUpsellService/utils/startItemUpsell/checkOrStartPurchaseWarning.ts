@@ -1,5 +1,6 @@
-import { EmailVerificationService, RobloxTranslationResourceProviderInstance } from '@rbx/legacy-webapp-types/Roblox';
-import { paymentFlowAnalyticsService } from '@rbx/core-scripts/legacy/core-roblox-utilities';
+import { EmailVerificationService } from '@rbx/legacy-webapp-types/Roblox';
+import type { RobloxTranslationResourceProviderInstance } from '@rbx/legacy-webapp-types/Roblox';
+import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
 import getPurchaseWarningAction from '../../api/getPurchaseWarningAction';
 import { ItemDetailElementDataset, UpsellProduct } from '../../constants/serviceTypeDefinitions';
 import {
@@ -7,6 +8,7 @@ import {
   UPSELL_COUNTER_NAMES
 } from '../../constants/upsellConstants';
 import openPurchaseWarningModal from '../../modals/openPurchaseWarningModal';
+import { closeDialog } from '../../modals/openDialog';
 import reportCounter from '../common/reportCounter';
 
 function sendUserPurchaseFlowEvent(viewMessage: string) {
@@ -85,6 +87,9 @@ export default async function checkOrStartPurchaseWarning(
         UPSELL_COUNTER_NAMES.U13PaymentModalEmailVerificationTriggered,
         itemPurchaseObj?.assetType
       );
+      // A Radix modal blocks pointer events outside it, so close ours (without firing its cancel
+      // callbacks) before the verification modal opens.
+      closeDialog();
       EmailVerificationService.handleUserEmailVerificationRequiredByPurchaseWarning()?.then(
         data => {
           sendUserPurchaseFlowEvent(

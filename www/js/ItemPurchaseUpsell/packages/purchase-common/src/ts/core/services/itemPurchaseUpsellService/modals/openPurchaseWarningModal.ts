@@ -1,4 +1,4 @@
-import { Dialog, RobloxTranslationResourceProviderInstance } from '@rbx/legacy-webapp-types/Roblox';
+import type { RobloxTranslationResourceProviderInstance } from '@rbx/legacy-webapp-types/Roblox';
 import {
   COMMON_UI_CONTROLS_NAMESPACE,
   FEATURE_PREMIUM_NAMESPACE,
@@ -9,6 +9,7 @@ import {
 import { ItemDetailElementDataset, UpsellProduct } from '../constants/serviceTypeDefinitions';
 import { invalidateCurrentAutoPurchaseFlow } from '../utils/common/invalidationHelpers';
 import acknowledgePurchaseWarning from '../api/acknowledgePurchaseWarning';
+import openDialog from './openDialog';
 import reportCounter from '../utils/common/reportCounter';
 
 export default function openPurchaseWarningModal(
@@ -52,7 +53,7 @@ export default function openPurchaseWarningModal(
     );
   }
 
-  Dialog.open({
+  openDialog({
     titleText: featurePremiumTranslationResource.get(
       LANG_KEYS.featurePremiumScaryModalTitleHeading,
       {}
@@ -104,7 +105,6 @@ export default function openPurchaseWarningModal(
     allowHtmlContentInBody: true,
     allowHtmlContentInFooter: false,
     fieldValidationRequired: true,
-    dismissable: true,
     xToCancel: true
   });
 }

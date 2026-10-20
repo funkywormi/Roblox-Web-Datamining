@@ -35,6 +35,7 @@ export type Thumbnail2dProps = {
   altName?: string;
   imgClassName?: string;
   containerClassName?: string;
+  onLoad?: () => void;
 };
 
 // Renders a 2D asset/bundle thumbnail from the thumbnails `/v1/batch` endpoint. A `QueryClientProvider` ancestor is required.
@@ -50,6 +51,7 @@ const Thumbnail2d = ({
   altName = "",
   imgClassName = "",
   containerClassName = "",
+  onLoad,
 }: Thumbnail2dProps) => {
   // Per-request timing/poll tracking for the load metrics fired below.
   const startRef = useRef(Date.now());
@@ -155,6 +157,7 @@ const Thumbnail2d = ({
           className={["size-full", imgClassName].filter(Boolean).join(" ")}
           src={imageUrl}
           alt={altName}
+          onLoad={onLoad}
         />
       )}
     </span>

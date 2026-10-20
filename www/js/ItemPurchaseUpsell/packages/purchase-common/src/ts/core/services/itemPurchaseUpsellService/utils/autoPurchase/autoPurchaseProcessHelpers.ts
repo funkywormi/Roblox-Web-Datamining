@@ -1,5 +1,5 @@
 import { escapeHtml } from '@rbx/core-scripts/format/string';
-import { upsellUtil } from '@rbx/core-scripts/legacy/core-roblox-utilities';
+import * as upsellUtil from '@rbx/core-scripts/util/upsell';
 import { MetaDataValues } from '@rbx/legacy-webapp-types/Roblox';
 import { redirectToCatalogShop, redirectToItemPath } from '../common/redirectionHelpers';
 import {

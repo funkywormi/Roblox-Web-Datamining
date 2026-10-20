@@ -1,6 +1,6 @@
-import { RobloxIntlInstance } from '@rbx/legacy-webapp-types/Roblox';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import type { RobloxIntlInstance } from '@rbx/legacy-webapp-types/Roblox';
 import UnifiedRobuxUpsellModal, {
   UnifiedRobuxUpsellModalProps
 } from '../../../../react/components/UnifiedRobuxUpsellModal';
@@ -32,7 +32,6 @@ export type OpenUnifiedRobuxUpsellProps =
       assetType: string;
       assetTypeDisplayName?: string;
       upsellProduct: UpsellProduct;
-      intl: RobloxIntlInstance;
       priceSuffix?: string;
       title?: string;
       discountInformation?: DiscountInformation | null;

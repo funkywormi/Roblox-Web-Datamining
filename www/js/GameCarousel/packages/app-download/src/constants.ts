@@ -26,6 +26,24 @@ export const appDownloadNamespaces = [
   "Common.VisitGame",
 ] as const satisfies readonly Namespace[];
 
+/**
+ * The namespaces DownloadDialog's keys come from: the gameLaunch component's list, so lookups match
+ * the legacy merged map. Later entries win, as they did there.
+ */
+export const downloadDialogNamespaces = [
+  "Feature.GameLaunchGuestMode",
+  "Common.VisitGame",
+  "CommonUI.Controls",
+  "Feature.ExperienceDetails",
+  "Feature.DownloadLanding",
+] as const satisfies readonly Namespace[];
+
+/** The namespaces LaunchFailureDialog's keys come from. */
+export const launchFailureDialogNamespaces = [
+  "Common.VisitGame",
+  "CommonUI.Controls",
+] as const satisfies readonly Namespace[];
+
 export const downloadPageStrings = {
   downloadPageHeader: "Heading.DownloadPage",
   appStoreLinksHeader: "Heading.AppStoreLinks",

@@ -1,5 +1,5 @@
 import { escapeHtml } from '@rbx/core-scripts/format/string';
-import { RobloxTranslationResource } from '@rbx/legacy-webapp-types/Roblox';
+import type { RobloxTranslationResource } from '@rbx/legacy-webapp-types/Roblox';
 import {
   ItemDetailObject,
   ItemPurchaseAjaxDataObject,

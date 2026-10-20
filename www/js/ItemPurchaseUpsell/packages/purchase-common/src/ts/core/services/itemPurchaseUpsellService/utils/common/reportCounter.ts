@@ -1,4 +1,4 @@
-import { fireEvent } from 'roblox-event-tracker';
+import { fireEvent } from '@rbx/www-common/event-tracker';
 import {
   ASSET_TYPE_ENUM,
   UPSELL_COUNTER_BUNDLE_PREFIX,

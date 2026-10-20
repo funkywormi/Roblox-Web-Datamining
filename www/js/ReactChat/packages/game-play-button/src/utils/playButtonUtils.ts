@@ -17,6 +17,7 @@ import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
 import { fireEvent } from "@rbx/www-common/event-tracker";
 import playButtonConstants from "../constants/playButtonConstants";
+import { getStartAccessManagementUpsell } from "./accessManagementUpsell";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import {
   TAppsFlyerReferralProperties,
@@ -270,10 +271,7 @@ export const startAgeCheckAccessManagementUpsellFlow = async ({
       },
     };
 
-    return (
-      (await window.Roblox.AccessManagementUpsellV2Service?.startAccessManagementUpsell(params)) ??
-      false
-    );
+    return (await getStartAccessManagementUpsell()?.(params)) ?? false;
   } catch (e) {
     fireEvent(counterEvents.PlayButtonUpsellAgeRestrictionVerificationError);
     // re-throw the error to allow clients to handle their specific requirements

@@ -89,10 +89,13 @@ const MessageBubble = ({
           <span className="size-800 shrink-0" aria-hidden="true" />
         ))}
       <div
-        className={classNames("flex max-width-[196px] flex-col gap-xxsmall", {
-          "items-end": isOutgoing,
-          "items-start": !isOutgoing,
-        })}
+        className={classNames(
+          "react-chat-message-column flex max-width-[196px] flex-col gap-xxsmall",
+          {
+            "items-end": isOutgoing,
+            "items-start": !isOutgoing,
+          },
+        )}
       >
         {conversation.dialogType === "Group" &&
           !isOutgoing &&

@@ -1,14 +1,12 @@
-import { CurrentUser } from '@rbx/legacy-webapp-types/Roblox';
+import { getCurrentUser } from '@rbx/www-common/user';
 import { EnvironmentUrls } from '@rbx/environment-urls';
 import * as httpService from '@rbx/core-scripts/http';
 import { GET_USER_BALANCE_API } from '../../constants/upsellConstants';
 import { UserBalance } from '../../constants/serviceTypeDefinitions';
 
 export default async function fetchUserBalance(): Promise<number> {
-  const { userId } = CurrentUser;
-
   const urlConfig = {
-    url: `${EnvironmentUrls.economyApi}${GET_USER_BALANCE_API.replace('{userId}', userId)}`,
+    url: `${EnvironmentUrls.economyApi}${GET_USER_BALANCE_API.replace('{userId}', getCurrentUser()?.id ?? '')}`,
     withCredentials: true,
     retryable: false,
     noCache: true

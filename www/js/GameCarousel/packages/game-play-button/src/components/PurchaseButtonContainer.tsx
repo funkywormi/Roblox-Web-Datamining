@@ -1,8 +1,7 @@
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
-import { TranslateFunction, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
-import { translations } from "../constants/translations";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import usePurchaseProductData from "../hooks/usePurchaseProductData";
+import { usePlayButtonTranslate } from "../hooks/usePlayButtonTranslate";
 import {
   TGetProductDetails,
   TPlayabilityStatusPurchaseRequired,
@@ -47,7 +46,6 @@ export type TPurchaseButtonContainerProps = {
 };
 
 export const PurchaseButtonContainer = ({
-  translate,
   universeId,
   placeId,
   iconClassName = "icon-robux-white",
@@ -59,9 +57,8 @@ export const PurchaseButtonContainer = ({
   playabilityStatus,
   showDefaultPurchaseText = false,
   pageContext,
-}: TPurchaseButtonContainerProps & {
-  translate: TranslateFunction;
-}): React.JSX.Element => {
+}: TPurchaseButtonContainerProps): React.JSX.Element => {
+  const translate = usePlayButtonTranslate();
   const { productInfo, productDetails, isLoading } = usePurchaseProductData(universeId, placeId);
 
   if (isLoading) {
@@ -98,7 +95,4 @@ export const PurchaseButtonContainer = ({
   );
 };
 
-export default withTranslations<TPurchaseButtonContainerProps>(
-  PurchaseButtonContainer,
-  translations,
-);
+export default PurchaseButtonContainer;

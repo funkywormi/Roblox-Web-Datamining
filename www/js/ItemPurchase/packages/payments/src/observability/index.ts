@@ -16,7 +16,10 @@ export const observabilityRegistry = {
     PriceTag: {
       counters: [{ name: "PriceTag_ArabicLocaleTriggered" }],
       criticalErrors: [
-        { name: "PriceTag_NumberFormatLocaleException" },
+        {
+          name: "PriceTag_NumberFormatLocaleException",
+          dimensions: ["currencyCode", "internalPageName"],
+        },
         { name: "PriceTag_DataNotValid", dimensions: ["currencyCode"] },
       ],
     },

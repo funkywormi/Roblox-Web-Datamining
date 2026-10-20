@@ -24,7 +24,7 @@ export default function createLeaveRobloxWarningModal() {
     const bodyContent =
       translate(resources.redirectToPartnerWebsiteMessage, { linebreak: '\n\n' }) ||
       'This purchase must be completed on our partner’s website. You will be returned to Roblox after the purchase is completed.\n\n Proceed to partner website for payment?';
-    const body = <p className='modal-body'>{bodyContent}</p>;
+    const body = <p className='text-body-large'>{bodyContent}</p>;
     return (
       <FoundationPurchaseModal
         open={open}

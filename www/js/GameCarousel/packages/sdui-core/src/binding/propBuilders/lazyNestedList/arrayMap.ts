@@ -56,6 +56,8 @@ function buildArrayMapItem(
       buildContext.builderConfig,
       buildContext.parentAnalyticsContext,
       overlaySources,
+      undefined,
+      buildContext.poolBuildMetadata,
     );
   }
 
@@ -71,6 +73,7 @@ function buildArrayMapItem(
     buildContext.parentAnalyticsContext,
     undefined,
     pendingInputKeysSignal,
+    buildContext.poolBuildMetadata,
   );
 }
 

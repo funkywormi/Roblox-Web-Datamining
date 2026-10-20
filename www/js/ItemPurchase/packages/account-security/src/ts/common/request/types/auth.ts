@@ -1,5 +1,5 @@
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 import { Fido2Credential } from "./twoStepVerification";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
@@ -21,6 +21,8 @@ export enum PasswordResetError {
   INVALID_PASSWORD = 20,
   PASSWORDS_DO_NOT_MATCH = 21,
   TWO_STEP_VERIFICATION_REQUIRED = 24,
+  PASSWORD_LOW_COMPLEXITY = 27,
+  PASSWORD_TOO_SIMILAR_TO_USERNAME = 28,
 }
 
 export type StartRegistrationReturnType = {
@@ -31,7 +33,7 @@ export type StartRegistrationReturnType = {
 /**
  * Request Type: `POST`.
  */
-export const START_REGISTRATION_CONFIG: UrlConfig = {
+export const START_REGISTRATION_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v1/passkey/StartRegistration`,
   timeout: AUTH_API_TIMEOUT,
@@ -40,7 +42,7 @@ export const START_REGISTRATION_CONFIG: UrlConfig = {
 /**
  * Request Type: `POST`.
  */
-export const START_PRE_AUTH_REGISTRATION_CONFIG: UrlConfig = {
+export const START_PRE_AUTH_REGISTRATION_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v1/passkey/start-preauth-registration`,
   timeout: AUTH_API_TIMEOUT,
@@ -51,7 +53,7 @@ export type FinishRegistrationReturnType = void;
 /**
  * Request Type: `POST`.
  */
-export const FINISH_REGISTRATION_CONFIG: UrlConfig = {
+export const FINISH_REGISTRATION_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v1/passkey/FinishRegistration`,
   timeout: AUTH_API_TIMEOUT,
@@ -63,7 +65,7 @@ export type FinishARPreAuthRegistrationReturnType = void;
  * Request Type: `POST`.
  * Finishes account recovery pre-auth passkey registration and deactivates password.
  */
-export const FINISH_AR_PRE_AUTH_REGISTRATION_CONFIG: UrlConfig = {
+export const FINISH_AR_PRE_AUTH_REGISTRATION_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v1/passkey/finish-ar-preauth-registration`,
   timeout: AUTH_API_TIMEOUT,
@@ -71,7 +73,7 @@ export const FINISH_AR_PRE_AUTH_REGISTRATION_CONFIG: UrlConfig = {
 
 export type DeleteCredentialBatchReturnType = void;
 
-export const DELETE_CREDENTIAL_BATCH_CONFIG: UrlConfig = {
+export const DELETE_CREDENTIAL_BATCH_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v1/passkey/DeleteCredentialBatch`,
   timeout: AUTH_API_TIMEOUT,
@@ -81,7 +83,7 @@ export type ListCredentialsReturnType = {
   credentials: Fido2Credential[];
 };
 
-export const LIST_CREDENTIALS_CONFIG: UrlConfig = {
+export const LIST_CREDENTIALS_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v1/passkey/ListCredentials`,
   timeout: AUTH_API_TIMEOUT,
@@ -99,7 +101,7 @@ export type ResetPasswordReturnType = {
 /**
  * Request Type: `POST`.
  */
-export const RESET_PASSWORD_CONFIG: UrlConfig = {
+export const RESET_PASSWORD_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v2/passwords/reset`,
   timeout: AUTH_API_TIMEOUT,
@@ -111,7 +113,7 @@ export type InvalidateTicketsReturnType = void;
  * Invalidates all account security tickets / revert links for the authenticated user.
  * Request Type: `POST`.
  */
-export const INVALIDATE_TICKETS_CONFIG: UrlConfig = {
+export const INVALIDATE_TICKETS_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v1/revert/invalidate-tickets`,
   timeout: AUTH_API_TIMEOUT,

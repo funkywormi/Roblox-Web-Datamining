@@ -19,6 +19,7 @@ import {
   ProcessPaymentProviderPayload,
   ProcessPaymentStripeProviderPayload,
   QuickPayFlowType,
+  SubscribedRobuxProductOffer,
   StripeErrorCode,
   StripeTaxType,
 } from "../../services/paymentsGatewayService";
@@ -97,6 +98,9 @@ export type QuickPay = {
     isSub: boolean,
     updatedPaymentProfile?: PaymentProfile,
   ) => Promise<void>;
+  subscribedRobuxProductOffers: SubscribedRobuxProductOffer[];
+  isSubscribeAndSaveChecked: boolean;
+  toggleSubscribeAndSave: () => void;
   preparePaymentProviderPayload: PreparePaymentProviderPayload | null | undefined;
   process3DSForQuickPay: (ev: MessageEvent<QuickPayIframeMessage>) => Promise<string | undefined>;
   processPaymentForQuickPay: (
@@ -130,7 +134,7 @@ export function useQuickPay({
     url: quickPay3DSUrl,
   },
 }: Modals): QuickPay {
-  const { getPurchaseUrl, paymentSession, purchaseFlowId, urlParams } =
+  const { getPurchaseUrl, paymentSession, productIds, purchaseFlowId, urlParams } =
     useContext(BuyRobuxPageContext);
   const { trackQuickPayClick, trackQuickPayPurchase } = useContext(TrackingContext);
 
@@ -150,6 +154,10 @@ export function useQuickPay({
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>();
   const [stripe, setStripe] = useState<Stripe | null>(null);
   const [isQuickPayLoading, setIsQuickPayLoading] = useState<boolean>(false);
+  const [subscribedRobuxProductOffers, setSubscribedRobuxProductOffers] = useState<
+    SubscribedRobuxProductOffer[]
+  >([]);
+  const [isSubscribeAndSaveChecked, setIsSubscribeAndSaveChecked] = useState(false);
 
   const prepareRequestIdRef = useRef(0);
 
@@ -176,13 +184,15 @@ export function useQuickPay({
 
     trackCounter("QuickPayGetMetadataFlow", { step: "start" });
 
-    const data = await getQuickPayMetadata(quickPayFlowType);
+    const data = await getQuickPayMetadata(quickPayFlowType, productIds);
     if (!data) {
       trackError("QuickPayGetMetadataFlow", { step: "noData" });
       return;
     }
 
+    const offers = data.subscribedRobuxProductOffers ?? [];
     setLegalDisclosureTranslationKey(data.legalDisclosureTranslationKey);
+    setSubscribedRobuxProductOffers(offers);
 
     if (!data.isUserEligible) {
       trackCounter("QuickPayGetMetadataFlow", { step: "ineligible" });
@@ -216,7 +226,7 @@ export function useQuickPay({
     setSelectedPaymentProfile(eligibleProfiles[0]);
 
     firePaymentMethodSelectedCounter(eligibleProfiles[0]);
-  }, [urlParams.product_id, firePaymentMethodSelectedCounter]);
+  }, [urlParams.product_id, firePaymentMethodSelectedCounter, productIds]);
 
   const fetchStripe = useCallback(async () => {
     if (window === undefined) {
@@ -639,6 +649,10 @@ export function useQuickPay({
     ],
   );
 
+  const toggleSubscribeAndSave = useCallback(() => {
+    setIsSubscribeAndSaveChecked(previous => !previous);
+  }, []);
+
   const redirectToPurchase = useCallback(() => {
     setShouldRedirectToPurchase(true);
   }, []);
@@ -683,6 +697,9 @@ export function useQuickPay({
       stripe,
       taxTranslationKey,
       isQuickPayLoading,
+      subscribedRobuxProductOffers,
+      isSubscribeAndSaveChecked,
+      toggleSubscribeAndSave,
     }),
     [
       checkoutSessionId,
@@ -700,6 +717,9 @@ export function useQuickPay({
       selectedProduct,
       shouldRedirectToPurchase,
       stripe,
+      subscribedRobuxProductOffers,
+      isSubscribeAndSaveChecked,
+      toggleSubscribeAndSave,
       taxTranslationKey,
       process3DSForQuickPay,
       isQuickPayLoading,

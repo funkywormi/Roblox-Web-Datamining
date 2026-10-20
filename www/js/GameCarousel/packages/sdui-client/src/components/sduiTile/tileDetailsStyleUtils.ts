@@ -1,4 +1,5 @@
 import { clsx } from "clsx";
+import type { CSSProperties } from "react";
 import {
   buildFoundationTokenCss,
   buildTextXAlignmentCss,
@@ -14,6 +15,7 @@ interface GetTileDetailsStylesParams {
   containmentPadding?: SduiTokenOrLiteral | null;
   isContained?: boolean;
   titleFont?: SduiTokenOrLiteral | null;
+  titleLines?: number;
   titleTextXAlignment?: SduiTextXAlignment;
 }
 
@@ -21,6 +23,7 @@ export const getTileDetailsStyles = ({
   containmentPadding,
   isContained = false,
   titleFont,
+  titleLines = 1,
   titleTextXAlignment,
 }: GetTileDetailsStylesParams) => {
   const resolvedContainmentPadding =
@@ -33,6 +36,15 @@ export const getTileDetailsStyles = ({
   const containmentPaddingNumeric = getSduiNumeric(resolvedContainmentPadding);
   const titleFontClass =
     buildFoundationTokenCss(getSduiToken(titleFont ?? undefined)) ?? "text-title-medium";
+  const titleClampStyle: CSSProperties | undefined =
+    titleLines === 1
+      ? undefined
+      : {
+          overflow: "hidden",
+          display: "-webkit-box",
+          WebkitLineClamp: titleLines,
+          WebkitBoxOrient: "vertical",
+        };
 
   return {
     detailsStyles: {
@@ -57,8 +69,10 @@ export const getTileDetailsStyles = ({
       className: clsx(
         "content-emphasis",
         titleFontClass,
+        titleLines === 1 && "text-truncate-end text-no-wrap [overflow-wrap:break-word]",
         buildTextXAlignmentCss(titleTextXAlignment ?? "left"),
       ),
+      style: titleClampStyle,
     },
     footerStyles: {
       className: clsx("flex", "flex-col", "width-full"),

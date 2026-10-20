@@ -112,13 +112,18 @@ export const useConversationMessages = (
     initialData: [],
   });
 
+  // The latest page holds the cursor of the first older page. After that, only the oldest loaded
+  // page knows if more exist, and no cursor on it means the history ended. The server sends an
+  // empty cursor there, or none at all while it sheds load. Falling back to the latest page's
+  // cursor would load the first older page again and show its messages twice.
+  const nextCursor =
+    olderPages.length > 0 ? olderPages.at(-1)?.page.next_cursor : messagesQuery.data?.next_cursor;
+
   const fetchNextPage = useCallback(() => {
     if (isFetchingNextPageRef.current) {
       return;
     }
 
-    const lastPage = olderPages.at(-1)?.page;
-    const nextCursor = lastPage?.next_cursor ?? messagesQuery.data?.next_cursor;
     if (!nextCursor || !normalizedConversationId) {
       return;
     }
@@ -132,7 +137,7 @@ export const useConversationMessages = (
       .finally(() => {
         isFetchingNextPageRef.current = false;
       });
-  }, [olderPages, messagesQuery.data?.next_cursor, normalizedConversationId]);
+  }, [nextCursor, normalizedConversationId]);
 
   // initialData: [] guarantees these are always defined arrays.
   const moderatedMessages = moderatedMessagesQuery.data;
@@ -180,14 +185,10 @@ export const useConversationMessages = (
     failedMessages,
   ]);
 
-  const hasNextPage = Boolean(
-    olderPages.at(-1)?.page.next_cursor ?? messagesQuery.data?.next_cursor,
-  );
-
   return {
     messages,
     fetchNextPage,
-    hasNextPage,
+    hasNextPage: Boolean(nextCursor),
     isLoading: isQueryPending(messagesQuery),
   };
 };

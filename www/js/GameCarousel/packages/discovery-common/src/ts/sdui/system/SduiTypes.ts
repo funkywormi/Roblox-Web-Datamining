@@ -125,6 +125,7 @@ export type TSduiDataStore = {
 
 export type TSduiPageContextType =
   | PageContext.HomePage
+  | PageContext.SearchPage
   | PageContext.GamesPage
   | PageContext.SpotlightPage
   | PageContext.SortDetailPageDiscover

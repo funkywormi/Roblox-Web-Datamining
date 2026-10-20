@@ -7,7 +7,11 @@ import GamesOmniFeed from "../gamesPage/GamesOmniFeed";
 import SortDetailV2 from "../sortDetail/SortDetailV2";
 import ChartsMainIxpWrapper from "./ChartsMainIxpWrapper";
 import ChartsSeeAllIxpWrapper from "./ChartsSeeAllIxpWrapper";
-import { chartsHistory, useBindChartsSduiRouter } from "./sduiV2/chartsSduiRouter";
+import {
+  chartsHistory,
+  syncChartsHistoryWithWindow,
+  useBindChartsSduiRouter,
+} from "./sduiV2/chartsSduiRouter";
 
 const localeRouteRegex = "/:locale([a-z]{2,3}-[a-z0-9]{2,3}|[a-z]{2})";
 
@@ -38,6 +42,9 @@ export function ChartsRoutes(props: Props): JSX.Element {
 }
 
 function App(props: Props) {
+  // Sync before Router renders so it starts with the current browser URL.
+  syncChartsHistoryWithWindow();
+
   return (
     <Router history={chartsHistory}>
       <ChartsRoutes {...props} />

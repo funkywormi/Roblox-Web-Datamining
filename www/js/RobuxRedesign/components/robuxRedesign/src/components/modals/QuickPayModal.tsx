@@ -22,6 +22,7 @@ import {
   Icon,
 } from "@rbx/foundation-ui";
 import { FullScreenLoading } from "@rbx/payments/components";
+import { PriceTag } from "@rbx/payments/priceTag";
 import { window } from "@rbx/core-lib/browser";
 import { isIconVariant } from "../../utils/iconVariants";
 import { resolveBonusRobuxTagLabelKey } from "../../utils/bonusRobuxTag";
@@ -30,9 +31,12 @@ import { ModalContext } from "../../contexts/ModalContext";
 import { convertProviderPayloadMoneyToDecimal, formatAmount } from "../../utils/formatMoney";
 import { QuickPaySelectCardDropdown } from "./QuickPaySelectCardDropdown";
 import { QuickPayLegalDisclosure } from "../QuickPayLegalDisclosure";
+import SubscribeAndSaveQuickPayOffer from "../SubscribeAndSaveQuickPayOffer";
 import { QuickPay, QuickPayIframeMessage } from "../../hooks/quickPay/useQuickPay";
+import { Money } from "../../types/buyRobuxPageData";
 import { TrackingContext } from "../../contexts/TrackingContext";
 import { PreparePaymentProviderPayload } from "../../services/paymentsGatewayService";
+import { trackCounter } from "../../observability";
 import { BlueCheckIcon } from "../BlueCheckIcon";
 import "../../stylesheets/quickPay.scss";
 
@@ -54,6 +58,9 @@ function QuickPayModal({
   selectedProduct,
   stripe,
   taxTranslationKey,
+  subscribedRobuxProductOffers = [],
+  isSubscribeAndSaveChecked = false,
+  toggleSubscribeAndSave = () => undefined,
 }: QuickPay) {
   const {
     bonusItemDisplayName,
@@ -61,6 +68,7 @@ function QuickPayModal({
     bonusItemImageUrl,
     collectibleBonusItemMetadata,
     buyRobuxPageData,
+    getPurchaseUrl,
   } = useContext(BuyRobuxPageContext);
   const {
     quickPay: { closeModal, isOpen: isQuickPayModalOpen },
@@ -84,6 +92,14 @@ function QuickPayModal({
   const shouldShowPersonalizedBonusItems = Boolean(
     ltbItemMetadata ?? (isBonusItem && bonusItemId) ?? collectibleBonusItemMetadata,
   );
+
+  const subscribeAndSaveOffer = selectedProduct
+    ? subscribedRobuxProductOffers.find(offer => offer.productId === selectedProduct.productId)
+    : undefined;
+  const continueToSubscriptionCheckout = Boolean(
+    isSubscribeAndSaveChecked && subscribeAndSaveOffer,
+  );
+  const displayPriceAmount: Money = selectedProduct?.price.amount ?? { currencyCode: "USD" };
 
   const [isLoading, setIsLoading] = useState(false);
   const [isTaxTooltipOpen, setIsTaxTooltipOpen] = useState(false);
@@ -109,13 +125,24 @@ function QuickPayModal({
     setQuickPayError("");
   }, [trackQuickPayClose, closeModal]);
 
+  const handleContinueToCheckout = useCallback(() => {
+    if (!selectedProduct || window === undefined) {
+      return;
+    }
+
+    const purchaseUrl = getPurchaseUrl(selectedProduct, false);
+    const separator = purchaseUrl.includes("?") ? "&" : "?";
+    trackCounter("QuickPaySubscribeAndSaveRedirect");
+    window.location.href = `${purchaseUrl}${separator}subscribeAndSave=1`;
+  }, [getPurchaseUrl, selectedProduct]);
+
   const handleUseDifferentPaymentMethodClick = useCallback(() => {
     trackQuickPayUseDifferentPaymentMethod();
     redirectToPurchase();
     closeModal();
   }, [trackQuickPayUseDifferentPaymentMethod, redirectToPurchase, closeModal]);
 
-  const [amountTotal, taxAmountExclusive] = useMemo(() => {
+  const [amountTotal = 0, taxAmountExclusive = 0] = useMemo(() => {
     if (!preparePaymentProviderPayload) {
       return [];
     }
@@ -160,20 +187,6 @@ function QuickPayModal({
     };
   }, [eventListener3DS]);
 
-  useEffect(() => {
-    if (window === undefined || !isQuickPayModalOpen) {
-      return;
-    }
-
-    window.dispatchEvent(
-      new window.CustomEvent("price-tag:render", {
-        detail: {
-          targetSelector: ".quick-pay-price-tag",
-        },
-      }),
-    );
-  }, [isQuickPayModalOpen, taxAmountExclusive, amountTotal]);
-
   if (!stripe || !selectedProduct || !selectedPaymentProfile) {
     return null;
   }
@@ -210,10 +223,10 @@ function QuickPayModal({
                     quantity: formatNumber(Number(selectedProduct.robuxAmount)),
                   })}
                 </div>
-                <span
-                  className="product-price quick-pay-price-tag"
-                  data-amount={formatAmount(selectedProduct.price.amount)}
-                  data-currency-code={selectedProduct.price.amount.currencyCode}
+                <PriceTag
+                  tagClassName="product-price"
+                  amount={Number(formatAmount(displayPriceAmount))}
+                  currencyCode={displayPriceAmount.currencyCode}
                 />
               </div>
               {selectedProduct.bonusRobuxAmount &&
@@ -289,13 +302,20 @@ function QuickPayModal({
               </Fragment>
             )}
           </div>
+          {subscribeAndSaveOffer && (
+            <SubscribeAndSaveQuickPayOffer
+              isChecked={isSubscribeAndSaveChecked}
+              onToggle={toggleSubscribeAndSave}
+              offer={subscribeAndSaveOffer}
+            />
+          )}
 
           <div className="price-info space-between-container">
             <div className="subtotal">{translate("Message.OneClickPay.Subtotal")}</div>
-            <span
-              className="subtotal-price quick-pay-price-tag"
-              data-amount={formatAmount(selectedProduct.price.amount)}
-              data-currency-code={selectedProduct.price.amount.currencyCode}
+            <PriceTag
+              tagClassName="subtotal-price"
+              amount={Number(formatAmount(displayPriceAmount))}
+              currencyCode={displayPriceAmount.currencyCode}
             />
           </div>
           <div className="tax-info space-between-container">
@@ -330,10 +350,10 @@ function QuickPayModal({
               )}
             </div>
             {preparePaymentProviderPayload ? (
-              <span
-                className="tax-price quick-pay-price-tag"
-                data-amount={taxAmountExclusive}
-                data-currency-code={selectedProduct.price.amount.currencyCode}
+              <PriceTag
+                tagClassName="tax-price"
+                amount={taxAmountExclusive}
+                currencyCode={displayPriceAmount.currencyCode}
               />
             ) : (
               loadingAnimation
@@ -343,10 +363,10 @@ function QuickPayModal({
           <div className="space-between-container">
             <div className="total-due">{translate("Message.OneClickPay.TotalDue")}</div>
             {preparePaymentProviderPayload ? (
-              <span
-                className="total-due-price quick-pay-price-tag"
-                data-amount={amountTotal}
-                data-currency-code={selectedProduct.price.amount.currencyCode}
+              <PriceTag
+                tagClassName="total-due-price"
+                amount={amountTotal}
+                currencyCode={displayPriceAmount.currencyCode}
               />
             ) : (
               loadingAnimation
@@ -381,17 +401,23 @@ function QuickPayModal({
           {!isLoading && (
             <div className="flex flex-row gap-small justify-center">
               <Button
-                isDisabled={!preparePaymentProviderPayload}
+                isDisabled={!continueToSubscriptionCheckout && !preparePaymentProviderPayload}
                 variant="Emphasis"
                 className="min-width-[90px]"
                 size="Medium"
                 onClick={() => {
+                  if (continueToSubscriptionCheckout) {
+                    handleContinueToCheckout();
+                    return;
+                  }
                   if (preparePaymentProviderPayload) {
                     void handleProcessPayment(preparePaymentProviderPayload);
                   }
                 }}
               >
-                {translate("Button.OneClickPay.PayNow")}
+                {translate(
+                  continueToSubscriptionCheckout ? "Action.Continue" : "Button.OneClickPay.PayNow",
+                )}
               </Button>
               <Button
                 variant="Standard"

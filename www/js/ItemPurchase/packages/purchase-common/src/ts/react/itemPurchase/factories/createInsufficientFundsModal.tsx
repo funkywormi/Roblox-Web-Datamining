@@ -1,6 +1,8 @@
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
+import { assetUrl } from '@rbx/www-common/asset';
+import moneyStack from '../../../../images/moneystack.png';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
 import urlConstants from '../constants/urlConstants';
 import PriceLabel from '../components/PriceLabel';
@@ -30,10 +32,10 @@ function InsufficientFundsModalInner({
 }: InsufficientFundsModalProps & { translate: PurchaseTranslate }) {
   let body = (
     <div
-      className='modal-message'
+      className='text-body-large'
       dangerouslySetInnerHTML={{
         __html: translate(resources.insufficientFundsMessage, {
-          robux: renderToString(<PriceLabel {...{ price: robuxNeeded }} />)
+          robux: renderToString(<PriceLabel translate={translate} price={robuxNeeded} />)
         })
       }}
     />
@@ -45,7 +47,14 @@ function InsufficientFundsModalInner({
     <FoundationPurchaseModal
       open={open}
       title={translate(resources.insufficientFundsHeading)}
-      thumbnail={<span className='money-stack-icon' />}
+      thumbnail={
+        <img
+          className='width-[284px] height-[183px]'
+          src={assetUrl(moneyStack)}
+          alt=''
+          aria-hidden='true'
+        />
+      }
       body={body}
       neutralButtonText={translate(resources.cancelAction)}
       actionButtonText={translate(resources.buyRobuxAction)}

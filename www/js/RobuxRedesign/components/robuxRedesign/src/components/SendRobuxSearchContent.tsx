@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
+import { getCurrentUser, userIdToNumber } from "@rbx/www-common/user";
 import { SheetBody } from "@rbx/foundation-ui";
 import { TFriend } from "@rbx/friends-common/types/friendsCarousel";
 import { useUserSearch } from "../hooks/useUserSearch";
@@ -38,7 +38,8 @@ export function SendRobuxSearchContent({
   onSelectUser,
 }: SendRobuxSearchContentProps) {
   const { translate } = useTranslation();
-  const currentUserId = authenticatedUser()?.id ?? undefined;
+  const currentUser = getCurrentUser();
+  const currentUserId = currentUser === undefined ? undefined : userIdToNumber(currentUser.id);
   const excludedUserIds = useMemo(
     () => (currentUserId !== undefined && currentUserId > 0 ? [currentUserId] : []),
     [currentUserId],

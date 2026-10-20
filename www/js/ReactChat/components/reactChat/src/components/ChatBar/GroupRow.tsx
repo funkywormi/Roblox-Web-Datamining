@@ -4,12 +4,14 @@ import ChatRow from "./ChatRow";
 
 type TGroupRowProps = {
   conversation: TChatConversation;
+  isSelected?: boolean;
   onOpenConversation: (layoutId: string) => void;
 };
 
-const GroupRow = ({ conversation, onOpenConversation }: TGroupRowProps) => (
+const GroupRow = ({ conversation, isSelected, onOpenConversation }: TGroupRowProps) => (
   <ChatRow
     conversation={conversation}
+    isSelected={isSelected}
     onOpenConversation={onOpenConversation}
     avatar={
       <GroupAvatar

@@ -66,6 +66,8 @@ function VideoPlayerLoadingFallbackInner({
         targetId={parsedImage.thumbnail.targetId}
         format={ThumbnailFormat.webp}
         size={parsedImage.thumbnail.size}
+        includeBackground={parsedImage.thumbnail.includeBackground}
+        includeProfileFrame={parsedImage.thumbnail.includeProfileFrame}
         containerClass="sdui-video-poster width-full height-full"
       />
     );

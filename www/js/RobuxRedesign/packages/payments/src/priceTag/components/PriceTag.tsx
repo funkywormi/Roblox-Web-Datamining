@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
+import { getInternalPageName } from "@rbx/www-common/page-name";
 import { TPriceTagProps } from "../constants/typeDefinitions";
 import {
   ARABIC_LOCALE,
@@ -12,6 +13,16 @@ import {
   NAVBAR_COMPACT_MAX_SIG_FIG,
 } from "../constants/priceTagConstants";
 import { trackCounter, trackCriticalError } from "../../observability";
+
+function getCurrencyCodeDimension(currencyCode: unknown): string {
+  if (currencyCode === null) return "null";
+  if (currencyCode === undefined) return "undefined";
+  if (currencyCode === "") return "empty";
+  // Bound malformed values while retaining well-formed currency codes.
+  return typeof currencyCode === "string" && /^[a-z]{3}$/i.test(currencyCode)
+    ? currencyCode.toUpperCase()
+    : "invalid";
+}
 
 function getLocale() {
   const systemLocale = Intl.NumberFormat().resolvedOptions().locale;
@@ -69,8 +80,13 @@ export function getFormattedAmount({
     formattedAmount = Intl.NumberFormat(locale, formatOptions as Intl.NumberFormatOptions).format(
       amountAbs,
     );
-  } catch (e) {
-    trackCriticalError("PriceTag_NumberFormatLocaleException", undefined, e);
+  } catch {
+    // These caught formatting errors are flooding Sentry. Omit the exception to
+    // keep critical-severity metrics and dimensions in Grafana without Sentry capture.
+    trackCriticalError("PriceTag_NumberFormatLocaleException", {
+      currencyCode: getCurrencyCodeDimension(currencyCode),
+      internalPageName: getInternalPageName() ?? "unknown",
+    });
   }
   return {
     formattedAmount,

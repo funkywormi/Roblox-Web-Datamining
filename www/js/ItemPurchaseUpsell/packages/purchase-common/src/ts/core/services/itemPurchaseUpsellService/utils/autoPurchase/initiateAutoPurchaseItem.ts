@@ -3,14 +3,12 @@
  * This method was implemented in the WebSites: https://github.rbx.com/Roblox/web-platform/blob/186bc2798a9b636ef94f884de652d9554e4518ad/Web/RobloxWebSite/js/ItemPurchaseForDialog/ItemPurchaseForDialog.js#L99
  * In order to control the auto purchase flow, we have to rewrite part of the method.
  */
-import {
-  ItemPurchase,
-  CurrentUser,
-  EventStream,
-  UrlParser,
-  EnvironmentUrls,
-  RobloxTranslationResource
-} from '@rbx/legacy-webapp-types/Roblox';
+import { ItemPurchase } from '@rbx/legacy-webapp-types/Roblox';
+import type { RobloxTranslationResource } from '@rbx/legacy-webapp-types/Roblox';
+import { EnvironmentUrls } from '@rbx/environment-urls';
+import { sendEventWithTarget, targetTypes } from '@rbx/core-scripts/event-stream';
+import { UrlSearchParams } from '@rbx/core-lib/url';
+import { getCurrentUser } from '@rbx/www-common/user';
 import { generateRandomUuid } from '@rbx/core-lib/uuid';
 import * as httpService from '@rbx/core-scripts/http';
 import {
@@ -34,22 +32,21 @@ import openTryAgainLaterErrorModal from '../../modals/openTryAgainLaterErrorModa
 import reportCounter from '../common/reportCounter';
 
 function getAssetAcquiredAnalyticsVariables(itemId: string | undefined) {
-  const userId = CurrentUser?.userId;
-
-  const urlParametersObject = UrlParser.getParametersAsObject();
+  const searchParams = UrlSearchParams.parse(window.location.search, false);
+  const param = (name: string) => searchParams.get(name) ?? undefined;
 
   return {
     assetId: itemId,
-    category: urlParametersObject.Category,
-    creatorId: urlParametersObject.CreatorId,
-    genre: urlParametersObject.GenreCsv,
-    page: urlParametersObject.Page,
-    position: urlParametersObject.Position,
-    searchKeyword: urlParametersObject.SearchKeyword,
-    sortAggregation: urlParametersObject.SortAggregation,
-    sortType: urlParametersObject.SortType,
-    userId,
-    searchId: urlParametersObject.SearchId
+    category: param('Category'),
+    creatorId: param('CreatorId'),
+    genre: param('GenreCsv'),
+    page: param('Page'),
+    position: param('Position'),
+    searchKeyword: param('SearchKeyword'),
+    sortAggregation: param('SortAggregation'),
+    sortType: param('SortType'),
+    userId: getCurrentUser()?.id,
+    searchId: param('SearchId')
   };
 }
 
@@ -75,7 +72,7 @@ async function purchaseWithUrl(
       userAssetId: itemPurchaseObj.userAssetId,
       collectibleItemId: itemPurchaseObj.itemDetail?.collectibleItemId,
       collectibleProductId: itemPurchaseObj.itemDetail?.collectibleProductId,
-      expectedPurchaserId: CurrentUser.userId,
+      expectedPurchaserId: getCurrentUser()?.id,
       expectedPurchaserType: 'User',
       idempotencyKey: generateRandomUuid(),
       // Marketplace offers the user accepted; required for the discounted
@@ -103,14 +100,9 @@ async function purchaseWithUrl(
       return Promise.resolve(); // let the original error flow handle the error, reject will handle twice by catch
     }
 
-    if (itemPurchaseObj.isLibrary && EventStream && UrlParser) {
+    if (itemPurchaseObj.isLibrary) {
       const obj = getAssetAcquiredAnalyticsVariables(purchaseResult.assetId);
-      EventStream.SendEventWithTarget(
-        'LibraryAssetAcquired',
-        'Marketplace',
-        obj,
-        EventStream.TargetTypes.WWW
-      );
+      sendEventWithTarget('LibraryAssetAcquired', 'Marketplace', obj, targetTypes.WWW);
     }
 
     reportCounter(UPSELL_COUNTER_NAMES.AutoPurchaseSucceed, itemPurchaseObj.assetType);

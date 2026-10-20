@@ -116,6 +116,14 @@ export function asNonEmptyString(value: unknown): string | undefined {
   return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
+export function positiveIntegerOr(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isInteger(value) && value > 0 ? value : fallback;
+}
+
+export function nonNegativeIntegerOr(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : fallback;
+}
+
 /**
  * Returns a finite number from a number or numeric string. `NaN`,
  * `Infinity`, and blank strings return `undefined`. Blank strings are

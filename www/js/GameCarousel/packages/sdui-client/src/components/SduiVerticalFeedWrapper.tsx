@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Children, useCallback, useRef } from "react";
+import React, { Children, useCallback, useEffect, useMemo, useRef } from "react";
 import {
   resolveManagedChildList,
   SDUI_MANAGED_CHILDREN_PROP,
@@ -14,6 +14,7 @@ import {
   type SduiVerticalFeedProps as SduiCoreVerticalFeedProps,
 } from "@rbx/sdui-common";
 import { useSduiLoadMorePagination, useSduiServices } from "@rbx/sdui-core/client";
+import { useProgressiveItemCount } from "../hooks/useProgressiveItemCount";
 import { useSduiFeedImpressions } from "../hooks/useSduiFeedImpressions";
 import { BackToTopButton } from "./primitives/BackToTopButton";
 
@@ -25,6 +26,10 @@ export interface SduiVerticalFeedProps extends SduiCoreVerticalFeedProps {
   onScrollToEnd?: SduiResolvedAction;
   thresholdFromEnd?: number;
   enableBackToTop?: boolean;
+  initialNumToRender?: number;
+  progressiveFillRate?: number;
+  /** Milliseconds between fill batches. When unset or <= 0, the next batch is scheduled ASAP. */
+  progressiveFillIntervalMs?: number;
 }
 
 function hasFeedItems(
@@ -43,11 +48,15 @@ export function SduiVerticalFeed({
   onScrollToEnd,
   thresholdFromEnd,
   enableBackToTop = false,
+  initialNumToRender,
+  progressiveFillRate,
+  progressiveFillIntervalMs,
   feedItems,
   ...feedProps
 }: SduiVerticalFeedProps): React.JSX.Element {
   const feedColumnRef = useRef<HTMLDivElement | null>(null);
   const services = useSduiServices();
+  const { configKey, poolRegistry } = services;
   const translatedBackToTop = services.translate?.(BACK_TO_TOP_TRANSLATION_KEY);
   const backToTopText = translatedBackToTop?.length
     ? translatedBackToTop
@@ -70,19 +79,69 @@ export function SduiVerticalFeed({
     feedItems,
     feedProps[SDUI_MANAGED_CHILDREN_PROP],
   );
+  const [visibleFeedItemCount, isFillingFeed] = useProgressiveItemCount(
+    managedFeedItems?.configs.length ?? 0,
+    initialNumToRender,
+    progressiveFillRate,
+    progressiveFillIntervalMs,
+    managedFeedItems?.configs ?? [],
+  );
+  const visibleManagedFeedItems = useMemo<SduiManagedChildList | undefined>(() => {
+    if (managedFeedItems == null || visibleFeedItemCount >= managedFeedItems.configs.length) {
+      return managedFeedItems;
+    }
+    return {
+      ...managedFeedItems,
+      configs: managedFeedItems.configs.slice(0, visibleFeedItemCount),
+    };
+  }, [managedFeedItems, visibleFeedItemCount]);
   const isFeedPopulated = hasFeedItems(feedItems, managedFeedItems, feedProps.children);
 
   useSduiFeedImpressions({
     feedColumnRef,
-    feedItemConfigs: managedFeedItems?.configs ?? [],
+    feedItemConfigs: visibleManagedFeedItems?.configs ?? [],
     dataUpdatedTimestamp,
   });
 
+  useEffect(() => {
+    if (!configKey) return undefined;
+
+    const poolStore = poolRegistry.getOrCreate(configKey);
+    const measurement = poolStore.mountContainerMeasurement();
+
+    const feedColumn = feedColumnRef.current;
+    if (feedColumn) {
+      measurement.setWidth(feedColumn.getBoundingClientRect().width);
+    }
+
+    const resizeObserver =
+      feedColumn && typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(entries => {
+            const feedColumnEntry = entries.find(entry => entry.target === feedColumn);
+            if (feedColumnEntry) {
+              measurement.setWidth(feedColumnEntry.contentRect.width);
+            }
+          })
+        : undefined;
+    if (resizeObserver && feedColumn) {
+      resizeObserver.observe(feedColumn);
+    }
+
+    return () => {
+      resizeObserver?.disconnect();
+      measurement.release();
+    };
+  }, [configKey, poolRegistry]);
+
   return (
     <React.Fragment>
-      <SduiCoreVerticalFeed {...feedProps} feedItems={feedItems} feedColumnRef={feedColumnRef} />
+      <SduiCoreVerticalFeed
+        {...feedProps}
+        feedItems={visibleManagedFeedItems ?? feedItems}
+        feedColumnRef={feedColumnRef}
+      />
       {isLoadingMore ? <Loading ariaLabel="Loading more content" /> : null}
-      {hasNextPage ? (
+      {hasNextPage && !isFillingFeed ? (
         <LoadMoreSentinel
           onLoadMore={triggerLoadMore}
           dataUpdatedTimestamp={dataUpdatedTimestamp}

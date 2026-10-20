@@ -67,6 +67,21 @@ export function SduiFilterPillsCarousel({
     setPendingApply(null);
   }, [filterGroups]);
 
+  const onFilterAppliedRef = useRef(onFilterApplied);
+  onFilterAppliedRef.current = onFilterApplied;
+
+  // Reports the server-resolved selections so the host can reflect them (e.g. Charts writes them
+  // onto the URL, matching control). `isInitialSync` distinguishes this from a user apply.
+  useEffect(() => {
+    if (filterGroups.length === 0) {
+      return;
+    }
+    onFilterAppliedRef.current?.onActivated({
+      filterSelections: buildFilterSelections(filterGroups, null),
+      isInitialSync: true,
+    });
+  }, [filterGroups]);
+
   const collectionAnalyticsData = useMemo(() => {
     return buildFilterPillsCollectionAnalyticsData(
       analyticsContext,

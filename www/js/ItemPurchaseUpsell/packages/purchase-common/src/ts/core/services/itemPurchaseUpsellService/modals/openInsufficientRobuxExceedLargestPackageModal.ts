@@ -1,8 +1,9 @@
 import React from 'react';
 import { escapeHtml } from '@rbx/core-scripts/format/string';
-import { deviceMeta } from '@rbx/core-scripts/legacy/header-scripts';
-import { Dialog, RobloxTranslationResource, Endpoints } from '@rbx/legacy-webapp-types/Roblox';
-import { paymentFlowAnalyticsService } from '@rbx/core-scripts/legacy/core-roblox-utilities';
+import { removeUrlLocale, supportLocalizedUrls } from '@rbx/core-scripts/endpoints';
+import { getDeviceMeta } from '@rbx/core-scripts/meta/device';
+import type { RobloxTranslationResource } from '@rbx/legacy-webapp-types/Roblox';
+import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
 import { ItemDetailElementDataset } from '../constants/serviceTypeDefinitions';
 import formattingRobux from '../utils/common/formattingRobux';
 import { GAMES_PAGE_PREFIX, LANG_KEYS, UPSELL_COUNTER_NAMES } from '../constants/upsellConstants';
@@ -10,6 +11,7 @@ import reportCounter from '../utils/common/reportCounter';
 import { redirectToRobuxStore } from '../utils/common/redirectionHelpers';
 import getGamePassThumbnailUrl from '../utils/common/getGamePassThumbnailUrl';
 import openUnifiedRobuxUpsellModal from './openUnifiedRobuxUpsellModal';
+import openDialog from './openDialog';
 import ItemPreviewThumbnail from '../../../../react/components/ItemPreviewThumbnail';
 
 export default function openInsufficientRobuxExceedLargestPackageModal(
@@ -24,8 +26,8 @@ export default function openInsufficientRobuxExceedLargestPackageModal(
   const expectedPrice = parseInt(itemDetail.expectedPrice, 10);
   const robuxItemPrice = formattingRobux(expectedPrice);
   let itemPath = window.location.pathname;
-  if (Endpoints?.supportLocalizedUrls) {
-    itemPath = Endpoints.removeUrlLocale(itemPath);
+  if (supportLocalizedUrls) {
+    itemPath = removeUrlLocale(itemPath);
   }
   let thumbnailImageUrl = defaultThumbnailUrl;
   if (itemPath.startsWith(GAMES_PAGE_PREFIX)) {
@@ -70,8 +72,8 @@ export default function openInsufficientRobuxExceedLargestPackageModal(
       itemDetail?.assetType
     );
     redirectToRobuxStore(
-      deviceMeta.getDeviceMeta()?.isTablet ?? false,
-      deviceMeta.getDeviceMeta()?.isUniversalApp ?? false
+      getDeviceMeta()?.isTablet ?? false,
+      getDeviceMeta()?.isUniversalApp ?? false
     );
     return false;
   }
@@ -102,12 +104,11 @@ export default function openInsufficientRobuxExceedLargestPackageModal(
     });
     return;
   }
-  Dialog.open({
+  openDialog({
     titleText: translationResource.get(LANG_KEYS.insufficientRobuxHeading, {}),
     bodyContent: dialogBody,
     declineText: translationResource.get(LANG_KEYS.cancelAction, {}),
     acceptText: translationResource.get(LANG_KEYS.goToRobuxStoreAction, {}),
-    acceptColor: 'btn-primary-md',
     onAccept,
     onDecline: () => {
       paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
@@ -123,7 +124,6 @@ export default function openInsufficientRobuxExceedLargestPackageModal(
     allowHtmlContentInBody: true,
     allowHtmlContentInFooter: false,
     fieldValidationRequired: true,
-    dismissable: true,
     xToCancel: true
   });
 }

@@ -1,5 +1,8 @@
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
-import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import AXAnalyticsConstants from "@rbx/catalog/analytics/AXAnalyticsConstants";
+import { TItemCardSource } from "@rbx/catalog/analytics/axTrackingEvents";
+import sendAXTracking from "@rbx/catalog/analytics/sendAXTracking";
+import { AXSendTrackingActionType } from "@rbx/catalog/analytics/types";
 import {
   ActionType,
   SduiErrorName,
@@ -12,54 +15,19 @@ import {
 } from "@rbx/sdui-core";
 
 const ACTION_TYPE_NAME = actionTypeName(ActionType.OPEN_MARKETPLACE_TRY_ON);
-const UNIFIED_EVENT_LOG_NAME = "unifiedEventLog";
-const MARKETPLACE_ORGANIC_EVENT_NAME = "marketplaceOrganicFELog";
-// These are the bare minimum values needed for the marketplace action
-// https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/userjourney/enums/marketplace_unified_action.proto
-const MARKETPLACE_UNIFIED_ACTION = { ItemSelected: 3 } as const;
-// https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/avatarmarketplacesnd/enums/marketplace_action_type.proto
-const MARKETPLACE_ACTION_TYPE = { UiButtonClick: 9 } as const;
-// https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/userjourney/enums/marketplace_eventsender_api.proto
-const MARKETPLACE_EVENT_SENDER_API = { SendRobloxTelemetryEvent: 2 } as const;
-// https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/userjourney/enums/marketplace_client.proto
-const MARKETPLACE_CLIENT = { Web: 1, WebMobile: 2 } as const;
-// https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/userjourney/enums/marketplace_unified_item_type.proto
-const MARKETPLACE_UNIFIED_ITEM_TYPE = { Asset: 1, Bundle: 2, Look: 3 } as const;
-// https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/userjourney/enums/marketplace_unified_surface.proto
-const MARKETPLACE_UNIFIED_SURFACE = { DiscoverySearchResults: 11 } as const;
-// https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/avatarmarketplacesnd/enums/marketplace_surface_type.proto
-const MARKETPLACE_SURFACE_TYPE = { DiscoverySearchResults: 7 } as const;
-// https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/avatarmarketplacesnd/enums/widget_ui_treatement.proto
-const WIDGET_UI_TREATMENT = { ItemGroup: 1 } as const;
-
 const APP_PAGE = { SearchPage: "searchPage" } as const;
-
-const MARKETPLACE_EVENT_CONFIG_BY_APP_PAGE: Record<
-  string,
-  { unifiedSurface: number; organicContext: string; organicGroup: string; organicSurface: number }
-> = {
-  [APP_PAGE.SearchPage]: {
-    unifiedSurface: MARKETPLACE_UNIFIED_SURFACE.DiscoverySearchResults,
-    organicContext: "TryOnScreen",
-    organicGroup: "AvatarItemWidgetClick",
-    organicSurface: MARKETPLACE_SURFACE_TYPE.DiscoverySearchResults,
-  },
-};
 
 const ITEM_TYPE_CONFIG = {
   Asset: {
     path: "catalog",
-    telemetryType: MARKETPLACE_UNIFIED_ITEM_TYPE.Asset,
     requiresSubType: true,
   },
   Bundle: {
     path: "bundles",
-    telemetryType: MARKETPLACE_UNIFIED_ITEM_TYPE.Bundle,
     requiresSubType: true,
   },
   Look: {
     path: "looks",
-    telemetryType: MARKETPLACE_UNIFIED_ITEM_TYPE.Look,
     requiresSubType: false,
   },
 } as const;
@@ -73,15 +41,17 @@ function reportMalformedParam(ctx: SduiActionContext, message: string, propName:
   });
 }
 
-function getMarketplaceEventConfig(
-  ctx: SduiActionContext,
-): (typeof MARKETPLACE_EVENT_CONFIG_BY_APP_PAGE)[string] | undefined {
-  const { appPage } = ctx.pageContext;
-  const config = MARKETPLACE_EVENT_CONFIG_BY_APP_PAGE[appPage];
-  if (config === undefined) {
-    reportMalformedParam(ctx, `Unsupported appPage for ${ACTION_TYPE_NAME}: ${appPage}`, "appPage");
+/** Maps an SDUI app page to the marketplace AX item-click source. */
+function getMarketplaceAXSourceForAppPage(appPage: string): TItemCardSource | undefined {
+  switch (appPage) {
+    case APP_PAGE.SearchPage:
+      // Named after MarketplaceUnifiedSurface.DISCOVERY_SEARCH_RESULTS;
+      // this is an AX metadata label, not the numeric unified-event enum.
+      // https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/userjourney/enums/marketplace_unified_surface.proto
+      return TItemCardSource.DiscoverySearchResults;
+    default:
+      return undefined;
   }
-  return config;
 }
 
 function isMarketplaceItemType(value: string): value is MarketplaceItemType {
@@ -93,13 +63,6 @@ function readItemType(value: string | undefined): MarketplaceItemType | undefine
     return value;
   }
   return undefined;
-}
-
-function getMarketplaceClient(): number {
-  const deviceMeta = getDeviceMeta();
-  return deviceMeta?.isPhone === true || deviceMeta?.isTablet === true
-    ? MARKETPLACE_CLIENT.WebMobile
-    : MARKETPLACE_CLIENT.Web;
 }
 
 function getValidatedMarketplaceParams(
@@ -156,62 +119,38 @@ export const openMarketplaceTryOnTelemetryHandler: SduiActionTelemetryHandler = 
     return;
   }
 
-  const eventConfig = getMarketplaceEventConfig(ctx);
-  if (eventConfig === undefined) {
+  const { appPage } = ctx.pageContext;
+  const source = getMarketplaceAXSourceForAppPage(appPage);
+  if (!source) {
+    reportMalformedParam(ctx, `Unsupported appPage for ${ACTION_TYPE_NAME}: ${appPage}`, "appPage");
     return;
   }
 
-  ctx.analyticsReporter.logEvent(
-    {
-      name: MARKETPLACE_ORGANIC_EVENT_NAME,
-      type: MARKETPLACE_ORGANIC_EVENT_NAME,
-      context: eventConfig.organicContext,
-    },
-    {
-      actionType: MARKETPLACE_ACTION_TYPE.UiButtonClick,
-      group: eventConfig.organicGroup,
-      surface: eventConfig.organicSurface,
-      item_id: params.itemId,
-      item_type: params.itemType,
-      event_sender_api: MARKETPLACE_EVENT_SENDER_API.SendRobloxTelemetryEvent,
-      client: getMarketplaceClient(),
-    },
-  );
-
-  const fields: Record<string, string | number> = {
+  const fields = {
+    source,
+    actionType: ACTION_TYPE_NAME,
+    pageContext: appPage,
     itemId: params.itemId,
-    itemType: ITEM_TYPE_CONFIG[params.itemType].telemetryType,
-    action: MARKETPLACE_UNIFIED_ACTION.ItemSelected,
-    surface: eventConfig.unifiedSurface,
+    itemType: params.itemType,
+    itemPrice: params.itemPrice,
+    widgetId: findAnalyticsFieldInAncestors("widgetId", analyticsContext),
+    widgetType: findAnalyticsFieldInAncestors("widgetType", analyticsContext),
+    widgetItemIds: findAnalyticsFieldInAncestors("widgetItemIds", analyticsContext),
+    requestId: findAnalyticsFieldInAncestors("requestId", analyticsContext),
   };
-  const widgetId = findAnalyticsFieldInAncestors("widgetId", analyticsContext, "");
-  const widgetType = findAnalyticsFieldInAncestors("widgetType", analyticsContext, "");
-  const widgetItemIds = findAnalyticsFieldInAncestors("widgetItemIds", analyticsContext, "");
-  const requestId = findAnalyticsFieldInAncestors("requestId", analyticsContext, "");
-  const hasWidgetAttribution =
-    widgetId !== "" && widgetType !== "" && widgetItemIds !== "" && requestId !== "";
 
-  if (hasWidgetAttribution) {
-    Object.assign(fields, {
-      widgetId,
-      widgetType,
-      widgetItemIds,
-      requestId,
-      uiTreatmentType: WIDGET_UI_TREATMENT.ItemGroup,
+  try {
+    sendAXTracking({
+      itemName: AXAnalyticsConstants.ItemCardClick,
+      actionType: AXSendTrackingActionType.Click,
+      metaData: { metaData: JSON.stringify(fields) },
     });
+  } catch (error) {
+    ctx.errorReporter.reportSduiError(
+      SduiErrorName.FailedToExecuteAction,
+      `AX tracking failed for ${ACTION_TYPE_NAME}: ${error instanceof Error ? error.message : String(error)}`,
+      ctx.pageContext,
+      { actionType: ACTION_TYPE_NAME },
+    );
   }
-
-  if (params.itemPrice !== undefined) {
-    const priceField = hasWidgetAttribution ? "widgetItemPrice" : "organicItemPrice";
-    fields[priceField] = params.itemPrice;
-  }
-
-  ctx.analyticsReporter.logEvent(
-    {
-      name: UNIFIED_EVENT_LOG_NAME,
-      type: UNIFIED_EVENT_LOG_NAME,
-      context: UNIFIED_EVENT_LOG_NAME,
-    },
-    fields,
-  );
 };

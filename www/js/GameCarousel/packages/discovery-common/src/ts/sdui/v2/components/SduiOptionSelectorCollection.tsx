@@ -165,6 +165,7 @@ export function SduiOptionSelectorCollection({
     return {
       configs,
       renderItem: optionItemConfigs.renderItem,
+      ...(optionItemConfigs.poolLayout ? { poolLayout: optionItemConfigs.poolLayout } : {}),
     };
   }, [
     optionItemConfigs,

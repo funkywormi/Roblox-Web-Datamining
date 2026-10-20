@@ -1,13 +1,13 @@
-import { urlService } from '@rbx/core-scripts/legacy/core-utilities';
 import { escapeHtml } from '@rbx/core-scripts/format/string';
-import {
-  CurrentUser,
-  Dialog,
+import { getAbsoluteUrl } from '@rbx/core-scripts/endpoints';
+import { getUrlWithLocale } from '@rbx/core-scripts/util/url';
+import { getCurrentUser } from '@rbx/www-common/user';
+import type {
   RobloxIntlInstance,
   RobloxTranslationResource,
   RobloxTranslationResourceProviderInstance
 } from '@rbx/legacy-webapp-types/Roblox';
-import { paymentFlowAnalyticsService } from '@rbx/core-scripts/legacy/core-roblox-utilities';
+import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
 import {
   InsufficientFundsErrorObject,
   ItemDetailElementDataset,
@@ -31,6 +31,7 @@ import openUnifiedRobuxUpsellModal, {
   UnifiedRobuxUpsellOfferActionParams
 } from './openUnifiedRobuxUpsellModal';
 import initiateDirectCollectiblePurchase from '../utils/autoPurchase/initiateDirectCollectiblePurchase';
+import openDialog from './openDialog';
 import ItemPreviewThumbnail from '../../../../react/components/ItemPreviewThumbnail';
 
 function prepareAndStartAutoPurchaseFlow(
@@ -62,7 +63,7 @@ function prepareAndStartAutoPurchaseFlow(
     paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.GO_TO_ROBUX_PURCHASE_PAGE
   );
 
-  window.location.href = urlService.getAbsoluteUrl(
+  window.location.href = getAbsoluteUrl(
     `${UPGRADES_PAYMENT_METHODS_URL}?ap=${upsellProduct.roblox_product_id}&UpsellUuid=${upsellUuid}`
   );
 }
@@ -102,7 +103,7 @@ function autoPurchaseFlow(
   shouldShowUnifiedPurchaseModal = false
 ) {
   const modalStartTime = Date.now();
-  const termsOfUseTag = `<a class='text-link-secondary terms-of-use-link' target='_blank' href='${urlService.getUrlWithLocale(
+  const termsOfUseTag = `<a class='text-link-secondary terms-of-use-link' target='_blank' href='${getUrlWithLocale(
     ROBLOX_TERMS_OF_USE_URL,
     intl.getRobloxLocale()
   )}'>`;
@@ -141,7 +142,7 @@ function autoPurchaseFlow(
       // this isUnder13 logic is only works for the web/desktop.
       // it will only show for under 13 modals, no 13-17 modal, because we have a line of text on the payment method page for them
       // but for mobile, we will should pass in true all the time. but this openNewInsufficientRobuxModal file will only be called on web
-      CurrentUser.isUnder13,
+      getCurrentUser()?.isUnder13 ?? false,
       () =>
         prepareAndStartAutoPurchaseFlow(
           upsellProduct,
@@ -234,7 +235,7 @@ function autoPurchaseFlow(
       const offerIdsToPersist = offerIds.length ? offerIds : undefined;
       checkOrStartPurchaseWarning(
         activeUpsellProduct,
-        CurrentUser.isUnder13,
+        getCurrentUser()?.isUnder13 ?? false,
         () =>
           prepareAndStartAutoPurchaseFlow(
             activeUpsellProduct,
@@ -289,7 +290,6 @@ function autoPurchaseFlow(
       currentRobuxBalance: userBalance,
       onAccept,
       onCancel,
-      intl,
       priceSuffix: isSubscription ? itemDetail.priceSuffix : undefined,
       title: isSubscription
         ? translationResource.get(LANG_KEYS.buyRobuxAndSubscriptionAction, {})
@@ -304,13 +304,12 @@ function autoPurchaseFlow(
     });
     return;
   }
-  Dialog.open({
+  openDialog({
     titleText,
     bodyContent: dialogBodyNew,
     footerText: '',
     declineText: translationResource.get(LANG_KEYS.cancelAction, {}),
     acceptText: translationResource.get(LANG_KEYS.buyRobuxAndItemAction, {}),
-    acceptColor: 'btn-primary-md',
     onAccept,
     onDecline: () => {
       insufficientRobuxModalSendPurchaseFlowEvent(
@@ -328,7 +327,6 @@ function autoPurchaseFlow(
     allowHtmlContentInBody: true,
     allowHtmlContentInFooter: false,
     fieldValidationRequired: true,
-    dismissable: true,
     xToCancel: true
   });
 }

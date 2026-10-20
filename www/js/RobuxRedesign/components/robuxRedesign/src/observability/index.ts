@@ -204,6 +204,7 @@ export const observabilityRegistry = {
           name: "QuickPayPaymentMethodSelected",
           dimensions: ["method"],
         },
+        "QuickPaySubscribeAndSaveRedirect",
         {
           name: "QuickPay3DSFlow",
           dimensions: ["step"],

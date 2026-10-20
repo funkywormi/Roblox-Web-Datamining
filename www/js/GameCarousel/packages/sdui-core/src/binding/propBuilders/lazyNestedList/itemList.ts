@@ -58,6 +58,8 @@ function buildItemListEntry(
       buildContext.builderConfig,
       buildContext.parentAnalyticsContext,
       request.dataSources,
+      undefined,
+      buildContext.poolBuildMetadata,
     );
   }
 
@@ -73,6 +75,7 @@ function buildItemListEntry(
     buildContext.parentAnalyticsContext,
     undefined,
     pendingInputKeysSignal,
+    buildContext.poolBuildMetadata,
   );
 }
 

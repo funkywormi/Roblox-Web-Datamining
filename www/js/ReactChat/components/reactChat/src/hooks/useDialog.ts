@@ -12,6 +12,10 @@ import { isFriendPlaceholderConversation } from "../utils/chatTransforms";
 
 export type TUseDialogOptions = {
   onPromoteFriendPlaceholder?: (newConversationId: string) => void;
+  /** Draft to start with, so a chat that remounts keeps its unsent message. */
+  initialDraft?: string;
+  /** Called on every draft change, including the reset after a send. */
+  onDraftChange?: (draftMessage: string) => void;
 };
 
 export type TUseDialogResult = {
@@ -45,14 +49,21 @@ export const useDialog = (
   } = useConversationMessages(conversation.id, conversation.messages, !isFriendPlaceholder);
   const sendMessageMutation = useSendMessage();
   const createConversationMutation = useCreateOneToOneConversation();
-  const [draftMessage, setDraftMessage] = useState("");
+  const [draftMessage, setDraftMessage] = useState(options?.initialDraft ?? "");
   const lastTypingSentRef = useRef(0);
+  const onDraftChangeRef = useRef(options?.onDraftChange);
+  onDraftChangeRef.current = options?.onDraftChange;
 
   const isSendable = Boolean(conversation.id);
 
+  const updateDraft = useCallback((value: string) => {
+    setDraftMessage(value);
+    onDraftChangeRef.current?.(value);
+  }, []);
+
   const handleSetDraftMessage = useCallback(
     (value: string) => {
-      setDraftMessage(value);
+      updateDraft(value);
 
       if (!isSendable || isFriendPlaceholder || value.trim().length === 0) {
         return;
@@ -64,7 +75,13 @@ export const useDialog = (
         updateTypingStatus(conversation.id).catch((): undefined => undefined);
       }
     },
-    [conversation.id, isFriendPlaceholder, isSendable, typingInChatFromSenderThrottleMs],
+    [
+      conversation.id,
+      isFriendPlaceholder,
+      isSendable,
+      typingInChatFromSenderThrottleMs,
+      updateDraft,
+    ],
   );
 
   const sendMessage = useCallback(() => {
@@ -73,7 +90,7 @@ export const useDialog = (
       return;
     }
 
-    setDraftMessage("");
+    updateDraft("");
     lastTypingSentRef.current = 0;
 
     // Recipients for the conversationMessageSent analytics. The transformed participants already
@@ -125,6 +142,7 @@ export const useDialog = (
     options,
     queryClient,
     sendMessageMutation,
+    updateDraft,
   ]);
 
   const resendMessage = useCallback(

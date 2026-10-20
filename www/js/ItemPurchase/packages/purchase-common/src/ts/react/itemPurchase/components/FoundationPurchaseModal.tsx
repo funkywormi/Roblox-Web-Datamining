@@ -75,7 +75,7 @@ const FoundationPurchaseModal = ({
       </DialogTitle>
       <Divider />
       <DialogBody className="padding-top-medium">
-        {thumbnail && <div className="modal-image-container">{thumbnail}</div>}
+        {thumbnail && <div className="flex justify-center padding-bottom-medium">{thumbnail}</div>}
         {body}
       </DialogBody>
       <DialogFooter className="gap-small flex flex-col">
@@ -99,7 +99,7 @@ const FoundationPurchaseModal = ({
             )}
           </div>
         )}
-        {footerText && <div className="text-footer">{footerText}</div>}
+        {footerText && <div className="text-caption-medium content-muted">{footerText}</div>}
       </DialogFooter>
     </DialogContent>
   </Dialog>

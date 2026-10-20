@@ -6,7 +6,13 @@ import {
 } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/ui_component_type_pb.js";
 import { AnalyticsContext, SduiAnalyticsReporter, SduiPageContext } from "./analytics";
 import { SduiApiStore } from "./api";
-import { PropParserContext, PropValidator, SduiComponentConfig, SduiDataBinder } from "./binding";
+import {
+  PoolSectionLayoutMetadata,
+  PropParserContext,
+  PropValidator,
+  SduiComponentConfig,
+  SduiDataBinder,
+} from "./binding";
 import { SduiErrorReporter } from "./error";
 import { DataStatus } from "./hydration";
 
@@ -98,6 +104,9 @@ export type {
   DataBindingSources,
   NestedComponentBuildContext,
   Parser,
+  PoolBuildMetadata,
+  PoolItemPlacementMetadata,
+  PoolSectionLayoutMetadata,
   PropBuilder,
   PropBuildOptions,
   PropBuildRequest,
@@ -108,6 +117,7 @@ export type {
   SduiBuilderDeps,
   SduiComponentConfig,
   SduiDataBinder,
+  SduiPooledConfigList,
 } from "./binding";
 
 export type {
@@ -263,7 +273,12 @@ export interface PropDefinition {
 /** Nested configs + render callback when `doesManageChildren` is true (SSR-safe closure). */
 export interface SduiManagedChildList {
   configs: SduiComponentConfig[];
-  renderItem: (childConfig: SduiComponentConfig, index: number, reactKey?: Key) => ReactElement;
+  renderItem: (
+    childConfig: SduiComponentConfig,
+    index: number,
+    reactKey?: Key,
+  ) => ReactElement | null;
+  poolLayout?: PoolSectionLayoutMetadata;
 }
 
 /**

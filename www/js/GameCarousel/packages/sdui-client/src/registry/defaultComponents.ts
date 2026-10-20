@@ -10,6 +10,7 @@ import { SduiCollectionGrid } from "../components/SduiCollectionGridWrapper";
 import { SduiGameTile } from "../components/SduiGameTile";
 import { SduiTile } from "../components/sduiTile/SduiTile";
 import { SduiImage } from "../components/SduiImage";
+import { SduiPlayButton } from "../components/SduiPlayButton";
 import { SduiText } from "../components/SduiText";
 import { SduiDownloadButton } from "../components/SduiDownloadButton";
 import { SduiDialog } from "../components/SduiDialog";
@@ -98,6 +99,9 @@ export const DEFAULT_CLIENT_COMPONENTS: Partial<Record<UiComponentType, SduiComp
     [UiComponentType.BADGE_TILE]: {
       component: SduiBadgeTile,
       propParsers: TILE_PROP_PARSERS,
+    },
+    [UiComponentType.PLAY_BUTTON]: {
+      component: SduiPlayButton,
     },
     [UiComponentType.VIDEO_PLAYER]: {
       component: SduiVideoPlayer,

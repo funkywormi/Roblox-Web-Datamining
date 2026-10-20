@@ -50,6 +50,16 @@ type TChatDialogProps = {
   isMetadataLoaded: boolean;
   /** True while the realtime connection is lost — disables the message input in place (legacy parity). */
   isConnectionLost: boolean;
+  /** Fills the unified chat window's conversation pane instead of floating as a fixed-size dialog. */
+  isEmbedded?: boolean;
+  /** Shows a back arrow instead of the close button in the messages header. */
+  onBack?: (layoutId: string) => void;
+  /** Shows a Minimize button in the messages header. */
+  onMinimize?: () => void;
+  /** Unsent draft to start with, so a chat that remounts keeps it. */
+  initialDraft?: string;
+  /** Called on every draft change, including the reset after a send. */
+  onDraftChange?: (layoutId: string, draftMessage: string) => void;
 };
 
 const fallbackScreenTranslationKeys: Record<
@@ -84,6 +94,11 @@ const ChatDialog = ({
   onConsentResolved,
   isMetadataLoaded,
   isConnectionLost,
+  isEmbedded = false,
+  onBack,
+  onMinimize,
+  initialDraft,
+  onDraftChange,
 }: TChatDialogProps) => {
   const translate = useChatTranslate();
   const {
@@ -98,6 +113,10 @@ const ChatDialog = ({
   } = useDialog(conversation, {
     onPromoteFriendPlaceholder: newConversationId => {
       onPromoteFriendPlaceholder?.(conversation.layoutId, newConversationId);
+    },
+    initialDraft,
+    onDraftChange: draft => {
+      onDraftChange?.(conversation.layoutId, draft);
     },
   });
   const {
@@ -157,8 +176,9 @@ const ChatDialog = ({
   }, [conversation, isMetadataLoaded]);
 
   // Collapse only applies on the Default screen; a pending consent modal takes over the panel and
-  // needs the full height regardless.
+  // needs the full height regardless. The unified window has no collapse in place.
   const isCollapsedInPlace =
+    !isEmbedded &&
     conversation.isCollapsed === true &&
     conversation.currentScreen === "Default" &&
     consentVariant == null;
@@ -199,11 +219,16 @@ const ChatDialog = ({
   return (
     <section
       className={classNames(
-        "react-chat-dialog-shell react-chat-top-radius flex width-[260px] pointer-events-auto flex-col overflow-hidden bg-surface-100 stroke-standard stroke-muted shadow-transient-high clip content-default",
-        {
-          "height-[360px]": !isCollapsedInPlace,
-          "stroke-emphasis": conversation.isFocused,
-        },
+        "react-chat-dialog-shell flex flex-col overflow-hidden bg-surface-100 content-default",
+        isEmbedded
+          ? "min-width-0 grow-1 height-full"
+          : [
+              "react-chat-top-radius width-[260px] pointer-events-auto stroke-standard stroke-muted shadow-transient-high clip",
+              {
+                "height-[360px]": !isCollapsedInPlace,
+                "stroke-emphasis": conversation.isFocused,
+              },
+            ],
       )}
       aria-label={conversation.title}
     >
@@ -212,10 +237,12 @@ const ChatDialog = ({
           <DialogHeader
             conversation={conversation}
             onClose={onClose}
-            onToggleCollapsed={onToggleCollapsed}
+            onToggleCollapsed={isEmbedded ? undefined : onToggleCollapsed}
             onOpenDetails={layoutId => {
               onSetScreen(layoutId, "Details");
             }}
+            onBack={onBack}
+            onMinimize={onMinimize}
           />
           {!isCollapsedInPlace && (
             <React.Fragment>

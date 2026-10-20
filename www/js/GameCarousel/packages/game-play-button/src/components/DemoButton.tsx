@@ -1,9 +1,8 @@
 import React, { useCallback } from "react";
-import { TranslateFunction, withTranslations } from "@rbx/core-scripts/react";
-import { translations } from "../constants/translations";
 import { type TAppsFlyerReferralProperties } from "../types/playButtonTypes";
 import playButtonConstants from "../constants/playButtonConstants";
 import { handleShareLinkEventLogging, launchGame } from "../utils/playButtonUtils";
+import { usePlayButtonTranslate } from "../hooks/usePlayButtonTranslate";
 
 const { playButtonTextTranslationMap } = playButtonConstants;
 
@@ -27,8 +26,7 @@ export type TDemoButtonProps = {
   appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
 };
 
-const DemoButtonContent = ({
-  translate,
+export const DemoButton = ({
   universeId,
   placeId,
   rootPlaceId,
@@ -36,7 +34,8 @@ const DemoButtonContent = ({
   gameInstanceId,
   eventProperties,
   appsFlyerReferralProperties,
-}: TDemoButtonProps & { translate: TranslateFunction }): React.JSX.Element => {
+}: TDemoButtonProps): React.JSX.Element => {
+  const translate = usePlayButtonTranslate();
   const handlePlayDemo = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -80,7 +79,5 @@ const DemoButtonContent = ({
     </button>
   );
 };
-
-export const DemoButton = withTranslations<TDemoButtonProps>(DemoButtonContent, translations);
 
 export default DemoButton;

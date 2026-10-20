@@ -1,7 +1,7 @@
 import { generateRandomUuid } from '@rbx/core-lib/uuid';
-import { CurrentUser } from '@rbx/legacy-webapp-types/Roblox';
+import { getCurrentUser } from '@rbx/www-common/user';
 import { EnvironmentUrls } from '@rbx/environment-urls';
-import { upsellUtil } from '@rbx/core-scripts/legacy/core-roblox-utilities';
+import * as upsellUtil from '@rbx/core-scripts/util/upsell';
 import {
   ItemDetailElementDataset,
   ItemPurchaseAjaxDataObject
@@ -57,7 +57,7 @@ export default function generateCookieForAutoPurchase(
   autoPurchaseRequiredData += `,${itemPurchaseObj.collectibleProductId || ''}`;
   autoPurchaseRequiredData += `,${itemPurchaseObj.subscriptionTargetKey || ''}`;
   autoPurchaseRequiredData += `,${encodeURIComponent(itemPurchaseObj.itemName || '')}`;
-  const cookieData = `${upsellUuid},${assetUrl},${CurrentUser.userId},${purchaseMetadata},${autoPurchaseRequiredData}`;
+  const cookieData = `${upsellUuid},${assetUrl},${getCurrentUser()?.id ?? ''},${purchaseMetadata},${autoPurchaseRequiredData}`;
   const expires = new Date();
   expires.setHours(expires.getHours() + 1);
   const cookie = [

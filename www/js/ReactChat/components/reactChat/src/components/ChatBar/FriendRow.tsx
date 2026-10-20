@@ -6,10 +6,11 @@ import ChatRow from "./ChatRow";
 
 type TFriendRowProps = {
   conversation: TChatConversation;
+  isSelected?: boolean;
   onOpenConversation: (layoutId: string) => void;
 };
 
-const FriendRow = ({ conversation, onOpenConversation }: TFriendRowProps) => {
+const FriendRow = ({ conversation, isSelected, onOpenConversation }: TFriendRowProps) => {
   const participant = conversation.participants[0];
 
   if (!participant) {
@@ -19,6 +20,7 @@ const FriendRow = ({ conversation, onOpenConversation }: TFriendRowProps) => {
   return (
     <ChatRow
       conversation={conversation}
+      isSelected={isSelected}
       onOpenConversation={onOpenConversation}
       avatar={
         <div className="relative shrink-0">

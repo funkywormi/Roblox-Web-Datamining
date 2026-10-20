@@ -10,6 +10,7 @@ export type TileDetailsProps = TileDetailsContentProps & {
   containmentPadding?: SduiTokenOrLiteral | null;
   isContained?: boolean;
   titleFont?: SduiTokenOrLiteral | null;
+  titleLines?: number;
   titleTextXAlignment?: SduiTextXAlignment;
 };
 
@@ -19,6 +20,7 @@ export function TileDetails({
   footerComponent,
   isContained = false,
   titleFont,
+  titleLines = 1,
   titleText,
   titleTextXAlignment,
 }: TileDetailsProps) {
@@ -28,6 +30,7 @@ export function TileDetails({
     containmentPadding,
     isContained,
     titleFont,
+    titleLines,
     titleTextXAlignment,
   });
 

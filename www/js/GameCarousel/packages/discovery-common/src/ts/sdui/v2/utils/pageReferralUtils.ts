@@ -14,6 +14,8 @@ export function getSessionInfoKey(pageContext: SduiPageContext): SessionInfoType
   switch (pageKey) {
     case PageContext.HomePage:
       return SessionInfoType.HomePageSessionInfo;
+    case PageContext.SearchPage:
+      return SessionInfoType.GameSearchSessionInfo;
     case PageContext.GamesPage:
     case PageContext.SongListPage:
     case PageContext.SortDetailPageDiscover:

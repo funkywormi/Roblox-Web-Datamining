@@ -27,15 +27,25 @@ const useFilterUrlParams = (): {
 
   const [filters, setFilters] = useState<Map<string, string>>(getInitialUrlParamFilters);
 
-  // Update the URL params with the currently selected filters for link sharing
+  // Update the URL params with the currently selected filters for link sharing.
+  // Skip when the query already matches so mount does not replaceState an
+  // unchanged URL.
   useEffect(() => {
     const newSearchParams = new URLSearchParams();
     filters.forEach((value, key) => {
       newSearchParams.append(key, value);
     });
 
-    history.replace({ search: newSearchParams.toString() });
-  }, [filters, history]);
+    const nextSearch = newSearchParams.toString();
+    const currentSearch = location.search.startsWith("?")
+      ? location.search.slice(1)
+      : location.search;
+    if (nextSearch === currentSearch) {
+      return;
+    }
+
+    history.replace({ search: nextSearch });
+  }, [filters, history, location.search]);
 
   return { filters, setFilters, getInitialUrlParamFilters };
 };

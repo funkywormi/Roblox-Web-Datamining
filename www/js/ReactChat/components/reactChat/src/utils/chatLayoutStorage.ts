@@ -25,6 +25,8 @@ export type TPersistedChatLayout = {
   collapsedConversationLayoutIds?: string[];
   focusedLayoutId: string | null;
   isCollapsed: boolean;
+  /** Unified chat window only: the window is at its large size. Optional for back-compat. */
+  isExpanded?: boolean;
 };
 
 // Register the key with the sanctioned localStorage wrapper (@rbx/core-lib/local-storage) so access

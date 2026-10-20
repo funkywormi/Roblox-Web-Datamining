@@ -1,5 +1,5 @@
 import { useCallback, useContext, useMemo } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import {
   Button,
   Dialog,
@@ -19,7 +19,7 @@ export function PurchaseDisabledModal() {
   const { trackPurchaseDisabledConfirm, trackPurchaseDisabledNeutral } =
     useContext(TrackingContext);
 
-  const { translate } = useTranslation();
+  const translate = useTranslations("Common.VerifiedParentalConsent");
 
   const [title, body] = useMemo(() => {
     if (showVPCOptimization && !hasUserDisabledPurchases) {

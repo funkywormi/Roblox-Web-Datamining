@@ -9,6 +9,8 @@ export interface ReportImpressionsOptions {
   itemAnalyticsDatas: (ItemAnalyticsData | null)[];
   collectionAnalyticsData: CollectionAnalyticsData | undefined;
   startRowNumber?: number;
+  /** Physical grid-cell positions aligned with itemAnalyticsDatas. */
+  itemCellIndexes?: readonly number[];
   /** Proto `impression_event_name`. Looked up in `registry`. */
   impressionEventName?: string;
   /** When defined, wins over handler config; otherwise falls back to handler
@@ -34,6 +36,7 @@ export function reportImpressions(options: ReportImpressionsOptions): void {
     itemAnalyticsDatas,
     collectionAnalyticsData,
     startRowNumber,
+    itemCellIndexes,
     impressionEventName,
     skipItemImpressionsLog,
   } = options;
@@ -49,6 +52,7 @@ export function reportImpressions(options: ReportImpressionsOptions): void {
       itemAnalyticsDatas,
       collectionAnalyticsData,
       startRowNumber,
+      itemCellIndexes,
     );
   } else if (impressionEventName != null) {
     // Unregistered override: fire default payload under the custom name (Lua parity).
@@ -60,6 +64,7 @@ export function reportImpressions(options: ReportImpressionsOptions): void {
       analyticsReporter: ctx.analyticsReporter,
       errorReporter: ctx.errorReporter,
       eventNameOverride: impressionEventName,
+      itemCellIndexes,
     });
   }
 
@@ -73,5 +78,6 @@ export function reportImpressions(options: ReportImpressionsOptions): void {
     pageContext: ctx.pageContext,
     analyticsReporter: ctx.analyticsReporter,
     errorReporter: ctx.errorReporter,
+    itemCellIndexes,
   });
 }

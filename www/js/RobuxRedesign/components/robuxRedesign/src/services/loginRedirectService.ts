@@ -1,5 +1,5 @@
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
+import { getCurrentUser } from "@rbx/www-common/user";
 import { trackCounter } from "../observability";
 import { getIosMajorVersion } from "../utils/iosVersion";
 import { waitForExperimentationService } from "./experimentationService";
@@ -14,7 +14,7 @@ export class LoginRedirectService {
   private isExperimentAccessed = false;
 
   async getExperimentBasedPathname(): Promise<{ pathname: string; isInExperiment: boolean }> {
-    const userId = authenticatedUser()?.id;
+    const userId = getCurrentUser()?.id;
     if (!userId) {
       return { pathname: DEFAULT_LOGIN_REDIRECT_PATHNAME, isInExperiment: false };
     }

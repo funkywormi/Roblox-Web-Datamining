@@ -28,6 +28,7 @@ import {
   SduiBackgroundBlur,
   SduiOverflowMenu,
   SduiDivider,
+  SduiTooltip,
 } from "../components";
 
 /**
@@ -146,5 +147,8 @@ export const DEFAULT_COMPONENTS: Partial<Record<UiComponentType, SduiComponentDe
   },
   [UiComponentType.DIVIDER]: {
     component: SduiDivider,
+  },
+  [UiComponentType.TOOLTIP]: {
+    component: SduiTooltip,
   },
 };

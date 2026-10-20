@@ -1,4 +1,4 @@
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
+import { getCurrentUser } from "@rbx/www-common/user";
 import { trackCounter, trackError } from "../observability";
 import { waitForExperimentationService } from "./experimentationService";
 
@@ -22,7 +22,7 @@ export class PlusBillingPeriodSelectionService {
   }
 
   private async fetchIsTreatment(): Promise<boolean> {
-    if (!authenticatedUser()?.id) {
+    if (!getCurrentUser()?.id) {
       return false;
     }
 

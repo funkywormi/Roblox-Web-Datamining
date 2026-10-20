@@ -202,9 +202,10 @@ function buildComponentConfig(
  *   classes at render time, whereas Lua resolves to a token value at build time.
  */
 export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
-  const { dataBinder, templateStore, errorReporter } = deps;
+  const { dataBinder, templateStore, errorReporter, poolRegistry } = deps;
 
   const builder: SduiBuilder = {
+    poolRegistry,
     buildProp(rawProp, dataSources, ctx, buildContext) {
       return createPropBuildDispatcher({ dataBinder, dataSources, buildContext })(rawProp, ctx);
     },
@@ -220,6 +221,7 @@ export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
       parentAnalyticsContext,
       parentDataSources,
       pendingInputKeysSignal,
+      poolBuildMetadata,
     ) {
       const rootCtx: BindingContext = {
         errorReporter,
@@ -246,6 +248,8 @@ export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
         templateStore,
         builder,
         builderConfig,
+        poolRegistry,
+        poolBuildMetadata,
       };
 
       return buildComponentConfig(template, scope, nestedBuildContext, parentAnalyticsContext);

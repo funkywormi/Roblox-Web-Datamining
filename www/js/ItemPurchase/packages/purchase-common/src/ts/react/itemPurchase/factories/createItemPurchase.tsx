@@ -9,6 +9,7 @@ import { ItemPurchaseUpsellService } from '@rbx/legacy-webapp-types/Roblox';
 import * as AccountIntegrityChallengeService from '@rbx/account-security/challenge/runtime';
 import { userId, isAuthenticated } from '@rbx/core-scripts/meta/user';
 import { generateRandomUuid } from '@rbx/core-lib/uuid';
+import { fireEvent } from '@rbx/www-common/event-tracker';
 import { getMetaData } from '../util/itemPurchaseUtil';
 import getSubscriptionProductInfoForModal from '../../utils/getSubscriptionProductInfoForModal';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
@@ -275,13 +276,13 @@ export default function createItemPurchase({
           // startItemUpsellProcess invokes the fallback callback before
           // rejecting; catch here to prevent unhandled promise rejection.
         });
-        window.EventTracker.fireEvent(events.NEW_UPSELL_FROM_REACT_BUY_BUTTON);
+        fireEvent(events.NEW_UPSELL_FROM_REACT_BUY_BUTTON);
       } catch (e) {
-        window.EventTracker.fireEvent(events.NEW_UPSELL_FAILED_DUE_TO_ERROR);
+        fireEvent(events.NEW_UPSELL_FAILED_DUE_TO_ERROR);
         startOriginalFlowWhenNewFlowFailed();
       }
     } else {
-      window.EventTracker.fireEvent(events.NEW_UPSELL_FAILED_DUE_TO_LOADING);
+      fireEvent(events.NEW_UPSELL_FAILED_DUE_TO_LOADING);
       startOriginalFlowWhenNewFlowFailed();
     }
   };

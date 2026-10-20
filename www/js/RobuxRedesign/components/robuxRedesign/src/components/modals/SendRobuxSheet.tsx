@@ -1,5 +1,5 @@
 import { useCallback, useContext } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { SheetContent, SheetTitle, Icon } from "@rbx/foundation-ui";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
@@ -21,7 +21,7 @@ function RobuxBalanceUtility() {
 }
 
 export function SendRobuxSheet() {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.BuyRobux");
   const { trackTransferSendUserSelected } = useContext(TrackingContext);
   const { friends, isLoading, error, isLoggedIn } = useMyFriends();
 

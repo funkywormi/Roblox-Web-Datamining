@@ -1,4 +1,4 @@
-import { upsellUtil } from '@rbx/core-scripts/legacy/core-roblox-utilities';
+import * as upsellUtil from '@rbx/core-scripts/util/upsell';
 
 export function removeUrlQueryParameterNoRedirection() {
   if (!window.history) {

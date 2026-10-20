@@ -1,7 +1,7 @@
 import { ComponentProps, CSSProperties, useCallback, useContext, useEffect, useState } from "react";
 import { ErrorBoundary } from "@sentry/react";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
+import { getCurrentUser } from "@rbx/www-common/user";
 import { Button, SheetRoot } from "@rbx/foundation-ui";
 import { window } from "@rbx/core-lib/browser";
 import { SendRobuxSheet } from "./modals/SendRobuxSheet";
@@ -27,7 +27,7 @@ export function SendRobuxButton({
   const [sheetOpen, setSheetOpen] = useState(false);
   const { trackTransferSendImpression, trackTransferSendSheetView } = useContext(TrackingContext);
 
-  const isAuthed = Boolean(authenticatedUser()?.id);
+  const isAuthed = Boolean(getCurrentUser()?.id);
 
   const handleSheetChange = useCallback(
     (isOpen: boolean) => {

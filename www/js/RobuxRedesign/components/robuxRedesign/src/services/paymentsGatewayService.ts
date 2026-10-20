@@ -73,9 +73,29 @@ export enum QuickPayFlowType {
   BuyRobuxPagePreselectedProduct = "BuyRobuxPagePreselectedProduct",
 }
 
+export type SubscribedRobuxProductOfferPrice = {
+  amount: {
+    currencyCode: string;
+    units?: number | string;
+    nanos?: number;
+  };
+  currencySymbol: string;
+};
+
+/** Subscribe & Save offer for one OTP Robux pack, returned by get-quick-pay-metadata. */
+export type SubscribedRobuxProductOffer = {
+  productId: string;
+  robuxAmount: number;
+  initialPrice: SubscribedRobuxProductOfferPrice;
+  recurringPrice: SubscribedRobuxProductOfferPrice;
+  subscriptionProductId: string;
+  subscriptionProductType: string;
+};
+
 export type GetQuickPayMetadataResponse = {
   isUserEligible: boolean;
   legalDisclosureTranslationKey: string;
+  subscribedRobuxProductOffers?: SubscribedRobuxProductOffer[];
 };
 
 export type GetPaymentProfilesResponse = PaymentProfile[];
@@ -179,18 +199,24 @@ export const checkUserPurchaseSetting = async (): Promise<
 
 export const getQuickPayMetadata = async (
   quickPayFlowType: QuickPayFlowType,
-): Promise<GetQuickPayMetadataResponse | undefined> =>
-  withApiEvents<GetQuickPayMetadataResponse>(
+  productIds: string[] = [],
+): Promise<GetQuickPayMetadataResponse | undefined> => {
+  // Repeated productIds keys match ASP.NET [FromQuery] List<long>.
+  const params = new URLSearchParams({ quickPayFlowType });
+  productIds.forEach(productId => {
+    params.append("productIds", productId);
+  });
+
+  return withApiEvents<GetQuickPayMetadataResponse>(
     HTTPVerb.GET,
     APICall.GET_QUICK_PAY_METADATA,
     {
       url: `${EnvironmentUrls.apiGatewayUrl}/payments-gateway/v1/get-quick-pay-metadata`,
       withCredentials: true,
     },
-    {
-      quickPayFlowType,
-    },
+    params,
   );
+};
 
 export const getPaymentProfiles = async (): Promise<GetPaymentProfilesResponse | undefined> =>
   withApiEvents<GetPaymentProfilesResponse>(HTTPVerb.GET, APICall.GET_PAYMENT_PROFILES, {

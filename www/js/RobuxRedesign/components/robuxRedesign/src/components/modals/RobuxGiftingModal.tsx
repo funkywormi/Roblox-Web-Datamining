@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { getCurrentUser } from "@rbx/www-common/user";
+import { useTranslations } from "@rbx/www-common/i18n";
 import {
   Dialog,
   DialogBody,
@@ -25,9 +25,9 @@ export function RobuxGiftingModal() {
     robuxGifting: { closeModal, isOpen },
   } = useContext(ModalContext);
 
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.GiftingProducts");
   const { handleCopyUrl, handleShareLink, qrImgSrc } = useRobuxGifting(giftingUrl);
-  const currentUser = authenticatedUser();
+  const currentUser = getCurrentUser();
   const isLoggedIn = currentUser != null;
   const wasOpenRef = useRef(false);
 
@@ -49,7 +49,7 @@ export function RobuxGiftingModal() {
     return null;
   }
 
-  const { displayName, name } = currentUser;
+  const { displayName, userName: name } = currentUser;
   const userName = `@${name}`;
 
   return (

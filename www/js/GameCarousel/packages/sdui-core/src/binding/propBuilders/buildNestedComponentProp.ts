@@ -112,6 +112,8 @@ export function buildNestedComponentProp(
       nestedBuildContext.builderConfig,
       nestedBuildContext.parentAnalyticsContext,
       request.dataSources,
+      undefined,
+      nestedBuildContext.poolBuildMetadata,
     );
     return nestedConfig
       ? { value: nestedConfig, category: "nestedConfig" }
@@ -137,6 +139,7 @@ export function buildNestedComponentProp(
     nestedBuildContext.parentAnalyticsContext,
     undefined,
     pendingInputKeysSignal,
+    nestedBuildContext.poolBuildMetadata,
   );
   return nestedConfig
     ? { value: nestedConfig, category: "nestedConfig" }

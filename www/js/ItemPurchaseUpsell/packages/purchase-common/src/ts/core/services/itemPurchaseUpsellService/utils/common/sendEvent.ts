@@ -1,13 +1,14 @@
-import { EventStream } from '@rbx/legacy-webapp-types/Roblox';
+import { sendEventWithTarget, targetTypes } from '@rbx/core-scripts/event-stream';
 import { ITEM_UPSELL_EVENTS } from '../../constants/upsellConstants';
 
 export default function sendEvent(context: string, properties: { [key: string]: unknown }) {
   try {
-    EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       ITEM_UPSELL_EVENTS.EVENT_NAME,
       context,
-      properties,
-      EventStream.TargetTypes.WWW as number
+      // Callers pass objects and errors, which the global EventStream accepts.
+      properties as Parameters<typeof sendEventWithTarget>[2],
+      targetTypes.WWW
     );
   } catch (e) {
     // do nothing

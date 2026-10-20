@@ -14,12 +14,14 @@ type UseSduiFeedImpressionsOptions = {
   dataUpdatedTimestamp?: number;
 };
 
+type PendingConfigSnapshot = SduiComponentConfig | undefined;
+
 function hasTrackedFeedIndex(
   reportedIndexes: Set<number>,
-  pendingIndexes: Set<number>,
+  pendingByIndex: Map<number, PendingConfigSnapshot>,
   index: number,
 ): boolean {
-  return reportedIndexes.has(index) || pendingIndexes.has(index);
+  return reportedIndexes.has(index) || pendingByIndex.has(index);
 }
 
 /**
@@ -39,6 +41,18 @@ function forgetIndexesWithReplacedConfigs(
   });
 }
 
+function forgetPendingWithReplacedConfigs(
+  pendingByIndex: Map<number, PendingConfigSnapshot>,
+  previousConfigs: readonly SduiComponentConfig[],
+  nextConfigs: readonly SduiComponentConfig[],
+): void {
+  pendingByIndex.forEach((_config, index) => {
+    if (nextConfigs[index] !== previousConfigs[index]) {
+      pendingByIndex.delete(index);
+    }
+  });
+}
+
 export function useSduiFeedImpressions({
   feedColumnRef,
   feedItemConfigs,
@@ -46,37 +60,53 @@ export function useSduiFeedImpressions({
 }: UseSduiFeedImpressionsOptions): void {
   const services = useSduiServices();
   const reportedIndexesRef = useRef<Set<number>>(new Set());
-  const pendingIndexesRef = useRef<Set<number>>(new Set());
+  // Index → config captured at detection time so a later reindex cannot reattribute the event.
+  const pendingByIndexRef = useRef<Map<number, PendingConfigSnapshot>>(new Map());
   const previousDataUpdatedTimestampRef = useRef(dataUpdatedTimestamp);
   const previousFeedItemConfigsRef = useRef<SduiComponentConfig[]>([]);
+  // Read when detecting so the snapshot does not depend on the configs array identity.
+  const latestFeedItemConfigsRef = useRef(feedItemConfigs);
   const flushTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const hasFeedItems = feedItemConfigs.length > 0;
 
   useEffect(() => {
     const previousConfigs = previousFeedItemConfigsRef.current;
     previousFeedItemConfigsRef.current = feedItemConfigs;
+    // Runs after the watcher cleanup below, so a flush there still sees the configs that were on screen.
+    latestFeedItemConfigsRef.current = feedItemConfigs;
 
     if (previousDataUpdatedTimestampRef.current === dataUpdatedTimestamp) {
       return;
     }
 
     previousDataUpdatedTimestampRef.current = dataUpdatedTimestamp;
-    [reportedIndexesRef.current, pendingIndexesRef.current].forEach(trackedIndexes => {
-      forgetIndexesWithReplacedConfigs(trackedIndexes, previousConfigs, feedItemConfigs);
-    });
+    forgetIndexesWithReplacedConfigs(reportedIndexesRef.current, previousConfigs, feedItemConfigs);
+    forgetPendingWithReplacedConfigs(pendingByIndexRef.current, previousConfigs, feedItemConfigs);
   }, [dataUpdatedTimestamp, feedItemConfigs]);
 
   const flushPendingImpressions = useCallback(() => {
-    const indexesToSend = [...pendingIndexesRef.current]
+    const pendingByIndex = pendingByIndexRef.current;
+    const indexesToSend = [...pendingByIndex.keys()]
       .filter(index => !reportedIndexesRef.current.has(index))
       .sort((left, right) => left - right);
-    pendingIndexesRef.current.clear();
 
     if (indexesToSend.length === 0) {
+      pendingByIndex.clear();
       return;
     }
 
+    // Sparse array keyed by feed index so payload building still indexes by position.
+    const snapshotConfigs: SduiComponentConfig[] = [];
+    indexesToSend.forEach(index => {
+      const config = pendingByIndex.get(index);
+      if (config != null) {
+        snapshotConfigs[index] = config;
+      }
+    });
+    pendingByIndex.clear();
+
     const { fields, impressedIndexes, missingIndexes } = buildSduiFeedImpressionPayload(
-      feedItemConfigs,
+      snapshotConfigs,
       indexesToSend,
       services.pageContext.appPage,
     );
@@ -102,16 +132,12 @@ export function useSduiFeedImpressions({
       fields,
     );
     impressedIndexes.forEach(index => reportedIndexesRef.current.add(index));
-  }, [feedItemConfigs, services.analyticsReporter, services.errorReporter, services.pageContext]);
+  }, [services.analyticsReporter, services.errorReporter, services.pageContext]);
 
   useEffect(() => {
     const feedColumn = feedColumnRef.current;
-    const pendingIndexes = pendingIndexesRef.current;
-    if (
-      feedItemConfigs.length === 0 ||
-      feedColumn == null ||
-      typeof IntersectionObserver === "undefined"
-    ) {
+    const pendingByIndex = pendingByIndexRef.current;
+    if (!hasFeedItems || feedColumn == null || typeof IntersectionObserver === "undefined") {
       return undefined;
     }
 
@@ -125,9 +151,11 @@ export function useSduiFeedImpressions({
     const stopWatching = watchFeedItemVisibility({
       feedColumn,
       isIndexTracked: index =>
-        hasTrackedFeedIndex(reportedIndexesRef.current, pendingIndexes, index),
+        hasTrackedFeedIndex(reportedIndexesRef.current, pendingByIndex, index),
       onFeedItemVisible: index => {
-        pendingIndexes.add(index);
+        if (!hasTrackedFeedIndex(reportedIndexesRef.current, pendingByIndex, index)) {
+          pendingByIndex.set(index, latestFeedItemConfigsRef.current[index]);
+        }
         queueImpressionFlush();
       },
       onInvalidIndexMarker: () => {
@@ -145,16 +173,16 @@ export function useSduiFeedImpressions({
         clearTimeout(flushTimeoutRef.current);
         flushTimeoutRef.current = undefined;
       }
-      // Send sections already seen, using the configs that were on screen.
+      // Send sections already seen, using the configs captured at detection.
       // The next watcher skips pending indexes, so clearing them here would lose the event.
-      if (pendingIndexes.size > 0) {
+      if (pendingByIndex.size > 0) {
         flushPendingImpressions();
       }
     };
   }, [
     dataUpdatedTimestamp,
     feedColumnRef,
-    feedItemConfigs.length,
+    hasFeedItems,
     flushPendingImpressions,
     services.errorReporter,
     services.pageContext,

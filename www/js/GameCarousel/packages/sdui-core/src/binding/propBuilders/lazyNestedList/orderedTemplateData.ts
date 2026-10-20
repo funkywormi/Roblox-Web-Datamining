@@ -147,6 +147,8 @@ function buildOrderedEntryConfig(
       buildContext.builderConfig,
       buildContext.parentAnalyticsContext,
       overlaySources,
+      undefined,
+      buildContext.poolBuildMetadata,
     );
   } else {
     // Isolated scope: mapping `inputs` defs resolve reactively against
@@ -162,6 +164,7 @@ function buildOrderedEntryConfig(
       buildContext.parentAnalyticsContext,
       undefined,
       pendingInputKeysSignal,
+      buildContext.poolBuildMetadata,
     );
   }
 

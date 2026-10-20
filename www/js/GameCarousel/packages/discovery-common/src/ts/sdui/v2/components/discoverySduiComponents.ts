@@ -9,6 +9,7 @@ import { SduiOptionSelectorCollection } from "./SduiOptionSelectorCollection";
 import { SduiSlotOverlay } from "./SduiSlotOverlay";
 import { SduiSongTile } from "./SduiSongTile";
 import { SduiVariableItemWidthCarousel } from "./SduiVariableItemWidthCarousel";
+import { SduiFriendRequestButton } from "./friendRequestButton";
 
 export const DISCOVERY_V2_COMPONENTS: Partial<Record<UiComponentType, SduiComponentDefinition>> = {
   [UiComponentType.SECTION_HEADER]: {
@@ -40,6 +41,9 @@ export const DISCOVERY_V2_COMPONENTS: Partial<Record<UiComponentType, SduiCompon
   },
   [UiComponentType.FILTER_PILLS_CAROUSEL]: {
     component: SduiFilterPillsCarousel,
+  },
+  [UiComponentType.FRIEND_REQUEST_BUTTON]: {
+    component: SduiFriendRequestButton,
   },
 };
 

@@ -1,5 +1,5 @@
 import { ActionType, type SduiActionHandlerConfig } from "@rbx/sdui-core";
-import { applyChartsFilter } from "./chartsSduiRouter";
+import { applyChartsFilter, replaceChartsUrlWithResolvedFilters } from "./chartsSduiRouter";
 import type { ChartsRequestFilters } from "./chartsPageConfiguration";
 
 const readFilterSelections = (
@@ -19,6 +19,10 @@ export const CHARTS_PAGE_ACTION_HANDLERS: Partial<Record<ActionType, SduiActionH
     handler: ({ actionParams }) => {
       const filterSelections = readFilterSelections(actionParams);
       if (!filterSelections) {
+        return;
+      }
+      if (actionParams.isInitialSync === true) {
+        replaceChartsUrlWithResolvedFilters(filterSelections);
         return;
       }
       applyChartsFilter(filterSelections);

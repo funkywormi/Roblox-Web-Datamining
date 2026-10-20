@@ -27,6 +27,8 @@ import { startGamepassPurchaseFlow } from "../flows/startGamepassPurchaseFlow";
 const { errorTypeIds } = itemPurchaseConstants;
 
 export { PriceContainer };
+// Named so callers can import it directly; on .NET this module is the RobloxItemPurchase external.
+export { createItemPurchase };
 
 export default {
   createTransactionFailureModal,

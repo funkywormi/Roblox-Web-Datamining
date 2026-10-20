@@ -1,5 +1,6 @@
-import { Dialog, RobloxTranslationResource, Endpoints } from '@rbx/legacy-webapp-types/Roblox';
-import { paymentFlowAnalyticsService } from '@rbx/core-scripts/legacy/core-roblox-utilities';
+import { removeUrlLocale, supportLocalizedUrls } from '@rbx/core-scripts/endpoints';
+import type { RobloxTranslationResource } from '@rbx/legacy-webapp-types/Roblox';
+import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
 import {
   ASSET_TYPE_ENUM,
   GAMES_PAGE_PREFIX,
@@ -10,6 +11,7 @@ import formattingRobux from '../utils/common/formattingRobux';
 import { redirectToCustomizeAvatar, redirectToItemPath } from '../utils/common/redirectionHelpers';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { ItemPurchaseObject } from '../constants/serviceTypeDefinitions';
+import openDialog from './openDialog';
 import reportCounter from '../utils/common/reportCounter';
 
 export default function openNewPurchaseSucceededModal(
@@ -42,12 +44,11 @@ export default function openNewPurchaseSucceededModal(
   const acceptText = isGamePassOrSubscription
     ? translationResource.get(LANG_KEYS.okAction, {})
     : translationResource.get(LANG_KEYS.equipMyAvatarAction, {});
-  Dialog.open({
+  openDialog({
     titleText: translationResource.get(LANG_KEYS.purchaseSucceededHeading, {}),
     bodyContent: dialogBody,
     declineText: translationResource.get(LANG_KEYS.backToShopAction, {}),
     acceptText,
-    acceptColor: 'btn-primary-md',
     onAccept: () => {
       paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
         paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
@@ -63,8 +64,8 @@ export default function openNewPurchaseSucceededModal(
         itemPurchaseObj.assetType
       );
       let { itemPath } = itemPurchaseObj;
-      if (Endpoints?.supportLocalizedUrls) {
-        itemPath = Endpoints.removeUrlLocale(itemPath);
+      if (supportLocalizedUrls) {
+        itemPath = removeUrlLocale(itemPath);
       }
       if (!isGamePassOrSubscription) {
         redirectToCustomizeAvatar();

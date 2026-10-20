@@ -1,9 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentProps,
+} from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { window as browserWindow } from "@rbx/core-lib/browser";
 import { useUniversalFeatureRestrictions } from "@rbx/universal-feature-restrictions";
 import useChatTranslate from "../hooks/useChatTranslate";
 import ChatBar from "../components/ChatBar/ChatBar";
+import ConversationList from "../components/ChatBar/ConversationList";
 import ChatDialog from "../components/ChatDialog/ChatDialog";
+import ChatWindow from "../components/ChatWindow/ChatWindow";
+import ChatWindowEmptyState from "../components/ChatWindow/ChatWindowEmptyState";
 import GroupInviteDialog from "../components/GroupInviteDialog/GroupInviteDialog";
 import MinimizedTray from "../components/MinimizedTray/MinimizedTray";
 import SystemFeedback from "../components/SystemFeedback/SystemFeedback";
@@ -14,6 +25,8 @@ import { useChatLayout } from "../hooks/useChatLayout";
 import { useChatMetadataConfig } from "../hooks/useChatMetadataConfig";
 import { useChatRealtimeBridge } from "../hooks/useChatRealtimeBridge";
 import { useChatUiPolicies } from "../hooks/useChatUiPolicies";
+import { useIsSinglePaneViewport } from "../hooks/useIsSinglePaneViewport";
+import { useUnifiedChatWindowExperiment } from "../hooks/useUnifiedChatWindowExperiment";
 import { useMarkAsRead } from "../hooks/useMarkAsRead";
 import { useModerationTimeouts } from "../hooks/useModerationTimeouts";
 import { usePartyChatReactiveFeatureRestriction } from "../hooks/usePartyChatReactiveFeatureRestriction";
@@ -42,7 +55,7 @@ import { CHAT_UPDATE_STATUS } from "../constants/chatPolicyConstants";
 import type { TChatConversation, TChatFeedback, TRenameResult } from "../types/chat";
 import { applyModerationTimeouts } from "../utils/chatTransforms";
 import { seedPendingConversation } from "../utils/chatQueryCache";
-import { clearAllPersistedChatLayouts } from "../utils/chatLayoutStorage";
+import { clearAllPersistedChatLayouts, readPersistedChatLayout } from "../utils/chatLayoutStorage";
 import { getCurrentUserId } from "../utils/currentUser";
 
 type TChatJQueryEventTarget = {
@@ -115,6 +128,12 @@ const AppContainer = () => {
   });
 
   const {
+    isEnabled: isUnifiedChatWindowEnabled,
+    isSettled: isUnifiedChatWindowSettled,
+    logExposureOnce,
+  } = useUnifiedChatWindowExperiment();
+  const isSinglePane = useIsSinglePaneViewport();
+  const {
     layout,
     conversations,
     openConversation,
@@ -127,9 +146,14 @@ const AppContainer = () => {
     confirmRemoveParticipant,
     resolveConsent,
     toggleCollapsed,
+    toggleExpanded,
     openGroupInviteDialog,
     closeGroupInviteDialog,
-  } = useChatLayout(chatData.conversations);
+  } = useChatLayout(chatData.conversations, {
+    isUnifiedWindow: isUnifiedChatWindowEnabled,
+    // Reopen saved chats once the layout is known, so the restore runs once, in that layout.
+    isRestoreReady: isUnifiedChatWindowSettled,
+  });
   // Fetch conversation-level timeouts only for conversations that are currently open dialogs.
   // The user-level timeout is fetched regardless (inside useModerationTimeouts) and applies to
   // every non–trusted-comms conversation.
@@ -225,6 +249,45 @@ const AppContainer = () => {
     showPartyChatFeatureRestriction,
   });
 
+  // When chat starts collapsed (no chat left open and no chat deep link), both layouts show the same
+  // bar, so it renders before the layer answers instead of waiting for it.
+  const [startsCollapsed] = useState(() => {
+    const persisted = readPersistedChatLayout(getCurrentUserId());
+    const hasDeepLink =
+      parseChatDeepLinkFromSearchString(browserWindow?.location.search ?? "").kind !== "none";
+    return (
+      !hasDeepLink &&
+      (persisted == null ||
+        (persisted.isCollapsed &&
+          persisted.openedConversationLayoutIds.length === 0 &&
+          persisted.minimizedConversationLayoutIds.length === 0))
+    );
+  });
+
+  // Exposure is the first moment the two layouts can differ, detected from events that are the same
+  // in both arms: chat starts open, the user opens the bar, the window, or Create group, a message
+  // arrives, or a "Chat with" event. What is on screen differs by arm, so it is not used.
+  const [hasExposureTrigger, setHasExposureTrigger] = useState(!startsCollapsed);
+  const isGroupInviteDialogRequested = layout.conversationInviteDialogLayoutId != null;
+  useEffect(() => {
+    if (
+      isUnifiedChatWindowSettled &&
+      chatData.isMetadataLoaded &&
+      chatData.isChatVisible &&
+      (hasExposureTrigger || !layout.isCollapsed || isGroupInviteDialogRequested)
+    ) {
+      logExposureOnce();
+    }
+  }, [
+    chatData.isChatVisible,
+    chatData.isMetadataLoaded,
+    hasExposureTrigger,
+    isGroupInviteDialogRequested,
+    isUnifiedChatWindowSettled,
+    layout.isCollapsed,
+    logExposureOnce,
+  ]);
+
   const deepLinkConsumedRef = useRef(false);
   const webChatRenderedSentRef = useRef(false);
   const conversationsLoadedSentRef = useRef(false);
@@ -252,30 +315,31 @@ const AppContainer = () => {
     [openConversation, queryClient],
   );
 
+  // "Chat with" and incoming-message events can arrive before the layer answers. Listen from the
+  // start and queue them; they are handled once the layout is known, in the layout the user keeps.
+  const [pendingStartChatUserId, setPendingStartChatUserId] = useState<number | null>(null);
+  const [pendingIncomingConversationIds, setPendingIncomingConversationIds] = useState<string[]>(
+    [],
+  );
+  const isGroupInviteDialogInOnlySlot =
+    layout.conversationInviteDialogLayoutId != null && layout.maxVisiblePanelCount <= 1;
+
   useEffect(() => {
     if (!isLiveData) {
       return;
     }
 
-    const startChat = (userId: number | undefined) => {
+    const queueStartChat = (userId: number | undefined) => {
       if (!userId) {
         return;
       }
-
-      const existing = conversationsRef.current.find(
-        c => c.dialogType === "Direct" && c.participants.some(p => p.id === userId),
-      );
-      if (existing) {
-        openConversation(existing.layoutId);
-        return;
-      }
-
-      startConversationWithUser(userId).catch(() => undefined);
+      setHasExposureTrigger(true);
+      setPendingStartChatUserId(userId);
     };
 
     // Native event works without jQuery (Next.js); triggerHandler senders only reach $.on.
     const handleNativeStartChat = (event: DocumentEventMap["Roblox.Chat.StartChat"]) => {
-      startChat(event.detail?.userId);
+      queueStartChat(event.detail?.userId);
     };
     document.addEventListener("Roblox.Chat.StartChat", handleNativeStartChat);
 
@@ -283,7 +347,7 @@ const AppContainer = () => {
     const $doc = isChatJQuery($) ? $(document) : null;
     // $.on also fires for native dispatches, without args; those are handled above.
     const handleJQueryStartChat = (_event: unknown, args?: { userId?: number }) => {
-      startChat(args?.userId);
+      queueStartChat(args?.userId);
     };
     $doc?.on("Roblox.Chat.StartChat", handleJQueryStartChat);
 
@@ -291,15 +355,61 @@ const AppContainer = () => {
       document.removeEventListener("Roblox.Chat.StartChat", handleNativeStartChat);
       $doc?.off("Roblox.Chat.StartChat", handleJQueryStartChat);
     };
-  }, [isLiveData, openConversation, startConversationWithUser]);
+  }, [isLiveData]);
+
+  useEffect(() => {
+    if (pendingStartChatUserId == null || !isUnifiedChatWindowSettled) {
+      return;
+    }
+    setPendingStartChatUserId(null);
+
+    const existing = conversationsRef.current.find(
+      c => c.dialogType === "Direct" && c.participants.some(p => p.id === pendingStartChatUserId),
+    );
+    if (existing) {
+      openConversation(existing.layoutId);
+      return;
+    }
+    startConversationWithUser(pendingStartChatUserId).catch(() => undefined);
+  }, [
+    isUnifiedChatWindowSettled,
+    openConversation,
+    pendingStartChatUserId,
+    startConversationWithUser,
+  ]);
 
   useEffect(() => {
     if (!isLiveData) {
-      return;
+      return undefined;
     }
 
     const handleIncomingMessage = (event: CustomEvent<{ conversationId: string }>) => {
       const { conversationId } = event.detail;
+      setHasExposureTrigger(true);
+      setPendingIncomingConversationIds(current =>
+        current.includes(conversationId) ? current : [...current, conversationId],
+      );
+    };
+
+    window.addEventListener("reactChatIncomingMessage", handleIncomingMessage);
+    return () => {
+      window.removeEventListener("reactChatIncomingMessage", handleIncomingMessage);
+    };
+  }, [isLiveData]);
+
+  useEffect(() => {
+    if (pendingIncomingConversationIds.length === 0 || !isUnifiedChatWindowSettled) {
+      return;
+    }
+    setPendingIncomingConversationIds([]);
+    // The unified window never opens or switches on an incoming message; the unread badges show it.
+    // Nor does the floating chat while Create group fills the only slot: opening the chat would
+    // close Create group and lose the group the user is making.
+    if (isUnifiedChatWindowEnabled || isGroupInviteDialogInOnlySlot) {
+      return;
+    }
+
+    pendingIncomingConversationIds.forEach(conversationId => {
       const match = conversationsRef.current.find(
         conversation => conversation.id === conversationId,
       );
@@ -321,13 +431,17 @@ const AppContainer = () => {
           scheduleMarkRead(match.id);
         }
       }
-    };
-
-    window.addEventListener("reactChatIncomingMessage", handleIncomingMessage);
-    return () => {
-      window.removeEventListener("reactChatIncomingMessage", handleIncomingMessage);
-    };
-  }, [focusConversation, isLiveData, openConversation, scheduleMarkRead, isConsentBlocked]);
+    });
+  }, [
+    focusConversation,
+    isConsentBlocked,
+    isGroupInviteDialogInOnlySlot,
+    isUnifiedChatWindowEnabled,
+    isUnifiedChatWindowSettled,
+    openConversation,
+    pendingIncomingConversationIds,
+    scheduleMarkRead,
+  ]);
 
   // Force-close a dialog when the current user is removed from a conversation/channel or it is
   // archived/deleted (parity with the legacy chat, which removes the dialog on these events). The
@@ -419,6 +533,7 @@ const AppContainer = () => {
       deepLinkConsumedRef.current ||
       chatData.isLoading ||
       !chatData.isChatVisible ||
+      !isUnifiedChatWindowSettled ||
       conversations.length === 0
     ) {
       return;
@@ -462,6 +577,7 @@ const AppContainer = () => {
     chatData.isLoading,
     chatData.isChatVisible,
     conversations,
+    isUnifiedChatWindowSettled,
     openConversation,
     startConversationWithUser,
   ]);
@@ -469,13 +585,25 @@ const AppContainer = () => {
   // webChatRendered — one-shot, once the chat has rendered and event sampling is configured off the
   // metadata (isMetadataLoaded). Skipped when hidden (U9 kids) so a chat that never renders isn't
   // counted; isChatOpen mirrors the expanded (non-collapsed) bar.
+  // A chat that starts open renders only once the two-pane layer answers (see the render gate).
   useEffect(() => {
-    if (!chatData.isMetadataLoaded || !chatData.isChatVisible || webChatRenderedSentRef.current) {
+    if (
+      !chatData.isMetadataLoaded ||
+      !chatData.isChatVisible ||
+      !(isUnifiedChatWindowSettled || startsCollapsed) ||
+      webChatRenderedSentRef.current
+    ) {
       return;
     }
     webChatRenderedSentRef.current = true;
     sendWebChatRendered({ isChatEnabled: true, isChatOpen: !layout.isCollapsed });
-  }, [chatData.isMetadataLoaded, chatData.isChatVisible, layout.isCollapsed]);
+  }, [
+    chatData.isMetadataLoaded,
+    chatData.isChatVisible,
+    isUnifiedChatWindowSettled,
+    layout.isCollapsed,
+    startsCollapsed,
+  ]);
 
   // webChatConversationsLoaded — one-shot, fired once the conversation list has *succeeded* (gating
   // on areConversationsLoaded, not merely !isLoading, so a failed fetch never emits a phantom empty
@@ -548,6 +676,17 @@ const AppContainer = () => {
     resolveTimeout,
   );
 
+  // Unified window: the one open conversation. It may be parked (minimized) while the window is
+  // collapsed or Create group fills the pane; it stays mounted then, so its draft survives.
+  const activeLayoutId = layout.openedConversationLayoutIds.at(-1);
+  const [activeConversation] = applyModerationTimeouts(
+    conversations.filter(
+      conversation => conversation.isOpen && conversation.layoutId === activeLayoutId,
+    ),
+    resolveTimeout,
+  );
+  const isActiveConversationShown = activeConversation != null && !activeConversation.isMinimized;
+
   const handleOpenConversation = useCallback(
     (layoutId: string) => {
       openConversation(layoutId);
@@ -586,6 +725,50 @@ const AppContainer = () => {
       }
     },
     [focusConversation, conversations, scheduleMarkRead, isConsentBlocked],
+  );
+
+  // A parked chat shows again when Create group closes, the window widens, or the unified window
+  // reopens. Mark it read then — parity with restoring it from the tray. useChatLayout reports
+  // unreadCount 0 once a chat's messages are on screen (a collapsed floating dialog keeps its count),
+  // so read the server count from chatData.
+  const parkedLayoutIdsRef = useRef(new Set<string>());
+  useEffect(() => {
+    conversations.forEach(conversation => {
+      const isShownAgain =
+        parkedLayoutIdsRef.current.has(conversation.layoutId) &&
+        conversation.isOpen &&
+        !conversation.isMinimized &&
+        conversation.unreadCount === 0;
+      if (!isShownAgain || isConsentBlocked(conversation)) {
+        return;
+      }
+      const serverUnreadCount =
+        chatData.conversations.find(c => c.layoutId === conversation.layoutId)?.unreadCount ?? 0;
+      if (serverUnreadCount > 0) {
+        scheduleMarkRead(conversation.id);
+      }
+    });
+    parkedLayoutIdsRef.current = new Set(
+      conversations.filter(c => c.isOpen && c.isMinimized).map(c => c.layoutId),
+    );
+  }, [chatData.conversations, conversations, isConsentBlocked, scheduleMarkRead]);
+
+  // Unified window: drafts are kept per chat while the user switches chats or goes Back, because only
+  // the active chat is mounted. Closing a chat with X discards its draft, as the floating chat does.
+  const draftsRef = useRef(new Map<string, string>());
+  const handleDraftChange = useCallback((layoutId: string, draftMessage: string) => {
+    if (draftMessage) {
+      draftsRef.current.set(layoutId, draftMessage);
+    } else {
+      draftsRef.current.delete(layoutId);
+    }
+  }, []);
+  const handleCloseEmbeddedConversation = useCallback(
+    (layoutId: string) => {
+      draftsRef.current.delete(layoutId);
+      closeConversation(layoutId);
+    },
+    [closeConversation],
   );
 
   const handleToggleCollapsed = useCallback(
@@ -762,77 +945,170 @@ const AppContainer = () => {
   );
 
   // Hide the whole widget until metadata resolves, and whenever hidden (U9 kids). Legacy keeps
-  // #chat-container hidden until isChatVisible !== false, so U9 never flashes.
-  if (!chatData.isMetadataLoaded || !chatData.isChatVisible) {
+  // #chat-container hidden until isChatVisible !== false, so U9 never flashes. Until the two-pane
+  // layer answers, show only the collapsed bar (the same in both layouts), or nothing if chat starts
+  // open, so the layout never switches on screen.
+  if (
+    !chatData.isMetadataLoaded ||
+    !chatData.isChatVisible ||
+    (!isUnifiedChatWindowSettled && !startsCollapsed)
+  ) {
     return null;
   }
 
+  const canCreateGroup = isGroupChatEnabled && chatData.conversations.length > 0;
+
+  const renderChatBar = ({
+    isCollapsed,
+    canCreateGroup: isCreateGroupShown,
+    onToggleCollapsed,
+    onOpenGroupInviteDialog,
+  }: Pick<
+    ComponentProps<typeof ChatBar>,
+    "isCollapsed" | "canCreateGroup" | "onToggleCollapsed" | "onOpenGroupInviteDialog"
+  >) => (
+    <ChatBar
+      conversations={mergedConversations}
+      searchTerm={searchTerm}
+      unreadConversationCount={chatData.unreadConversationCount}
+      isCollapsed={isCollapsed}
+      isLoaded={!chatData.isLoading}
+      chatDisabledReason={chatData.chatDisabledReason}
+      canCreateGroup={isCreateGroupShown}
+      hasNextPage={chatData.hasNextPage}
+      onSearchTermChange={setSearchTerm}
+      onOpenConversation={handleOpenConversation}
+      onToggleCollapsed={onToggleCollapsed}
+      onOpenGroupInviteDialog={onOpenGroupInviteDialog}
+      onLoadMore={chatData.fetchNextPage}
+    />
+  );
+
+  const renderChatDialog = (conversation: TChatConversation, isEmbedded = false) => (
+    <ChatDialog
+      key={conversation.id}
+      conversation={conversation}
+      onClose={isEmbedded ? handleCloseEmbeddedConversation : closeConversation}
+      onLeaveGroupConversation={layoutId => {
+        handleLeaveGroupConversation(layoutId).catch(() => undefined);
+      }}
+      onToggleCollapsed={handleToggleCollapsed}
+      onRenameConversation={handleRenameConversation}
+      onAddFriends={(conversationId, userIds) => {
+        handleAddFriends(conversationId, userIds).catch(() => undefined);
+      }}
+      onRemoveParticipant={(conversationId, userId) => {
+        handleRemoveParticipant(conversationId, userId).catch(() => undefined);
+      }}
+      onSetScreen={setConversationScreen}
+      onRequestRemoveParticipant={confirmRemoveParticipant}
+      onReportParticipant={reportParticipant}
+      onPromoteFriendPlaceholder={handlePromoteFriendPlaceholder}
+      onRemoveTrustedConnection={friendId => {
+        handleRemoveTrustedConnection(friendId).catch(() => undefined);
+      }}
+      onOpenPartyChatRestriction={showPartyChatFeatureRestriction}
+      onConsentResolved={handleConsentResolved}
+      isMetadataLoaded={chatData.isMetadataLoaded}
+      isConnectionLost={isConnectionLost}
+      isEmbedded={isEmbedded}
+      onBack={isEmbedded && isSinglePane ? closeConversation : undefined}
+      // On a narrow screen the window's own Minimize is in the hidden list pane.
+      onMinimize={isEmbedded && isSinglePane ? toggleCollapsed : undefined}
+      initialDraft={isEmbedded ? draftsRef.current.get(conversation.layoutId) : undefined}
+      onDraftChange={isEmbedded ? handleDraftChange : undefined}
+    />
+  );
+
+  const renderGroupInviteDialog = (isEmbedded = false) => (
+    <GroupInviteDialog
+      isOpen={isGroupInviteDialogOpen}
+      isSubmitting={isCreatingGroup}
+      isEmbedded={isEmbedded}
+      onClose={closeGroupInviteDialog}
+      onCreateGroup={(groupName, participantIds) => {
+        handleCreateGroup(groupName, participantIds).catch(() => undefined);
+      }}
+    />
+  );
+
   return (
     <div className="react-chat-root fixed bottom-[0] right-[var(--margin-small)] pointer-events-none content-default">
-      <div className="fixed bottom-[0] right-[calc(286px+var(--gap-small)+var(--margin-small))] flex items-end justify-end gap-small pointer-events-none">
-        {dialogsToRender.map(conversation => (
-          <ChatDialog
-            key={conversation.id}
-            conversation={conversation}
-            onClose={closeConversation}
-            onLeaveGroupConversation={layoutId => {
-              handleLeaveGroupConversation(layoutId).catch(() => undefined);
-            }}
-            onToggleCollapsed={handleToggleCollapsed}
-            onRenameConversation={handleRenameConversation}
-            onAddFriends={(conversationId, userIds) => {
-              handleAddFriends(conversationId, userIds).catch(() => undefined);
-            }}
-            onRemoveParticipant={(conversationId, userId) => {
-              handleRemoveParticipant(conversationId, userId).catch(() => undefined);
-            }}
-            onSetScreen={setConversationScreen}
-            onRequestRemoveParticipant={confirmRemoveParticipant}
-            onReportParticipant={reportParticipant}
-            onPromoteFriendPlaceholder={handlePromoteFriendPlaceholder}
-            onRemoveTrustedConnection={friendId => {
-              handleRemoveTrustedConnection(friendId).catch(() => undefined);
-            }}
-            onOpenPartyChatRestriction={showPartyChatFeatureRestriction}
-            onConsentResolved={handleConsentResolved}
-            isMetadataLoaded={chatData.isMetadataLoaded}
-            isConnectionLost={isConnectionLost}
-          />
-        ))}
-        <GroupInviteDialog
-          isOpen={isGroupInviteDialogOpen}
-          isSubmitting={isCreatingGroup}
-          onClose={closeGroupInviteDialog}
-          onCreateGroup={(groupName, participantIds) => {
-            handleCreateGroup(groupName, participantIds).catch(() => undefined);
-          }}
-        />
-      </div>
-      <div
-        className="react-chat-tray-area fixed bottom-[0] flex items-end gap-small pointer-events-none"
-        style={{ right: getTrayRightOffset(activePanelCount) }}
-      >
-        <MinimizedTray
-          conversations={minimizedConversations}
-          onRestoreConversation={handleRestoreConversation}
-          onCloseConversation={closeConversation}
-        />
-      </div>
-      <ChatBar
-        conversations={mergedConversations}
-        searchTerm={searchTerm}
-        unreadConversationCount={chatData.unreadConversationCount}
-        isCollapsed={layout.isCollapsed}
-        isLoaded={!chatData.isLoading}
-        chatDisabledReason={chatData.chatDisabledReason}
-        canCreateGroup={isGroupChatEnabled && chatData.conversations.length > 0}
-        hasNextPage={chatData.hasNextPage}
-        onSearchTermChange={setSearchTerm}
-        onOpenConversation={handleOpenConversation}
-        onToggleCollapsed={toggleCollapsed}
-        onOpenGroupInviteDialog={openGroupInviteDialog}
-        onLoadMore={chatData.fetchNextPage}
-      />
+      {!isUnifiedChatWindowSettled ? (
+        // An early click opens chat once the layer answers, in the layout the user will keep. The bar
+        // still looks collapsed, so a second click must not cancel the first.
+        renderChatBar({
+          isCollapsed: true,
+          canCreateGroup: false,
+          onToggleCollapsed: () => {
+            if (layout.isCollapsed) {
+              toggleCollapsed();
+            }
+          },
+          onOpenGroupInviteDialog: openGroupInviteDialog,
+        })
+      ) : isUnifiedChatWindowEnabled ? (
+        <ChatWindow
+          isCollapsed={layout.isCollapsed}
+          isExpanded={layout.isExpanded}
+          isSinglePane={isSinglePane}
+          isConversationPaneActive={isActiveConversationShown || isGroupInviteDialogOpen}
+          unreadConversationCount={chatData.unreadConversationCount}
+          canCreateGroup={canCreateGroup}
+          onToggleCollapsed={toggleCollapsed}
+          onToggleExpanded={toggleExpanded}
+          onOpenGroupInviteDialog={openGroupInviteDialog}
+          collapsedBar={renderChatBar({
+            isCollapsed: true,
+            canCreateGroup,
+            onToggleCollapsed: toggleCollapsed,
+            onOpenGroupInviteDialog: () => {
+              openGroupInviteDialog();
+              toggleCollapsed();
+            },
+          })}
+          list={
+            <ConversationList
+              conversations={mergedConversations}
+              searchTerm={searchTerm}
+              isLoaded={!chatData.isLoading}
+              chatDisabledReason={chatData.chatDisabledReason}
+              hasNextPage={chatData.hasNextPage}
+              activeLayoutId={isActiveConversationShown ? activeConversation.layoutId : undefined}
+              onSearchTermChange={setSearchTerm}
+              onOpenConversation={handleOpenConversation}
+              onLoadMore={chatData.fetchNextPage}
+            />
+          }
+        >
+          {activeConversation && renderChatDialog(activeConversation, true)}
+          {renderGroupInviteDialog(true)}
+          {!activeConversation && !isGroupInviteDialogOpen && <ChatWindowEmptyState />}
+        </ChatWindow>
+      ) : (
+        <React.Fragment>
+          <div className="fixed bottom-[0] right-[calc(286px+var(--gap-small)+var(--margin-small))] flex items-end justify-end gap-small pointer-events-none">
+            {dialogsToRender.map(conversation => renderChatDialog(conversation))}
+            {renderGroupInviteDialog()}
+          </div>
+          <div
+            className="react-chat-tray-area fixed bottom-[0] flex items-end gap-small pointer-events-none"
+            style={{ right: getTrayRightOffset(activePanelCount) }}
+          >
+            <MinimizedTray
+              conversations={minimizedConversations}
+              onRestoreConversation={handleRestoreConversation}
+              onCloseConversation={closeConversation}
+            />
+          </div>
+          {renderChatBar({
+            isCollapsed: layout.isCollapsed,
+            canCreateGroup,
+            onToggleCollapsed: toggleCollapsed,
+            onOpenGroupInviteDialog: openGroupInviteDialog,
+          })}
+        </React.Fragment>
+      )}
       <SystemFeedback
         feedback={feedback}
         onClose={() => {

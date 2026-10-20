@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import type { RobloxIntlInstance } from '@rbx/legacy-webapp-types/Roblox';
 import { getUrlWithLocale } from '@rbx/core-scripts/util/url';
+import { getLocaleFromDocument } from '@rbx/www-common/intl';
+import { localeToLowercaseUnderscore } from '@rbx/www-common/locale';
 import { translateHtml } from '@rbx/translation-utils';
 import type { TranslateHtmlTag } from '@rbx/translation-utils';
 import { type PurchaseTranslate } from '../itemPurchase/useTranslate';
@@ -11,10 +12,7 @@ import {
 } from '../../core/services/itemPurchaseUpsellService/constants/upsellConstants';
 import ampFeatureService from '../services/ampFeatureService';
 
-export default function useTermsOfUseText(
-  translate: PurchaseTranslate,
-  intl: RobloxIntlInstance
-): React.ReactNode {
+export default function useTermsOfUseText(translate: PurchaseTranslate): React.ReactNode {
   const [isDmccaLegalTextFeature, setIsDmccaLegalTextFeature] = useState(false);
 
   useEffect(() => {
@@ -30,7 +28,7 @@ export default function useTermsOfUseText(
   }, []);
 
   const url =
-    getUrlWithLocale(ROBLOX_TERMS_OF_USE_URL, intl.getRobloxLocale()) +
+    getUrlWithLocale(ROBLOX_TERMS_OF_USE_URL, localeToLowercaseUnderscore(getLocaleFromDocument())) +
     (isDmccaLegalTextFeature ? ROBLOX_TERMS_OF_USE_ANCHOR_FOR_DMCCA : '');
 
   const tags: TranslateHtmlTag[] = [

@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Checkbox, IconButton, TextInput } from "@rbx/foundation-ui";
 import useChatTranslate from "../../hooks/useChatTranslate";
@@ -9,6 +10,8 @@ import AvatarHeadshot from "../AvatarHeadshot";
 type TGroupInviteDialogProps = {
   isOpen: boolean;
   isSubmitting?: boolean;
+  /** Fills the unified chat window's conversation pane instead of floating as a fixed-size dialog. */
+  isEmbedded?: boolean;
   onClose: () => void;
   onCreateGroup: (groupName: string, participantIds: number[]) => void;
 };
@@ -20,6 +23,7 @@ const FRIEND_CHECKBOX_ID_PREFIX = "react-chat-create-group-friend-";
 const GroupInviteDialog = ({
   isOpen,
   isSubmitting,
+  isEmbedded = false,
   onClose,
   onCreateGroup,
 }: TGroupInviteDialogProps) => {
@@ -73,7 +77,12 @@ const GroupInviteDialog = ({
 
   return (
     <section
-      className="react-chat-dialog-shell react-chat-top-radius flex width-[260px] height-[360px] pointer-events-auto flex-col overflow-hidden bg-surface-100 stroke-standard stroke-muted shadow-transient-high clip content-default"
+      className={classNames(
+        "react-chat-dialog-shell flex flex-col overflow-hidden bg-surface-100 content-default",
+        isEmbedded
+          ? "min-width-0 grow-1 height-full"
+          : "react-chat-top-radius width-[260px] height-[360px] pointer-events-auto stroke-standard stroke-muted shadow-transient-high clip",
+      )}
       aria-label={translate(CREATE_CHAT_HEADER_TRANSLATION_KEY)}
     >
       <div className="react-chat-top-radius flex width-full shrink-0 items-center justify-between gap-small bg-surface-100 padding-x-small padding-y-small">

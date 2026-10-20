@@ -65,9 +65,9 @@ function ItemThumbnail({ itemsCount, item, index, timedOption, translate }: Item
   const shouldShowOverlay = hasMoreItems && index === batchBuyMaxThumbnails - 1;
 
   return (
-    <div className='modal-multi-item-image-container'>
+    <div className='relative'>
       {timedOption && (
-        <div className='timed-options-badge-container'>
+        <div className='absolute top-[6px] left-[6px]'>
           <Badge
             variant='Neutral'
             icon='icon-regular-clock'
@@ -85,13 +85,13 @@ function ItemThumbnail({ itemsCount, item, index, timedOption, translate }: Item
         type={item.itemType.toLowerCase() === ItemType.Bundle ? 'BundleThumbnail' : 'Asset'}
         size='150x150'
         targetId={item.id}
-        containerClassName='batch-buy-thumbnail'
+        containerClassName='size-2400 shrink-0 radius-medium bg-shift-200'
         format='webp'
         altName={itemName}
       />
       {shouldShowOverlay && (
-        <div className='thumb-overlay'>
-          <div className='font-header-1'>＋{moreItemsCount}</div>
+        <div className='absolute top-[0] left-[0] size-full flex items-center justify-center radius-medium bg-over-media-100'>
+          <div className='text-heading-large content-emphasis'>＋{moreItemsCount}</div>
         </div>
       )}
     </div>
@@ -358,8 +358,8 @@ export default function createMultiItemPurchaseModal() {
     const assetInfo = {
       itemCount: itemDetails.length,
       robux: renderToString(
-        <span className='robux-price'>
-          <PriceLabel {...{ price: expectedTotalPrice }} />
+        <span>
+          <PriceLabel translate={translate} price={expectedTotalPrice} />
         </span>
       )
     };
@@ -524,14 +524,14 @@ export default function createMultiItemPurchaseModal() {
     const body = (
       <Fragment>
         <div
-          className='modal-message multi-item'
+          className='text-body-large'
           // Used for formatting purchase text, hardcoded string value from translation service
           dangerouslySetInnerHTML={{
             __html: translate(bodyMessageResource, assetInfo)
           }}
         />
         {itemDetails !== undefined && itemDetails.length > 0 && (
-          <div className='modal-multi-item-images-container'>
+          <div className='flex items-center justify-center gap-xsmall min-height-[174px]'>
             {itemsSlice.map((item, i) => {
               const matchedItem = items.find(
                 itemInfo => itemInfo.id === item.id && itemInfo.itemType === item.itemType

@@ -1,5 +1,5 @@
-import { Dialog, RobloxTranslationResourceProviderInstance } from '@rbx/legacy-webapp-types/Roblox';
-import { paymentFlowAnalyticsService } from '@rbx/core-scripts/legacy/core-roblox-utilities';
+import type { RobloxTranslationResourceProviderInstance } from '@rbx/legacy-webapp-types/Roblox';
+import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
 import {
   COMMON_UI_CONTROLS_NAMESPACE,
   FEATURE_PREMIUM_NAMESPACE,
@@ -7,6 +7,7 @@ import {
   UPSELL_COUNTER_NAMES
 } from '../constants/upsellConstants';
 import { ItemDetailElementDataset } from '../constants/serviceTypeDefinitions';
+import openDialog from './openDialog';
 import reportCounter from '../utils/common/reportCounter';
 
 export default function openLeaveRobloxWarningModal(
@@ -29,7 +30,7 @@ export default function openLeaveRobloxWarningModal(
     ) ||
     'This purchase must be completed on our partner’s website. You will be returned to Roblox after the purchase is completed.<br /><br /> Proceed to partner website for payment?';
 
-  Dialog.open({
+  openDialog({
     titleText:
       featurePremiumTranslationResource.get(LANG_KEYS.insufficientRobuxLeaveRobloxHeading, {}) ||
       'Leaving Roblox',
@@ -72,7 +73,6 @@ export default function openLeaveRobloxWarningModal(
     allowHtmlContentInBody: true,
     allowHtmlContentInFooter: false,
     fieldValidationRequired: true,
-    dismissable: true,
     xToCancel: true
   });
 }

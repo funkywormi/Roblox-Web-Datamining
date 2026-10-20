@@ -1,6 +1,6 @@
 /* eslint-disable react/no-danger */
 import { useCallback, useContext, useMemo } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import {
   Button,
   Dialog,
@@ -23,28 +23,29 @@ export function PurchaseWarningModal() {
     purchaseWarning: { action, closeModal, continuePurchase, isOpen },
   } = useContext(ModalContext);
 
-  const { translate } = useTranslation();
+  const translatePremium = useTranslations("Feature.Premium");
+  const translateCommonUI = useTranslations("CommonUI.Controls");
 
   const body = useMemo(() => {
     switch (action) {
       case PurchaseWarningAction.U13PaymentModal: {
-        return translate("Description.ScaryModalBodyNew", { lineBreak });
+        return translatePremium("Description.ScaryModalBodyNew", { lineBreak });
       }
       case PurchaseWarningAction.ParentalConsentWarningPaymentModal13To17: {
-        return translate("Description.ScaryModalBody13To17");
+        return translatePremium("Description.ScaryModalBody13To17");
       }
       case PurchaseWarningAction.U13MonthlyThreshold1Modal: {
-        return translate("Description.ScaryModalThreshold1Body", { linebreak: lineBreak });
+        return translatePremium("Description.ScaryModalThreshold1Body", { linebreak: lineBreak });
       }
       case PurchaseWarningAction.U13MonthlyThreshold2Modal: {
-        return translate("Description.ScaryModalThreshold2Body", { linebreak: lineBreak });
+        return translatePremium("Description.ScaryModalThreshold2Body", { linebreak: lineBreak });
       }
       case PurchaseWarningAction.RequireEmailVerification:
       case undefined:
       default:
         return null;
     }
-  }, [action, translate]);
+  }, [action, translatePremium]);
 
   const onPurchaseWarningConfirm = useCallback(() => {
     if (!action) {
@@ -71,12 +72,12 @@ export function PurchaseWarningModal() {
       onOpenChange={closeModal}
       isModal
       hasCloseAffordance
-      closeLabel={translate("Action.Close")}
+      closeLabel={translateCommonUI("Action.Close")}
       size="Medium"
     >
       <DialogContent>
         <DialogBody className="flex flex-col gap-medium">
-          <DialogTitle>{translate("Heading.ScaryModalTitle")}</DialogTitle>
+          <DialogTitle>{translatePremium("Heading.ScaryModalTitle")}</DialogTitle>
           <div>
             {body && (
               <div>
@@ -88,10 +89,10 @@ export function PurchaseWarningModal() {
         <DialogFooter>
           <div className="flex flex-row gap-medium">
             <Button onClick={onPurchaseWarningConfirm} variant="Emphasis" className="width-full">
-              {translate("Action.OK")}
+              {translateCommonUI("Action.OK")}
             </Button>
             <Button onClick={closeModal} variant="Standard" className="width-full">
-              {translate("Action.Cancel")}
+              {translateCommonUI("Action.Cancel")}
             </Button>
           </div>
         </DialogFooter>

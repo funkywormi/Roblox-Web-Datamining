@@ -131,6 +131,8 @@ export function SduiImage({
         targetId={parsedImage.thumbnail.targetId}
         format={ThumbnailFormat.webp}
         size={parsedImage.thumbnail.size}
+        includeBackground={parsedImage.thumbnail.includeBackground}
+        includeProfileFrame={parsedImage.thumbnail.includeProfileFrame}
         containerClass="sdui-thumbnail-image-container"
         imgClassName={objectFitClass}
         altName={alt}

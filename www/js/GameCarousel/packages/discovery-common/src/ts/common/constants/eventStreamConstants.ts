@@ -112,6 +112,7 @@ export enum EventStreamMetadata {
   PreviousOptionContextTag = "previousOptionContextTag",
   PreviousOptionId = "previousOptionId",
   PreviousIndex = "previousIndex",
+  OmniSearchType = "omniSearchType",
   QueryText = "queryText",
   QueryTexts = "queryTexts",
   ResourceId = "resourceId",
@@ -192,6 +193,11 @@ export enum SessionInfoType {
   PreAuthLandingPageSessionInfo = "preAuthLandingPageSessionInfo",
 }
 
+export enum OmniSearchType {
+  Games = "Games",
+  TopResults = "TopResults",
+}
+
 export type TDiscoverySessionInfo = {
   [key in SessionInfoType]?: string;
 };
@@ -237,6 +243,7 @@ export type TGridGameImpressions = TBaseGameImpressions & {
   [EventStreamMetadata.EmphasisFlag]?: boolean;
   [EventStreamMetadata.SortPos]?: number;
   [EventStreamMetadata.NumberOfLoadedTiles]?: number;
+  [EventStreamMetadata.OmniSearchType]?: OmniSearchType;
   [EventStreamMetadata.Page]:
     | PageContext.SearchPage
     | PageContext.SortDetailPageDiscover
@@ -282,10 +289,12 @@ export type TCarouselGameImpressions = TBaseGameImpressions & {
   [EventStreamMetadata.SortPos]: number;
   [EventStreamMetadata.NumberOfLoadedTiles]?: number;
   [SessionInfoType.HomePageSessionInfo]?: string;
+  [SessionInfoType.GameSearchSessionInfo]?: string;
   [SessionInfoType.DiscoverPageSessionInfo]?: string;
   [SessionInfoType.SearchLandingPageSessionInfo]?: string;
   [SessionInfoType.PreAuthLandingPageSessionInfo]?: string;
   [EventStreamMetadata.Page]:
+    | PageContext.SearchPage
     | PageContext.SortDetailPageDiscover
     | PageContext.SortDetailPageHome
     | PageContext.HomePage
@@ -398,6 +407,7 @@ export type TPlayGameClicked = TCommonReferralParams & {
   [EventStreamMetadata.IsAd]: string;
   [EventStreamMetadata.PlayContext]:
     | PageContext.HomePage
+    | PageContext.SearchPage
     | PageContext.GameDetailPage
     | PageContext.GamesPage
     | PageContext.SpotlightPage

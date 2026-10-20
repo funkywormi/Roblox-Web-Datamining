@@ -45,6 +45,8 @@ export const chatQueryKeys = {
   countryRegions: () => [...chatQueryKeys.all, "countryRegions"] as const,
   gamePlaceDetails: (placeId: string) =>
     [...chatQueryKeys.all, "gamePlaceDetails", placeId] as const,
+  /** IXP parameters of the two-pane chat window layer. */
+  unifiedChatWindowLayer: () => [...chatQueryKeys.all, "unifiedChatWindowLayer"] as const,
 };
 
 /** Profile fields for friend rows: combinedName for display, username for search. */

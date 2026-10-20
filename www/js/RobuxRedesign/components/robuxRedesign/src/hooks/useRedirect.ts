@@ -1,7 +1,7 @@
 import { useCallback, useState, useEffect, useMemo } from "react";
 import { UrlSearchParams } from "@rbx/core-lib/url";
 import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
+import { getCurrentUser, userIdToNumber } from "@rbx/www-common/user";
 import { PaymentSession } from "../types/buyRobuxPageData";
 import { EXP_FLOW_QUERY_PARAM, EXP_FLOW_QUERY_VALUE } from "../constants/loginRedirect";
 import { trackCounter, trackError } from "../observability";
@@ -98,13 +98,14 @@ export default function useRedirect({
     if (!authTicket || !paymentSessionId) {
       return "";
     }
+    const currentUser = getCurrentUser();
     return constructRedirectUrl({
       authTicket,
       paymentSessionId,
       returnUrl: PAYMENT_METHODS_REDIRECT_URL,
       loginRedirectPathname: pathname,
       isInExperiment,
-      userId: authenticatedUser()?.id ?? 0,
+      userId: currentUser === undefined ? 0 : userIdToNumber(currentUser.id),
     });
   }, [authTicket, paymentSessionId, pathname, isInExperiment]);
 

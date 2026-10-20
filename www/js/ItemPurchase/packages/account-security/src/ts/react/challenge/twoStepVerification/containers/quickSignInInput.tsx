@@ -1,7 +1,7 @@
 // Currently only used to display quick sign in modal for devices in Roblox App with non compatible two sv methods.
 
 import React, { useEffect } from "react";
-import { Modal } from "react-style-guide";
+import { DialogBody } from "@rbx/foundation-ui";
 import { openModal as openCrossDeviceLoginDisplayCodeModal } from "@rbx/authentication/crossDeviceLoginDisplayCodeModal/services/crossDeviceLoginDisplayCodeService";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
@@ -65,7 +65,7 @@ const QuickSignInInput: React.FC<Props> = ({ setModalTitleText, children }: Prop
     action: handleButtonClick,
   };
 
-  const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
+  const BodyElement = renderInline ? InlineChallengeBody : DialogBody;
   const lockIconClassName = renderInline
     ? "inline-challenge-protection-shield-icon"
     : "modal-protection-shield-icon";

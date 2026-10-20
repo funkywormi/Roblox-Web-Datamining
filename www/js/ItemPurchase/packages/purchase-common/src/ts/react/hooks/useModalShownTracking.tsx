@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { fireEvent } from 'roblox-event-tracker';
+import { fireEvent } from '@rbx/www-common/event-tracker';
 
 const RENDER_TRACKING_PREFIX = 'RenderTracking';
 const WEBAPP_NAME = 'Purchase';

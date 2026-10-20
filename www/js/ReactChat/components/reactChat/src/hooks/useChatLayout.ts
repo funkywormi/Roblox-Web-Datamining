@@ -25,8 +25,23 @@ export type TUseChatLayoutResult = {
   /** Clears the blocking consent flags after the user accepts the group-OSA / U13 opt-in modal. */
   resolveConsent: (layoutId: string) => void;
   toggleCollapsed: () => void;
+  /** Unified chat window only: switches the window between its default and large size. */
+  toggleExpanded: () => void;
   openGroupInviteDialog: () => void;
   closeGroupInviteDialog: () => void;
+};
+
+export type TUseChatLayoutOptions = {
+  /**
+   * Unified chat window: at most one conversation is open. Opening another closes it, and the
+   * open one parks while the window is collapsed or Create group fills its pane.
+   */
+  isUnifiedWindow?: boolean;
+  /**
+   * While false, saved chats are not reopened yet (the saved window size and collapsed state still
+   * are). Lets the caller wait until the layout mode is final, so the restore runs once, in that mode.
+   */
+  isRestoreReady?: boolean;
 };
 
 const CHAT_BAR_WIDTH_PX = 286;
@@ -60,16 +75,27 @@ const moveLayoutIdToNewest = (layoutIds: string[], layoutId: string) => [
   layoutId,
 ];
 
+// The parking effect owns visibility, so a screen change (for example the contact card arriving
+// after its request resolves) must not unpark a chat that Create group, the window width, or a
+// collapsed unified window is covering. The unified window also keeps only its newest conversation
+// open, so there a screen change does not reopen a chat either.
+const getScreenChangeVisibility = (isUnifiedWindow: boolean): Partial<TChatConversation> =>
+  isUnifiedWindow ? {} : { isOpen: true };
+
 /** Append still-pending restore ids that have not loaded yet, so persistence never drops them. */
 const unionWithPending = (liveIds: string[], pendingIds: string[] = []): string[] => [
   ...liveIds,
   ...pendingIds.filter(layoutId => !liveIds.includes(layoutId)),
 ];
 
-export const useChatLayout = (sourceConversations: TChatConversation[]): TUseChatLayoutResult => {
+export const useChatLayout = (
+  sourceConversations: TChatConversation[],
+  { isUnifiedWindow = false, isRestoreReady = true }: TUseChatLayoutOptions = {},
+): TUseChatLayoutResult => {
   const { typingInChatForReceiverExpirationMs } = useChatMetadataConfig();
   const [layout, setLayout] = useState<TChatLayoutState>({
     isCollapsed: true,
+    isExpanded: false,
     focusedLayoutId:
       sourceConversations.find(conversation => conversation.isFocused)?.layoutId ?? null,
     conversationInviteDialogLayoutId: null,
@@ -101,13 +127,14 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
 
         // A collapsed dialog (header only) hides its messages, so it is not "read" yet — keep its
         // unread count so the header shows a badge and expanding it can mark it read (legacy parity).
-        if (merged.isOpen && !merged.isMinimized && !merged.isCollapsed) {
+        // The unified window has no collapse in place, so there the flag is ignored.
+        if (merged.isOpen && !merged.isMinimized && (isUnifiedWindow || !merged.isCollapsed)) {
           return { ...merged, unreadCount: 0 };
         }
 
         return merged;
       }),
-    [conversationOverrides, layout.focusedLayoutId, sourceConversations],
+    [conversationOverrides, isUnifiedWindow, layout.focusedLayoutId, sourceConversations],
   );
 
   // Restore dialogs that were open before the last reload. The conversation list can arrive
@@ -128,18 +155,24 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
       currentUserIdRef.current = getCurrentUserId();
       const persisted = readPersistedChatLayout(currentUserIdRef.current);
       if (persisted) {
+        // Hold the full saved lists, even in the unified window: persistence writes them back until
+        // they restore, so a reload before the restore runs keeps the saved chats.
         pendingRestoreRef.current = {
           openedConversationLayoutIds: persisted.openedConversationLayoutIds,
           minimizedConversationLayoutIds: persisted.minimizedConversationLayoutIds,
           collapsedConversationLayoutIds: persisted.collapsedConversationLayoutIds ?? [],
           focusedLayoutId: persisted.focusedLayoutId,
         };
-        setLayout(current => ({ ...current, isCollapsed: persisted.isCollapsed }));
+        setLayout(current => ({
+          ...current,
+          isCollapsed: persisted.isCollapsed,
+          isExpanded: persisted.isExpanded ?? false,
+        }));
       }
     }
 
     const pending = pendingRestoreRef.current;
-    if (!pending) {
+    if (!pending || !isRestoreReady) {
       return;
     }
 
@@ -150,26 +183,36 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
     const restorableLayoutIds = new Set(
       sourceConversations.map(conversation => conversation.layoutId),
     );
-    const openedToRestore = reconcilePersistedLayoutIds(
+    const restorableOpenedLayoutIds = reconcilePersistedLayoutIds(
       pending.openedConversationLayoutIds,
       restorableLayoutIds,
     );
-    const minimizedToRestore = reconcilePersistedLayoutIds(
-      pending.minimizedConversationLayoutIds,
-      restorableLayoutIds,
-    );
+    // The unified window shows one conversation: the newest persisted one that loads. Ids that have
+    // not loaded are persisted after the loaded ones, so the last id can be one that never loads
+    // (for example a group the user left). It has no minimized or collapsed dialogs.
+    const openedToRestore = isUnifiedWindow
+      ? restorableOpenedLayoutIds.slice(-1)
+      : restorableOpenedLayoutIds;
+    const minimizedToRestore = isUnifiedWindow
+      ? []
+      : reconcilePersistedLayoutIds(pending.minimizedConversationLayoutIds, restorableLayoutIds);
     // Collapsed dialogs are a subset of the opened (open-intent) list, so they restore via
     // openedToRestore and just need isCollapsed re-applied.
     const collapsedToRestore = new Set(
-      reconcilePersistedLayoutIds(pending.collapsedConversationLayoutIds, restorableLayoutIds),
+      isUnifiedWindow
+        ? []
+        : reconcilePersistedLayoutIds(pending.collapsedConversationLayoutIds, restorableLayoutIds),
     );
     if (openedToRestore.length === 0 && minimizedToRestore.length === 0) {
       return;
     }
 
+    const persistedFocusedLayoutId = isUnifiedWindow
+      ? openedToRestore.at(-1)
+      : pending.focusedLayoutId;
     const focusedToRestore =
-      pending.focusedLayoutId != null && restorableLayoutIds.has(pending.focusedLayoutId)
-        ? pending.focusedLayoutId
+      persistedFocusedLayoutId != null && restorableLayoutIds.has(persistedFocusedLayoutId)
+        ? persistedFocusedLayoutId
         : null;
 
     pending.openedConversationLayoutIds = pending.openedConversationLayoutIds.filter(
@@ -184,9 +227,11 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
     if (focusedToRestore != null) {
       pending.focusedLayoutId = null;
     }
+    // The unified window restores one conversation, so a later page cannot switch the open chat.
     if (
-      pending.openedConversationLayoutIds.length === 0 &&
-      pending.minimizedConversationLayoutIds.length === 0
+      isUnifiedWindow ||
+      (pending.openedConversationLayoutIds.length === 0 &&
+        pending.minimizedConversationLayoutIds.length === 0)
     ) {
       pendingRestoreRef.current = null;
     }
@@ -219,7 +264,7 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
         ...openedToRestore,
       ],
     }));
-  }, [sourceConversations]);
+  }, [isRestoreReady, isUnifiedWindow, sourceConversations]);
 
   // Persist open/minimized dialog state (after hydration) so it survives a reload.
   useEffect(() => {
@@ -272,6 +317,7 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
       ).filter(layoutId => openedFinalSet.has(layoutId)),
       focusedLayoutId: layout.focusedLayoutId ?? pending?.focusedLayoutId ?? null,
       isCollapsed: layout.isCollapsed,
+      isExpanded: layout.isExpanded,
     };
 
     const serialized = JSON.stringify(nextLayout);
@@ -283,6 +329,7 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
   }, [
     conversations,
     layout.isCollapsed,
+    layout.isExpanded,
     layout.focusedLayoutId,
     layout.openedConversationLayoutIds,
   ]);
@@ -404,31 +451,50 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
   }, [typingInChatForReceiverExpirationMs]);
 
   useLayoutEffect(() => {
-    const conversationSlotCount = Math.max(
-      0,
-      layout.maxVisiblePanelCount - (layout.conversationInviteDialogLayoutId ? 1 : 0),
-    );
-    const openedLayoutIds = layout.openedConversationLayoutIds;
+    const isInviteDialogOpen = layout.conversationInviteDialogLayoutId != null;
+    // Unified window: the one open conversation parks while the window is collapsed or Create
+    // group fills its pane, and comes back when either closes.
+    const conversationSlotCount = isUnifiedWindow
+      ? Number(!layout.isCollapsed && !isInviteDialogOpen)
+      : Math.max(0, layout.maxVisiblePanelCount - (isInviteDialogOpen ? 1 : 0));
+    // Unified window: only the newest opened conversation stays open. This also trims dialogs
+    // restored before the flag resolved.
+    const openedLayoutIds = isUnifiedWindow
+      ? layout.openedConversationLayoutIds.slice(-1)
+      : layout.openedConversationLayoutIds;
     // The newest `conversationSlotCount` opened chats stay visible; anything older is
-    // parked in the minimized tray. Visibility is derived purely from width here — the
-    // open-intent list is never trimmed — so widening the window automatically brings
-    // parked dialogs back, while chats the user minimized manually (removed from this
+    // parked in the minimized tray. In the floating layout, visibility is derived purely from
+    // width — the open-intent list is never trimmed — so widening the window automatically
+    // brings parked dialogs back, while chats the user minimized manually (removed from this
     // list) stay minimized.
     const visibleLayoutIdSet = new Set(
       openedLayoutIds.slice(Math.max(0, openedLayoutIds.length - conversationSlotCount)),
     );
 
     setConversationOverrides(current => {
+      const closedLayoutIds = isUnifiedWindow
+        ? Object.keys(current).filter(
+            layoutId => current[layoutId]?.isOpen === true && !openedLayoutIds.includes(layoutId),
+          )
+        : [];
       const staleLayoutIds = openedLayoutIds.filter(layoutId => {
         const existing = current[layoutId] as Partial<TChatConversation> | undefined;
         const shouldMinimize = !visibleLayoutIdSet.has(layoutId);
         return !existing?.isOpen || (existing.isMinimized ?? false) !== shouldMinimize;
       });
-      if (staleLayoutIds.length === 0) {
+      if (closedLayoutIds.length === 0 && staleLayoutIds.length === 0) {
         return current;
       }
 
       const next = { ...current };
+      closedLayoutIds.forEach(layoutId => {
+        next[layoutId] = {
+          ...current[layoutId],
+          currentScreen: "Default",
+          isOpen: false,
+          isMinimized: false,
+        };
+      });
       staleLayoutIds.forEach(layoutId => {
         const existing = current[layoutId] as Partial<TChatConversation> | undefined;
         const shouldMinimize = !visibleLayoutIdSet.has(layoutId);
@@ -442,6 +508,15 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
       return next;
     });
     setLayout(current => {
+      if (isUnifiedWindow) {
+        return current.openedConversationLayoutIds.length > 1
+          ? {
+              ...current,
+              focusedLayoutId: openedLayoutIds.at(-1) ?? null,
+              openedConversationLayoutIds: openedLayoutIds,
+            }
+          : current;
+      }
       const focusedIsParked =
         current.focusedLayoutId != null &&
         openedLayoutIds.includes(current.focusedLayoutId) &&
@@ -451,35 +526,48 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
         : current;
     });
   }, [
+    isUnifiedWindow,
     layout.conversationInviteDialogLayoutId,
+    layout.isCollapsed,
     layout.maxVisiblePanelCount,
     layout.openedConversationLayoutIds,
   ]);
 
-  const openConversation = useCallback((layoutId: string) => {
-    setConversationOverrides(current => ({
-      ...current,
-      [layoutId]: {
-        ...current[layoutId],
-        currentScreen: "Default",
-        isOpen: true,
-        isMinimized: false,
-        isCollapsed: false,
-      },
-    }));
-    setLayout(current => ({
-      ...current,
-      conversationInviteDialogLayoutId:
-        current.conversationInviteDialogLayoutId && current.maxVisiblePanelCount <= 1
-          ? null
-          : current.conversationInviteDialogLayoutId,
-      focusedLayoutId: layoutId,
-      openedConversationLayoutIds: moveLayoutIdToNewest(
-        current.openedConversationLayoutIds,
-        layoutId,
-      ),
-    }));
-  }, []);
+  const openConversation = useCallback(
+    (layoutId: string) => {
+      // The user's choice wins over a saved chat that has not loaded yet, now and after a reload.
+      if (isUnifiedWindow) {
+        pendingRestoreRef.current = null;
+      }
+      setConversationOverrides(current => ({
+        ...current,
+        [layoutId]: {
+          ...current[layoutId],
+          currentScreen: "Default",
+          isOpen: true,
+          isMinimized: false,
+          isCollapsed: false,
+        },
+      }));
+      setLayout(current => ({
+        ...current,
+        // The unified window holds the conversation, so opening one also opens the window, and
+        // replaces Create group, which shares its pane.
+        isCollapsed: isUnifiedWindow ? false : current.isCollapsed,
+        conversationInviteDialogLayoutId:
+          current.conversationInviteDialogLayoutId &&
+          (isUnifiedWindow || current.maxVisiblePanelCount <= 1)
+            ? null
+            : current.conversationInviteDialogLayoutId,
+        focusedLayoutId: layoutId,
+        openedConversationLayoutIds: moveLayoutIdToNewest(
+          current.openedConversationLayoutIds,
+          layoutId,
+        ),
+      }));
+    },
+    [isUnifiedWindow],
+  );
 
   const closeConversation = useCallback((layoutId: string) => {
     setConversationOverrides(current => ({
@@ -546,63 +634,69 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
     }));
   }, []);
 
-  const setConversationScreen = useCallback((layoutId: string, screen: TDialogScreen) => {
-    setConversationOverrides(current => ({
-      ...current,
-      [layoutId]: {
-        ...current[layoutId],
-        currentScreen: screen,
-        // Leaving any screen clears the abuse-report target; routing INTO the confirmation goes
-        // through reportParticipant, which sets it.
-        abuseReportTargetId: undefined,
-        removeMemberTargetId: undefined,
-        isOpen: true,
-        isMinimized: false,
-      },
-    }));
-    // Focus the dialog but keep its position — navigating an already-open dialog to another screen
-    // must not reorder it to the newest slot, which would shift it to the far left.
-    setLayout(current => ({
-      ...current,
-      focusedLayoutId: layoutId,
-    }));
-  }, []);
+  const setConversationScreen = useCallback(
+    (layoutId: string, screen: TDialogScreen) => {
+      setConversationOverrides(current => ({
+        ...current,
+        [layoutId]: {
+          ...current[layoutId],
+          currentScreen: screen,
+          // Leaving any screen clears the abuse-report target; routing INTO the confirmation goes
+          // through reportParticipant, which sets it.
+          abuseReportTargetId: undefined,
+          removeMemberTargetId: undefined,
+          ...getScreenChangeVisibility(isUnifiedWindow),
+        },
+      }));
+      // Focus the dialog but keep its position — navigating an already-open dialog to another screen
+      // must not reorder it to the newest slot, which would shift it to the far left.
+      setLayout(current => ({
+        ...current,
+        focusedLayoutId: layoutId,
+      }));
+    },
+    [isUnifiedWindow],
+  );
 
-  const reportParticipant = useCallback((layoutId: string, participantId: number) => {
-    setConversationOverrides(current => ({
-      ...current,
-      [layoutId]: {
-        ...current[layoutId],
-        currentScreen: "AbuseReportConfirmation",
-        abuseReportTargetId: participantId,
-        isOpen: true,
-        isMinimized: false,
-      },
-    }));
-    // Focus but keep position (see setConversationScreen) — navigating screens must not reorder.
-    setLayout(current => ({
-      ...current,
-      focusedLayoutId: layoutId,
-    }));
-  }, []);
+  const reportParticipant = useCallback(
+    (layoutId: string, participantId: number) => {
+      setConversationOverrides(current => ({
+        ...current,
+        [layoutId]: {
+          ...current[layoutId],
+          currentScreen: "AbuseReportConfirmation",
+          abuseReportTargetId: participantId,
+          ...getScreenChangeVisibility(isUnifiedWindow),
+        },
+      }));
+      // Focus but keep position (see setConversationScreen) — navigating screens must not reorder.
+      setLayout(current => ({
+        ...current,
+        focusedLayoutId: layoutId,
+      }));
+    },
+    [isUnifiedWindow],
+  );
 
-  const confirmRemoveParticipant = useCallback((layoutId: string, participantId: number) => {
-    setConversationOverrides(current => ({
-      ...current,
-      [layoutId]: {
-        ...current[layoutId],
-        currentScreen: "RemoveMemberConfirmation",
-        removeMemberTargetId: participantId,
-        isOpen: true,
-        isMinimized: false,
-      },
-    }));
-    // Focus but keep position (see setConversationScreen) — navigating screens must not reorder.
-    setLayout(current => ({
-      ...current,
-      focusedLayoutId: layoutId,
-    }));
-  }, []);
+  const confirmRemoveParticipant = useCallback(
+    (layoutId: string, participantId: number) => {
+      setConversationOverrides(current => ({
+        ...current,
+        [layoutId]: {
+          ...current[layoutId],
+          currentScreen: "RemoveMemberConfirmation",
+          removeMemberTargetId: participantId,
+          ...getScreenChangeVisibility(isUnifiedWindow),
+        },
+      }));
+      // Focus but keep position (see setConversationScreen) — navigating screens must not reorder.
+      setLayout(current => ({
+        ...current,
+        focusedLayoutId: layoutId,
+      }));
+    },
+    [isUnifiedWindow],
+  );
 
   const resolveConsent = useCallback((layoutId: string) => {
     setConversationOverrides(current => ({
@@ -617,6 +711,10 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
 
   const toggleCollapsed = useCallback(() => {
     setLayout(current => ({ ...current, isCollapsed: !current.isCollapsed }));
+  }, []);
+
+  const toggleExpanded = useCallback(() => {
+    setLayout(current => ({ ...current, isExpanded: !current.isExpanded }));
   }, []);
 
   const openGroupInviteDialog = useCallback(() => {
@@ -646,6 +744,7 @@ export const useChatLayout = (sourceConversations: TChatConversation[]): TUseCha
     confirmRemoveParticipant,
     resolveConsent,
     toggleCollapsed,
+    toggleExpanded,
     openGroupInviteDialog,
     closeGroupInviteDialog,
   };
