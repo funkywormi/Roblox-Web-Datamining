@@ -1,11 +1,7 @@
 import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import "@rbx/core-scripts/global";
-import {
-  JoinDataProperties,
-  launchGame as launchPlayGame,
-  buildPlayGameProperties,
-} from "@rbx/core-scripts/game";
+import { JoinDataProperties, buildPlayGameProperties } from "@rbx/core-scripts/game";
 import {
   eventTypes,
   sendEvent,
@@ -16,6 +12,7 @@ import { composeQueryString } from "@rbx/core-scripts/util/url";
 import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
 import { fireEvent } from "@rbx/www-common/event-tracker";
+import { isJoinAttemptIdEnabled, launchPlayGame } from "./gameLauncher";
 import playButtonConstants from "../constants/playButtonConstants";
 import { getStartAccessManagementUpsell } from "./accessManagementUpsell";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
@@ -46,10 +43,6 @@ type TJoinAttemptProperties = {
   joinAttemptId?: string;
   joinAttemptOrigin?: string | number;
 };
-
-const isJoinAttemptIdEnabled = (): boolean =>
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- window.Roblox is absent on Next.js
-  window.Roblox?.GameLauncher?.isJoinAttemptIdEnabled() ?? false;
 
 function getJoinAttemptProperties(eventProperties: TEventProperties): TJoinAttemptProperties {
   if (!isJoinAttemptIdEnabled()) {

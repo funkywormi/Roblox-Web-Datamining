@@ -41,9 +41,9 @@ export type TUseChatDataResult = {
   fetchNextPage: () => void;
   hasNextPage: boolean;
   /**
-   * Ids of conversations eligible for a conversation-level moderation timeout (moderated / channels;
-   * not trusted_comms). AppContainer intersects this with the open dialogs to scope the timeout
-   * fetch to what the user is actually viewing.
+   * Ids of conversations eligible for a conversation-level moderation timeout (moderated or
+   * channels, including unfiltered trusted_comms chats). AppContainer intersects this with the open
+   * dialogs to scope the timeout fetch to what the user is actually viewing.
    */
   moderationEligibleIds: ReadonlySet<string>;
   /**

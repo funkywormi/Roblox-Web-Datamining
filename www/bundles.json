@@ -2513,7 +2513,7 @@
         },
         {
             "name": "Feature.Parents",
-            "url": "https://js.rbxcdn.com/e48f2f8ec2e56e046729782484a9a5e7792f0a6f2a582179322046c3e9c719e3.js",
+            "url": "https://js.rbxcdn.com/9787f5e1530ba66f3a9fe9ba207839184ab4d103331e6d670173797cf1861fb6.js",
             "sources": [
                 "/home",
                 "/",
@@ -5959,7 +5959,7 @@
         },
         {
             "name": "ProfilePlatform",
-            "url": "https://js.rbxcdn.com/f741098c9e25d71932090f0f8ec46c3fe9c0f9e779bff1319e66fd3fed6f9fcd-ProfilePlatform.js",
+            "url": "https://js.rbxcdn.com/91358e3d82eef37f976b8f7469df2b35a4f8fa60aeedfb9e7a44f6dcfa039e4e-ProfilePlatform.js",
             "sources": [
                 "/users/1/profile"
             ]
@@ -5991,7 +5991,7 @@
         },
         {
             "name": "ReactChat",
-            "url": "https://js.rbxcdn.com/08c0b6508443d49cf1f290999cf5bfaa6da23212035a84b645641bc6152c8d11-ReactChat.js",
+            "url": "https://js.rbxcdn.com/3b2ec112fc2c04063bc31ceacc6126dbfde80651dde40d2e8ba9c324049c1dff-ReactChat.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -8235,7 +8235,7 @@
         },
         {
             "name": "ProfilePlatform",
-            "url": "https://css.rbxcdn.com/4aa5f2b90db5cbe00011ed0861a0814012b259bf24a8e5774ff63290f80c5416-ProfilePlatform.css",
+            "url": "https://css.rbxcdn.com/68a2fc4ef963816670f8847ce83886373bd056b75bbea97edfad2aba8a3ad8d9-ProfilePlatform.css",
             "sources": [
                 "/users/1/profile"
             ]

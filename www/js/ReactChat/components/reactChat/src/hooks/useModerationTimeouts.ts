@@ -21,8 +21,8 @@ const NOT_TIMED_OUT: TResolvedTimeout = { isTimedOut: false, expiresAtMs: null }
 const MODERATION_TIMEOUTS_KEY_PREFIX = [...chatQueryKeys.all, "moderationTimeouts"] as const;
 
 export type TUseModerationTimeoutsResult = {
-  /** Resolves the effective timeout for one conversation (honors trusted_comms exemption + scoping). */
-  resolveTimeout: (conversationId: string, moderationType: string | undefined) => TResolvedTimeout;
+  /** Resolves the effective timeout for one conversation (user-level + per-conversation scoping). */
+  resolveTimeout: (conversationId: string) => TResolvedTimeout;
   /**
    * Fetches moderation statuses and returns the response data. When forceFresh is true, it cancels
    * any in-flight fetch for the current key and issues a new request instead of deduping onto
@@ -54,7 +54,7 @@ const soonestFutureEndMs = (map: TModerationTimeoutMap, nowMs: number): number |
 /**
  * Owns the moderation-timeout state, gated by the `useChatTimeouts` rollout. Seeds a timeout map
  * from `get-chat-moderation-statuses` — the response's `user_timeout_range` is a **user-level**
- * timeout that applies to every non–trusted-comms conversation, so we fetch it even with no
+ * timeout that applies to every conversation, so we fetch it even with no
  * conversation ids; `conversation_timeout_ranges` are per-conversation (callers pass the open
  * dialogs' channel ids). A realtime `FeatureIntervention` or acknowledgeable nudge refetches the
  * authoritative timeout rather than merging the notification payload into the store. A timer causes
@@ -188,9 +188,9 @@ export const useModerationTimeouts = (conversationIds: string[]): TUseModeration
   }, [timeoutMap, refreshModerationStatuses]);
 
   const resolveTimeout = useCallback(
-    (conversationId: string, moderationType: string | undefined): TResolvedTimeout =>
+    (conversationId: string): TResolvedTimeout =>
       useChatTimeouts
-        ? resolveConversationTimeout(conversationId, moderationType, timeoutMap, new Date())
+        ? resolveConversationTimeout(conversationId, timeoutMap, new Date())
         : NOT_TIMED_OUT,
     [useChatTimeouts, timeoutMap],
   );

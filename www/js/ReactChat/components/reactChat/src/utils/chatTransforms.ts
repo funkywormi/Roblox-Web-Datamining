@@ -342,15 +342,9 @@ export const applyPresences = (
 /** Layers moderation-timeout state (`isTimedOut` + `timeoutExpiresAtMs`) onto conversations. */
 export const applyModerationTimeouts = (
   conversations: TChatConversation[],
-  resolveTimeout: (
-    conversationId: string,
-    moderationType: string | undefined,
-  ) => { isTimedOut: boolean; expiresAtMs: number | null },
+  resolveTimeout: (conversationId: string) => { isTimedOut: boolean; expiresAtMs: number | null },
 ): TChatConversation[] =>
   conversations.map(conversation => {
-    const { isTimedOut, expiresAtMs } = resolveTimeout(
-      conversation.id,
-      conversation.moderationType,
-    );
+    const { isTimedOut, expiresAtMs } = resolveTimeout(conversation.id);
     return { ...conversation, isTimedOut, timeoutExpiresAtMs: expiresAtMs ?? undefined };
   });

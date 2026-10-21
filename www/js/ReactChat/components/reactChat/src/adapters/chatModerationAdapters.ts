@@ -1,5 +1,3 @@
-import { CHAT_MODERATION_TYPE } from "../constants/chatPolicyConstants";
-
 export type TModerationTimeoutRange = {
   start_time?: string;
   end_time?: string;
@@ -17,7 +15,7 @@ export type TChatModerationStatusesResponse = {
 };
 
 export type TModerationTimeoutMap = {
-  /** User-level timeout end (applies to every *moderated* conversation), or null. */
+  /** User-level timeout end (applies to every conversation), or null. */
   userTimedOutUntil: TModerationTimeoutActive | null;
   /** Per-conversation timeout ends, keyed by conversation id. */
   conversationTimedOutUntilById: Map<string, Date>;
@@ -83,21 +81,15 @@ export function buildModerationTimeoutMap(
 
 /**
  * Resolves the effective timeout for one conversation, honoring the scoping rules:
- * - trusted_comms conversations are exempt (never timed out);
- * - the user-level timeout applies to every moderated conversation;
+ * - the user-level timeout applies to every conversation, including unfiltered (trusted_comms) ones;
  * - a per-conversation timeout applies to its own id;
  * - when both are active, the one expiring later wins.
  */
 export function resolveConversationTimeout(
   conversationId: string,
-  moderationType: string | undefined,
   map: TModerationTimeoutMap,
   now: Date,
 ): TResolvedTimeout {
-  if (moderationType === CHAT_MODERATION_TYPE.trusted_comms) {
-    return { isTimedOut: false, expiresAtMs: null };
-  }
-
   const nowMs = now.getTime();
   const userUntil = map.userTimedOutUntil;
   const userMs =

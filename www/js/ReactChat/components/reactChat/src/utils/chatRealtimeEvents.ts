@@ -23,7 +23,7 @@ type TFeatureInterventionDetail = {
 /** Real-time moderation timeout (FeatureIntervention, type "timeout"). */
 export type TFeatureInterventionTimeoutDetail = TFeatureInterventionDetail & {
   type: "timeout";
-  /** Conversation to time out; absent ⇒ user-level (all moderated conversations). */
+  /** Conversation to time out; absent ⇒ user-level (all conversations). */
   conversationId?: string;
   /** Epoch ms the timeout ends. */
   endTimeMs: number;

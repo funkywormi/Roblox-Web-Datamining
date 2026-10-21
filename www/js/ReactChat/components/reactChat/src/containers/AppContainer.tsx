@@ -156,7 +156,7 @@ const AppContainer = () => {
   });
   // Fetch conversation-level timeouts only for conversations that are currently open dialogs.
   // The user-level timeout is fetched regardless (inside useModerationTimeouts) and applies to
-  // every non–trusted-comms conversation.
+  // every conversation.
   const openModerationIds = useMemo(
     () =>
       conversations

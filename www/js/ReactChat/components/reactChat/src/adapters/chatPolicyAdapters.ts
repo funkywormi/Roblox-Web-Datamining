@@ -73,12 +73,23 @@ export function deriveChatPolicyFlags(
   };
 }
 
+/**
+ * Whether to ask `get-chat-moderation-statuses` for this conversation's conversation-level
+ * timeout. This leans on two backend rules:
+ * 1. Only `source === "channels"` conversations can be queried by id (also true for
+ *    get-conversations and get-conversation-messages).
+ * 2. Only channels conversations can carry a conversation-level timeout: a conversation is
+ *    moderated when a message is sent in it, and sending upgrades it to a channels conversation.
+ * Unfiltered (trusted_comms) chats aren't special-cased: they go through the same source check as
+ * any other conversation. The user-level timeout is fetched separately and applies to every
+ * conversation, so skipping a conversation here never hides a user-level timeout.
+ *
+ * Follow-up: rule 1 is repeated across the chat code. Pull it into one shared policy for which
+ * network requests can be made for which conversations.
+ */
 export function canFetchModerationStatusesForConversation(conv: TChatApiConversation): boolean {
   const moderationType = conv.moderation_type?.toLowerCase();
   const source = conv.source?.toLowerCase();
-  if (moderationType === CHAT_MODERATION_TYPE.trusted_comms) {
-    return false;
-  }
   if (moderationType === CHAT_MODERATION_TYPE.moderated) {
     return true;
   }

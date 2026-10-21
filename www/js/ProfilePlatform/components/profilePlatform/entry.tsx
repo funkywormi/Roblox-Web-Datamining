@@ -46,11 +46,5 @@ ready(() => {
       </QueryClientProvider>,
       profilePlatformContainer,
     );
-
-    // Temporary fix to remove IDs from old profile tabs so that navigating to tabs
-    // via hrefs don't cause scrolling issues. This can be removed once old
-    // `profile-container` code is cleaned up.
-    document.querySelector("#about")?.removeAttribute("id");
-    document.querySelector("#creations")?.removeAttribute("id");
   }
 });

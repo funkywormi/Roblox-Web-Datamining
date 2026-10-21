@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import RealTime from "@rbx/core-scripts/realtime";
 import { useSystemFeedback } from "@rbx/core-ui";
-import ProfileTabsContainer from "./components/ProfileTabs/ProfileTabsContainer";
+import ProfileContent from "./components/ProfileContent";
 import UserProfileHeader from "./components/UserProfileHeader";
 import CurrentlyWearingAvatar from "./components/CurrentlyWearing/CurrentlyWearingAvatar";
 
@@ -24,14 +24,13 @@ const ProfilePlatformContainer = () => {
     profileType,
     profileSessionId,
     refreshProfilePlatform,
-    isActionsLoaded,
   } = useProfilePlatformContext();
   const { SystemFeedbackComponent } = useSystemFeedback();
   const firedPageLoadEvent = useRef(false);
   const gracefulDegradationEnabled = profileData?.gracefulDegradationEnabled ?? false;
 
   useEffect(() => {
-    if (isLoading || hasError || !profileData || !isActionsLoaded || firedPageLoadEvent.current) {
+    if (isLoading || hasError || !profileData || firedPageLoadEvent.current) {
       return;
     }
     firedPageLoadEvent.current = true;
@@ -47,16 +46,7 @@ const ProfilePlatformContainer = () => {
         authedUser?.id?.toString() === profileId,
       ),
     });
-  }, [
-    isLoading,
-    hasError,
-    profileData,
-    isActionsLoaded,
-    profileId,
-    profileType,
-    profileSessionId,
-    authedUser?.id,
-  ]);
+  }, [isLoading, hasError, profileData, profileId, profileType, profileSessionId, authedUser?.id]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -82,7 +72,7 @@ const ProfilePlatformContainer = () => {
       <SystemFeedbackComponent />
       <CurrentlyWearingAvatar />
       <UserProfileHeader gracefulDegradationEnabled={gracefulDegradationEnabled} />
-      {gracefulDegradationEnabled ? <GracefulDegradationBanner /> : <ProfileTabsContainer />}
+      {gracefulDegradationEnabled ? <GracefulDegradationBanner /> : <ProfileContent />}
     </div>
   );
 };
