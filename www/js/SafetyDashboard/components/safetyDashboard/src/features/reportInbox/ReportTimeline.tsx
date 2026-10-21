@@ -1,5 +1,5 @@
 import { Timeline, TimelineItem } from "@rbx/foundation-ui";
-import { Details } from "../../types/api";
+import { Details, ActivityStatus } from "../../types/api";
 import { formatReportDate } from "./util/dateTime";
 
 const ReportTimeline = ({ details }: { details: Details }) => {
@@ -14,7 +14,12 @@ const ReportTimeline = ({ details }: { details: Details }) => {
             key={activity.id}
             title={activity.title}
             description={activity.description}
-            icon="icon-regular-middle-dot"
+            // Only show a blank circle for the "currently reviewing your report" activity, checkmark for everything else
+            icon={
+              activity.status === ActivityStatus.Reviewing
+                ? "icon-regular-circle"
+                : "icon-filled-circle-check"
+            }
           >
             <span className="text-body-small">
               {activity.date && formatReportDate(activity.date)}

@@ -9,14 +9,13 @@ import React, {
 } from "react";
 import classNames from "classnames";
 import { sendEvent } from "@rbx/core-scripts/event-stream";
-import { useOnClickOutside } from "@rbx/core-scripts/react";
 import { useTranslations } from "@rbx/www-common/i18n";
-import { SearchLandingService } from "@rbx/core-scripts/legacy/Roblox";
-import { PageNameProvider } from "@rbx/core-scripts/util/page-name";
 import events from "../constants/searchEventStreamConstants";
 import NewSearchLinks from "./NewSearchLinks";
 import { Suggestion } from "../util/searchUtil";
 import NavIcon from "./NavIcon";
+import useOnClickOutside from "../hooks/useOnClickOutside";
+import { getNavCapability } from "../util/navCapabilities";
 
 export default function SearchInput({
   searchInput,
@@ -75,7 +74,7 @@ export default function SearchInput({
         searchInput,
         undefined,
         autocompleteSessionInfo,
-        PageNameProvider.getInternalPageName(),
+        getNavCapability("getInternalPageName")?.(),
       ),
     );
     isClearingInputRef.current = true;
@@ -126,11 +125,11 @@ export default function SearchInput({
   // jpark 3/4/2022 Avatar Shop Autocomplete is fully enabled - this check can be removed when this IXP test code is cleaned up
   const showNewSearchLinks = true;
 
-  useOnClickOutside<HTMLElement>([inputRef, dropdownRef, searchLandingRef], closeMenu);
+  useOnClickOutside([inputRef, dropdownRef, searchLandingRef], closeMenu);
 
   useEffect(() => {
     if (searchLandingRef.current) {
-      SearchLandingService.mountSearchLanding();
+      getNavCapability("searchLanding")?.mount();
     }
   }, [searchLandingRef]);
 

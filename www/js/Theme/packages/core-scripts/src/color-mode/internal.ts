@@ -203,7 +203,38 @@ export type InitializeOptions = {
   defaultColorMode?: ColorMode;
 };
 
+const updateBgImage = (bg: HTMLDivElement, path: string) => {
+  const shouldHaveBg = /^\/(?:[a-z]{2}\/)?(home|charts|my\/account)\/?$/.test(path);
+  if (shouldHaveBg) {
+    bg.classList.remove("hidden");
+  } else {
+    bg.classList.add("hidden");
+  }
+};
+
+const initializeThemeBackground = () => {
+  const bg = document.createElement("div");
+  bg.setAttribute("id", "theme-background");
+  let oldPath = window.location.pathname;
+  updateBgImage(bg, oldPath);
+  document.body.appendChild(bg);
+
+  const observer = new MutationObserver(() => {
+    const newPath = window.location.pathname;
+    if (oldPath !== newPath) {
+      oldPath = newPath;
+      updateBgImage(bg, newPath);
+    }
+  });
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+};
+
 export const initialize = (currentUserId: UserId | null, options: InitializeOptions = {}): void => {
+  initializeThemeBackground();
+
   const { classList } = document.body;
   // First, check for color mode classes added by the backend.
   if (classList.contains("color-mode-system") || classList.contains("system-theme")) {
@@ -261,6 +292,10 @@ export const initialize = (currentUserId: UserId | null, options: InitializeOpti
   }
 
   window.addEventListener("storage", storageEventListener);
+
+  if (classList.contains("theme-halloween-2026")) {
+    updateColorModeOverride("dark");
+  }
 };
 
 export const setColorMode = (colorMode: ColorMode): void => {

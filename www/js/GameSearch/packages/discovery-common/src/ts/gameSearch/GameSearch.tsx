@@ -6,7 +6,11 @@ import { TGameData, TMetaData, TPaginationMethod } from "../common/types/bedev1T
 import bedev2Services from "../common/services/bedev2Services";
 import { gameSearchPage } from "../common/constants/configConstants";
 import { PageContext } from "../common/types/pageContext";
-import { EventStreamMetadata, SessionInfoType } from "../common/constants/eventStreamConstants";
+import {
+  EventStreamMetadata,
+  OmniSearchType,
+  SessionInfoType,
+} from "../common/constants/eventStreamConstants";
 import {
   FeatureGamePage,
   CommonGameSorts,
@@ -95,6 +99,7 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
           ),
           ...getSponsoredAdImpressionsData(gameData, parsedViewedIndex),
           gameSetTypeId: analyticsTopicId,
+          omniSearchType: OmniSearchType.Games,
           componentType,
           suggestionKwd: keyword,
           suggestionReplacedKwd: metaData?.filteredKeyword || "",

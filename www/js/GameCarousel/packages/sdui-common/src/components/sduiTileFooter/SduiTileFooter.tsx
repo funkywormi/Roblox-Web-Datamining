@@ -14,6 +14,7 @@ import {
 } from "@rbx/sdui-core";
 import { SDUI_TILE_FOOTER_DEFAULTS } from "../../consts/defaults";
 import { ActionWrapper } from "../primitives/ActionWrapper";
+import { renderRobloxGlyphText } from "../primitives/RobloxGlyphText";
 
 export interface SduiTileFooterProps extends SduiRendererInjectedProps {
   // TODO: Support the remaining TileFooter schema features
@@ -56,12 +57,13 @@ export function SduiTileFooter({
   leftHeadingLevel,
   rightHeadingLevel,
 }: SduiTileFooterProps) {
+  const textColorClassName = buildFoundationTokenCss(textColor, "content") ?? textColor;
   const textClassName = clsx(
     "height-full",
     "width-full",
     "text-truncate-end",
     buildFoundationTokenCss(fontStyle) ?? fontStyle,
-    buildFoundationTokenCss(textColor, "content") ?? textColor,
+    textColorClassName,
   );
   const textStyle = { padding: 0 };
 
@@ -120,13 +122,14 @@ export function SduiTileFooter({
         "max-width-full",
         leftFlexClassName,
         textIconGapClassName,
+        textColorClassName,
       )}
       data-testid="tile-footer-left"
       style={{ ...(textIconGapPx != null ? { gap: textIconGapPx } : {}) }}
     >
       {leftIconNode}
       <LeftTextElement data-sdui-text="true" className={textClassName} style={textStyle}>
-        {leftText}
+        {renderRobloxGlyphText(leftText)}
       </LeftTextElement>
     </div>
   );
@@ -144,6 +147,7 @@ export function SduiTileFooter({
           "max-width-full",
           rightFlexClassName,
           textIconGapClassName,
+          textColorClassName,
         )}
         data-testid="tile-footer-right"
         style={{ ...(textIconGapPx != null ? { gap: textIconGapPx } : {}) }}
@@ -151,7 +155,7 @@ export function SduiTileFooter({
         {rightIconNode}
         {rightText && (
           <RightTextElement data-sdui-text="true" className={textClassName} style={textStyle}>
-            {rightText}
+            {renderRobloxGlyphText(rightText)}
           </RightTextElement>
         )}
       </div>

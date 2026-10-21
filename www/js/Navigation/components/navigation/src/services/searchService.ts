@@ -1,30 +1,17 @@
 import * as http from "@rbx/core-scripts/http";
 import searchConstants from "../constants/searchConstants";
 import { withApiMetrics } from "../topNav/observability";
+import type { TAvatarAutocompleteSuggestion, TGamesAutocompleteSuggestion } from "./searchTypes";
+
+export { GamesAutocompleteSuggestionEntryType } from "./searchTypes";
+export type {
+  TAvatarAutocompleteSuggestion,
+  TAvatarAutocompleteSuggestionEntry,
+  TGamesAutocompleteSuggestion,
+  TGamesAutocompleteSuggestionEntry,
+} from "./searchTypes";
 
 let cancelToken = http.createCancelToken();
-
-export enum GamesAutocompleteSuggestionEntryType {
-  GameSuggestion = 0,
-  QuerySuggestion = 1,
-  TrendingQuerySuggestion = 2,
-}
-
-export type TGamesAutocompleteSuggestionEntry = {
-  type: GamesAutocompleteSuggestionEntryType;
-  score: number;
-  universeId: number;
-  canonicalTitle: string;
-  thumbnailUrl: string;
-  searchQuery: string;
-  trendingSearchStartDateTime: string;
-};
-
-export type TGamesAutocompleteSuggestion = {
-  prefix: string;
-  algorithmName: string;
-  entries: TGamesAutocompleteSuggestionEntry[];
-};
 
 export const getSearchSuggestion = async (
   search: string,
@@ -68,16 +55,6 @@ export const postRequestSuggestion = async (
   );
 
   return data;
-};
-
-export type TAvatarAutocompleteSuggestion = {
-  Args: { Prefix: string; Limit: number; Algo: string | null };
-  Data: TAvatarAutocompleteSuggestionEntry[];
-};
-
-export type TAvatarAutocompleteSuggestionEntry = {
-  Query: string;
-  Score: number;
 };
 
 export const getAvatarRequestSuggestion = async (

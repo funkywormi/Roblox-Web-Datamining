@@ -2,7 +2,6 @@ import type { ComponentProps } from "react";
 import type { ValueOf } from "@rbx/core-types";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import type { Icon } from "@rbx/foundation-ui";
-import type { Namespace } from "@rbx/www-common/i18n";
 
 type FoundationIconName = ComponentProps<typeof Icon>["name"];
 
@@ -20,29 +19,11 @@ export const pageName = "downloadV2";
 
 export const installInstructionsDelayMs = 1000;
 
-/** The namespaces app-download's keys come from; every entry that renders its components provides them. */
-export const appDownloadNamespaces = [
-  "Feature.DownloadLanding",
-  "Common.VisitGame",
-] as const satisfies readonly Namespace[];
-
-/**
- * The namespaces DownloadDialog's keys come from: the gameLaunch component's list, so lookups match
- * the legacy merged map. Later entries win, as they did there.
- */
-export const downloadDialogNamespaces = [
-  "Feature.GameLaunchGuestMode",
-  "Common.VisitGame",
-  "CommonUI.Controls",
-  "Feature.ExperienceDetails",
-  "Feature.DownloadLanding",
-] as const satisfies readonly Namespace[];
-
-/** The namespaces LaunchFailureDialog's keys come from. */
-export const launchFailureDialogNamespaces = [
-  "Common.VisitGame",
-  "CommonUI.Controls",
-] as const satisfies readonly Namespace[];
+export {
+  appDownloadNamespaces,
+  downloadDialogNamespaces,
+  launchFailureDialogNamespaces,
+} from "./namespaces";
 
 export const downloadPageStrings = {
   downloadPageHeader: "Heading.DownloadPage",

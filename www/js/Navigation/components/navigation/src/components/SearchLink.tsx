@@ -1,18 +1,12 @@
 import { MouseEventHandler, useState } from "react";
 import ClassNames from "classnames";
 import { useTranslations } from "@rbx/www-common/i18n";
-
-import {
-  Thumbnail2d,
-  ThumbnailTypes,
-  DefaultThumbnailSize,
-  ThumbnailFormat,
-} from "@rbx/thumbnails";
 import {
   GamesAutocompleteSuggestionEntryType,
   TAvatarAutocompleteSuggestionEntry,
   TGamesAutocompleteSuggestionEntry,
-} from "../services/searchService";
+} from "../services/searchTypes";
+import { getNavCapability } from "../util/navCapabilities";
 import links, { UniversalSearchLink } from "../constants/linkConstants";
 import Link from "./NavLink";
 import NavIcon from "./NavIcon";
@@ -35,6 +29,7 @@ export function AutocompleteSearchLink({
   });
   const { type, universeId, searchQuery } = suggestion;
   const [isThumbnailVisible, setIsThumbnailVisible] = useState(false);
+  const GameIconThumbnail = getNavCapability("GameIconThumbnail");
 
   if (type === GamesAutocompleteSuggestionEntryType.GameSuggestion) {
     return (
@@ -61,16 +56,14 @@ export function AutocompleteSearchLink({
             })}
           >
             <span className="background-icon" />
-            <Thumbnail2d
-              type={ThumbnailTypes.gameIcon}
-              size={DefaultThumbnailSize}
-              targetId={universeId}
-              containerClass="thumbnail-icon"
-              format={ThumbnailFormat.jpeg}
-              onLoad={() => {
-                setIsThumbnailVisible(true);
-              }}
-            />
+            {GameIconThumbnail ? (
+              <GameIconThumbnail
+                universeId={universeId}
+                onLoad={() => {
+                  setIsThumbnailVisible(true);
+                }}
+              />
+            ) : null}
           </span>
         </Link>
       </li>

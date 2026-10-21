@@ -52,8 +52,16 @@ export interface RecommendedRule {
 /**
  * Report list types
  */
+export enum ActivityStatus {
+  Received = "received",
+  Violation = "violation",
+  NoViolation = "no_violation",
+  Reviewing = "reviewing",
+}
+
 export interface Activity {
   id: string;
+  status: ActivityStatus;
   title: string;
   date?: string;
   description?: string;

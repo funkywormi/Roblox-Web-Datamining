@@ -13,6 +13,8 @@ import { useAppDispatch } from "../../../../redux/hooks";
 import useStartOdpWizard from "../../../hooks/useStartOdpWizard";
 import RobuxTransferLimitsForm from "../shared/RobuxTransferLimitsForm";
 import RobuxSettingName from "../../../../../enums/RobuxSettingName";
+import { formInteractionOdpSetting } from "../../../services/eventServices/odpFamilyEventService";
+import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
 import { trackCounter } from "./observability";
 import { ParentZoneCounter } from "./observability/eventConstants";
 
@@ -36,6 +38,7 @@ export const OdpRobuxTransferLimits = (): React.JSX.Element => {
   const [childSettings, isChildSettingsLoading, isChildSettingsError] =
     useGetSettingsAndOptionsV2();
 
+  const { data: parentInfo } = useGetParentInfoQuery();
   useEffect(() => {
     trackCounter(ParentZoneCounter.PageShown, { page: RobuxSettingName.TransferLimits });
   }, []);
@@ -49,13 +52,20 @@ export const OdpRobuxTransferLimits = (): React.JSX.Element => {
   }, [isLoadError]);
 
   const saveTransferLimitsHandler = async (limits: TRobuxTransferLimitsInput): Promise<void> => {
+    const value = buildRobuxTransferLimitsConsentValue(limits);
+    formInteractionOdpSetting(
+      RobuxSettingName.TransferLimits,
+      UserSetting.robuxTransferLimits,
+      value,
+      parentInfo?.parents,
+    );
     await startOdpWizard({
       flow: {
         name: odpFlowName,
         props: {
           requestType: updateUserSettingRequestType,
           requestDetails: {
-            [UserSetting.robuxTransferLimits]: buildRobuxTransferLimitsConsentValue(limits),
+            [UserSetting.robuxTransferLimits]: value,
           },
           isOdpInitiated: true,
         },

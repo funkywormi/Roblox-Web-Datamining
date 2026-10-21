@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { useGetOdpChildContextQuery } from "../../../../apis/parentalControlsApi";
+import {
+  useGetOdpChildContextQuery,
+  useGetParentInfoQuery,
+} from "../../../../apis/parentalControlsApi";
 import { ManagementAction } from "../../../../../types/parentConsentsTypes";
 import useTopWeeklyGames from "../../../hooks/useTopWeeklyGames";
 import { parentZonePages } from "../../../constants/parentalControls/parentZonePages";
@@ -10,6 +13,7 @@ import GameDetailsSection, {
 } from "../shared/GameDetailsSection";
 import useManageOdpExperience from "./hooks/useManageOdpExperience";
 import ParentalControlsPageName from "../../../../../enums/parentalControls/ParentalControlsPageName";
+import { btnClickOdpManageExperience } from "../../../services/eventServices/odpFamilyEventService";
 import { trackCounter } from "./observability";
 import { ParentZoneCounter } from "./observability/eventConstants";
 
@@ -23,6 +27,7 @@ export const OdpTopGameDetails = (): JSX.Element | null => {
   const { universeId: universeIdParam } = useParams<{ universeId: string }>();
   const universeId = Number(universeIdParam);
 
+  const { data: parentInfo } = useGetParentInfoQuery();
   useEffect(() => {
     trackCounter(ParentZoneCounter.PageShown, { page: ParentalControlsPageName.TopGameDetails });
   }, [universeId]);
@@ -35,6 +40,12 @@ export const OdpTopGameDetails = (): JSX.Element | null => {
   const manageExperience = async (action: ManagementAction): Promise<TManageExperienceOutcome> => {
     if (!game) return ManageExperienceOutcome.Settled;
 
+    btnClickOdpManageExperience(
+      ParentalControlsPageName.TopGameDetails,
+      game.universeId,
+      action,
+      parentInfo?.parents,
+    );
     await manageOdpExperience(game.universeId, action);
     return ManageExperienceOutcome.Settled;
   };

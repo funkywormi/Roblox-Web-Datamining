@@ -1,12 +1,12 @@
 import { KeyboardEvent } from "react";
-import Intl from "@rbx/core-scripts/intl";
 import links, { UniversalSearchLink } from "../constants/linkConstants";
 import searchConstants from "../constants/searchConstants";
 import {
   GamesAutocompleteSuggestionEntryType,
   TAvatarAutocompleteSuggestionEntry,
   TGamesAutocompleteSuggestionEntry,
-} from "../services/searchService";
+} from "../services/searchTypes";
+import { getNavCapability } from "./navCapabilities";
 
 export type Suggestion =
   | TGamesAutocompleteSuggestionEntry
@@ -89,7 +89,7 @@ export const getSuggestionUrl = (
 };
 
 export const getAvatarAutocompleteLanguageCode = () => {
-  let locale = new Intl().getLocale();
+  let locale = getNavCapability("getLocale")?.() ?? searchConstants.englishLanguageCode;
   const regionChar = locale.indexOf("-");
   locale = locale.substring(0, regionChar !== -1 ? regionChar : locale.length);
   if (locale !== searchConstants.englishLanguageCode) {

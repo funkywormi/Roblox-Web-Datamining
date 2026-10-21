@@ -9,6 +9,9 @@ import parentalControlsTranslationConstants from "../../../constants/contentCons
 import { getProfileUrl } from "../../../constants/urlConstants";
 import useFriendReportUrl from "../../../hooks/useFriendReportUrl";
 import useManageOdpFriend from "./hooks/useManageOdpFriend";
+import ParentalControlsPageName from "../../../../../enums/parentalControls/ParentalControlsPageName";
+import { btnClickOdpManageFriend } from "../../../services/eventServices/odpFamilyEventService";
+import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
 
 export const OdpFriendListItem = ({
   friend,
@@ -22,6 +25,7 @@ export const OdpFriendListItem = ({
   canManageFriends: boolean;
 }): JSX.Element => {
   const { manageFriend } = useManageOdpFriend();
+  const { data: parentInfo } = useGetParentInfoQuery();
   const reportUrl = useFriendReportUrl(friend.id);
   const { friendManagement } = parentalControlsTranslationConstants;
 
@@ -31,7 +35,15 @@ export const OdpFriendListItem = ({
     size: "sm",
     actionButtonTextResourceId: friendManagement.block,
     neutralButtonTextResourceId: commonTranslationConstants.cancel,
-    onAction: () => manageFriend(friend.id, ManagementAction.Block),
+    onAction: () => {
+      btnClickOdpManageFriend(
+        ParentalControlsPageName.FriendManagement,
+        friend.id,
+        ManagementAction.Block,
+        parentInfo?.parents,
+      );
+      return manageFriend(friend.id, ManagementAction.Block);
+    },
   });
 
   return (

@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useQuery, QueryClientProvider } from "@tanstack/react-query";
 import classNames from "classnames";
-import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
+import { getCurrentUser } from "@rbx/www-common/user";
 import { Button } from "@rbx/foundation-ui";
 import { queryClient } from "@rbx/core-scripts/react";
 import * as NavigationService from "@rbx/navigation";
 import ExperimentationService from "@rbx/experimentation";
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import {
@@ -36,6 +37,12 @@ import ExperienceApprovalActionNeededButton from "./ExperienceApprovalActionNeed
 import ParentalControlsActionNeededButton from "./ParentalControlsActionNeededButton";
 import PurchaseButton from "./PurchaseButtonContainer";
 import { DemoButton } from "./DemoButton";
+import { PlayOnWebButton } from "./PlayOnWebButton";
+import {
+  getSecondaryPlayButton,
+  StackedPlayButtons,
+  type TSecondaryPlayButtonCase,
+} from "./SecondaryPlayButton";
 import UnplayableButton from "./UnplayableButton";
 import useLaunchGameWithPlayableUxTreatment from "../hooks/useLaunchGameWithPlayableUxTreatment";
 import usePurchaseProductData from "../hooks/usePurchaseProductData";
@@ -53,7 +60,7 @@ const getShowIdentityVerificationFlow = async (
     isUniverseEnabledForAvatarVideo: false,
   };
 
-  if (!authenticatedUser.isAuthenticated) {
+  if (getCurrentUser() === undefined) {
     return {
       elegibleToSeeVoiceUpsell: false,
       universePlaceVoiceEnabledSettings: defaultUniverseSettings,
@@ -142,6 +149,19 @@ const getJoindata = (launchDataFromProps?: string) => {
 
 const EMPTY_OBJECT = {} as const;
 
+// Primary statuses Play Demo may appear alongside.
+const demoPrimaryStatuses: ReadonlySet<TPlayabilityStatus> = new Set<TPlayabilityStatus>([
+  PlayabilityStatus.PurchaseRequired,
+  PlayabilityStatus.FiatPurchaseRequired,
+  PlayabilityStatus.FiatPurchaseDeviceRestricted,
+  PlayabilityStatus.ContextualPlayabilityRegionalAvailability,
+]);
+
+// Primary statuses Play on Web may appear alongside.
+const playOnWebPrimaryStatuses: ReadonlySet<TPlayabilityStatus> = new Set<TPlayabilityStatus>([
+  PlayabilityStatus.Playable,
+]);
+
 export type TPlayButtonProps = {
   universeId: string;
   placeId: string;
@@ -220,7 +240,7 @@ const PlayButtonContents = ({
         setUseCameraU13Design(showIdentityVerificationFlow.useCameraU13Design);
         setUseVoiceUpsellV2Design(showIdentityVerificationFlow.useVoiceUpsellV2Design);
       } catch {
-        window.EventTracker?.fireEvent(counterEvents.PlayButtonShowIdentificationError);
+        fireEvent(counterEvents.PlayButtonShowIdentificationError);
         setElegibleToSeeVoiceUpsell(false);
         setIsExperienceVoiceEnabled(false);
         setShowVerification(false);
@@ -379,6 +399,7 @@ export type TDefaultPlayButtonProps = {
     >
   >;
   pageContext: TPlayButtonPageContext;
+  playOnWebEnabled?: boolean;
 };
 
 export const DefaultPlayButton = ({
@@ -400,12 +421,11 @@ export const DefaultPlayButton = ({
   shouldShowVpcPlayButtonUpsells,
   playabilityStatusCtaOverrides,
   pageContext,
+  playOnWebEnabled,
 }: TDefaultPlayButtonProps): React.JSX.Element => {
-  const { fireEvent } = window.EventTracker ?? {};
-
   // Share the purchase button's product-data loading (react-query dedupes the
-  // fetch) so Play Demo is withheld until the purchase button is ready, rather
-  // than showing next to a spinner.
+  // fetch) so the secondary button is withheld until the purchase button is ready,
+  // rather than showing next to a spinner.
   const isPurchaseStatus =
     playabilityStatus === PlayabilityStatus.PurchaseRequired ||
     playabilityStatus === PlayabilityStatus.FiatPurchaseRequired;
@@ -415,38 +435,44 @@ export const DefaultPlayButton = ({
     productDetails,
   } = usePurchaseProductData(universeId, placeId, isPurchaseStatus);
 
-  const demoButton = demoModeAvailable ? (
-    <DemoButton
-      universeId={universeId}
-      placeId={placeId}
-      rootPlaceId={rootPlaceId}
-      privateServerLinkCode={privateServerLinkCode}
-      gameInstanceId={gameInstanceId}
-      eventProperties={eventProperties}
-      appsFlyerReferralProperties={appsFlyerReferralProperties}
-    />
-  ) : null;
+  // Secondary CTAs that can stack under the primary button. Each case lists the primary
+  // statuses it may appear alongside; the first enabled match is shown.
+  const secondaryPlayButtonCases: TSecondaryPlayButtonCase[] = [
+    {
+      isEnabled: Boolean(demoModeAvailable),
+      primaryStatuses: demoPrimaryStatuses,
+      render: () => (
+        <DemoButton
+          universeId={universeId}
+          placeId={placeId}
+          rootPlaceId={rootPlaceId}
+          privateServerLinkCode={privateServerLinkCode}
+          gameInstanceId={gameInstanceId}
+          eventProperties={eventProperties}
+          appsFlyerReferralProperties={appsFlyerReferralProperties}
+        />
+      ),
+    },
+    {
+      isEnabled: Boolean(playOnWebEnabled),
+      primaryStatuses: playOnWebPrimaryStatuses,
+      render: () => <PlayOnWebButton placeId={placeId} />,
+    },
+  ];
 
-  // Stack the primary button and Play Demo button when a demo is available.
-  // showDemo=false keeps the container but holds Play Demo back until the
-  // primary button has loaded.
-  const withDemoButton = (primaryButton: React.JSX.Element, showDemo = true): React.JSX.Element =>
-    demoButton ? (
-      <div className="stacked-play-buttons-container">
-        {primaryButton}
-        {showDemo && demoButton}
-      </div>
-    ) : (
-      primaryButton
-    );
+  let primaryButton: React.JSX.Element;
+  // Hides any secondary button while the primary button is still loading its data. (While
+  // playability itself loads, getSecondaryPlayButton already returns null.)
+  let isPrimaryButtonLoading = false;
 
   switch (playabilityStatus) {
     case undefined:
       if (!disableLoadingState) {
-        return <LoadingButton buttonClassName={buttonClassName} />;
+        primaryButton = <LoadingButton buttonClassName={buttonClassName} />;
+        break;
       }
 
-      return (
+      primaryButton = (
         <PlayButton
           universeId={universeId}
           placeId={placeId}
@@ -461,16 +487,18 @@ export const DefaultPlayButton = ({
           pageContext={pageContext}
         />
       );
+      break;
     // CTA overrides are currently only honored for GuestProhibited and Playable.
     // Other statuses keep their dedicated buttons; expand this if new use cases appear.
     case PlayabilityStatus.GuestProhibited:
     case PlayabilityStatus.Playable: {
       const ctaOverride = playabilityStatusCtaOverrides?.[playabilityStatus];
       if (ctaOverride !== undefined) {
-        return ctaOverride;
+        primaryButton = ctaOverride;
+        break;
       }
 
-      return (
+      primaryButton = (
         <PlayButton
           universeId={universeId}
           placeId={placeId}
@@ -485,11 +513,12 @@ export const DefaultPlayButton = ({
           pageContext={pageContext}
         />
       );
+      break;
     }
     case PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser:
     case PlayabilityStatus.ContextualPlayabilityAgeCheckRequired:
-      fireEvent?.(counterEvents.ActionNeeded);
-      return (
+      fireEvent(counterEvents.ActionNeeded);
+      primaryButton = (
         <AgeCheckNeededButton
           universeId={universeId}
           buttonClassName={buttonClassName}
@@ -497,24 +526,26 @@ export const DefaultPlayButton = ({
           pageContext={pageContext}
         />
       );
+      break;
     case PlayabilityStatus.PurchaseRequired:
     case PlayabilityStatus.FiatPurchaseRequired: {
-      // Fall back to an unplayable button (keeping Play Demo when available) when the purchase
-      // data is inadequate, e.g. FiatPurchaseRequired with no fiat pricing.
+      // Fall back to an unplayable button (keeping the secondary button when available) when the
+      // purchase data is inadequate, e.g. FiatPurchaseRequired with no fiat pricing.
       const hasAdequatePurchaseData =
         playabilityStatus === PlayabilityStatus.FiatPurchaseRequired
           ? Boolean(productDetails?.fiatPurchaseData)
           : Boolean(productInfo?.isForSale);
 
       if (!isPurchaseProductLoading && !hasAdequatePurchaseData) {
-        fireEvent?.(counterEvents.Unplayable);
+        fireEvent(counterEvents.Unplayable);
 
-        return withDemoButton(
-          <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />,
+        primaryButton = (
+          <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
         );
+        break;
       }
 
-      return withDemoButton(
+      primaryButton = (
         <PurchaseButton
           refetchPlayabilityStatus={refetchPlayabilityStatus}
           universeId={universeId}
@@ -525,22 +556,24 @@ export const DefaultPlayButton = ({
           playabilityStatus={playabilityStatus}
           showDefaultPurchaseText={showDefaultPurchaseText}
           pageContext={pageContext}
-        />,
-        !isPurchaseProductLoading,
+        />
       );
+      isPrimaryButtonLoading = isPurchaseProductLoading;
+      break;
     }
     case PlayabilityStatus.FiatPurchaseDeviceRestricted:
     case PlayabilityStatus.ContextualPlayabilityRegionalAvailability:
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
-      return withDemoButton(
-        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />,
+      primaryButton = (
+        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
       );
+      break;
     case PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls:
       if (shouldShowVpcPlayButtonUpsells) {
-        fireEvent?.(counterEvents.ActionNeeded);
+        fireEvent(counterEvents.ActionNeeded);
 
-        return (
+        primaryButton = (
           <ParentalControlsActionNeededButton
             universeId={universeId}
             buttonClassName={buttonClassName}
@@ -553,28 +586,36 @@ export const DefaultPlayButton = ({
             pageContext={pageContext}
           />
         );
+        break;
       }
 
       // If policy is false, fall back to unplayable behavior
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
-      return <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />;
+      primaryButton = (
+        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+      );
+      break;
     case PlayabilityStatus.ContextualPlayabilityRequireParentApproval:
       if (shouldShowVpcPlayButtonUpsells) {
-        fireEvent?.(counterEvents.ActionNeeded);
+        fireEvent(counterEvents.ActionNeeded);
 
-        return (
+        primaryButton = (
           <ExperienceApprovalActionNeededButton
             universeId={universeId}
             buttonClassName={buttonClassName}
             pageContext={pageContext}
           />
         );
+        break;
       }
 
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
-      return <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />;
+      primaryButton = (
+        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+      );
+      break;
     case PlayabilityStatus.UnplayableOtherReason:
     case PlayabilityStatus.GameUnapproved:
     case PlayabilityStatus.IncorrectConfiguration:
@@ -593,9 +634,22 @@ export const DefaultPlayButton = ({
     case PlayabilityStatus.ContextualPlayabilityAgeGatedByDescriptor:
     case PlayabilityStatus.ContextualPlayabilityExperienceBlockedParentalControls:
     case PlayabilityStatus.ContextualPlayabilityCoreGated:
+    case PlayabilityStatus.ContextualPlayabilityPlaytestDisabled:
+    case PlayabilityStatus.ContextualPlayabilityTrustedFriendRequired:
     default:
-      fireEvent?.(counterEvents.Unplayable);
+      fireEvent(counterEvents.Unplayable);
 
-      return <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />;
+      primaryButton = (
+        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+      );
+      break;
   }
+
+  return (
+    <StackedPlayButtons
+      primaryButton={primaryButton}
+      secondaryButton={getSecondaryPlayButton(secondaryPlayButtonCases, playabilityStatus)}
+      isPrimaryButtonLoading={isPrimaryButtonLoading}
+    />
+  );
 };

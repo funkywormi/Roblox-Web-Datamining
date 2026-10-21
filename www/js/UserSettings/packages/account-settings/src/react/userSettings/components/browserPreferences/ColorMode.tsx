@@ -1,26 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
+import { arrayIncludes } from "@rbx/core-lib";
 import { useTranslation } from "@rbx/core-scripts/react";
 import {
-  type Mode,
-  getMode as getModeGlobal,
-  setMode as setModeGlobal,
+  colorModes,
+  getColorMode as getColorModeGlobal,
+  setColorMode as setColorModeGlobal,
 } from "@rbx/core-scripts/color-mode";
 import { Dropdown, Menu, MenuSection, MenuItem } from "@rbx/foundation-ui";
-import { modeTranslations } from "../../constants/theme";
+import { colorModeTranslations } from "../../constants/theme";
 import accountInfoTranslationConstants from "../../constants/contentConstants/accountInfoTranslationConstants";
 
 const themeModeHeadingId = "app-theme-mode-heading";
 
-const isMode = (value: string): value is Mode => value in modeTranslations;
-
-export default function ColorModeSetting() {
+export default function ColorModeSetting({ disabled }: { disabled: boolean }) {
   const { translate } = useTranslation();
-  const [mode, setMode] = useState(getModeGlobal());
+  const [colorMode, setColorMode] = useState(getColorModeGlobal());
   const options = useMemo(
     () => (
       <Menu>
         <MenuSection>
-          {Object.entries(modeTranslations).map(([value, translationKey]) => (
+          {Object.entries(colorModeTranslations).map(([value, translationKey]) => (
             <MenuItem key={value} title={translate(translationKey)} value={value} />
           ))}
         </MenuSection>
@@ -30,7 +29,7 @@ export default function ColorModeSetting() {
   );
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      setMode(getModeGlobal());
+      setColorMode(getColorModeGlobal());
     });
     observer.observe(document.body, { attributeFilter: ["class"] });
     return () => {
@@ -49,17 +48,18 @@ export default function ColorModeSetting() {
         </p>
       </div>
       <Dropdown
-        value={mode}
+        value={colorMode}
         size="Large"
         placeholder=""
         className="fill basis-0"
+        isDisabled={disabled}
         ariaLabelledBy={themeModeHeadingId}
-        onValueChange={newMode => {
-          if (!isMode(newMode)) {
+        onValueChange={newColorMode => {
+          if (!arrayIncludes(colorModes, newColorMode)) {
             return;
           }
-          setModeGlobal(newMode);
-          setMode(getModeGlobal());
+          setColorModeGlobal(newColorMode);
+          setColorMode(getColorModeGlobal());
         }}
       >
         {options}

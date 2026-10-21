@@ -1,0 +1,97 @@
+import { RBX_THUMB_DEFAULTS } from "../consts/defaults";
+
+// rbxthumb URIs use the thumbnails API spelling.
+const THUMBNAIL_2D_TYPE_BY_RBXTHUMB_TYPE: Record<string, string> = {
+  // Thumbnail2d's caller enum spells this one value `AvatarHeadshot`
+  // then maps it back to the API.
+  AvatarHeadShot: "AvatarHeadshot",
+};
+
+export interface RbxThumbParams {
+  type: string;
+  targetId: number;
+  size: string;
+  includeBackground?: boolean;
+  includeProfileFrame?: boolean;
+}
+
+export type ParsedImageString =
+  | {
+      kind: "thumbnail";
+      thumbnail: RbxThumbParams;
+    }
+  | {
+      kind: "asset";
+      assetId: string;
+    };
+
+function readBooleanParam(params: URLSearchParams, ...keys: string[]): boolean | undefined {
+  for (const key of keys) {
+    const value = params.get(key);
+    if (value === "true") return true;
+    if (value === "false") return false;
+  }
+  return undefined;
+}
+
+/**
+ * Parses `rbxthumb://type=Asset&id=123&w=420&h=420` into Thumbnail2d props.
+ */
+export function parseRbxThumb(raw: string): RbxThumbParams | null {
+  if (!raw.startsWith("rbxthumb://")) return null;
+
+  const params = new URLSearchParams(raw.slice("rbxthumb://".length));
+  const rawType = params.get("type") ?? RBX_THUMB_DEFAULTS.type;
+  const id = params.get("id");
+  const width = params.get("w") ?? RBX_THUMB_DEFAULTS.width;
+  const height = params.get("h") ?? RBX_THUMB_DEFAULTS.height;
+  const includeBackground = readBooleanParam(params, "includeBackground");
+  const includeProfileFrame = readBooleanParam(
+    params,
+    "includeprofileframe",
+    "includeProfileFrame",
+  );
+
+  if (!id) return null;
+
+  const targetId = Number(id);
+  if (!Number.isFinite(targetId) || targetId === 0) return null;
+
+  return {
+    type: THUMBNAIL_2D_TYPE_BY_RBXTHUMB_TYPE[rawType] ?? rawType,
+    targetId,
+    size: `${width}x${height}`,
+    ...(includeBackground != null ? { includeBackground } : {}),
+    ...(includeProfileFrame != null ? { includeProfileFrame } : {}),
+  };
+}
+
+/**
+ * Parses `rbxassetid://93407147592241` into an asset id string.
+ */
+export function parseRbxAsset(raw: string): string | null {
+  if (!raw.startsWith("rbxassetid://")) return null;
+
+  const assetId = raw.slice("rbxassetid://".length);
+  const parsedAssetId = Number(assetId);
+  if (!assetId || !Number.isFinite(parsedAssetId) || parsedAssetId === 0) return null;
+
+  return assetId;
+}
+
+/**
+ * Parses supported Roblox image strings into render-ready image data.
+ */
+export function parseImageString(raw: string): ParsedImageString | null {
+  const thumbnail = parseRbxThumb(raw);
+  if (thumbnail) {
+    return { kind: "thumbnail", thumbnail };
+  }
+
+  const assetId = parseRbxAsset(raw);
+  if (assetId) {
+    return { kind: "asset", assetId };
+  }
+
+  return null;
+}

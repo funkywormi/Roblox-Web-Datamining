@@ -10,6 +10,7 @@ import {
   createImpressionContext,
   expandManagedList,
   isValidCollectionAnalyticsData,
+  materializeSduiComponentConfig,
   reportImpressions,
   type ItemAnalyticsData,
   type SduiComponentConfig,
@@ -37,6 +38,11 @@ export interface SduiCollectionCarouselProps extends SduiRendererInjectedProps {
   impressionEventName?: string;
   /** when true, skips the item impression log. */
   skipItemImpressionsLog?: boolean;
+  /**
+   * Off-screen item buffer for horizontal scroll windowing in `CollectionCarousel`.
+   * Default 6 in the library; pass `-1` to disable windowing via `disableWindowing`.
+   */
+  numItemsToRenderOffScreen?: number;
 }
 
 // TODO(ltao): migrate this wrapper onto the shared useSduiCollectionItems hook in a follow-up PR (carousel serves production traffic; keeping it untouched here).
@@ -54,6 +60,7 @@ export function SduiCollectionCarousel({
   numColumnsOverride,
   impressionEventName,
   skipItemImpressionsLog,
+  numItemsToRenderOffScreen,
 }: SduiCollectionCarouselProps) {
   const tokens = useTokens();
   const services = useSduiServices();
@@ -61,9 +68,16 @@ export function SduiCollectionCarousel({
 
   const itemsContainerRef = useRef<HTMLDivElement | null>(null);
   const [itemsPerRow, setItemsPerRow] = useState(-1);
-  const itemConfigs: SduiComponentConfig[] = items?.configs ?? [];
+  const itemConfigs = useMemo(() => items?.configs ?? [], [items?.configs]);
   const totalNumberOfItems = itemConfigs.length;
-  const isWideTiles = computeIsWideTiles(itemConfigs);
+  // Wide-tile layout reads props from the first item; materialize deferred shells first.
+  const isWideTiles = useMemo(() => {
+    const firstItem = itemConfigs[0];
+    if (firstItem != null) {
+      materializeSduiComponentConfig(firstItem);
+    }
+    return computeIsWideTiles(itemConfigs);
+  }, [itemConfigs]);
 
   const collectionAnalyticsData = useMemo(
     () =>
@@ -128,8 +142,14 @@ export function SduiCollectionCarousel({
 
   const renderItem = useCallback(
     (config: SduiComponentConfig, index: number, isVisible: boolean): React.JSX.Element => {
+      // Item analytics read config fields, so a deferred shell must be built first.
+      // The managed-list renderer materializes again, which is a no-op after this.
+      const materializedConfig = materializeSduiComponentConfig(config);
+      if (materializedConfig == null) {
+        return <React.Fragment key={index} />;
+      }
       itemAnalyticsDatasRef.current[index] = buildItemAnalyticsData(
-        config.analyticsContext,
+        materializedConfig.analyticsContext,
         index,
         pageContext,
         services.errorReporter,
@@ -142,7 +162,7 @@ export function SduiCollectionCarousel({
           // @ts-expect-error @types/react does not include the standard inert attribute yet.
           inert={isVisible ? undefined : ""}
         >
-          {items?.renderItem(config, index) ?? <React.Fragment key={index} />}
+          {items?.renderItem(materializedConfig, index) ?? <React.Fragment key={index} />}
         </div>
       );
     },
@@ -176,6 +196,10 @@ export function SduiCollectionCarousel({
         scrollArrowBoxShadowColor={tokens.Color.Common.Shadow}
         scrollArrowOffset={isWideTiles ? undefined : 0}
         thresholdFromEnd={scrollThresholdFromEnd}
+        numItemsToRenderOffScreen={
+          numItemsToRenderOffScreen === -1 ? undefined : numItemsToRenderOffScreen
+        }
+        disableWindowing={numItemsToRenderOffScreen === -1}
       />
     </div>
   );

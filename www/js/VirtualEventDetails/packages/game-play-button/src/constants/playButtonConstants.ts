@@ -59,6 +59,7 @@ const playButtonTextTranslationMap = {
   Unplayable: "PlayButtonText.Unavailable",
   Buy: "PlayButtonText.Buy",
   PlayDemo: "PlayButtonText.PlayDemo",
+  PlayOnWeb: "PlayButtonText.PlayOnWeb",
 };
 
 const counterEvents = {
@@ -97,6 +98,11 @@ const playButtonLayer = "Website.PlayButton";
 const ageCheckUpsellFeatureName = "TriggerAgeCheckUpsellIncludingVPC";
 const ageCheckUpsellNamespace = "core_content/CoreContent";
 
+const ampNamespaces = {
+  settingChange: "account_management/SettingsChange",
+  accountManagement: "account_management/AccountManagement",
+};
+
 const unlockPlayIntentConstants = {
   eventName: "unlockPlayIntent",
   ageCheckUpsellName: "AgeCheckRequired",
@@ -106,6 +112,8 @@ const unlockPlayIntentConstants = {
   fiatPurchaseUpsellName: "FiatPurchase",
   reconfirmLaunchModalUpsellName: "ReconfirmLaunchModal",
   experienceApprovalUpsellName: "ExperienceApproval",
+  updatePlaytestSettingsUpsellName: "UpdatePlaytestSettings",
+  trustedFriendRequiredUpsellName: "TrustedFriendRequired",
 };
 
 const playButtonUpsellContexts = {
@@ -136,4 +144,5 @@ export default {
   playButtonUpsellContexts,
   ageCheckUpsellFeatureName,
   ageCheckUpsellNamespace,
+  ampNamespaces,
 };

@@ -4,7 +4,7 @@ const searchConstants = {
   searchQueryParamName: "keyword",
 };
 
-const getKeyword = () => {
+export const getKeyword = () => {
   const { searchQueryParamName } = searchConstants;
   const currentUrl = window.location.search;
   const queries = parseQueryString(currentUrl.toLowerCase());

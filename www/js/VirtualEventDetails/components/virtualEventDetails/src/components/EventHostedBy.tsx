@@ -4,7 +4,10 @@ import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/legac
 import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
 import { Link } from "@rbx/core-ui/legacy/react-style-guide";
 
-import { BadgeSizes, VerifiedBadgeIconContainer } from "@rbx/roblox-badges";
+import VerifiedBadgeIcon, {
+  VERIFIED_BADGE_ARIA_LABEL,
+  VERIFIED_BADGE_ARIA_LABEL_KEY,
+} from "@rbx/www-common/components/verified-badge";
 import {
   EntrypointExposure,
   logCmntyEntrypointClickEvent,
@@ -32,13 +35,13 @@ function HostedBy({ host, translate }: { host?: Host } & WithTranslationsProps) 
   const entrypointImpressionId = useEntrypointImpressionId();
   const isCommunityHost = Boolean(host && host.hostType !== "user" && host.hostId);
 
-  const badgeToRender =
-    host?.hasVerifiedBadge && VerifiedBadgeIconContainer ? (
-      <VerifiedBadgeIconContainer
-        overrideImgClass="verified-badge-icon-header"
-        size={BadgeSizes.CAPTIONHEADER}
-      />
-    ) : null;
+  const badgeToRender = host?.hasVerifiedBadge ? (
+    <VerifiedBadgeIcon
+      size="Medium"
+      className="verified-badge-icon-header"
+      titleText={translate(VERIFIED_BADGE_ARIA_LABEL_KEY, undefined, VERIFIED_BADGE_ARIA_LABEL)}
+    />
+  ) : null;
 
   const hostedByContent = (
     <div className="hosted-by-content">

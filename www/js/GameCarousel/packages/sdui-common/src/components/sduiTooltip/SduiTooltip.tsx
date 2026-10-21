@@ -59,8 +59,9 @@ export function SduiTooltip({ title, text, side, align, anchor }: SduiTooltipPro
          * TODO: A long-term solution is needed to forward trigger props and refs
          * through the SDUI renderer.
          * pointer-events-auto: game tiles set pointer-events: none on the footer
-         * and only restore it for links and buttons. This span is the hover target. */}
-        <span className="pointer-events-auto" data-testid="sdui-tooltip-trigger">
+         * and only restore it for links and buttons. This span is the hover target.
+         * inline-flex: sizes the wrapper to the anchor instead of the text line height. */}
+        <span className="pointer-events-auto inline-flex" data-testid="sdui-tooltip-trigger">
           {anchor}
         </span>
       </TooltipTrigger>

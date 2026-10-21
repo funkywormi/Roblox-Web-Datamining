@@ -3,7 +3,7 @@ import React, { Ref, useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Link } from "@rbx/core-ui";
 import { TranslateFunction } from "@rbx/core-scripts/react";
 import { AbuseReportDialog, prefetchAbuseUI } from "@rbx/abuse-report-ui";
-import { ABUSE_VECTOR_PLACE } from "../constants/abuseReportConstants";
+import { ABUSE_VECTOR_GAME_TILE } from "../constants/abuseReportConstants";
 import configConstants from "../constants/configConstants";
 import { FeaturePlacesList } from "../constants/translationConstants";
 import useFocused from "../hooks/useFocused";
@@ -395,7 +395,7 @@ const WideGameTile = React.forwardRef(
     useEffect(() => {
       if (overflowMenuOpen && canReportExperience && reportExperienceAttributes) {
         prefetchAbuseUI({
-          abuseVector: ABUSE_VECTOR_PLACE,
+          abuseVector: ABUSE_VECTOR_GAME_TILE,
           attributes: reportExperienceAttributes,
         });
       }
@@ -510,7 +510,7 @@ const WideGameTile = React.forwardRef(
             </WideGameTileLinkWrapper>
             {canReportExperience && reportExperienceAttributes && (
               <AbuseReportDialog
-                abuseVector={ABUSE_VECTOR_PLACE}
+                abuseVector={ABUSE_VECTOR_GAME_TILE}
                 attributes={reportExperienceAttributes}
                 analyticsTargetId={reportExperienceAttributes.targetId}
                 open={isReportExperienceDialogOpen}

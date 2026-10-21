@@ -1,4 +1,5 @@
-import localStorage from "@rbx/core-scripts/local-storage";
+import { getItem, setItem } from "@rbx/core-lib/local-storage";
+import "../constants/localStorageRegistry";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 
 /** Which referral nav entry a badge belongs to. A user sees only one of the two at a time. */
@@ -24,7 +25,7 @@ const entryKey = (entry: ReferralNavEntry): string =>
 const readClickCounts = (): ClickCounts => {
   let stored: unknown;
   try {
-    stored = localStorage.getLocalStorage(localStorageKey);
+    stored = getItem(localStorageKey);
   } catch {
     // Unparseable value written by an older client, or storage unavailable.
     return {};
@@ -61,7 +62,7 @@ export const recordReferralNavClick = (entry: ReferralNavEntry): void => {
   counts[key] = (typeof count === "number" ? count : 0) + 1;
 
   try {
-    localStorage.setLocalStorage(localStorageKey, { data: counts });
+    setItem(localStorageKey, { data: counts });
   } catch {
     // Storage full or unavailable. This runs before the click handler opens the invite sheet, so
     // a throw here would make the entry look dead; badge bookkeeping is best-effort either way.

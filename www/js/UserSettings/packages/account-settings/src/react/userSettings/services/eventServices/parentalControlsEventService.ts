@@ -18,7 +18,10 @@ import birthdayUtils from "../../utils/birthdayUtils";
 import { optionToString } from "../../utils/parentalControls/parentalConsentUtils";
 import settingsJourneyService from "../journeys/settingsJourneyService";
 import { pageLoadOdpParentSettings } from "./odpParentSettingsEventService";
-import { pageLoadOdpParentZoneLandingPage } from "./odpFamilyEventService";
+import {
+  pageLoadOdpParentZoneLandingPage,
+  pageLoadOdpParentZonePage,
+} from "./odpFamilyEventService";
 import { baseParentalControlsPath } from "../../constants/parentalControls/parentalControlsConstants";
 
 const parentalControlsChildState = (child: TChildSettingsInfo): string => {
@@ -682,11 +685,22 @@ export const sendParentalControlsOdpPageloadEvent = (
     return;
   }
   const page = parentZonePages.find(p => matchPath(pathname, { path: p.path, exact: true }));
-  switch (page?.name) {
+  if (!page) {
+    return;
+  }
+  switch (page.name) {
     case ParentalControlsPageName.ManageOnDeviceParent:
       pageLoadOdpParentSettings(parents);
       break;
+    case ParentalControlsPageName.TopGameDetails: {
+      const universeId = Number(pathname.split("/").pop());
+      if (Number.isFinite(universeId)) {
+        pageLoadOdpParentZonePage(page.name, parents, universeId);
+      }
+      break;
+    }
     default:
+      pageLoadOdpParentZonePage(page.name, parents);
   }
 };
 

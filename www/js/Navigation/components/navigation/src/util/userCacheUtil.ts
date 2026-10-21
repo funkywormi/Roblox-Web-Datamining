@@ -1,4 +1,5 @@
-import localStorageService from "@rbx/core-scripts/local-storage";
+import { getItem, setItem } from "@rbx/core-lib/local-storage";
+import "../constants/localStorageRegistry";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { userCacheKey } from "../constants/cacheConstants";
 import layoutConstants from "../constants/layoutConstants";
@@ -10,7 +11,7 @@ export const cacheUserId = () => {
   const currentUserId = authenticatedUser()?.id?.toString() ?? null;
   let cachedUserId: string | null = null;
   try {
-    const cached = localStorageService.getLocalStorage(userCacheKey) ?? null;
+    const cached = getItem(userCacheKey) ?? null;
     if (typeof cached === "string") {
       cachedUserId = cached;
     }
@@ -23,13 +24,13 @@ export const cacheUserId = () => {
       window.location.href,
     );
   }
-  localStorageService.setLocalStorage(userCacheKey, currentUserId);
+  setItem(userCacheKey, currentUserId);
 
   // listen for login event
   window.addEventListener(loginEvent.name, e => {
     const { userId } = (e as unknown as { detail: { userId?: string } }).detail;
     if (userId != null) {
-      localStorageService.setLocalStorage(userCacheKey, userId);
+      setItem(userCacheKey, userId);
     }
   });
 
@@ -37,7 +38,7 @@ export const cacheUserId = () => {
   window.addEventListener(signupEvent.name, e => {
     const { userId } = (e as unknown as { detail: { userId?: string } }).detail;
     if (userId != null) {
-      localStorageService.setLocalStorage(userCacheKey, userId);
+      setItem(userCacheKey, userId);
     }
   });
 };

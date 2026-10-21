@@ -264,5 +264,9 @@
     "Label.QualityReducedExposure": "Quality reduced exposure",
     "Label.VideoQuality": "Video quality",
     "Label.DiscoveryContentQualityCategory": "Discovery Content Quality",
-    "Chat.Disclaimer.AIConversationMayMakeMistakes": "This is an AI-powered conversation. It may make mistakes."
+    "Chat.Disclaimer.AIConversationMayMakeMistakes": "This is an AI-powered conversation. It may make mistakes.",
+    "Label.DeveloperID": "Developer ID",
+    "Label.VideoID": "Video ID",
+    "Response.InvalidDeveloperID": "Please enter a valid Developer ID.",
+    "Response.InvalidVideoID": "Please enter a valid Video ID."
 }

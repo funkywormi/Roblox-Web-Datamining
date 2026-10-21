@@ -41,12 +41,14 @@ export const logGroupPageClickEvent = ({
   clickTargetType,
   clickTargetId,
   hasRichText,
+  enterFrom,
 }: {
   groupId?: number;
   clickTargetType: string;
   clickTargetId?: string;
   hasRichText?: boolean;
   context: string;
+  enterFrom?: string;
 }): void => {
   const {
     pageRoute,
@@ -64,6 +66,7 @@ export const logGroupPageClickEvent = ({
       sessionId: getImpressionId(),
       ...(clickTargetId && { clickTargetId }),
       ...(hasRichText && { hasRichText }),
+      ...(enterFrom && { enterFrom }),
     }),
   );
 };
@@ -206,6 +209,153 @@ export const logCmntySearchResultsReturnedEvent = ({
   );
 };
 
+// Value sets the forums-search protos document as string fields, enforced at the call site.
+export type SearchSurface = "communitiesSearch" | "forumsSearch";
+export type ForumsSearchMode = "text" | "member" | "filtersOnly";
+export type ForumsSearchTrigger = "search" | "reset" | "navigation";
+export type ForumsSearchResultType = "Post" | "Comment";
+export type ForumsSearchContentType = "Any" | "Post" | "Comment";
+export type ForumsSearchTimeRange = "day" | "week" | "month" | "all";
+
+export type ForumsSearchResultItem = {
+  resultType: ForumsSearchResultType;
+  postId: string;
+  commentId?: string;
+  positionInList: number;
+  positionOnPage: number;
+};
+
+export const logCmntyForumsSearchConductedEvent = ({
+  searchId,
+  groupId,
+  surface,
+  searchMode,
+  searchKeyword,
+  isMemberSearch,
+  searchTrigger,
+  contentType,
+  timeRange,
+  categoryScope,
+}: {
+  searchId: string;
+  groupId: number;
+  surface: SearchSurface;
+  searchMode: ForumsSearchMode;
+  searchKeyword: string;
+  isMemberSearch: boolean;
+  searchTrigger: ForumsSearchTrigger;
+  contentType: ForumsSearchContentType;
+  timeRange: ForumsSearchTimeRange;
+  categoryScope: string;
+}): void => {
+  const { pageRoute, locationTab } = getCommonParams(
+    window.location.hash,
+    window.location.pathname,
+  );
+
+  CommunityEventStream.sendEvent(
+    CommunityMetric.CmntyForumsSearchConducted({
+      searchId,
+      groupId,
+      surface,
+      searchMode,
+      searchKeyword,
+      isMemberSearch,
+      searchTrigger,
+      contentType,
+      timeRange,
+      categoryScope,
+      pageRoute,
+      locationTab,
+      sessionId: getImpressionId(),
+    }),
+  );
+};
+
+export const logCmntyForumsSearchResultsReturnedEvent = ({
+  searchId,
+  groupId,
+  surface,
+  totalResults,
+  pageIndex,
+  hasMore,
+  results,
+}: {
+  searchId: string;
+  groupId: number;
+  surface: SearchSurface;
+  totalResults: number;
+  pageIndex: number;
+  hasMore: boolean;
+  results: ForumsSearchResultItem[];
+}): void => {
+  const { pageRoute, locationTab } = getCommonParams(
+    window.location.hash,
+    window.location.pathname,
+  );
+
+  CommunityEventStream.sendEvent(
+    CommunityMetric.CmntyForumsSearchResultsReturned({
+      searchId,
+      groupId,
+      surface,
+      totalResults,
+      pageIndex,
+      hasMore,
+      resultsInPage: results.length,
+      resultsReturned: JSON.stringify(results),
+      pageRoute,
+      locationTab,
+      sessionId: getImpressionId(),
+    }),
+  );
+};
+
+export const logCmntyForumsSearchResultClickedEvent = ({
+  searchId,
+  groupId,
+  surface,
+  resultType,
+  postId,
+  commentId,
+  positionInList,
+  positionOnPage,
+  pageIndex,
+}: {
+  searchId: string;
+  groupId: number;
+  surface: SearchSurface;
+  resultType: ForumsSearchResultType;
+  postId: string;
+  commentId?: string;
+  positionInList: number;
+  positionOnPage: number;
+  pageIndex: number;
+}): void => {
+  const { pageRoute, locationTab } = getCommonParams(
+    window.location.hash,
+    window.location.pathname,
+  );
+
+  CommunityEventStream.sendEvent(
+    CommunityMetric.CmntyForumsSearchResultClicked({
+      searchId,
+      groupId,
+      surface,
+      resultType,
+      postId,
+      positionInList,
+      positionOnPage,
+      pageIndex,
+      // proto3 has no null; an absent comment is the empty string.
+      commentId: commentId ?? "",
+      pageRoute,
+      locationTab,
+      sessionId: getImpressionId(),
+    }),
+  );
+};
+
 export const logGroupForumsClickEvent = ({
   groupId,
   clickTargetType,
@@ -224,4 +374,129 @@ export const logGroupForumsClickEvent = ({
     hasRichText,
     context: GROUP_FORUMS_CONTEXT,
   });
+};
+
+export type ForumContentType = "post" | "comment" | "reply";
+
+export const logCmntyForumsConcealedContentShownEvent = ({
+  groupId,
+  contentType,
+  concealedCount,
+  concealmentImpressionId,
+}: {
+  groupId?: number;
+  contentType: ForumContentType;
+  concealedCount: number;
+  concealmentImpressionId: string;
+}): void => {
+  const {
+    pageRoute,
+    locationTab,
+    groupId: groupIdFromRoute,
+  } = getCommonParams(window.location.hash, window.location.pathname);
+
+  CommunityEventStream.sendEvent(
+    CommunityMetric.CmntyForumsConcealedContentShown({
+      groupId: groupId ?? groupIdFromRoute,
+      contentType,
+      concealedCount,
+      concealmentImpressionId,
+      pageRoute,
+      locationTab,
+      sessionId: getImpressionId(),
+    }),
+  );
+};
+
+export const logCmntyForumsConcealedContentRevealedEvent = ({
+  groupId,
+  contentType,
+  concealedCount,
+  concealmentImpressionId,
+}: {
+  groupId?: number;
+  contentType: ForumContentType;
+  concealedCount: number;
+  concealmentImpressionId: string;
+}): void => {
+  const {
+    pageRoute,
+    locationTab,
+    groupId: groupIdFromRoute,
+  } = getCommonParams(window.location.hash, window.location.pathname);
+
+  CommunityEventStream.sendEvent(
+    CommunityMetric.CmntyForumsConcealedContentRevealed({
+      groupId: groupId ?? groupIdFromRoute,
+      contentType,
+      concealedCount,
+      concealmentImpressionId,
+      pageRoute,
+      locationTab,
+      sessionId: getImpressionId(),
+    }),
+  );
+};
+
+export const logCmntyForumsDeleteDialogShownEvent = ({
+  groupId,
+  contentType,
+  preventSimilarShown,
+  deleteDialogImpressionId,
+}: {
+  groupId?: number;
+  contentType: ForumContentType;
+  preventSimilarShown: boolean;
+  deleteDialogImpressionId: string;
+}): void => {
+  const {
+    pageRoute,
+    locationTab,
+    groupId: groupIdFromRoute,
+  } = getCommonParams(window.location.hash, window.location.pathname);
+
+  CommunityEventStream.sendEvent(
+    CommunityMetric.CmntyForumsDeleteDialogShown({
+      groupId: groupId ?? groupIdFromRoute,
+      contentType,
+      preventSimilarShown,
+      deleteDialogImpressionId,
+      pageRoute,
+      locationTab,
+      sessionId: getImpressionId(),
+    }),
+  );
+};
+
+export const logCmntyForumsDeleteConfirmEvent = ({
+  groupId,
+  contentType,
+  preventSimilarShown,
+  preventSimilar,
+  deleteDialogImpressionId,
+}: {
+  groupId?: number;
+  contentType: ForumContentType;
+  preventSimilarShown: boolean;
+  preventSimilar: boolean;
+  deleteDialogImpressionId: string;
+}): void => {
+  const {
+    pageRoute,
+    locationTab,
+    groupId: groupIdFromRoute,
+  } = getCommonParams(window.location.hash, window.location.pathname);
+
+  CommunityEventStream.sendEvent(
+    CommunityMetric.CmntyForumsDeleteConfirm({
+      groupId: groupId ?? groupIdFromRoute,
+      contentType,
+      preventSimilarShown,
+      preventSimilar,
+      deleteDialogImpressionId,
+      pageRoute,
+      locationTab,
+      sessionId: getImpressionId(),
+    }),
+  );
 };

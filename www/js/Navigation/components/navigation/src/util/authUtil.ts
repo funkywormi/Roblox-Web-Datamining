@@ -1,7 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Should be removed / fixed once React Chat is out
 import angular from "angular";
-import localStorageService from "@rbx/core-scripts/local-storage";
+import { setItem } from "@rbx/core-lib/local-storage";
+import "../constants/localStorageRegistry";
 import * as http from "@rbx/core-scripts/http";
 import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
 import { handleLogoutUpsell } from "@rbx/authentication";
@@ -31,7 +32,7 @@ const logoutAndRedirect = () =>
     }
 
     // clear cached user id
-    localStorageService.setLocalStorage(userCacheKey, null);
+    setItem(userCacheKey, null);
 
     // NOTE: we should not delete keyPairs upon logout.
     // TODO: delete CrpytoKey in indexeddb when all users are signed out.
@@ -67,7 +68,7 @@ const openAccountSwitcher = () => {
   sendSwitchAccountButtonClickEvent(window.location.href);
 
   // clear cached user id
-  localStorageService.setLocalStorage(userCacheKey, null);
+  setItem(userCacheKey, null);
 
   // destroy chat cookie after account switching
   if (!angular.isUndefined(angular.element("#chat-container").scope())) {
@@ -78,10 +79,7 @@ const openAccountSwitcher = () => {
   const containerId = "navigation-account-switcher-container";
 
   const switchAccountAndGoToHomePage = () => {
-    localStorageService.setLocalStorage(
-      layoutConstants.accountSwitchConfirmationKeys.accountSwitchedFlag,
-      true,
-    );
+    setItem(layoutConstants.accountSwitchConfirmationKeys.accountSwitchedFlag, true);
     window.location.href = getHomeUrl();
   };
 

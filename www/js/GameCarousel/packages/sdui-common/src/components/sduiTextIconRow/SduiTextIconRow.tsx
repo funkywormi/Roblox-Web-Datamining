@@ -8,6 +8,7 @@ import {
   type SduiRendererInjectedProps,
   type SduiTokenOrLiteral,
 } from "@rbx/sdui-core";
+import { renderRobloxGlyphText, stripRobloxGlyphs } from "../primitives/RobloxGlyphText";
 
 export interface SduiTextIconRowProps extends SduiRendererInjectedProps {
   // TODO: Support the remaining TextIconRow schema features
@@ -43,7 +44,7 @@ export function SduiTextIconRow({
         icon != null && buildFoundationTokenCss(gapToken, "gap"),
       )}
       style={icon != null ? buildSduiNumericStyle(gap, px => ({ gap: px })) : {}}
-      aria-label={text}
+      aria-label={text != null ? stripRobloxGlyphs(text) : undefined}
     >
       <TextElement
         data-sdui-text="true"
@@ -58,7 +59,7 @@ export function SduiTextIconRow({
         )}
         style={{ padding: 0 }}
       >
-        {text}
+        {text != null ? renderRobloxGlyphText(text) : null}
       </TextElement>
       {icon != null ? (
         <span

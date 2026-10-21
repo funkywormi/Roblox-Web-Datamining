@@ -43,20 +43,6 @@ type Has<N extends Namespace> = (key: string) => key is TranslationKey<N>;
 type TranslateDynamic = (key: string, values?: TranslationValues, fallback?: string) => string;
 
 /**
- * Translates a full `Namespace.Key` string (the namespace is the first two segments). The third
- * argument is returned when the key is missing; when it is omitted, the result is `""`.
- */
-export type FullKeyTranslator = (
-  key: string,
-  values?: TranslationValues,
-  fallback?: string,
-) => string;
-
-export type FullKeyTranslations = {
-  translateFullKey: FullKeyTranslator;
-};
-
-/**
  * Renders a legacy `{tagStart}...{tagEnd}` string. `key` may be a catalogue key or a runtime
  * string. A missing key or malformed segment is tracked and renders nothing.
  */
@@ -65,6 +51,32 @@ type TranslateHtml<N extends Namespace> = (
   tags: readonly HtmlTag[],
   values?: Record<string, string | number | Date>,
 ) => ReactNode;
+
+/**
+ * Renders a legacy `{tagStart}...{tagEnd}` string for a full `Namespace.Key`. A missing key or
+ * malformed segment is tracked and renders nothing.
+ */
+type TranslateFullKeyHtml = (
+  key: string,
+  tags: readonly HtmlTag[],
+  values?: Record<string, string | number | Date>,
+) => ReactNode;
+
+/**
+ * Translates a full `Namespace.Key` string (the namespace is the first two segments). The third
+ * argument is returned when the key is missing; when it is omitted, the result is `""`.
+ */
+export type FullKeyTranslator = ((
+  key: string,
+  values?: TranslationValues,
+  fallback?: string,
+) => string) & {
+  html: TranslateFullKeyHtml;
+};
+
+export type FullKeyTranslations = {
+  translateFullKey: FullKeyTranslator;
+};
 
 export type Translator<N extends Namespace> = Translate<N> & {
   rich: TranslateRich<N>;
@@ -150,7 +162,7 @@ export const adaptFullKeyTranslator = (translator: unknown): FullKeyTranslator =
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const untyped = translator as UntypedTranslator;
 
-  return (fullKey, values, fallback = "") => {
+  const translateFullKey = (fullKey: string, values?: TranslationValues, fallback = "") => {
     const resolved = toFullKeyPath(fullKey);
     if (!resolved) {
       trackTranslationError("TranslationKeyNotFound", fullKey, fullKey);
@@ -164,4 +176,25 @@ export const adaptFullKeyTranslator = (translator: unknown): FullKeyTranslator =
 
     return untyped(resolved.path, values);
   };
+
+  const html: TranslateFullKeyHtml = (fullKey, tags, values) => {
+    const resolved = toFullKeyPath(fullKey);
+    if (!resolved) {
+      trackTranslationError("TranslationKeyNotFound", fullKey, fullKey);
+      return null;
+    }
+
+    if (!untyped.has(resolved.path)) {
+      trackTranslationError("TranslationKeyNotFound", resolved.namespace, resolved.key);
+      return null;
+    }
+
+    const result = renderHtml(interpolated => untyped(resolved.path, interpolated), tags, values);
+    if (result == null) {
+      trackTranslationError("TranslationMalformed", resolved.namespace, resolved.key);
+    }
+    return result;
+  };
+
+  return Object.assign(translateFullKey, { html });
 };

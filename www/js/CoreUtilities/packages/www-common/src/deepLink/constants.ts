@@ -48,6 +48,7 @@ export enum PathPart {
   PlusReferralDashboard = "plus_referral_dashboard",
   PlusSubscribe = "plus_subscribe",
   PlusWebview = "plus_webview",
+  AcceptGift = "accept_gift",
 }
 
 export enum ItemType {

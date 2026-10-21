@@ -1,7 +1,6 @@
 "use client";
 import { useMemo, type CSSProperties } from "react";
 import { clsx } from "clsx";
-import domPurify from "dompurify";
 import {
   buildFoundationTokenCss,
   buildPositionAndAnchorPointCss,
@@ -18,11 +17,8 @@ import {
   type SduiRendererInjectedProps,
   type SduiVector2,
 } from "@rbx/sdui-core";
-
-const DOM_PURIFY_CONFIG = {
-  ALLOWED_TAGS: ["em", "i", "strong", "b", "u", "a", "br"],
-  ALLOWED_ATTR: ["href", "target", "rel"],
-};
+import { renderRobloxGlyphText } from "@rbx/sdui-common";
+import { renderSanitizedRichText } from "./sanitizedRichText";
 
 function textTruncateClass(mode: ReturnType<typeof parseTextTruncate>): string {
   return mode == null ? "text-truncate-end" : buildTextTruncateCss(mode);
@@ -109,19 +105,14 @@ export function SduiText({
     textXAlignmentMode != null && buildTextXAlignmentCss(textXAlignmentMode),
   );
 
-  const sanitizedHtml = useMemo(
-    () => (isRenderedText ? domPurify.sanitize(text, DOM_PURIFY_CONFIG) : undefined),
+  const content = useMemo(
+    () => (isRenderedText ? renderSanitizedRichText(text) : renderRobloxGlyphText(text)),
     [text, isRenderedText],
   );
 
   return (
     <Element data-testid="sdui-text" className={parentClassName} style={style}>
-      {sanitizedHtml != null ? (
-        // eslint-disable-next-line react/no-danger -- DOMPurify strips everything outside DOM_PURIFY_CONFIG
-        <span className={contentClassName} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
-      ) : (
-        <span className={contentClassName}>{text}</span>
-      )}
+      <span className={contentClassName}>{content}</span>
     </Element>
   );
 }

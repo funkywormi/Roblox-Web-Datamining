@@ -20,13 +20,14 @@ export const plusThemes = [
   "pixel-pop",
   "quantum-pulse",
   "classic",
+  "halloween-2026",
 ] as const;
 
 /* Themes that only plus users can switch to. */
 export type PlusTheme = (typeof plusThemes)[number];
 
 /* Themes that non-plus and plus users can switch to. */
-export const freeThemes = ["default"] as const;
+export const freeThemes = ["default", "halloween-2026"] as const;
 
 /* Themes that non-plus and plus users can switch to. */
 export type FreeTheme = (typeof freeThemes)[number];

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
 import { CurrentUser, Endpoints } from "@rbx/core-scripts/legacy/Roblox";
 import { translation } from "../translation.config";
@@ -144,6 +144,11 @@ function App() {
     fetchEventData();
   }, [eventId]);
 
+  const eventStatus = eventDetails?.eventStatus;
+  const imgSrc = useMemo(() => {
+    return (eventStatus !== EVENT_STATUS.MODERATED && heroThumbnailUrl) || fallbackUrl.default;
+  }, [eventStatus, heroThumbnailUrl]);
+
   if (isLoading) {
     return (
       <div className="virtual-event-detail-container">
@@ -171,9 +176,9 @@ function App() {
             ? eventDetails.eventCategories[0].category
             : ""
         }
-        eventStatus={eventDetails?.eventStatus}
+        eventStatus={eventStatus}
         userRsvpStatus={eventDetails?.userRsvpStatus}
-        imgSrc={heroThumbnailUrl || fallbackUrl.default}
+        imgSrc={imgSrc}
         rootPlaceId={gameDetails?.rootPlaceId}
         eventPlaceId={eventDetails?.placeId}
         startTimeUtc={tryParseDate(eventDetails?.eventTime?.startUtc)}

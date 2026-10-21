@@ -52,8 +52,8 @@ export const logoutAllLoggedInUsersUrl = `${EnvironmentUrls.apiGatewayUrl}/accou
 // Parental Controls help articles
 export const spendRestrictionsHelpUrl = "https://help.roblox.com/hc/articles/4409125091348";
 export const spendingHelpUrl = "https://help.roblox.com/hc/categories/200213820";
-export const premiumHelpUrl = "https://help.roblox.com/hc/articles/203312540";
-export const subscriptionsHelpUrl = "https://help.roblox.com/hc/articles/20292396051220";
+export const premiumHelpUrl = "https://help.roblox.com/hc/articles/47967913158164";
+export const subscriptionsHelpUrl = "https://help.roblox.com/hc/articles/20292312961556";
 
 export const getAMPFeatureUrl = (featureName: string): string =>
   `${EnvironmentUrls.apiGatewayUrl}/access-management/v1/upsell-feature-access?featureName=${featureName}`;

@@ -8,11 +8,8 @@ import {
 } from "react";
 import { usePrevious, useDebounce } from "@rbx/core-scripts/react";
 import { UrlSearchParams } from "@rbx/core-lib/url";
-import * as http from "@rbx/core-scripts/http";
-import { PageNameProvider } from "@rbx/core-scripts/util/page-name";
 import { sendEvent } from "@rbx/core-scripts/event-stream";
 import { removeUrlLocale } from "@rbx/core-scripts/endpoints";
-import { SearchLandingService } from "@rbx/core-scripts/legacy/Roblox";
 import SearchInput from "../components/SearchInput";
 import layout from "../constants/layoutConstants";
 import linkConstants from "../constants/linkConstants";
@@ -21,15 +18,10 @@ import {
   GamesAutocompleteSuggestionEntryType,
   TAvatarAutocompleteSuggestionEntry,
   TGamesAutocompleteSuggestionEntry,
-  getAvatarRequestSuggestion,
-  getSearchSuggestion,
-} from "../services/searchService";
+} from "../services/searchTypes";
 import events from "../constants/searchEventStreamConstants";
-import {
-  getNewUniversalSearchLinks,
-  getAvatarAutocompleteSearchLinks,
-} from "../util/navigationUtil";
-import { logTopSearchResultsExposureOnce } from "../util/topSearchResultsIxp";
+import { getNewUniversalSearchLinks, getAvatarAutocompleteSearchLinks } from "../util/searchLinks";
+import { getNavCapability } from "../util/navCapabilities";
 import {
   getAutocompleteSearchType,
   getAvatarAutocompleteLanguageCode,
@@ -37,6 +29,11 @@ import {
   getSuggestionUrl,
   serializeSuggestions,
 } from "../util/searchUtil";
+
+const noSuggestions = () => Promise.reject(new Error("search suggestions are not registered"));
+const isSearchRequestCancelled = (error: unknown) =>
+  getNavCapability("isSearchRequestCancelled")?.(error) ?? false;
+const getInternalPageName = () => getNavCapability("getInternalPageName")?.();
 
 export default function UniversalSearch({
   isUniverseSearchShown = true,
@@ -135,7 +132,7 @@ export default function UniversalSearch({
 
   useEffect(() => {
     if (isMenuOpen && !isSearchInputEmpty) {
-      logTopSearchResultsExposureOnce();
+      getNavCapability("logTopSearchResultsExposureOnce")?.();
     }
   }, [isMenuOpen, isSearchInputEmpty]);
 
@@ -184,7 +181,9 @@ export default function UniversalSearch({
         if (showAvatarAutocompleteSuggestions) {
           try {
             const end = Date.now();
-            const data = await getAvatarRequestSuggestion(
+            const data = await (
+              getNavCapability("getAvatarAutocompleteSuggestions") ?? noSuggestions
+            )(
               debouncedSearchInput,
               userLanguageCode,
               search.avatarAutocompleteQueryPaddingAmount,
@@ -205,20 +204,22 @@ export default function UniversalSearch({
                 end - start,
                 search.debounceTimeout,
                 "",
-                PageNameProvider.getInternalPageName(),
+                getInternalPageName(),
                 previousDebouncedSearchInput !== "",
               ),
             );
             setAutocompleteSuggestions(constructedSuggestions);
           } catch (error) {
-            if (!http.isCancelled(error)) {
+            if (!isSearchRequestCancelled(error)) {
               setAutocompleteSuggestions([]);
             }
             setUseAvatarAutocompletFallbackUrl(true);
           }
         } else {
           try {
-            const data = await getSearchSuggestion(debouncedSearchInput);
+            const data = await (
+              getNavCapability("getGamesAutocompleteSuggestions") ?? noSuggestions
+            )(debouncedSearchInput);
             const end = Date.now();
             const seenSuggestions = constructSearchSuggestions(data.entries);
             sendEvent(
@@ -231,23 +232,19 @@ export default function UniversalSearch({
                 end - start,
                 search.debounceTimeout,
                 autocompleteSessionInfo,
-                PageNameProvider.getInternalPageName(),
+                getInternalPageName(),
                 false,
               ),
             );
             setAutocompleteSuggestions(data.entries);
           } catch (error) {
-            if (!http.isCancelled(error)) {
+            if (!isSearchRequestCancelled(error)) {
               setAutocompleteSuggestions([]);
             }
           }
         }
       }
     };
-
-    if (showAvatarAutocompleteSuggestions) {
-      setUniversalSearchLinks(getNewUniversalSearchLinks());
-    }
 
     getAutocompleteSuggestion();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -260,7 +257,7 @@ export default function UniversalSearch({
   const resetSearchLandingPageSessionInfo = () => {
     const newSearchLandingSessionInfo = events.generateSessionInfo();
     setSearchLandingPageSessionInfo(newSearchLandingSessionInfo);
-    SearchLandingService.updateSessionInfo(newSearchLandingSessionInfo);
+    getNavCapability("searchLanding")?.updateSessionInfo(newSearchLandingSessionInfo);
   };
 
   const resetSessionInfo = () => {
@@ -270,7 +267,7 @@ export default function UniversalSearch({
 
   const showSearchLandingPage = useCallback(() => {
     const newSearchLandingSessionInfo = events.generateSessionInfo();
-    SearchLandingService.showSearchLanding(newSearchLandingSessionInfo);
+    getNavCapability("searchLanding")?.show(newSearchLandingSessionInfo);
     sendEvent(
       ...events.search(
         undefined,
@@ -288,6 +285,8 @@ export default function UniversalSearch({
   const handleSearchOpenOrInputChange = useCallback(
     (newSearchInput: string = searchInput) => {
       setSearchInput(newSearchInput);
+      // Link order depends on the current page, which can change without remounting the header
+      setUniversalSearchLinks(getNewUniversalSearchLinks());
 
       // If the search input is trimmed, send a search text trim event
       if (newSearchInput.length < searchInput.length) {
@@ -403,7 +402,7 @@ export default function UniversalSearch({
             autocompleteSessionInfo,
           ),
         );
-        sendEvent(...events.catalogSearch(1, PageNameProvider.getInternalPageName()));
+        sendEvent(...events.catalogSearch(1, getInternalPageName()));
       } else if ("label" in suggestion || "isTopSearchResult" in suggestion) {
         sendEvent(
           ...events.searchSuggestionClicked(
@@ -416,7 +415,7 @@ export default function UniversalSearch({
             autocompleteSessionInfo,
           ),
         );
-        sendEvent(...events.catalogSearch(0, PageNameProvider.getInternalPageName()));
+        sendEvent(...events.catalogSearch(0, getInternalPageName()));
       }
       resetAutocompleteSessionInfo();
       const suggestionUrl = getSuggestionUrl(suggestion, e);

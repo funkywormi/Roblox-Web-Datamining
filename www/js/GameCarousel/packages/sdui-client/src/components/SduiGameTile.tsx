@@ -13,7 +13,7 @@ import {
   SUPPORTED_ICON_CLASSES,
 } from "@rbx/sdui-core";
 import { abbreviateNumber } from "@rbx/core-scripts/format/number";
-import { ActionWrapper, SduiTileFooter } from "@rbx/sdui-common";
+import { ActionWrapper, renderRobloxGlyphText, SduiTileFooter } from "@rbx/sdui-common";
 import { useHoverIntent } from "@rbx/sdui-core/client";
 import "./css/sduiGameTile.css";
 import { SDUI_GAME_TILE_DEFAULTS } from "../consts/defaults";
@@ -190,7 +190,7 @@ export function SduiGameTile({
               }
         }
       >
-        {titleText}
+        {renderRobloxGlyphText(titleText)}
       </TitleElement>
     ) : null);
 

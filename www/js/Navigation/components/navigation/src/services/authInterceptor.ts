@@ -1,6 +1,6 @@
 import { httpClient, HttpResponseCodes } from "@rbx/core-scripts/http";
 import { hbaUnauthorizedEventName } from "@rbx/www-common/auth";
-import { renderSimpleAuth } from "../components/SimpleAuthModal";
+import { renderSimpleAuth } from "../components/renderSimpleAuth";
 import {
   MODAL_CONTAINER_ID,
   MODAL_SIGN_IN_KEY,

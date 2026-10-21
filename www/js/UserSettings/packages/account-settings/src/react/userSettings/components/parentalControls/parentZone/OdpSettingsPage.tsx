@@ -27,6 +27,12 @@ import useManageOdpSetting from "./hooks/useManageOdpSetting";
 import useOdpSettingsAndPages from "./hooks/useOdpSettingsAndPages";
 import useOdpChildInfo from "./hooks/useOdpChildInfo";
 import useManageOdpExperience from "./hooks/useManageOdpExperience";
+import {
+  btnClickOdpManageExperience,
+  formInteractionOdpSetting,
+  msgShownOdpParentZoneError,
+} from "../../../services/eventServices/odpFamilyEventService";
+import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
 import { trackCounter } from "./observability";
 import { ParentZoneCounter } from "./observability/eventConstants";
 
@@ -114,12 +120,19 @@ const OdpSettingsPage = ({ name }: { name: string }): React.JSX.Element => {
   const { manageSetting, isManaging, revision } = useManageOdpSetting();
   const { manageExperience, isManaging: isManagingExperience } = useManageOdpExperience();
   const { translate } = useWrappedTranslation();
+  const { data: parentInfo, isLoading: isParentInfoLoading } = useGetParentInfoQuery();
+  const parents = parentInfo?.parents;
   const isLoadError = isError || childQuery.isError;
   useEffect(() => {
     if (isLoadError) {
       trackCounter(ParentZoneCounter.SettingsPageLoadFailed, { page: name });
     }
   }, [isLoadError, name]);
+  useEffect(() => {
+    if (isLoadError && !isParentInfoLoading) {
+      msgShownOdpParentZoneError(name, parents);
+    }
+  }, [isLoadError, isParentInfoLoading, name, parents]);
   const isPageReady = !isLoading && !childQuery.isLoading && !!pages[name] && !!childQuery.child;
   useEffect(() => {
     if (isPageReady) {
@@ -166,6 +179,7 @@ const OdpSettingsPage = ({ name }: { name: string }): React.JSX.Element => {
                 name === SettingCategoryPageName.ContentRestrictions &&
                 childQuery.child?.canParentManageChildsExperiences === true
               ) {
+                btnClickOdpManageExperience(name, universeId, action, parents);
                 await manageExperience(universeId, action);
               }
             }}
@@ -176,6 +190,9 @@ const OdpSettingsPage = ({ name }: { name: string }): React.JSX.Element => {
                   : request.setting;
               const setting = page.settings.find(candidate => candidate.name === settingName);
               if (!isFetching && !isManaging && !isManagingExperience && setting) {
+                if (request.value !== undefined) {
+                  formInteractionOdpSetting(name, request.setting, request.value, parents);
+                }
                 await manageSetting(request);
               }
             }}

@@ -5,9 +5,9 @@ import analytics from "@rbx/core-scripts/payments-flow";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import links from "../constants/linkConstants";
-import { getGuacBehavior, getVngShopSignedRedirectionUrl } from "../services/navigationService";
 import LeaveRobloxPopupDisclaimer from "../components/robux-popover/LeaveRobloxPopupDisclaimer";
 import Link from "../components/NavLink";
+import { getNavCapability } from "../util/navCapabilities";
 
 export default function NavigationRobux() {
   const t = useTranslations("CommonUI.Features");
@@ -44,7 +44,7 @@ export default function NavigationRobux() {
       return;
     }
 
-    getGuacBehavior().then(guacMetadata => {
+    getNavCapability("getNavigationHeaderBehavior")?.().then(guacMetadata => {
       setIsEligibleForVng(guacMetadata.shouldShowVng);
       cache.set(cacheKey, guacMetadata.shouldShowVng);
     });
@@ -67,8 +67,11 @@ export default function NavigationRobux() {
   const onBuyRobuxExternalContinue = () => {
     sendAnalyticsEvent(ENUM_VIEW_MESSAGE.CONTINUE_TO_VNG);
 
-    getVngShopSignedRedirectionUrl().then(
-      ({ data: { vngShopRedirectUrl } }) => {
+    const getVngShopUrl =
+      getNavCapability("getVngShopSignedRedirectionUrl") ??
+      (() => Promise.resolve<{ vngShopRedirectUrl?: string }>({}));
+    getVngShopUrl().then(
+      ({ vngShopRedirectUrl }) => {
         window.open(vngShopRedirectUrl ?? buyRobuxOnVng.url, "_blank")?.focus();
       },
       () => {

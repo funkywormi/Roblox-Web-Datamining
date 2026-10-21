@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import * as localStorage from "@rbx/core-lib/local-storage";
+import { getCurrentUser } from "@rbx/www-common/user";
 import { useTranslation } from "@rbx/core-scripts/react";
 import {
   getTheme as getThemeGlobal,
@@ -7,6 +9,7 @@ import {
   clearPreviewTheme,
   subscribeToThemeChange,
   setListeningToThemeChanges,
+  AppTheme,
 } from "@rbx/core-scripts/theme";
 import { Badge, Chip, Icon } from "@rbx/foundation-ui";
 import { UserSetting } from "@rbx/user-settings";
@@ -18,14 +21,7 @@ import {
   appThemeLabel,
   newBadgeLabel,
 } from "../../constants/contentConstants/browserPreferencesTranslationConstants";
-import {
-  appThemeCategories,
-  AppThemeCategoryId,
-  appThemesByKey,
-  appThemeDefs,
-  defaultTheme,
-  AppThemeDef,
-} from "../../constants/appThemes";
+import { appThemeCategories, AppThemeCategoryId, AppThemeDef } from "../../constants/appThemes";
 import appThemeEventService from "../../services/eventServices/appThemeEventService";
 import AppThemeCard from "./AppThemeCard";
 import AppThemeUpsellBanner from "./AppThemeUpsellBanner";
@@ -44,11 +40,11 @@ const ThemeGrid = ({
 }) => {
   return (
     <div className="grid gap-medium [grid-template-columns:repeat(2,minmax(0,1fr))]">
-      {themes.map(def => (
+      {themes.map(theme => (
         <AppThemeCard
-          key={def.key}
-          def={def}
-          selected={def.key === selectedTheme?.key}
+          key={theme.key}
+          theme={theme}
+          selected={theme.key === selectedTheme?.key}
           disabled={disabled}
           onSelect={onSelect}
         />
@@ -58,15 +54,22 @@ const ThemeGrid = ({
 };
 
 const AppThemeSettingSection = ({
+  theme,
+  setTheme,
+  themes,
+  themesByKey,
   isPlus,
   isEligible,
 }: {
+  theme: AppThemeDef | null;
+  setTheme: (theme: AppThemeDef | null) => void;
+  themes: AppThemeDef[];
+  themesByKey: Map<AppTheme, AppThemeDef>;
   isPlus: boolean;
   isEligible: boolean;
 }) => {
   const { translate } = useTranslation();
   const [updateSettingValue, { isLoading }] = useUpdateUserSettingValueMutation();
-  const [theme, setTheme] = useState(appThemesByKey.get(getThemeGlobal()) ?? null);
   const [category, setCategory] = useState<AppThemeCategoryId>(theme?.category ?? "dynamic");
   const [upsellOpen, setUpsellOpen] = useState(false);
   // Prefetched with the banner so its CTA knows about a trial; the sheet reuses the cache.
@@ -77,21 +80,23 @@ const AppThemeSettingSection = ({
 
   useEffect(() => clearPreviewTheme, []);
 
+  const freeThemes = useMemo(() => themes.filter(theme => theme.category == null), [themes]);
+
   useEffect(() => {
-    if (!isPlus) {
+    if (!isPlus && freeThemes.length <= 1) {
       return;
     }
-    return subscribeToThemeChange(theme => {
-      const def = appThemesByKey.get(theme);
-      if (def == null) {
+    return subscribeToThemeChange(key => {
+      const theme = themesByKey.get(key);
+      if (theme == null) {
         return;
       }
-      setTheme(def);
-      if (def.category) {
-        setCategory(def.category);
+      setTheme(theme);
+      if (theme.category) {
+        setCategory(theme.category);
       }
     });
-  }, [isPlus]);
+  }, [themesByKey, isPlus, setTheme, freeThemes.length]);
 
   const hasFiredExitRef = useRef(false);
   const sawUpsell = useRef(false);
@@ -116,8 +121,8 @@ const AppThemeSettingSection = ({
   }, []);
 
   const themesInCategory = useMemo(
-    () => appThemeDefs.filter(t => t.category === category),
-    [category],
+    () => themes.filter(theme => theme.category === category),
+    [themes, category],
   );
 
   const onSelect = (newTheme: AppThemeDef) => {
@@ -125,8 +130,26 @@ const AppThemeSettingSection = ({
       return;
     }
     if (!isPlus) {
-      if (newTheme.key === "default") {
+      if (newTheme.category == null) {
+        const id = getCurrentUser()?.id;
+        const localStorageKey = "event-halloween-2026";
+        const hollowEvent = localStorage.getItem(localStorageKey) ?? {
+          version: 0,
+          data: [],
+        };
+        if (id != null && hollowEvent.version === 0) {
+          if (newTheme.key === "halloween-2026") {
+            if (!hollowEvent.data.includes(id)) {
+              hollowEvent.data.push(id);
+              localStorage.setItem(localStorageKey, hollowEvent);
+            }
+          } else {
+            const users = hollowEvent.data.filter(x => x !== id);
+            localStorage.setItem(localStorageKey, { version: 0, data: users });
+          }
+        }
         clearPreviewTheme();
+        setThemeGlobal(newTheme.key);
       } else {
         setPreviewTheme(newTheme.key);
       }
@@ -170,7 +193,7 @@ const AppThemeSettingSection = ({
         </p>
       </div>
       <ThemeGrid
-        themes={[defaultTheme]}
+        themes={freeThemes}
         selectedTheme={theme}
         disabled={isLoading}
         onSelect={onSelect}
@@ -227,12 +250,31 @@ const AppThemeSettingSection = ({
   );
 };
 
-export default function AppThemeSetting() {
+export default function AppThemeSetting({
+  theme,
+  setTheme,
+  themes,
+  themesByKey,
+}: {
+  theme: AppThemeDef | null;
+  setTheme: (theme: AppThemeDef | null) => void;
+  themes: AppThemeDef[];
+  themesByKey: Map<AppTheme, AppThemeDef>;
+}) {
   const { data: settingsUiPolicy } = useGetSettingsUiPolicyQuery();
   const isPlus = settingsUiPolicy?.appThemesAccess === AppThemesAccess.Enabled;
   const isEligible = settingsUiPolicy?.appThemesAccess === AppThemesAccess.Eligible;
   if (settingsUiPolicy == null || (!isPlus && !isEligible)) {
     return null;
   }
-  return <AppThemeSettingSection isPlus={isPlus} isEligible={isEligible} />;
+  return (
+    <AppThemeSettingSection
+      theme={theme}
+      setTheme={setTheme}
+      themes={themes}
+      themesByKey={themesByKey}
+      isPlus={isPlus}
+      isEligible={isEligible}
+    />
+  );
 }

@@ -11,6 +11,11 @@ import commonTranslationConstants from "../../../constants/contentConstants/comm
 import useStartOdpWizard from "../../../hooks/useStartOdpWizard";
 import ScreentimeLimitControl from "../shared/ScreentimeLimitControl";
 import ParentalControlsPageName from "../../../../../enums/parentalControls/ParentalControlsPageName";
+import {
+  formInteractionOdpSetting,
+  msgShownOdpParentZoneError,
+} from "../../../services/eventServices/odpFamilyEventService";
+import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
 import { trackCounter } from "./observability";
 import { ParentZoneCounter } from "./observability/eventConstants";
 
@@ -25,6 +30,16 @@ export const OdpScreentimeLimitPage = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const startOdpWizard = useStartOdpWizard();
   const [userSettings, status] = useGetSettingsAndOptions(undefined, { showErrorSnackbar: false });
+  const isError = status === QueryStatus.rejected;
+
+  const { data: parentInfo, isLoading: isParentInfoLoading } = useGetParentInfoQuery();
+  const parents = parentInfo?.parents;
+
+  useEffect(() => {
+    if (isError && !isParentInfoLoading) {
+      msgShownOdpParentZoneError(ParentalControlsPageName.ScreentimeManagement, parents);
+    }
+  }, [isError, isParentInfoLoading, parents]);
 
   useEffect(() => {
     trackCounter(ParentZoneCounter.PageShown, {
@@ -41,6 +56,12 @@ export const OdpScreentimeLimitPage = (): JSX.Element => {
   }, [isLoadError]);
 
   const saveScreentimeLimit = async (newValue: number): Promise<void> => {
+    formInteractionOdpSetting(
+      ParentalControlsPageName.ScreentimeManagement,
+      UserSetting.dailyScreenTimeLimit,
+      newValue,
+      parents,
+    );
     await startOdpWizard({
       flow: {
         name: odpFlowName,
@@ -56,7 +77,7 @@ export const OdpScreentimeLimitPage = (): JSX.Element => {
     dispatch(baseApi.util.invalidateTags([ApiCacheTag.UserSettingsAndOptions]));
   };
 
-  if (status === QueryStatus.rejected) {
+  if (isError) {
     return (
       <InformationalScreen descriptionTranslationKey={commonTranslationConstants.unknownError} />
     );

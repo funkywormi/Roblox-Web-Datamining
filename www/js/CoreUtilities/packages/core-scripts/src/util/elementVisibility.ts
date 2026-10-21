@@ -1,58 +1,22 @@
-export type TVisibilityCallback = (visible: boolean) => void;
+import {
+  observeIntersection as observeChildrenVisibilityImpl,
+  observeVisibility as observeVisibilityImpl,
+  type TObserveIntersectionOptions as ObserveChildrenVisibilityOptions,
+  type TObserveVisibilityOptions as ObserveVisibilityOptions,
+  type TVisibilityCallback as VisibilityCallback,
+} from "@rbx/core-lib/element-visibility";
 
-export type TObserveVisibilityOptions = {
-  element: HTMLElement;
-  threshold?: number;
-};
+/** @deprecated Import from `@rbx/core-lib/element-visibility` instead. */
+export type TVisibilityCallback = VisibilityCallback;
 
-export type TObserveChildrenVisibilityOptions = {
-  elements: Element[];
-  threshold?: number;
-};
+/** @deprecated Import from `@rbx/core-lib/element-visibility` instead. */
+export type TObserveVisibilityOptions = ObserveVisibilityOptions;
 
-export const observeVisibility = (
-  options: TObserveVisibilityOptions,
-  callback: TVisibilityCallback,
-): VoidFunction => {
-  const { element, threshold } = options;
-  try {
-    const intersectionObserver = new IntersectionObserver(
-      ([entry]: IntersectionObserverEntry[]) => {
-        callback(entry?.isIntersecting ?? false);
-      },
-      { threshold },
-    );
+/** @deprecated Import `TObserveIntersectionOptions` from `@rbx/core-lib/element-visibility` instead. */
+export type TObserveChildrenVisibilityOptions = ObserveChildrenVisibilityOptions;
 
-    intersectionObserver.observe(element);
-    return () => {
-      intersectionObserver.disconnect();
-    };
-  } catch {
-    // Ignore cases where IntersectionObserver does not exist in ancient browsers
-    // We could write our own implementation based on window.scroll or use a polyfill in the future if needed
-  }
+/** @deprecated Import from `@rbx/core-lib/element-visibility` instead. */
+export const observeVisibility = observeVisibilityImpl;
 
-  return () => undefined;
-};
-
-export const observeChildrenVisibility = (
-  options: TObserveChildrenVisibilityOptions,
-  callback: IntersectionObserverCallback,
-): VoidFunction => {
-  const { elements, threshold } = options;
-  try {
-    const intersectionObserver = new window.IntersectionObserver(callback, { threshold });
-
-    elements.forEach(el => {
-      intersectionObserver.observe(el);
-    });
-    return () => {
-      intersectionObserver.disconnect();
-    };
-  } catch {
-    // Ignore cases where IntersectionObserver does not exist in ancient browsers
-    // We could write our own implementation based on window.scroll or use a polyfill in the future if needed
-  }
-
-  return () => undefined;
-};
+/** @deprecated Import `observeIntersection` from `@rbx/core-lib/element-visibility` instead. */
+export const observeChildrenVisibility = observeChildrenVisibilityImpl;

@@ -1,9 +1,5 @@
 import React from "react";
-// TODO: figure out a better way to do this
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { render } from "react-dom";
 import { useTranslations } from "@rbx/www-common/i18n";
-import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import {
   Button,
   Dialog,
@@ -12,14 +8,13 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import { navNamespaces } from "../constants/translationNamespaces";
 import {
   MODAL_CONTAINER_ID,
   MODAL_TITLE_KEY,
   MODAL_BODY_CTA,
   MODAL_SIGN_IN_KEY,
 } from "../constants/modalConstants";
-import { navigateToLoginWithRedirect } from "../util/authUtil";
+import { getLoginLinkUrl } from "../util/authLinkUtil";
 import {
   sendAuth401ModalButtonClickEvent,
   sendAuth401ModalShownEvent,
@@ -51,7 +46,7 @@ export const SimpleAuthModal = ({
     setOpen(false);
     const container = document.getElementById(MODAL_CONTAINER_ID);
     container?.parentNode?.removeChild(container);
-    navigateToLoginWithRedirect();
+    window.location.href = getLoginLinkUrl();
   }, []);
 
   const translate = (key: string) => (t.has(key) ? t(key) : "");
@@ -81,24 +76,5 @@ export const SimpleAuthModal = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
-
-interface RenderSimpleAuthTranslationKeys {
-  titleKey?: string;
-  bodyContextKey?: string;
-  bodyCtaKey?: string;
-  buttonKey?: string;
-}
-
-export const renderSimpleAuth = (translationKeys: RenderSimpleAuthTranslationKeys = {}) => {
-  const container = document.getElementById(MODAL_CONTAINER_ID);
-  if (!container) return;
-
-  render(
-    <TranslationProviderSCC namespaces={navNamespaces}>
-      <SimpleAuthModal {...translationKeys} />
-    </TranslationProviderSCC>,
-    container,
   );
 };

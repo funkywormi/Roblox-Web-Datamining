@@ -7,6 +7,7 @@ import {
   ShareLinksType,
   type StudioLinkData,
 } from "@rbx/www-common/deep-link";
+import { getGameLauncher } from "@rbx/www-common/game-launch";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { launchGame } from "../game";
 import { startDesktopAndMobileWebChat } from "../util/chat";
@@ -69,11 +70,21 @@ const { navigateToDeepLink } = createDeepLinkNavigator({
     window.Roblox.GameLauncher!.joinMultiplayerGame(placeId, true, false);
   },
   startGameWithDeepLinkUrl: (deepLinkUrl, placeId) => {
+    const launcher = getGameLauncher();
+    if (launcher) {
+      launcher.startGameWithDeepLinkUrl(deepLinkUrl, placeId);
+      return;
+    }
     // TODO: old, migrated code
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     window.Roblox.ProtocolHandlerClientInterface!.startGameWithDeepLinkUrl(deepLinkUrl, placeId);
   },
   startDeepLinkFlow: deepLinkUrl => {
+    const launcher = getGameLauncher();
+    if (launcher) {
+      launcher.startDeepLinkFlow(deepLinkUrl);
+      return true;
+    }
     if (window.Roblox.ProtocolHandlerClientInterface?.startDeepLinkFlow) {
       window.Roblox.ProtocolHandlerClientInterface.startDeepLinkFlow(deepLinkUrl);
       return true;

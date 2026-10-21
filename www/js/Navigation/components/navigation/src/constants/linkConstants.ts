@@ -21,10 +21,11 @@ const gameSearchLink = {
   foundationIcon: "icon-regular-circle-play",
 } satisfies UniversalSearchLink;
 
+// Shares Games' pageSort so it sorts directly ahead of Games
 const topSearchLink = {
   url: getAbsoluteUrl("/discover/?searchType=top&keyword="),
-  pageSort: [],
-  foundationIcon: "icon-regular-circle-play",
+  pageSort: gameSearchLink.pageSort,
+  foundationIcon: "icon-regular-magnifying-glass",
   isTopSearchResult: true,
 } satisfies UniversalSearchLink;
 

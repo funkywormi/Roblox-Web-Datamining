@@ -1,9 +1,16 @@
 import { ValueOf } from "@rbx/core-types";
-import localStorageService from "@rbx/core-scripts/local-storage";
+import { getItem, setItem } from "@rbx/core-lib/local-storage";
+import "../constants/localStorageRegistry";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import RobuxBadgeType from "../constants/robuxBadgeConstants";
 
-export const mapRobuxBadgeTypeToLocalStorageKey = (robuxBadgeType: string): string => {
+export const mapRobuxBadgeTypeToLocalStorageKey = (
+  robuxBadgeType: string,
+):
+  | `prevLocalVirtualItemStartTimeSeconds${string}`
+  | "hasSeenRobuxUpdate"
+  | "hasSeenRobuxBonusRobux2026_10"
+  | "" => {
   switch (robuxBadgeType) {
     case RobuxBadgeType.VIRTUAL_ITEM:
       return `prevLocalVirtualItemStartTimeSeconds${authenticatedUser()?.id ?? ""}`;
@@ -30,15 +37,19 @@ export const mapRobuxBadgeTypeToStr = (robuxBadgeType: string): string => {
 };
 
 export const setRobuxBadgeLocalStorage = (robuxBadgeType: string): void => {
-  const localStorageKey = mapRobuxBadgeTypeToLocalStorageKey(robuxBadgeType);
   switch (robuxBadgeType) {
     case RobuxBadgeType.VIRTUAL_ITEM:
       // Set local storage to hide robux badge for current virtual item when badge is acknowledged.
-      localStorageService.setLocalStorage(localStorageKey, Math.floor(Date.now() / 1000));
+      setItem(
+        `prevLocalVirtualItemStartTimeSeconds${authenticatedUser()?.id ?? ""}`,
+        Math.floor(Date.now() / 1000),
+      );
       break;
     case RobuxBadgeType.UPDATE:
+      setItem("hasSeenRobuxUpdate", "true");
+      break;
     case RobuxBadgeType.BONUS_ROBUX_2026_10:
-      localStorageService.setLocalStorage(localStorageKey, "true");
+      setItem("hasSeenRobuxBonusRobux2026_10", "true");
       break;
     default:
   }
@@ -48,7 +59,7 @@ export const setRobuxBadgeLocalStorage = (robuxBadgeType: string): void => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getRobuxBadgeLocalStorage = (robuxBadgeType: string): any => {
   const localStorageKey = mapRobuxBadgeTypeToLocalStorageKey(robuxBadgeType);
-  return localStorageService.getLocalStorage(localStorageKey);
+  return localStorageKey === "" ? null : getItem(localStorageKey);
 };
 
 export const shouldShowRobuxUpdateBadge = (): ValueOf<typeof RobuxBadgeType> | null => {

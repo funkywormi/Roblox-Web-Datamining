@@ -6,6 +6,7 @@ import {
   type FromColonToPeriodDelimited,
   type FromPeriodToColonDelimited,
   fromPeriodToColonDelimited,
+  toFullKeyPath,
 } from "./util";
 import type { Namespace } from "./types";
 import { trackError, type ErrorName } from "../observability";
@@ -15,9 +16,13 @@ type TranslationKey<N extends Namespace> = FromColonToPeriodDelimited<
   keyof Messages[FromPeriodToColonDelimited<N>] & string
 >;
 
+type TranslationValues = Record<string, string | number | Date>;
+
 type Translate<N extends Namespace> = (
   key: TranslationKey<N>,
-  values?: Record<string, string | number | Date>,
+  values?: TranslationValues,
+  /** Returned when `key` is absent from the messages loaded at runtime. */
+  fallback?: string,
 ) => string;
 
 type TranslateRich<N extends Namespace> = (
@@ -35,11 +40,21 @@ type Has<N extends Namespace> = (key: string) => key is TranslationKey<N>;
  * Looks up a key that only exists at runtime. Returns the translation when the key resolves, and
  * `fallback` (or `""`) when it does not, without the missing-key console error from `translate`.
  */
-type TranslateDynamic = (
+type TranslateDynamic = (key: string, values?: TranslationValues, fallback?: string) => string;
+
+/**
+ * Translates a full `Namespace.Key` string (the namespace is the first two segments). The third
+ * argument is returned when the key is missing; when it is omitted, the result is `""`.
+ */
+export type FullKeyTranslator = (
   key: string,
-  values?: Record<string, string | number | Date>,
+  values?: TranslationValues,
   fallback?: string,
 ) => string;
+
+export type FullKeyTranslations = {
+  translateFullKey: FullKeyTranslator;
+};
 
 /**
  * Renders a legacy `{tagStart}...{tagEnd}` string. `key` may be a catalogue key or a runtime
@@ -87,7 +102,14 @@ export const adaptTranslator = <N extends Namespace>(
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const untyped = translator as unknown as UntypedTranslator;
 
-  const translate: Translate<N> = (key, values) => untyped(fromPeriodToColonDelimited(key), values);
+  const translate: Translate<N> = (key, values, fallback) => {
+    const translatedKey = fromPeriodToColonDelimited(key);
+    if (fallback !== undefined && !untyped.has(translatedKey)) {
+      trackTranslationError("TranslationKeyNotFound", namespace, translatedKey);
+      return fallback;
+    }
+    return untyped(translatedKey, values);
+  };
 
   const rich: TranslateRich<N> = (key, values) =>
     untyped.rich(fromPeriodToColonDelimited(key), values);
@@ -118,4 +140,28 @@ export const adaptTranslator = <N extends Namespace>(
   };
 
   return Object.assign(translate, { rich, has, dynamic, html });
+};
+
+/**
+ * Adapts an un-namespaced `use-intl` translator to full `Namespace.Key` strings.
+ * The argument is widened once: colon-delimited lookup paths are not part of the caller's key type.
+ */
+export const adaptFullKeyTranslator = (translator: unknown): FullKeyTranslator => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  const untyped = translator as UntypedTranslator;
+
+  return (fullKey, values, fallback = "") => {
+    const resolved = toFullKeyPath(fullKey);
+    if (!resolved) {
+      trackTranslationError("TranslationKeyNotFound", fullKey, fullKey);
+      return fallback;
+    }
+
+    if (!untyped.has(resolved.path)) {
+      trackTranslationError("TranslationKeyNotFound", resolved.namespace, resolved.key);
+      return fallback;
+    }
+
+    return untyped(resolved.path, values);
+  };
 };

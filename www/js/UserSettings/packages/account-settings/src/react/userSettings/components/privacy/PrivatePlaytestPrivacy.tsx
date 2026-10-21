@@ -135,14 +135,15 @@ export const PrivatePlaytestPrivacy = ({
 
   return (
     <React.Fragment>
-      <SettingsSection>
+      <SettingsSection
+        description={translate(
+          child?.userId
+            ? privacyTranslationConstants.parentSidePrivatePlaytestDescription
+            : privacyTranslationConstants.privatePlaytestDescription,
+        )}
+      >
         <RadioButtonOptionsWithParentalConsentV2
           title={translate(privacyTranslationConstants.privatePlaytestLabel)}
-          description={translate(
-            child?.userId
-              ? privacyTranslationConstants.parentSidePrivatePlaytestDescription
-              : privacyTranslationConstants.privatePlaytestDescription,
-          )}
           className="section-content"
           settingName={UserSetting.privatePlaytest}
           options={privatePlaytestOptions}

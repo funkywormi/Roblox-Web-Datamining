@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import localStorage from "@rbx/core-scripts/local-storage";
+import { getItem, setItem } from "@rbx/core-lib/local-storage";
+import "../constants/localStorageRegistry";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { isTestSite } from "@rbx/core-scripts/meta/environment";
 import ixp from "@rbx/experimentation";
@@ -8,7 +9,7 @@ type LocalStorageData = Record<string, boolean>;
 const localStorageKey = "top-nav-download-button";
 
 const readLocalStorage = (): LocalStorageData | null => {
-  const localData = localStorage.getLocalStorage(localStorageKey);
+  const localData = getItem(localStorageKey);
   if (localData == null || typeof localData !== "object") {
     return null;
   }
@@ -36,7 +37,7 @@ export const useTopNavDownloadButton = () => {
       const ixpValue = ixpData.IsTopNavDownloadEnabled === true;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       userLookup[id!] = ixpValue;
-      localStorage.setLocalStorage(localStorageKey, { data: userLookup });
+      setItem(localStorageKey, { data: userLookup });
       return ixpValue;
     },
     enabled: id != null,
