@@ -29,8 +29,10 @@ const HYDRATION_CONTENT_TYPE_TO_FIELD_KEY: Record<ValidHydrationContentType, str
   [HydrationContentType.MOMENT]: "moment",
   [HydrationContentType.COMMUNITY]: "community",
   [HydrationContentType.COMMUNITY_USER_MEMBERSHIP]: "communityUserMembership",
-  [HydrationContentType.USER_RECOMMENDATION]: "userRecommendation",
-  [HydrationContentType.CONTACT]: "contact",
+  [HydrationContentType.FRIEND_RECOMMENDATION]: "friendRecommendation",
+  [HydrationContentType.UNIVERSE_PRIVATE_SERVER]: "universePrivateServer",
+  [HydrationContentType.NOTIFICATION_BADGE]: "notificationBadge",
+  [HydrationContentType.COLLECTIBLE_ITEM]: "collectibleItem",
 };
 
 export function hydrationContentTypeToFieldKey(type: HydrationContentType): string {

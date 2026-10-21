@@ -6,10 +6,10 @@ import type {
   PropBuildRequest,
   ResolvedProp,
 } from "../../types";
-import { reportFailedToParse, reportInvalidConfig, stringifyError } from "../../errors";
+import { reportInvalidConfig } from "../../errors";
 import { isRecord, type RecordOf } from "../../utils/typeGuards";
 import { generateConditionalPropValue } from "./utils/sduiPropSignalUtils";
-import { resolveInputDefs } from "./utils/resolveInputs";
+import { createInputDataSignals, resolveInputDefs } from "./utils/resolveInputs";
 import { resolveTemplate } from "./utils/resolveTemplate";
 import { PROP_KIND } from "../../types/propKinds";
 
@@ -112,6 +112,8 @@ export function buildNestedComponentProp(
       nestedBuildContext.builderConfig,
       nestedBuildContext.parentAnalyticsContext,
       request.dataSources,
+      undefined,
+      nestedBuildContext.poolBuildMetadata,
     );
     return nestedConfig
       ? { value: nestedConfig, category: "nestedConfig" }
@@ -123,27 +125,21 @@ export function buildNestedComponentProp(
   // child's `dataBindingSourcesSignal` consumes this signal and re-resolves
   // entity IDs reactively. Matches lua's `createComputed(inputDataSlice)`.
   //
-  // Lua wraps `buildInputsForNestedComponent` in `pcall` and logs
-  // `FailedToParseProp` so a bad input def does not tear down the render —
-  // match that defensive behavior.
+  // `resolveInputDefs` owns pending-read and failure handling so every
+  // isolated-scope caller gets the same behavior.
   const inputDefs: RecordOf = isRecord(templateData.inputs) ? templateData.inputs : {};
-  const inputDataSignal = computed(() => {
-    try {
-      return resolveInputDefs(inputDefs, { ...request, ctx: bindingContext });
-    } catch (err) {
-      reportFailedToParse(
-        bindingContext,
-        `failed to build inputs for nested component: ${stringifyError(err)}`,
-      );
-      return {};
-    }
-  });
+  const { inputDataSignal, pendingInputKeysSignal } = createInputDataSignals(() =>
+    resolveInputDefs(inputDefs, { ...request, ctx: bindingContext }),
+  );
 
   const nestedConfig = nestedBuildContext.builder.buildConfigForComponent(
     template,
     inputDataSignal,
     nestedBuildContext.builderConfig,
     nestedBuildContext.parentAnalyticsContext,
+    undefined,
+    pendingInputKeysSignal,
+    nestedBuildContext.poolBuildMetadata,
   );
   return nestedConfig
     ? { value: nestedConfig, category: "nestedConfig" }

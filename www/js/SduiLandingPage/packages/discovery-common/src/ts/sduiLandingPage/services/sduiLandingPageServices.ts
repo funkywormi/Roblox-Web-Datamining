@@ -1,11 +1,7 @@
 import type { TranslateFunction } from "@rbx/core-scripts/react";
-import {
-  composeSduiRegistries,
-  getOrCreatePageServices,
-  SduiCommonModule,
-  type SduiServices,
-} from "@rbx/sdui-core";
+import { composeSduiRegistries, getOrCreatePageServices, type SduiServices } from "@rbx/sdui-core";
 import { createSduiCsrTelemetry, SduiClientModule } from "@rbx/sdui-client";
+import { SduiCommonModule } from "@rbx/sdui-common";
 import type { PageContext } from "../../common/types/pageContext";
 import { DiscoverySduiModule } from "../../sdui/v2/discoverySduiModule";
 
@@ -37,6 +33,8 @@ export function getSduiLandingPageServices(
     impressionHandlerRegistry: registries.impressionHandlerRegistry,
     analyticsReporter: telemetry.analyticsReporter,
     errorReporter: telemetry.errorReporter,
+    observeWebVitals: telemetry.observeWebVitals,
+    pageLoadPlatformAdapter: telemetry.pageLoadPlatformAdapter,
     pageContext: { pageName: appPage, appPage },
     translate,
   });

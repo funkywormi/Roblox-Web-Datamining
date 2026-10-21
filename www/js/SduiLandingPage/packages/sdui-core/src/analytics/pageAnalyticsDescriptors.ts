@@ -9,6 +9,7 @@ import type { SduiEventDescriptor, SduiPageContext } from "../types";
 export const SDUI_LOAD_MORE_EVENT_NAME = "Sdui_LoadMoreFromApi";
 export const SDUI_PAGE_STATUS_EVENT_NAME = "Sdui_PageStatus";
 export const SDUI_PAGE_PAYLOAD_SIZE_EVENT_NAME = "Sdui_PagePayloadSize";
+export const SDUI_PAGE_LOAD_TIMER_EVENT_NAME = "webDiscoverySduiPageLoadTimer";
 
 /**
  * Builds an `SduiEventDescriptor` for a page-level telemetry event.

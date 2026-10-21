@@ -1,10 +1,11 @@
 import type { MouseEvent } from "react";
+import { window as browserWindow } from "@rbx/core-lib/browser";
 import DownloadButton from "./DownloadButton";
 import type { DownloadButtonProps } from "./DownloadButton";
 import { downloadSourceType } from "./deferredDeeplinkConstants";
 import { onAppDownloadClick } from "./resolveAppDownload";
 import type { ResolvedAppDownload } from "./resolveAppDownload";
-import { useAppDownload } from "./useAppDownload";
+import { getDownloadLinkParams } from "./getDownloadLinkParams";
 
 export type TokenizedDownloadButtonProps = Omit<DownloadButtonProps, "onClick"> & {
   linkId?: string;
@@ -17,17 +18,13 @@ export type TokenizedDownloadButtonProps = Omit<DownloadButtonProps, "onClick"> 
  * installer download. Token creation stitches the link ID, browser tracker ID (`btId`), optional
  * auth ticket, and download source into a server-issued token that is appended to the download URL.
  * If token creation fails, navigation falls back to the original URL; store links are not intercepted.
- *
- * Must be rendered beneath a TanStack QueryClientProvider.
  */
 function TokenizedDownloadButton({
-  linkId = window.location.href,
+  linkId,
   downloadSource = downloadSourceType.Installer,
   onClick,
   ...downloadButtonProps
 }: TokenizedDownloadButtonProps) {
-  const { resolveTokenizedHref } = useAppDownload({ linkId, downloadSource });
-
   const handleClick = async (
     download: ResolvedAppDownload,
     event: MouseEvent<HTMLElement>,
@@ -46,7 +43,9 @@ function TokenizedDownloadButton({
       return;
     }
 
-    const url = await resolveTokenizedHref(download.href);
+    const resolvedLinkId = linkId ?? browserWindow?.location.href;
+    const params = await getDownloadLinkParams({ linkId: resolvedLinkId, downloadSource });
+    const url = download.href.withSearchParamsAppended(params);
     window.location.assign(url.toString());
   };
 

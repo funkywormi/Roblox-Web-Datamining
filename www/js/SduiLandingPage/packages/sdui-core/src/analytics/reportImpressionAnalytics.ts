@@ -33,6 +33,11 @@ export interface ReportImpressionAnalyticsOptions {
    * `reportImpressions` on the handler-miss path (lua parity).
    */
   eventNameOverride?: string;
+  /**
+   * Physical 0-based grid cells, aligned with `itemAnalyticsDatas`. Row numbers
+   * use these when a pooled item's canonical rank differs from its cell.
+   */
+  itemCellIndexes?: readonly number[];
 }
 
 /**
@@ -49,6 +54,7 @@ export function reportImpressionAnalytics(options: ReportImpressionAnalyticsOpti
     analyticsReporter,
     errorReporter,
     eventNameOverride,
+    itemCellIndexes,
   } = options;
 
   if (impressionIndexes.length === 0) {
@@ -73,11 +79,12 @@ export function reportImpressionAnalytics(options: ReportImpressionAnalyticsOpti
     return;
   }
 
-  const validItems = impressionIndexes
-    .map(index => itemAnalyticsDatas[index])
-    .filter((item): item is ItemAnalyticsData => item != null);
+  const impressedItems = impressionIndexes.flatMap(index => {
+    const item = itemAnalyticsDatas[index];
+    return item == null ? [] : [{ index, item }];
+  });
 
-  if (validItems.length === 0) {
+  if (impressedItems.length === 0) {
     reportError(
       SduiErrorName.ReportItemImpressionsMissingData,
       "No valid item analytics data for impressions",
@@ -91,9 +98,15 @@ export function reportImpressionAnalytics(options: ReportImpressionAnalyticsOpti
   if (!analyticsReporter) return;
 
   const itemsPerRow = collectionAnalyticsData.itemsPerRow || 1;
-  const itemIds = validItems.map(item => item.id);
-  const itemPositions = validItems.map(item => item.itemPosition);
-  const rowNumbers = itemPositions.map(position => Math.ceil(position / itemsPerRow));
+  const itemIds = impressedItems.map(({ item }) => item.id);
+  const itemPositions = impressedItems.map(({ item }) => item.itemPosition);
+  // itemPosition is the 1-based canonical rank. Cell indexes are 0-based, so
+  // a deferred pool item (rank 8 in cell 0) must not inherit the rank's row.
+  const rowNumbers = impressedItems.map(({ index, item }) => {
+    const cellIndex = itemCellIndexes?.[index];
+    const layoutPosition = cellIndex === undefined ? item.itemPosition : cellIndex + 1;
+    return Math.ceil(layoutPosition / itemsPerRow);
+  });
   const context = pageContext?.appPage ?? "unknown";
 
   const params: Record<string, EventParamValue> = {

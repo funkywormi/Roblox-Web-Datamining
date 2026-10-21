@@ -12,6 +12,8 @@ import type {
   SduiErrorReporter,
   SduiFetchReason,
   SduiPageContext,
+  SduiPostBody,
+  SduiPostConfig,
   SduiTargetedRefreshInput,
   SduiTargetedRefreshResult,
   SduiTargetedRefreshUnavailableReason,
@@ -26,9 +28,10 @@ import {
   parseTemplateEntries,
 } from "./responseParser";
 import { reportError, SduiErrorName } from "../errors";
+import { isFirstPageLoad } from "../performance/pageLoadEmit";
 import type { SduiLoadTimerRegistry } from "../performance/SduiLoadTimerRegistry";
 import type { SduiLoadTimer } from "../types/performance";
-import { getConfigKey, pickRootConfig } from "../utils/apiStoreHelper";
+import { getConfigKey, getRequestIdentity, pickRootConfig } from "../utils/apiStoreHelper";
 import { toError } from "../utils/error";
 import { mergePaginatedSduiResponse } from "./mergeSduiResponse";
 import { createSduiRequestExecutor } from "./SduiRequestExecutor";
@@ -55,6 +58,12 @@ export interface SduiApiStoreDeps {
   loadTimerRegistry: SduiLoadTimerRegistry;
   pageContext: SduiPageContext;
 }
+
+export type SduiApplyResponseOptions = {
+  shouldDeferCacheSettling?: boolean;
+  shouldMergeStreamingResponse?: boolean;
+  streamingInputIdentifiers?: Set<string>;
+};
 
 const EMPTY_CACHE_ENTRY: CacheEntry = {
   configs: new Map(),
@@ -128,6 +137,31 @@ function toStoredRequestConfig(requestConfig: ApiRequestConfig): StoredRequestCo
   return storedConfig;
 }
 
+/**
+ * Outcome of rebuilding the POST body for a request derived from the stored
+ * base config (load-more pagination or targeted refresh).
+ *
+ * GET surfaces need no rebuild — the URL is the request. When the body builder
+ * returns nothing, the original POST body is kept: the next page or targets may
+ * already be on the URL as query params.
+ */
+type PostBodyRebuild = { kind: "get" } | { kind: "post"; postConfig: SduiPostConfig };
+
+function rebuildPostBody(
+  baseConfig: StoredRequestConfig,
+  buildBody: () => SduiPostBody | undefined,
+  bodyKeySuffix: string,
+): PostBodyRebuild {
+  const { postConfig } = baseConfig;
+  if (!postConfig) return { kind: "get" };
+  const body = buildBody();
+  if (body === undefined) return { kind: "post", postConfig };
+  return {
+    kind: "post",
+    postConfig: { ...postConfig, body, bodyKey: `${postConfig.bodyKey}#${bodyKeySuffix}` },
+  };
+}
+
 // ─── Factory ───
 
 export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
@@ -151,14 +185,27 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
     pageContext: deps.pageContext,
   });
 
-  function resetLoadTimer(requestConfig: ApiRequestConfig): SduiLoadTimer {
+  function resetPageLoadTimer(requestConfig: ApiRequestConfig): SduiLoadTimer {
     return loadTimerRegistry.reset(getConfigKey(requestConfig), {
       pageContext: deps.pageContext,
     });
   }
 
-  function resolveLoadTimer(requestConfig: ApiRequestConfig): SduiLoadTimer | undefined {
-    return loadTimerRegistry.get(getConfigKey(requestConfig));
+  function createRequestLoadTimer(requestConfig: ApiRequestConfig): SduiLoadTimer {
+    const configKey = getConfigKey(requestConfig);
+    const startSource = requestConfig.startSource ?? "initial";
+    const shouldRegisterPageTimer =
+      isFirstPageLoad(startSource) && loadTimerRegistry.get(configKey) == null;
+    const loadTimer = shouldRegisterPageTimer
+      ? resetPageLoadTimer(requestConfig)
+      : loadTimerRegistry.createDetached(configKey, { pageContext: deps.pageContext });
+    // A later initial fetch for the same page is request telemetry, not a
+    // second page load. Start its detached timer as refresh so it does not wait
+    // for a paint that belongs to the registered page timer.
+    const timerStartSource =
+      shouldRegisterPageTimer || !isFirstPageLoad(startSource) ? startSource : "refresh";
+    loadTimer.start(timerStartSource);
+    return loadTimer;
   }
 
   // ─── Signal accessors ───
@@ -203,10 +250,24 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
 
   // ─── Response application ───
 
-  function applyResponse(response: SduiApiResponse, requestConfig: ApiRequestConfig): void {
+  function applyResponse(
+    response: SduiApiResponse,
+    requestConfig: ApiRequestConfig,
+    loadTimer: SduiLoadTimer,
+    options?: SduiApplyResponseOptions,
+  ): void {
+    const {
+      shouldDeferCacheSettling = false,
+      shouldMergeStreamingResponse: mergeStreamingResponse = false,
+      streamingInputIdentifiers,
+    } = options ?? {};
     const configKey = getConfigKey(requestConfig);
     const paginateResponse = requestConfig.isPaginated === true;
-    const loadTimer = resolveLoadTimer(requestConfig);
+    const enableStreaming = requestConfig.enableStreaming === true;
+    // For now, the ability to set `merge=true` is not available in
+    // `ApiRequestConfig`, and it is derived internally when these
+    // conditions are met.
+    const enableInternalMerge = paginateResponse || mergeStreamingResponse;
 
     batch(() => {
       const newlyBuiltEntries = handleSduiApiResponse(response, {
@@ -218,6 +279,8 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
         pageContext: deps.pageContext,
         errorReporter: deps.errorReporter,
         paginateResponse,
+        enableStreaming: mergeStreamingResponse,
+        streamingInputIdentifiers,
         mergeStrategy: requestConfig.mergeStrategy,
         getInputDataSignal: identifier => getOrCreateInputDataSignal(configKey, identifier),
         hasComponentConfig: identifier =>
@@ -225,11 +288,12 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
         parseHydrationData,
         parseTemplateEntries,
         parsePageEntries,
-        ...(loadTimer ? { loadTimer } : {}),
+        loadTimer,
       });
 
       if (
-        !paginateResponse &&
+        !enableInternalMerge &&
+        !enableStreaming &&
         newlyBuiltEntries.length === 0 &&
         requestConfig.allowNoConfigsBuilt !== true
       ) {
@@ -244,11 +308,11 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
 
       const isEmpty = response.pageEntries.length === 0;
       const shouldClear =
-        !paginateResponse && isEmpty && requestConfig.clearOnEmptyResponse === true;
+        !enableInternalMerge && isEmpty && requestConfig.clearOnEmptyResponse === true;
 
       updateCache(configKey, previous => {
         let cachedResponse = response;
-        if (paginateResponse) {
+        if (enableInternalMerge) {
           cachedResponse = mergePaginatedSduiResponse(
             previous.response,
             response,
@@ -270,7 +334,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
           };
         }
 
-        const shouldPreserveEntries = paginateResponse || (!shouldClear && isEmpty);
+        const shouldPreserveEntries = enableInternalMerge || (!shouldClear && isEmpty);
         const configs = shouldPreserveEntries
           ? new Map(previous.configs)
           : new Map<string, SduiComponentConfig>();
@@ -281,10 +345,12 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
           ...previous,
           response: cachedResponse,
           configs,
-          status: "loaded",
+          status: shouldDeferCacheSettling ? previous.status : "loaded",
           error: undefined,
           nextPageUrl,
-          dataUpdatedTimestamp: Date.now(),
+          dataUpdatedTimestamp: shouldDeferCacheSettling
+            ? previous.dataUpdatedTimestamp
+            : Date.now(),
         };
       });
     });
@@ -355,6 +421,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
     targets: readonly SduiTargetedRefreshInput[],
     validatedTargets: readonly ResolvedTargetedRefreshTarget[],
     initialInvalidTargets: readonly InvalidTargetedRefreshTarget[],
+    loadTimer: SduiLoadTimer,
   ): SduiTargetedRefreshResult {
     const configKey = getConfigKey(requestConfig);
     const currentCachedResponse = getOrCreateCacheSignal(configKey).peek()?.response;
@@ -400,8 +467,6 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
           entry.pageEntry.robloxComponent
       );
     });
-    const loadTimer = resolveLoadTimer(requestConfig);
-
     batch(() => {
       const templateSnapshot = deps.templateStore.snapshot();
       const previousInputData = new Map<string, Record<string, unknown> | undefined>();
@@ -415,7 +480,7 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
           inputDataSignal.value = inputData;
         }
 
-        loadTimer?.logConfigBuildBegin();
+        loadTimer.logConfigBuildBegin();
         try {
           rebuiltEntries = parsePageEntries(changedRootEntries, {
             templateStore: deps.templateStore,
@@ -425,10 +490,12 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
             pageContext: deps.pageContext,
             errorReporter: deps.errorReporter,
             paginateResponse: false,
+            // TODO: Support streaming a targetted refresh
+            enableStreaming: false,
             getInputDataSignal: identifier => getOrCreateInputDataSignal(configKey, identifier),
           });
         } finally {
-          loadTimer?.logConfigBuildEnd();
+          loadTimer.logConfigBuildEnd();
         }
 
         if (rebuiltEntries.length !== changedRootEntries.length) {
@@ -444,10 +511,10 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
         throw error;
       }
 
-      loadTimer?.logResponseDataStoreUpdateBegin();
+      loadTimer.logResponseDataStoreUpdateBegin();
       parseHydrationData(response.hydrationData, deps.dataBinder);
       parseLocalizedLiterals(response.localizedLiterals, deps.dataBinder);
-      loadTimer?.logResponseDataStoreUpdateEnd();
+      loadTimer.logResponseDataStoreUpdateEnd();
 
       updateCache(configKey, previous => {
         const configs = new Map(previous.configs);
@@ -480,14 +547,18 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
     url: Url,
     isRequestCurrent: IsCurrentRequest,
     invalidationSignal: AbortSignal,
-    applyDecodedResponse: (response: SduiApiResponse, requestConfig: ApiRequestConfig) => TResult,
+    applyDecodedResponse: (
+      response: SduiApiResponse,
+      requestConfig: ApiRequestConfig,
+      loadTimer: SduiLoadTimer,
+      options: SduiApplyResponseOptions,
+    ) => TResult,
     cacheStatePolicy: CacheStatePolicy = "update",
   ): Promise<SduiFetchOutcome<TResult>> {
     const configKey = getConfigKey(requestConfig);
     const startSource: SduiFetchReason = requestConfig.startSource ?? "initial";
-    const loadTimer = resetLoadTimer(requestConfig);
+    const loadTimer = createRequestLoadTimer(requestConfig);
 
-    loadTimer.start(startSource);
     loadTimer.logUiRequestQueued();
     if (cacheStatePolicy === "update") {
       updateCache(configKey, setLoading);
@@ -496,16 +567,49 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
     }
 
     try {
-      const decodedResponse = await executeSduiRequest(requestConfig, url, {
+      const responses = executeSduiRequest(requestConfig, url, {
         loadTimer,
         isRequestCurrent,
         reportPageAnalytics: true,
         invalidationSignal,
       });
-      if (!isRequestCurrent()) {
-        return { status: "canceled" };
+      // TODO: The returned result is mainly used for targeted refresh which is
+      // not supported for streaming yet. In the streaming case, there can be
+      // multiple results
+      let result!: TResult;
+      const shouldDeferCacheSettling = requestConfig.enableStreaming;
+      let isFirstResponse = true;
+      let streamingInputIdentifiers: Set<string> | undefined;
+      for await (const decodedResponse of responses) {
+        if (!isRequestCurrent()) {
+          return { status: "canceled" };
+        }
+
+        // A content-first stream replaces prior-request input once per identifier.
+        // Hydration-first streams retain their existing cross-request merge behavior.
+        if (
+          isFirstResponse &&
+          requestConfig.enableStreaming === true &&
+          requestConfig.isPaginated !== true &&
+          decodedResponse.pageEntries.length > 0
+        ) {
+          streamingInputIdentifiers = new Set();
+        }
+        result = applyDecodedResponse(decodedResponse, requestConfig, loadTimer, {
+          shouldDeferCacheSettling,
+          shouldMergeStreamingResponse: requestConfig.enableStreaming === true && !isFirstResponse,
+          streamingInputIdentifiers,
+        });
+        isFirstResponse = false;
       }
-      const result = applyDecodedResponse(decodedResponse, requestConfig);
+      if (shouldDeferCacheSettling) {
+        updateCache(configKey, previous => ({
+          ...previous,
+          status: CacheStatus.Loaded,
+          error: undefined,
+          dataUpdatedTimestamp: Date.now(),
+        }));
+      }
       if (cacheStatePolicy === "paginate") {
         updateCache(configKey, clearLoadingMore);
       }
@@ -535,18 +639,25 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
   return {
     async fetchIfNeeded(requestConfig, forceRefresh = false) {
       const configKey = getConfigKey(requestConfig);
-      const requestHref = requestConfig.url.href;
+      const requestIdentity = getRequestIdentity(requestConfig);
 
       await requestQueue.enqueue(
         configKey,
         async (isRequestCurrent, invalidationSignal) => {
           // Cache validation belongs inside the queue so no later operation can
-          // append between the check and this request. The cached URL is read
+          // append between the check and this request. The cached request is read
           // here for the same reason: an earlier queued fetch may have replaced
-          // it, and a caller whose URL differs — a filter applied mid-fetch —
-          // must issue its own request rather than accept the previous URL's data.
-          const isSameUrlAsCached = baseRequestConfigs.get(configKey)?.url.href === requestHref;
-          if (!forceRefresh && isSameUrlAsCached && this.getData(configKey)?.status === "loaded") {
+          // it, and a caller whose URL or POST body differs must issue its own
+          // request rather than accept the previous request's data.
+          const cachedBaseConfig = baseRequestConfigs.get(configKey);
+          const isSameRequestAsCached =
+            cachedBaseConfig !== undefined &&
+            getRequestIdentity(cachedBaseConfig) === requestIdentity;
+          if (
+            !forceRefresh &&
+            isSameRequestAsCached &&
+            this.getData(configKey)?.status === "loaded"
+          ) {
             return;
           }
 
@@ -616,9 +727,19 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
               : entry.nextPageUrl;
           if (!nextUrl) return;
 
+          // Optional: rebuild the POST body when the cursor lives there. If the
+          // builder is absent or returns nothing, keep the original body and
+          // POST to nextUrl (pagination may be query params on the URL).
+          const rebuild = rebuildPostBody(
+            baseConfig,
+            () => (entry.response ? baseConfig.buildNextPageBody?.(entry.response) : undefined),
+            nextUrl.href,
+          );
+
           await runFetch(
             {
               ...baseConfig,
+              ...(rebuild.kind === "post" ? { postConfig: rebuild.postConfig } : {}),
               url: nextUrl,
               isPaginated: true,
               startSource: "loadMore",
@@ -715,8 +836,18 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
               return;
             }
 
+            // Optional: rebuild the POST body when the targets live there. If the
+            // builder is absent or returns nothing, keep the original body and
+            // POST to targetedRefreshUrl (targets may be query params on the URL).
+            const rebuild = rebuildPostBody(
+              baseConfig,
+              () => baseConfig.buildTargetedRefreshBody?.(validTargets),
+              targetedRefreshUrl.href,
+            );
+
             const requestConfig: ApiRequestConfig = {
               ...baseConfig,
+              ...(rebuild.kind === "post" ? { postConfig: rebuild.postConfig } : {}),
               url: targetedRefreshUrl,
               isPaginated: false,
               startSource: "refresh",
@@ -726,13 +857,14 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
               targetedRefreshUrl,
               isRequestCurrent,
               invalidationSignal,
-              (response, config) =>
+              (response, config, loadTimer) =>
                 applyTargetedResponse(
                   response,
                   config,
                   targets,
                   initialTargetResolution.validTargets,
                   initialTargetResolution.invalidTargets,
+                  loadTimer,
                 ),
               "preserve",
             );
@@ -778,10 +910,11 @@ export function createSduiApiStore(deps: SduiApiStoreDeps): SduiApiStore {
       requestQueue.invalidate(configKey);
       baseRequestConfigs.set(configKey, toStoredRequestConfig(requestConfig));
       // No network request runs for seeded data, so start a timer here.
-      const loadTimer = resetLoadTimer(requestConfig);
+      const loadTimer = resetPageLoadTimer(requestConfig);
       loadTimer.start("seed");
+      loadTimer.updateRequestStatus("LoadedFromNetwork");
       // SSR seed is non-paginated for now; force the flag off and don't rely on derived configs.
-      applyResponse(response, { ...requestConfig, isPaginated: false });
+      applyResponse(response, { ...requestConfig, isPaginated: false }, loadTimer);
       loadTimer.finish();
     },
 

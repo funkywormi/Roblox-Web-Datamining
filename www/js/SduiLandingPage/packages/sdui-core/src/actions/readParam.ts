@@ -132,6 +132,39 @@ export function readNumberActionParam(
 }
 
 /**
+ * Reads a `int64` field from action params with a fallback. Returns `defaultValue`
+ * when the key is missing or the value is not a finite number, including
+ * `NaN`, `Infinity`, and `-Infinity`.
+ *
+ * int64 gets normalized to a string in the protobuf decoder, so we need to check for both number and string types.
+ *
+ * The function uses function overloading to exclude undefined from the return
+ * type when a default value is provided.
+ */
+export function readBigIntActionParam(
+  actionParams: ActionParams,
+  key: string,
+  defaultValue: number | string,
+): number | string;
+
+export function readBigIntActionParam(
+  actionParams: ActionParams,
+  key: string,
+  defaultValue: number | string | undefined,
+): number | string | undefined;
+
+export function readBigIntActionParam(
+  actionParams: ActionParams,
+  key: string,
+  defaultValue: number | string | undefined,
+): number | string | undefined {
+  const value = actionParams[key];
+  return (typeof value === "number" && Number.isFinite(value)) || typeof value === "string"
+    ? value
+    : defaultValue;
+}
+
+/**
  * Reads an `array` field from action params with a fallback. Returns `defaultValue`
  * when the key is missing or the value is not an array. Note that this function only
  * checks for the presence of an array, not the type of the array items.

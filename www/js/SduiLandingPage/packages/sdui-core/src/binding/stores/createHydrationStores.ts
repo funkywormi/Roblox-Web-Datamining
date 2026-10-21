@@ -1,15 +1,28 @@
 import type { HydrationStore, TranslateFunction } from "../../types";
 import { AUTH_CONTENT_TYPE, AuthStore } from "./contentStores/AuthStore";
 import { BADGE_CONTENT_TYPE, BadgeStore } from "./contentStores/BadgeStore";
+import {
+  CLIENT_PAGE_SCOPE_CONTENT_TYPE,
+  ClientPageScopeStore,
+} from "./contentStores/ClientPageScopeStore";
 import { CREATOR_CONTENT_TYPE, CreatorStore } from "./contentStores/CreatorStore";
 import {
   LOCALIZED_LITERALS_CONTENT_TYPE,
   LocalizedLiteralsStore,
 } from "./contentStores/LocalizedLiteralsStore";
+import {
+  MARKETPLACE_ASSET_CONTENT_TYPE,
+  MarketplaceAssetStore,
+} from "./contentStores/MarketplaceAssetStore";
+import {
+  MARKETPLACE_BUNDLE_CONTENT_TYPE,
+  MarketplaceBundleStore,
+} from "./contentStores/MarketplaceBundleStore";
 import { QUERY_PARAM_CONTENT_TYPE, QueryParamStore } from "./contentStores/QueryParamStore";
 import { RESPONSIVE_CONTENT_TYPE, ResponsiveStore } from "./contentStores/ResponsiveStore";
 import { SONG_CONTENT_TYPE, SongStore } from "./contentStores/SongStore";
 import { UNIVERSE_CONTENT_TYPE, UniverseStore } from "./contentStores/UniverseStore";
+import { USER_PROFILE_CONTENT_TYPE, UserProfileStore } from "./contentStores/UserProfileStore";
 
 /**
  * Canonical set of hydration stores registered with the data binder, wired
@@ -42,8 +55,12 @@ export function createHydrationStores(
     [CREATOR_CONTENT_TYPE]: CreatorStore.getInstance(),
     [SONG_CONTENT_TYPE]: SongStore.getInstance(),
     [UNIVERSE_CONTENT_TYPE]: UniverseStore.getInstance(translate),
+    [MARKETPLACE_ASSET_CONTENT_TYPE]: MarketplaceAssetStore.getInstance(),
+    [MARKETPLACE_BUNDLE_CONTENT_TYPE]: MarketplaceBundleStore.getInstance(),
+    [USER_PROFILE_CONTENT_TYPE]: UserProfileStore.getInstance(),
     [RESPONSIVE_CONTENT_TYPE]: ResponsiveStore.getInstance(),
     [AUTH_CONTENT_TYPE]: AuthStore.getInstance(),
+    [CLIENT_PAGE_SCOPE_CONTENT_TYPE]: ClientPageScopeStore.getInstance(),
     [LOCALIZED_LITERALS_CONTENT_TYPE]: LocalizedLiteralsStore.getInstance(),
     [QUERY_PARAM_CONTENT_TYPE]: QueryParamStore.getInstance(),
   };

@@ -1,11 +1,11 @@
 import { clsx } from "clsx";
 import type { CSSProperties } from "react";
 import {
-  buildFoundationColorCssVar,
   buildSduiTokenClass,
   getSduiNumeric,
   getSduiToken,
   resolveFoundationRadiusClass,
+  resolveSduiColor,
   type SduiTokenOrLiteral,
 } from "@rbx/sdui-core";
 
@@ -15,21 +15,14 @@ interface GetCardStylesParams {
   descriptionMaxLines?: number;
 }
 
-function resolveBackgroundColor(
-  backgroundStyle: SduiTokenOrLiteral | null | undefined,
-  backgroundTokenClass: string | undefined,
-): string | undefined {
-  if (backgroundTokenClass != null || backgroundStyle?.kind !== "token") return undefined;
-  return buildFoundationColorCssVar(backgroundStyle.value) ?? backgroundStyle.value;
-}
-
 export const getCardStyles = ({
   cornerRadius,
   backgroundStyle,
   descriptionMaxLines,
 }: GetCardStylesParams) => {
   const backgroundTokenClass = buildSduiTokenClass(backgroundStyle ?? undefined, "background");
-  const backgroundColor = resolveBackgroundColor(backgroundStyle, backgroundTokenClass);
+  const backgroundColor =
+    backgroundTokenClass == null ? resolveSduiColor(backgroundStyle) : undefined;
   const cornerRadiusClass = resolveFoundationRadiusClass(getSduiToken(cornerRadius ?? undefined));
   const cornerRadiusPx = getSduiNumeric(cornerRadius ?? undefined);
 

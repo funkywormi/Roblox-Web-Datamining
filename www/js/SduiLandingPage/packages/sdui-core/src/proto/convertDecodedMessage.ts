@@ -15,7 +15,7 @@ import {
   type ComponentShared as InternalComponentShared,
 } from "../types";
 import { HYDRATION_FIELD_KEYS, hydrationContentTypeToFieldKey } from "../utils/hydration";
-import { asRecordOrEmpty, isRecord, type RecordOf } from "../utils/typeGuards";
+import { asNonEmptyString, asRecordOrEmpty, isRecord, type RecordOf } from "../utils/typeGuards";
 
 // ─── Shape primitives & narrowing helpers ───
 
@@ -38,16 +38,6 @@ interface OneOfRaw {
 
 function asString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
-}
-
-/**
- * Returns a string only when it is non-empty. Equivalent to the legacy
- * `someStringField || undefined` pattern but type-safe — proto fields default
- * to `""` for unset strings, and downstream consumers expect `undefined` so
- * they can apply their own fallbacks.
- */
-function asNonEmptyString(value: unknown): string | undefined {
-  return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
 function asArray(value: unknown): unknown[] {

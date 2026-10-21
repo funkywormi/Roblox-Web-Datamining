@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useQuery, QueryClientProvider } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
 import { getCurrentUser } from "@rbx/www-common/user";
 import { Button } from "@rbx/foundation-ui";
-import { queryClient } from "@rbx/core-scripts/react";
 import * as NavigationService from "@rbx/navigation";
 import ExperimentationService from "@rbx/experimentation";
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
@@ -181,7 +180,8 @@ export type TPlayButtonProps = {
   pageContext: TPlayButtonPageContext;
 };
 
-const PlayButtonContents = ({
+// Uses the host's QueryClientProvider, like usePlayabilityStatus, which every host already calls.
+export const PlayButton = ({
   universeId,
   placeId,
   rootPlaceId,
@@ -198,7 +198,7 @@ const PlayButtonContents = ({
   hideIcon = false,
   analyticsCallback = undefined,
   pageContext,
-}: TPlayButtonProps) => {
+}: TPlayButtonProps): React.JSX.Element => {
   const [isExperienceVoiceEnabled, setIsExperienceVoiceEnabled] = useState<boolean | undefined>(
     undefined,
   );
@@ -368,12 +368,6 @@ const PlayButtonContents = ({
     </React.Fragment>
   );
 };
-
-export const PlayButton = (props: TPlayButtonProps): React.JSX.Element => (
-  <QueryClientProvider client={queryClient}>
-    <PlayButtonContents {...props} />
-  </QueryClientProvider>
-);
 
 export type TDefaultPlayButtonProps = {
   placeId: string;

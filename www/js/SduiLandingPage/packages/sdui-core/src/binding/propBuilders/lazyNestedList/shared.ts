@@ -4,17 +4,36 @@ import type { RecordOf } from "../../../utils/typeGuards";
 import { computedEqual } from "../../../signals/computedEqual";
 
 /**
- * Wraps parent data sources with a per-iteration `inputData` overlay
- * (overlay wins on collision).
+ * Overlays `inputData` onto parent sources (overlay wins on collision) and
+ * drops overlay-owned keys from `pendingInputKeys` so a row cannot inherit
+ * the parent's pending status for fields it supplies.
+ *
+ * Hydration `sources` / `pendingEntitySourceKeys` stay the parent's: overlay does
+ * not rebuild entity IDs from the overlaid record.
+ */
+export function overlayDataSources(
+  parent: DataBindingSources,
+  overlay: RecordOf,
+): DataBindingSources {
+  const pendingInputKeys = new Set(parent.pendingInputKeys);
+  for (const key of Object.keys(overlay)) {
+    pendingInputKeys.delete(key);
+  }
+  return {
+    ...parent,
+    inputData: { ...parent.inputData, ...overlay },
+    pendingInputKeys,
+  };
+}
+
+/**
+ * Reactive wrapper around {@link overlayDataSources} for a static overlay.
  */
 export function makeOverlayDataSources(
   parentDataSources: ReadonlySignal<DataBindingSources>,
   overlay: RecordOf,
 ): ReadonlySignal<DataBindingSources> {
-  return computed(() => {
-    const parent = parentDataSources.value;
-    return { ...parent, inputData: { ...parent.inputData, ...overlay } };
-  });
+  return computed(() => overlayDataSources(parentDataSources.value, overlay));
 }
 
 /**

@@ -21,9 +21,6 @@ export default {
     getAllGroupRolePermissionsURL(groupId: number): string {
       return `${EnvironmentUrls.groupsApi}/v1/groups/${groupId}/roles/permissions`;
     },
-    getGroupMigrationStatusURL(groupId: number): string {
-      return `${EnvironmentUrls.groupsApi}/v1/groups/${groupId}/migration`;
-    },
     getGroupURL(groupId: number): string {
       return `${EnvironmentUrls.groupsApi}/v1/groups/${groupId}`;
     },

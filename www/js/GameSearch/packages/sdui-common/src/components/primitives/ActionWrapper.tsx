@@ -4,6 +4,7 @@ import { isPlainLeftClick, type SduiRendererInjectedProps } from "@rbx/sdui-core
 
 export interface ActionWrapperProps extends SduiRendererInjectedProps {
   href?: string;
+  target?: string;
   clientNavigation?: boolean;
   onClick?: () => void;
   className?: string;
@@ -53,6 +54,7 @@ const buttonStyleReset: React.CSSProperties = {
 function ActionWrapperInner(props: ActionWrapperProps) {
   const {
     href,
+    target,
     clientNavigation,
     onClick,
     className,
@@ -80,6 +82,7 @@ function ActionWrapperInner(props: ActionWrapperProps) {
     return (
       <a
         href={href}
+        target={target}
         style={{ ...linkStyleReset, ...style }}
         rel="noreferrer"
         onClick={e => {

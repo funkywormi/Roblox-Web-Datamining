@@ -32,6 +32,15 @@ const url = {
     url: `${apiGatewayUrl}/landing-page-api/spotlight`,
     withCredentials: true,
   }),
+  // Charts SDUI v2 (charts-api) endpoints — main page feed and See All sort detail.
+  getChartsPage: (): UrlConfig => ({
+    url: `${apiGatewayUrl}/charts-api/v1/charts-page`,
+    withCredentials: true,
+  }),
+  getChartsSortDetail: (): UrlConfig => ({
+    url: `${apiGatewayUrl}/charts-api/v1/charts-sort-detail`,
+    withCredentials: true,
+  }),
   postUserSignal: (): UrlConfig => ({
     url: `${apiGatewayUrl}/user-signal-http-gateway/v1/user-signal/ingest`,
     withCredentials: true,

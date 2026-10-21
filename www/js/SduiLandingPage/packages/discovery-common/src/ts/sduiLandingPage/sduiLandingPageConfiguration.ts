@@ -15,12 +15,15 @@ const SDUIPageConfig: ISduiLandingPageConfigurationBase[] = [
     appPage: PageContext.SpotlightPage,
     urlRouteTemplates: ["/spotlight/{spotlightSlug}"],
     buildConfigKey: slug => `spotlight_${slug}`,
-    buildRequestUrl: (slug, sessionId) => {
+    buildRequestUrl: (slug, sessionId, queryParams) => {
       const { url } = bedev2Constants.url.getSpotlightData();
-      const query = `pageSlug=${encodeURIComponent(slug)}${
-        sessionId ? `&sessionId=${encodeURIComponent(sessionId)}` : ""
-      }`;
-      return Url.parse(`${url}?${query}`).getOrThrow();
+      return Url.parse(url)
+        .getOrThrow()
+        .withSearchParams({
+          pageSlug: slug,
+          ...(sessionId ? { sessionId } : {}),
+          ...(queryParams?.gsrbx === "1" ? { gsrbx: "1" } : {}),
+        });
     },
     protoSchema: SpotlightPageResponseSchema,
     responseFormat: "protobuf",

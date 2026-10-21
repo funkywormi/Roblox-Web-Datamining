@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect } from "react";
+import React from "react";
 import classNames from "classnames";
-import { Button } from "@rbx/core-ui";
-import { Badge } from "@rbx/foundation-ui";
+import { Badge, Button } from "@rbx/foundation-ui";
 import type { FilterPillsInputDataFilterGroup } from "@rbx/sdui-core";
 import { useSduiServices } from "@rbx/sdui-core/client";
 import {
@@ -13,61 +12,26 @@ type FilterMenuProps = {
   filterGroup: FilterPillsInputDataFilterGroup;
   selectedOptionId: string;
   committedOptionId: string;
-  containerRef: React.RefObject<HTMLDivElement>;
   onOptionSelected: (optionId: string) => void;
   onApply: () => void;
   onClose: () => void;
 };
 
-const ESCAPE_KEY = "Escape";
-
 export function FilterMenu({
   filterGroup,
   selectedOptionId,
   committedOptionId,
-  containerRef,
   onOptionSelected,
   onApply,
   onClose,
 }: FilterMenuProps): React.JSX.Element {
   const { translate } = useSduiServices();
 
-  const handleMouseDown = useCallback(
-    (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        event.target instanceof Node &&
-        !containerRef.current.contains(event.target)
-      ) {
-        onClose();
-      }
-    },
-    [containerRef, onClose],
-  );
-
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key === ESCAPE_KEY) {
-        onClose();
-      }
-    },
-    [onClose],
-  );
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleMouseDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handleMouseDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleMouseDown, handleKeyDown]);
-
   const closeLabel = translate?.(CommonUIFeatures.ActionClose) ?? "Close";
   const applyLabel = translate?.(FeatureGamePage.ActionApply) ?? "Apply";
 
   return (
-    <div className="filters-modal-container" role="dialog" aria-label={filterGroup.displayName}>
+    <div className="filters-modal-container">
       <div className="header-container">
         <h3>{filterGroup.displayName}</h3>
         <div>
@@ -127,9 +91,8 @@ export function FilterMenu({
       <div className="action-buttons-container">
         <Button
           onClick={onApply}
-          variant={Button.variants.primary}
-          size={Button.sizes.medium}
-          width={Button.widths.full}
+          variant="Emphasis"
+          size="Medium"
           className="apply-button"
           isDisabled={selectedOptionId === committedOptionId}
         >

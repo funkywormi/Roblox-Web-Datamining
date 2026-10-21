@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useCollectionItemsIntersectionTracker } from "@rbx/unified-logging";
 import {
   UiComponentType,
-  SduiSectionHeader,
   buildCollectionAnalyticsData,
   buildItemAnalyticsData,
   componentTypeName,
@@ -16,6 +15,7 @@ import {
   type SduiManagedChildList,
   type SduiRendererInjectedProps,
 } from "@rbx/sdui-core";
+import { SduiSectionHeader } from "@rbx/sdui-common";
 import { useSduiServices } from "@rbx/sdui-core/client";
 import VariableItemWidthCarousel from "../../../common/components/VariableItemWidthCarousel";
 

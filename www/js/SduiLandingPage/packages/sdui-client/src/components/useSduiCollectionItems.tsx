@@ -19,6 +19,7 @@ export interface UseSduiCollectionItemsArgs {
   items?: SduiManagedChildList;
   /** Logged on the collection analytics record, e.g. "COLLECTION_CAROUSEL" / "COLLECTION_GRID". */
   collectionComponentType: string;
+  itemsPerRowOverride?: number;
   /**
    * When defined, looks up in `registry`; otherwise falls back to default item
    * impression log.
@@ -50,6 +51,7 @@ export function useSduiCollectionItems({
   analyticsContext,
   items,
   collectionComponentType,
+  itemsPerRowOverride,
   impressionEventName,
   skipItemImpressionsLog,
 }: UseSduiCollectionItemsArgs): SduiCollectionItems {
@@ -57,9 +59,11 @@ export function useSduiCollectionItems({
   const { pageContext } = services;
 
   const itemsContainerRef = useRef<HTMLDivElement | null>(null);
-  const [itemsPerRow, setItemsPerRow] = useState(-1);
+  const [measuredItemsPerRow, setMeasuredItemsPerRow] = useState(-1);
+  const itemsPerRow = itemsPerRowOverride ?? measuredItemsPerRow;
   const itemConfigs: SduiComponentConfig[] = items?.configs ?? [];
   const totalNumberOfItems = itemConfigs.length;
+  const isPooled = items?.poolLayout !== undefined;
 
   const collectionAnalyticsData = useMemo(
     () =>
@@ -107,6 +111,10 @@ export function useSduiCollectionItems({
         impressionIndexes: indexesToSend,
         itemAnalyticsDatas: itemAnalyticsDatasRef.current,
         collectionAnalyticsData,
+        startRowNumber: items?.poolLayout?.startRow,
+        itemCellIndexes: isPooled
+          ? items.configs.map((config, index) => config.poolPlacement?.cellIndex ?? index)
+          : undefined,
         impressionEventName,
         skipItemImpressionsLog,
       });
@@ -115,6 +123,9 @@ export function useSduiCollectionItems({
       impressionCtx,
       services.impressionHandlerRegistry,
       collectionAnalyticsData,
+      items?.poolLayout?.startRow,
+      items?.configs,
+      isPooled,
       itemsPerRow,
       impressionEventName,
       skipItemImpressionsLog,
@@ -130,11 +141,12 @@ export function useSduiCollectionItems({
         index,
         pageContext,
         services.errorReporter,
+        config.poolPlacement ? config.poolPlacement.poolIndex + 1 : undefined,
       );
       return items?.renderItem(config, index) ?? <React.Fragment key={index} />;
     },
     [items, pageContext, services.errorReporter],
   );
 
-  return { itemsContainerRef, itemConfigs, setItemsPerRow, renderItem };
+  return { itemsContainerRef, itemConfigs, setItemsPerRow: setMeasuredItemsPerRow, renderItem };
 }

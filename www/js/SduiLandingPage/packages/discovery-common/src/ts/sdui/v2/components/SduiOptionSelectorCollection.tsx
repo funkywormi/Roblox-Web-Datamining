@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import classNames from "classnames";
 import {
   SduiErrorName,
-  SduiPlaceholderWrapper,
   componentTypeName,
   expandManagedList,
   omitPropSignals,
@@ -12,6 +11,7 @@ import {
   type SduiRendererInjectedProps,
   type SduiResolvedAction,
 } from "@rbx/sdui-core";
+import { SduiPlaceholderWrapper } from "@rbx/sdui-common";
 import { useSduiServices } from "@rbx/sdui-core/client";
 import { SduiVariableItemWidthCarousel } from "./SduiVariableItemWidthCarousel";
 
@@ -165,6 +165,7 @@ export function SduiOptionSelectorCollection({
     return {
       configs,
       renderItem: optionItemConfigs.renderItem,
+      ...(optionItemConfigs.poolLayout ? { poolLayout: optionItemConfigs.poolLayout } : {}),
     };
   }, [
     optionItemConfigs,

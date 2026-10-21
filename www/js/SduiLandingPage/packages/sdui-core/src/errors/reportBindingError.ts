@@ -1,4 +1,8 @@
-import type { BindingContext, SduiErrorDimensions } from "../types";
+import type {
+  BindingContext,
+  ReportSduiErrorAdditionalOptions,
+  SduiErrorDimensions,
+} from "../types";
 import { reportError } from "./SduiLogger";
 import { SduiErrorName } from "./SduiErrors";
 
@@ -25,6 +29,7 @@ export function reportBindingError(
   ctx: BindingContext,
   message: string,
   extras?: SduiErrorDimensions,
+  additionalOptions?: ReportSduiErrorAdditionalOptions,
 ): void {
   reportError(
     errorName,
@@ -32,6 +37,7 @@ export function reportBindingError(
     ctx.pageContext,
     { ...bindingDimensions(ctx), ...extras },
     ctx.errorReporter,
+    additionalOptions,
   );
 }
 

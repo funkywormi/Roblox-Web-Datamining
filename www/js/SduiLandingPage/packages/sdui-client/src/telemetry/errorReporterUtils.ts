@@ -9,6 +9,21 @@ export function getErrorPageContext(pageContext?: SduiPageContext): string {
 }
 
 /**
+ * Decides whether a channel should fire for the given per-channel sample rate.
+ * An unset rate (or any rate `>= 1`) always fires; `0` never fires; otherwise a
+ * fresh random draw must fall under the rate.
+ */
+export function shouldFireChannel(rate: number | undefined): boolean {
+  if (rate === undefined || rate >= 1) {
+    return true;
+  }
+  if (rate <= 0) {
+    return false;
+  }
+  return Math.random() < rate;
+}
+
+/**
  * Fires the real-time error counter keyed by error name. No-op when the host
  * `EventTracker` isn't present.
  */
@@ -18,14 +33,16 @@ export function fireErrorCounter(errorName: string): void {
   }
 }
 
-export function captureError({
+/**
+ * Emits the error to the eventstream table. Kept separate from the counter so
+ * the two channels can be sampled independently.
+ */
+export function sendErrorEvent({
   eventName,
   errorName,
   errorMessage,
   errorContext,
 }: CaptureErrorInput): void {
-  fireErrorCounter(errorName);
-
   const params = { errorName, errorMessage };
   sendEvent(
     {

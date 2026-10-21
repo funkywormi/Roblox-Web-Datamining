@@ -1,3 +1,8 @@
+/** Uppercases the first character, leaving the rest unchanged: `"right"` → `"Right"`. */
+export function capitalizeFirst(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 /**
  * Strip a SHOUTY_SNAKE_CASE proto enum prefix and convert the remainder to
  * camelCase (or PascalCase when `capitalize` is true). Matches lua-apps
@@ -20,5 +25,5 @@ export function stripEnumPrefix(value: unknown, prefix: string, capitalize = fal
   if (!capitalize || camel.length === 0) {
     return camel;
   }
-  return camel.charAt(0).toUpperCase() + camel.slice(1);
+  return capitalizeFirst(camel);
 }

@@ -13,12 +13,14 @@ import {
 } from "@rbx/discovery-common/telemetry";
 import { buildSearchApiRequestConfig } from "../common/services/searchService";
 import { getSduiServices } from "../common/services/sduiServices";
+import { useIsSearchResultsFeedEmpty } from "../common/hooks/useIsSearchResultsFeedEmpty";
 import { normalizeKeyword } from "../common/utils/keywordUtils";
 import "./topSearchResults.scss";
 
 const TOP_SEARCH_RESULTS_APP_PAGE = PageContext.SearchPage;
 const TOP_SEARCH_RESULTS_SURFACE_KEY = PageContext.SearchPage;
 const TOP_SEARCH_RESULTS_FEED_IDENTIFIER = "search_results_feed";
+const NO_SEARCH_RESULTS_KEY = "LabelNoSearchResults";
 
 const getTopSearchResultsPageKey = (sessionId: string) => `${PageContext.SearchPage}-${sessionId}`;
 
@@ -61,8 +63,20 @@ export const TopSearchResultsContainer = ({ translate }: TopSearchResultsContain
     [sessionId],
   );
 
+  const isEmpty = useIsSearchResultsFeedEmpty(
+    services.apiStore,
+    pageKey,
+    TOP_SEARCH_RESULTS_FEED_IDENTIFIER,
+  );
+
   return (
     <div className="top-search-results-page flex padding-x-[10px]">
+      {isEmpty ? (
+        // Currently, app and web both handle no-results on the client
+        <div data-testid="game-search-no-results" className="shrink-0 font-bold">
+          {translate(NO_SEARCH_RESULTS_KEY)}
+        </div>
+      ) : null}
       <SduiPageEntryPoint
         services={services}
         LoadingComponent={TopSearchResultsLoading}

@@ -22,6 +22,8 @@ export const sduiGameImpressionsHandler: SduiImpressionHandlerConfig["handler"] 
   impressionIndexes,
   itemAnalyticsDatas,
   collectionAnalyticsData,
+  startRowNumber,
+  itemCellIndexes,
 ) => {
   if (!collectionAnalyticsData) {
     ctx.errorReporter.reportSduiError(
@@ -69,6 +71,8 @@ export const sduiGameImpressionsHandler: SduiImpressionHandlerConfig["handler"] 
     pageContext: toV1PageContext(ctx.pageContext),
     useGridTiles,
     componentTypeFallback: DEFAULT_ITEM_COMPONENT_TYPE,
+    startRowNumber,
+    itemCellIndexes,
   });
 
   const [descriptor, fields] = eventStreamConstants.gameImpressions(gameImpressionParams);

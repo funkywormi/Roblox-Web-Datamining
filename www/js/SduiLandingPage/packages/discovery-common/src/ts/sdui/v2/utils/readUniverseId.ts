@@ -1,7 +1,6 @@
-import type { AnalyticsContext } from "@rbx/sdui-core";
+import { findAnalyticsFieldInAncestors, type AnalyticsContext } from "@rbx/sdui-core";
 
 import { parseMaybeStringNumberField } from "../../utils/analyticsParsingUtils";
-import { findAnalyticsFieldInAncestors } from "./findAnalyticsFieldInAncestors";
 
 export function readUniverseId(
   actionParams: Record<string, unknown>,

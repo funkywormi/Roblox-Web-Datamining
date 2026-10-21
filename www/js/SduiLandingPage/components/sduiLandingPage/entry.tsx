@@ -7,8 +7,18 @@ import {
 } from "@rbx/discovery-common";
 import "@rbx/discovery-common/sduiLandingPage.scss";
 import "@rbx/discovery-common/sduiIcons.scss";
+import { gamePlayButtonNamespaces } from "@rbx/game-play-button";
+import type { Namespace } from "@rbx/www-common/i18n";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { translations } from "./component.json";
 import "./src/main.css";
+
+// The SDUI Play button and game tiles read their own namespaces from this provider too.
+const namespaces = [
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- CI narrows Namespace; component.json is always valid
+  ...(translations as unknown as readonly Namespace[]),
+  ...gamePlayButtonNamespaces,
+];
 
 ready(() => {
   const containerElement = getSduiLandingPageContainerElement(window.location.pathname);
@@ -17,12 +27,14 @@ ready(() => {
   }
 
   renderWithErrorBoundary(
-    <TranslationProvider config={translations}>
-      <QueryClientProvider client={queryClient}>
-        {/* @ts-expect-error TODO: old, migrated code */}
-        <SduiLandingPageContainer />
-      </QueryClientProvider>
-    </TranslationProvider>,
+    <TranslationProviderSCC namespaces={namespaces}>
+      <TranslationProvider config={translations}>
+        <QueryClientProvider client={queryClient}>
+          {/* @ts-expect-error TODO: old, migrated code */}
+          <SduiLandingPageContainer />
+        </QueryClientProvider>
+      </TranslationProvider>
+    </TranslationProviderSCC>,
     containerElement,
   );
 });

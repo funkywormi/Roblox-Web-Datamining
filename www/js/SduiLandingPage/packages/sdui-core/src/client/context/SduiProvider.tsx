@@ -20,6 +20,14 @@ export function useSduiServices(): SduiContextValue {
   return contextValue;
 }
 
+/**
+ * Read `translate` from the nearest `SduiProvider`. Unlike `useSduiServices`, returns undefined
+ * outside a provider, for primitives that fall back to English text.
+ */
+export function useSduiTranslate(): SduiServices["translate"] {
+  return useContext(SduiContext)?.translate;
+}
+
 /** Read the cache/request key scoped to the nearest SDUI render subtree. */
 export function useSduiConfigKey(): string | undefined {
   return useSduiServices().configKey;

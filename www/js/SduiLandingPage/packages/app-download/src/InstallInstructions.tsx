@@ -1,12 +1,9 @@
-import {
-  withTranslations,
-  type TranslateFunction,
-  type WithTranslationsProps,
-} from "@rbx/core-scripts/react";
-import { appDownloadTranslationConfig, downloadPageStrings } from "./constants";
+import type { TranslateFunction } from "@rbx/core-scripts/react";
+import { downloadPageStrings } from "./constants";
 import type { AppDownloadLink } from "./constants";
 import { getInstallInstructions } from "./appDownloadService";
-import "./InstallInstructions.scss";
+import { useAppDownloadTranslate } from "./useAppDownloadTranslate";
+import "./InstallInstructions.css";
 
 type Props = {
   translate: TranslateFunction;
@@ -73,23 +70,9 @@ function InstallInstructions({ translate, downloadLink, showQrCode = true }: Pro
   );
 }
 
-function InstallInstructionsWithTranslationBase({
-  translate,
-  downloadLink,
-  showQrCode,
-}: PropsWithoutTranslate & WithTranslationsProps) {
-  return (
-    <InstallInstructions
-      translate={translate}
-      downloadLink={downloadLink}
-      showQrCode={showQrCode}
-    />
-  );
+export function InstallInstructionsWithTranslation(props: PropsWithoutTranslate) {
+  const translate = useAppDownloadTranslate();
+  return <InstallInstructions {...props} translate={translate} />;
 }
-
-export const InstallInstructionsWithTranslation = withTranslations(
-  InstallInstructionsWithTranslationBase,
-  appDownloadTranslationConfig,
-);
 
 export default InstallInstructions;

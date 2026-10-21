@@ -14,6 +14,11 @@ export function camelToSnake(s: string): string {
   return s.replace(/[A-Z]/g, char => `_${char.toLowerCase()}`);
 }
 
+/** True when `snakeToCamel` would leave `s` unchanged. */
+export function isUnchangedBySnakeToCamel(s: string): boolean {
+  return snakeToCamel(s) === s;
+}
+
 /**
  * Converts a PascalCase or camelCase identifier to kebab-case.
  *

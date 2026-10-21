@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, type CSSProperties } from "react";
+import { useMemo, type CSSProperties, type ReactNode } from "react";
 import { clsx } from "clsx";
 import {
   buildFoundationTokenCss,
@@ -43,6 +43,8 @@ export interface SduiTextProps extends SduiRendererInjectedProps {
   textYAlignment?: string;
   /** Web-only class names from `TextSchema.WebProps.class_names`. App `tag` is ignored. */
   classNames?: string;
+  /** Rendered in place of `text`. */
+  children?: ReactNode;
 }
 
 /**
@@ -66,6 +68,7 @@ export function SduiText({
   textXAlignment,
   textYAlignment,
   classNames,
+  children,
 }: SduiTextProps) {
   const Element = toHtmlElement(headingLevel);
 
@@ -112,7 +115,7 @@ export function SduiText({
 
   return (
     <Element data-testid="sdui-text" className={parentClassName} style={style}>
-      <span className={contentClassName}>{content}</span>
+      <span className={contentClassName}>{children ?? content}</span>
     </Element>
   );
 }

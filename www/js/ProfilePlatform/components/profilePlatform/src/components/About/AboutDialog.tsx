@@ -28,7 +28,7 @@ const AboutDialog: React.FC<AboutDialogProps> = ({ open, onClose, sections }) =>
       hasMarginTop
       hasMarginBottom
     >
-      <DialogContent className="width-[calc(var(--size-100)*160)]">
+      <DialogContent className="width-full">
         <DialogBody className="gap-xxlarge flex flex-col">
           <DialogTitle hidden>{translate("Label.About")}</DialogTitle>
           {sections}

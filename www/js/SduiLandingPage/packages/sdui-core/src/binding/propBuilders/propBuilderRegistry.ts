@@ -5,6 +5,7 @@ import {
   ScaleBasisSchema,
   ScaleTypeSchema,
   TextTruncateSchema,
+  TextXAlignmentSchema,
 } from "../../types";
 import { reportBindingError, SduiErrorName } from "../../errors";
 import { enumNumberToName, jsonEnumToString } from "../../utils/protoEnum";
@@ -22,6 +23,7 @@ import {
   parseScaleTypeProp,
   parseStringArrayProp,
   parseTextTruncateProp,
+  parseTextAlignmentProp,
   parseUDimProp,
   parseUDim2Prop,
   parseVector2Prop,
@@ -84,6 +86,7 @@ const PROP_BUILDERS: Partial<Record<PropDescriptorName, PropBuilder>> = {
   TypographyProp: buildDefaultProp,
   TypographyFontProp: buildDefaultProp,
   TextTruncateProp: withEnumParser(TextTruncateSchema, parseTextTruncateProp),
+  TextXAlignmentProp: withEnumParser(TextXAlignmentSchema, parseTextAlignmentProp),
   FillBehaviorProp: buildDefaultProp,
   InputSizeProp: buildDefaultProp,
   IconProp: withDefaultParser(parseIconProp),
@@ -100,9 +103,11 @@ const PROP_BUILDERS: Partial<Record<PropDescriptorName, PropBuilder>> = {
   TemplateArg: buildDefaultProp,
   AnalyticsDataField: buildDefaultProp,
   NestedComponentProp: buildNestedComponentProp,
-  // TODO(web-sdui): NestedComponentListProp and LazyNestedComponentListProp share
-  // the same builder today. Provide descriptor-driven lazy rendering so they defer /
-  // diverge — LazyNestedComponentListProp should lazy-render, NestedComponentListProp should not.
+  // TODO(web-sdui): Preserve the raw config for parent-controlled rendering.
+  // Eager rendering is the current web fallback until per-prop lazy rendering exists.
+  LazyNestedComponentProp: buildNestedComponentProp,
+  // TODO(web-sdui): Add descriptor-driven lazy rendering so these prop types can
+  // diverge. Explicit ComponentList.deferItemBuild is handled by capable parents.
   NestedComponentListProp: buildLazyNestedComponentListProp,
   LazyNestedComponentListProp: buildLazyNestedComponentListProp,
   StringArrayProp: withDefaultParser(parseStringArrayProp),

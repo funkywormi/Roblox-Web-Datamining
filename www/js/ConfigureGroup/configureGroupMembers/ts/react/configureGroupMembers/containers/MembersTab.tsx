@@ -4,7 +4,6 @@ import { Loading } from 'react-style-guide';
 import { useTranslation } from 'react-utilities';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { CurrentUser } from 'Roblox';
-import { MIGRATION_STATUS, useGetMigrationStatus } from '@rbx/group-management';
 import { AssignedRole, Group, UserAndRoles } from '../../shared/types';
 import groupMembersService from '../services/groupMembersService';
 import useMemberModerationActions from '../hooks/useMemberModerationActions';
@@ -58,15 +57,6 @@ const MembersTab: React.FC<MembersTabProps> = ({ group }) => {
       group.permissions?.groupMembershipPermissions.banMembers
   );
 
-  // The lexorank affordance is unified-groups only (flag on AND migrated); legacy groups stay rank-based.
-  const isUnifiedUIEnabled = features.IsUnifiedUIEnabled === true;
-  const {
-    data: migrationStatus,
-    isLoading: isMigrationStatusLoading
-  } = useGetMigrationStatus(groupId, { enabled: isUnifiedUIEnabled });
-  const isUnifiedGroup =
-    isUnifiedUIEnabled && migrationStatus?.status === MIGRATION_STATUS.MIGRATED;
-
   // Role management and moderation both compare role position, so fetch the acting user's held
   // roles (members query filtered to self) whenever they can manage ranks or moderate members.
   const authedUserId = Number(CurrentUser.userId);
@@ -86,8 +76,6 @@ const MembersTab: React.FC<MembersTabProps> = ({ group }) => {
     () => (authedUserData ? getAuthedUserItems(authedUserData)[0]?.roles ?? [] : undefined),
     [authedUserData, getAuthedUserItems]
   );
-
-  const authedUserRank = group.role?.rank;
 
   // Kick/ban are only offered for members the acting user outranks, matching role management.
   const canModerateMember = useCallback(
@@ -117,23 +105,10 @@ const MembersTab: React.FC<MembersTabProps> = ({ group }) => {
       computeManageableRoles({
         authedUserCanManageRanks,
         isLoggedInUserOwner,
-        isUnifiedUIEnabled,
-        isMigrationStatusLoading,
-        isUnifiedGroup,
         roles,
-        authedUserRoles,
-        authedUserRank
+        authedUserRoles
       }),
-    [
-      authedUserCanManageRanks,
-      isLoggedInUserOwner,
-      isUnifiedUIEnabled,
-      isMigrationStatusLoading,
-      isUnifiedGroup,
-      roles,
-      authedUserRoles,
-      authedUserRank
-    ]
+    [authedUserCanManageRanks, isLoggedInUserOwner, roles, authedUserRoles]
   );
 
   const onRoleChanged = useCallback((value: string) => {

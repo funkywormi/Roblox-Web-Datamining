@@ -24,26 +24,14 @@ function configureGroupService(
   let economyMetadata;
   let getEconomyMetadataPromise;
 
-  function getCanManageRolePermissions(groupId, isUnifiedUIEnabled) {
-    if (!isUnifiedUIEnabled) {
-      return $q.when(false);
-    }
-    return httpService
-      .httpGet({
-        url: `${EnvironmentUrls.groupsApi}/v1/groups/${groupId}/migration`
-      })
-      .then(migrationStatus => {
-        if (migrationStatus.status !== 'Migrated') {
-          return false;
-        }
-        return forumsService
-          .getResolvedGroupRolePermissions(groupId)
-          .then(resolvedRolePermissions =>
-            Object.values(resolvedRolePermissions).some(
-              rolePermissions => rolePermissions.canEditPermissions === true
-            )
-          );
-      })
+  function getCanManageRolePermissions(groupId) {
+    return forumsService
+      .getResolvedGroupRolePermissions(groupId)
+      .then(resolvedRolePermissions =>
+        Object.values(resolvedRolePermissions).some(
+          rolePermissions => rolePermissions.canEditPermissions === true
+        )
+      )
       .catch(error => {
         $log.error('[UnifiedForumPermissions] role management gate failed', {
           groupId,
@@ -82,25 +70,15 @@ function configureGroupService(
     );
   }
 
-  function getCanConfigureGroupProfile(groupId, isUnifiedUIEnabled) {
-    if (!isUnifiedUIEnabled) {
-      return $q.when(false);
-    }
+  function getCanConfigureGroupProfile(groupId) {
     const config = {
       url: $filter('formatString')(configureGroupConstants.urls.getResolvedGroupPermissionsUrl, {
         groupId
       })
     };
     return httpService
-      .httpGet({ url: `${EnvironmentUrls.groupsApi}/v1/groups/${groupId}/migration` })
-      .then(migrationStatus => {
-        if (migrationStatus.status !== 'Migrated') {
-          return false;
-        }
-        return httpService
-          .httpGet(config)
-          .then(response => response?.permissions?.canConfigureGroupProfile === true);
-      })
+      .httpGet(config)
+      .then(response => response?.permissions?.canConfigureGroupProfile === true)
       .catch(error => {
         $log.error('[ConfigureGroup] profile permission check failed', { groupId, error });
         return false;
@@ -340,13 +318,9 @@ function configureGroupService(
         const groupPromise = groupsService.getGroup(groupId).catch(() => undefined);
         const productFeaturesPromise = groupsService
           .getGroupProductFeatures(groupId)
-          .catch(() => ({ IsOwnerRolesetDeprecated: false }));
-        const canManageRolePermissionsPromise = productFeaturesPromise.then(productFeatures =>
-          getCanManageRolePermissions(groupId, productFeatures?.IsUnifiedUIEnabled === true)
-        );
-        const canConfigureGroupProfilePromise = productFeaturesPromise.then(productFeatures =>
-          getCanConfigureGroupProfile(groupId, productFeatures?.IsUnifiedUIEnabled === true)
-        );
+          .catch(() => undefined);
+        const canManageRolePermissionsPromise = getCanManageRolePermissions(groupId);
+        const canConfigureGroupProfilePromise = getCanConfigureGroupProfile(groupId);
 
         const menuOptions = [];
         const menuOptionNameValidity = {};

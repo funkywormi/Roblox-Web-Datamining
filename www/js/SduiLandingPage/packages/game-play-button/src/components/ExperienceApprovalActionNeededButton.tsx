@@ -1,0 +1,66 @@
+import React, { useCallback } from "react";
+import { fireEvent } from "@rbx/www-common/event-tracker";
+import { sendUnlockPlayIntentEvent } from "../utils/playButtonUtils";
+import { getStartAccessManagementUpsell } from "../utils/accessManagementUpsell";
+import ActionNeededButton from "./ActionNeededButton";
+import playButtonConstants from "../constants/playButtonConstants";
+import { PlayabilityStatus } from "../constants/playabilityStatus";
+import type { TPlayButtonPageContext } from "../types/playButtonTypes";
+
+const { counterEvents, unlockPlayIntentConstants, ampNamespaces } = playButtonConstants;
+
+type TExperienceApprovalActionNeededButtonProps = {
+  universeId: string;
+  buttonClassName?: string;
+  pageContext: TPlayButtonPageContext;
+};
+
+const ExperienceApprovalActionNeededButton = ({
+  universeId,
+  buttonClassName,
+  pageContext,
+}: TExperienceApprovalActionNeededButtonProps): React.JSX.Element => {
+  const onButtonClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      fireEvent(counterEvents.PlayButtonUpsellExperienceApprovalTriggered);
+
+      sendUnlockPlayIntentEvent(
+        universeId,
+        unlockPlayIntentConstants.experienceApprovalUpsellName,
+        PlayabilityStatus.ContextualPlayabilityRequireParentApproval,
+        pageContext,
+      );
+
+      const startAccessManagementUpsell = getStartAccessManagementUpsell();
+      if (!startAccessManagementUpsell) {
+        fireEvent(counterEvents.PlayButtonUpsellExperienceApprovalError);
+        return;
+      }
+
+      startAccessManagementUpsell({
+        featureName: "CanApproveExperience",
+        namespace: ampNamespaces.accountManagement,
+        isAsyncCall: false,
+        usePrologue: true,
+        ampRecourseData: {
+          universeId,
+          experienceManagementAction: "Approve",
+        },
+      }).catch(() => {
+        fireEvent(counterEvents.PlayButtonUpsellExperienceApprovalError);
+      });
+    },
+    [universeId, pageContext],
+  );
+
+  return <ActionNeededButton onButtonClick={onButtonClick} buttonClassName={buttonClassName} />;
+};
+
+ExperienceApprovalActionNeededButton.defaultProps = {
+  buttonClassName: undefined,
+};
+
+export default ExperienceApprovalActionNeededButton;

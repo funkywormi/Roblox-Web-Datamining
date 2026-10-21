@@ -41,7 +41,6 @@ export interface SduiImageProps extends SduiRendererInjectedProps {
   /**
    * ImageSchema `scale_type`, already parsed by `ScaleTypeProp`
    * (`stretch` | `slice` | `tile` | `fit` | `crop`).
-   * Currently applied on the asset (`rbxassetid`) path only — not Thumbnail2d.
    */
   scaleType?: SduiScaleType;
   /**
@@ -69,6 +68,8 @@ export function SduiImage({
   const { src, status } = useResolvedImageUrl(assetId, true);
   const fillsBox = scaleType != null && aspectRatio == null;
   const tintClass = buildFoundationTokenCss(getSduiToken(imageStyleProp ?? undefined), "content");
+  const objectFit =
+    scaleType != null ? buildObjectFitCss(scaleType) : aspectRatio != null ? "contain" : undefined;
 
   // TODO: Convert image container inline styles to Tailwind classes.
   const imageStyle: CSSProperties = {
@@ -123,13 +124,17 @@ export function SduiImage({
 
   // Thumbnail images delegate to Thumbnail2d which owns its own shimmer.
   if (parsedImage.kind === "thumbnail") {
+    const objectFitClass = objectFit != null ? `object-fit-${objectFit}` : undefined;
     return renderImageContainer(
       <Thumbnail2d
         type={parsedImage.thumbnail.type}
         targetId={parsedImage.thumbnail.targetId}
         format={ThumbnailFormat.webp}
         size={parsedImage.thumbnail.size}
+        includeBackground={parsedImage.thumbnail.includeBackground}
+        includeProfileFrame={parsedImage.thumbnail.includeProfileFrame}
         containerClass="sdui-thumbnail-image-container"
+        imgClassName={objectFitClass}
         altName={alt}
       />,
     );
@@ -137,9 +142,6 @@ export function SduiImage({
 
   // Asset resolution failed: show broken-image icon (matches Thumbnail2d error behavior)
   if (status === "error") return renderImageContainer(<ImageWithShimmer errored />);
-
-  const objectFit =
-    scaleType != null ? buildObjectFitCss(scaleType) : aspectRatio != null ? "contain" : undefined;
 
   return renderImageContainer(
     <ImageWithShimmer

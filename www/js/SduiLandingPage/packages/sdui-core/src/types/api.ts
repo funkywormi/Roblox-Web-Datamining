@@ -109,11 +109,29 @@ export type SduiTargetedRefreshResult =
       targets: readonly SduiTargetedRefreshInput[];
     };
 
+export type SduiPostBody = BufferSource | string;
+
+export interface SduiPostConfig {
+  body: SduiPostBody;
+  contentType: string;
+  /**
+   * Stable identity of the body for cache comparisons. The body is the query
+   * for POST surfaces, so requests with different bodies must not share data.
+   */
+  bodyKey: string;
+}
+
 export interface ApiRequestConfig {
   url: Url;
   surfaceKey: string;
   configKey?: string;
   responseFormat?: "protobuf" | "json";
+  /**
+   * When set, the store issues a POST with this body instead of GET.
+   * Required for surfaces whose gateway route only allows POST
+   * (e.g. account-management user settings menu).
+   */
+  postConfig?: SduiPostConfig;
   startSource?: SduiFetchReason;
   /**
    * Proto descriptor for decoding protobuf responses. Required when
@@ -121,6 +139,8 @@ export interface ApiRequestConfig {
    * a pre-decoded response (SSR hydration).
    */
   protoSchema?: DescMessage;
+  /** Processes a varint-framed protobuf response incrementally when enabled. */
+  enableStreaming?: boolean;
   isPaginated?: boolean;
   /**
    * Per-field strategy for continuation merges. Mirrors lua-apps'
@@ -131,6 +151,21 @@ export interface ApiRequestConfig {
   buildNextPageUrl?: (previousResponse: SduiApiResponse) => Url | undefined;
   buildRefreshUrl?: () => Url | undefined;
   buildTargetedRefreshUrl?: (inputs: readonly SduiTargetedRefreshInput[]) => Url | undefined;
+  /**
+   * Rebuilds the POST body for the next page when the cursor lives in the
+   * body. Optional when pagination is carried on the URL (query params):
+   * load-more then reuses the original POST body at {@link buildNextPageUrl}.
+   */
+  buildNextPageBody?: (previousResponse: SduiApiResponse) => SduiPostBody | undefined;
+  /**
+   * Rebuilds the POST body for a targeted refresh when the targets live in
+   * the body. Optional when they are carried on the URL (query params):
+   * targeted refresh then reuses the original POST body at
+   * {@link buildTargetedRefreshUrl}.
+   */
+  buildTargetedRefreshBody?: (
+    inputs: readonly SduiTargetedRefreshInput[],
+  ) => SduiPostBody | undefined;
   onRetry?: () => void;
   /**
    * When true, a successful fetch that produces zero parsed page entries

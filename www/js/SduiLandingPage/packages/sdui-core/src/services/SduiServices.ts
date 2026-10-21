@@ -1,3 +1,4 @@
+import { document as browserDocument } from "@rbx/core-lib/browser";
 import {
   createSduiLoadTimerRegistry,
   type SduiLoadTimerRegistry,
@@ -5,12 +6,15 @@ import {
 import { createSduiBuilder } from "../binding/SduiBuilder";
 import { createSduiDataBinder } from "../binding/SduiDataBinder";
 import { createHydrationStores } from "../binding/stores";
+import { RESPONSIVE_CONTENT_TYPE } from "../binding/stores/contentStores/ResponsiveStore";
 import type { SduiActionHandlerRegistry } from "../registry/SduiActionHandlerRegistry";
 import type { SduiComponentRegistry } from "../registry/SduiComponentRegistry";
 import type { SduiImpressionHandlerRegistry } from "../registry/SduiImpressionHandlerRegistry";
+import { createSduiPoolRegistry, type SduiPoolRegistry } from "../registry/SduiPoolRegistry";
 import type { SduiTelemetryHandlerNameRegistry } from "../registry/SduiTelemetryHandlerNameRegistry";
 import { createSduiApiStore } from "../store/SduiApiStore";
 import { createSduiTemplateStore } from "../store/SduiTemplateStore";
+import { createDeduplicatingErrorReporter } from "../errors/DeduplicatingSduiErrorReporter";
 import type {
   HydrationContent,
   HydrationStore,
@@ -20,7 +24,9 @@ import type {
   SduiDataBinder,
   SduiErrorReporter,
   SduiPageContext,
+  SduiPageLoadPlatformAdapter,
   SduiTemplateStore,
+  SduiWebVitalsObserver,
   TranslateFunction,
 } from "../types";
 
@@ -31,6 +37,7 @@ export interface SduiServices {
   templateStore: SduiTemplateStore;
   dataBinder: SduiDataBinder;
   builder: SduiBuilder;
+  poolRegistry: SduiPoolRegistry;
   componentRegistry: SduiComponentRegistry;
   actionHandlerRegistry: SduiActionHandlerRegistry;
   telemetryHandlerNameRegistry: SduiTelemetryHandlerNameRegistry;
@@ -49,6 +56,13 @@ export interface CreateSduiServicesOptions {
   impressionHandlerRegistry: SduiImpressionHandlerRegistry;
   analyticsReporter: SduiAnalyticsReporter;
   errorReporter: SduiErrorReporter;
+  /**
+   * Optional CSR-only Core Web Vitals observer. When omitted, an injected
+   * page-load platform adapter can still close the emit gate through its fallbacks.
+   */
+  observeWebVitals?: SduiWebVitalsObserver;
+  /** Optional CSR-only browser lifecycle and fallback scheduler. */
+  pageLoadPlatformAdapter?: SduiPageLoadPlatformAdapter;
   /** Identifies the page/surface for telemetry. */
   pageContext: SduiPageContext;
   /** Seed entity hydration data at creation time. */
@@ -76,12 +90,33 @@ export function createSduiServicesWithStores(
     telemetryHandlerNameRegistry,
     impressionHandlerRegistry,
     analyticsReporter,
-    errorReporter,
+    observeWebVitals,
+    pageLoadPlatformAdapter,
     pageContext,
   } = options;
-  const loadTimerRegistry = createSduiLoadTimerRegistry(errorReporter);
+  const errorReporter = createDeduplicatingErrorReporter(options.errorReporter);
+  const loadTimerRegistry = createSduiLoadTimerRegistry(errorReporter, {
+    analyticsReporter,
+    observeWebVitals,
+    pageLoadPlatformAdapter,
+  });
 
   const templateStore = createSduiTemplateStore();
+  const screenWidth = stores[RESPONSIVE_CONTENT_TYPE]?.getField("", ["screenWidth"]).value;
+  const contentWidth = browserDocument?.getElementById("content")?.getBoundingClientRect().width;
+  const initialWidth =
+    typeof contentWidth === "number" && Number.isFinite(contentWidth) && contentWidth > 0
+      ? contentWidth
+      : typeof screenWidth === "number" && Number.isFinite(screenWidth) && screenWidth > 0
+        ? screenWidth
+        : undefined;
+  const poolRegistry = createSduiPoolRegistry({
+    errorReporter,
+    pageContext,
+    fallbackLayout: {
+      screenWidth: initialWidth,
+    },
+  });
   const dataBinder = createSduiDataBinder({
     errorReporter,
     pageContext,
@@ -96,6 +131,7 @@ export function createSduiServicesWithStores(
     dataBinder,
     templateStore,
     errorReporter,
+    poolRegistry,
   });
 
   const apiStore = createSduiApiStore({
@@ -113,6 +149,7 @@ export function createSduiServicesWithStores(
     templateStore,
     dataBinder,
     builder,
+    poolRegistry,
     componentRegistry,
     actionHandlerRegistry,
     telemetryHandlerNameRegistry,
@@ -201,6 +238,7 @@ export function disposePageServices(pageKey: string): void {
   if (!services) return;
 
   services.apiStore.clear();
+  services.poolRegistry.clear();
   services.dataBinder.clear();
   services.templateStore.clear();
   pageServicesByKey.delete(pageKey);

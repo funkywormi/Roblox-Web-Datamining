@@ -802,7 +802,6 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
             onConfirm={handleCreateRoleSubmit}
             saving={isRoleSaving}
             canSetVisibility={permissions?.canCreateRoles === true}
-            showLowestRoleWarning={showLowestRoleWarning}
           />
         </>
       );
@@ -973,7 +972,6 @@ const GroupRoles: FunctionComponent<React.PropsWithChildren<GroupRolesProps>> = 
         onConfirm={handleCreateRoleSubmit}
         saving={isRoleSaving}
         canSetVisibility={permissions?.canCreateRoles === true}
-        showLowestRoleWarning={showLowestRoleWarning}
       />
     </Grid>
   );

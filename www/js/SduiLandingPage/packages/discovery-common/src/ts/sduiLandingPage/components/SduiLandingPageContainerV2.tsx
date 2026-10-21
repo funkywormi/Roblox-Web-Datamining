@@ -1,7 +1,6 @@
-import "@rbx/core-scripts/http/core-intercept";
 import React, { useEffect, useMemo, useState } from "react";
 import { WithTranslationsProps } from "@rbx/core-scripts/react";
-import { Loading } from "@rbx/core-ui";
+import { Loading } from "@rbx/sdui-common";
 import {
   decodeJsonWithSchema,
   type ApiRequestConfig,
@@ -12,6 +11,7 @@ import {
 import { SduiFeatureEntryPoint } from "@rbx/sdui-core/client";
 import { FeatureSduiLandingPage } from "../../common/constants/translationConstants";
 import { usePageSession } from "../../common/utils/PageSessionContext";
+import { parseQueryString } from "../../common/utils/parsingUtils";
 import { getSessionInfoKey, toV1PageContext } from "../../sdui/v2/utils/pageReferralUtils";
 import { logSduiError, SduiErrorNames } from "../../sdui/utils/logSduiError";
 import type { ISduiLandingPageConfiguration } from "../types/sduiLandingPageTypes";
@@ -98,8 +98,11 @@ export const SduiLandingPageContainerV2 = ({
     () => services.apiStore.getCacheSignal(configKey).peek()?.error,
   );
 
+  const [queryParams] = useState(() =>
+    parseQueryString(typeof window === "undefined" ? "" : window.location.search),
+  );
   const requestConfig = useMemo<ApiRequestConfig>(() => {
-    const requestUrl = buildRequestUrl(pageSlug, sessionId);
+    const requestUrl = buildRequestUrl(pageSlug, sessionId, queryParams);
 
     return {
       url: requestUrl,
@@ -119,6 +122,7 @@ export const SduiLandingPageContainerV2 = ({
     pageSlug,
     protoSchema,
     responseFormat,
+    queryParams,
     sessionId,
   ]);
 

@@ -6,7 +6,6 @@ import type { TranslationResourceProvider } from '@rbx/intl';
 import { LocalizationProvider } from '@rbx/intl';
 import type { ThemeMode } from '@rbx/ui';
 import { DialogProvider, UIThemeProvider } from '@rbx/ui';
-import { useGetMigrationStatus } from '../queries/migrationQueries';
 import type {
   AuthenticatedUser,
   GroupData,
@@ -15,7 +14,6 @@ import type {
   GroupManagementStudio,
   GroupManagementSurface,
 } from '../utils/types';
-import { MIGRATION_STATUS } from '../utils/unificationUtils';
 import GroupManagementProvider from './GroupManagementProvider';
 
 const defaultQueryClientConfig: QueryClientConfig = {
@@ -84,9 +82,6 @@ const GroupManagementRootProvidersContent: FunctionComponent<
   unifiedLogger,
   children,
 }) => {
-  const { data: migrationStatus } = useGetMigrationStatus(group.id);
-  const isUnified = migrationStatus?.status === MIGRATION_STATUS.MIGRATED;
-
   return (
     <LocalizationProvider provider={translationProvider}>
       <UIThemeProvider theme={theme}>
@@ -97,7 +92,6 @@ const GroupManagementRootProvidersContent: FunctionComponent<
             navigation={navigation}
             user={user}
             showToast={showToast}
-            isUnified={isUnified}
             studio={studio}
             unifiedLogger={unifiedLogger}>
             {children}

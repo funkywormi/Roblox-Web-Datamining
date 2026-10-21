@@ -1,10 +1,19 @@
-import type { SduiAnalyticsReporter, SduiErrorReporter } from "@rbx/sdui-core";
+import type {
+  SduiAnalyticsReporter,
+  SduiErrorReporter,
+  SduiPageLoadPlatformAdapter,
+  SduiWebVitalsObserver,
+} from "@rbx/sdui-core";
 import { createCsrAnalyticsReporter } from "./csrAnalyticsReporter";
 import { createCsrErrorReporter, type CreateCsrErrorReporterDefaults } from "./csrErrorReporter";
+import { observeSduiWebVitals } from "./observeSduiWebVitals";
+import { browserPageLoadPlatformAdapter } from "./browserPageLoadPlatformAdapter";
 
 export interface SduiCsrTelemetry {
   analyticsReporter: SduiAnalyticsReporter;
   errorReporter: SduiErrorReporter;
+  observeWebVitals: SduiWebVitalsObserver;
+  pageLoadPlatformAdapter: SduiPageLoadPlatformAdapter;
 }
 
 export type SduiCsrTelemetryDefaults = {
@@ -18,5 +27,7 @@ export function createSduiCsrTelemetry(defaults: SduiCsrTelemetryDefaults = {}):
   return {
     analyticsReporter: createCsrAnalyticsReporter(),
     errorReporter: createCsrErrorReporter(defaults.errorReporterDefaults),
+    observeWebVitals: observeSduiWebVitals,
+    pageLoadPlatformAdapter: browserPageLoadPlatformAdapter,
   };
 }

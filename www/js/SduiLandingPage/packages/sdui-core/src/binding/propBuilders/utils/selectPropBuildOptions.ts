@@ -18,6 +18,7 @@ export function selectPropBuildOptions(
   }
   if (
     descriptorName === "NestedComponentProp" ||
+    descriptorName === "LazyNestedComponentProp" ||
     descriptorName === "LazyNestedComponentListProp" ||
     descriptorName === "NestedComponentListProp"
   ) {

@@ -10,6 +10,7 @@ import type {
 } from "../../types";
 import { isRecord } from "../../utils/typeGuards";
 import { unwrapOneOf } from "../../utils/oneOfHelper";
+import { isUnchangedBySnakeToCamel, snakeToCamel } from "../../utils/caseConversion";
 import { buildDefaultProp } from "./buildDefaultProp";
 
 /**
@@ -46,6 +47,12 @@ function makeFieldContext(rootCtx: BindingContext, fieldName: string): BindingCo
  * prop builder so binding paths and conditionals follow the same resolution
  * mechanics as regular props. Per-field failures are isolated and reported
  * so one bad entry can't sink the rest of the map.
+ *
+ * Keys are normalized to camelCase. Templates author analytics keys against
+ * proto field names, so the same field arrives as `universe_id` on one surface
+ * and `universeId` on another; every consumer reads camelCase, matching the Lua
+ * client's `ProtoVariableMapper` output. Normalizing here keeps that the one
+ * place the two spellings are reconciled.
  */
 export function resolveAnalyticsFields(
   rawAnalyticsData: Record<string, unknown> | undefined,
@@ -57,18 +64,39 @@ export function resolveAnalyticsFields(
 
   const literals: AnalyticsFieldMap = {};
   const signals: Record<string, ReadonlySignal<unknown>> = {};
+  // camelCase key -> original template key that owns it
+  const usedKeys = new Map<string, string>();
 
-  for (const [fieldName, rawField] of Object.entries(rawAnalyticsData)) {
-    const fieldCtx = makeFieldContext(rootCtx, fieldName);
+  // Keys that snakeToCamel would leave unchanged (already the consumer spelling)
+  // are resolved first so they win over a snake_case spelling of the same field
+  // regardless of map order. The sort is stable, so fields that don't collide
+  // keep their template order.
+  const entries = Object.entries(rawAnalyticsData).sort(
+    ([a], [b]) => Number(isUnchangedBySnakeToCamel(b)) - Number(isUnchangedBySnakeToCamel(a)),
+  );
+
+  for (const [rawFieldName, rawField] of entries) {
+    const fieldCtx = makeFieldContext(rootCtx, rawFieldName);
 
     const reportFieldError = (errorName: SduiErrorName, message: string, extra?: object): void => {
       reportBindingError(errorName, fieldCtx, message, extra);
     };
 
+    const key = snakeToCamel(rawFieldName);
+    const isKeyUsed = usedKeys.has(key);
+    if (isKeyUsed) {
+      const usedKeyName = usedKeys.get(key);
+      reportFieldError(
+        SduiErrorName.DuplicateAnalyticsFieldKey,
+        `analytics field "${rawFieldName}" collides with "${usedKeyName}" as "${key}"; keeping "${usedKeyName}"`,
+      );
+      continue;
+    }
+
     if (!isRecord(rawField)) {
       reportFieldError(
         SduiErrorName.FailedToParseProp,
-        `analytics field "${fieldName}" must be a record; got ${typeof rawField}`,
+        `analytics field "${rawFieldName}" must be a record; got ${typeof rawField}`,
       );
       continue;
     }
@@ -77,7 +105,7 @@ export function resolveAnalyticsFields(
     if (!kindWrapper) {
       reportFieldError(
         SduiErrorName.FailedToParseProp,
-        `analytics field "${fieldName}" missing oneOf wrapper (kind/value)`,
+        `analytics field "${rawFieldName}" missing oneOf wrapper (kind/value)`,
       );
       continue;
     }
@@ -105,16 +133,18 @@ export function resolveAnalyticsFields(
       if (scalar === undefined) {
         reportFieldError(
           SduiErrorName.FailedToParseProp,
-          `analytics field "${fieldName}" literal was not a scalar (got ${typeof kindWrapper.propValue})`,
+          `analytics field "${rawFieldName}" literal was not a scalar (got ${typeof kindWrapper.propValue})`,
         );
         continue;
       }
-      literals[fieldName] = scalar;
+      literals[key] = scalar;
+      usedKeys.set(key, rawFieldName);
       continue;
     }
 
     if (result.category === "propSignal") {
-      signals[fieldName] = result.signal;
+      signals[key] = result.signal;
+      usedKeys.set(key, rawFieldName);
     }
   }
 

@@ -323,7 +323,9 @@ export function generateStructuredBindingPropValue(
     try {
       const outerRead = resolveBindingPath(bindingPath, dataSources, dataBinder, ctx);
       const statuses: StatusCollector = [outerRead.status];
-      if (outerRead.status !== DataStatus.Ready) {
+      // An absent value is skipped even when the read is `Ready`: a path that
+      // names no input-data field resolves to `Ready`/`undefined`.
+      if (outerRead.status !== DataStatus.Ready || outerRead.value === undefined) {
         return { value: undefined, status: outerRead.status };
       }
       const value = resolveValue(outerRead.value, statuses);

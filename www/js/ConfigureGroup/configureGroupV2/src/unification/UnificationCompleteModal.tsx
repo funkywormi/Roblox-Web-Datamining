@@ -10,7 +10,8 @@ import {
 } from '@rbx/foundation-ui';
 import { useTranslation } from '@rbx/intl';
 import TranslationNamespace from '../constants/TranslationNamespace';
-import { DEVFORUM_URL } from '../utils/unificationUtils';
+
+const DEVFORUM_URL = 'https://devforum.roblox.com/unified-group-roles-and-permissions';
 
 type MigrationCompleteModalProps = {
   isOpen: boolean;

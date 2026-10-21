@@ -7,7 +7,9 @@ import { DiscoverySduiSectionHeader } from "./DiscoverySduiSectionHeader";
 import { SduiFilterPillsCarousel } from "./filterPills/SduiFilterPillsCarousel";
 import { SduiOptionSelectorCollection } from "./SduiOptionSelectorCollection";
 import { SduiSlotOverlay } from "./SduiSlotOverlay";
+import { SduiSongTile } from "./SduiSongTile";
 import { SduiVariableItemWidthCarousel } from "./SduiVariableItemWidthCarousel";
+import { SduiFriendRequestButton } from "./friendRequestButton";
 
 export const DISCOVERY_V2_COMPONENTS: Partial<Record<UiComponentType, SduiComponentDefinition>> = {
   [UiComponentType.SECTION_HEADER]: {
@@ -15,6 +17,12 @@ export const DISCOVERY_V2_COMPONENTS: Partial<Record<UiComponentType, SduiCompon
     propParsers: {
       verticalGap: makeTokenOrLiteralPropParser("Gap.XXSmall"),
       titleGap: makeTokenOrLiteralPropParser("Gap.XSmall"),
+    },
+  },
+  [UiComponentType.SONG_TILE]: {
+    component: SduiSongTile,
+    propParsers: {
+      cornerRadius: makeTokenOrLiteralPropParser("Radius.Medium"),
     },
   },
   [UiComponentType.OPTION_SELECTOR_COLLECTION]: {
@@ -33,6 +41,9 @@ export const DISCOVERY_V2_COMPONENTS: Partial<Record<UiComponentType, SduiCompon
   },
   [UiComponentType.FILTER_PILLS_CAROUSEL]: {
     component: SduiFilterPillsCarousel,
+  },
+  [UiComponentType.FRIEND_REQUEST_BUTTON]: {
+    component: SduiFriendRequestButton,
   },
 };
 

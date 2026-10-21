@@ -202,9 +202,10 @@ function buildComponentConfig(
  *   classes at render time, whereas Lua resolves to a token value at build time.
  */
 export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
-  const { dataBinder, templateStore, errorReporter } = deps;
+  const { dataBinder, templateStore, errorReporter, poolRegistry } = deps;
 
   const builder: SduiBuilder = {
+    poolRegistry,
     buildProp(rawProp, dataSources, ctx, buildContext) {
       return createPropBuildDispatcher({ dataBinder, dataSources, buildContext })(rawProp, ctx);
     },
@@ -219,10 +220,13 @@ export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
       builderConfig,
       parentAnalyticsContext,
       parentDataSources,
+      pendingInputKeysSignal,
+      poolBuildMetadata,
     ) {
       const rootCtx: BindingContext = {
         errorReporter,
         pageContext: builderConfig.pageContext,
+        configKey: builderConfig.configKey,
         componentType: String(template.shared.componentType),
       };
 
@@ -231,7 +235,12 @@ export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
       // `hydrationDataSpecs` construction.
       const dataSources =
         parentDataSources ??
-        buildDataBindingSourcesSignal(inputDataSignal, template.shared.hydrationDataSpecs, rootCtx);
+        buildDataBindingSourcesSignal(
+          inputDataSignal,
+          template.shared.hydrationDataSpecs,
+          rootCtx,
+          pendingInputKeysSignal,
+        );
 
       const scope: ComponentBuildScope = { dataBinder, dataSources, rootCtx };
 
@@ -239,6 +248,8 @@ export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
         templateStore,
         builder,
         builderConfig,
+        poolRegistry,
+        poolBuildMetadata,
       };
 
       return buildComponentConfig(template, scope, nestedBuildContext, parentAnalyticsContext);

@@ -20,6 +20,7 @@ import { useSduiServices } from "@rbx/sdui-core/client";
 import { toV1CollectionItemSize } from "../utils/v1Adapters";
 
 const COLLECTION_COMPONENT_TYPE = "COLLECTION_CAROUSEL";
+const SQUARE_TILE_COLUMN_GAP = 14;
 
 export interface SduiCollectionCarouselProps extends SduiRendererInjectedProps {
   // TODO: Support the remaining CollectionCarousel schema features
@@ -62,6 +63,7 @@ export function SduiCollectionCarousel({
   const [itemsPerRow, setItemsPerRow] = useState(-1);
   const itemConfigs: SduiComponentConfig[] = items?.configs ?? [];
   const totalNumberOfItems = itemConfigs.length;
+  const isWideTiles = computeIsWideTiles(itemConfigs);
 
   const collectionAnalyticsData = useMemo(
     () =>
@@ -71,14 +73,14 @@ export function SduiCollectionCarousel({
           itemsPerRow,
           totalNumberOfItems,
           collectionComponentType: COLLECTION_COMPONENT_TYPE,
-          isWideTiles: computeIsWideTiles(items?.configs ?? []),
+          isWideTiles,
         },
         pageContext,
         services.errorReporter,
       ),
     [
       analyticsContext,
-      items?.configs,
+      isWideTiles,
       itemsPerRow,
       totalNumberOfItems,
       pageContext,
@@ -125,14 +127,24 @@ export function SduiCollectionCarousel({
   useCollectionItemsIntersectionTracker(itemsContainerRef, itemConfigs.length, onItemsImpressed);
 
   const renderItem = useCallback(
-    (config: SduiComponentConfig, index: number, _isVisible: boolean): React.JSX.Element => {
+    (config: SduiComponentConfig, index: number, isVisible: boolean): React.JSX.Element => {
       itemAnalyticsDatasRef.current[index] = buildItemAnalyticsData(
         config.analyticsContext,
         index,
         pageContext,
         services.errorReporter,
       );
-      return items?.renderItem(config, index) ?? <React.Fragment key={index} />;
+      return (
+        <div
+          data-testid={`sdui-carousel-item-${index}`}
+          className="height-full"
+          aria-hidden={!isVisible}
+          // @ts-expect-error @types/react does not include the standard inert attribute yet.
+          inert={isVisible ? undefined : ""}
+        >
+          {items?.renderItem(config, index) ?? <React.Fragment key={index} />}
+        </div>
+      );
     },
     [items, pageContext, services.errorReporter],
   );
@@ -141,6 +153,7 @@ export function SduiCollectionCarousel({
   const resolvedLayoutOverrides = {
     numColumns: numColumnsOverride,
     fractionalItemAmount: maxItemsToShow,
+    ...(!isWideTiles && { columnGap: SQUARE_TILE_COLUMN_GAP }),
   };
 
   // Cast CollectionCarousel to a React.ComponentType to avoid react package discrepancy
@@ -161,6 +174,7 @@ export function SduiCollectionCarousel({
         isHorizontalScrollEnabled
         scrollArrowBackgroundColor={tokens.Color.Surface.Surface_100}
         scrollArrowBoxShadowColor={tokens.Color.Common.Shadow}
+        scrollArrowOffset={isWideTiles ? undefined : 0}
         thresholdFromEnd={scrollThresholdFromEnd}
       />
     </div>

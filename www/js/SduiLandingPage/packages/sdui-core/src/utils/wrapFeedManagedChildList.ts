@@ -1,6 +1,7 @@
 import type React from "react";
 
 import { applyFeedEntryAnalytics } from "../analytics/applyFeedEntryAnalytics";
+import { materializeSduiComponentConfig } from "../binding/deferredSduiComponentConfig";
 import type { SduiComponentConfig, SduiManagedChildList } from "../types";
 
 /**
@@ -17,9 +18,16 @@ export function wrapFeedManagedChildList(
 ): SduiManagedChildList {
   return {
     configs: list.configs,
+    ...(list.poolLayout ? { poolLayout: list.poolLayout } : {}),
     renderItem: (childConfig: SduiComponentConfig, index: number, reactKey?: React.Key) => {
-      applyFeedEntryAnalytics(childConfig, index, collectionPositionOffset);
-      return list.renderItem(childConfig, index, reactKey);
+      // Feed analytics read the config's fields, so a deferred shell must be built first.
+      // The renderer materializes again, which is a no-op after this.
+      const materializedConfig = materializeSduiComponentConfig(childConfig);
+      if (materializedConfig == null) {
+        return null;
+      }
+      applyFeedEntryAnalytics(materializedConfig, index, collectionPositionOffset);
+      return list.renderItem(materializedConfig, index, reactKey);
     },
   };
 }

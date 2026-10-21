@@ -1,0 +1,655 @@
+import React, { useCallback, useEffect, useState } from "react";
+import { useQuery, QueryClientProvider } from "@tanstack/react-query";
+import classNames from "classnames";
+import { getCurrentUser } from "@rbx/www-common/user";
+import { Button } from "@rbx/foundation-ui";
+import { queryClient } from "@rbx/core-scripts/react";
+import * as NavigationService from "@rbx/navigation";
+import ExperimentationService from "@rbx/experimentation";
+import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
+import { fireEvent } from "@rbx/www-common/event-tracker";
+import playButtonConstants from "../constants/playButtonConstants";
+import { PlayabilityStatus } from "../constants/playabilityStatus";
+import {
+  buttonWidths,
+  fuiButtonStyle,
+  fullWidthClassName,
+  TButtonWidth,
+} from "../constants/buttonWidths";
+import playButtonService from "../services/playButtonService";
+import {
+  TAppsFlyerReferralProperties,
+  TPlayabilityStatus,
+  TPlayabilityStatuses,
+  TShowAgeVerificationOverlayResponse,
+  TUniversePlaceVoiceEnabledSettings,
+  type TPlayButtonPageContext,
+} from "../types/playButtonTypes";
+import {
+  handleShareLinkEventLogging,
+  launchGame,
+  launchLogin,
+  startAvatarVideoOptInOverlayFlow,
+  startVerificationFlow,
+  startVoiceOptInOverlayFlow,
+} from "../utils/playButtonUtils";
+import ExperienceApprovalActionNeededButton from "./ExperienceApprovalActionNeededButton";
+import ParentalControlsActionNeededButton from "./ParentalControlsActionNeededButton";
+import PurchaseButton from "./PurchaseButtonContainer";
+import { DemoButton } from "./DemoButton";
+import { PlayOnWebButton } from "./PlayOnWebButton";
+import {
+  getSecondaryPlayButton,
+  StackedPlayButtons,
+  type TSecondaryPlayButtonCase,
+} from "./SecondaryPlayButton";
+import UnplayableButton from "./UnplayableButton";
+import useLaunchGameWithPlayableUxTreatment from "../hooks/useLaunchGameWithPlayableUxTreatment";
+import usePurchaseProductData from "../hooks/usePurchaseProductData";
+import { AgeCheckNeededButton } from "./AgeCheckNeededButton";
+import LoadingButton from "./LoadingButton";
+import "./playButton.css";
+
+const { counterEvents, avatarChatUpsellLayer, avatarChatUpsellLayerU13 } = playButtonConstants;
+
+const getShowIdentityVerificationFlow = async (
+  universeId: string,
+): Promise<TShowAgeVerificationOverlayResponse> => {
+  const defaultUniverseSettings: TUniversePlaceVoiceEnabledSettings = {
+    isUniverseEnabledForVoice: false,
+    isUniverseEnabledForAvatarVideo: false,
+  };
+
+  if (getCurrentUser() === undefined) {
+    return {
+      elegibleToSeeVoiceUpsell: false,
+      universePlaceVoiceEnabledSettings: defaultUniverseSettings,
+      showAgeVerificationOverlay: false,
+      showVoiceOptInOverlay: false,
+      showAvatarVideoOptInOverlay: false,
+      requireExplicitVoiceConsent: true,
+      useCameraU13Design: false,
+      useVoiceUpsellV2Design: false,
+    };
+  }
+
+  const {
+    playButtonOverlayWebFlag,
+    voiceOptInWebFlag,
+    cameraOptInWebFlag: cameraOptInWebFlagO13,
+    cameraOptInWebFlagU13,
+    requireExplicitVoiceConsent,
+    useCameraU13Design,
+    useVoiceUpsellV2Design,
+  } = await playButtonService.getGuacPlayButtonUI(); // TODO(ACCMAN-4355): migrate to useGuacPlayButtonUI hook for caching
+
+  // TODO: remove this check if playButtonOverlayWebFlag is always true
+  if (!playButtonOverlayWebFlag && !(voiceOptInWebFlag || cameraOptInWebFlagO13)) {
+    return {
+      elegibleToSeeVoiceUpsell: false,
+      universePlaceVoiceEnabledSettings: defaultUniverseSettings,
+      showAgeVerificationOverlay: false,
+      showVoiceOptInOverlay: false,
+      showAvatarVideoOptInOverlay: false,
+      requireExplicitVoiceConsent,
+      useCameraU13Design,
+      useVoiceUpsellV2Design,
+    };
+  }
+
+  const {
+    showAgeVerificationOverlay,
+    showVoiceOptInOverlay,
+    showAvatarVideoOptInOverlay,
+    elegibleToSeeVoiceUpsell,
+    universePlaceVoiceEnabledSettings,
+  } = await playButtonService.getShowAgeVerificationOverlay(universeId);
+
+  let shouldShowUpsellO13 = false;
+  let shouldShowUpsellU13 = false;
+
+  // TODO: old, migrated code
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (ExperimentationService.getAllValuesForLayer) {
+    shouldShowUpsellO13 = Boolean(
+      (await ExperimentationService.getAllValuesForLayer(avatarChatUpsellLayer)).ShouldShowUpsell,
+    );
+
+    shouldShowUpsellU13 = Boolean(
+      (await ExperimentationService.getAllValuesForLayer(avatarChatUpsellLayerU13))
+        .ShouldShowUpsell,
+    );
+  }
+
+  return {
+    elegibleToSeeVoiceUpsell,
+    universePlaceVoiceEnabledSettings,
+    showAgeVerificationOverlay: playButtonOverlayWebFlag && showAgeVerificationOverlay,
+    showVoiceOptInOverlay: voiceOptInWebFlag && showVoiceOptInOverlay,
+    showAvatarVideoOptInOverlay:
+      showAvatarVideoOptInOverlay &&
+      ((cameraOptInWebFlagO13 && shouldShowUpsellO13) ||
+        (cameraOptInWebFlagU13 && shouldShowUpsellU13)),
+    requireExplicitVoiceConsent,
+    useCameraU13Design,
+    useVoiceUpsellV2Design,
+  };
+};
+
+const getJoindata = (launchDataFromProps?: string) => {
+  // Allow launchData to be passed from props for direct joins
+  const launchData =
+    new URLSearchParams(window.location.search).get("launchData") ?? launchDataFromProps;
+  const eventId = new URLSearchParams(window.location.search).get("eventId") ?? undefined;
+  return {
+    launchData,
+    eventId,
+  };
+};
+
+const EMPTY_OBJECT = {} as const;
+
+// Primary statuses Play Demo may appear alongside.
+const demoPrimaryStatuses: ReadonlySet<TPlayabilityStatus> = new Set<TPlayabilityStatus>([
+  PlayabilityStatus.PurchaseRequired,
+  PlayabilityStatus.FiatPurchaseRequired,
+  PlayabilityStatus.FiatPurchaseDeviceRestricted,
+  PlayabilityStatus.ContextualPlayabilityRegionalAvailability,
+]);
+
+// Primary statuses Play on Web may appear alongside.
+const playOnWebPrimaryStatuses: ReadonlySet<TPlayabilityStatus> = new Set<TPlayabilityStatus>([
+  PlayabilityStatus.Playable,
+]);
+
+export type TPlayButtonProps = {
+  universeId: string;
+  placeId: string;
+  rootPlaceId?: string;
+  privateServerLinkCode?: string;
+  gameInstanceId?: string;
+  iconClassName?: string;
+  buttonWidth?: TButtonWidth;
+  buttonClassName?: string;
+  eventProperties?: Record<string, string | number | undefined>;
+  appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
+  status: TPlayabilityStatuses["Playable"] | TPlayabilityStatuses["GuestProhibited"];
+  disableLoadingState?: boolean;
+  buttonText?: string | undefined;
+  hideIcon?: boolean;
+  analyticsCallback?: () => void;
+  pageContext: TPlayButtonPageContext;
+};
+
+const PlayButtonContents = ({
+  universeId,
+  placeId,
+  rootPlaceId,
+  privateServerLinkCode,
+  gameInstanceId,
+  status,
+  eventProperties = EMPTY_OBJECT,
+  appsFlyerReferralProperties = EMPTY_OBJECT,
+  iconClassName = "icon-common-play",
+  buttonWidth = buttonWidths.full,
+  buttonClassName = "btn-common-play-game-lg",
+  disableLoadingState = false,
+  buttonText = undefined,
+  hideIcon = false,
+  analyticsCallback = undefined,
+  pageContext,
+}: TPlayButtonProps) => {
+  const [isExperienceVoiceEnabled, setIsExperienceVoiceEnabled] = useState<boolean | undefined>(
+    undefined,
+  );
+  const [showVerification, setShowVerification] = useState<boolean | undefined>(undefined);
+  const [elegibleToSeeVoiceUpsell, setElegibleToSeeVoiceUpsell] = useState<boolean | undefined>(
+    undefined,
+  );
+  const [showVoiceOptIn, setShowVoiceOptIn] = useState<boolean | undefined>(undefined);
+  const [showAvatarVideoOptIn, setShowAvatarVideoOptIn] = useState<boolean | undefined>(undefined);
+  const [requireExplicitVoiceConsent, setRequireExplicitVoiceConsent] = useState<
+    boolean | undefined
+  >(undefined);
+  const [useCameraU13Design, setUseCameraU13Design] = useState<boolean | undefined>(undefined);
+  const [useVoiceUpsellV2Design, setUseVoiceUpsellV2Design] = useState<boolean | undefined>(
+    undefined,
+  );
+
+  const { data: isVNGRedirectEnabled } = useQuery({
+    queryKey: ["getIsVNGLandingRedirectEnabled"],
+    queryFn: NavigationService.getIsVNGLandingRedirectEnabled,
+    retry: false,
+  });
+
+  useEffect(() => {
+    const fetchShowIdentityVerificationFlow = async () => {
+      try {
+        const showIdentityVerificationFlow = await getShowIdentityVerificationFlow(universeId);
+        setIsExperienceVoiceEnabled(
+          // TODO: old, migrated code
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          showIdentityVerificationFlow.universePlaceVoiceEnabledSettings
+            .isUniverseEnabledForVoice ?? false,
+        );
+        setElegibleToSeeVoiceUpsell(showIdentityVerificationFlow.elegibleToSeeVoiceUpsell);
+        setShowVerification(showIdentityVerificationFlow.showAgeVerificationOverlay);
+        setShowVoiceOptIn(showIdentityVerificationFlow.showVoiceOptInOverlay);
+        setShowAvatarVideoOptIn(showIdentityVerificationFlow.showAvatarVideoOptInOverlay);
+        setRequireExplicitVoiceConsent(showIdentityVerificationFlow.requireExplicitVoiceConsent);
+        setUseCameraU13Design(showIdentityVerificationFlow.useCameraU13Design);
+        setUseVoiceUpsellV2Design(showIdentityVerificationFlow.useVoiceUpsellV2Design);
+      } catch {
+        fireEvent(counterEvents.PlayButtonShowIdentificationError);
+        setElegibleToSeeVoiceUpsell(false);
+        setIsExperienceVoiceEnabled(false);
+        setShowVerification(false);
+        setShowVoiceOptIn(false);
+        setShowAvatarVideoOptIn(false);
+        setRequireExplicitVoiceConsent(true); // assume consent is required
+        setUseCameraU13Design(false); // TODO: EXPR-907 clean up useCameraU13Design
+        setUseVoiceUpsellV2Design(false);
+      }
+    };
+
+    // eslint-disable-next-line no-void
+    void fetchShowIdentityVerificationFlow();
+    // TODO: old, migrated code
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const doGameLaunch = useCallback(() => {
+    handleShareLinkEventLogging(placeId, universeId);
+
+    const joinData = getJoindata(
+      eventProperties.launchData != null ? String(eventProperties.launchData) : undefined,
+    );
+
+    launchGame(
+      placeId,
+      rootPlaceId,
+      privateServerLinkCode,
+      gameInstanceId,
+      eventProperties,
+      joinData,
+      appsFlyerReferralProperties,
+    );
+  }, [
+    placeId,
+    universeId,
+    eventProperties,
+    appsFlyerReferralProperties,
+    rootPlaceId,
+    privateServerLinkCode,
+    gameInstanceId,
+  ]);
+
+  const { doGameLaunchWithPlayableUxTreatment, playableUxTreatmentModal } =
+    useLaunchGameWithPlayableUxTreatment(universeId, doGameLaunch, pageContext);
+
+  if (showVerification === undefined && !disableLoadingState) {
+    return <LoadingButton buttonClassName={buttonClassName} buttonWidth={buttonWidth} />;
+  }
+
+  return (
+    <React.Fragment>
+      <Button
+        data-testid="play-button"
+        variant="Emphasis"
+        style={fuiButtonStyle}
+        className={classNames(fullWidthClassName(buttonWidth), buttonClassName)}
+        // TODO: old, migrated code
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (status === PlayabilityStatus.Playable) {
+            if (elegibleToSeeVoiceUpsell && isExperienceVoiceEnabled) {
+              const layerName = "SocialVoice.VoiceUpsell";
+              // you must fetch ixp layer values before sending exposure event.
+              const ixpPromise = ExperimentationService.getAllValuesForLayer(layerName);
+              ixpPromise
+                .then(() => {
+                  ExperimentationService.logLayerExposure(layerName);
+                })
+                .catch(() => {
+                  console.error("error logging exposure event in play-join");
+                });
+            }
+
+            if (showVerification) {
+              const [_, didVerifyAge] = await startVerificationFlow();
+              if (didVerifyAge) {
+                setShowVerification(false);
+              }
+            } else if (showVoiceOptIn) {
+              const success = await startVoiceOptInOverlayFlow(
+                requireExplicitVoiceConsent ?? true,
+                useVoiceUpsellV2Design ?? false,
+              );
+              if (success) {
+                setShowVoiceOptIn(false);
+              }
+            } else if (showAvatarVideoOptIn) {
+              const success = await startAvatarVideoOptInOverlayFlow(
+                requireExplicitVoiceConsent ?? true,
+                useCameraU13Design ?? true,
+              );
+              if (success) {
+                setShowAvatarVideoOptIn(false);
+              }
+            }
+
+            doGameLaunchWithPlayableUxTreatment();
+          } else if (
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            status === PlayabilityStatus.GuestProhibited
+          ) {
+            // if it is vng, redirect user to login page directly
+            if (isVNGRedirectEnabled) {
+              // redirct to login page
+              NavigationService.navigateToLoginWithRedirect();
+            } else {
+              launchLogin(placeId, appsFlyerReferralProperties);
+            }
+          }
+
+          if (analyticsCallback) {
+            analyticsCallback();
+          }
+        }}
+      >
+        {!hideIcon && <span className={iconClassName} />}
+        {buttonText && <span className="play-button-text">{buttonText}</span>}
+      </Button>
+      <div id="id-verification-container" />
+      {playableUxTreatmentModal}
+    </React.Fragment>
+  );
+};
+
+export const PlayButton = (props: TPlayButtonProps): React.JSX.Element => (
+  <QueryClientProvider client={queryClient}>
+    <PlayButtonContents {...props} />
+  </QueryClientProvider>
+);
+
+export type TDefaultPlayButtonProps = {
+  placeId: string;
+  rootPlaceId?: string;
+  universeId: string;
+  privateServerLinkCode?: string;
+  gameInstanceId?: string;
+  refetchPlayabilityStatus: () => void;
+  playabilityStatus: TPlayabilityStatus | undefined;
+  demoModeAvailable?: boolean;
+  hideButtonText?: boolean;
+  eventProperties?: Record<string, number | string | undefined>;
+  appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
+  disableLoadingState?: boolean;
+  buttonClassName?: string;
+  redirectPurchaseUrl?: ValidHttpUrl;
+  showDefaultPurchaseText?: boolean;
+  shouldShowVpcPlayButtonUpsells?: boolean;
+  playabilityStatusCtaOverrides?: Partial<
+    Record<
+      TPlayabilityStatuses["Playable"] | TPlayabilityStatuses["GuestProhibited"],
+      React.ReactElement
+    >
+  >;
+  pageContext: TPlayButtonPageContext;
+  playOnWebEnabled?: boolean;
+};
+
+export const DefaultPlayButton = ({
+  placeId,
+  rootPlaceId,
+  universeId,
+  privateServerLinkCode,
+  gameInstanceId,
+  refetchPlayabilityStatus,
+  playabilityStatus,
+  demoModeAvailable,
+  hideButtonText,
+  eventProperties = EMPTY_OBJECT,
+  appsFlyerReferralProperties = EMPTY_OBJECT,
+  disableLoadingState,
+  buttonClassName,
+  redirectPurchaseUrl,
+  showDefaultPurchaseText,
+  shouldShowVpcPlayButtonUpsells,
+  playabilityStatusCtaOverrides,
+  pageContext,
+  playOnWebEnabled,
+}: TDefaultPlayButtonProps): React.JSX.Element => {
+  // Share the purchase button's product-data loading (react-query dedupes the
+  // fetch) so the secondary button is withheld until the purchase button is ready,
+  // rather than showing next to a spinner.
+  const isPurchaseStatus =
+    playabilityStatus === PlayabilityStatus.PurchaseRequired ||
+    playabilityStatus === PlayabilityStatus.FiatPurchaseRequired;
+  const {
+    isLoading: isPurchaseProductLoading,
+    productInfo,
+    productDetails,
+  } = usePurchaseProductData(universeId, placeId, isPurchaseStatus);
+
+  // Secondary CTAs that can stack under the primary button. Each case lists the primary
+  // statuses it may appear alongside; the first enabled match is shown.
+  const secondaryPlayButtonCases: TSecondaryPlayButtonCase[] = [
+    {
+      isEnabled: Boolean(demoModeAvailable),
+      primaryStatuses: demoPrimaryStatuses,
+      render: () => (
+        <DemoButton
+          universeId={universeId}
+          placeId={placeId}
+          rootPlaceId={rootPlaceId}
+          privateServerLinkCode={privateServerLinkCode}
+          gameInstanceId={gameInstanceId}
+          eventProperties={eventProperties}
+          appsFlyerReferralProperties={appsFlyerReferralProperties}
+        />
+      ),
+    },
+    {
+      isEnabled: Boolean(playOnWebEnabled),
+      primaryStatuses: playOnWebPrimaryStatuses,
+      render: () => <PlayOnWebButton placeId={placeId} />,
+    },
+  ];
+
+  let primaryButton: React.JSX.Element;
+  // Hides any secondary button while the primary button is still loading its data. (While
+  // playability itself loads, getSecondaryPlayButton already returns null.)
+  let isPrimaryButtonLoading = false;
+
+  switch (playabilityStatus) {
+    case undefined:
+      if (!disableLoadingState) {
+        primaryButton = <LoadingButton buttonClassName={buttonClassName} />;
+        break;
+      }
+
+      primaryButton = (
+        <PlayButton
+          universeId={universeId}
+          placeId={placeId}
+          rootPlaceId={rootPlaceId}
+          privateServerLinkCode={privateServerLinkCode}
+          gameInstanceId={gameInstanceId}
+          status={PlayabilityStatus.Playable}
+          eventProperties={eventProperties}
+          appsFlyerReferralProperties={appsFlyerReferralProperties}
+          disableLoadingState={disableLoadingState}
+          buttonClassName={buttonClassName}
+          pageContext={pageContext}
+        />
+      );
+      break;
+    // CTA overrides are currently only honored for GuestProhibited and Playable.
+    // Other statuses keep their dedicated buttons; expand this if new use cases appear.
+    case PlayabilityStatus.GuestProhibited:
+    case PlayabilityStatus.Playable: {
+      const ctaOverride = playabilityStatusCtaOverrides?.[playabilityStatus];
+      if (ctaOverride !== undefined) {
+        primaryButton = ctaOverride;
+        break;
+      }
+
+      primaryButton = (
+        <PlayButton
+          universeId={universeId}
+          placeId={placeId}
+          rootPlaceId={rootPlaceId}
+          privateServerLinkCode={privateServerLinkCode}
+          gameInstanceId={gameInstanceId}
+          status={playabilityStatus}
+          eventProperties={eventProperties}
+          appsFlyerReferralProperties={appsFlyerReferralProperties}
+          disableLoadingState={disableLoadingState}
+          buttonClassName={buttonClassName}
+          pageContext={pageContext}
+        />
+      );
+      break;
+    }
+    case PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser:
+    case PlayabilityStatus.ContextualPlayabilityAgeCheckRequired:
+      fireEvent(counterEvents.ActionNeeded);
+      primaryButton = (
+        <AgeCheckNeededButton
+          universeId={universeId}
+          buttonClassName={buttonClassName}
+          playabilityStatus={playabilityStatus}
+          pageContext={pageContext}
+        />
+      );
+      break;
+    case PlayabilityStatus.PurchaseRequired:
+    case PlayabilityStatus.FiatPurchaseRequired: {
+      // Fall back to an unplayable button (keeping the secondary button when available) when the
+      // purchase data is inadequate, e.g. FiatPurchaseRequired with no fiat pricing.
+      const hasAdequatePurchaseData =
+        playabilityStatus === PlayabilityStatus.FiatPurchaseRequired
+          ? Boolean(productDetails?.fiatPurchaseData)
+          : Boolean(productInfo?.isForSale);
+
+      if (!isPurchaseProductLoading && !hasAdequatePurchaseData) {
+        fireEvent(counterEvents.Unplayable);
+
+        primaryButton = (
+          <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        );
+        break;
+      }
+
+      primaryButton = (
+        <PurchaseButton
+          refetchPlayabilityStatus={refetchPlayabilityStatus}
+          universeId={universeId}
+          placeId={placeId}
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
+          redirectPurchaseUrl={redirectPurchaseUrl}
+          playabilityStatus={playabilityStatus}
+          showDefaultPurchaseText={showDefaultPurchaseText}
+          pageContext={pageContext}
+        />
+      );
+      isPrimaryButtonLoading = isPurchaseProductLoading;
+      break;
+    }
+    case PlayabilityStatus.FiatPurchaseDeviceRestricted:
+    case PlayabilityStatus.ContextualPlayabilityRegionalAvailability:
+      fireEvent(counterEvents.Unplayable);
+
+      primaryButton = (
+        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+      );
+      break;
+    case PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls:
+      if (shouldShowVpcPlayButtonUpsells) {
+        fireEvent(counterEvents.ActionNeeded);
+
+        primaryButton = (
+          <ParentalControlsActionNeededButton
+            universeId={universeId}
+            buttonClassName={buttonClassName}
+            placeId={placeId}
+            rootPlaceId={rootPlaceId}
+            privateServerLinkCode={privateServerLinkCode}
+            gameInstanceId={gameInstanceId}
+            eventProperties={eventProperties}
+            appsFlyerReferralProperties={appsFlyerReferralProperties}
+            pageContext={pageContext}
+          />
+        );
+        break;
+      }
+
+      // If policy is false, fall back to unplayable behavior
+      fireEvent(counterEvents.Unplayable);
+
+      primaryButton = (
+        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+      );
+      break;
+    case PlayabilityStatus.ContextualPlayabilityRequireParentApproval:
+      if (shouldShowVpcPlayButtonUpsells) {
+        fireEvent(counterEvents.ActionNeeded);
+
+        primaryButton = (
+          <ExperienceApprovalActionNeededButton
+            universeId={universeId}
+            buttonClassName={buttonClassName}
+            pageContext={pageContext}
+          />
+        );
+        break;
+      }
+
+      fireEvent(counterEvents.Unplayable);
+
+      primaryButton = (
+        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+      );
+      break;
+    case PlayabilityStatus.UnplayableOtherReason:
+    case PlayabilityStatus.GameUnapproved:
+    case PlayabilityStatus.IncorrectConfiguration:
+    case PlayabilityStatus.UniverseRootPlaceIsPrivate:
+    case PlayabilityStatus.InsufficientPermissionFriendsOnly:
+    case PlayabilityStatus.InsufficientPermissionGroupOnly:
+    case PlayabilityStatus.DeviceRestricted:
+    case PlayabilityStatus.UnderReview:
+    case PlayabilityStatus.AccountRestricted:
+    case PlayabilityStatus.TemporarilyUnavailable:
+    case PlayabilityStatus.ComplianceBlocked:
+    case PlayabilityStatus.ContextualPlayabilityRegionalCompliance:
+    case PlayabilityStatus.ContextualPlayabilityAgeGated:
+    case PlayabilityStatus.PlaceHasNoPublishedVersion:
+    case PlayabilityStatus.ContextualPlayabilityUnrated:
+    case PlayabilityStatus.ContextualPlayabilityAgeGatedByDescriptor:
+    case PlayabilityStatus.ContextualPlayabilityExperienceBlockedParentalControls:
+    case PlayabilityStatus.ContextualPlayabilityCoreGated:
+    case PlayabilityStatus.ContextualPlayabilityPlaytestDisabled:
+    case PlayabilityStatus.ContextualPlayabilityTrustedFriendRequired:
+    default:
+      fireEvent(counterEvents.Unplayable);
+
+      primaryButton = (
+        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+      );
+      break;
+  }
+
+  return (
+    <StackedPlayButtons
+      primaryButton={primaryButton}
+      secondaryButton={getSecondaryPlayButton(secondaryPlayButtonCases, playabilityStatus)}
+      isPrimaryButtonLoading={isPrimaryButtonLoading}
+    />
+  );
+};

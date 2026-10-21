@@ -13,6 +13,17 @@ export function getConfigKey(requestConfig: ApiRequestConfig): string {
 }
 
 /**
+ * Wire-level identity used to decide whether cached data answers a request.
+ * A POST body contains the query, so its caller-supplied key participates.
+ */
+export function getRequestIdentity(
+  requestConfig: Pick<ApiRequestConfig, "url" | "postConfig">,
+): string {
+  const { url, postConfig } = requestConfig;
+  return postConfig ? `${url.href}\n${postConfig.bodyKey}` : url.href;
+}
+
+/**
  * Resolve the root `SduiComponentConfig` from a cache entry. When
  * `identifier` is provided returns that specific config; otherwise returns
  * the first one.

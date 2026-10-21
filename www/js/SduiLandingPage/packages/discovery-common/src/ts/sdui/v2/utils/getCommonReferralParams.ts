@@ -1,15 +1,20 @@
-import type { AnalyticsContext, SduiPageContext } from "@rbx/sdui-core";
+import {
+  findAnalyticsFieldInAncestors,
+  getZeroBasedPosition,
+  type AnalyticsContext,
+  type SduiPageContext,
+} from "@rbx/sdui-core";
 
 import {
   EventStreamMetadata,
   type TCommonReferralParams,
 } from "../../../common/constants/eventStreamConstants";
+import { PageContext } from "../../../common/types/pageContext";
 import {
   parseBooleanField,
   parseMaybeStringNumberField,
   parseStringField,
 } from "../../utils/analyticsParsingUtils";
-import { findAnalyticsFieldInAncestors } from "./findAnalyticsFieldInAncestors";
 import {
   buildSessionAnalyticsData,
   getSessionInfoKey,
@@ -33,19 +38,22 @@ export function getCommonReferralParams(
     findAnalyticsFieldInAncestors("heroUnitId", analyticsContext, ""),
     "",
   );
-  const position = parseMaybeStringNumberField(
-    findAnalyticsFieldInAncestors("itemPosition", analyticsContext, -1),
-    -1,
+  const position = getZeroBasedPosition(
+    parseMaybeStringNumberField(
+      findAnalyticsFieldInAncestors("itemPosition", analyticsContext, -1),
+      -1,
+    ),
   );
 
   const collectionAnalyticsData = analyticsContext?.getCollectionData?.();
 
-  const sortPosition =
+  const sortPosition = getZeroBasedPosition(
     collectionAnalyticsData?.collectionPosition ??
-    parseMaybeStringNumberField(
-      findAnalyticsFieldInAncestors("collectionPosition", analyticsContext, -1),
-      -1,
-    );
+      parseMaybeStringNumberField(
+        findAnalyticsFieldInAncestors("collectionPosition", analyticsContext, -1),
+        -1,
+      ),
+  );
   const numberOfLoadedTiles =
     collectionAnalyticsData?.totalNumberOfItems ??
     parseMaybeStringNumberField(
@@ -78,6 +86,9 @@ export function getCommonReferralParams(
     [EventStreamMetadata.NumberOfLoadedTiles]: numberOfLoadedTiles,
     [EventStreamMetadata.GameSetTypeId]: gameSetTypeId,
     [EventStreamMetadata.Page]: resolvePageForReferral(pageContext),
+    ...(pageContext.pageName === PageContext.GamesPage && {
+      [EventStreamMetadata.PlayContext]: PageContext.GamesPage,
+    }),
     ...buildSessionAnalyticsData(pageSessionInfo, pageContext),
   };
 }

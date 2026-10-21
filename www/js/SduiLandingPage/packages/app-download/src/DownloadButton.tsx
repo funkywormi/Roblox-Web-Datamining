@@ -1,9 +1,10 @@
 import React, { type ComponentProps, type ReactNode, useState } from "react";
 import { Button, Dialog, DialogBody, DialogContent, Icon } from "@rbx/foundation-ui";
-import { withTranslations, type WithTranslationsProps } from "@rbx/core-scripts/react";
-import { appDownloadTranslationConfig, installInstructionsDelayMs } from "./constants";
+import type { TranslateFunction } from "@rbx/core-scripts/react";
+import { installInstructionsDelayMs } from "./constants";
 import { onAppDownloadClick, resolveAppDownload } from "./resolveAppDownload";
 import type { ResolvedAppDownload, ResolveAppDownloadOptions } from "./resolveAppDownload";
+import { useAppDownloadTranslate } from "./useAppDownloadTranslate";
 
 type ButtonVariant = ComponentProps<typeof Button>["variant"];
 type ButtonSize = ComponentProps<typeof Button>["size"];
@@ -24,7 +25,7 @@ export type DownloadButtonProps = {
   showIcon?: boolean;
   renderInstallInstructions?: (
     download: ResolvedAppDownload,
-    translate: WithTranslationsProps["translate"],
+    translate: TranslateFunction,
   ) => ReactNode;
   isDisabled?: boolean;
   isVisible?: boolean;
@@ -44,7 +45,6 @@ export type DownloadButtonProps = {
 };
 
 function DownloadButton({
-  translate,
   text,
   variant = "Emphasis",
   size = "Small",
@@ -58,7 +58,8 @@ function DownloadButton({
   download: downloadOverride,
   downloadTypeOverride,
   onClick,
-}: DownloadButtonProps & WithTranslationsProps) {
+}: DownloadButtonProps) {
+  const translate = useAppDownloadTranslate();
   const [showInstructions, setShowInstructions] = useState(false);
   const [isClickPending, setIsClickPending] = useState(false);
   const download =
@@ -147,4 +148,4 @@ function DownloadButton({
   );
 }
 
-export default withTranslations(DownloadButton, appDownloadTranslationConfig);
+export default DownloadButton;

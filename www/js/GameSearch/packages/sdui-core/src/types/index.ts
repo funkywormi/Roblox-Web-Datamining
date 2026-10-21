@@ -409,6 +409,8 @@ export interface SduiActionHandlerConfig {
    * but the renderer suppresses the browser default on plain left clicks.
    */
   clientNavigation?: boolean;
+  /** Resolves the anchor `target` (e.g. `_blank`) for the resolved `href`. */
+  resolveTarget?: (actionParams: Record<string, unknown>) => string | undefined;
 }
 
 export type ActionParams = Record<string, unknown>;
@@ -446,6 +448,8 @@ export interface SduiResolvedAction {
   /** Awaitable activation for consumers that manage pending, success, or failure state. */
   onActivatedAsync: (overrides?: Record<string, unknown>) => Promise<void>;
   href?: string;
+  /** Anchor `target` for `href`; only set when `href` is. */
+  target?: string;
   clientNavigation?: boolean;
 }
 

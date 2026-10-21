@@ -1,33 +1,35 @@
 import { computed, type ReadonlySignal } from "@preact/signals-core";
 
-import { reportFailedToParse, reportInvalidConfig, stringifyError } from "../../../../errors";
-import {
-  asShallowEqualValue,
-  computedEqual,
-  shallowEqual,
-  shallowValueEqual,
-} from "../../../../signals/computedEqual";
+import { createDeferredSduiComponentConfig } from "../../../deferredSduiComponentConfig";
+import { reportInvalidConfig } from "../../../../errors";
+import { shallowValueEqual } from "../../../../signals/computedEqual";
 import type {
   DataBindingSources,
   NestedComponentBuildContext,
+  PoolBuildMetadata,
   PropBuildRequest,
   SduiComponentConfig,
 } from "../../../../types";
 import { asRecordOrEmpty, isRecord, type RecordOf } from "../../../../utils/typeGuards";
 import { unwrapOneOf } from "../../../../utils/oneOfHelper";
-import { resolveInputDefs } from "../../utils/resolveInputs";
+import { createInputDataSignals, resolveInputDefs } from "../../utils/resolveInputs";
+import { overlayDataSources } from "../shared";
 import type { ComponentListEntry } from "./types";
 
-export type InputSlicer = (
-  entry: ComponentListEntry,
-  isUniqueIdentifier: boolean,
-) => ReadonlySignal<Record<string, unknown> | undefined>;
+export interface InputSlice {
+  inputDataSignal: ReadonlySignal<Record<string, unknown> | undefined>;
+  pendingInputKeysSignal?: ReadonlySignal<ReadonlySet<string>>;
+  parentDataSources?: ReadonlySignal<DataBindingSources>;
+  poolBuildMetadata?: PoolBuildMetadata;
+}
+
+export type InputSlicer = (entry: ComponentListEntry, isUniqueIdentifier: boolean) => InputSlice;
 
 /** A stable child config and the entry structure it was built from. */
 export interface CachedEntryConfig {
   config: SduiComponentConfig;
   entry: ComponentListEntry;
-  identity: "unique" | "position";
+  identity: "unique" | "position" | "poolIndex";
   reactKey: string;
 }
 
@@ -44,6 +46,7 @@ export interface CachedEntryConfig {
 export interface EntryConfigCache {
   byIdentifier: Map<string, CachedEntryConfig>;
   byIndex: CachedEntryConfig[];
+  byPoolIndex: Map<number, CachedEntryConfig>;
 }
 
 export interface BuildEntryConfigsResult {
@@ -59,6 +62,10 @@ function createReactKey(identifier: string | undefined): string {
   return `component-list:row:${nextOpaqueReactKey}`;
 }
 
+function createPoolItemReactKey(poolIndex: number): string {
+  return `component-list:pool:${poolIndex}`;
+}
+
 function unwrapEntryData(entryData: unknown): RecordOf {
   if (!isRecord(entryData)) return { value: entryData };
   const unwrapped = unwrapOneOf(entryData.inputData);
@@ -66,14 +73,6 @@ function unwrapEntryData(entryData: unknown): RecordOf {
     return { ...asRecordOrEmpty(unwrapped.propValue) };
   }
   return { ...entryData };
-}
-
-function createInputDataSignal(
-  computeInputData: () => Record<string, unknown> | undefined,
-): ReadonlySignal<Record<string, unknown> | undefined> {
-  return computedEqual(computeInputData, (previous, next) =>
-    shallowEqual(asShallowEqualValue(previous), asShallowEqualValue(next)),
-  );
 }
 
 function indexUniqueIdentifiers<T>(
@@ -94,26 +93,10 @@ function indexUniqueIdentifiers<T>(
   return uniqueItems;
 }
 
-function fillInputs(
-  data: RecordOf,
-  inputs: RecordOf | undefined,
-  buildDeps: PropBuildRequest,
-): void {
-  if (!inputs) return;
-  try {
-    const resolvedInputs = resolveInputDefs(inputs, buildDeps);
-    Object.assign(data, resolvedInputs);
-  } catch (err) {
-    reportFailedToParse(
-      buildDeps.ctx,
-      `Failed to build inputs for ComponentList item: ${stringifyError(err)}`,
-    );
-  }
-}
-
 export function createInputSlicer(
   buildDeps: PropBuildRequest,
   boundSourceSignal?: ReadonlySignal<unknown>,
+  resolveEntryItem?: (entry: ComponentListEntry) => unknown,
 ): InputSlicer {
   const boundArrayIndexes = new WeakMap<unknown[], ReadonlyMap<string, unknown>>();
   const resolveBoundItem = (identifier: string): unknown => {
@@ -133,36 +116,36 @@ export function createInputSlicer(
 
   return (entry, isUniqueIdentifier) => {
     const resolveItem = (): unknown => {
+      if (resolveEntryItem) return resolveEntryItem(entry);
       if (!isUniqueIdentifier || !entry.identifier || !boundSourceSignal) return entry.item;
       return resolveBoundItem(entry.identifier);
     };
 
     if (entry.sourceMode === "literal") {
       if (entry.isInline) {
-        return computed(() => buildDeps.dataSources.value.inputData);
+        return {
+          inputDataSignal: computed(() => buildDeps.dataSources.value.inputData),
+          parentDataSources: buildDeps.dataSources,
+        };
       }
-      return computed(() => {
-        const inputData: RecordOf = {};
-        fillInputs(inputData, entry.inputs, buildDeps);
-        return inputData;
-      });
+      return createInputDataSignals(() => resolveInputDefs(entry.inputs ?? {}, buildDeps));
     }
 
     if (entry.isInline) {
-      return createInputDataSignal(() => {
+      const overlaySources = computed(() => {
         const currentItem = resolveItem();
-        return {
-          ...buildDeps.dataSources.value.inputData,
-          ...(isRecord(currentItem) ? currentItem : {}),
-        };
+        const overlay = isRecord(currentItem) ? currentItem : {};
+        return overlayDataSources(buildDeps.dataSources.value, overlay);
       });
+      return {
+        inputDataSignal: computed(() => overlaySources.value.inputData),
+        parentDataSources: overlaySources,
+      };
     }
 
-    return createInputDataSignal(() => {
-      const inputData = unwrapEntryData(resolveItem());
-      fillInputs(inputData, entry.inputs, buildDeps);
-      return inputData;
-    });
+    return createInputDataSignals(() =>
+      resolveInputDefs(entry.inputs ?? {}, buildDeps, unwrapEntryData(resolveItem())),
+    );
   };
 }
 
@@ -187,18 +170,24 @@ function findReusableEntry(
   uniqueIdentifiers: Set<string>,
 ): CachedEntryConfig | undefined {
   const { identifier } = entry;
+  const poolIndex = entry.poolPlacement?.poolIndex;
   const isUniquelyIdentified = identifier != null && uniqueIdentifiers.has(identifier);
-  const candidate = isUniquelyIdentified
-    ? previousCache.byIdentifier.get(identifier)
-    : allowPositionalReuse
-      ? previousCache.byIndex[displayIndex]
-      : undefined;
+  const candidate =
+    poolIndex !== undefined
+      ? previousCache.byPoolIndex.get(poolIndex)
+      : isUniquelyIdentified
+        ? previousCache.byIdentifier.get(identifier)
+        : allowPositionalReuse
+          ? previousCache.byIndex[displayIndex]
+          : undefined;
   if (!candidate) return undefined;
 
-  const identity = isUniquelyIdentified ? "unique" : "position";
+  const identity =
+    poolIndex !== undefined ? "poolIndex" : isUniquelyIdentified ? "unique" : "position";
   if (candidate.identity !== identity) return undefined;
   const { entry: previous } = candidate;
   if (!entryStructureMatches(previous, entry)) return undefined;
+  if (identity === "poolIndex") return candidate;
   if (isUniquelyIdentified) return candidate;
   if (previous.identifier !== identifier || !shallowValueEqual(previous.item, entry.item)) {
     return undefined;
@@ -207,8 +196,8 @@ function findReusableEntry(
 }
 
 /**
- * Reuse `previousCache` only with a slicer created from a bound source.
- * Literal lists pass `undefined` so every config is built fresh.
+ * Reuse `previousCache` across recomputes of the same ComponentList signal
+ * (bound or literal). A missing cache builds every config fresh.
  */
 export function buildEntryConfigs(
   entries: ComponentListEntry[],
@@ -218,10 +207,12 @@ export function buildEntryConfigs(
   buildContext: NestedComponentBuildContext,
   buildDeps: PropBuildRequest,
   sourceUniqueIdentifiers?: ReadonlySet<string>,
+  deferItemBuild = false,
 ): BuildEntryConfigsResult {
   const result: SduiComponentConfig[] = [];
   const byIdentifier = new Map<string, CachedEntryConfig>();
   const byIndex: CachedEntryConfig[] = [];
+  const byPoolIndex = new Map<number, CachedEntryConfig>();
   const uniqueIdentifiers = findUniqueIdentifiers(entries);
   if (sourceUniqueIdentifiers) {
     // Ordering can collapse duplicate IDs into one row.
@@ -236,6 +227,7 @@ export function buildEntryConfigs(
     if (!entry) continue;
 
     const { identifier } = entry;
+    const poolIndex = entry.poolPlacement?.poolIndex;
     const isUniquelyIdentified = identifier != null && uniqueIdentifiers.has(identifier);
     let nestedConfig: SduiComponentConfig | undefined;
     let reactKey: string | undefined;
@@ -256,7 +248,8 @@ export function buildEntryConfigs(
     }
 
     if (!nestedConfig) {
-      if (!entry.template) {
+      const { template } = entry;
+      if (!template) {
         reportInvalidConfig(
           buildDeps.ctx,
           `No template found for ComponentList item (identifier: ${entry.identifier ?? String(index)})`,
@@ -264,40 +257,55 @@ export function buildEntryConfigs(
         continue;
       }
 
-      const inputDataSignal = inputSlicer(entry, isUniquelyIdentified);
-      // Overlay the slicer's merged `inputData` (parent + per-row item) onto the parent sources so
-      // inline children bind against the row data instead of stale parent data.
-      const parentSources = entry.isInline
-        ? computed<DataBindingSources>(() => ({
-            ...buildDeps.dataSources.value,
-            inputData: inputDataSignal.value ?? buildDeps.dataSources.value.inputData,
-          }))
-        : undefined;
-      nestedConfig = buildContext.builder.buildConfigForComponent(
-        entry.template,
-        inputDataSignal,
-        buildContext.builderConfig,
-        buildContext.parentAnalyticsContext,
-        parentSources,
-      );
+      const { inputDataSignal, pendingInputKeysSignal, parentDataSources, poolBuildMetadata } =
+        inputSlicer(entry, isUniquelyIdentified);
+      const parentSources = entry.isInline ? parentDataSources : undefined;
+      const buildConfig = () =>
+        buildContext.builder.buildConfigForComponent(
+          template,
+          inputDataSignal,
+          buildContext.builderConfig,
+          buildContext.parentAnalyticsContext,
+          parentSources,
+          pendingInputKeysSignal,
+          poolBuildMetadata ?? buildContext.poolBuildMetadata,
+        );
+      // Filterable entries must build eagerly — deferred shells have no isComponentFilteredSignal yet.
+      nestedConfig =
+        deferItemBuild && template.shared.isComponentFiltered == null
+          ? createDeferredSduiComponentConfig(
+              template.shared.componentType,
+              buildConfig,
+              buildDeps.ctx,
+            )
+          : buildConfig();
 
       if (!nestedConfig) continue;
     }
 
     result.push(nestedConfig);
 
-    const renderIdentifier = isUniquelyIdentified ? identifier : undefined;
+    const renderIdentifier =
+      poolIndex === undefined && isUniquelyIdentified ? identifier : undefined;
+    const identity =
+      poolIndex !== undefined ? "poolIndex" : isUniquelyIdentified ? "unique" : "position";
     const cacheEntry: CachedEntryConfig = {
       config: nestedConfig,
       entry,
-      identity: isUniquelyIdentified ? "unique" : "position",
-      reactKey: reactKey ?? createReactKey(renderIdentifier),
+      identity,
+      reactKey:
+        reactKey ??
+        (poolIndex !== undefined
+          ? createPoolItemReactKey(poolIndex)
+          : createReactKey(renderIdentifier)),
     };
     byIndex[index] = cacheEntry;
     if (renderIdentifier) byIdentifier.set(renderIdentifier, cacheEntry);
+    if (poolIndex !== undefined) byPoolIndex.set(poolIndex, cacheEntry);
     nestedConfig.identifier = renderIdentifier;
     nestedConfig.reactKey = cacheEntry.reactKey;
+    if (entry.poolPlacement) nestedConfig.poolPlacement = entry.poolPlacement;
   }
 
-  return { configs: result, cache: { byIdentifier, byIndex } };
+  return { configs: result, cache: { byIdentifier, byIndex, byPoolIndex } };
 }

@@ -87,6 +87,61 @@ export function stringFieldOr(record: RecordOf | undefined, key: string, fallbac
 }
 
 /**
+ * Converts the input to a string or undefined if it cannot be converted.
+ *
+ * @param coerceFiniteNumber - Also convert finite numbers to strings.
+ */
+export function asString(
+  value: unknown,
+  options: { coerceFiniteNumber?: boolean } = {},
+): string | undefined {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (options.coerceFiniteNumber && typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+
+  return undefined;
+}
+
+/**
+ * Returns a string only when it is non-empty. Equivalent to the legacy
+ * `someStringField || undefined` pattern but type-safe — proto fields default
+ * to `""` for unset strings, and downstream consumers expect `undefined` so
+ * they can apply their own fallbacks.
+ */
+export function asNonEmptyString(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+export function positiveIntegerOr(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isInteger(value) && value > 0 ? value : fallback;
+}
+
+export function nonNegativeIntegerOr(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : fallback;
+}
+
+/**
+ * Returns a finite number from a number or numeric string. `NaN`,
+ * `Infinity`, and blank strings return `undefined`. Blank strings are
+ * rejected before `Number()` because `Number("")` and `Number(" ")` are `0`.
+ */
+export function asFiniteNumber(value: unknown): number | undefined {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : undefined;
+  }
+  // We reject blank strings before `Number()` because `Number("")` and `Number(" ")` are `0`.
+  if (typeof value !== "string" || value.trim() === "") {
+    return undefined;
+  }
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : undefined;
+}
+
+/**
  * Narrows `unknown` to bufbuild's {@link JsonValue}. Used at the network
  * boundary because the DOM lib types `Response.json()` as `Promise<any>`,
  * which would otherwise leak `any` into the rest of the pipeline.
