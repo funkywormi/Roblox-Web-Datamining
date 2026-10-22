@@ -1,6 +1,6 @@
 import { httpService } from 'core-utilities';
-import { Document } from '@rbx/richtext';
 import { MessageContent } from '../../shared/types';
+import { getDisplayContent, parseDocument } from '../../shared/utils/messageContentUtils';
 import {
   AnnouncementModel,
   AnnouncementResponse,
@@ -12,32 +12,22 @@ import {
 } from '../types';
 import groupAnnouncementsConstants from '../constants/groupAnnouncementsConstants';
 
-const parseSlate = (slate: string | null): Document | undefined => {
-  if (!slate) return undefined;
-  try {
-    return JSON.parse(slate) as Document;
-  } catch {
-    return undefined;
-  }
-};
-
 const mapResponseToModel = (raw: AnnouncementResponse): AnnouncementModel => {
   const reactions = raw.message.reactions ?? [];
 
   const originalContent: MessageContent = {
     plainText: raw.message.content.plainText ?? '',
-    slate: parseSlate(raw.message.content.slate)
+    slate: parseDocument(raw.message.content)
   };
 
-  let content: MessageContent;
-  if (raw.message.contentToDisplay?.plainText != null) {
-    content = {
-      plainText: raw.message.contentToDisplay.plainText,
-      slate: parseSlate(raw.message.contentToDisplay.slate)
-    };
-  } else {
-    content = originalContent;
-  }
+  // Translations arrive as either plain text or Slate, never both. Keep the
+  // original plain text under a Slate-only translation so the body isn't
+  // blank when rich text rendering is disabled.
+  const displayContent = getDisplayContent(originalContent, raw.message.contentToDisplay);
+  const content: MessageContent = {
+    ...displayContent,
+    plainText: displayContent.plainText ?? originalContent.plainText
+  };
 
   const title = raw.nameToDisplay ?? raw.name;
 
@@ -141,7 +131,7 @@ const mapDraftResponseToModel = (draft: AnnouncementDraftResponse): Announcement
   title: draft.name,
   content: {
     plainText: draft.message.content.plainText ?? '',
-    slate: parseSlate(draft.message.content.slate)
+    slate: parseDocument(draft.message.content)
   },
   assetId: draft.message.media?.assetId,
   formId: draft.message.form?.formId,

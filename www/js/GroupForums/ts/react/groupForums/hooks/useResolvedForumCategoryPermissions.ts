@@ -8,7 +8,6 @@ type UseResolvedForumCategoryPermissionsOptions = {
   groupId: number;
   categoryIds: string[];
   currentCategoryId?: string;
-  enabled: boolean;
 };
 
 type UseResolvedForumCategoryPermissionsResult = {
@@ -19,15 +18,14 @@ type UseResolvedForumCategoryPermissionsResult = {
 export default function useResolvedForumCategoryPermissions({
   groupId,
   categoryIds,
-  currentCategoryId,
-  enabled
+  currentCategoryId
 }: UseResolvedForumCategoryPermissionsOptions): UseResolvedForumCategoryPermissionsResult {
   const queries = useQueries({
     queries: categoryIds.map(categoryId => ({
       queryKey: getResolvedCategoryPermissionsKey(groupId, categoryId),
       queryFn: async () =>
         forumsService.getResolvedGroupForumCategoryPermissions(groupId, categoryId),
-      enabled,
+      enabled: true,
       retry: 1,
       refetchOnWindowFocus: false
     }))
@@ -50,6 +48,6 @@ export default function useResolvedForumCategoryPermissions({
 
   return {
     permissions,
-    hasCurrentCategoryPermissionError: enabled && currentCategoryQuery?.isError === true
+    hasCurrentCategoryPermissionError: currentCategoryQuery?.isError === true
   };
 }

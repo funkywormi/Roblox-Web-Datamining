@@ -16,7 +16,7 @@ import {
 } from '@rbx/foundation-ui';
 import type { GroupRolePermissions as ResolvedGroupRolePermissions } from '@rbx/group-management';
 import { groupsConfig } from '../translation.config';
-import { Group, GroupPermissions } from '../../shared/types';
+import { Group } from '../../shared/types';
 import forumsService from '../services/forumsService';
 import {
   ChannelModerationType,
@@ -43,7 +43,6 @@ export type GroupForumsCategoryConfigSectionExpandedProps = {
   forumCategory: ForumCategory;
   refetchForumCategories: () => Promise<void>;
   canManageCategory: boolean;
-  isUnified: boolean;
   resolvedRolePermissions: ResolvedGroupRolePermissions;
 } & WithTranslationsProps;
 
@@ -52,7 +51,6 @@ const GroupForumsCategoryConfigSectionExpanded = ({
   forumCategory,
   refetchForumCategories,
   canManageCategory,
-  isUnified,
   resolvedRolePermissions,
   translate
 }: GroupForumsCategoryConfigSectionExpandedProps): JSX.Element | null => {
@@ -114,19 +112,17 @@ const GroupForumsCategoryConfigSectionExpanded = ({
     const selectedRoleIsEditable = rolesPermissions.some(
       rolePermissions =>
         rolePermissions.role.id === selectedRoleId &&
-        (!isUnified ||
-          resolvedRolePermissions[rolePermissions.role.id]?.canEditPermissions === true)
+        resolvedRolePermissions[rolePermissions.role.id]?.canEditPermissions === true
     );
     if (!selectedRoleIsEditable) {
       setSelectedRoleId(
         rolesPermissions.find(
           rolePermissions =>
-            !isUnified ||
             resolvedRolePermissions[rolePermissions.role.id]?.canEditPermissions === true
         )?.role.id
       );
     }
-  }, [isUnified, resolvedRolePermissions, rolesPermissions, selectedRoleId]);
+  }, [resolvedRolePermissions, rolesPermissions, selectedRoleId]);
 
   const selectedRolePermissions = rolesPermissions?.find(
     rolePermissions => rolePermissions.role.id === selectedRoleId
@@ -139,16 +135,13 @@ const GroupForumsCategoryConfigSectionExpanded = ({
     categoryId: forumCategory.id,
     roleId: selectedRoleId,
     enabled:
-      isUnified &&
-      !!selectedRoleId &&
-      resolvedRolePermissions[selectedRoleId]?.canEditPermissions === true,
+      !!selectedRoleId && resolvedRolePermissions[selectedRoleId]?.canEditPermissions === true,
     onError: () => systemFeedbackService.warning(translate('NetworkError'))
   });
   const roles =
     rolesPermissions?.map(rolePermissions => ({
       ...rolePermissions.role,
-      isDisabled:
-        isUnified && resolvedRolePermissions[rolePermissions.role.id]?.canEditPermissions !== true
+      isDisabled: resolvedRolePermissions[rolePermissions.role.id]?.canEditPermissions !== true
     })) || [];
   const roleIds = roles?.map(role => role.id) || [];
   const networkErrorTranslation = translate('NetworkError');
@@ -266,30 +259,6 @@ const GroupForumsCategoryConfigSectionExpanded = ({
     }
   }, []);
 
-  const updateSelectedRolesForumsPermission = useCallback(
-    (roleId: number, permissionName: string, value: boolean) => {
-      if (!rolesPermissions) return;
-      const newRolesPermissions = rolesPermissions.map(rolePermissions => {
-        if (rolePermissions.role.id === roleId) {
-          const newRolePermissions = {
-            ...rolePermissions,
-            permissions: {
-              ...rolePermissions.permissions,
-              groupForumsPermissions: {
-                ...rolePermissions.permissions.groupForumsPermissions,
-                [permissionName as keyof GroupPermissions['groupForumsPermissions']]: value
-              }
-            }
-          };
-          return newRolePermissions;
-        }
-        return rolePermissions;
-      });
-      queryClient.setQueryData(rolesPermissionsQueryKey, newRolesPermissions);
-    },
-    [rolesPermissions, queryClient, rolesPermissionsQueryKey]
-  );
-
   const updateSelectedRoleUnifiedForumsPermission = useCallback(
     (roleId: number, unifiedPermissionName: string, value: boolean) => {
       const rolePermissionsQueryKey = getCategoryRolePermissionsKey(
@@ -328,37 +297,24 @@ const GroupForumsCategoryConfigSectionExpanded = ({
       value: boolean;
       roleId: number;
     }) => {
-      if (isUnified) {
-        const unifiedPermissionName = getUnifiedForumPermissionName(permissionName);
-        if (!unifiedPermissionName) {
-          throw new Error(`Unsupported forum permission: ${permissionName}`);
-        }
-        // optimistically update state
-        updateSelectedRoleUnifiedForumsPermission(roleId, unifiedPermissionName, value);
-        return forumsService.updateUnifiedGroupForumCategoryRolePermissions(
-          group.id,
-          forumCategory.id,
-          roleId,
-          {
-            [unifiedPermissionName]: value ? 'granted' : 'denied'
-          }
-        );
+      const unifiedPermissionName = getUnifiedForumPermissionName(permissionName);
+      if (!unifiedPermissionName) {
+        throw new Error(`Unsupported forum permission: ${permissionName}`);
       }
       // optimistically update state
-      updateSelectedRolesForumsPermission(roleId, permissionName, value);
-      await forumsService.updateGroupForumCategoryRolesPermissions(
+      updateSelectedRoleUnifiedForumsPermission(roleId, unifiedPermissionName, value);
+      return forumsService.updateUnifiedGroupForumCategoryRolePermissions(
         group.id,
         forumCategory.id,
         roleId,
         {
-          [permissionName]: value
+          [unifiedPermissionName]: value ? 'granted' : 'denied'
         }
       );
-      return undefined;
     },
     {
       onSuccess: (updatedPermissions, { roleId }) => {
-        if (isUnified && updatedPermissions) {
+        if (updatedPermissions) {
           queryClient.setQueryData(
             getCategoryRolePermissionsKey(group.id, forumCategory.id, roleId),
             updatedPermissions
@@ -378,13 +334,9 @@ const GroupForumsCategoryConfigSectionExpanded = ({
           roleId: number;
         }
       ) => {
-        if (isUnified) {
-          const unifiedPermissionName = getUnifiedForumPermissionName(permissionName);
-          if (unifiedPermissionName) {
-            updateSelectedRoleUnifiedForumsPermission(roleId, unifiedPermissionName, !value);
-          }
-        } else {
-          updateSelectedRolesForumsPermission(roleId, permissionName, !value);
+        const unifiedPermissionName = getUnifiedForumPermissionName(permissionName);
+        if (unifiedPermissionName) {
+          updateSelectedRoleUnifiedForumsPermission(roleId, unifiedPermissionName, !value);
         }
         systemFeedbackService.warning(networkErrorTranslation);
       }
@@ -393,9 +345,7 @@ const GroupForumsCategoryConfigSectionExpanded = ({
 
   const selectedRolePermissionsConfiguration = useForumCategoryRolePermissionsConfiguration({
     features,
-    isUnified,
-    legacyPermissions: selectedRolePermissions?.permissions.groupForumsPermissions,
-    unifiedPermissions: unifiedSelectedRolePermissions
+    permissions: unifiedSelectedRolePermissions
   });
 
   const isLoading = useMemo(
@@ -403,14 +353,12 @@ const GroupForumsCategoryConfigSectionExpanded = ({
       isRolesPermissionsQueryLoading ||
       addRoleMutation.isLoading ||
       removeRoleMutation.isLoading ||
-      (isUnified &&
-        !!selectedRoleId &&
+      (!!selectedRoleId &&
         resolvedRolePermissions[selectedRoleId]?.canEditPermissions === true &&
         isUnifiedSelectedRolePermissionsLoading),
     [
       isRolesPermissionsQueryLoading,
       isUnifiedSelectedRolePermissionsLoading,
-      isUnified,
       resolvedRolePermissions,
       selectedRoleId,
       addRoleMutation,
@@ -504,7 +452,6 @@ const GroupForumsCategoryConfigSectionExpanded = ({
           hiddenRoleIds={roleIds}
           hideGuestRole
           hideOwnerRole
-          isUnified={isUnified}
           resolvedRolePermissions={resolvedRolePermissions}
         />
       )}

@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useContext } from 'react';
 import { ExperimentationService } from 'Roblox';
 import { ForumPermissionsState, ForumPost } from '../types';
-import { GroupPermissions, GroupChannelPermissions } from '../../shared/types';
+import { GroupPermissions } from '../../shared/types';
 import useForumStore from '../hooks/useForumStore';
 import { useForumExperiments } from './ForumExperimentsContext';
 import { layers } from '../../shared/constants/experimentConstants';
@@ -18,8 +18,6 @@ export const useForumPermissions = (): ForumPermissionsState => {
 
 export type ForumPermissionsProviderProps = {
   permissions: GroupPermissions;
-  channelsPermissions: GroupChannelPermissions[];
-  isUnified?: boolean;
   resolvedCategoryPermissions?: Record<string, GroupPermissions['groupForumsPermissions']>;
   isGroupMember: boolean;
   // Derived by useCanViewMembers (see ForumPermissionsBridge) rather than piped in from Angular.
@@ -43,8 +41,6 @@ const deniedForumPermissions: GroupPermissions['groupForumsPermissions'] = {
 export function ForumPermissionsProvider({
   children,
   permissions,
-  channelsPermissions,
-  isUnified = false,
   resolvedCategoryPermissions = {},
   isGroupMember,
   canViewMembers = false,
@@ -54,25 +50,10 @@ export function ForumPermissionsProvider({
   const categoryId = useForumStore.use.categoryId();
   const { subscriberNotificationsExperimentConfig } = useForumExperiments();
 
-  const channelsPermissionsMap: Map<string, GroupChannelPermissions> = useMemo(() => {
-    // Using channels permissions is flagged here because the channelsPermissions array will be null from the backend when this is flagged off
-    return (channelsPermissions || []).reduce((acc, val) => {
-      acc.set(val.channelId, val);
-      return acc;
-    }, new Map<string, GroupChannelPermissions>());
-  }, [channelsPermissions]);
+  const getForumCategoryPermissions = (forumCategoryId: string) =>
+    resolvedCategoryPermissions[forumCategoryId] ?? deniedForumPermissions;
 
-  const getForumCategoryPermissions = (forumCategoryId: string) => {
-    if (isUnified) {
-      return resolvedCategoryPermissions[forumCategoryId] ?? deniedForumPermissions;
-    }
-    return (
-      channelsPermissionsMap.get(forumCategoryId)?.groupForumsPermissions ||
-      permissions.groupForumsPermissions
-    );
-  };
-
-  let forumsPermissions = isUnified ? deniedForumPermissions : permissions.groupForumsPermissions;
+  let forumsPermissions = deniedForumPermissions;
   if (categoryId) {
     forumsPermissions = getForumCategoryPermissions(categoryId);
   }

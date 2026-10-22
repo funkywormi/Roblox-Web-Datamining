@@ -3,7 +3,6 @@ import { withTranslations, WithTranslationsProps, useTheme } from 'react-utiliti
 import { Button } from '@rbx/foundation-ui';
 import { useSystemFeedback, Loading } from 'react-style-guide';
 import { UIThemeProvider } from '@rbx/ui';
-import { MIGRATION_STATUS, useGetMigrationStatus } from '@rbx/group-management';
 import { groupsConfig } from '../translation.config';
 import {
   Group,
@@ -49,29 +48,19 @@ export type GroupForumsConfigSectionProps = {
 const GroupForumsConfigSectionInner = ({
   group,
   permissions,
-  channelsPermissions,
   displayPermissionsConfig,
   metadata,
   translate
 }: GroupForumsConfigSectionProps): JSX.Element | null => {
   const { SystemFeedbackComponent, systemFeedbackService } = useSystemFeedback();
+  const { features } = useCommunityProductFeatures();
   const theme = useTheme();
-  const { features, isLoading: areProductFeaturesLoading } = useCommunityProductFeatures();
-  const isUnifiedUIEnabled = features.IsUnifiedUIEnabled === true;
-  const { data: migrationStatus, isLoading: isMigrationStatusLoading } = useGetMigrationStatus(
-    group.id,
-    {
-      enabled: isUnifiedUIEnabled
-    }
-  );
-  const isUnified = isUnifiedUIEnabled && migrationStatus?.status === MIGRATION_STATUS.MIGRATED;
 
   const {
     data: resolvedRolePermissions,
     isLoading: areResolvedRolePermissionsLoading
   } = useResolvedGroupRolePermissions({
     groupId: group.id,
-    enabled: isUnified,
     onError: () => systemFeedbackService.warning(translate('NetworkError'))
   });
   const editableRoleIds = useMemo(
@@ -81,10 +70,7 @@ const GroupForumsConfigSectionInner = ({
         .map(([roleId]) => roleId),
     [resolvedRolePermissions]
   );
-  const canManageRolePermissions = useMemo(() => isUnified && editableRoleIds.length > 0, [
-    editableRoleIds,
-    isUnified
-  ]);
+  const canManageRolePermissions = useMemo(() => editableRoleIds.length > 0, [editableRoleIds]);
 
   const [isCreateForumCategoryDialogVisible, setIsCreateForumCategoryDialogVisible] = useState(
     false
@@ -101,9 +87,7 @@ const GroupForumsConfigSectionInner = ({
   >({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [networkError, setNetworkError] = useState<boolean>(false);
-  const showRoles = isUnified
-    ? canManageRolePermissions
-    : permissions.groupMembershipPermissions.changeRank;
+  const showRoles = canManageRolePermissions;
 
   const hasGroupLevelCategoryManagement =
     permissions.groupForumsPermissions?.manageCategories ?? false;
@@ -111,27 +95,10 @@ const GroupForumsConfigSectionInner = ({
   // Users need this permission at the group level to order categories
   const hasPermissionsToOrderForumCategories = hasGroupLevelCategoryManagement;
 
-  const canManageLegacyCategory = useCallback(
-    (category: ForumCategory) => {
-      if (channelsPermissions) {
-        const groupForumsPermissions = channelsPermissions.find(
-          channelPermissions => channelPermissions.channelId === category.id
-        )?.groupForumsPermissions;
-        // If this category was just added then we haven't refreshed the users membership yet so won't be able to find the channelPermissions for it
-        // So in that case assume they can manage it, since it was just added by them
-        return groupForumsPermissions ? groupForumsPermissions.manageCategories : true;
-      }
-      return hasGroupLevelCategoryManagement;
-    },
-    [channelsPermissions, hasGroupLevelCategoryManagement]
-  );
-
   const canManageCategory = useCallback(
     (category: ForumCategory) =>
-      isUnified
-        ? resolvedCategoryPermissions[category.id]?.manageCategories ?? false
-        : canManageLegacyCategory(category),
-    [canManageLegacyCategory, isUnified, resolvedCategoryPermissions]
+      resolvedCategoryPermissions[category.id]?.manageCategories ?? false,
+    [resolvedCategoryPermissions]
   );
 
   const fetchForumCategories = useCallback(
@@ -148,57 +115,42 @@ const GroupForumsConfigSectionInner = ({
           forumsService.getGroupForumCategories(group.id, false),
           forumsService.getGroupForumCategories(group.id, true)
         ]);
-        if (isUnified) {
-          const allCategories = [
-            ...getCategoriesResponse.data,
-            ...getArchivedCategoriesResponse.data
-          ];
-          const categoryPermissions: Record<
-            string,
-            GroupPermissions['groupForumsPermissions']
-          > = {};
-          const resolvedPermissions = await Promise.all(
-            allCategories.map(async category => {
-              try {
-                const response = await forumsService.getResolvedGroupForumCategoryPermissions(
-                  group.id,
-                  category.id
-                );
-                return [category.id, mapResolvedForumCategoryPermissions(response)] as const;
-              } catch {
-                return undefined;
-              }
-            })
-          );
-          resolvedPermissions.forEach(resolvedPermission => {
-            if (resolvedPermission) {
-              const [categoryId, categoryPermission] = resolvedPermission;
-              categoryPermissions[categoryId] = categoryPermission;
+        const allCategories = [
+          ...getCategoriesResponse.data,
+          ...getArchivedCategoriesResponse.data
+        ];
+        const categoryPermissions: Record<string, GroupPermissions['groupForumsPermissions']> = {};
+        const resolvedPermissions = await Promise.all(
+          allCategories.map(async category => {
+            try {
+              const response = await forumsService.getResolvedGroupForumCategoryPermissions(
+                group.id,
+                category.id
+              );
+              return [category.id, mapResolvedForumCategoryPermissions(response)] as const;
+            } catch {
+              return undefined;
             }
-          });
-          if (resolvedPermissions.some(resolvedPermission => resolvedPermission === undefined)) {
-            systemFeedbackService.warning(translate('NetworkError'));
+          })
+        );
+        resolvedPermissions.forEach(resolvedPermission => {
+          if (resolvedPermission) {
+            const [categoryId, categoryPermission] = resolvedPermission;
+            categoryPermissions[categoryId] = categoryPermission;
           }
-          setResolvedCategoryPermissions(categoryPermissions);
-          const canManageFetchedCategory = (category: ForumCategory) =>
-            categoryPermissions[category.id]?.manageCategories ?? false;
-          const canViewFetchedCategory = (category: ForumCategory) =>
-            canManageRolePermissions || canManageFetchedCategory(category);
-          setForumCategories(getCategoriesResponse.data.filter(canViewFetchedCategory));
-          setArchivedForumCategories(
-            getArchivedCategoriesResponse.data.filter(canManageFetchedCategory)
-          );
-        } else {
-          // Group-level category managers can order every active category, so they see them all.
-          setForumCategories(
-            hasPermissionsToOrderForumCategories
-              ? getCategoriesResponse.data
-              : getCategoriesResponse.data.filter(canManageLegacyCategory)
-          );
-          setArchivedForumCategories(
-            getArchivedCategoriesResponse.data.filter(canManageLegacyCategory)
-          );
+        });
+        if (resolvedPermissions.some(resolvedPermission => resolvedPermission === undefined)) {
+          systemFeedbackService.warning(translate('NetworkError'));
         }
+        setResolvedCategoryPermissions(categoryPermissions);
+        const canManageFetchedCategory = (category: ForumCategory) =>
+          categoryPermissions[category.id]?.manageCategories ?? false;
+        const canViewFetchedCategory = (category: ForumCategory) =>
+          canManageRolePermissions || canManageFetchedCategory(category);
+        setForumCategories(getCategoriesResponse.data.filter(canViewFetchedCategory));
+        setArchivedForumCategories(
+          getArchivedCategoriesResponse.data.filter(canManageFetchedCategory)
+        );
         setUnfilteredForumCategoriesCount(getCategoriesResponse.data.length);
         setUnfilteredArchivedForumCategoriesCount(getArchivedCategoriesResponse.data.length);
       } catch {
@@ -218,10 +170,7 @@ const GroupForumsConfigSectionInner = ({
       setIsLoading,
       setForumCategories,
       systemFeedbackService,
-      canManageLegacyCategory,
-      canManageRolePermissions,
-      hasPermissionsToOrderForumCategories,
-      isUnified
+      canManageRolePermissions
     ]
   );
 
@@ -261,23 +210,12 @@ const GroupForumsConfigSectionInner = ({
   const hasPermissionsToAddForumCategory = hasGroupLevelCategoryManagement;
 
   useEffect(() => {
-    if (
-      areProductFeaturesLoading ||
-      (isUnifiedUIEnabled && isMigrationStatusLoading) ||
-      (isUnified && areResolvedRolePermissionsLoading)
-    ) {
+    if (areResolvedRolePermissionsLoading) {
       return;
     }
     // eslint-disable-next-line no-void
     void fetchForumCategories();
-  }, [
-    areProductFeaturesLoading,
-    areResolvedRolePermissionsLoading,
-    fetchForumCategories,
-    isUnifiedUIEnabled,
-    isMigrationStatusLoading,
-    isUnified
-  ]);
+  }, [areResolvedRolePermissionsLoading, fetchForumCategories]);
 
   const showCreateForumCategoryDialog = useCallback(() => {
     setIsCreateForumCategoryDialogVisible(true);
@@ -390,7 +328,6 @@ const GroupForumsConfigSectionInner = ({
                       displayPermissionsConfig={displayPermissionsConfig}
                       canManageCategory={canManageCategory(forumCategory)}
                       canManageRolePermissions={canManageRolePermissions}
-                      isUnified={isUnified}
                       resolvedRolePermissions={resolvedRolePermissions ?? {}}
                     />
                   );
@@ -412,7 +349,6 @@ const GroupForumsConfigSectionInner = ({
                   displayPermissionsConfig={displayPermissionsConfig}
                   canManageCategory={canManageCategory(forumCategory)}
                   canManageRolePermissions={canManageRolePermissions}
-                  isUnified={isUnified}
                   resolvedRolePermissions={resolvedRolePermissions ?? {}}
                 />
               ))}

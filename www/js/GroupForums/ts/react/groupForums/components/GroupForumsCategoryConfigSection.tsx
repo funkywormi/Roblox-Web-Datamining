@@ -10,7 +10,6 @@ import {
   PopoverTrigger
 } from '@rbx/foundation-ui';
 import '../../../../css/tailwind.css';
-import { CurrentUser } from 'Roblox';
 import type { GroupRolePermissions as ResolvedGroupRolePermissions } from '@rbx/group-management';
 import { groupsConfig } from '../translation.config';
 import { Group } from '../../shared/types';
@@ -30,7 +29,6 @@ export type GroupForumsCategoryConfigSectionProps = {
   displayPermissionsConfig: boolean;
   canManageCategory: boolean;
   canManageRolePermissions: boolean;
-  isUnified: boolean;
   resolvedRolePermissions: ResolvedGroupRolePermissions;
 } & WithTranslationsProps;
 
@@ -43,7 +41,6 @@ const GroupForumsCategoryConfigSection = ({
   displayPermissionsConfig = false,
   canManageCategory,
   canManageRolePermissions,
-  isUnified,
   resolvedRolePermissions,
   translate
 }: GroupForumsCategoryConfigSectionProps): JSX.Element | null => {
@@ -64,11 +61,8 @@ const GroupForumsCategoryConfigSection = ({
   }, [forumCategory.archivedBy]);
 
   const canEditPermissions = useMemo(
-    () =>
-      displayPermissionsConfig &&
-      !isArchived &&
-      (isUnified ? canManageRolePermissions : group.owner?.userId === Number(CurrentUser.userId)),
-    [canManageRolePermissions, displayPermissionsConfig, group, isArchived, isUnified]
+    () => displayPermissionsConfig && !isArchived && canManageRolePermissions,
+    [canManageRolePermissions, displayPermissionsConfig, isArchived]
   );
 
   const showRenameButton = useMemo(() => {
@@ -217,7 +211,6 @@ const GroupForumsCategoryConfigSection = ({
             forumCategory={forumCategory}
             refetchForumCategories={refetchForumCategories}
             canManageCategory={canManageCategory}
-            isUnified={isUnified}
             resolvedRolePermissions={resolvedRolePermissions}
           />
         )}

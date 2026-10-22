@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { TSystemFeedbackService } from "react-style-guide";
 import { TranslateFunction } from "@rbx/core-scripts/react";
+import { getCurrentUser } from "@rbx/www-common/user";
 import {
   getRedeemGiftCardConversionMetadata,
   TRANSLATION_KEYS,
@@ -43,6 +44,10 @@ function HeuristicConvertToCredit({
   const [isConvertAllFlowEnabled, setIsConvertAllFlowEnabled] = useState(false);
 
   const fetchCreditBalance = async () => {
+    if (!getCurrentUser()) {
+      return;
+    }
+
     const getConversionMetadataResponse = await getRedeemGiftCardConversionMetadata();
     if (getConversionMetadataResponse.status !== 200) {
       trackCounter("GetConversionMetadata_Failed", {

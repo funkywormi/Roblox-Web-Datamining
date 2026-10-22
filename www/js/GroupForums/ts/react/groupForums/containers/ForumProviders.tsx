@@ -2,12 +2,10 @@ import React, { FC, ReactNode, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-utilities';
 import { useSystemFeedback } from 'react-style-guide';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MIGRATION_STATUS, useGetMigrationStatus } from '@rbx/group-management';
 import { GroupPermissions, GroupChannelPermissions } from '../../shared/types';
 import { ForumPermissionsProvider } from '../contexts/ForumPermissionsContext';
 import { ForumExperimentsProvider } from '../contexts/ForumExperimentsContext';
 import useForumStore from '../hooks/useForumStore';
-import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
 import useResolvedForumCategoryPermissions from '../hooks/useResolvedForumCategoryPermissions';
 import useCanViewMembers from '../../shared/hooks/useCanViewMembers';
 
@@ -41,15 +39,6 @@ const ForumPermissionsBridge: FC<ForumPermissionsBridgeProps> = ({
   const canViewMembers = useCanViewMembers(groupId);
   const { translate } = useTranslation();
   const { systemFeedbackService } = useSystemFeedback();
-  const { features, isLoading: areProductFeaturesLoading } = useCommunityProductFeatures();
-  const { data: migrationStatus, isLoading: isMigrationStatusLoading } = useGetMigrationStatus(
-    groupId,
-    {
-      enabled: features.IsUnifiedUIEnabled === true
-    }
-  );
-  const isUnified =
-    features.IsUnifiedUIEnabled === true && migrationStatus?.status === MIGRATION_STATUS.MIGRATED;
   const categoryIds = useMemo(
     () =>
       Array.from(
@@ -68,8 +57,7 @@ const ForumPermissionsBridge: FC<ForumPermissionsBridgeProps> = ({
   } = useResolvedForumCategoryPermissions({
     groupId,
     categoryIds,
-    currentCategoryId: categoryId,
-    enabled: isUnified
+    currentCategoryId: categoryId
   });
 
   useEffect(() => {
@@ -77,19 +65,9 @@ const ForumPermissionsBridge: FC<ForumPermissionsBridgeProps> = ({
       systemFeedbackService.warning(translate('NetworkError'));
     }
   }, [hasCategoryPermissionError, systemFeedbackService, translate]);
-
-  if (
-    areProductFeaturesLoading ||
-    (features.IsUnifiedUIEnabled === true && isMigrationStatusLoading)
-  ) {
-    return null;
-  }
-
   return (
     <ForumPermissionsProvider
       permissions={permissions}
-      channelsPermissions={channelsPermissions}
-      isUnified={isUnified}
       resolvedCategoryPermissions={resolvedCategoryPermissions}
       isGroupMember={isGroupMember}
       canViewMembers={canViewMembers}

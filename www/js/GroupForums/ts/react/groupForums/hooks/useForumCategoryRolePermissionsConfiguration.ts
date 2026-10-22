@@ -1,30 +1,13 @@
 import { useMemo } from 'react';
-import type {
-  CommunityProductFeatures,
-  GroupPermissions,
-  PermissionConfigurationState
-} from '../../shared/types';
+import type { CommunityProductFeatures, PermissionConfigurationState } from '../../shared/types';
 import configureGroupConstants from '../../shared/constants/configureGroupConstants';
 import type { ForumCategoryRolePermissionResponse } from '../types';
 import { mapForumCategoryRolePermissions } from '../services/unifiedForumPermissions';
 
 type UseForumCategoryRolePermissionsConfigurationOptions = {
   features: CommunityProductFeatures;
-  isUnified: boolean;
-  legacyPermissions?: GroupPermissions['groupForumsPermissions'];
-  unifiedPermissions?: ForumCategoryRolePermissionResponse;
+  permissions?: ForumCategoryRolePermissionResponse;
 };
-
-const mapLegacyPermissions = (
-  permissions: GroupPermissions['groupForumsPermissions']
-): Record<string, PermissionConfigurationState> =>
-  Object.entries(permissions).reduce<Record<string, PermissionConfigurationState>>(
-    (configuration, [permissionName, isEnabled]) => ({
-      ...configuration,
-      [permissionName]: { isEnabled, canEdit: true }
-    }),
-    {}
-  );
 
 const filterFeatureGatedPermissions = (
   configuration: Record<string, PermissionConfigurationState>,
@@ -46,17 +29,13 @@ const filterFeatureGatedPermissions = (
 
 export default function useForumCategoryRolePermissionsConfiguration({
   features,
-  isUnified,
-  legacyPermissions,
-  unifiedPermissions
+  permissions
 }: UseForumCategoryRolePermissionsConfigurationOptions):
   | Record<string, PermissionConfigurationState>
   | undefined {
   return useMemo(() => {
-    const configuration = isUnified
-      ? unifiedPermissions && mapForumCategoryRolePermissions(unifiedPermissions)
-      : legacyPermissions && mapLegacyPermissions(legacyPermissions);
+    const configuration = permissions && mapForumCategoryRolePermissions(permissions);
 
     return configuration ? filterFeatureGatedPermissions(configuration, features) : configuration;
-  }, [features, isUnified, legacyPermissions, unifiedPermissions]);
+  }, [features, permissions]);
 }

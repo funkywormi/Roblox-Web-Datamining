@@ -20,7 +20,6 @@ type Props = {
   hiddenRoleIds: number[];
   hideGuestRole: boolean;
   hideOwnerRole: boolean;
-  isUnified: boolean;
   resolvedRolePermissions: ResolvedGroupRolePermissions;
 } & WithTranslationsProps;
 
@@ -31,7 +30,6 @@ const RoleSelectDialog = ({
   hiddenRoleIds,
   hideGuestRole,
   hideOwnerRole,
-  isUnified,
   resolvedRolePermissions,
   translate
 }: Props): JSX.Element => {
@@ -42,40 +40,25 @@ const RoleSelectDialog = ({
   const { maxRank, minRank } = metadata.roleConfiguration;
   const isOwnerRolesetDeprecated = features.IsOwnerRolesetDeprecated;
 
-  const { isLoading: areLegacyRolePermissionsLoading, data: groupRolePermissions } = useQuery({
-    queryKey: queryKeys.getAllGroupRolePermissionsKey(groupId),
-    queryFn: async () => {
-      const response = await groupsService.getAllGroupRolePermissions(groupId);
-      return response;
-    },
-    onError: () => systemFeedbackService.warning(translate('NetworkError')),
-    enabled: !isUnified,
-    retry: false,
-    refetchOnWindowFocus: false
-  });
-
-  const { isLoading: areUnifiedRolesLoading, data: unifiedRoles } = useQuery({
+  const { isLoading, data: roles } = useQuery({
     queryKey: queryKeys.getGroupRolesKey(groupId),
     queryFn: async () => groupsService.getGroupRoles({ groupId, includePrivate: true }),
     onError: () => systemFeedbackService.warning(translate('NetworkError')),
-    enabled: isUnified,
     retry: false,
     refetchOnWindowFocus: false
   });
 
-  const roles = useMemo(
+  const editableRoles = useMemo(
     () =>
-      isUnified
-        ? (unifiedRoles ?? [])
-            .filter(role => resolvedRolePermissions[role.id]?.canEditPermissions === true)
-            .sort((firstRole, secondRole) => secondRole.rank - firstRole.rank)
-        : groupRolePermissions?.map(rolePermissions => rolePermissions.role) ?? [],
-    [groupRolePermissions, isUnified, resolvedRolePermissions, unifiedRoles]
+      (roles ?? [])
+        .filter(role => resolvedRolePermissions[role.id]?.canEditPermissions === true)
+        .sort((firstRole, secondRole) => secondRole.rank - firstRole.rank),
+    [resolvedRolePermissions, roles]
   );
 
   const filteredRoles = useMemo(
     () =>
-      roles.filter(
+      editableRoles.filter(
         role =>
           !hiddenRoleIds.find(hiddenRoleId => hiddenRoleId === role.id) &&
           !(hideGuestRole && role.rank === minRank) &&
@@ -85,7 +68,7 @@ const RoleSelectDialog = ({
           (search.length === 0 || role.name.toLowerCase().includes(search.toLowerCase()))
       ),
     [
-      roles,
+      editableRoles,
       hiddenRoleIds,
       search,
       minRank,
@@ -95,8 +78,6 @@ const RoleSelectDialog = ({
       isOwnerRolesetDeprecated
     ]
   );
-  const isLoading = isUnified ? areUnifiedRolesLoading : areLegacyRolePermissionsLoading;
-
   return (
     <Dialog
       open

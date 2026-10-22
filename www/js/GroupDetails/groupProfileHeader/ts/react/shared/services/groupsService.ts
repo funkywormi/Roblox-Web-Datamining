@@ -7,15 +7,6 @@ interface GroupRolePermissionsResponse {
 }
 
 export default {
-  getGroupMigrationStatus: async (groupId: number): Promise<string> => {
-    const urlConfig = {
-      url: groupConstants.urls.getGroupMigrationStatusURL(groupId),
-      withCredentials: true
-    };
-
-    const response = await httpService.get(urlConfig);
-    return (response.data as { status: string }).status;
-  },
   getAllGroupRolePermissions: async (groupId: number): Promise<GroupRolePermissions[]> => {
     const urlConfig = {
       url: groupConstants.urls.getAllGroupRolePermissionsURL(groupId),
