@@ -2,10 +2,14 @@ import classNames from "classnames";
 import { useContext } from "react";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { Badge, Icon } from "@rbx/foundation-ui";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { useResponsiveValue } from "@rbx/payments/hooks";
-import { useFullKeyTranslations, useTranslations } from "@rbx/www-common/i18n";
 import { isInApp } from "../../utils/platform";
 import { isIconVariant } from "../../utils/iconVariants";
+import {
+  BONUS_ROBUX_TAG_FALLBACK_KEY,
+  resolveBonusRobuxTagLabelKey,
+} from "../../utils/bonusRobuxTag";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 
 const BadgeWrapper = ({ icon, label }: { icon?: string; label: string }) => {
@@ -41,8 +45,7 @@ export function RobuxAmount({
   bonusRobuxTagTranslationKey,
 }: RobuxAmountProps) {
   const { productBadgeSlotCount } = useContext(BuyRobuxPageContext);
-  const translatePremium = useTranslations("Feature.Premium");
-  const { translateFullKey } = useFullKeyTranslations();
+  const { translate } = useTranslation();
 
   const responsiveStyle = useResponsiveValue(
     {
@@ -77,13 +80,11 @@ export function RobuxAmount({
     ? formatNumber(Number(bonusRobuxAmount))
     : undefined;
 
-  const fallbackBonusRobuxTagLabel = translatePremium("Label.PlusAmountMoreLower", {
-    amount: formattedBonusRobuxAmount ?? "",
-  });
+  const bonusRobuxTagLabelKey = resolveBonusRobuxTagLabelKey(bonusRobuxTagTranslationKey);
 
   return (
     <div
-      className={`robux-amount-item flex ${nonPromotionalAmount ? "flex-col" : "flex-row"} num-badges-${productBadgeSlotCount} justify-start gap-small wrap`}
+      className={`flex ${nonPromotionalAmount ? "flex-col" : "flex-row"} num-badges-${productBadgeSlotCount} justify-start gap-small wrap`}
     >
       {/* Robux Amount */}
       <div className="flex gap-small items-center">
@@ -119,17 +120,9 @@ export function RobuxAmount({
             (bonusRobuxTagIcon ? (
               <BadgeWrapper
                 icon={bonusRobuxTagIcon}
-                label={
-                  bonusRobuxTagTranslationKey
-                    ? translateFullKey(
-                        bonusRobuxTagTranslationKey,
-                        {
-                          amount: formattedBonusRobuxAmount ?? "",
-                        },
-                        fallbackBonusRobuxTagLabel,
-                      )
-                    : fallbackBonusRobuxTagLabel
-                }
+                label={translate(bonusRobuxTagLabelKey, {
+                  amount: formattedBonusRobuxAmount,
+                })}
               />
             ) : (
               // On non-large screens, only show for when in-app.
@@ -137,14 +130,15 @@ export function RobuxAmount({
                 className={classNames(isInApp ? "block" : "hidden", "large:block")}
                 data-testid="bonus-pill"
               >
-                <BadgeWrapper label={fallbackBonusRobuxTagLabel} />
+                <BadgeWrapper
+                  label={translate(BONUS_ROBUX_TAG_FALLBACK_KEY, {
+                    amount: formattedBonusRobuxAmount,
+                  })}
+                />
               </div>
             ))}
           {inlineBadgeTranslationKey && (
-            <BadgeWrapper
-              icon={inlineBadgeIcon}
-              label={translateFullKey(inlineBadgeTranslationKey)}
-            />
+            <BadgeWrapper icon={inlineBadgeIcon} label={translate(inlineBadgeTranslationKey)} />
           )}
         </div>
       )}

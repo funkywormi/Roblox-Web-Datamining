@@ -38,7 +38,6 @@ export enum AccountTheme {
   HyperPlum = "HyperPlum",
   QuantumPulse = "QuantumPulse",
   Classic = "Classic",
-  Halloween2026 = "Halloween2026",
 }
 
 export enum CommunicationPrivacyLevel {

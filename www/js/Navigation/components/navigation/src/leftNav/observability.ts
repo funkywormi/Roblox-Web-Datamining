@@ -6,7 +6,7 @@ import { reportError } from "@rbx/core-scripts/sentry";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import { createFireTelemetryHistogram } from "@rbx/web-telemetry/v2/histogram";
-import { createWithApiMetrics } from "../../util/apiMetrics";
+import { createWithApiMetrics } from "../util/apiMetrics";
 
 export const observabilityRegistry = {
   featureName: "LeftNav",

@@ -1,8 +1,8 @@
 import { type FC } from "react";
 import { Icon } from "@rbx/foundation-ui";
-import type { TTailwindIconClass } from "@rbx/foundation-tailwind/classes";
-import { useFormatter, useTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 
+import type { TTailwindIconClass } from "@rbx/foundation-tailwind/classes";
 import type { SectionSubscriptionV2Product } from "../../types/buyRobuxPageData";
 
 type BenefitContext = {
@@ -21,14 +21,7 @@ type BenefitContext = {
 
 type BenefitConfig = {
   iconName: TTailwindIconClass;
-  translationKey:
-    | "Description.Benefit.DiscountBuyRobux"
-    | "Description.Benefit.PrivateServersExpandedTitle"
-    | "Description.Benefit.RobuxTransfers"
-    | "Description.Benefit.ProfileFrameAppTheme"
-    | "Description.Benefit.AllPlus.V2"
-    | "Description.Benefit.RobuxAllowance"
-    | "Description.Benefit.BetterValue.V2";
+  translationKey: string;
   getParams?: (ctx: BenefitContext) => Record<string, string>;
   // Optional predicate; when provided and false, the row is suppressed.
   isVisible?: (ctx: BenefitContext) => boolean;
@@ -127,8 +120,7 @@ export const SubscriptionTileBenefits: FC<SubscriptionTileBenefitsProps> = ({
   product,
   robuxAllowance,
 }) => {
-  const translate = useTranslations("Feature.RobloxSubscription");
-  const formatter = useFormatter();
+  const { translate, intl } = useTranslation();
 
   // "Up to {discountPercent} off" advertises the ceiling, so take the highest
   // configured tier (e.g. the 20% step-up tier) rather than the base tier.
@@ -136,12 +128,12 @@ export const SubscriptionTileBenefits: FC<SubscriptionTileBenefitsProps> = ({
     (max, b) => Math.max(max, b.plusDiscountSubscriptionBenefits?.discountPercentage ?? 0),
     0,
   );
-  const discountPercent = formatter.number(rawDiscountPercent / 100, {
+  const discountPercent = intl.n(rawDiscountPercent / 100, {
     style: "percent",
     maximumFractionDigits: 0,
   });
 
-  const newAmount = formatter.number(
+  const newAmount = intl.n(
     parseMoneyUnits(product.price.units) + (product.price.nanos ?? 0) * 1e-9,
     {
       style: "currency",
@@ -149,7 +141,7 @@ export const SubscriptionTileBenefits: FC<SubscriptionTileBenefitsProps> = ({
     },
   );
   const oldAmount = product.strikethroughPrice
-    ? formatter.number(
+    ? intl.n(
         parseMoneyUnits(product.strikethroughPrice.units) +
           (product.strikethroughPrice.nanos ?? 0) * 1e-9,
         {
@@ -159,10 +151,10 @@ export const SubscriptionTileBenefits: FC<SubscriptionTileBenefitsProps> = ({
       )
     : null;
 
-  // formatter.number with no `style` does locale-aware decimal grouping ("1,000" in
+  // intl.n with no `style` does locale-aware decimal grouping ("1,000" in
   // en-US, "1.000" in de-DE). The Robux glyph itself is owned by the
   // translation string, not appended here.
-  const formattedRobuxAmount = formatter.number(robuxAllowance);
+  const formattedRobuxAmount = intl.n(robuxAllowance);
 
   const configs = robuxAllowance > 0 ? BUNDLED_BENEFITS : BASE_BENEFITS;
   const ctx: BenefitContext = {

@@ -16,6 +16,11 @@ const securityTabStateReducer = (
     case SecurityTabActionType.INITIALIZE_TWO_STEP_VERIFICATION:
       newState.twoStepVerificationMetadata = action.metadata;
       newState.enabledMediaTypes = action.enabledMediaTypes;
+      newState.isTwoStepVerificationMetadataResolved = true;
+      return newState;
+
+    case SecurityTabActionType.SET_TWO_STEP_VERIFICATION_METADATA_RESOLVED:
+      newState.isTwoStepVerificationMetadataResolved = true;
       return newState;
 
     case SecurityTabActionType.SET_PASSKEY_INFO:

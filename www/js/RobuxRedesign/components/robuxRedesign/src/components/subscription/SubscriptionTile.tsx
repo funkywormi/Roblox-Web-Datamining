@@ -1,6 +1,6 @@
 import { type FC, useMemo } from "react";
 import classNames from "classnames";
-import { useFormatter, useTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { Button } from "@rbx/foundation-ui";
 import { SubscriptionButton } from "@rbx/subscriptions-common";
 import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
@@ -72,8 +72,7 @@ export const SubscriptionTile: FC<SubscriptionTileProps> = ({
   paymentSessionId,
   redirect,
 }) => {
-  const translate = useTranslations("Feature.RobloxSubscription");
-  const formatter = useFormatter();
+  const { translate, intl } = useTranslation();
 
   // Takes global redirect url and modifies for subscription bundle.
   // - Overrides ctx to subscription
@@ -101,12 +100,12 @@ export const SubscriptionTile: FC<SubscriptionTileProps> = ({
   const hasFreeTrial = offers.some(o => o.freeTrial);
   const isRedirect = Boolean(product.isRedirect);
 
-  const price = formatter.number(getMoneyAmount(product.price), {
+  const price = intl.n(getMoneyAmount(product.price), {
     style: "currency",
     currency: product.price.currencyCode,
   });
   const strikethroughPrice = product.strikethroughPrice
-    ? formatter.number(getMoneyAmount(product.strikethroughPrice), {
+    ? intl.n(getMoneyAmount(product.strikethroughPrice), {
         style: "currency",
         currency: product.strikethroughPrice.currencyCode,
       })

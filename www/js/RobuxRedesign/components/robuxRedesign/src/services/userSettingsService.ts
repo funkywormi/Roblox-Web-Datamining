@@ -1,5 +1,5 @@
 import { EnvironmentUrls } from "@rbx/environment-urls";
-import type { TUserSettingsAndOptionsBody } from "@rbx/user-settings/types/userSettingsTypes";
+import type { TUserSettingsAndOptionsBody } from "@rbx/user-settings";
 import { APICall, HTTPVerb, withApiEvents } from "../utils/apiEventsCounter";
 
 export const getEnablePurchasesSetting = async (): Promise<

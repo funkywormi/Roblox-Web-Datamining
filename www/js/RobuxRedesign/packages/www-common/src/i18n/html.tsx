@@ -16,12 +16,11 @@ const END_MARK = "__FN_END_nvfToKPAOuiV__";
 const START = (key: string) => `${START_MARK}${key}|`;
 const END = (key: string) => `${END_MARK}${key}|`;
 const START_PATTERN = new RegExp(`${START_MARK}(\\d+)\\|`);
-const END_PATTERN = new RegExp(`${END_MARK}(\\d+)\\|`);
 
 /**
  * Interpolates `values`, then replaces each tag's placeholders with `render`. Returns `null`
- * when a segment is malformed, so the caller can track the failure without displaying raw
- * placeholders or a partial message. Tags whose placeholders are both absent are ignored.
+ * when a segment is malformed or a tag is unused, so the caller can track the failure without
+ * displaying raw placeholders or a partial message.
  */
 export const renderHtml = (
   translate: (values: Record<string, string | number | Date>) => string,
@@ -29,7 +28,10 @@ export const renderHtml = (
   values?: Record<string, string | number | Date>,
 ): ReactNode => {
   const plainValues: Record<string, string | number | Date> = { ...values };
-  const segments: Record<string, { start: string; end: string; render: HtmlTag["render"] }> = {};
+  const segments: Record<
+    string,
+    { start: string; end: string; used: boolean; render: HtmlTag["render"] }
+  > = {};
 
   tags.forEach((tag, index) => {
     const reactKey = index.toString();
@@ -37,16 +39,12 @@ export const renderHtml = (
     const end = END(reactKey);
     plainValues[tag.opening] = start;
     plainValues[tag.closing] = end;
-    segments[reactKey] = { start, end, render: tag.render };
+    segments[reactKey] = { start, end, render: tag.render, used: false };
   });
 
   const generateTree = (translation: string): ReactNode[] | null => {
     const parts: ReactNode[] = [];
     const startMatch = START_PATTERN.exec(translation);
-    const endMatch = END_PATTERN.exec(translation);
-    if (endMatch && (!startMatch || endMatch.index < startMatch.index)) {
-      return null;
-    }
     if (!startMatch) {
       return [translation];
     }
@@ -59,6 +57,7 @@ export const renderHtml = (
     if (segment == null) {
       return null;
     }
+    segment.used = true;
 
     const endIndex = translation.indexOf(segment.end);
     if (endIndex < startMatch.index + startMatch[0].length) {
@@ -84,7 +83,7 @@ export const renderHtml = (
   };
 
   const result = generateTree(translate(plainValues));
-  if (result == null) {
+  if (result == null || Object.values(segments).some(segment => !segment.used)) {
     return null;
   }
 

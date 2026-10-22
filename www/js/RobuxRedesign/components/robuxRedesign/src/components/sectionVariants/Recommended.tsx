@@ -1,6 +1,6 @@
 /* eslint-disable no-void */
 import { useCallback, useContext } from "react";
-import { useFullKeyTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { Button } from "@rbx/foundation-ui";
 import { PriceTag } from "@rbx/payments/priceTag";
 import { Product, SectionBase, SectionRecommended } from "../../types/buyRobuxPageData";
@@ -23,7 +23,7 @@ export function Recommended({ isPrimary, sectionBase }: RecommendedProps) {
   const { purchaseNonRedirectProduct } = useContext(PurchaseContext);
 
   const { breakpoint } = useContext(BuyRobuxPageContext);
-  const { translateFullKey } = useFullKeyTranslations();
+  const { translate } = useTranslation();
 
   const buttonClickHandler = useCallback(
     (product: Product) => {
@@ -39,7 +39,7 @@ export function Recommended({ isPrimary, sectionBase }: RecommendedProps) {
 
   return (
     <Section {...getSectionTrackingProps(sectionBase)}>
-      <SectionHeader>{translateFullKey(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
+      <SectionHeader>{translate(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
       <SectionBody isPrimary={isPrimary}>
         <div className="flex flex-col self-stretch medium:flex-row medium:justify-between medium:items-center">
           <div className="flex flex-col self-stretch gap-small padding-bottom-large medium:padding-bottom-none medium:self-auto">

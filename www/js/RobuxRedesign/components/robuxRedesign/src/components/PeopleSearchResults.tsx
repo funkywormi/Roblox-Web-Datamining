@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import classNames from "classnames";
-import { useTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { DisplayNameBadges, PLUS_BADGE_ARIA_LABEL_KEY, usePlusStatus } from "@rbx/identity-badges";
 import { useAvatarThumbnails } from "../hooks/useAvatarThumbnails";
 import { OmniSearchUser } from "../services/userSearchService";
@@ -23,8 +23,7 @@ export function PeopleSearchResults({
   onSelectUser,
   hasSectionAbove = false,
 }: PeopleSearchResultsProps) {
-  const translate = useTranslations("Feature.RobloxSubscription");
-  const translateBuyRobux = useTranslations("Feature.BuyRobux");
+  const { translate } = useTranslation();
   const plusBadgeAriaLabel = translate(PLUS_BADGE_ARIA_LABEL_KEY);
   const thumbnails = useAvatarThumbnails(users);
 
@@ -43,7 +42,7 @@ export function PeopleSearchResults({
     return null;
   }
 
-  const heading = translateBuyRobux("Label.PeopleWithCount", { count: users.length });
+  const heading = translate("Label.PeopleWithCount", { count: users.length });
 
   return (
     <div

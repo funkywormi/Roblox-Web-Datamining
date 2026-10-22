@@ -1,4 +1,5 @@
 import React from "react";
+import { Checkbox } from "@rbx/foundation-ui";
 import useTwoStepVerificationContext from "../hooks/useTwoStepVerificationContext";
 
 type Props = {
@@ -22,22 +23,20 @@ const RememberDeviceCheckBox: React.FC<Props> = ({
     state: { resources },
   } = useTwoStepVerificationContext();
 
-  const onCheckBoxChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRememberDevice(event.target.checked);
-  };
-
   return (
-    <p className={className} data-testid="remember-device-checkbox">
-      <input
-        id="remember-device"
-        type="checkbox"
-        onChange={onCheckBoxChanged}
-        checked={rememberDevice}
-        disabled={disabled}
-        tabIndex={0}
-      />{" "}
-      <label htmlFor="remember-device">{resources.Label.TrustThisDevice}</label>
-    </p>
+    <div
+      className={`challenge-checkbox flex justify-center ${className ?? ""}`}
+      data-testid="remember-device-checkbox"
+    >
+      <Checkbox
+        size="Large"
+        placement="Start"
+        label={resources.Label.TrustThisDevice}
+        isChecked={rememberDevice}
+        isDisabled={disabled}
+        onCheckedChange={isChecked => setRememberDevice(isChecked === true)}
+      />
+    </div>
   );
 };
 

@@ -5,6 +5,7 @@ import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { AuthenticatedUser } from "@rbx/core-scripts/meta/user";
+import { eventData } from "@rbx/core-scripts/meta/event";
 import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
 import {
   Icon,
@@ -17,9 +18,10 @@ import {
   Button,
   Badge,
 } from "@rbx/foundation-ui";
+import { assetUrl } from "@rbx/www-common/asset";
 import VerifiedBadgeIcon from "@rbx/www-common/components/verified-badge";
 import EntrypointExposure from "@rbx/community-telemetry/EntrypointExposure";
-import { getNavCapability, type PlusNavEntries } from "../../util/navCapabilities";
+import { getNavCapability, type PlusNavEntries } from "../util/navCapabilities";
 import {
   StateLayer,
   blackbirdPathRegex,
@@ -27,6 +29,7 @@ import {
   interactable,
   navItemClasses,
 } from "./navItemStyles";
+import theHollowImage from "../images/The Hollow.webp";
 
 const noPlusNavEntries: PlusNavEntries = {
   isPlusSubscriber: false,
@@ -238,6 +241,21 @@ const BlackbirdNavItem = ({ currentPath }: { currentPath: string }) => {
   );
 };
 
+export const EventNavItem = () => {
+  const event = eventData();
+  if (!event?.purple) {
+    return null;
+  }
+  const url = event.purple;
+  return (
+    <li key={url}>
+      <a href={url} className="flex">
+        <img src={assetUrl(theHollowImage)} alt="The Hollow" className="width-full radius-medium" />
+      </a>
+    </li>
+  );
+};
+
 const plusAbbreviate = (num: number, limit: number) => (num > limit ? `${limit}+` : num.toString());
 
 export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
@@ -366,6 +384,7 @@ export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
           text={t("Label.GiftCards")}
         />
         {upsellEntry}
+        <EventNavItem />
       </ul>
     </nav>
   );

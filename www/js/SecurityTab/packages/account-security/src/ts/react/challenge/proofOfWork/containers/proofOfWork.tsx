@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Modal, ProgressBar } from "react-style-guide";
+import { DialogBody, ProgressBar } from "@rbx/foundation-ui";
 import { getItem, setItem } from "@rbx/core-lib/local-storage";
 import {
   TimeLockPuzzleMessage,
   TimeLockPuzzleParameters,
   TimeLockPuzzleSolver,
 } from "../../../../common/algorithm/proofOfWork/timeLockPuzzleSolver";
+import ChallengeDialog from "../../../common/challengeDialog";
+import { ChallengeDialogHeader, HeaderButtonType } from "../../../common/challengeDialogHeader";
 import InlineChallenge from "../../../common/inlineChallenge";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
-import { FragmentModalHeader, HeaderButtonType } from "../../../common/modalHeader";
 import { mapProofOfWorkErrorToChallengeErrorCode } from "../constants/resources";
 import { AnswerState } from "../constants/types";
 import useProofOfWorkContext from "../hooks/useProofOfWorkContext";
@@ -326,18 +327,21 @@ const ProofOfWork: React.FC = () => {
    */
 
   const getPageContent = () => {
-    const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
+    const BodyElement = renderInline ? InlineChallengeBody : DialogBody;
     const progressPercentage = (progress || 0) * 100;
 
     return (
       <React.Fragment>
         <BodyElement>
-          <div className="computation-progress-body">
+          <div className="flex flex-col gap-small [margin-block:18px]">
             <ProgressBar
-              now={progressPercentage}
-              label={getProgressLabelString(progressPercentage)}
-              striped
+              variant="Determinate"
+              value={progressPercentage}
+              ariaLabel={resources.Description.VerifyingYouAreNotBot}
             />
+            <p className="text-body-medium content-default">
+              {getProgressLabelString(progressPercentage)}
+            </p>
           </div>
         </BodyElement>
       </React.Fragment>
@@ -353,13 +357,8 @@ const ProofOfWork: React.FC = () => {
       {getPageContent()}
     </InlineChallenge>
   ) : (
-    <Modal
-      className="modal-modern modal-modern-challenge-computation-progress"
-      show={isModalVisible}
-      onHide={terminateComputationAndCloseModal}
-      backdrop="static"
-    >
-      <FragmentModalHeader
+    <ChallengeDialog open={isModalVisible} onClose={terminateComputationAndCloseModal}>
+      <ChallengeDialogHeader
         headerText={resources.Description.VerifyingYouAreNotBot}
         buttonType={HeaderButtonType.CLOSE}
         buttonAction={terminateComputationAndCloseModal}
@@ -367,7 +366,7 @@ const ProofOfWork: React.FC = () => {
         headerInfo={null}
       />
       {getPageContent()}
-    </Modal>
+    </ChallengeDialog>
   );
 };
 

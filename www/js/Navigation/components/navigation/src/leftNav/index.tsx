@@ -1,51 +1,32 @@
 import { useEffect, useRef } from "react";
-import { authenticatedUser, type AuthenticatedUser } from "@rbx/core-scripts/meta/user";
-import LeftNavigationOld from "./old";
-import LeftNavigationNew from "./new";
-import { isAccountExperienceRevampEnabled } from "../util/accountExperienceUtils";
-import { useNewLeftNav } from "./newLeftNav";
+import { AuthenticatedUser } from "@rbx/core-scripts/meta/user";
 import {
-  getDeviceType,
   LeftNavErrorBoundary,
+  getDeviceType,
   publishHistogram,
   trackCounter,
 } from "./observability";
+import LeftNavigationContent from "./LeftNavigation";
 
-function LeftNavigationArm({
-  user,
-  isNew,
-  isSettled,
-}: {
-  user: AuthenticatedUser;
-  isNew: boolean;
-  isSettled: boolean;
-}) {
+function LeftNavigationWithMetrics({ user }: { user: AuthenticatedUser }) {
   const hasTrackedRender = useRef(false);
-  const variant = isNew ? "NEW" : "OLD";
-
   useEffect(() => {
-    if (!isSettled || hasTrackedRender.current) {
+    if (hasTrackedRender.current) {
       return;
     }
     hasTrackedRender.current = true;
     const deviceType = getDeviceType();
-    trackCounter("Rendered", { variant, deviceType });
-    publishHistogram("RenderedMs", { variant, deviceType }, performance.now());
-  }, [isSettled, variant]);
+    trackCounter("Rendered", { variant: "NEW", deviceType });
+    publishHistogram("RenderedMs", { variant: "NEW", deviceType }, performance.now());
+  }, []);
 
-  return isNew ? <LeftNavigationNew user={user} /> : <LeftNavigationOld />;
+  return <LeftNavigationContent user={user} />;
 }
 
-export default function LeftNavigation() {
-  const { isNew, isSettled } = useNewLeftNav();
-  const user = authenticatedUser();
-  if (!user?.isAuthenticated || isAccountExperienceRevampEnabled()) {
-    return null;
-  }
-
+export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
   return (
     <LeftNavErrorBoundary name="LeftNavReactCrash">
-      <LeftNavigationArm user={user} isNew={isNew} isSettled={isSettled} />
+      <LeftNavigationWithMetrics user={user} />
     </LeftNavErrorBoundary>
   );
 }

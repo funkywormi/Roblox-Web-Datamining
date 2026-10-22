@@ -20,7 +20,7 @@ import { TurnstileActionType } from "../store/action";
  * enough for timers to run, while remaining invisible and non-interactive.
  */
 const TURNSTILE_OFFSCREEN_WHILE_EVALUATING_CLASS =
-  "fixed left-[-10000px] top-0 z-[-1] h-px w-px overflow-hidden opacity-0 pointer-events-none";
+  "fixed left-[-10000px] [top:0] [z-index:-1] [width:1px] [height:1px] [overflow:hidden] [opacity:0] pointer-events-none";
 
 /**
  * A container element for the Turnstile UI.

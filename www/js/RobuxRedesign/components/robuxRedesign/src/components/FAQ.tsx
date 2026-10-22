@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { HtmlTag, useTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { getAbsoluteUrl } from "@rbx/core-scripts/util/url";
 import { Icon } from "@rbx/foundation-ui";
+import { translateHtml, type TranslateHtmlTag } from "@rbx/translation-utils";
 import { Section, SectionHeader } from "./sections/Section";
 import { isOnDesktop } from "../utils/platform";
 
@@ -9,7 +10,7 @@ const FAQ_BASE_KEYS = ["Action.WhatAreRobux", "Action.WhereAreMyRobux", "Action.
 const DESKTOP_FAQ_BASE_KEY = "Action.HowToRedeemGiftCard";
 
 export function FAQ() {
-  const translate = useTranslations("Feature.BuyRobux");
+  const { translate } = useTranslation();
   const [openIds, setOpenIds] = useState<Set<string>>(() => new Set());
   const [showDesktopFaq, setShowDesktopFaq] = useState(false);
 
@@ -33,6 +34,11 @@ export function FAQ() {
     });
   }, []);
 
+  const isMissingTranslation = (key: string, translation: string) => {
+    const normalized = translation.trim();
+    return !normalized || normalized === key;
+  };
+
   return (
     <Section>
       <SectionHeader>{translate("Heading.FAQ")}</SectionHeader>
@@ -40,14 +46,17 @@ export function FAQ() {
         {faqKeys.map(baseKey => {
           const questionKey = `${baseKey}Question`;
           const answerKey = `${baseKey}Answer`;
-          const hasQuestionKey = translate.has(questionKey);
-          const hasAnswerKey = translate.has(answerKey);
+          const question = translate(questionKey);
+          const answerPlain = translate(answerKey);
 
-          if (!hasQuestionKey || !hasAnswerKey) {
+          if (
+            isMissingTranslation(questionKey, question) ||
+            isMissingTranslation(answerKey, answerPlain)
+          ) {
             return null;
           }
 
-          let answerTags: HtmlTag[] = [];
+          let answerTags: TranslateHtmlTag[] | undefined;
           if (baseKey === "Action.WhereAreMyRobux") {
             answerTags = [
               {
@@ -97,9 +106,7 @@ export function FAQ() {
                   }
                 }}
               >
-                <span className="text-align-x-left text-title-medium">
-                  {translate(questionKey)}
-                </span>
+                <span className="text-align-x-left text-title-medium">{question}</span>
                 <Icon
                   name={
                     isOpen ? "icon-regular-chevron-large-up" : "icon-regular-chevron-large-down"
@@ -112,11 +119,11 @@ export function FAQ() {
                 <div
                   id={contentRegionId}
                   role="region"
-                  aria-label={translate(questionKey)}
+                  aria-label={question}
                   className="padding-bottom-medium text-body-medium content-default"
                   style={{ whiteSpace: "pre-wrap" }}
                 >
-                  {translate.html(answerKey, answerTags)}
+                  {translateHtml(translate, answerKey, answerTags)}
                 </div>
               )}
             </div>

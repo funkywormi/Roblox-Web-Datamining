@@ -1,9 +1,9 @@
 import classNames from "classnames";
 import { useContext } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@rbx/foundation-ui";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { usePendingPlusReferrals } from "@rbx/subscriptions-common";
-import { useFullKeyTranslations } from "@rbx/www-common/i18n";
+import { useQuery } from "@tanstack/react-query";
 import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
 import { Section } from "../types/buyRobuxPageData";
 import { InlinePendingRequests } from "./InlinePendingRequests";
@@ -34,7 +34,7 @@ export function Header({
   const { breakpoint } = useContext(BuyRobuxPageContext);
   const { trackRobuxGiftClick } = useContext(TrackingContext);
 
-  const { translateFullKey } = useFullKeyTranslations();
+  const { translate } = useTranslation();
   const { pendingReferrals: allPendingReferrals } = usePendingPlusReferrals();
 
   const appPolicyQuery = useQuery({
@@ -146,7 +146,7 @@ export function Header({
                   openModal();
                 }}
               >
-                {translateFullKey(robuxGift.buttonTextTranslationKey)}
+                {translate(robuxGift.buttonTextTranslationKey)}
               </Button>
             )}
           </div>

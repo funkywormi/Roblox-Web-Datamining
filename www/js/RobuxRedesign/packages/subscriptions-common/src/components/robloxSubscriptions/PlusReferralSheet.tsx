@@ -12,7 +12,6 @@ import {
   SheetTitle,
 } from "@rbx/foundation-ui";
 import { translateHtml } from "@rbx/translation-utils";
-import { assetUrl } from "@rbx/www-common/asset";
 import { useFormatter, useTranslations } from "@rbx/www-common/i18n";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 
@@ -260,12 +259,12 @@ const PlusReferralSheetBody: FC<PlusReferralSheetBodyProps> = ({
             <img
               alt=""
               className={`${PICTOGRAM_CLASS} ${PICTOGRAM_GAP_CLASS} dark:hidden`}
-              src={assetUrl(plusRobuxLight)}
+              src={plusRobuxLight}
             />
             <img
               alt=""
               className={`${PICTOGRAM_CLASS} ${PICTOGRAM_GAP_CLASS} hidden dark:block`}
-              src={assetUrl(plusRobuxDark)}
+              src={plusRobuxDark}
             />
 
             <div className="gap-y-medium text-align-x-left flex flex-col items-start">

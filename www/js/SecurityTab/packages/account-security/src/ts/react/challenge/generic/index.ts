@@ -7,7 +7,7 @@ import {
   ForceActionRedirect as ForceActionRedirectInterface,
 } from "@rbx/generic-challenge-types";
 import { RequestServiceDefault } from "../../../common/request";
-import "../../../../css/challenge/biometric/biometric-overlay.scss";
+import "../../../../css/challenge/biometric/biometric-overlay.css";
 import * as Captcha from "../captcha";
 import * as CaptchaInterface from "../captcha/interface";
 import * as DeviceIntegrity from "../deviceIntegrity";

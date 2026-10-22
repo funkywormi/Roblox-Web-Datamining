@@ -1,6 +1,4 @@
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { RequestServiceDefault } from "../../../common/request";
 import App from "./App";
 import { TRANSLATION_NAMESPACES } from "./app.config";
@@ -8,6 +6,7 @@ import { RenderChallenge } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
 import "../../../../css/challenge/biometric/tailwind.css";
+import { mountChallenge, unmountChallenge } from "../challengeMount";
 
 // Global instance since we do not need biometric parameters for instantiation.
 const requestServiceDefault = new RequestServiceDefault();
@@ -35,7 +34,7 @@ export const renderChallenge: RenderChallenge = ({
   const container = document.getElementById(containerId);
   if (container !== null) {
     // Remove any existing instances of the app.
-    unmountComponentAtNode(container);
+    unmountChallenge(container);
 
     // Instantiate services externally to the app, which will offer future
     // flexibility (e.g. for mocking).
@@ -47,22 +46,21 @@ export const renderChallenge: RenderChallenge = ({
     );
 
     // Render the app on the selected element.
-    render(
-      <TranslationProviderSCC namespaces={TRANSLATION_NAMESPACES}>
-        <App
-          challengeId={challengeId}
-          biometricType={biometricType}
-          appType={appType}
-          renderInline={renderInline}
-          eventService={eventService}
-          metricsService={metricsService}
-          onChallengeDisplayed={onChallengeDisplayed}
-          onChallengeCompleted={onChallengeCompleted}
-          onChallengeInvalidated={onChallengeInvalidated}
-          onModalChallengeAbandoned={onModalChallengeAbandoned}
-        />
-      </TranslationProviderSCC>,
+    mountChallenge(
       container,
+      <App
+        challengeId={challengeId}
+        biometricType={biometricType}
+        appType={appType}
+        renderInline={renderInline}
+        eventService={eventService}
+        metricsService={metricsService}
+        onChallengeDisplayed={onChallengeDisplayed}
+        onChallengeCompleted={onChallengeCompleted}
+        onChallengeInvalidated={onChallengeInvalidated}
+        onModalChallengeAbandoned={onModalChallengeAbandoned}
+      />,
+      TRANSLATION_NAMESPACES,
     );
 
     eventService.sendChallengeInitializedEvent();

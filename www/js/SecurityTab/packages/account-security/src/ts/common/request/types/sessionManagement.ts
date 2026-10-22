@@ -3,7 +3,7 @@
  */
 
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 import { DelayParameters } from "../../../react/challenge/twoStepVerification/delay";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
@@ -62,7 +62,7 @@ export type GetSessionsReturnType = {
 /**
  * Request Type: `GET`.
  */
-export const GET_SESSIONS_CONFIG: UrlConfig = {
+export const GET_SESSIONS_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${tokenMetadataServiceUrl}/v1/sessions`,
   timeout: 10000,
@@ -73,7 +73,7 @@ export type LogoutSessionReturnType = void;
 /**
  * Request Type: `POST`.
  */
-export const LOGOUT_SESSION_CONFIG: UrlConfig = {
+export const LOGOUT_SESSION_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${tokenMetadataServiceUrl}/v1/logout`,
   timeout: 10000,
@@ -84,7 +84,7 @@ export type LogoutFromAllSessionsReturnType = void;
 /**
  * Request Type: `POST`.
  */
-export const LOGOUT_FROM_ALL_SESSIONS_CONFIG: UrlConfig = {
+export const LOGOUT_FROM_ALL_SESSIONS_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v1/logoutfromallsessionsandreauthenticate`,
   timeout: 10000,

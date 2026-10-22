@@ -1,13 +1,11 @@
 import { useCallback, useContext } from "react";
-import { useFullKeyTranslations, useTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { window } from "@rbx/core-lib/browser";
 import { SectionBase, SectionGiftCard } from "../../types/buyRobuxPageData";
 import { BaseSectionProps, Section, SectionBody, SectionHeader } from "../sections/Section";
 import { SectionBodySimpleCTA } from "../sections/SectionBodySimpleCTA";
 import { TrackingContext } from "../../contexts/TrackingContext";
 import { getSectionTrackingProps } from "../../hooks/useScrollTracking";
-import { isAndroidApp } from "../../utils/platform";
-import { getOpenExternalBrowserUrl } from "../../utils/openExternalBrowser";
 
 type GiftCardProps = BaseSectionProps & {
   sectionBase: SectionBase;
@@ -17,28 +15,25 @@ type GiftCardProps = BaseSectionProps & {
 export function GiftCard({ isPrimary, sectionBase, giftCard }: GiftCardProps) {
   const { trackGiftCardClick } = useContext(TrackingContext);
 
-  const { translateFullKey } = useFullKeyTranslations();
-  const translatePremium = useTranslations("Feature.Premium");
+  const { translate } = useTranslation();
 
   const buttonClickHandler = useCallback(() => {
     trackGiftCardClick();
-    window?.location.assign(
-      isAndroidApp ? getOpenExternalBrowserUrl(giftCard.redirectUrl) : giftCard.redirectUrl,
-    );
+    // The Android app (2.728+) loads target="_blank" popups in a hidden WebView, so window.open does
+    // nothing (MOBAPP-3220). Navigating in place lets the app's domain allow-list hand off to the browser.
+    window?.location.assign(giftCard.redirectUrl);
   }, [trackGiftCardClick, giftCard.redirectUrl]);
 
   return (
     <Section {...getSectionTrackingProps(sectionBase)}>
-      <SectionHeader>{translateFullKey(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
+      <SectionHeader>{translate(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
       <SectionBody isPrimary={isPrimary}>
         <SectionBodySimpleCTA
-          title={translateFullKey(
-            giftCard.titleTranslationKey,
-            undefined,
-            translatePremium("Description.GiftCard"),
-          )}
-          body={translateFullKey(giftCard.bodyTranslationKey)}
-          buttonText={translateFullKey(giftCard.buttonTextTranslationKey)}
+          // TODO: remove translation key fallback once BE is updated to return titleTranslationKey
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          titleTranslationKey={giftCard.titleTranslationKey ?? "Description.GiftCard"}
+          bodyTranslationKey={giftCard.bodyTranslationKey}
+          buttonTextTranslationKey={giftCard.buttonTextTranslationKey}
           buttonClickHandler={buttonClickHandler}
         />
       </SectionBody>

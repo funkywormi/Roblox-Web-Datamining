@@ -1,7 +1,7 @@
 import { useCallback, useContext, useMemo } from "react";
 import classNames from "classnames";
 import { useResponsiveValue } from "@rbx/payments/hooks";
-import { useFullKeyTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { Button, Media } from "@rbx/foundation-ui";
 import { PriceTag } from "@rbx/payments/priceTag";
 import {
@@ -106,14 +106,14 @@ function BonusItemCard({
   redirectUrl,
   onPurchaseClick,
 }: BonusItemCardProps) {
-  const { translateFullKey } = useFullKeyTranslations();
+  const { translate } = useTranslation();
   const metadata = item.displayableBonus.collectibleItemMetadata;
 
   const bannerHeightClass =
     totalCards > 1 ? "min-height-[120px]" : "min-height-[186px] medium:min-height-[204px]";
 
   const itemName = metadata
-    ? translateFullKey(metadata.translationKey, undefined, "Bonus Item")
+    ? translate(metadata.translationKey) || "Bonus Item"
     : (item.displayableBonus.gamePassMetadata?.gamePassDisplayName ?? "");
 
   const bodyLayoutClass =
@@ -188,7 +188,7 @@ export function LimitedTimeBonusSection({
 }: LimitedTimeBonusSectionProps) {
   const { purchaseProduct } = useContext(PurchaseContext);
   const { redirect } = useContext(BuyRobuxPageContext);
-  const { translateFullKey } = useFullKeyTranslations();
+  const { translate } = useTranslation();
 
   const cards = useMemo(() => {
     const products = sectionBase.products ?? [];
@@ -237,16 +237,12 @@ export function LimitedTimeBonusSection({
         data-testid="ltb-section-header-row"
       >
         <SectionHeader className="self-auto min-width-0 flex-1 medium:self-stretch medium:flex-none">
-          {translateFullKey(
-            sectionBase.sectionHeaderTranslationKey,
-            undefined,
-            "Limited-time avatar items",
-          )}
+          {translate(sectionBase.sectionHeaderTranslationKey) || "Limited-time avatar items"}
         </SectionHeader>
         {daysLeftResult.success && <ExpirationBadge daysLeft={daysLeftResult.value} />}
       </div>
       {limitedTimeBonus.bodyTranslationKey && (
-        <SectionSubHeader>{translateFullKey(limitedTimeBonus.bodyTranslationKey)}</SectionSubHeader>
+        <SectionSubHeader>{translate(limitedTimeBonus.bodyTranslationKey)}</SectionSubHeader>
       )}
       <div className="self-stretch flex flex-col gap-xlarge medium:gap-xxlarge">
         {cards.map(({ item, products }) => (

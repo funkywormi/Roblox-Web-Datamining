@@ -30,6 +30,10 @@ import ConsoleDisconnect from "../components/consoleDisconnect";
 import EnhancedProtectionProgramCard from "../components/EnhancedProtectionProgramCard";
 import EnhancedProtectionProgramDetails from "../components/EnhancedProtectionProgramDetails";
 import { isPasskeyCompatible } from "../../common/compatibility";
+import { isEppDisplayRequested } from "../utils/displayParam";
+
+// How long to keep the tab hidden while waiting to learn whether an EPP deep link can open.
+export const EPP_DISPLAY_TIMEOUT_MS = 5000;
 
 type ModalSchema = {
   innerFragment: React.FC<ModalFragmentProps>;
@@ -93,7 +97,7 @@ const SecurityTabContainer: React.FC = () => {
   } = useSecurityTabContext();
 
   const { isRedesignEnabled, isSecurityTabRedesignEnabled } = useRedesignFlags();
-  const { shouldShowEppCard, isEppEnabled } = useEppFlags();
+  const { shouldShowEppCard, isEppEnabled, isEppEligibilityPending } = useEppFlags();
 
   /*
    * Component State
@@ -103,6 +107,7 @@ const SecurityTabContainer: React.FC = () => {
   const [displayTwoStepVerification, setDisplayTwoStepVerification] = useState<boolean>(false);
   const [isTwoStepToggleEnabled, setIsTwoStepToggleEnabled] = useState<boolean>(false);
   const [isEppDetailsVisible, setIsEppDetailsVisible] = useState<boolean>(false);
+  const [isEppDisplayPending, setIsEppDisplayPending] = useState<boolean>(isEppDisplayRequested);
 
   /*
    * Event Handlers
@@ -268,6 +273,28 @@ const SecurityTabContainer: React.FC = () => {
     void getPhoneConfiguration();
   }, []);
 
+  // Open EPP details when linked with `?display=enhanced-protection-program`. Everything stays hidden
+  // while `isEppEligibilityPending` and opens the details once the user is eligible. A settled
+  // ineligible result shows the tab immediately. If eligibility never settles, the timeout below
+  // shows the tab anyway.
+  useEffect(() => {
+    if (!isEppDisplayPending || isEppEligibilityPending) {
+      return;
+    }
+    setIsEppDisplayPending(false);
+    if (shouldShowEppCard) {
+      setIsEppDetailsVisible(true);
+    }
+  }, [isEppDisplayPending, isEppEligibilityPending, shouldShowEppCard]);
+
+  useEffect(() => {
+    if (!isEppDisplayPending) {
+      return undefined;
+    }
+    const timeoutId = setTimeout(setIsEppDisplayPending, EPP_DISPLAY_TIMEOUT_MS, false);
+    return () => clearTimeout(timeoutId);
+  }, [isEppDisplayPending]);
+
   useEffect(() => {
     if (!isEppDetailsVisible) {
       SessionManagement.renderComponent({
@@ -286,6 +313,11 @@ const SecurityTabContainer: React.FC = () => {
   // to prevent unwanted animations on modal updates due to modal components
   // being added and removed from the DOM.
   const modalSchema = getModalSchema(modalStateAndProps.modalState);
+  // When query params show that we should display the EPP card, don't display
+  // anything until we know the user is eligible to see EPP or not.
+  const pendingEppDisplayStyle: React.CSSProperties | undefined = isEppDisplayPending
+    ? { display: "none" }
+    : undefined;
 
   return (
     <React.Fragment>
@@ -293,7 +325,11 @@ const SecurityTabContainer: React.FC = () => {
         <EnhancedProtectionProgramDetails onBackClick={() => setIsEppDetailsVisible(false)} />
       ) : (
         <React.Fragment>
-          <div className={isRedesignEnabled ? "settings-redesign-enabled" : ""}>
+          <div
+            className={isRedesignEnabled ? "settings-redesign-enabled" : ""}
+            style={pendingEppDisplayStyle}
+            data-testid="security-tab-content"
+          >
             <div className="settings-v2-header" id="rbx-security-settings-header">
               <h2 data-testid="security-heading">{resources.Heading.Security}</h2>
             </div>
@@ -319,7 +355,11 @@ const SecurityTabContainer: React.FC = () => {
               <ConsoleDisconnect consoleType={ConsoleType.PLAYSTATION} />
             )}
           </div>
-          <div id={SESSION_MANAGEMENT_ELEMENT_ID} data-testid="session-management-section" />
+          <div
+            id={SESSION_MANAGEMENT_ELEMENT_ID}
+            data-testid="session-management-section"
+            style={pendingEppDisplayStyle}
+          />
         </React.Fragment>
       )}
 

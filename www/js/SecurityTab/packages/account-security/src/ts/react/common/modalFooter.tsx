@@ -1,13 +1,8 @@
 import React from "react";
 import { Modal } from "react-style-guide";
+import type { FooterButtonConfig } from "./challengeDialogFooter";
 
-export type FooterButtonConfig = {
-  content: JSX.Element | string;
-  /** Used primarily for accessibility labeling. */
-  label: string;
-  enabled: boolean;
-  action: (event: React.MouseEvent<HTMLButtonElement>) => void;
-};
+export type { FooterButtonConfig };
 
 type Props = {
   positiveButton: FooterButtonConfig;

@@ -4,7 +4,7 @@ import realTime from "@rbx/core-scripts/realtime";
 import { UncheckedBadge, showUncheckedBadge } from "@rbx/identity-badges";
 import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
 import { useLiveUserNameForDisplay } from "./hooks/useLiveUserNameForDisplay";
-import { usePlusNavEntries } from "./leftNav/new/PlusNavEntries";
+import { usePlusNavEntries } from "./leftNav/PlusNavEntries";
 import { useCommunitiesEntrypointTelemetry } from "./leftNav/useCommunitiesEntrypointTelemetry";
 import { trackOpenToVisible, withApiMetrics } from "./leftNav/observability";
 import { logLeftNavExposure } from "./util/leftNavIxpUtil";

@@ -1,4 +1,4 @@
-import { paymentFlowAnalyticsService as pfas } from "@rbx/payments/payments-flow-analytics";
+import pfas from "@rbx/core-scripts/payments-flow";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { isInApp } from "./platform";
 

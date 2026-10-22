@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as http from "@rbx/core-scripts/http";
 import environmentUrls from "@rbx/environment-urls";
 import { withApiMetrics } from "../topNav/observability";
-import { useRealTime } from "../leftNav/new/useRealTime";
+import { useRealTime } from "../leftNav/useRealTime";
 
 export const NOTIFICATION_STREAM_UNREAD_COUNT_QUERY_KEY = ["notification-stream-unread-count"];
 const QUERY_KEY = NOTIFICATION_STREAM_UNREAD_COUNT_QUERY_KEY;

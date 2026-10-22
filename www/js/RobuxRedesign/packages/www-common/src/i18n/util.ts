@@ -41,13 +41,8 @@ export type FullKeyPath = {
   key: string;
 };
 
-/** Returns undefined when `fullKey` is missing or has no message key after its namespace. */
+/** Returns undefined when `fullKey` has no message key after its namespace. */
 export const toFullKeyPath = (fullKey: string): FullKeyPath | undefined => {
-  // Backend payloads can omit the key at runtime even though the type is `string`.
-  if (typeof fullKey !== "string" || fullKey.length === 0) {
-    return undefined;
-  }
-
   const segments = fullKey.split(".");
   if (
     segments.length <= NAMESPACE_SEGMENT_COUNT ||

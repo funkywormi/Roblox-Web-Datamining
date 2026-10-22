@@ -1,5 +1,6 @@
 import environmentUrls from "@rbx/environment-urls";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ProgressCircle } from "@rbx/foundation-ui";
 import InlineChallenge from "../../../common/inlineChallenge";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import {
@@ -13,6 +14,7 @@ import { ErrorCode } from "../interface";
 import { CaptchaReducerActionType } from "../store/action";
 import ArkoseIframeInlineShim from "./arkoseIframeInlineShim";
 import { CaptchaElementEvent, CaptchaElementEventId } from "./captchaElementEvent";
+import "../../../../../css/challenge/captcha/captcha.css";
 
 /*
  * Visible Captcha Override Control
@@ -376,7 +378,13 @@ const CaptchaV2: React.FC = () => {
       <InlineChallenge titleText={resources.Description.VerifyingYouAreNotBot}>
         <InlineChallengeBody>
           {(pageLoading || !captchaElementListenerReady) && (
-            <span className="spinner spinner-default spinner-no-margin challenge-captcha-body" />
+            <div className="flex justify-center challenge-captcha-body">
+              <ProgressCircle
+                variant="Indeterminate"
+                size="Small"
+                ariaLabel={resources.Description.VerifyingYouAreNotBot}
+              />
+            </div>
           )}
           {captchaElementListenerReady && captchaBody}
         </InlineChallengeBody>

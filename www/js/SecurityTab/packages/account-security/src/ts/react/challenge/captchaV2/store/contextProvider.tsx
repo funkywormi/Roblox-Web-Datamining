@@ -1,6 +1,6 @@
 import React, {
   createContext,
-  ReactChild,
+  ReactNode,
   ReactElement,
   useEffect,
   useReducer,
@@ -43,7 +43,7 @@ type Props = {
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onModalChallengeAbandoned: OnModalChallengeAbandonedCallback | null;
-  children: ReactChild;
+  children: ReactNode;
 };
 
 /**

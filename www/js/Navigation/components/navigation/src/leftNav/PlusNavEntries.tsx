@@ -4,7 +4,7 @@ import {
   usePendingPlusReferrals,
   useSenderReferralEligibility,
 } from "@rbx/subscriptions-common";
-import type { PlusNavEntries } from "../../util/navCapabilities";
+import type { PlusNavEntries } from "../util/navCapabilities";
 import { plusNavEntries } from "./PlusNavCards";
 import PlusJoinReferralNavItem from "./PlusJoinReferralNavItem";
 

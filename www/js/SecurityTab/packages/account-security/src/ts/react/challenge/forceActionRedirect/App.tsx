@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "react-utilities";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ForceActionRedirect as ForceActionRedirectTypes } from "@rbx/generic-challenge-types";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { DelayParameters } from "../twoStepVerification/delay";
@@ -9,6 +8,17 @@ import ForcePasswordlessLogin from "./containers/forcePasswordlessLogin";
 import { FORCE_PASSWORDLESS_LOGIN_SIGNIFIER, ForceActionRedirectConfig } from "./app.config";
 import { asNamespace, toIntlValues } from "./i18n";
 import { ForceActionRedirectContextProvider } from "./store/contextProvider";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    },
+  },
+});
 
 type ContainerProps = { translate: ForceActionRedirectTypes.ForceActionRedirectTranslateFunction };
 

@@ -1,9 +1,7 @@
 import { useCallback } from "react";
-import {
-  paymentFlowAnalyticsService as pfas,
-  UserPurchaseSettingFailureReason,
-} from "@rbx/payments/payments-flow-analytics";
+import pfas from "@rbx/core-scripts/payments-flow";
 import { Tracking } from "../useTracking";
+import { UserPurchaseSettingFailureReason } from "../../services/paymentsGatewayService";
 
 export type PurchaseEligibilityTracking = {
   trackEconomicRestrictionErrorShown: () => void;

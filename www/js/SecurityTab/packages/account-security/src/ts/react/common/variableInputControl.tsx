@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { FormControl, FormGroup } from "react-style-guide";
 import classNames from "classnames";
-import "../../../css/common/inputFieldConcealed.scss";
-import "../../../css/common/variableInputControl.scss";
+import "../../../css/common/inputFieldConcealed.css";
+import "../../../css/common/variableInputControl.css";
 import { useDebounce } from "react-utilities";
 import { PhonePrefix } from "../../common/request/types/phone";
 import { InputValidator } from "./inputControl";

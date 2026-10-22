@@ -1,11 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo } from "react";
-import {
-  paymentFlowAnalyticsService as pfas,
-  PurchaseEventType,
-  ViewMessage,
-  ViewName,
-  type PurchaseStatus,
-} from "@rbx/payments/payments-flow-analytics";
+import pfas from "@rbx/core-scripts/payments-flow";
 import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
 import { getTriggerContext } from "../utils/getTriggerContext";
 import { useApplePayAvailabilityTracking } from "./useApplePayAvailabilityTracking";
@@ -13,14 +7,20 @@ import { useScrollTracking } from "./useScrollTracking";
 
 export type Tracking = {
   trackFlow: (
-    viewName: ViewName,
-    eventType: PurchaseEventType,
-    viewMessage?: ViewMessage,
+    viewName: VIEW_NAME,
+    eventType: PURCHASE_EVENT_TYPE,
+    viewMessage?: VIEW_MESSAGE,
     // Values must be strings: the warehouse drops all metadata on an event if any value is not.
     eventMetadata?: Record<string, string>,
   ) => void;
-  trackStatus: (viewName: ViewName, status: PurchaseStatus, viewMessage?: string) => void;
+  trackStatus: (viewName: VIEW_NAME, status: PURCHASE_EVENT_STATUS, viewMessage?: string) => void;
 };
+
+type VIEW_NAME = NonNullable<Parameters<typeof pfas.sendUserPurchaseFlowEvent>[2]>;
+type PURCHASE_EVENT_TYPE = NonNullable<Parameters<typeof pfas.sendUserPurchaseFlowEvent>[3]>;
+type VIEW_MESSAGE = NonNullable<Parameters<typeof pfas.sendUserPurchaseFlowEvent>[4]>;
+
+type PURCHASE_EVENT_STATUS = NonNullable<Parameters<typeof pfas.sendUserPurchaseStatusEvent>[1]>;
 
 export function useTracking(): Tracking {
   const {
@@ -72,34 +72,34 @@ export function useTracking(): Tracking {
 
   const trackFlow = useCallback(
     (
-      viewName: ViewName,
-      purchaseEventType: PurchaseEventType,
-      viewMessage?: ViewMessage,
+      viewName: VIEW_NAME,
+      eventType: PURCHASE_EVENT_TYPE,
+      viewMessage?: VIEW_MESSAGE,
       eventMetadata?: Record<string, string>,
     ) => {
-      pfas.sendUserPurchaseFlowEvent({
-        triggerContext: getTriggerContext(viewName === PREMIUM_PURCHASE),
-        isMidPurchaseStep: true,
+      pfas.sendUserPurchaseFlowEvent(
+        getTriggerContext(viewName === PREMIUM_PURCHASE),
+        true,
         viewName,
-        purchaseEventType,
+        eventType,
         viewMessage,
-        eventMetadata: {
+        {
           ...contextMetadata,
           ...eventMetadata,
         },
-      });
+      );
     },
     [contextMetadata, PREMIUM_PURCHASE],
   );
 
   const trackStatus = useCallback(
-    (viewName: ViewName, status: PurchaseStatus, viewMessage?: string) => {
-      pfas.sendUserPurchaseStatusEvent({
-        triggerContext: getTriggerContext(viewName === PREMIUM_PURCHASE),
+    (viewName: VIEW_NAME, status: PURCHASE_EVENT_STATUS, viewMessage?: string) => {
+      pfas.sendUserPurchaseStatusEvent(
+        getTriggerContext(viewName === PREMIUM_PURCHASE),
         status,
         viewMessage,
         viewName,
-      });
+      );
     },
     [PREMIUM_PURCHASE],
   );

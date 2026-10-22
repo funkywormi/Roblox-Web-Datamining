@@ -5653,7 +5653,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/a1c1c6829ab3c4e5ba4ab2a71d7b929161e048781b733534a45712695231ac63-Navigation.js",
+            "url": "https://js.rbxcdn.com/24e09d877846d5b9ee0de07478c0d2ba4aedc0e606966ff4af1050105d6aaa3f-Navigation.js",
             "sources": [
                 "/home",
                 "/",
@@ -6171,7 +6171,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/f045c4bdfebd2334ab2d98a0ce13dbaf0240defbe7119d6aa711dc3d89dc92e3-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/19037ca0bff6ed2f6f85d1e4a3d50474f8c999a7a85fec31230cf4dd0c69f9ab-RobuxRedesign.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -6269,7 +6269,7 @@
         },
         {
             "name": "SecurityTab",
-            "url": "https://js.rbxcdn.com/acbd8fd3b3118c2e8255045ed8867cf4cb98af262b13ad61d20bd49ec36b09f7-SecurityTab.js",
+            "url": "https://js.rbxcdn.com/23d69e95a51672fa3b9d54ad18df3a6b18bb051ff2f08910188276d9f559810c-SecurityTab.js",
             "sources": [
                 "/my/account"
             ]
@@ -8433,7 +8433,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://css.rbxcdn.com/faea1560e68b275e24baa122505a65e0e85240ad70e9dae8c19a85a6aa359cdc-RobuxRedesign.css",
+            "url": "https://css.rbxcdn.com/f2fbbf77696d6da15e9344d33998fc5d037ef99b8a759cb91a3e4320993edc32-RobuxRedesign.css",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -8520,7 +8520,7 @@
         },
         {
             "name": "SecurityTab",
-            "url": "https://css.rbxcdn.com/d684f11183ca66380aca690319a4e2e494145d27b59a65826f4ddf8626be0e6e-SecurityTab.css",
+            "url": "https://css.rbxcdn.com/69bcb3dab6c6f2b993d3a6f230cac451045df066f43ae882fc3cf9e096f865b7-SecurityTab.css",
             "sources": [
                 "/my/account"
             ]

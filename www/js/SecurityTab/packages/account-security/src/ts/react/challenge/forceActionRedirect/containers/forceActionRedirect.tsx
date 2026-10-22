@@ -1,10 +1,11 @@
 import React from "react";
-import { Modal } from "react-style-guide";
+import { DialogBody } from "@rbx/foundation-ui";
+import ChallengeDialog from "../../../common/challengeDialog";
 import InlineChallenge from "../../../common/inlineChallenge";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import { InlineChallengeFooter } from "../../../common/inlineChallengeFooter";
-import { FooterButtonConfig, FragmentModalFooter } from "../../../common/modalFooter";
-import { FragmentModalHeader, HeaderButtonType } from "../../../common/modalHeader";
+import { FooterButtonConfig, ChallengeDialogFooter } from "../../../common/challengeDialogFooter";
+import { ChallengeDialogHeader, HeaderButtonType } from "../../../common/challengeDialogHeader";
 import { ACCOUNT_SETTINGS_SECURITY_PATH } from "../app.config";
 import useCloseModal from "../hooks/useCloseModal";
 import useForceActionRedirectContext from "../hooks/useForceActionRedirectContext";
@@ -57,8 +58,8 @@ const ForceActionRedirect: React.FC = () => {
    */
 
   const getPageContent = () => {
-    const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
-    const FooterElement = renderInline ? InlineChallengeFooter : FragmentModalFooter;
+    const BodyElement = renderInline ? InlineChallengeBody : DialogBody;
+    const FooterElement = renderInline ? InlineChallengeFooter : ChallengeDialogFooter;
     const lockIconClassName = renderInline
       ? "inline-challenge-protection-shield-icon"
       : "modal-protection-shield-icon";
@@ -86,8 +87,8 @@ const ForceActionRedirect: React.FC = () => {
   return renderInline ? (
     <InlineChallenge titleText={resources.Header}>{getPageContent()}</InlineChallenge>
   ) : (
-    <Modal className="modal-modern" show={isModalVisible} onHide={closeModal} backdrop="static">
-      <FragmentModalHeader
+    <ChallengeDialog open={isModalVisible} onClose={closeModal}>
+      <ChallengeDialogHeader
         headerText={resources.Header}
         buttonType={HeaderButtonType.CLOSE}
         buttonAction={closeModal}
@@ -95,7 +96,7 @@ const ForceActionRedirect: React.FC = () => {
         headerInfo={null}
       />
       {getPageContent()}
-    </Modal>
+    </ChallengeDialog>
   );
 };
 

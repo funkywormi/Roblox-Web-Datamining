@@ -10,6 +10,7 @@ import { MediaType } from "../../challenge/twoStepVerification";
 export enum SecurityTabActionType {
   INITIALIZE_MY_SETTINGS_INFO,
   INITIALIZE_TWO_STEP_VERIFICATION,
+  SET_TWO_STEP_VERIFICATION_METADATA_RESOLVED,
   SET_PASSKEY_INFO,
   INITIALIZE_USER_SETTINGS,
   SET_PHONE_CONFIGURATION,
@@ -31,6 +32,9 @@ export type SecurityTabAction =
       type: SecurityTabActionType.INITIALIZE_TWO_STEP_VERIFICATION;
       metadata: TwoStepVerificationApiTypes.GetMetadataReturnType;
       enabledMediaTypes: string[];
+    }
+  | {
+      type: SecurityTabActionType.SET_TWO_STEP_VERIFICATION_METADATA_RESOLVED;
     }
   | {
       type: SecurityTabActionType.SET_PHONE_CONFIGURATION;

@@ -1,33 +1,20 @@
 import React from "react";
 import { FormControl, FormGroup } from "react-style-guide";
-import "../../../css/common/inputFieldConcealed.scss";
+import "../../../css/common/inputFieldConcealed.css";
 import { RequestService } from "../../common/request";
+import {
+  handleKeyDown,
+  InputValidator,
+  validateAndSetStateForInput,
+  validateTrue,
+} from "./inputValidation";
 import {
   AccountSecurityPromptResources,
   mapPasswordValidationStatusToResource,
 } from "../accountSecurityPrompt/constants/resources";
 
-/**
- * A helper function that captures [Enter] presses within input elements
- * (especially those that are not bound to forms with submit behavior).
- */
-const handleKeyDown =
-  (handler: () => void | Promise<void>, canSubmit: boolean) =>
-  async (event: React.KeyboardEvent<unknown>): Promise<void> => {
-    // Enter key.
-    if (event.key === "Enter" && canSubmit) {
-      event.preventDefault();
-      event.stopPropagation();
-      await handler();
-    }
-  };
-
-export type InputValidator = (value: string) => Promise<string | null>;
-
-/**
- * Returns null (no error) for every argument.
- */
-export const validateTrue: InputValidator = () => Promise.resolve(null);
+export type { InputValidator };
+export { validateTrue };
 
 /**
  * Returns null (no error) if the argument is an acceptable password (meets
@@ -98,33 +85,6 @@ export const validateChained =
     return null;
   };
 
-/**
- * A helper function that captures form input `onChange` events, validating the
- * input value and setting the appropriate React state variables.
- */
-const validateAndSetStateForInput =
-  (
-    lastValue: string,
-    validCharactersRegEx: RegExp | undefined,
-    validate: InputValidator,
-    setValue: (value: string) => void,
-    setError: (errorMessage: string | null) => void,
-    onChangeCustom?: (value: string) => void,
-  ) =>
-  async (event: React.FormEvent<FormControl & HTMLInputElement>): Promise<void> => {
-    let { value } = event.currentTarget;
-    // Force the value back to the original value if we got invalid characters.
-    if (validCharactersRegEx !== undefined && !validCharactersRegEx.test(value)) {
-      value = lastValue;
-    }
-
-    if (onChangeCustom !== undefined) {
-      onChangeCustom(value);
-    }
-    setValue(value);
-    setError(await validate(value));
-  };
-
 type Props = {
   // Required parameters:
   id: string;
@@ -145,7 +105,7 @@ type Props = {
   // eslint-disable-next-line react/require-default-props
   label?: string;
   // eslint-disable-next-line react/require-default-props
-  bottomLabel?: string | JSX.Element;
+  bottomLabel?: string | React.ReactElement;
   // eslint-disable-next-line react/require-default-props
   inputMode?: FormControl.FormControlProps["inputMode"];
   // eslint-disable-next-line react/require-default-props
@@ -220,7 +180,7 @@ const InputControl: React.FC<Props> = ({
           disabled={disabled}
           value={value}
           placeholder={placeholder}
-          onChange={validateAndSetStateForInput(
+          onChange={validateAndSetStateForInput<FormControl & HTMLInputElement>(
             value, // The value prior to change.
             validCharactersRegEx,
             validate,

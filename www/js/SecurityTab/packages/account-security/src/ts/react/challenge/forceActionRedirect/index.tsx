@@ -1,13 +1,10 @@
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
-import "../../../../css/common/modalModern.scss";
-import "../../../../css/common/spinner.scss";
 import { ForceActionRedirect } from "@rbx/generic-challenge-types";
 import App from "./App";
 import { getForceActionRedirectChallengeConfig } from "./app.config";
 import { asNamespace } from "./i18n";
 import { DelayParameters } from "../twoStepVerification/delay/types";
+import { mountChallenge, unmountChallenge } from "../challengeMount";
 
 // Export some additional enums that are declared in the shared interface (they
 // are also defined in the shared interface, but we need to expose them in the
@@ -47,24 +44,23 @@ export const renderChallenge: ForceActionRedirect.RenderChallenge = ({
 
   if (container !== null) {
     // Remove any existing instances of the app.
-    unmountComponentAtNode(container);
+    unmountChallenge(container);
 
     // The namespace varies with forceActionRedirectChallengeType.
     const namespace = asNamespace(forceActionRedirectChallengeConfig.translationConfig.feature);
 
     // Render the app on the selected element.
-    render(
-      <TranslationProviderSCC namespaces={[namespace]}>
-        <App
-          forceActionRedirectChallengeConfig={forceActionRedirectChallengeConfig}
-          renderInline={renderInline}
-          onModalChallengeAbandoned={onModalChallengeAbandoned}
-          onChallengeAbandoned={onChallengeAbandoned}
-          delayParameters={delayParametersTyped}
-          bodyTranslationKey={bodyTranslationKey}
-        />
-      </TranslationProviderSCC>,
+    mountChallenge(
       container,
+      <App
+        forceActionRedirectChallengeConfig={forceActionRedirectChallengeConfig}
+        renderInline={renderInline}
+        onModalChallengeAbandoned={onModalChallengeAbandoned}
+        onChallengeAbandoned={onChallengeAbandoned}
+        delayParameters={delayParametersTyped}
+        bodyTranslationKey={bodyTranslationKey}
+      />,
+      [namespace],
     );
     return true;
   }

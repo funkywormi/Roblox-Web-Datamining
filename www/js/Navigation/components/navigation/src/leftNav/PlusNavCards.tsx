@@ -14,8 +14,8 @@ import {
   shouldShowReferralEntry,
   shouldShowReferralNewBadge,
   type ReferralNavEntry,
-} from "../../util/plusReferralBadgeUtil";
-import type { PlusNavEntries } from "../../util/navCapabilities";
+} from "../util/plusReferralBadgeUtil";
+import type { PlusNavEntries } from "../util/navCapabilities";
 import { StateLayer, blackbirdPathRegex, interactable } from "./navItemStyles";
 
 export const useRewardAmount = (): string => useFormatter().number(REFERRAL_REWARD_ROBUX);

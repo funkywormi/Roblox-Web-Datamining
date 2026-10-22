@@ -1,12 +1,12 @@
+import { useTranslation } from "@rbx/core-scripts/react";
 import { Badge } from "@rbx/foundation-ui";
-import { useTranslations } from "@rbx/www-common/i18n";
 
 export type ExpirationBadgeProps = {
   daysLeft: number;
 };
 
 export function ExpirationBadge({ daysLeft }: ExpirationBadgeProps) {
-  const translate = useTranslations("Feature.PersonalizedBonus");
+  const { translate } = useTranslation();
 
   return (
     <Badge

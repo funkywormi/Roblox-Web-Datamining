@@ -1,6 +1,6 @@
 import { useMemo, useState, Fragment, useCallback } from "react";
 import { Button, Icon } from "@rbx/foundation-ui";
-import { useTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { Product } from "../../types/buyRobuxPageData";
 import { trackCounter } from "../../observability";
 import { ProductItemDefault, ProductItemDefaultProps } from "../ProductItem/ProductItemDefault";
@@ -16,7 +16,7 @@ export function SectionBodyProductList({
   products,
   OverrideProductItemComponent,
 }: SectionBodyProductListProps) {
-  const translate = useTranslations("Feature.Premium");
+  const { translate } = useTranslation();
 
   const [isExpanded, setIsExpanded] = useState(false);
 

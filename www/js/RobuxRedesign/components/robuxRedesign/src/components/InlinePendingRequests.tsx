@@ -1,4 +1,5 @@
 import { Fragment, useContext, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { Icon, SheetRoot } from "@rbx/foundation-ui";
 import {
@@ -9,7 +10,6 @@ import {
   useReferrerHandle,
   type SubscriptionReferral,
 } from "@rbx/subscriptions-common";
-import { useFullKeyTranslations, useTranslations } from "@rbx/www-common/i18n";
 import type { PendingTransfer, SectionTransfers } from "../types/buyRobuxPageData";
 import { PendingTransfersAvatars } from "./PendingTransfersAvatars";
 import { PendingRequestsSheet } from "./modals/PendingRequestsSheet";
@@ -72,7 +72,7 @@ function ReferralRequestSummary({
   referral: SubscriptionReferral;
   handle: string;
 }) {
-  const translate = useTranslations("Feature.RobloxSubscription");
+  const { translate } = useTranslation();
   const referrers = useMemo(() => [{ id: referral.senderUserId }], [referral.senderUserId]);
   const thumbnails = useAvatarThumbnails(referrers);
 
@@ -85,9 +85,11 @@ function ReferralRequestSummary({
         thumbnailUrl={thumbnails[referral.senderUserId]}
       />
       <span className="text-label-medium content-emphasis text-truncate-end">
-        {translate.has("Label.ReferralPendingRequestSummary")
-          ? translate("Label.ReferralPendingRequestSummary", { displayName: handle })
-          : `${handle} referred you`}
+        {translate(
+          "Label.ReferralPendingRequestSummary",
+          { displayName: handle },
+          `${handle} referred you`,
+        )}
       </span>
     </Fragment>
   );
@@ -100,7 +102,7 @@ function TransfersOnlySummary({
   pendingTransfers: PendingTransfer[];
   totalRobux: number;
 }) {
-  const translate = useTranslations("Feature.BuyRobux");
+  const { translate } = useTranslation();
   const descriptionTranslationKey =
     pendingTransfers.length === 1
       ? "Label.PendingTransfersSummary.Singular"
@@ -127,9 +129,7 @@ export function InlinePendingRequests({
   pendingReferrals,
   shouldDeeplinkToReferral,
 }: InlinePendingRequestsProps) {
-  const translateBuyRobux = useTranslations("Feature.BuyRobux");
-  const translateRobloxSubscription = useTranslations("Feature.RobloxSubscription");
-  const { translateFullKey } = useFullKeyTranslations();
+  const { translate } = useTranslation();
   const { trackPendingTransfersImpression, trackPendingTransfersSheetView } =
     useContext(TrackingContext);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -197,7 +197,7 @@ export function InlinePendingRequests({
     requestCount === 1
       ? "Label.PendingRequestsSummary.Singular"
       : "Label.PendingRequestsSummary.Plural";
-  const countLabel = translateBuyRobux(
+  const countLabel = translate(
     summaryTranslationKey,
     { count },
     requestCount === 1 ? `${count} pending request` : `${count} pending requests`,
@@ -270,8 +270,8 @@ export function InlinePendingRequests({
           tabIndex={0}
         >
           {isTransfersOnly && transfers
-            ? translateFullKey(transfers.acceptTransfersTranslationKey)
-            : translateRobloxSubscription("Action.Review", undefined, "Review")}
+            ? translate(transfers.acceptTransfersTranslationKey)
+            : translate("Action.Review", undefined, "Review")}
         </a>
       </div>
 

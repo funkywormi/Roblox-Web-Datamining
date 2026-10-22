@@ -1,27 +1,9 @@
 import { useContext } from "react";
-import { useTranslations } from "@rbx/www-common/i18n";
-import { Dialog, DialogBody, DialogContent, DialogTitle } from "@rbx/foundation-ui";
+import { Modal, Button } from "@rbx/core-ui/legacy/react-style-guide";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { ModalContext } from "../../contexts/ModalContext";
 import { SamsungPaymentMethods } from "../../hooks/samsungPaymentMethods/useSamsungPaymentMethods";
-
-type PayButtonProps = {
-  onClick: () => void;
-  title: string;
-  iconComponent: React.ReactNode;
-};
-const PayButton = (props: PayButtonProps) => {
-  const { onClick, title, iconComponent } = props;
-  return (
-    <button
-      className="width-full flex flex-row gap-small bg-action-standard stroke-none justify-between items-center padding-large radius-medium"
-      type="button"
-      onClick={onClick}
-    >
-      {iconComponent}
-      <div className="text-body-large">{title}</div>
-    </button>
-  );
-};
+import "../../stylesheets/samsungPaymentMethods.scss";
 
 export function SamsungPaymentMethodsModal({
   handleClose,
@@ -32,42 +14,55 @@ export function SamsungPaymentMethodsModal({
     samsungPaymentMethods: { isOpen: isSamsungPaymentMethodsModalOpen },
   } = useContext(ModalContext);
 
-  const translate = useTranslations("Feature.Premium");
+  const { translate } = useTranslation();
 
   return (
-    <Dialog
-      open={isSamsungPaymentMethodsModalOpen}
-      onOpenChange={handleClose}
-      isModal
-      hasCloseAffordance
-      closeLabel={translate("Action.Close")}
-      size="Large"
+    <Modal
+      show={isSamsungPaymentMethodsModalOpen}
+      onHide={handleClose}
+      size="md"
+      scrollable={false}
+      className="bottom-modal"
     >
-      <DialogContent>
-        <DialogBody className="flex flex-col gap-medium">
-          <DialogTitle>
-            {/* Margin right help avoid overlapping with the modal close icon */}
-            <div className="margin-right-large">
-              {translate("Message.MobilePaymentMethod.BottomSheetTitle")}
+      <Modal.Header
+        title={translate("Message.MobilePaymentMethod.BottomSheetTitle")}
+        showCloseButton
+        onClose={handleClose}
+      />
+      <Modal.Body>
+        <div className="samsung-pay-modal-buttons">
+          <Button
+            className="modal-button button-with-icon-text"
+            variant={Button.variants.control}
+            width={Button.widths.full}
+            size={Button.sizes.large}
+            onClick={handleSamsungPayClick}
+          >
+            <div className="button-inner">
+              <div className="icon-samsung-pay" />
+              <span className="button-label">
+                {translate("Message.MobilePaymentMethod.MilkyWayCheckout")}
+              </span>
             </div>
-          </DialogTitle>
-
-          <div className="flex flex-col gap-medium">
-            <PayButton
-              onClick={handleSamsungPayClick}
-              title={translate("Message.MobilePaymentMethod.MilkyWayCheckout")}
-              iconComponent={<div className="icon-samsung-pay width-[34px] height-[34px]" />}
-            />
-            <PayButton
-              onClick={handleRedeemCreditClick}
-              title={translate("Message.MobilePaymentMethod.RobloxCredit")}
-              iconComponent={
-                <div className="payment-method-image robloxCredit width-[42px] height-[28px]" />
-              }
-            />
-          </div>
-        </DialogBody>
-      </DialogContent>
-    </Dialog>
+          </Button>
+        </div>
+        <div className="redeem-credit-buttons">
+          <Button
+            className="modal-button button-with-icon-text"
+            variant={Button.variants.control}
+            width={Button.widths.full}
+            size={Button.sizes.large}
+            onClick={handleRedeemCreditClick}
+          >
+            <div className="button-inner">
+              <div className="payment-method-image payment-method-image-roblox robloxCredit" />
+              <span className="button-label">
+                {translate("Message.MobilePaymentMethod.RobloxCredit")}
+              </span>
+            </div>
+          </Button>
+        </div>
+      </Modal.Body>
+    </Modal>
   );
 }

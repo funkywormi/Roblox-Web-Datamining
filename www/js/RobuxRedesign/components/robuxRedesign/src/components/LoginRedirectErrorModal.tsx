@@ -1,11 +1,10 @@
 import { useContext } from "react";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { Dialog, DialogBody, DialogContent, DialogTitle } from "@rbx/foundation-ui";
-import { useTranslations } from "@rbx/www-common/i18n";
 import { ModalContext } from "../contexts/ModalContext";
 
 export function LoginRedirectErrorModal() {
-  const translate = useTranslations("CommonUI.Controls");
-  const translatePremium = useTranslations("Feature.Premium");
+  const { translate } = useTranslation();
 
   const {
     redirectError: { isOpen, closeModal },
@@ -22,8 +21,8 @@ export function LoginRedirectErrorModal() {
     >
       <DialogContent>
         <DialogBody>
-          <DialogTitle>{translatePremium("Message.SomethingWentWrong")}</DialogTitle>
-          <div className="text-body-large">{translatePremium("Message.PleaseTryAgain")}</div>
+          <DialogTitle>{translate("Message.SomethingWentWrong")}</DialogTitle>
+          <div className="text-body-large">{translate("Message.PleaseTryAgain")}</div>
         </DialogBody>
       </DialogContent>
     </Dialog>

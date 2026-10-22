@@ -140,6 +140,7 @@ export const SecurityTabContextProvider = ({
       is2svRecoveryEnabled: false,
       isEppRecoveryCodesEnabled: false,
     },
+    isTwoStepVerificationMetadataResolved: false,
     credentialsList: null,
     isPasskeySupported: null,
     userSettings: null,

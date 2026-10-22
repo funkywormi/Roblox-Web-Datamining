@@ -1,7 +1,8 @@
 import { getItem, setItem } from "@rbx/core-lib/local-storage";
-import { HttpResponseCodes } from "@rbx/core-scripts/http";
 import React, { useCallback, useEffect, useState } from "react";
-import { Modal } from "react-style-guide";
+import { DialogBody, ProgressCircle } from "@rbx/foundation-ui";
+import ChallengeDialog from "../../../common/challengeDialog";
+import { HttpStatus } from "../../../../common/request/requestConfig";
 import InlineChallenge from "../../../common/inlineChallenge";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import { mapPrivateAccessTokenErrorToChallengeErrorCode } from "../constants/resources";
@@ -54,7 +55,7 @@ const PrivateAccessToken: React.FC = () => {
     if (result.isError) {
       // CASE: getPATToken yields a 401 status indicating device/platform is not supporting PAT.
       // Pass empty redemption token for verification.
-      if (result.errorStatusCode === HttpResponseCodes.unauthorized) {
+      if (result.errorStatusCode === HttpStatus.unauthorized) {
         setAnswerState(AnswerState.COMPLETED_SUCCESS);
         dispatch({
           type: PrivateAccessTokenActionType.SET_CHALLENGE_COMPLETED,
@@ -112,15 +113,30 @@ const PrivateAccessToken: React.FC = () => {
   return renderInline ? (
     <InlineChallenge titleText={resources.Description.VerifyingYouAreNotBot}>
       <InlineChallengeBody>
-        <span className="spinner spinner-default spinner-no-margin" />
+        <div className="flex justify-center">
+          <ProgressCircle
+            variant="Indeterminate"
+            size="Small"
+            ariaLabel={resources.Description.VerifyingYouAreNotBot}
+          />
+        </div>
       </InlineChallengeBody>
     </InlineChallenge>
   ) : (
-    <Modal className="modal-modern" backdrop="static">
-      <Modal.Body>
-        <span className="spinner spinner-default spinner-no-margin" />
-      </Modal.Body>
-    </Modal>
+    // Known issue: this modal has never opened (the legacy `Modal` had no `show`); kept as-is.
+    <ChallengeDialog
+      open={false}
+      onClose={() => undefined}
+      hiddenTitle={resources.Description.VerifyingYouAreNotBot}
+    >
+      <DialogBody className="flex justify-center">
+        <ProgressCircle
+          variant="Indeterminate"
+          size="Small"
+          ariaLabel={resources.Description.VerifyingYouAreNotBot}
+        />
+      </DialogBody>
+    </ChallengeDialog>
   );
 };
 

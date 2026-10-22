@@ -3,7 +3,7 @@
  */
 
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const apiGatewayUrl = EnvironmentUrls.apiGatewayCdnUrl ?? URL_NOT_FOUND;
@@ -23,7 +23,7 @@ export type GetMetadataReturnType = {
 /**
  * Request Type: `GET`.
  */
-export const GET_METADATA_CONFIG: UrlConfig = {
+export const GET_METADATA_CONFIG: RequestConfig = {
   url: `${captchaServiceUrl}/v1/metadata`,
   timeout: 60000,
 };

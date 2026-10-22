@@ -217,6 +217,9 @@ const TwoStepVerification: React.FC = () => {
 
     const getMetadataResult = await requestService.twoStepVerification.getMetadata();
     if (getMetadataResult.isError) {
+      dispatch({
+        type: SecurityTabActionType.SET_TWO_STEP_VERIFICATION_METADATA_RESOLVED,
+      });
       setRequestInFlight(false);
       setRequestError(resources.Response.GeneralError);
       return;
@@ -230,6 +233,11 @@ const TwoStepVerification: React.FC = () => {
           authenticatedUser.id!.toString(),
         );
       if (getUserConfigurationResult.isError) {
+        dispatch({
+          type: SecurityTabActionType.INITIALIZE_TWO_STEP_VERIFICATION,
+          metadata,
+          enabledMediaTypes: [],
+        });
         setRequestInFlight(false);
         setRequestError(resources.Response.GeneralError);
         return;
@@ -312,6 +320,11 @@ const TwoStepVerification: React.FC = () => {
         recoveryCodeStatus: getRecoveryCodesStatusResult.value,
       });
     } else {
+      dispatch({
+        type: SecurityTabActionType.INITIALIZE_TWO_STEP_VERIFICATION,
+        metadata,
+        enabledMediaTypes: [],
+      });
       setRequestInFlight(false);
       setRequestError(resources.Response.FeatureDisabled);
     }

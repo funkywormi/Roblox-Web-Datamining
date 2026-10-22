@@ -1,7 +1,7 @@
 /* eslint-disable no-void */
 import { useCallback, useContext, useEffect, useState } from "react";
 import { getCurrentUser } from "@rbx/www-common/user";
-import { useTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { RequirementType } from "@rbx/user-settings";
 import { useToast } from "@rbx/payments/components";
 import { window } from "@rbx/core-lib/browser";
@@ -60,9 +60,7 @@ export function usePurchaseEligibility(): {
   } = useContext(ModalContext);
   const { trackEconomicRestrictionErrorShown } = useContext(TrackingContext);
 
-  const translatePremium = useTranslations("Feature.Premium");
-  const translateNotApproved = useTranslations("Feature.NotApproved");
-  const translatePurchaseError = useTranslations("IAPExperience.PurchaseError");
+  const { translate } = useTranslation();
 
   const [vpcOptimizationEnabled, setVPCOptimizationEnabled] = useState<boolean | undefined>();
 
@@ -127,7 +125,7 @@ export function usePurchaseEligibility(): {
     const userPurchaseSetting = await checkUserPurchaseSetting();
     if (!userPurchaseSetting) {
       trackCounter("PurchaseEligibilityFailedToFetch");
-      toastService.warning(translatePremium("Heading.GeneralError"));
+      toastService.warning(translate("Heading.GeneralError"));
       return false;
     }
 
@@ -135,17 +133,14 @@ export function usePurchaseEligibility(): {
       trackEconomicRestrictionErrorShown();
 
       const timeoutInHours = Math.ceil(userPurchaseSetting.expirationTimeInMinutes / 60);
-      const violationTranslationKey = getViolationLabel(userPurchaseSetting.failureReason);
-      const violation = translateNotApproved.has(violationTranslationKey)
-        ? translateNotApproved(violationTranslationKey)
-        : "";
+      const violation = translate(getViolationLabel(userPurchaseSetting.failureReason));
       toastService.warning(
         timeoutInHours > 24
-          ? translatePurchaseError("Text.EconomicRestrictionsDays", {
+          ? translate("Text.EconomicRestrictionsDays", {
               day: Math.ceil(timeoutInHours / 24),
               violation,
             })
-          : translatePurchaseError("Text.EconomicRestrictionsHours", {
+          : translate("Text.EconomicRestrictionsHours", {
               hour: timeoutInHours,
               violation,
             }),
@@ -196,14 +191,12 @@ export function usePurchaseEligibility(): {
     trackCounter("PurchaseEligibility", {
       failureReason: userPurchaseSetting.failureReason,
     });
-    toastService.warning(translatePremium("Heading.GeneralError"));
+    toastService.warning(translate("Heading.GeneralError"));
     return false;
   }, [
     trackEconomicRestrictionErrorShown,
     toastService,
-    translatePremium,
-    translateNotApproved,
-    translatePurchaseError,
+    translate,
     fetchParentalConsentRequiredForSettingUpdate,
     fetchPurchasingDisabledBySelf,
     vpcOptimizationEnabled,

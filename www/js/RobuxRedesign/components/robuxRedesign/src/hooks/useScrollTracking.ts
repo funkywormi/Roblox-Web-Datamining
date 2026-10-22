@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { observeIntersection } from "@rbx/core-lib/element-visibility";
+import { observeChildrenVisibility } from "@rbx/core-scripts/util/element-visibility";
 import { document } from "@rbx/core-lib/browser";
 import { ROOT_ELEMENT_ID } from "../constants";
 import { SectionBase } from "../types/buyRobuxPageData";
@@ -225,7 +225,7 @@ export function useScrollTracking(): ImpressionData {
       return;
     }
 
-    const disconnect = observeIntersection(
+    const disconnect = observeChildrenVisibility(
       {
         elements,
         threshold: INTERSECTION_THRESHOLD,

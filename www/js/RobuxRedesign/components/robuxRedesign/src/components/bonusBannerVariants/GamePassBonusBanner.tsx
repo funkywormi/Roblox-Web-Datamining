@@ -1,6 +1,6 @@
 import { useCallback, useContext } from "react";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { IconButton, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
-import { useTranslations } from "@rbx/www-common/i18n";
 import { window } from "@rbx/core-lib/browser";
 import { GamePassMetadata } from "../../types/buyRobuxPageData";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
@@ -11,7 +11,7 @@ type BannerProps = {
 };
 
 export function GamePassBonusBanner({ metadata }: BannerProps) {
-  const translate = useTranslations("Feature.PersonalizedBonus");
+  const { translate } = useTranslation();
   const { bonusItemBannerImageUrl, bonusItemImageUrl } = useContext(BuyRobuxPageContext);
 
   const iconReportHandler = useCallback(() => {

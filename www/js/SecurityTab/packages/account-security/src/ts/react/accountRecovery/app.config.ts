@@ -151,6 +151,8 @@ export const ACCOUNT_RECOVERY_LANGUAGE_RESOURCES = [
   "Response.PasswordBadLength",
   "Response.PasswordComplexity",
   "Response.PasswordContainsUsernameError",
+  "Response.PasswordLowComplexity",
+  "Response.PasswordTooSimilarToUsername",
   "Heading.EnterSecondMethod",
   "Heading.PasskeyUpsellTitle",
   "Heading.PasskeyUpsellSubtitle",

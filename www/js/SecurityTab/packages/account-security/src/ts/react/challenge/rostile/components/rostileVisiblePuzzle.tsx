@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Loading } from "react-style-guide";
-import "../../../../../css/challenge/rostile/rostile.scss";
+import { Button, Icon, ProgressCircle } from "@rbx/foundation-ui";
+import "../../../../../css/challenge/rostile/rostile.css";
 import { Solution } from "../../../../common/request/types/rostile";
 import sleep from "../../../../common/sleep";
 import { checkAnswerDelay } from "../constants/challengeConfig";
@@ -122,7 +122,13 @@ const VisiblePuzzle: React.FC<{
   const getContent = () => {
     if (waitingToCheckAnswer) {
       // For additional collection of data before submitting answer.
-      return <Loading />;
+      return (
+        <ProgressCircle
+          variant="Indeterminate"
+          size="Small"
+          ariaLabel={resources.Description.VerificationHeader}
+        />
+      );
     }
     switch (answerState) {
       case AnswerState.INITIAL:
@@ -131,18 +137,30 @@ const VisiblePuzzle: React.FC<{
             <span>{resources.Description.VerificationPrompt}</span>
             <br />
             <span ref={verifyButtonBoundingRef}>
-              <Button className="rostile-verify-button" onClick={onClick} onMouseDown={onMouseDown}>
+              <Button
+                variant="Emphasis"
+                size="Medium"
+                className="rostile-verify-button !bg-[var(--color-content-emphasis)] !content-[var(--color-surface-0)]"
+                onClick={onClick}
+                onMouseDown={onMouseDown}
+              >
                 {resources.Description.ImAHuman}
               </Button>
             </span>
           </React.Fragment>
         );
       case AnswerState.COMPLETED_UNRESOLVED:
-        return <Loading />;
+        return (
+          <ProgressCircle
+            variant="Indeterminate"
+            size="Small"
+            ariaLabel={resources.Description.VerificationHeader}
+          />
+        );
       case AnswerState.COMPLETED_SUCCESS:
         return (
           <React.Fragment>
-            <div className="icon-checkmark" />
+            <Icon name="icon-filled-circle-check" size="XLarge" />
             <br />
             <span>{resources.Description.VerificationSuccess}</span>
           </React.Fragment>
@@ -153,7 +171,12 @@ const VisiblePuzzle: React.FC<{
             <span>{resources.Description.VerificationError}</span>
             <br />
             {!renderInline && (
-              <Button className="rostile-verify-button" onClick={closeModal}>
+              <Button
+                variant="Emphasis"
+                size="Medium"
+                className="rostile-verify-button !bg-[var(--color-content-emphasis)] !content-[var(--color-surface-0)]"
+                onClick={closeModal}
+              >
                 {resources.Description.Ok}
               </Button>
             )}

@@ -8,11 +8,12 @@ import {
   DialogFooter,
   TCheckboxCheckState,
 } from "@rbx/foundation-ui";
-import {
-  paymentFlowAnalyticsService,
-  TriggeringContext,
-} from "@rbx/payments/payments-flow-analytics";
+import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
 import type { FireTelemetryCounterFn } from "@rbx/web-telemetry/v2/fire";
+
+type TriggeringContext = Parameters<
+  typeof paymentFlowAnalyticsService.sendUserPurchaseFlowEvent
+>[0];
 
 export type FirstTimePurchaseConsentModalProps = {
   isOpen: boolean;
@@ -45,12 +46,12 @@ export function FirstTimePurchaseConsentModal({
   useEffect(() => {
     if (isOpen && !hasTrackedOpenRef.current) {
       hasTrackedOpenRef.current = true;
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
-        triggerContext: triggerContext,
-        isMidPurchaseStep: true,
-        viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.FIRST_TIME_PURCHASE_CONSENT_MODAL,
-        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
-      });
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
+        triggerContext,
+        true,
+        paymentFlowAnalyticsService.ENUM_VIEW_NAME.FIRST_TIME_PURCHASE_CONSENT_MODAL,
+        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
+      );
     }
     if (!isOpen) {
       hasTrackedOpenRef.current = false;
@@ -60,39 +61,40 @@ export function FirstTimePurchaseConsentModal({
   const onCheckedChange = useCallback(
     (checked: TCheckboxCheckState) => {
       setIsConsentChecked(checked === true);
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
-        triggerContext: triggerContext,
-        isMidPurchaseStep: true,
-        viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.FIRST_TIME_PURCHASE_CONSENT_MODAL,
-        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        eventMetadata: { checkboxState: String(checked === true) },
-      });
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
+        triggerContext,
+        true,
+        paymentFlowAnalyticsService.ENUM_VIEW_NAME.FIRST_TIME_PURCHASE_CONSENT_MODAL,
+        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+        undefined,
+        { checkboxState: String(checked === true) },
+      );
     },
     [triggerContext],
   );
 
   const handleConfirm = useCallback(() => {
     publishMetric("FirstTimePurchaseConsent_Confirmed");
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
       triggerContext,
-      isMidPurchaseStep: true,
-      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.FIRST_TIME_PURCHASE_CONSENT_MODAL,
-      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-      viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CONFIRM,
-    });
+      true,
+      paymentFlowAnalyticsService.ENUM_VIEW_NAME.FIRST_TIME_PURCHASE_CONSENT_MODAL,
+      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+      paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CONFIRM,
+    );
     setIsConsentChecked(false);
     onConfirm();
   }, [onConfirm, publishMetric, triggerContext]);
 
   const handleCancel = useCallback(() => {
     publishMetric("FirstTimePurchaseConsent_Cancelled");
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
       triggerContext,
-      isMidPurchaseStep: true,
-      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.FIRST_TIME_PURCHASE_CONSENT_MODAL,
-      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-      viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL,
-    });
+      true,
+      paymentFlowAnalyticsService.ENUM_VIEW_NAME.FIRST_TIME_PURCHASE_CONSENT_MODAL,
+      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+      paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL,
+    );
     setIsConsentChecked(false);
     onCancel();
   }, [onCancel, publishMetric, triggerContext]);

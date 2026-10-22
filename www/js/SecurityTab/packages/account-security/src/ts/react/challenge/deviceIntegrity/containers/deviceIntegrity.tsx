@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import * as hybridResponseService from "@rbx/core-scripts/auth/hybrid-response";
-import { Modal } from "react-style-guide";
+import { DialogBody, ProgressCircle } from "@rbx/foundation-ui";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import ChallengeDialog from "../../../common/challengeDialog";
 import InlineChallenge from "../../../common/inlineChallenge";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import useDeviceIntegrityContext from "../hooks/useDeviceIntegrityContext";
@@ -88,15 +89,30 @@ const DeviceIntegrity: React.FC = () => {
   return renderInline ? (
     <InlineChallenge titleText={resources.Description.VerifyingYouAreNotBot}>
       <InlineChallengeBody>
-        <span className="spinner spinner-default spinner-no-margin" />
+        <div className="flex justify-center">
+          <ProgressCircle
+            variant="Indeterminate"
+            size="Small"
+            ariaLabel={resources.Description.VerifyingYouAreNotBot}
+          />
+        </div>
       </InlineChallengeBody>
     </InlineChallenge>
   ) : (
-    <Modal className="modal-modern" backdrop="static">
-      <Modal.Body>
-        <span className="spinner spinner-default spinner-no-margin" />
-      </Modal.Body>
-    </Modal>
+    // Known issue: this modal has never opened (the legacy `Modal` had no `show`); kept as-is.
+    <ChallengeDialog
+      open={false}
+      onClose={() => undefined}
+      hiddenTitle={resources.Description.VerifyingYouAreNotBot}
+    >
+      <DialogBody className="flex justify-center">
+        <ProgressCircle
+          variant="Indeterminate"
+          size="Small"
+          ariaLabel={resources.Description.VerifyingYouAreNotBot}
+        />
+      </DialogBody>
+    </ChallengeDialog>
   );
 };
 

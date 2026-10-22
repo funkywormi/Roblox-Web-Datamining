@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal } from "react-style-guide";
-import { Button } from "@rbx/foundation-ui";
+import { Button, DialogBody } from "@rbx/foundation-ui";
 import * as TwoStepVerification from "../../../../common/request/types/twoStepVerification";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
 import { TIMEOUT_BEFORE_CALLBACK_MILLISECONDS } from "../app.config";
@@ -151,14 +150,17 @@ const CD2SVInput: React.FC<Props> = ({
    * Render Properties
    */
 
-  const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
+  const BodyElement = renderInline ? InlineChallengeBody : DialogBody;
   const marginBottomClassName = renderInline
     ? "inline-challenge-margin-bottom"
     : "modal-margin-bottom";
   const marginBottomLargeClassName = renderInline
-    ? "inline-margin-bottom-xlarge"
+    ? "inline-challenge-margin-bottom-xlarge"
     : "modal-margin-bottom-xlarge";
-  const textErrorClassName = marginBottomLargeClassName.concat(" ", "text-error xsmall");
+  const textErrorClassName = marginBottomLargeClassName.concat(
+    " ",
+    "text-caption-small content-system-alert",
+  );
   const lockIconClassName = renderInline
     ? "inline-challenge-protection-shield-icon"
     : "modal-protection-shield-icon";
@@ -297,11 +299,11 @@ const CD2SVInput: React.FC<Props> = ({
         {showRetryButton ? children : null}
         {showRetryButton || showHelpCenterLink ? (
           <p
-            className={`text-footer ${marginBottomClassName}`}
+            className={`text-caption-small content-default ${marginBottomClassName}`}
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: resources.Label.HelpCenterLink(
-                `<a class="text-name text-footer contact" href="${HELP_PAGE_URL}" target="_blank" rel="noopener noreferrer">${resources.Label.HelpCenter}</a>`,
+                `<a class="content-emphasis hover:underline focus-visible:underline" href="${HELP_PAGE_URL}" target="_blank" rel="noopener noreferrer">${resources.Label.HelpCenter}</a>`,
               ),
             }}
           />

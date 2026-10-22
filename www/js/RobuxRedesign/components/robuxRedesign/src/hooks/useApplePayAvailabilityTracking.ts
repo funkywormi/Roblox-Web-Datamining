@@ -10,12 +10,6 @@ export type ApplePaySession = {
   canMakePaymentsWithActiveCard: (merchantIdentifier: string) => Promise<boolean | undefined>;
 };
 
-declare global {
-  interface Window {
-    ApplePaySession?: ApplePaySession;
-  }
-}
-
 export function useApplePayAvailabilityTracking(): boolean | undefined {
   const [applePayAvailability, setApplePayAvailability] = useState<boolean>();
 

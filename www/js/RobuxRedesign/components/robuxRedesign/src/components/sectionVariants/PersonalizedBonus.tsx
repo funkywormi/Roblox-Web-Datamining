@@ -1,5 +1,5 @@
 import { useCallback, useContext, useMemo } from "react";
-import { useFullKeyTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { Product, SectionBase, SectionPersonalizedBonus } from "../../types/buyRobuxPageData";
 import {
   BaseSectionProps,
@@ -72,7 +72,7 @@ export function PersonalizedBonus({
   const { purchaseProduct } = useContext(PurchaseContext);
   const { redirect } = useContext(BuyRobuxPageContext);
 
-  const { translateFullKey } = useFullKeyTranslations();
+  const { translate } = useTranslation();
 
   const clickHandler = useCallback(
     (product: Product, event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
@@ -99,11 +99,9 @@ export function PersonalizedBonus({
   return (
     <Section {...getSectionTrackingProps(sectionBase)}>
       <div>
-        <SectionHeader>{translateFullKey(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
+        <SectionHeader>{translate(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
         {personalizedBonus.bodyTranslationKey && (
-          <SectionSubHeader>
-            {translateFullKey(personalizedBonus.bodyTranslationKey)}
-          </SectionSubHeader>
+          <SectionSubHeader>{translate(personalizedBonus.bodyTranslationKey)}</SectionSubHeader>
         )}
       </div>
       <SectionBody isPrimary={isPrimary} banner={<Banner personalizedBonus={personalizedBonus} />}>

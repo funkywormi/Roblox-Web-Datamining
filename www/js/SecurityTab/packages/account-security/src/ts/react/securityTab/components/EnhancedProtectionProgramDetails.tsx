@@ -509,7 +509,7 @@ const EnhancedProtectionProgramDetails: React.FC<EnhancedProtectionProgramDetail
     });
 
   return (
-    <div className="section enhanced-protection-program-details">
+    <div className="section enhanced-protection-program-details" data-testid="epp-details">
       <div>
         <h2>{resources.Heading.Security}</h2>
       </div>

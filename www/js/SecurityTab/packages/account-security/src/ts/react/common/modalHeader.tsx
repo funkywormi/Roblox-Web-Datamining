@@ -1,11 +1,8 @@
 import React from "react";
 import { Modal } from "react-style-guide";
+import { HeaderButtonType } from "./challengeDialogHeader";
 
-export enum HeaderButtonType {
-  BACK = "BACK",
-  CLOSE = "CLOSE",
-  HIDDEN = "HIDDEN",
-}
+export { HeaderButtonType };
 
 const renderHeaderButton = (
   buttonType: HeaderButtonType,
@@ -46,7 +43,7 @@ type Props = {
   buttonType: HeaderButtonType;
   buttonAction: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   buttonEnabled: boolean;
-  headerInfo: JSX.Element | null;
+  headerInfo: React.ReactElement | null;
 };
 
 /**

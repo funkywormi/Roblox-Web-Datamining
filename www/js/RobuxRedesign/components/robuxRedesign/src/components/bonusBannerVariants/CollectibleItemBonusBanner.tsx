@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useFullKeyTranslations, useTranslations } from "@rbx/www-common/i18n";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { Badge } from "@rbx/foundation-ui";
 import { CollectibleItemMetadata } from "../../types/buyRobuxPageData";
 import { BlueCheckIcon } from "../BlueCheckIcon";
@@ -30,8 +30,7 @@ type BannerProps = {
 };
 
 export function CollectibleItemBonusBanner({ metadata }: BannerProps) {
-  const { translateFullKey } = useFullKeyTranslations();
-  const translatePersonalizedBonus = useTranslations("Feature.PersonalizedBonus");
+  const { translate } = useTranslation();
 
   const daysRemaining = useMemo(() => getDaysUntilCampaignEnd(), []);
 
@@ -50,24 +49,21 @@ export function CollectibleItemBonusBanner({ metadata }: BannerProps) {
       />
       <div className="flex flex-col gap-small medium:gap-medium self-stretch items-start justify-center">
         <div className="text-title-large medium:text-heading-small content-emphasis text-wrap">
-          {translateFullKey(metadata.translationKey)}
+          {translate(metadata.translationKey)}
         </div>
         <div className="flex flex-col small:flex-row gap-medium self-stretch items-start justify-start">
           <div className="flex flex-row gap-xsmall self-stretch items-center justify-start">
             <div className="text-label-small medium:text-label-medium content-default">
-              {translatePersonalizedBonus("Label.ByRoblox")}
+              {translate("Label.ByRoblox")}
             </div>
             <BlueCheckIcon size={12} />
           </div>
           <Badge
             variant="Contrast"
             icon="icon-regular-clock"
-            label={translatePersonalizedBonus(
-              daysRemaining === 1 ? "Label.LastDay" : "Label.DaysLeft",
-              {
-                daysLeft: daysRemaining,
-              },
-            )}
+            label={translate(daysRemaining === 1 ? "Label.LastDay" : "Label.DaysLeft", {
+              daysLeft: daysRemaining,
+            })}
             className="text-overflow"
           />
         </div>
