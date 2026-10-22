@@ -10,9 +10,9 @@ import React, {
 import classNames from "classnames";
 import { FaceFrownIcon, FaceSmileIcon } from "@heroicons/react/24/outline";
 import { useLocation } from "react-router-dom";
-import { Checkbox, TCheckboxCheckState } from "@rbx/foundation-ui";
-import { WithTranslationsProps, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
 import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
+import { WithTranslationsProps, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
+import { Checkbox, TCheckboxCheckState } from "@rbx/foundation-ui";
 import { supportChatTranslationConfig } from "../app.config";
 import { SupportTicketStateKey, SupportTicketSelectableItems } from "../core/types/supportTicket";
 import DropdownMenu from "./common/dropdown/DropdownMenu";
@@ -44,9 +44,15 @@ import {
 import { useSubmitSupportForm, useValidateUsername } from "../hooks/supportFormServices";
 import { AgeGateDOBGroupLabel } from "../core/types/ageGate";
 import { clearSierraChatSession } from "../core/helpers/sierraSessionStorageManager";
+import {
+  SupportFormPrefill,
+  clipSupportFormMessage,
+  supportFormSelectionFromPrefill,
+} from "../core/helpers/supportFormPrefill";
 import useNav from "../hooks/useNav";
 import useScrollToTop from "../hooks/useScrollTop";
 import { MessageModalConfig, useConfirmDialog } from "./modal/MessageModal";
+import RedirectToPortalMessage from "./RedirectToPortalMessage";
 import ArticleSuggestions from "./article-suggestions/ArticleSuggestions";
 import { SubCategory } from "../core/types/serviceMetadataResponse";
 import DevModeComponent from "./DevModeComponent";
@@ -77,20 +83,35 @@ const ASSET_ID_SUBCATEGORIES: string[] = [
 ];
 
 /**
- * These subcategories will render an optional universe ID field to help identify
- * the specific experience being reported. Includes both experience genre appeals
- * and content maturity subcategories.
+ * These subcategories will render a universe ID field to help identify
+ * the specific experience being reported. Includes experience genre appeals,
+ * content maturity, and Discovery Content Quality subcategories.
  */
 const UNIVERSE_ID_SUBCATEGORIES: string[] = [
   SubCategory.AppealExperienceGenre,
   SubCategory.ContentMaturityAppeal,
   SubCategory.ContentMaturityAppealRestore,
   SubCategory.ContentMaturityRejectAppeal,
+  SubCategory.DiscoveryContentQualityReducedExposure,
+  SubCategory.DiscoveryContentQualityVideoQuality,
 ];
 
-export const UnwrappedSupportFormComponent: React.FC<WithTranslationsProps> = ({
-  translate: t,
-}) => {
+/**
+ * These subcategories will render a required developer ID field.
+ */
+const DEVELOPER_ID_SUBCATEGORIES: string[] = [
+  SubCategory.DiscoveryContentQualityReducedExposure,
+  SubCategory.DiscoveryContentQualityVideoQuality,
+];
+
+/**
+ * These subcategories will render a required video ID field.
+ */
+const VIDEO_ID_SUBCATEGORIES: string[] = [SubCategory.DiscoveryContentQualityVideoQuality];
+
+export const UnwrappedSupportFormComponent: React.FC<
+  WithTranslationsProps & { prefill?: SupportFormPrefill }
+> = ({ translate: t, prefill }) => {
   // Form context and field input state
   useScrollToTop();
   const { metadata, ageGateTag, updateSupportInquiryContext } = useContext(SupportContext);
@@ -102,6 +123,8 @@ export const UnwrappedSupportFormComponent: React.FC<WithTranslationsProps> = ({
     defaultTicketFormSelectables,
   );
   const [supportFormData, setSupportFormData] = useState<SupportFormState>(defaultTicketFormFields);
+  // Applied once; cleared after the categories are matched so later edits are not overwritten.
+  const [askPrefill, setAskPrefill] = useState(prefill);
 
   const userViewedHelpArticleRef = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -151,6 +174,38 @@ export const UnwrappedSupportFormComponent: React.FC<WithTranslationsProps> = ({
   const helpCenterArticleId = getAndValidateQueryParam(queryParams, "articleId");
   const helpCenterArticleLang = getAndValidateQueryParam(queryParams, "articleLang");
 
+  useEffect(() => {
+    if (!askPrefill) {
+      return;
+    }
+    setSupportFormData(current =>
+      current[SupportTicketStateKey.Message]
+        ? current
+        : {
+            ...current,
+            [SupportTicketStateKey.Message]: clipSupportFormMessage(askPrefill.message),
+          },
+    );
+    // Categories come from metadata, which can arrive a render after this form mounts.
+    if (!metadata?.categories) {
+      return;
+    }
+    const selection = supportFormSelectionFromPrefill(askPrefill, metadata.categories);
+    setAskPrefill(undefined);
+    if (!selection) {
+      return;
+    }
+    setSelectedItems(current =>
+      current[SupportTicketStateKey.HelpCategoryType]
+        ? current
+        : {
+            ...current,
+            [SupportTicketStateKey.HelpCategoryType]: selection.category,
+            [SupportTicketStateKey.HelpSubCategoryType]: selection.subcategory,
+          },
+    );
+  }, [askPrefill, metadata]);
+
   /**
    * Certain appeal subcategories will render an optional asset ID field to make which
    * can be used to route the appeal to Toolbox instead of Zendesk if applicable.
@@ -175,6 +230,10 @@ export const UnwrappedSupportFormComponent: React.FC<WithTranslationsProps> = ({
       ),
     );
   }, [selectedItems]);
+
+  const selectedSubCategoryId = selectedItems[SupportTicketStateKey.HelpSubCategoryType]?.id ?? "";
+  const showDeveloperIdField = DEVELOPER_ID_SUBCATEGORIES.includes(selectedSubCategoryId);
+  const showVideoIdField = VIDEO_ID_SUBCATEGORIES.includes(selectedSubCategoryId);
 
   /**
    * For logged in UK users, we need to show the opt-out communication checkbox for the "Appeal a decision"
@@ -262,8 +321,14 @@ export const UnwrappedSupportFormComponent: React.FC<WithTranslationsProps> = ({
     if (isUsernameRequired) {
       fields.push(SupportTicketStateKey.Username);
     }
+    if (showDeveloperIdField) {
+      fields.push(SupportTicketStateKey.UniverseId, SupportTicketStateKey.DeveloperId);
+    }
+    if (showVideoIdField) {
+      fields.push(SupportTicketStateKey.VideoId);
+    }
     return fields;
-  }, [isUsernameRequired]);
+  }, [isUsernameRequired, showDeveloperIdField, showVideoIdField]);
 
   // Sync username validation state via manual focus/blur trigger with username modal and submit ready state (e.g. submit button enablement)
   // TODO(mhowell): Confirm with Melissa if we want to show invalid username modal once or multiple times on change + blur
@@ -291,8 +356,17 @@ export const UnwrappedSupportFormComponent: React.FC<WithTranslationsProps> = ({
     };
   }, [supportFormData, selectedItems]);
 
-  const { username, firstName, email, confirmEmail, message, assetId, universeId } =
-    unwrappedSupportFormData;
+  const {
+    username,
+    firstName,
+    email,
+    confirmEmail,
+    message,
+    assetId,
+    universeId,
+    developerId,
+    videoId,
+  } = unwrappedSupportFormData;
 
   // list of keys that have been touched
   const [dirty, setDirty] = useState<Partial<Record<SupportTicketStateKey, boolean>>>({});
@@ -398,7 +472,9 @@ export const UnwrappedSupportFormComponent: React.FC<WithTranslationsProps> = ({
   // Render modal errors from server error response
   const showErrorDialog = useCallback(
     (params?: {
+      title?: string;
       message?: string;
+      body?: React.ReactNode;
       callback?: () => void;
       captureContext?: Record<string, string>;
     }) => {
@@ -428,8 +504,8 @@ export const UnwrappedSupportFormComponent: React.FC<WithTranslationsProps> = ({
       });
 
       return confirm({
-        headerText: t("Heading.Dialog.ErrorWithoutContext"),
-        bodyText: params?.message || t("Response.Dialog.ErrorWithoutContext"),
+        headerText: params?.title || t("Heading.Dialog.ErrorWithoutContext"),
+        bodyText: params?.body || params?.message || t("Response.Dialog.ErrorWithoutContext"),
         onOk: () => {
           params?.callback?.();
           resetFormState();
@@ -624,6 +700,16 @@ export const UnwrappedSupportFormComponent: React.FC<WithTranslationsProps> = ({
           await showErrorDialog({
             message: t("Response.Dialog.ErrorWithoutContext"),
             captureContext: buildSentryCaptureContext("submission_server_error"),
+          });
+          return;
+        }
+
+        if (submitData?.supportedReceived === SupportedReceivedValues.RedirectToPortal) {
+          await showErrorDialog({
+            title: t("Heading.Dialog.RedirectToPortal"),
+            message: "RedirectToPortal",
+            body: <RedirectToPortalMessage translate={t} />,
+            captureContext: buildSentryCaptureContext("submission_redirect_to_portal"),
           });
           return;
         }
@@ -959,6 +1045,64 @@ export const UnwrappedSupportFormComponent: React.FC<WithTranslationsProps> = ({
             className="text-red-500 text-sm"
           >
             {formErrors[SupportTicketStateKey.UniverseId]}
+          </span>
+        </div>
+
+        {/* Developer ID Field for Discovery Content Quality appeals */}
+        <div className="space-y-1" hidden={!showDeveloperIdField}>
+          <label htmlFor={SupportTicketStateKey.DeveloperId} className="block font-bold">
+            {t("Label.DeveloperID") || "Developer ID"}
+          </label>
+          <input
+            id={SupportTicketStateKey.DeveloperId}
+            name={SupportTicketStateKey.DeveloperId}
+            type="text"
+            placeholder={t("Label.DeveloperID") || "Developer ID"}
+            className={classNames("w-full px-3 py-2 form-control input-field", {
+              "ring-red-500 ring-1": !!formErrors[SupportTicketStateKey.DeveloperId],
+            })}
+            value={developerId}
+            onChange={e => {
+              updateSupportTicketFormTextInput(SupportTicketStateKey.DeveloperId, e.target.value);
+            }}
+            onBlur={() => {
+              handleBlur(SupportTicketStateKey.DeveloperId);
+            }}
+          />
+          <span
+            hidden={!formErrors[SupportTicketStateKey.DeveloperId]}
+            className="text-red-500 text-sm"
+          >
+            {formErrors[SupportTicketStateKey.DeveloperId]}
+          </span>
+        </div>
+
+        {/* Video ID Field for Discovery Content Quality appeals */}
+        <div className="space-y-1" hidden={!showVideoIdField}>
+          <label htmlFor={SupportTicketStateKey.VideoId} className="block font-bold">
+            {t("Label.VideoID") || "Video ID"}
+          </label>
+          <input
+            id={SupportTicketStateKey.VideoId}
+            name={SupportTicketStateKey.VideoId}
+            type="text"
+            placeholder={t("Label.VideoID") || "Video ID"}
+            className={classNames("w-full px-3 py-2 form-control input-field", {
+              "ring-red-500 ring-1": !!formErrors[SupportTicketStateKey.VideoId],
+            })}
+            value={videoId}
+            onChange={e => {
+              updateSupportTicketFormTextInput(SupportTicketStateKey.VideoId, e.target.value);
+            }}
+            onBlur={() => {
+              handleBlur(SupportTicketStateKey.VideoId);
+            }}
+          />
+          <span
+            hidden={!formErrors[SupportTicketStateKey.VideoId]}
+            className="text-red-500 text-sm"
+          >
+            {formErrors[SupportTicketStateKey.VideoId]}
           </span>
         </div>
 

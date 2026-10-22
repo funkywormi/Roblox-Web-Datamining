@@ -1,14 +1,15 @@
 import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "@rbx/www-common/i18n";
-import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
 import { Menu, MenuItem, MenuSection } from "@rbx/foundation-ui";
 
 import links from "../constants/linkConstants";
-import { logoutUser, openAccountSwitcher } from "../util/authUtil";
 import layoutConstants from "../constants/layoutConstants";
+import { getNavCapability } from "../util/navCapabilities";
 
 const { settingsUrl, quickLoginUrl } = links;
 const { quickLogin, settings, logout, switchAccountKey } = layoutConstants.menuKeys;
+
+const useNoAccountSwitcher = (): [boolean, boolean] => [false, false];
 
 interface Props {
   accountNotificationCount: number;
@@ -30,11 +31,12 @@ export default function SettingsMenu({
     }
     return tAlerts.has(label) ? tAlerts(label) : "";
   };
-  const [isAccountSwitchingEnabledForBrowser] =
-    AccountSwitcherService.useIsAccountSwitcherAvailableForBrowser();
+  const useIsAccountSwitcherAvailableForBrowser =
+    getNavCapability("useIsAccountSwitcherAvailableForBrowser") ?? useNoAccountSwitcher;
+  const [isAccountSwitchingEnabledForBrowser] = useIsAccountSwitcherAvailableForBrowser();
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await logoutUser();
+      await getNavCapability("logoutUser")?.();
     },
   });
   const handleLogoutSelect = () => {
@@ -66,7 +68,12 @@ export default function SettingsMenu({
           }
           if (urlKey === switchAccountKey) {
             return (
-              <MenuItem key={urlKey} value={urlKey} title={title} onSelect={openAccountSwitcher} />
+              <MenuItem
+                key={urlKey}
+                value={urlKey}
+                title={title}
+                onSelect={() => getNavCapability("openAccountSwitcher")?.()}
+              />
             );
           }
           return (

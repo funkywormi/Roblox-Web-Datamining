@@ -11,6 +11,8 @@ export enum SupportTicketStateKey {
   HelpCategoryType = "helpCategoryType",
   HelpSubCategoryType = "helpSubCategoryType",
   UniverseId = "universeId",
+  DeveloperId = "developerId",
+  VideoId = "videoId",
   Message = "message",
   IsBlockedFromSubmitting = "isBlockedFromSubmitting",
   Captcha = "captcha",
@@ -37,6 +39,8 @@ export interface CreateSupportTicketRequestModel {
   helpArticleCenterId?: string;
   helpArticleLang?: string;
   universeID?: string;
+  developerId?: string;
+  videoId?: string;
   otpSessionToken?: string;
   optOutCommunication?: boolean;
 }

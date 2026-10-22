@@ -117,6 +117,7 @@ export enum SupportedReceivedValues {
   C3U13Email = 4,
   Throttled = 5,
   Error = 6,
+  RedirectToPortal = 7,
 }
 
 export type GenericResponse = {

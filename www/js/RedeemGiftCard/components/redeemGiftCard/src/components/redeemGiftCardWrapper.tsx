@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { TranslateFunction } from "react-utilities";
 import { urlService } from "core-utilities";
 import { getRedeemMetadata, getTwentyPercentMoreRobuxStatus } from "@rbx/payments/creditCheckout";
+import { getCurrentUser } from "@rbx/www-common/user";
 import RedeemGiftCard from "./redeemGiftCard";
 import { redeemCodeQueryParamKey } from "../constants/redeemGiftCardConstants";
 
@@ -20,6 +21,10 @@ function RedeemGiftCardWrapper({ translate, intl }: Props) {
       const placeholder = urlService.getQueryParam(redeemCodeQueryParamKey);
       if (typeof placeholder === "string") {
         setPinPlaceholder(placeholder);
+        return;
+      }
+
+      if (!getCurrentUser()) {
         return;
       }
 

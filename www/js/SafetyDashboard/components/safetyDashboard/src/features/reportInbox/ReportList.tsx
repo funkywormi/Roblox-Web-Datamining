@@ -6,7 +6,10 @@ import protectionShieldLight from "@rbx/foundation-images/pictograms/protection_
 import type { Report } from "../../types/api";
 import { getReportDetailPath } from "../../shared/utils/navigation";
 import { HOW_TO_REPORT_URL } from "../../shared/url";
+import { SafetyDashboardEventType } from "../../telemetry/eventTypes";
+import { sendSafetyDashboardEvent } from "../../telemetry/sendSafetyDashboardEvent";
 import { formatReportDate } from "./util/dateTime";
+import { getLatestActivityStatus } from "./util/reports";
 
 interface ReportListProps {
   reports: Report[];
@@ -38,6 +41,10 @@ const ReportList = ({ reports }: ReportListProps) => {
               />
             }
             onSelect={() => {
+              sendSafetyDashboardEvent(SafetyDashboardEventType.ReportRowPress, {
+                position: index,
+                latestStatus: getLatestActivityStatus(report),
+              });
               history.push(getReportDetailPath(report.id));
             }}
           />
@@ -55,6 +62,9 @@ const ReportList = ({ reports }: ReportListProps) => {
         href={HOW_TO_REPORT_URL}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => {
+          sendSafetyDashboardEvent(SafetyDashboardEventType.ReportingInstructionsPress);
+        }}
       >
         {translate("Link.ViewReportingInstructions")}
       </a>

@@ -1,3 +1,4 @@
+import { AbortError } from "@rbx/core-lib/http";
 import { isCancelled } from "@rbx/core-scripts/http";
 import type { Attributes, FireTelemetryCounterFn } from "@rbx/web-telemetry/v2/fire";
 import type { FireTelemetryHistogramFn } from "@rbx/web-telemetry/v2/histogram";
@@ -6,8 +7,12 @@ export const statusCodeFromError = (error: unknown): string => {
   if (error == null) {
     return "NetworkError";
   }
-  if (isCancelled(error)) {
+  if (isCancelled(error) || (error instanceof AbortError && error.cause.code === "Abort")) {
     return "Cancelled";
+  }
+  // Same code axios gives a .NET request that hits its timeout.
+  if (error instanceof AbortError && error.cause.code === "Timeout") {
+    return "ECONNABORTED";
   }
   if (typeof error === "object") {
     const { status, code, response } = error as {

@@ -10,9 +10,10 @@ import {
   getSupportUiChoiceFromUrl,
   storeSupportUiChoice,
 } from "../core/helpers/supportUiPrototype";
+import { SupportFormPrefill } from "../core/helpers/supportFormPrefill";
 import { useFetchMetadata } from "../hooks/supportFormServices";
+import EmployeeOnly from "./employee-only/EmployeeOnly";
 
-const EMPLOYEE_LABEL = "Employee";
 const SWITCH_TO_CLASSIC = "Switch to classic support experience";
 const SWITCH_TO_NEW = "Switch to new support experience";
 
@@ -25,6 +26,7 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
   // in state rather than the URL so it can't be bookmarked to skip the new experience, and a
   // refresh goes back to the new experience.
   const [hasClickedUseSupportForm, setHasClickedUseSupportForm] = useState(false);
+  const [supportFormPrefill, setSupportFormPrefill] = useState<SupportFormPrefill>();
 
   // Only employees can pick their experience; everyone else gets what the backend decided.
   const isEmployee = metadata?.isRobloxEmployee === true;
@@ -60,6 +62,7 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
     storeSupportUiChoice(choice);
     setToggledChoice(choice);
     setHasClickedUseSupportForm(false);
+    setSupportFormPrefill(undefined);
   };
 
   return (
@@ -67,12 +70,10 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
     <div className="relative">
       {isEmployee && (
         <div
-          className="absolute top-0 right-0 rtl:right-auto rtl:left-0 z-10"
+          className="absolute top-0 right-0 rtl:right-auto rtl:left-0 z-10 ltr:margin-right-small rtl:margin-left-small"
           data-testid="support-ui-switch"
         >
-          <div className="flex items-center gap-xsmall padding-x-small padding-y-xsmall radius-circle stroke-standard stroke-default bg-surface-100 text-caption-medium content-muted">
-            <span className="content-emphasis">{EMPLOYEE_LABEL}</span>
-            <span aria-hidden="true">&middot;</span>
+          <EmployeeOnly className="bg-surface-100">
             <Link
               as="button"
               type="button"
@@ -85,17 +86,18 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
             >
               {showNewExperience ? SWITCH_TO_CLASSIC : SWITCH_TO_NEW}
             </Link>
-          </div>
+          </EmployeeOnly>
         </div>
       )}
       {showNewExperience ? (
         <SupportFormPrototype
-          onUseSupportForm={() => {
+          onUseSupportForm={prefill => {
+            setSupportFormPrefill(prefill);
             setHasClickedUseSupportForm(true);
           }}
         />
       ) : (
-        <SupportForm {...props} />
+        <SupportForm {...props} prefill={supportFormPrefill} />
       )}
     </div>
   );

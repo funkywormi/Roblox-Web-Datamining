@@ -6,6 +6,8 @@ import useStartAskChat from "../../hooks/useStartAskChat";
 import { AskReplyKind } from "../../core/types/supportAsk";
 import { SupportContext } from "../../providers/SupportContextProvider";
 import { isAskChatCategoryOffered } from "../../core/helpers/supportAskChatHelpers";
+import { SupportFormPrefill } from "../../core/helpers/supportFormPrefill";
+import EmployeeOnly from "../employee-only/EmployeeOnly";
 import "./SupportFormPrototype.scss";
 
 const HEADING = "Welcome to Roblox Support, how can we help?";
@@ -17,6 +19,8 @@ const CHAT_PROMPT = "Still need help?";
 const START_CHAT = "Start a chat";
 const USE_SUPPORT_FORM = "Use the support form";
 const ARTICLES_HEADING = "Learn more";
+const CLASSIFIED_AS_LABEL = "Classified as:";
+const NO_CLASSIFIED_CATEGORY = "none";
 
 /** Answers cite help-center articles, so keep the answer in place when a link is followed. */
 const MARKDOWN_OPTIONS = {
@@ -53,7 +57,7 @@ const QUICK_QUESTIONS = [
 
 type SupportFormPrototypeProps = {
   /** Swaps to the support form in place, so it is only reachable from an answer. */
-  onUseSupportForm: () => void;
+  onUseSupportForm: (prefill: SupportFormPrefill) => void;
 };
 
 const SupportFormPrototype: React.FC<SupportFormPrototypeProps> = ({ onUseSupportForm }) => {
@@ -74,6 +78,10 @@ const SupportFormPrototype: React.FC<SupportFormPrototypeProps> = ({ onUseSuppor
   const offersChat =
     isAskChatCategoryOffered(supportCategory, metadata) &&
     (metadata?.chatbotFlowCategories ?? []).includes(supportCategory.category);
+  const hasAnsweredOnTopic =
+    reply !== null && chatMetadata !== null && payload?.kind !== AskReplyKind.OffTopic;
+  // A failed ask has no category, so it is always pointed at the support form.
+  const showsHelpPrompt = error !== null || hasAnsweredOnTopic;
 
   const goBack = useCallback(() => {
     reset();
@@ -187,13 +195,13 @@ const SupportFormPrototype: React.FC<SupportFormPrototypeProps> = ({ onUseSuppor
           </div>
         )}
 
-        {reply && chatMetadata && payload?.kind !== AskReplyKind.OffTopic && (
+        {showsHelpPrompt && (
           <p
             className="support-prototype-chat-prompt text-body-medium"
             data-testid="support-prototype-chat-prompt"
           >
             {CHAT_PROMPT}{" "}
-            {offersChat ? (
+            {offersChat && chatMetadata ? (
               <Link
                 as="button"
                 type="button"
@@ -211,7 +219,13 @@ const SupportFormPrototype: React.FC<SupportFormPrototypeProps> = ({ onUseSuppor
                 as="button"
                 type="button"
                 underline="always"
-                onClick={onUseSupportForm}
+                onClick={() => {
+                  onUseSupportForm({
+                    message: submittedQuestion,
+                    category: supportCategory?.category,
+                    subcategory: supportCategory?.subcategory,
+                  });
+                }}
                 data-testid="support-prototype-classic-form"
               >
                 {USE_SUPPORT_FORM}
@@ -227,6 +241,22 @@ const SupportFormPrototype: React.FC<SupportFormPrototypeProps> = ({ onUseSuppor
           >
             {chatError}
           </p>
+        )}
+
+        {reply && metadata?.isRobloxEmployee === true && (
+          <EmployeeOnly
+            className="margin-top-large"
+            data-testid="support-prototype-classified-category"
+          >
+            <span>
+              {CLASSIFIED_AS_LABEL}{" "}
+              <code>
+                {supportCategory
+                  ? `${supportCategory.category} / ${supportCategory.subcategory}`
+                  : NO_CLASSIFIED_CATEGORY}
+              </code>
+            </span>
+          </EmployeeOnly>
         )}
       </div>
     );

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import pfas from "@rbx/core-scripts/payments-flow";
+import { paymentFlowAnalyticsService as pfas } from "@rbx/payments/payments-flow-analytics";
 import { Tracking } from "../useTracking";
 import { Product } from "../../types/buyRobuxPageData";
 import { BuyRobuxPageSectionType } from "../../contexts/PurchaseContext";
@@ -27,6 +27,8 @@ export function usePurchaseTracking({ trackFlow }: Tracking): PurchaseTracking {
       const viewName = isSubscriptionProduct ? PREMIUM_PURCHASE : PRODUCT_PURCHASE;
       const purchaseFromSectionType = sectionType ?? "Unknown";
 
+      // TODO: fix this type error
+      // @ts-expect-error - the 3rd param ViewMessage is a typed value but here we are passing a dynamic string. Dynamic string is still tracked, but the type checker is not happy. Hence we are ignoring the type error for now
       trackFlow(viewName, USER_INPUT, `${productId},${defaultDisplayName}`, {
         productId,
         purchaseFromSectionType,

@@ -49,6 +49,18 @@ export const isUsernameRequiredForCategory = (helpCategoryType?: string): boolea
   return USERNAME_REQUIRED_CATEGORIES.includes(helpCategoryType);
 };
 
+/**
+ * Discovery Content Quality subcategories (by `subCategory.name`) that require universe and developer IDs.
+ * The video quality subcategory also requires a video ID.
+ */
+const DISCOVERY_CONTENT_QUALITY_SUBCATEGORIES: readonly string[] = [
+  "DiscoveryContentQualityReducedExposure",
+  "DiscoveryContentQualityVideoQuality",
+];
+const VIDEO_QUALITY_SUBCATEGORY = "DiscoveryContentQualityVideoQuality";
+
+const isPositiveIntegerId = (id?: string): boolean => !!id && /^[1-9][0-9]*$/.test(id);
+
 // Dots must separate non-empty labels. EmailAddressesAPI rejects addresses
 // like "user..name@example.com" after the form would otherwise submit them.
 const emailRegex =
@@ -81,6 +93,8 @@ export const getFormFieldErrors = (
     helpSubCategoryType,
     assetId,
     universeId,
+    developerId,
+    videoId,
     username,
   } = formData;
 
@@ -126,6 +140,18 @@ export const getFormFieldErrors = (
     errors.universeId = t("Response.InvalidUniverseID");
   }
 
+  if (DISCOVERY_CONTENT_QUALITY_SUBCATEGORIES.includes(helpSubCategoryType ?? "")) {
+    if (!isPositiveIntegerId(universeId)) {
+      errors.universeId = t("Response.InvalidUniverseID");
+    }
+    if (!isPositiveIntegerId(developerId)) {
+      errors.developerId = t("Response.InvalidDeveloperID") || "Please enter a valid Developer ID.";
+    }
+    if (helpSubCategoryType === VIDEO_QUALITY_SUBCATEGORY && !isPositiveIntegerId(videoId)) {
+      errors.videoId = t("Response.InvalidVideoID") || "Please enter a valid Video ID.";
+    }
+  }
+
   return errors;
 };
 
@@ -149,6 +175,14 @@ export const toSupportTicketRequestModel = (
   ...(state[SupportTicketStateKey.AssetId] && { assetId: state[SupportTicketStateKey.AssetId] }),
   ...(state[SupportTicketStateKey.UniverseId] && {
     universeId: state[SupportTicketStateKey.UniverseId],
+  }),
+  ...(DISCOVERY_CONTENT_QUALITY_SUBCATEGORIES.includes(
+    state[SupportTicketStateKey.HelpSubCategoryType] ?? "",
+  ) && {
+    developerId: state[SupportTicketStateKey.DeveloperId],
+  }),
+  ...(state[SupportTicketStateKey.HelpSubCategoryType] === VIDEO_QUALITY_SUBCATEGORY && {
+    videoId: state[SupportTicketStateKey.VideoId],
   }),
   ...(captchaId && { captchaId }),
   ...(captchaToken && { captchaToken }),

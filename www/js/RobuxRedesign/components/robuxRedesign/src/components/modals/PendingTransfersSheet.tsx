@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useFullKeyTranslations, useTranslations } from "@rbx/www-common/i18n";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { SheetContent, SheetTitle, SheetBody, Button, Icon } from "@rbx/foundation-ui";
 import { PendingTransfer } from "../../types/buyRobuxPageData";
@@ -17,7 +17,7 @@ function PendingTransferRow({
   transfer: PendingTransfer;
   acceptTranslationKey: string;
 }) {
-  const { translate } = useTranslation();
+  const { translateFullKey } = useFullKeyTranslations();
   const { trackPendingTransfersAcceptClick } = useContext(TrackingContext);
 
   return (
@@ -55,7 +55,7 @@ function PendingTransferRow({
             navigateToAcceptTransferDeepLink(transfer.transferRequestId);
           }}
         >
-          {translate(acceptTranslationKey)}
+          {translateFullKey(acceptTranslationKey)}
         </Button>
       </div>
     </div>
@@ -75,7 +75,7 @@ export function PendingTransfersSheet({
   pendingTransfers,
   acceptTransfersTranslationKey,
 }: PendingTransfersSheetProps) {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.BuyRobux");
 
   return (
     <SheetContent centerSheetSize="Medium" closeLabel="Close" largeScreenVariant="center">

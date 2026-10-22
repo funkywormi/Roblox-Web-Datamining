@@ -12,6 +12,7 @@ const EVENT_CONSTANTS = {
     authOperationTiming: "authOperationTiming",
     usernameSuggestionShown: "usernameSuggestionShown",
     passkeyRegistrationEvent: "passkeyRegistrationEvent",
+    authButtonShown: "authButtonShown",
   },
   eventName: {
     loginOtherDevice: "loginOtherDevice",
@@ -152,10 +153,13 @@ const EVENT_CONSTANTS = {
     // PrivacyPolicy in lua-apps; the signup forms' tos_link/pp_link are a different vocabulary).
     termsOfService: "termsOfService",
     privacyPolicy: "privacyPolicy",
+    signupSuccess: "signupSuccess",
     // How the OS passkey prompt was raised; dismissal rates differ between them.
     autoPrompt: "autoPrompt",
     deliberateRetry: "deliberateRetry",
     general: "general",
+    loginOtherSignInOptionsModal: "loginOtherSignInOptionsModal",
+    loginSuccess: "loginSuccess",
   },
   btn: {
     cancel: "cancel",
@@ -220,6 +224,10 @@ const EVENT_CONSTANTS = {
     // Sent when the account upgrade birthday becomes a complete date (mirrors
     // EventStreamConstants.Button.ConfirmBirthday, which the Lua picker sends on confirm).
     confirmBirthday: "confirmBirthday",
+    // Matches the Lua app's SSO button names so cross-platform SSO funnels share one value.
+    googleSso: "googleSso",
+    appleSso: "appleSso",
+    otherSignInOptions: "otherSignInOptions",
   },
   input: {
     redacted: "[Redacted]",
@@ -232,8 +240,8 @@ const EVENT_CONSTANTS = {
     // OAuth origin vocabulary (accountUpgradeOAuthDialog/FullPage); the web modal is a distinct
     // surface, so it carries its own value.
     accountUpgradeOAuthWeb: "accountUpgradeOAuthWeb",
-    // Signup V2 arm on the form pageload. No legacy value: that arm renders the
-    // pre-existing form, which emits no origin. Identify it via IXP exposure.
+    // Signup V2 arm on the form pageload. The pre-existing form sends the assigned
+    // `auth-ui-data` arm (including `control`) and no origin under the `signup-v2-data` fallback.
     signUpV2Arm: {
       passwordFirst: "passwordFirst",
       passkeyFirst: "passkeyFirst",

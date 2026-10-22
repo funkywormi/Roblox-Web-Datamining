@@ -14,7 +14,7 @@ type OutsideEvent = CustomEvent<{ originalEvent: Event }>;
  *
  * Inert outside a shadow root, where getRootNode() is the document and there is no host.
  */
-export const popoverDismissGuard = (container: RefObject<HTMLElement>) => {
+export const popoverDismissGuard = (container: RefObject<HTMLElement | null>) => {
   const isOwnTrigger = (event: OutsideEvent) => {
     const root = container.current?.getRootNode();
     const host = root instanceof ShadowRoot ? root.host : null;

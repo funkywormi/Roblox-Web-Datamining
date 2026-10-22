@@ -3,22 +3,24 @@ import * as http from "@rbx/core-scripts/http";
 import realTime from "@rbx/core-scripts/realtime";
 import { UncheckedBadge, showUncheckedBadge } from "@rbx/identity-badges";
 import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
-import {
-  logCmntyEntrypointClickEvent,
-  logCmntyEntrypointExposureEvent,
-  useEntrypointImpressionId,
-} from "@rbx/community-telemetry";
 import { useLiveUserNameForDisplay } from "./hooks/useLiveUserNameForDisplay";
 import { usePlusNavEntries } from "./leftNav/new/PlusNavEntries";
+import { useCommunitiesEntrypointTelemetry } from "./leftNav/useCommunitiesEntrypointTelemetry";
 import { trackOpenToVisible, withApiMetrics } from "./leftNav/observability";
 import { logLeftNavExposure } from "./util/leftNavIxpUtil";
 import { registerNavCapabilities } from "./util/navCapabilities";
 
-const LEFT_NAV_CONTEXT = "leftNav";
-const LEFT_NAV_ENTRY_POINT = "leftNav";
-
-const AvatarHeadshot = ({ userId, altName }: { userId: number; altName: string }) => (
+const AvatarHeadshot = ({
+  userId,
+  altName,
+  containerClass,
+}: {
+  userId: number;
+  altName?: string;
+  containerClass?: string;
+}) => (
   <Thumbnail2d
+    containerClass={containerClass}
     targetId={userId}
     type={ThumbnailTypes.avatarHeadshot}
     altName={altName}
@@ -53,25 +55,7 @@ registerNavCapabilities({
   AvatarHeadshot,
   UncheckedBadge,
   shouldShowUncheckedBadge: showUncheckedBadge,
-  useCommunitiesEntrypointTelemetry: () => {
-    const entrypointImpressionId = useEntrypointImpressionId();
-    return {
-      onExpose: () => {
-        logCmntyEntrypointExposureEvent({
-          context: LEFT_NAV_CONTEXT,
-          entryPoint: LEFT_NAV_ENTRY_POINT,
-          entrypointImpressionId,
-        });
-      },
-      onClick: () => {
-        logCmntyEntrypointClickEvent({
-          context: LEFT_NAV_CONTEXT,
-          entryPoint: LEFT_NAV_ENTRY_POINT,
-          entrypointImpressionId,
-        });
-      },
-    };
-  },
+  useCommunitiesEntrypointTelemetry,
   usePlusNavEntries,
   logLeftNavExposure,
   trackOpenToVisible,

@@ -1,6 +1,6 @@
-import { eventStreamService } from "core-roblox-utilities";
-import { deviceMeta as DeviceMeta } from "header-scripts";
-import { fireEvent } from "roblox-event-tracker";
+import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import { fireEvent } from "@rbx/legacy-webapp-types/roblox-event-tracker";
 import {
   AXSendTrackingContextType,
   AXSendTrackingActionType,
@@ -17,11 +17,17 @@ import {
  * @returns void
  * * */
 
-const deviceMetaData = DeviceMeta.getDeviceMeta();
-const isMobile =
-  deviceMetaData?.isPhone || deviceMetaData?.isTablet || deviceMetaData?.deviceType === "phone";
+// Read per call, not at module scope: consumers bundle this module, so a module-scope read runs at
+// their load time and reports Web on a phone whose meta tag is not in the document yet.
+const isMobileDevice = (): boolean => {
+  const deviceMetaData = getDeviceMeta();
+  return (
+    !!deviceMetaData?.isPhone ||
+    !!deviceMetaData?.isTablet ||
+    deviceMetaData?.deviceType === "phone"
+  );
+};
 
-const COUNTER_PREFIX = `AXTracking_${isMobile ? "Mweb" : "Web"}`;
 const sendAXTracking = ({
   itemName,
   counterName,
@@ -32,12 +38,14 @@ const sendAXTracking = ({
 }: AXSendTrackingContextType): void => {
   // Debug logging
   const enableDebugLogging = sessionStorage.getItem("AXAnalyticsDebugLogging");
+  const isMobile = isMobileDevice();
+  const counterPrefix = `AXTracking_${isMobile ? "Mweb" : "Web"}`;
 
   // Send counter event as long as the flag is not set to exclude it
   if (!excludeCounter) {
     const counter = counterName
-      ? `${COUNTER_PREFIX}_${counterName}`
-      : `${COUNTER_PREFIX}_${itemName}`;
+      ? `${counterPrefix}_${counterName}`
+      : `${counterPrefix}_${itemName}`;
     fireEvent(counter);
 
     // Manually set session storage to enable debug logging
@@ -58,7 +66,7 @@ const sendAXTracking = ({
       platform,
       ...metaData,
     };
-    eventStreamService.sendEventWithTarget("userJourneyAction", "RobloxWWW", payload);
+    sendEventWithTarget("userJourneyAction", "RobloxWWW", payload);
 
     // Manually set session storage to enable debug logging
     if (enableDebugLogging) {

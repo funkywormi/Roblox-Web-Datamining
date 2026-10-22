@@ -9,6 +9,8 @@ export const defaultTicketFormFields = (): SupportFormState => ({
   [SupportTicketStateKey.ConfirmEmail]: "",
   [SupportTicketStateKey.AssetId]: "",
   [SupportTicketStateKey.UniverseId]: "",
+  [SupportTicketStateKey.DeveloperId]: "",
+  [SupportTicketStateKey.VideoId]: "",
   [SupportTicketStateKey.DeviceType]: "",
   [SupportTicketStateKey.HelpCategoryType]: "",
   [SupportTicketStateKey.HelpSubCategoryType]: "",

@@ -27,6 +27,7 @@ export enum MainCategory {
   Ads = "ads",
   ExperienceGenre = "experience_genre",
   ContentMaturity = "top_content_matur",
+  DiscoveryContentQuality = "top_disccntnt",
 }
 
 export enum SubCategory {
@@ -95,6 +96,8 @@ export enum SubCategory {
   ContentMaturityAppeal = "stop_appeal_explbl_lblmatur",
   ContentMaturityAppealRestore = "stop_appeal_explbl_exprestore",
   ContentMaturityRejectAppeal = "stop_appeal_explbl_lblmatur_exprestore",
+  DiscoveryContentQualityReducedExposure = "stop_disccntnt_qual_redexp",
+  DiscoveryContentQualityVideoQuality = "stop_disccntnt_qual_vid",
 }
 
 export enum DeviceType {

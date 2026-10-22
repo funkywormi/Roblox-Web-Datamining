@@ -1,8 +1,7 @@
 import { useContext, Fragment } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { Icon } from "@rbx/foundation-ui";
 import { formatNumber } from "@rbx/core-scripts/format/number";
-import { translateHtml } from "@rbx/translation-utils";
+import { useFullKeyTranslations } from "@rbx/www-common/i18n";
 import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
 import { isInApp } from "../utils/platform";
 import type { SectionTransfers } from "../types/buyRobuxPageData";
@@ -29,7 +28,7 @@ export function Banner({ transfers }: { transfers?: SectionTransfers }) {
     buyRobuxPageData: { pageHeaderMetadata },
     urlParams,
   } = useContext(BuyRobuxPageContext);
-  const { translate } = useTranslation();
+  const { translateFullKey } = useFullKeyTranslations();
 
   const isAboveLarge = breakpoint.isAboveInclusive("large");
   const showWebviewHeader = urlParams.showHeader === "true";
@@ -66,42 +65,46 @@ export function Banner({ transfers }: { transfers?: SectionTransfers }) {
 
   // Both percentages present means the header compares the old rate against the promotional one,
   // with the old rate struck through inside {divTagStart}/{divTagEnd}.
+  const strikethrough = { used: false };
   const comparisonHeading =
     percentage && strikethroughPercentage
-      ? translateHtml(
-          translate,
+      ? translateFullKey.html(
           translationKey,
           [
             {
               opening: "divTagStart",
               closing: "divTagEnd",
-              render: children => (
-                <span className="line-through [font-weight:normal] [color:var(--color-extended-gray-600)]">
-                  {children}
-                </span>
-              ),
+              render: children => {
+                strikethrough.used = true;
+                return (
+                  <span className="line-through [font-weight:normal] [color:var(--color-extended-gray-600)]">
+                    {children}
+                  </span>
+                );
+              },
             },
           ],
           { strikethroughPercentage, percentage },
         )
       : undefined;
 
-  // translateHtml yields an empty array if the resolved string is missing those placeholders, so
-  // fall back to the plain heading rather than leaving the page header blank.
-  const hasComparisonHeading = comparisonHeading !== undefined && comparisonHeading.length > 0;
+  // The HTML adapter returns null for missing keys or malformed pairs; keep the plain heading.
+  const hasComparisonHeading = comparisonHeading != null;
+  // Plain copy can also be returned by html; only widen a successfully rendered strikethrough.
+  const hasStrikethroughHeading = hasComparisonHeading && strikethrough.used;
 
   const heading = (
     <h1
       className="self-stretch text-align-x-left text-section-title content-emphasis large:text-align-x-center padding-y-none"
       style={
-        isAboveLarge && !hasComparisonHeading
+        isAboveLarge && !hasStrikethroughHeading
           ? { marginLeft: "120px", marginRight: "120px" }
           : undefined
       }
     >
       {hasComparisonHeading
         ? comparisonHeading
-        : translate(translationKey, percentage ? { percentage } : {})}
+        : translateFullKey(translationKey, percentage ? { percentage } : {})}
     </h1>
   );
 

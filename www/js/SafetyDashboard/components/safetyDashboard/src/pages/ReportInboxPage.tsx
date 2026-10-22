@@ -6,6 +6,10 @@ import ReportList from "../features/reportInbox/ReportList";
 import ReportListSkeleton from "../features/reportInbox/ReportListSkeleton";
 import LoadMoreSentinel from "../features/violations/violationDetails/LoadMoreSentinel"; // LoadMoreSentinel in violations has no violations-specific features, so we can reuse it
 import LoadMoreFooter from "../features/reportInbox/util/LoadMoreFooter";
+import { isHTTPError } from "../features/violations/util/violations";
+import { useEffectUntilTrueOnce } from "../hooks/useEffectUntilTrueOnce";
+import { SafetyDashboardEventType } from "../telemetry/eventTypes";
+import { sendSafetyDashboardEvent } from "../telemetry/sendSafetyDashboardEvent";
 
 const ReportInboxPage = (): ReactElement => {
   const {
@@ -13,6 +17,7 @@ const ReportInboxPage = (): ReactElement => {
     reports,
     isLoading,
     isLoadingError,
+    error,
     refetch,
     fetchNextPage,
     hasNextPage,
@@ -21,16 +26,46 @@ const ReportInboxPage = (): ReactElement => {
   } = useReports();
   const [errorDismissed, setErrorDismissed] = useState(false);
 
+  useEffectUntilTrueOnce(() => {
+    if (isLoading || isLoadingError) {
+      return false;
+    }
+
+    sendSafetyDashboardEvent(SafetyDashboardEventType.ReportInboxView, {
+      reportCount: reports.length,
+      hasNextPage,
+    });
+    return true;
+  });
+
+  useEffectUntilTrueOnce(() => {
+    if (!isLoadingError) {
+      return false;
+    }
+
+    sendSafetyDashboardEvent(SafetyDashboardEventType.ReportInboxError, {
+      statusCode: isHTTPError(error) ? error.status : 0,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return true;
+  });
+
   const handleLoadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage && !isRefetchError) {
+      sendSafetyDashboardEvent(SafetyDashboardEventType.ReportLoadMore, {
+        loadedCount: reports.length,
+      });
       fetchNextPage().catch(() => undefined);
     }
-  }, [hasNextPage, isFetchingNextPage, isRefetchError, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, isRefetchError, fetchNextPage, reports.length]);
 
   const handleRetryLoadMore = useCallback(() => {
+    sendSafetyDashboardEvent(SafetyDashboardEventType.ReportLoadMoreRetry, {
+      loadedCount: reports.length,
+    });
     setErrorDismissed(false);
     fetchNextPage().catch(() => undefined);
-  }, [fetchNextPage]);
+  }, [fetchNextPage, reports.length]);
 
   const handleCloseLoadMoreError = useCallback(() => {
     setErrorDismissed(true);

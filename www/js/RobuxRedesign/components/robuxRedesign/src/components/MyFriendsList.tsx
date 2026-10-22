@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { TFriend } from "@rbx/friends-common/types/friendsCarousel";
 import { useAvatarThumbnails } from "../hooks/useAvatarThumbnails";
 import { FriendRow } from "./FriendRow";
@@ -26,7 +26,7 @@ export function MyFriendsList({
   rowVariant = "Dropdown",
   useInternalScroll = true,
 }: MyFriendsListProps) {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.BuyRobux");
   const thumbnails = useAvatarThumbnails(friends);
   const listClassName = classNames(
     "flex flex-col",

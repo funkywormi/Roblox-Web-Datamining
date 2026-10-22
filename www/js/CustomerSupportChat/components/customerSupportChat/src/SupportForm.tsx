@@ -6,8 +6,11 @@ import { SupportContext } from "./providers/SupportContextProvider";
 import { SupportContextKey } from "./core/types/common";
 import SupportFormComponent from "./components/SupportFormComponent";
 import SupportPageContainer from "./components/common/support-page-container/SupportPageContainer";
+import { SupportFormPrefill } from "./core/helpers/supportFormPrefill";
 
-const SupportForm: React.FC<WithTranslationsProps> = () => {
+const SupportForm: React.FC<WithTranslationsProps & { prefill?: SupportFormPrefill }> = ({
+  prefill,
+}) => {
   const { ageGate, supportForm, chatbot, ageGateTag } = useContext(SupportContext);
 
   const currentStepFromContextProgress = useMemo(() => {
@@ -24,7 +27,9 @@ const SupportForm: React.FC<WithTranslationsProps> = () => {
       {currentStepFromContextProgress === SupportContextKey.AgeGate && <AgeGate />}
 
       {/* Support Form: Only render if we already have the user's date of birth stored in the context store */}
-      {currentStepFromContextProgress === SupportContextKey.SupportForm && <SupportFormComponent />}
+      {currentStepFromContextProgress === SupportContextKey.SupportForm && (
+        <SupportFormComponent prefill={prefill} />
+      )}
     </SupportPageContainer>
   );
 };

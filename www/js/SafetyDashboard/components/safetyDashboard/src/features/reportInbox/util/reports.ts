@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import * as http from "@rbx/core-scripts/http";
-import { Report, ReportsResponse } from "../../../types/api";
+import { ActivityStatus, Report, ReportsResponse } from "../../../types/api";
 import { REPORTS_URL } from "../../../shared/url";
 
 /**
@@ -66,3 +66,9 @@ export const fetchAtLeastXReports = async ({
     nextPageToken: currentPageToken,
   };
 };
+
+/**
+ * The status of the report's most recent activity, used to slice report inbox telemetry.
+ */
+export const getLatestActivityStatus = (report: Report): ActivityStatus | undefined =>
+  report.details.activities.at(-1)?.status;

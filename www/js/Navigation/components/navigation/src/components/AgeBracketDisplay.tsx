@@ -1,25 +1,30 @@
-import { authenticatedUser, isBlackbirdUser } from "@rbx/core-scripts/meta/user";
+import {
+  authenticatedUser,
+  isBlackbirdUser,
+  type AuthenticatedUser,
+} from "@rbx/core-scripts/meta/user";
 import { useTranslations } from "@rbx/www-common/i18n";
 
-import { Thumbnail2d, ThumbnailTypes } from "@rbx/thumbnails";
 import VerifiedBadgeIcon from "@rbx/www-common/components/verified-badge";
-import {
-  DisplayNameBadges,
-  useIsPlusBadgeEnabled,
-  PLUS_BADGE_ARIA_LABEL,
-  PLUS_BADGE_ARIA_LABEL_KEY,
-} from "@rbx/identity-badges";
+import DisplayNameBadges from "@rbx/identity-badges/DisplayNameBadges";
+import { PLUS_BADGE_ARIA_LABEL, PLUS_BADGE_ARIA_LABEL_KEY } from "@rbx/identity-badges/constants";
 import links from "../constants/linkConstants";
-import { useLiveUserNameForDisplay } from "../hooks/useLiveUserNameForDisplay";
+import { getNavCapability } from "../util/navCapabilities";
 import Link from "./NavLink";
 
-export default function AgeBracketDisplayContent() {
+const useDisplayName = (user: AuthenticatedUser) => user.displayName ?? "";
+const useVerifiedBadge = (user: AuthenticatedUser) => user.hasVerifiedBadge;
+const usePlusBadgeDisabled = () => false;
+
+function AgeBracketDisplayContent({ user }: { user: AuthenticatedUser }) {
   const tBadges = useTranslations("Feature.ProfileBadges");
   const tSubscription = useTranslations("Feature.RobloxSubscription");
-  const user = authenticatedUser();
-  const nameForDisplay = useLiveUserNameForDisplay(user);
+  const AvatarHeadshot = getNavCapability("AvatarHeadshot");
+  const nameForDisplay = (getNavCapability("useLiveUserNameForDisplay") ?? useDisplayName)(user);
+  const hasVerifiedBadge = (getNavCapability("useHasVerifiedBadge") ?? useVerifiedBadge)(user);
+  const isPlusBadgeEnabled = (getNavCapability("useIsPlusBadgeEnabled") ?? usePlusBadgeDisabled)();
 
-  const badgeToRender = user?.hasVerifiedBadge ? (
+  const badgeToRender = hasVerifiedBadge ? (
     <section>
       <VerifiedBadgeIcon
         className="verified-badge-icon-header"
@@ -29,22 +34,22 @@ export default function AgeBracketDisplayContent() {
     </section>
   ) : null;
 
-  const showPlusBadge = useIsPlusBadgeEnabled() && isBlackbirdUser();
+  const showPlusBadge = isPlusBadgeEnabled && isBlackbirdUser();
 
   return (
-    <div className="age-bracket-label text-header">
+    <li className="age-bracket-label text-header">
       <Link
         className="text-link dynamic-overflow-container"
         url={links.scrollListItems.profile.url}
       >
         <span className="avatar avatar-headshot-xs">
-          <Thumbnail2d
-            containerClass="avatar-card-image"
-            targetId={user?.id ?? 0}
-            type={ThumbnailTypes.avatarHeadshot}
-            altName={user?.name ?? undefined}
-            includeProfileFrame
-          />
+          {AvatarHeadshot ? (
+            <AvatarHeadshot
+              containerClass="avatar-card-image"
+              userId={user.id ?? 0}
+              altName={user.name ?? undefined}
+            />
+          ) : null}
         </span>
         <span className="text-overflow age-bracket-label-username font-caption-header">
           {nameForDisplay}
@@ -64,6 +69,11 @@ export default function AgeBracketDisplayContent() {
           </section>
         ) : null}
       </Link>
-    </div>
+    </li>
   );
+}
+
+export default function AgeBracketDisplay() {
+  const user = authenticatedUser();
+  return user == null ? null : <AgeBracketDisplayContent user={user} />;
 }

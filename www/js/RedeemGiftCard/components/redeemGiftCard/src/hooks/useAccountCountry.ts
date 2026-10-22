@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getCurrentUser } from "@rbx/www-common/user";
 import getAccountCountry from "../services/accountCountryService";
 
 export default function useAccountCountry() {
@@ -10,6 +11,10 @@ export default function useAccountCountry() {
 
   useEffect(() => {
     async function fetchAccountCountryCode() {
+      if (!getCurrentUser()) {
+        return;
+      }
+
       try {
         const {
           data: { value },

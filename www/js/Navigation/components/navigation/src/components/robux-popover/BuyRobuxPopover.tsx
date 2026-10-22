@@ -11,7 +11,7 @@ import CreditIcon from "../CreditIcon";
 import links from "../../constants/linkConstants";
 import layoutConstants from "../../constants/layoutConstants";
 import LeaveRobloxPopupDisclaimer from "./LeaveRobloxPopupDisclaimer";
-import { getVngShopSignedRedirectionUrl } from "../../services/navigationService";
+import { getNavCapability } from "../../util/navCapabilities";
 import RobuxBadgeType from "../../constants/robuxBadgeConstants";
 import { popoverDismissGuard } from "../../util/popoverDismissGuard";
 
@@ -72,8 +72,11 @@ export default function BuyRobuxPopover({
   const onBuyRobuxExternalContinue = () => {
     sendAnalyticsEvent(ENUM_VIEW_MESSAGE.CONTINUE_TO_VNG);
 
-    getVngShopSignedRedirectionUrl().then(
-      ({ data: { vngShopRedirectUrl } }) => {
+    const getVngShopUrl =
+      getNavCapability("getVngShopSignedRedirectionUrl") ??
+      (() => Promise.resolve<{ vngShopRedirectUrl?: string }>({}));
+    getVngShopUrl().then(
+      ({ vngShopRedirectUrl }) => {
         window.open(vngShopRedirectUrl ?? buyRobuxOnVng.url, "_blank")?.focus();
       },
       () => {

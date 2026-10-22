@@ -1,4 +1,4 @@
-import { EnvironmentUrls } from "@rbx/core-scripts/legacy/Roblox";
+import environmentUrls from "@rbx/environment-urls";
 
 const FORUM_POST_ROUTE = /^\/forums\/[^/]+\/post\//;
 const FORUM_CATEGORY_ROUTE = /^\/forums\/[^/]+/;
@@ -169,7 +169,7 @@ export const getSanitizedReferrer = (referrer: string): string => {
 
   try {
     const url = new URL(referrer);
-    if (url.origin !== EnvironmentUrls.websiteUrl) {
+    if (url.origin !== environmentUrls.websiteUrl) {
       return referrer;
     }
 

@@ -3,18 +3,11 @@
 import { MouseEventHandler, useState, useEffect, useRef } from "react";
 // @ts-expect-error TODO: remove this once React notification stream is ready
 import angular from "angular";
-import { ValueOf } from "@rbx/core-types";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { useTranslations } from "@rbx/www-common/i18n";
-import { getItem, removeItem } from "@rbx/core-lib/local-storage";
-import "../constants/localStorageRegistry";
-import { Snackbar } from "@rbx/foundation-ui";
-import {
-  getUserCurrency,
-  getGuacBehavior,
-  getRobuxBadge,
-  getCreditBalanceForNavigation,
-} from "../services/navigationService";
+import { getGuacBehavior } from "../services/navigationService";
+import AccountSwitchedSnackbar from "../components/AccountSwitchedSnackbar";
+import useRobuxBalance from "../hooks/useRobuxBalance";
 import DownloadAppNavItem from "../components/DownloadAppNavItem";
 import NotificationStreamPopover from "../components/NotificationStreamPopover";
 import SettingsPopover from "../components/SettingsPopover";
@@ -23,8 +16,6 @@ import UniverseSearchIcon from "../components/UniverseSearchIcon";
 import { getAccountNotificationCount } from "../util/navigationUtil";
 import AgeBracketDisplay from "../components/AgeBracketDisplay";
 import layoutConstants from "../constants/layoutConstants";
-import RobuxBadgeType from "../constants/robuxBadgeConstants";
-import { shouldShowRobuxUpdateBadge } from "../util/robuxBadgeUtil";
 
 export default function HeaderIconsGroup({
   toggleUniverseSearch,
@@ -32,53 +23,14 @@ export default function HeaderIconsGroup({
   toggleUniverseSearch: MouseEventHandler;
 }) {
   const tMessages = useTranslations("CommonUI.Messages");
-  const tAlerts = useTranslations("Common.AlertsAndOptions");
-  const tFeatures = useTranslations("CommonUI.Features");
   const user = authenticatedUser();
-  const userId = user?.id;
   const streamItemRef = useRef<HTMLLIElement>(null);
-  const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
   const [accountNotificationCount, setAccountNotificationCount] = useState(0);
-  const [isGetCurrencyCallDone, setGetCurrencyCallDone] = useState(false);
-  const [robuxAmount, setRobuxAmount] = useState(0);
   const [isEligibleForVng, setIsEligibleForVng] = useState(false);
   const [canAccessStream, setCanAccessStream] = useState(true);
-  const [robuxBadgeType, setRobuxBadgeType] = useState<ValueOf<typeof RobuxBadgeType> | null>(null);
-  const [robuxError, setRobuxError] = useState("");
   const [vngMetadataError, setVngMetadataError] = useState("");
-  const [creditDisplayConfig, setCreditDisplayConfig] = useState<
-    ValueOf<typeof layoutConstants.creditDisplayConfigVariants>
-  >(layoutConstants.creditDisplayConfigVariants.control);
-  const [creditAmount, setCreditAmount] = useState(0);
-  const [currencyCode, setCurrencyCode] = useState("USD");
-  const [creditError, setCreditError] = useState("");
-  // wait for experiment to load before loading Robux wallet icons
-  const [isExperimentCallDone, setIsExperimentCallDone] = useState(false);
+  const robuxBalance = useRobuxBalance();
 
-  const getUserCurrencyLocal = () => {
-    if (userId != null) {
-      setGetCurrencyCallDone(false);
-      // Set Robux amount
-      getUserCurrency(userId)
-        .then(
-          ({ data: usercurrencyData }) => {
-            setRobuxError("");
-            setRobuxAmount(usercurrencyData.robux);
-          },
-          () => {
-            const untranslatedMessage = layoutConstants.economySystemOutageMessage;
-            setRobuxError(
-              tMessages.has(untranslatedMessage)
-                ? tMessages(untranslatedMessage)
-                : untranslatedMessage,
-            );
-          },
-        )
-        .finally(() => {
-          setGetCurrencyCallDone(true);
-        });
-    }
-  };
   const getVngMetadata = () => {
     if (user != null) {
       getGuacBehavior().then(
@@ -93,116 +45,14 @@ export default function HeaderIconsGroup({
       );
     }
   };
-  const getRobuxBadgeLocal = () => {
-    if (user != null && shouldShowRobuxUpdateBadge() != null) {
-      getRobuxBadge()
-        .then(({ data: robuxBadgeData }) => {
-          const robuxUpdateBadge = shouldShowRobuxUpdateBadge();
-
-          // interpret is_virtual_item_available as indicating we should
-          // show the 'New Update' badge, overriding the virtual item badge in all cases.
-
-          // const prevLocalVirtualItemStartTimeSeconds =
-          //   getRobuxBadgeLocalStorage(RobuxBadgeType.VIRTUAL_ITEM) || -1;
-
-          if (
-            robuxBadgeData.is_virtual_item_available &&
-            robuxUpdateBadge
-            // prevLocalVirtualItemStartTimeSeconds <
-            //   robuxBadgeData.active_virtual_item_start_time_seconds_utc
-          ) {
-            setRobuxBadgeType(robuxUpdateBadge);
-            // setRobuxBadgeType(RobuxBadgeType.VIRTUAL_ITEM);
-          }
-        })
-        .catch((error: unknown) => {
-          if (
-            error != null &&
-            typeof error === "object" &&
-            (error as Record<string, unknown>).status === 403
-          ) {
-            setRobuxBadgeType(null);
-          }
-        });
-    }
-  };
-
-  const getCreditBalanceLocal = () => {
-    if (user != null) {
-      // Set credit amount
-      getCreditBalanceForNavigation()
-        .then(
-          ({ data: creditData }) => {
-            setCreditError("");
-            if (
-              creditData.creditDisplayConfig === null ||
-              creditData.creditBalance === null ||
-              creditData.creditBalance === 0 ||
-              creditData.currencyCode === null
-            ) {
-              // if user isn't enrolled in experiment, show control
-              // if creditBalance and currencyCode null (for new users), or creditBalance is 0, don't show credit anywhere
-              setCreditDisplayConfig(layoutConstants.creditDisplayConfigVariants.control);
-            } else {
-              setCreditDisplayConfig(creditData.creditDisplayConfig);
-            }
-            setCreditAmount(creditData.creditBalance ?? 0);
-            setCurrencyCode(creditData.currencyCode ?? "USD");
-          },
-          () => {
-            setCreditError(tMessages(layoutConstants.economySystemOutageMessage));
-          },
-        )
-        .finally(() => {
-          setIsExperimentCallDone(true);
-        });
-    }
-  };
-
-  useEffect(() => {
-    const handleCurrencyUpdate = () => {
-      getUserCurrencyLocal();
-      getCreditBalanceLocal();
-    };
-    window.addEventListener("navigation-update-user-currency", handleCurrencyUpdate);
-    return () => {
-      window.removeEventListener("navigation-update-user-currency", handleCurrencyUpdate);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (user != null) {
       // Set account notification count
       getAccountNotificationCount().then(setAccountNotificationCount);
 
-      getUserCurrencyLocal();
-
       // Get vng metadata
       getVngMetadata();
-
-      // Get Robux badge data
-      getRobuxBadgeLocal();
-
-      getCreditBalanceLocal();
-
-      // Conditionally display account switched confirmation banner
-      try {
-        const accountSwitched = getItem(
-          layoutConstants.accountSwitchConfirmationKeys.accountSwitchedFlag,
-        );
-
-        if (accountSwitched) {
-          const accountSwitchedMessage = tAlerts(
-            layoutConstants.accountSwitchConfirmationKeys.accountSwitchedMessage,
-            { accountName: user.name ?? "" },
-          );
-          setSnackbarMessage(accountSwitchedMessage);
-          removeItem(layoutConstants.accountSwitchConfirmationKeys.accountSwitchedFlag);
-        }
-      } catch {
-        // no op
-      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
@@ -240,33 +90,15 @@ export default function HeaderIconsGroup({
 
   return (
     <ul className="[&>li]:relative navbar-right rbx-navbar-icon-group">
-      {snackbarMessage != null && (
-        <Snackbar
-          title={snackbarMessage}
-          icon="icon-filled-check"
-          shouldAutoDismiss
-          autoDismissDurationMs={5000}
-          onClose={() => {
-            setSnackbarMessage(null);
-          }}
-          closeIconAriaLabel={tFeatures("Action.Close")}
-        />
-      )}
+      <AccountSwitchedSnackbar />
       <DownloadAppNavItem />
       <AgeBracketDisplay />
       <UniverseSearchIcon toggleUniverseSearch={toggleUniverseSearch} />
       {canAccessStream && notificationStream}
       <BuyRobuxPopover
-        robuxAmount={robuxAmount}
-        robuxError={robuxError || vngMetadataError}
-        creditAmount={creditAmount}
-        currencyCode={currencyCode}
-        creditError={creditError}
-        creditDisplayConfig={creditDisplayConfig}
+        {...robuxBalance}
+        robuxError={robuxBalance.robuxError || vngMetadataError}
         isEligibleForVng={isEligibleForVng}
-        isExperimentCallDone={isExperimentCallDone}
-        isGetCurrencyCallDone={isGetCurrencyCallDone}
-        robuxBadgeType={robuxBadgeType ?? undefined}
       />
       <SettingsPopover accountNotificationCount={accountNotificationCount} />
     </ul>

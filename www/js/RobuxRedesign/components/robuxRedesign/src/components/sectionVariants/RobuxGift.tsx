@@ -1,5 +1,5 @@
 import { useCallback, useContext } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useFullKeyTranslations } from "@rbx/www-common/i18n";
 import { SectionBase, SectionRobuxGiftPurchase } from "../../types/buyRobuxPageData";
 import { SectionHeader, SectionBody, Section, BaseSectionProps } from "../sections/Section";
 import { SectionBodySimpleCTA } from "../sections/SectionBodySimpleCTA";
@@ -18,7 +18,7 @@ export function RobuxGift({ isPrimary, robuxGift, sectionBase }: RobuxGiftProps)
   } = useContext(ModalContext);
   const { trackRobuxGiftClick } = useContext(TrackingContext);
 
-  const { translate } = useTranslation();
+  const { translateFullKey } = useFullKeyTranslations();
 
   const buttonClickHandler = useCallback(() => {
     trackRobuxGiftClick();
@@ -27,12 +27,12 @@ export function RobuxGift({ isPrimary, robuxGift, sectionBase }: RobuxGiftProps)
 
   return (
     <Section {...getSectionTrackingProps(sectionBase)}>
-      <SectionHeader>{translate(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
+      <SectionHeader>{translateFullKey(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
       <SectionBody isPrimary={isPrimary}>
         <SectionBodySimpleCTA
-          titleTranslationKey={robuxGift.titleTranslationKey}
-          bodyTranslationKey={robuxGift.bodyTranslationKey}
-          buttonTextTranslationKey={robuxGift.buttonTextTranslationKey}
+          title={translateFullKey(robuxGift.titleTranslationKey)}
+          body={translateFullKey(robuxGift.bodyTranslationKey)}
+          buttonText={translateFullKey(robuxGift.buttonTextTranslationKey)}
           buttonClickHandler={buttonClickHandler}
         />
       </SectionBody>

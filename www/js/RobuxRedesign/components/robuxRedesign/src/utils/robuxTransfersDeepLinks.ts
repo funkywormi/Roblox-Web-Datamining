@@ -1,4 +1,5 @@
 import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
+import { getGameLauncher } from "@rbx/www-common/game-launch";
 import { window } from "@rbx/core-lib/browser";
 import { trackCounter } from "../observability";
 import { isInApp } from "./platform";
@@ -32,7 +33,10 @@ export function navigateToDeepLink(deepLinkUrl: string): void {
   ) {
     window.location.href = getAppsFlyerUrl(deepLinkUrl);
   } else if (deviceMeta?.isDesktop && !deviceMeta.isUniversalApp) {
-    if (window.Roblox.ProtocolHandlerClientInterface?.startDeepLinkFlow) {
+    const launcher = getGameLauncher();
+    if (launcher) {
+      launcher.startDeepLinkFlow(deepLinkUrl);
+    } else if (window.Roblox.ProtocolHandlerClientInterface?.startDeepLinkFlow) {
       window.Roblox.ProtocolHandlerClientInterface.startDeepLinkFlow(deepLinkUrl);
     } else {
       window.location.href = deepLinkUrl;

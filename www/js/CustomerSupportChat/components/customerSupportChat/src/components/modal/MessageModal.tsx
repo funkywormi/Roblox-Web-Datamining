@@ -7,7 +7,7 @@ import { FooterButtonConfig, FragmentModalFooter } from "./ModalFragmentFooter";
 
 export type MessageModalConfig = {
   headerText: string;
-  bodyText: string;
+  bodyText: React.ReactNode;
   cancelText?: string;
   okText?: string;
   topIcon?: React.ReactNode;

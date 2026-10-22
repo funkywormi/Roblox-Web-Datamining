@@ -1,32 +1,32 @@
 import type { AXAnalyticsConstantsType } from "./types";
 
-const CatalogTrackingConstants: AXAnalyticsConstantsType = {
+const CatalogTrackingConstants = {
   CatalogView: "CatalogView",
-};
+} satisfies AXAnalyticsConstantsType;
 
-const CatalogSearchTrackingConstants: AXAnalyticsConstantsType = {
+const CatalogSearchTrackingConstants = {
   CatalogSearchView: "CatalogSearchView",
-};
+} satisfies AXAnalyticsConstantsType;
 
-const CatalogFilterTrackingConstants: AXAnalyticsConstantsType = {
+const CatalogFilterTrackingConstants = {
   CatalogFiltersApplied: "CatalogFiltersApplied",
-};
+} satisfies AXAnalyticsConstantsType;
 
-const CatalogSearchFilterTrackingConstants: AXAnalyticsConstantsType = {
+const CatalogSearchFilterTrackingConstants = {
   CatalogSearchFiltersApplied: "CatalogSearchFiltersApplied",
-};
+} satisfies AXAnalyticsConstantsType;
 
-const AvatarEditorTrackingConstants: AXAnalyticsConstantsType = {
+const AvatarEditorTrackingConstants = {
   AvatarEditorView: "AvatarEditorView",
   AvatarEditorChangeAvatar: "AvatarEditorChangeAvatar",
   AvatarEditorReactMigrationEnabled: "AvatarEditorReactMigrationEnabled",
   AvatarEditorReactMigrationControlGroup: "AvatarEditorReactMigrationControlGroup",
-};
+} satisfies AXAnalyticsConstantsType;
 
 // Avatar editor (Customize page) user interaction events. These are emitted by
 // the avatar component, which keeps a local copy of the string values so it does
 // not depend on this external being redeployed. Keep both in sync.
-const AvatarEditorInteractionTrackingConstants: AXAnalyticsConstantsType = {
+const AvatarEditorInteractionTrackingConstants = {
   // Fired once per session, the first time the user edits their avatar.
   AvatarEditorFirstEditClick: "AvatarEditorFirstEditClick",
   // Fired on every avatar edit (equip, body color, scale, type, emote, ...).
@@ -43,9 +43,9 @@ const AvatarEditorInteractionTrackingConstants: AXAnalyticsConstantsType = {
   AvatarEditorOutfitCreatedClick: "AvatarEditorOutfitCreatedClick",
   AvatarEditorOutfitDeletedClick: "AvatarEditorOutfitDeletedClick",
   AvatarEditorOutfitEditedClick: "AvatarEditorOutfitEditedClick",
-};
+} satisfies AXAnalyticsConstantsType;
 
-const CatalogItemDetailsTrackingConstants: AXAnalyticsConstantsType = {
+const CatalogItemDetailsTrackingConstants = {
   CatalogItemDetailsView: "CatalogItemDetailsView",
   CatalogLookDetailsView: "CatalogLookDetailsView",
   PurchaseSuccessAsset: "PurchaseSuccessAsset",
@@ -58,19 +58,19 @@ const CatalogItemDetailsTrackingConstants: AXAnalyticsConstantsType = {
   // Fired when a user purchases a timed option (days > 0) for an item they
   // already own or already have (expiring) timed access to.
   PurchaseSuccessTimedOptionRepurchase: "PurchaseSuccessTimedOptionRepurchase",
-};
+} satisfies AXAnalyticsConstantsType;
 
-const WebCatalogRevampCounters: AXAnalyticsConstantsType = {
+const WebCatalogRevampCounters = {
   CatalogRevampEnabledWithRobuxInThumbnail: "CatalogRevampEnabledWithRobuxInThumbnail",
   CatalogRevampEnabledWithoutRobuxInThumbnail: "CatalogRevampEnabledWithoutRobuxInThumbnail",
   CatalogRevampControlGroup: "CatalogRevampControlGroup",
-};
+} satisfies AXAnalyticsConstantsType;
 
 // Catalog user-interaction click events. The specific source/component and
 // item/filter details are passed through the telemetry `metaData` field (JSON
 // string) so a single counter can be sliced by source in telemetry, e.g.
 // { source: "Catalog", itemId, itemType } for ItemCardClick.
-const CatalogInteractionTrackingConstants: AXAnalyticsConstantsType = {
+const CatalogInteractionTrackingConstants = {
   // Fired when the user clicks an item card. `source` distinguishes where the
   // card was rendered (Catalog grid, item-details recommendations, bundle
   // contents, complimentary recommendations, look details, ...).
@@ -96,14 +96,14 @@ const CatalogInteractionTrackingConstants: AXAnalyticsConstantsType = {
   // details, current wearing, direct resale). Successful purchases are captured
   // by the existing PurchaseSuccess* events.
   PurchaseButtonClick: "PurchaseButtonClick",
-};
+} satisfies AXAnalyticsConstantsType;
 
 // Trades webapp funnel + engagement events. The Trades webapp (legacy Angular)
 // keeps a local copy of these string values in `tradeEventsService`, so it does
 // not depend on this external being redeployed. Keep both in sync. Trade value
 // dimensions (totalValueOffered, totalValueRequested, robux, per-item values)
 // and a `context` are passed through the telemetry `metaData` field (JSON string).
-const TradesTrackingConstants: AXAnalyticsConstantsType = {
+const TradesTrackingConstants = {
   // Fired on trade page navigation (inbound, outbound, completed, inactive).
   TradePageView: "tradePageView",
   // Fired when a new trade request is sent (not a counter).
@@ -132,9 +132,9 @@ const TradesTrackingConstants: AXAnalyticsConstantsType = {
   // Clicking through to a trade partner's profile; metaData `tradeStatusType`
   // + `source` (listRow | detailHeader).
   TradeProfileClick: "tradeProfileClick",
-};
+} satisfies AXAnalyticsConstantsType;
 
-const AXAnalyticsConstants: AXAnalyticsConstantsType = {
+const AXAnalyticsConstants = {
   ...CatalogTrackingConstants,
   ...CatalogSearchTrackingConstants,
   ...CatalogFilterTrackingConstants,
@@ -145,6 +145,6 @@ const AXAnalyticsConstants: AXAnalyticsConstantsType = {
   ...WebCatalogRevampCounters,
   ...CatalogInteractionTrackingConstants,
   ...TradesTrackingConstants,
-};
+} satisfies AXAnalyticsConstantsType;
 
 export default AXAnalyticsConstants;

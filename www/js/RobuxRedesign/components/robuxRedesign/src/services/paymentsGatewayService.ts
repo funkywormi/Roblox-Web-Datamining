@@ -42,6 +42,9 @@ export interface PaymentProfile {
   isQuickPayEnabled?: boolean;
 }
 
+/**
+ * @deprecated - use UserPurchaseSettingFailureReason from @rbx/payments/payments-flow-analytics instead
+ */
 export enum UserPurchaseSettingFailureReason {
   FraudPaymentAuthorizationAttempt = "FraudPaymentAuthorizationAttempt",
   FraudVirtualEconomyAbuse = "FraudVirtualEconomyAbuse",

@@ -4,6 +4,8 @@ import { formatNumber } from "@rbx/core-scripts/format/number";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { Icon, Menu, MenuItem, MenuLabel, MenuSection, MenuSeparator } from "@rbx/foundation-ui";
 import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
+import { PriceTag } from "@rbx/payments/priceTag";
+import "@rbx/payments/src/priceTag/priceTag.css";
 
 import links from "../../constants/linkConstants";
 import layoutConstants from "../../constants/layoutConstants";
@@ -75,17 +77,6 @@ export default function RobuxMenu({
     }
   }, [robuxAmount, creditAmount, creditDisplayConfig]);
 
-  useEffect(() => {
-    // Render PriceTag component
-    window.dispatchEvent(
-      new CustomEvent("price-tag:render", {
-        detail: {
-          targetSelector: ".dropdown-credit-balance",
-        },
-      }),
-    );
-  }, [creditDisplayConfig]);
-
   // Rendered even when hidden: .wallet-hidden is display:none above 992px but reverts below it,
   // where the header itself stops showing the balance.
   const walletClassName = isWalletDisplayed ? undefined : "wallet-hidden";
@@ -108,12 +99,9 @@ export default function RobuxMenu({
                 {creditError ? (
                   layoutConstants.robuxOnEconomySystemOutage
                 ) : (
-                  // PriceTag mounts onto this selector via the price-tag:render event.
-                  <span
-                    className="dropdown-credit-balance"
-                    data-amount={creditAmount}
-                    data-currency-code={currencyCode}
-                  />
+                  <span className="dropdown-credit-balance">
+                    <PriceTag amount={creditAmount} currencyCode={currencyCode} />
+                  </span>
                 )}
               </Fragment>
             }
