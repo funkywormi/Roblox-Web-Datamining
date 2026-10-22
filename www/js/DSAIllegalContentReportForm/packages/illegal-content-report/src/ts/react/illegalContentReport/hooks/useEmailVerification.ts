@@ -140,14 +140,11 @@ export const useEmailVerification = (
         // eslint-disable-next-line no-console
         console.error("Error sending OTP code:", error);
 
+        // Format was already validated above, so a failure here isn't the email's fault.
         const statusCode = getErrorStatusCode(error);
-        if (statusCode === 429) {
-          // Rate limit error - show specific message but don't disable the button
-          setCodeError(translate("Message.RateLimitError"));
-        } else {
-          // Other errors - show generic error and disable button
-          setEmailError(translate("Message.EmailError"));
-        }
+        setCodeError(
+          translate(statusCode === 429 ? "Message.RateLimitError" : "Message.SendCodeError"),
+        );
       } finally {
         setIsSendingCode(false);
       }

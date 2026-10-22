@@ -4377,7 +4377,7 @@
         },
         {
             "name": "AXAnalyticsService",
-            "url": "https://js.rbxcdn.com/d9cfa9e72eb42d219a9e492c649694567e744c0304480b47ca882c688ad56248-AxAnalyticsService.js",
+            "url": "https://js.rbxcdn.com/e95d259d287be5d42c5cde091e0cc8914e2451073bfa9494a7a6df1af75b0cca-AxAnalyticsService.js",
             "sources": [
                 "/catalog",
                 "/trades",
@@ -4772,7 +4772,7 @@
         },
         {
             "name": "CustomerSupportChat",
-            "url": "https://js.rbxcdn.com/231929ee421610329f96885f49c6af702236056080ac94d50f5cfea8e6d89cd8-CustomerSupportChat.js",
+            "url": "https://js.rbxcdn.com/f94c6dc80530cc11f797c45fe43bd44c2432ebc2bf04cbf874f7068dd0eeae2f-CustomerSupportChat.js",
             "sources": [
                 "/support"
             ]
@@ -4786,7 +4786,7 @@
         },
         {
             "name": "DSAIllegalContentReportForm",
-            "url": "https://js.rbxcdn.com/bad0d1596d308f2c54eb00da372c37bc837dbdbb1aad85fa1314edc8deb05994-DsaIllegalContentReportForm.js",
+            "url": "https://js.rbxcdn.com/a5fb3a550d3ad2d48791e0027818237a5f8ead04cbad08330f11ebca694a9abc-DsaIllegalContentReportForm.js",
             "sources": [
                 "/illegal-content-reporting"
             ]
@@ -5653,7 +5653,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/d206bf0bb75eceb9ab5a8fef63a43f2dd8115ab22b070f617ecf8c93e4b70c4c-Navigation.js",
+            "url": "https://js.rbxcdn.com/a1c1c6829ab3c4e5ba4ab2a71d7b929161e048781b733534a45712695231ac63-Navigation.js",
             "sources": [
                 "/home",
                 "/",
@@ -5890,53 +5890,9 @@
             "name": "PriceTag",
             "url": "https://js.rbxcdn.com/8548d5945af0a64ab611c7cd4b82f2d50b212839d431dc91e5cb244e98231e70-PriceTag.js",
             "sources": [
-                "/home",
-                "/",
-                "/login",
-                "/CreateAccount",
-                "/charts",
-                "/sitemap",
-                "/gift-robux",
-                "/catalog",
-                "/support",
-                "/trades",
-                "/transactions",
                 "/redeem",
-                "/request-error",
-                "/report-abuse",
-                "/discover/?Keyword=roblox",
                 "/upgrades/robux",
-                "/users/friends",
-                "/users/inventory",
-                "/users/1/profile",
-                "/users/1/inventory",
-                "/users/1/favorites",
-                "/users/1/friends",
-                "/users/profile/edit",
-                "/my/messages",
-                "/my/avatar",
-                "/my/account",
-                "/search/communities",
-                "/search/users",
-                "/communities/1",
-                "/communities/configure",
-                "/games/1818",
-                "/info/roblox-badges",
-                "/crossdevicelogin/ConfirmCode",
-                "/communities/create",
-                "/illegal-content-reporting",
-                "/game-pass/58000",
-                "/badges/176685910",
-                "/catalog/3360689775",
-                "/bundles/591",
-                "/sponsorships/list",
-                "/login/forgot-password-or-username",
-                "/help-safety",
-                "/support-center",
-                "/events/6177598281426797213",
-                "/developer-product/47545/product/45124061",
-                "/private-server/configure/527154577",
-                "/safety-dashboard"
+                "/my/account"
             ]
         },
         {
@@ -6140,7 +6096,7 @@
         },
         {
             "name": "RedeemGiftCard",
-            "url": "https://js.rbxcdn.com/6702756dec74a75b4c0c22a3058265b17a39f14e0fedde19449968945e69ea6e-RedeemGiftCard.js",
+            "url": "https://js.rbxcdn.com/5b1617c080afc6f21c4376f5e03d27f487344585339acc206d5935e15af115e2-RedeemGiftCard.js",
             "sources": [
                 "/redeem"
             ]
@@ -6215,7 +6171,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/19037ca0bff6ed2f6f85d1e4a3d50474f8c999a7a85fec31230cf4dd0c69f9ab-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/f045c4bdfebd2334ab2d98a0ce13dbaf0240defbe7119d6aa711dc3d89dc92e3-RobuxRedesign.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -6233,7 +6189,7 @@
         },
         {
             "name": "SafetyDashboard",
-            "url": "https://js.rbxcdn.com/6cab366fd05ae8f9a4ae2945669f95494bf2e867973372ed7b633c76c7e779b3-SafetyDashboard.js",
+            "url": "https://js.rbxcdn.com/a5ffe7f4df21702f1cb82d535c83cbf39f100c3712e574d73b82cb9c259c5700-SafetyDashboard.js",
             "sources": [
                 "/safety-dashboard"
             ]
@@ -7415,7 +7371,7 @@
         },
         {
             "name": "CustomerSupportChat",
-            "url": "https://css.rbxcdn.com/cf8574139e6a1a2a0e40c7dd3f9a5c0bb5ee36520244d658bd5d60d5a61c0dd5-CustomerSupportChat.css",
+            "url": "https://css.rbxcdn.com/f984e8b76b70f02e92c39b9a016e74f946adaf44aa71a81271054ed0d1f187ed-CustomerSupportChat.css",
             "sources": [
                 "/support"
             ]
@@ -8040,7 +7996,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://css.rbxcdn.com/1d6e08b6351bbc1648e24642b80e33ba6257a9ecde53f6cbf11a7f81c3f511ad-Navigation.css",
+            "url": "https://css.rbxcdn.com/c024176c8751425ec91cf0e65ddddd4c24566b1b226bb368ec367a7bbdfeb813-Navigation.css",
             "sources": [
                 "/home",
                 "/",
@@ -8171,53 +8127,9 @@
             "name": "PriceTag",
             "url": "https://css.rbxcdn.com/11f18daeb1f4bb97744bb5e001501f6d19e24bd1a8a4a001dfc47dd73c7e499d-PriceTag.css",
             "sources": [
-                "/home",
-                "/",
-                "/login",
-                "/CreateAccount",
-                "/charts",
-                "/sitemap",
-                "/gift-robux",
-                "/catalog",
-                "/support",
-                "/trades",
-                "/transactions",
                 "/redeem",
-                "/request-error",
-                "/report-abuse",
-                "/discover/?Keyword=roblox",
                 "/upgrades/robux",
-                "/users/friends",
-                "/users/inventory",
-                "/users/1/profile",
-                "/users/1/inventory",
-                "/users/1/favorites",
-                "/users/1/friends",
-                "/users/profile/edit",
-                "/my/messages",
-                "/my/avatar",
-                "/my/account",
-                "/search/communities",
-                "/search/users",
-                "/communities/1",
-                "/communities/configure",
-                "/games/1818",
-                "/info/roblox-badges",
-                "/crossdevicelogin/ConfirmCode",
-                "/communities/create",
-                "/illegal-content-reporting",
-                "/game-pass/58000",
-                "/badges/176685910",
-                "/catalog/3360689775",
-                "/bundles/591",
-                "/sponsorships/list",
-                "/login/forgot-password-or-username",
-                "/help-safety",
-                "/support-center",
-                "/events/6177598281426797213",
-                "/developer-product/47545/product/45124061",
-                "/private-server/configure/527154577",
-                "/safety-dashboard"
+                "/my/account"
             ]
         },
         {
@@ -8521,7 +8433,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://css.rbxcdn.com/f2fbbf77696d6da15e9344d33998fc5d037ef99b8a759cb91a3e4320993edc32-RobuxRedesign.css",
+            "url": "https://css.rbxcdn.com/faea1560e68b275e24baa122505a65e0e85240ad70e9dae8c19a85a6aa359cdc-RobuxRedesign.css",
             "sources": [
                 "/upgrades/robux"
             ]
