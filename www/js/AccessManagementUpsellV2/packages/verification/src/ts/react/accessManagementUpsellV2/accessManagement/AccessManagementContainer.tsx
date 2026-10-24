@@ -88,6 +88,7 @@ function AccessManagementContainer({
   async function onAccessManagementCustomEvent(
     event: CustomEvent<AccessManagementUpsellEventParams>
   ) {
+    event.preventDefault();
     const {
       featureName,
       redirectLink,

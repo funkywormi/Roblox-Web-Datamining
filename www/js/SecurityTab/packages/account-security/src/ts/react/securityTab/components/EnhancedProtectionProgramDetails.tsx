@@ -517,6 +517,7 @@ const EnhancedProtectionProgramDetails: React.FC<EnhancedProtectionProgramDetail
         <IconButton
           icon="icon-filled-chevron-large-left"
           ariaLabel="back-button"
+          data-testid="epp-details-back-button"
           variant="Utility"
           size="Large"
           onClick={() => {

@@ -1,5 +1,5 @@
 import { delete as deleteCookie, get, set } from "@rbx/core-lib/cookie";
-import { isValueOf } from "@rbx/core-types";
+import { isStringEnum } from "@rbx/core-lib";
 import environmentUrls from "@rbx/environment-urls";
 import "@rbx/www-common/global";
 import {
@@ -53,7 +53,7 @@ export class PaymentFlowContext {
     const [uuid, context] = cookie.value.split(",");
     const purchaseFlowUuid = uuid === "" ? undefined : uuid;
     const triggerContext =
-      context != null && isValueOf(TRIGGERING_CONTEXT, context) ? context : undefined;
+      context != null && isStringEnum(TRIGGERING_CONTEXT, context) ? context : undefined;
     return new PaymentFlowContext(purchaseFlowUuid, triggerContext);
   }
 }

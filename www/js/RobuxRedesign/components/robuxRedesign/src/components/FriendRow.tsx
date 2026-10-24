@@ -1,7 +1,7 @@
 import classNames from "classnames";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { Icon } from "@rbx/foundation-ui";
 import { TFriend } from "@rbx/friends-common/types/friendsCarousel";
+import { useTranslations } from "@rbx/www-common/i18n";
 import {
   DisplayNameBadges,
   useIsPlusBadgeEnabled,
@@ -23,7 +23,7 @@ export function FriendRow({
   onSelectUser,
   isFocused = false,
 }: FriendRowProps) {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.RobloxSubscription");
   const handleSelect = () => {
     onSelectUser({ id: friend.id });
   };

@@ -28,7 +28,7 @@ const persistPaymentSessionToLocalStorage = (paymentSession: PaymentSession): vo
   setItem(PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2, paymentSession);
 };
 
-type AppProps = {
+export type AppProps = {
   enhancedBuyRobuxPageData: EnhancedBuyRobuxPageData;
   urlParams: BuyRobuxUrlParams;
 };

@@ -1,6 +1,8 @@
 import { useCallback } from "react";
-import pfas from "@rbx/core-scripts/payments-flow";
-import { PurchaseWarningAction } from "../../services/purchaseWarningsService";
+import {
+  paymentFlowAnalyticsService as pfas,
+  PurchaseWarningAction,
+} from "@rbx/payments/payments-flow-analytics";
 import { Tracking } from "../useTracking";
 
 export type PurchaseWarningTracking = {

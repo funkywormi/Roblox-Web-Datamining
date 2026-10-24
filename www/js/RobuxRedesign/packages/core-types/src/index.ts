@@ -4,6 +4,8 @@
 /**
  * Similar to the `keyof` keyword, this type returns a union of the values of a type
  * (instead of the keys).
+ *
+ * @deprecated Use `ValueOf` from `@rbx/core-lib`.
  */
 export type ValueOf<T> = T[keyof T];
 
@@ -22,17 +24,31 @@ export type ValueOf<T> = T[keyof T];
  *    E.g., `Brand<string, "UserId">` is not type compatible with `Brand<string, "PlaceId">`.
  *
  * Use the {@link brand} function to "create" a branded value.
+ *
+ * @deprecated Use `SubType` from `@rbx/core-lib/types`.
  */
 export type Brand<T, U> = T & { __brand: U };
 
-/** Type casts a value to some {@link Brand}-ed type. */
+/**
+ * Type casts a value to some {@link Brand}-ed type.
+ *
+ * @deprecated Use `downcast` from `@rbx/core-lib/types`.
+ */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 export const brand = <T, U>(value: T): Brand<T, U> => value as Brand<T, U>;
 
-/** Type casts a {@link Brand}-ed type back to its underlying type. */
+/**
+ * Type casts a {@link Brand}-ed type back to its underlying type.
+ *
+ * @deprecated A `SubType` from `@rbx/core-lib/types` is already assignable to its underlying type.
+ */
 export const unbrand = <T, U>(value: Brand<T, U>): T => value;
 
-/** Forces a type expression to be resolved/flattened into a regular object type for better documentation. */
+/**
+ * Forces a type expression to be resolved/flattened into a regular object type for better documentation.
+ *
+ * @deprecated Use `Prettify` from `@rbx/core-lib`.
+ */
 export type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
@@ -59,6 +75,8 @@ export type Prettify<T> = {
  * @param x The value to check if it is present in the array.
  * @returns A boolean indicating whether the value is included in the array. If true, then the
  * value's type will be updated to match that of the array element type.
+ *
+ * @deprecated Use `arrayIncludes` from `@rbx/core-lib`.
  */
 export const arrayIncludes = <T>(values: readonly T[], x: unknown): x is T =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -86,6 +104,8 @@ export const arrayIncludes = <T>(values: readonly T[], x: unknown): x is T =>
  * @param x The value to check for.
  * @returns A boolean indicating whether the value is included in the record/object. If true, then the
  * value's type will be updated to be the {@link ValueOf} the record/object.
+ *
+ * @deprecated Use `isStringEnum` from `@rbx/core-lib`.
  */
 export const isValueOf = <E extends Readonly<Record<string, unknown>>>(
   record: E,
@@ -119,6 +139,8 @@ export const isValueOf = <E extends Readonly<Record<string, unknown>>>(
  * @param record The record to index into.
  * @param key The key of the value to get.
  * @returns The value in the record for the given key, or `undefined` if it does not exist.
+ *
+ * @deprecated Use `recordGet` from `@rbx/core-lib`.
  */
 export const recordGet = <T>(record: Readonly<Record<string, T>>, key: string): T | undefined =>
   record[key];

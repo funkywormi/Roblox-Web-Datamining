@@ -24,6 +24,8 @@ export type Transition = {
 export type FlowNodeBehavior = {
   /** Keep the previously rendered node mounted underneath this one. */
   presentsOverPrevious?: boolean;
+  /** Shown to the parent after the child hands over the device. */
+  parentFacing?: boolean;
 };
 
 /** One flow node: the component to render (`type`), its props (`details`), and where each outcome leads. */
@@ -153,6 +155,7 @@ export type WizardEventContext = {
   surface: string;
   node?: string;
   nodeType?: string;
+  analyticsSessionId?: string;
 };
 
 /** Params for a wizard event; the transport drops the non-scalars eventstream can't carry. */

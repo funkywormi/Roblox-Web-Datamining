@@ -1,5 +1,6 @@
-import { useTranslation } from "@rbx/core-scripts/react";
 import { SearchInput } from "@rbx/foundation-ui";
+import { useTranslations } from "@rbx/www-common/i18n";
+
 import { USER_SEARCH_MAX_CHARACTERS } from "../services/userSearchService";
 
 type FriendListSearchInputProps = {
@@ -18,7 +19,7 @@ export function FriendListSearchInput({
   setSearchText,
   clearSearch,
 }: FriendListSearchInputProps) {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.BuyRobux");
   const placeholder = translate(SEARCH_PLACEHOLDER_KEY);
 
   return (

@@ -10,13 +10,19 @@ import { startRemoteParentLink } from "./startStandaloneParentLink";
 /**
  * Starts standalone email parent linking in the amp-v2 wizard.
  */
-const useStartRemoteParentLinking = (): (() => void) => {
+const useStartRemoteParentLinking = (hasOnDeviceOption = false): (() => void) => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
   const dispatch = useAppDispatch();
 
   return () => {
-    parentalControlsEventService.authButtonClickSettingsPControlsAddParent();
+    parentalControlsEventService.authButtonClickSettingsPControlsAddParent({
+      onDevice: hasOnDeviceOption,
+      remote: true,
+    });
+    if (hasOnDeviceOption) {
+      parentalControlsEventService.authButtonClickSettingsPControlsAddRemoteParent();
+    }
     startRemoteParentLink(translate)
       .then(result => {
         // An empty flowId is a start that never opened. A real flowId already showed its own UI,

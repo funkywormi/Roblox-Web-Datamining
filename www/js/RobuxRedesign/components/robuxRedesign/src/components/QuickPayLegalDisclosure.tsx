@@ -1,8 +1,8 @@
-import { useTranslation } from "@rbx/core-scripts/react";
 import { getAbsoluteUrl } from "@rbx/core-scripts/util/url";
-import { translateHtml, type TranslateHtmlTag } from "@rbx/translation-utils";
+import { TranslateHtmlTag } from "@rbx/translation-utils";
+import { useFullKeyTranslations } from "@rbx/www-common/i18n";
 
-const DEFAULT_TRANSLATION_KEY = "Message.QuickPay.LegalDisclosureText";
+const DEFAULT_TRANSLATION_KEY = "Feature.BuyRobux.Message.QuickPay.LegalDisclosureText";
 const STRIPE_LEGAL_URL = "https://stripe.com/legal/consumer";
 
 const TERMS_URL = getAbsoluteUrl("/info/terms");
@@ -34,13 +34,12 @@ type QuickPayLegalDisclosureProps = {
 };
 
 export function QuickPayLegalDisclosure({ translationKey }: QuickPayLegalDisclosureProps) {
-  const { translate } = useTranslation();
+  const { translateFullKey } = useFullKeyTranslations();
 
   return (
     <div className="legal-disclosure-container">
       <p className="text-footer legal-text-holder content-default" style={{ fontSize: 10 }}>
-        {translateHtml(
-          translate,
+        {translateFullKey.html(
           translationKey ?? DEFAULT_TRANSLATION_KEY,
           QUICK_PAY_LEGAL_DISCLOSURE_TAGS,
         )}

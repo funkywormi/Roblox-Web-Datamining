@@ -147,10 +147,11 @@ const sendOdpFamilyButtonClick = (
   btn: string,
   associatedText: string,
   parents: TParentInfo[] | undefined,
+  ...pageTokens: (string | undefined)[]
 ): void => {
   sendEventWithTarget(EventName.ButtonClick, CONTEXT, {
     btn,
-    state: buildOdpFamilyState(parents),
+    state: buildOdpFamilyState(parents, ...pageTokens),
     associatedText,
   });
 };
@@ -165,8 +166,8 @@ export const pageLoadOdpParentZoneLandingPage = wrapEventServiceWithTryCatch(
 );
 
 export const btnClickCreatePin = wrapEventServiceWithTryCatch(
-  (parents: TParentInfo[] | undefined): void => {
-    sendOdpFamilyButtonClick(Button.CreatePin, AssociatedText.CreatePin, parents);
+  (parents: TParentInfo[] | undefined, layout?: string): void => {
+    sendOdpFamilyButtonClick(Button.CreatePin, AssociatedText.CreatePin, parents, layout);
   },
 );
 

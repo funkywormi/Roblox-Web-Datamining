@@ -7,7 +7,11 @@
 import { useContext, type JSX, type ReactNode } from "react";
 import { Dialog, DialogContent, DialogTitle, IconButton } from "@rbx/foundation-ui";
 
-import { WizardBackgroundedContext, WizardLoadingContext } from "./WizardLoadingContext";
+import {
+  WizardBackgroundedContext,
+  WizardLoadingContext,
+  WizardParentFacingContext,
+} from "./WizardLoadingContext";
 
 // 20px inset from `medium` (min-width 601px) up; full-width on phones. Arbitrary: margin scale stops at 16px.
 export const FULL_PAGE_CTA_INSET_CLASS = "medium:[margin-inline:20px]";
@@ -32,6 +36,7 @@ export function FullPageChrome({
 }: FullPageChromeProps): JSX.Element {
   const isLoading = useContext(WizardLoadingContext);
   const isBackgrounded = useContext(WizardBackgroundedContext);
+  const isParentFacing = useContext(WizardParentFacingContext);
 
   return (
     <Dialog
@@ -43,7 +48,7 @@ export function FullPageChrome({
     >
       <DialogContent
         overlayClassName="!padding-none ![overflow:hidden] ![animation:none]"
-        className="!bg-surface-0 !radius-none ![border:0] ![box-shadow:none] ![animation:none] ![min-width:0] ![max-width:none] width-full [height:100dvh] flex flex-col"
+        className={`!bg-surface-0 !radius-none ![border:0] ![box-shadow:none] ![animation:none] ![min-width:0] ![max-width:none] width-full [height:100dvh] flex flex-col${isParentFacing ? " theme-default content-default" : ""}`}
       >
         {/* The host's DOM loading lock cannot cross a portal. Disable controls here as well. */}
         <fieldset
@@ -56,7 +61,7 @@ export function FullPageChrome({
           and keep the side gutters scrollable. `scrollbar-gutter: stable both-edges` reserves
           classic-scrollbar space on both sides, so both columns stay centered on the same axis. */}
           <div
-            className="margin-x-auto gap-small width-full max-width-[730px] padding-x-xlarge padding-y-medium flex shrink-0 items-center [min-height:64px] [box-sizing:border-box]"
+            className="margin-x-auto gap-small width-full max-width-[480px] padding-x-xlarge padding-y-medium flex shrink-0 items-center [min-height:64px] [box-sizing:border-box]"
             data-testid="amp-v2-wizard-full-page-header"
           >
             {onBack ? (
@@ -94,7 +99,7 @@ export function FullPageChrome({
             data-testid="amp-v2-wizard-full-page-scroller"
           >
             <div
-              className="margin-x-auto width-full max-width-[730px] padding-x-xlarge padding-top-large [padding-bottom:64px] [box-sizing:border-box] flex grow flex-col"
+              className="margin-x-auto width-full max-width-[480px] padding-x-xlarge padding-top-large [padding-bottom:64px] [box-sizing:border-box] flex grow flex-col"
               data-testid="amp-v2-wizard-full-page-content"
             >
               {children}

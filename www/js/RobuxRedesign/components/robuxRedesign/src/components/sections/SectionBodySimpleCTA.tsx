@@ -1,38 +1,32 @@
 import { useContext } from "react";
 import { Button } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { BaseSectionProps } from "./Section";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 
 export type SectionBodySimpleCTAProps = BaseSectionProps & {
-  titleTranslationKey: string;
-  bodyTranslationKey: string;
-  buttonTextTranslationKey: string;
+  title: string;
+  body: string;
+  buttonText: string;
   buttonClickHandler: () => void;
 };
 
 export function SectionBodySimpleCTA({
   isPrimary,
-  titleTranslationKey,
-  bodyTranslationKey,
-  buttonTextTranslationKey,
+  title,
+  body,
+  buttonText,
   buttonClickHandler,
 }: SectionBodySimpleCTAProps) {
   const { breakpoint } = useContext(BuyRobuxPageContext);
-  const { translate } = useTranslation();
 
   return (
     <div className="flex flex-col self-stretch medium:flex-row medium:justify-between medium:items-center">
       <div className="flex flex-col self-stretch gap-small padding-bottom-large medium:padding-bottom-none">
         {/* Section Title */}
-        <div className="self-stretch text-heading-small content-emphasis">
-          {translate(titleTranslationKey)}
-        </div>
+        <div className="self-stretch text-heading-small content-emphasis">{title}</div>
 
         {/* Section Body */}
-        <div className="self-stretch text-body-medium content-emphasis">
-          {translate(bodyTranslationKey)}
-        </div>
+        <div className="self-stretch text-body-medium content-emphasis">{body}</div>
       </div>
 
       {/* Section Button */}
@@ -42,7 +36,7 @@ export function SectionBodySimpleCTA({
         size="Medium"
         variant={isPrimary ? "Emphasis" : "Standard"}
       >
-        {translate(buttonTextTranslationKey)}
+        {buttonText}
       </Button>
     </div>
   );

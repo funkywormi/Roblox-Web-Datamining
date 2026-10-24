@@ -1,8 +1,8 @@
 import { ComponentProps, CSSProperties, useCallback, useContext, useEffect, useState } from "react";
 import { ErrorBoundary } from "@sentry/react";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { getCurrentUser } from "@rbx/www-common/user";
 import { Button, SheetRoot } from "@rbx/foundation-ui";
+import { useFullKeyTranslations } from "@rbx/www-common/i18n";
 import { window } from "@rbx/core-lib/browser";
 import { SendRobuxSheet } from "./modals/SendRobuxSheet";
 import { TrackingContext } from "../contexts/TrackingContext";
@@ -23,7 +23,7 @@ export function SendRobuxButton({
   className,
   size = "Medium",
 }: SendRobuxButtonProps) {
-  const { translate } = useTranslation();
+  const { translateFullKey } = useFullKeyTranslations();
   const [sheetOpen, setSheetOpen] = useState(false);
   const { trackTransferSendImpression, trackTransferSendSheetView } = useContext(TrackingContext);
 
@@ -69,7 +69,7 @@ export function SendRobuxButton({
         variant="Standard"
         onClick={handleClick}
       >
-        {translate(translationKey)}
+        {translateFullKey(translationKey)}
       </Button>
 
       <SheetRoot open={sheetOpen} onOpenChange={handleSheetChange}>

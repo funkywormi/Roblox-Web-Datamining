@@ -1,16 +1,18 @@
-import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 
 import { trackCounter } from "../../observability";
 
 import type { BillingPeriodOption } from "../../utils/billingPeriod";
-
-type PurchaseFlowEventParams = Parameters<
-  typeof paymentFlowAnalyticsService.sendUserPurchaseFlowEvent
->;
+import type {
+  PurchaseEventType,
+  TriggeringContext,
+  ViewMessage,
+  ViewName,
+} from "@rbx/payments/payments-flow-analytics";
 
 export type BillingPeriodAnalyticsContext = {
-  triggeringContext: PurchaseFlowEventParams[0];
-  viewName: NonNullable<PurchaseFlowEventParams[2]>;
+  triggeringContext: TriggeringContext;
+  viewName: ViewName;
 };
 
 type BillingPeriodTrackingArgs = {
@@ -22,18 +24,18 @@ const { ENUM_PURCHASE_EVENT_TYPE, ENUM_VIEW_MESSAGE } = paymentFlowAnalyticsServ
 
 const sendPurchaseFlowEvent = (
   { analyticsContext, paymentSessionId }: BillingPeriodTrackingArgs,
-  eventType: NonNullable<PurchaseFlowEventParams[3]>,
-  viewMessage: NonNullable<PurchaseFlowEventParams[4]>,
-  metadata: Record<string, string>,
+  purchaseEventType: PurchaseEventType,
+  viewMessage: ViewMessage,
+  eventMetadata: Record<string, string>,
 ) => {
-  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-    analyticsContext.triggeringContext,
-    false,
-    analyticsContext.viewName,
-    eventType,
+  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+    triggerContext: analyticsContext.triggeringContext,
+    isMidPurchaseStep: false,
+    viewName: analyticsContext.viewName,
+    purchaseEventType,
     viewMessage,
-    paymentSessionId ? { ...metadata, paymentSessionId } : metadata,
-  );
+    eventMetadata: paymentSessionId ? { ...eventMetadata, paymentSessionId } : eventMetadata,
+  });
 };
 
 const optionMetadata = (option: BillingPeriodOption) => ({

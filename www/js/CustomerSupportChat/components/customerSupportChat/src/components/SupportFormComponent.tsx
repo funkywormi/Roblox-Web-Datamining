@@ -477,6 +477,7 @@ export const UnwrappedSupportFormComponent: React.FC<
       body?: React.ReactNode;
       callback?: () => void;
       captureContext?: Record<string, string>;
+      showIcon?: boolean;
     }) => {
       // Warn if Sentry isn't loaded on the page — captureException is a silent
       // no-op in that case, so nothing will be reported.
@@ -510,7 +511,7 @@ export const UnwrappedSupportFormComponent: React.FC<
           params?.callback?.();
           resetFormState();
         },
-        topIcon: <FaceFrownIcon width={50} height={50} />,
+        topIcon: params?.showIcon === false ? undefined : <FaceFrownIcon width={50} height={50} />,
       });
     },
     [confirm, resetFormState, t],
@@ -709,6 +710,7 @@ export const UnwrappedSupportFormComponent: React.FC<
             title: t("Heading.Dialog.RedirectToPortal"),
             message: "RedirectToPortal",
             body: <RedirectToPortalMessage translate={t} />,
+            showIcon: false,
             captureContext: buildSentryCaptureContext("submission_redirect_to_portal"),
           });
           return;

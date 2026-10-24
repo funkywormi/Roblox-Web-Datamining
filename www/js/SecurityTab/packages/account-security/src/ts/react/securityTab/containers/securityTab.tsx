@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { CurrentUser, DeviceMeta, SessionManagement } from "Roblox";
 import { Modal } from "react-style-guide";
 import { hybridResponseService } from "core-roblox-utilities";
@@ -30,7 +30,12 @@ import ConsoleDisconnect from "../components/consoleDisconnect";
 import EnhancedProtectionProgramCard from "../components/EnhancedProtectionProgramCard";
 import EnhancedProtectionProgramDetails from "../components/EnhancedProtectionProgramDetails";
 import { isPasskeyCompatible } from "../../common/compatibility";
-import { isEppDisplayRequested } from "../utils/displayParam";
+import { ACCOUNT_SECURITY_DISPLAY_EPP } from "../../../common/urls";
+import {
+  isEppDisplayRequested,
+  isTwoStepVerificationDisplayRequested,
+  setDisplayParam,
+} from "../utils/displayParam";
 
 // How long to keep the tab hidden while waiting to learn whether an EPP deep link can open.
 export const EPP_DISPLAY_TIMEOUT_MS = 5000;
@@ -108,6 +113,9 @@ const SecurityTabContainer: React.FC = () => {
   const [isTwoStepToggleEnabled, setIsTwoStepToggleEnabled] = useState<boolean>(false);
   const [isEppDetailsVisible, setIsEppDetailsVisible] = useState<boolean>(false);
   const [isEppDisplayPending, setIsEppDisplayPending] = useState<boolean>(isEppDisplayRequested);
+  const shouldScrollToTwoStepVerificationRef = useRef<boolean>(
+    isTwoStepVerificationDisplayRequested(),
+  );
 
   /*
    * Event Handlers
@@ -295,6 +303,18 @@ const SecurityTabContainer: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [isEppDisplayPending]);
 
+  // Keep `?display=enhanced-protection-program` in the URL only while EPP details are open, so a
+  // refresh or copied link matches what the user sees. Leave a pending EPP deep link alone until it
+  // resolves, and leave other `display` values (e.g. 2SV) untouched.
+  useEffect(() => {
+    const isEppDisplayInUrl = isEppDisplayRequested();
+    if (isEppDetailsVisible && !isEppDisplayInUrl) {
+      setDisplayParam(ACCOUNT_SECURITY_DISPLAY_EPP);
+    } else if (!isEppDetailsVisible && !isEppDisplayPending && isEppDisplayInUrl) {
+      setDisplayParam(null);
+    }
+  }, [isEppDetailsVisible, isEppDisplayPending]);
+
   useEffect(() => {
     if (!isEppDetailsVisible) {
       SessionManagement.renderComponent({
@@ -349,7 +369,9 @@ const SecurityTabContainer: React.FC = () => {
                 />
               </div>
             )}
-            {displayTwoStepVerification && isTwoStepToggleEnabled && <TwoStepVerification />}
+            {displayTwoStepVerification && isTwoStepToggleEnabled && (
+              <TwoStepVerification shouldScrollIntoViewRef={shouldScrollToTwoStepVerificationRef} />
+            )}
             {hasConnectedXboxAccount && <ConsoleDisconnect consoleType={ConsoleType.XBOX} />}
             {hasConnectedPlaystationAccount && (
               <ConsoleDisconnect consoleType={ConsoleType.PLAYSTATION} />

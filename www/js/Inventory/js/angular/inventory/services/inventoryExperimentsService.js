@@ -31,6 +31,21 @@ function inventoryExperimentsService() {
       return false;
     },
 
+    getPrivateServersV2Enabled: async () => {
+      if (!CurrentUser.isAuthenticated) {
+        return false;
+      }
+
+      try {
+        const experimentConfig = await getExperimentLayer(VIP_SERVERS_LAYER);
+
+        return experimentConfig?.IsPrivateServersV2Enabled === true;
+      } catch (e) {
+        // no-op, stay on the v1 endpoint
+      }
+      return false;
+    },
+
     logExposure: () => {
       if (!CurrentUser.isAuthenticated) {
         return;

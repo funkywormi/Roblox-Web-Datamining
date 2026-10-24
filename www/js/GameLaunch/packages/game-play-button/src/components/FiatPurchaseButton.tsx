@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { ValidHttpUrl, isValidStripeCheckoutUrl } from "@rbx/core-scripts/util/url";
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/react";
 import { fireEvent } from "@rbx/www-common/event-tracker";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";

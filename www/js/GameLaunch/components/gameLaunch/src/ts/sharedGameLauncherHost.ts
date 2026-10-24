@@ -1,11 +1,11 @@
 import { isMac, isWindows } from "@rbx/core-scripts/meta/device";
-import { isAuthenticated } from "@rbx/core-scripts/meta/user";
+import { isAuthenticated, userId } from "@rbx/core-scripts/meta/user";
 import { getBrowserTrackerId } from "@rbx/www-common/browser-tracker";
 import type {
   GameLaunchEvent,
   GameLaunchEventName,
   GameLaunchHost,
-  GameLaunchParams,
+  LaunchDialogParams,
 } from "@rbx/www-common/game-launch";
 
 // ProtocolHandlerClientInterface fields; the flags come from data-* attributes, so they're unchecked.
@@ -14,6 +14,7 @@ export type ClientInterfaceState = {
   robloxLocale: string;
   gameLocale: string;
   playerChannel: string;
+  studioChannel: string;
   isDuarAutoOptInEnabled: unknown;
   isDuarOptOutDisabled: unknown;
   isOmitPlayerChannelForWinAndMacEnabled: unknown;
@@ -24,7 +25,7 @@ export type SharedGameLauncherDeps = {
   getPlaceLauncherBaseUrl: () => string;
   triggerEvent: (name: GameLaunchEventName, event: GameLaunchEvent) => void;
   logToConsole: (message: string) => void;
-  showDialog: (params: GameLaunchParams, launch: () => Promise<void>) => void;
+  showDialog: (params: LaunchDialogParams, launch: () => Promise<void>) => void;
   closeDialog: () => void;
   showLaunchFailureDialog: () => void;
   openProtocolUrl: (url: string) => void;
@@ -45,12 +46,14 @@ export const createSharedGameLauncherHost = ({
     robloxLocale: state.robloxLocale,
     gameLocale: state.gameLocale,
     playerChannel: state.playerChannel,
+    studioChannel: state.studioChannel,
     isDuarAutoOptInEnabled: Boolean(state.isDuarAutoOptInEnabled),
     isDuarOptOutDisabled: Boolean(state.isDuarOptOutDisabled),
     isOmitPlayerChannelForWinAndMacEnabled: Boolean(state.isOmitPlayerChannelForWinAndMacEnabled),
   }),
   getBrowserTrackerId,
   isAuthenticated,
+  getUserId: userId,
   isWindowsOrMac: () => isWindows() || isMac(),
   onEvent: triggerEvent,
   // One flag shared with the legacy install dialog and download flows.

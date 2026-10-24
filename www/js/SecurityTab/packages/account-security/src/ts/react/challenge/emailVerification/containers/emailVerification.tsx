@@ -1,8 +1,10 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { Suspense, lazy, useState, useCallback, useEffect } from "react";
 import type { EmailVerifyCodeModalService as EmailVerifyCodeModalServiceType } from "Roblox";
 
 import { LOG_PREFIX, OTP_CONTAINER_ID } from "../app.config";
 import { ErrorCode } from "../interface";
+import { getChallengeModalLoaders } from "../../challengeModals";
+import ChallengeModalBoundary from "../../challengeModalBoundary";
 import * as Otp from "../../../../common/request/types/otp";
 
 import useEmailVerificationContext from "../hooks/useEmailVerificationContext";
@@ -27,6 +29,11 @@ const EmailVerification: React.FC = () => {
     state: { renderInline, resources, translate, eventService, metricsService, isModalVisible },
     dispatch,
   } = useEmailVerificationContext();
+
+  const [EmailVerifyCodeModal] = useState(() => {
+    const load = getChallengeModalLoaders().EmailVerifyCodeModal;
+    return load ? lazy(load) : undefined;
+  });
 
   const otpCodeLength = useOtpCodeLength();
 
@@ -57,6 +64,29 @@ const EmailVerification: React.FC = () => {
     eventService.sendChallengeInvalidatedEvent();
   }, [dispatch, eventService, metricsService]);
 
+  const emailVerifyCodeModalProps = {
+    containerId: OTP_CONTAINER_ID,
+    codeLength: otpCodeLength,
+    onEmailCodeEntered: (sessionToken: string, code: string) => {
+      dispatch({
+        type: EmailVerificationActionType.SET_CHALLENGE_COMPLETED,
+        onChallengeCompletedData: {
+          otpSession: sessionToken,
+        },
+      });
+      eventService.sendChallengeCompletedEvent();
+      metricsService.fireChallengeCompletedEvent();
+    },
+    onModalAbandoned,
+    enterEmailTitle: resources.Header.VerifyYourAccount,
+    enterEmailDescription: resources.Description.SuspiciousActivityEmailVerification,
+    enterCodeTitle: resources.Header.EnterCode,
+    enterCodeDescription: resources.Description.EnterCode,
+    origin: Otp.Origin.Challenge,
+    translate,
+    renderInWebview: renderInline,
+  };
+
   const loadChallenge = () => {
     const EmailVerifyCodeModalService = getEmailVerifyCodeModalService();
     if (!EmailVerifyCodeModalService) {
@@ -67,43 +97,38 @@ const EmailVerification: React.FC = () => {
       });
       return;
     }
-    EmailVerifyCodeModalService.renderEmailVerifyCodeModal({
-      containerId: OTP_CONTAINER_ID,
-      codeLength: otpCodeLength,
-      onEmailCodeEntered: (sessionToken: string, code: string) => {
-        dispatch({
-          type: EmailVerificationActionType.SET_CHALLENGE_COMPLETED,
-          onChallengeCompletedData: {
-            otpSession: sessionToken,
-          },
-        });
-        eventService.sendChallengeCompletedEvent();
-        metricsService.fireChallengeCompletedEvent();
-      },
-      onModalAbandoned,
-      enterEmailTitle: resources.Header.VerifyYourAccount,
-      enterEmailDescription: resources.Description.SuspiciousActivityEmailVerification,
-      enterCodeTitle: resources.Header.EnterCode,
-      enterCodeDescription: resources.Description.EnterCode,
-      origin: Otp.Origin.Challenge,
-      translate,
-      renderInWebview: renderInline,
-    });
+    EmailVerifyCodeModalService.renderEmailVerifyCodeModal(emailVerifyCodeModalProps);
   };
 
   useEffect(() => {
-    if (isModalVisible) {
+    if (isModalVisible && !EmailVerifyCodeModal) {
       // eslint-disable-next-line no-void
       void loadChallenge();
     }
   }, [isModalVisible]);
+
+  const onModalFailed = useCallback(() => {
+    dispatch({
+      type: EmailVerificationActionType.SET_CHALLENGE_INVALIDATED,
+      errorCode: ErrorCode.UNKNOWN,
+    });
+  }, [dispatch]);
+
+  const injectedEmailVerifyCodeModal =
+    EmailVerifyCodeModal && isModalVisible ? (
+      <ChallengeModalBoundary onError={onModalFailed}>
+        <Suspense fallback={null}>
+          <EmailVerifyCodeModal {...emailVerifyCodeModalProps} />
+        </Suspense>
+      </ChallengeModalBoundary>
+    ) : null;
 
   /*
    * Rendering helper
    */
   const getPageContent = () => (
     <InlineChallengeBody>
-      <div id={OTP_CONTAINER_ID} />
+      <div id={OTP_CONTAINER_ID}>{injectedEmailVerifyCodeModal}</div>
     </InlineChallengeBody>
   );
 
@@ -134,7 +159,11 @@ const EmailVerification: React.FC = () => {
     // (Radix) Dialog, whose portaled content is not reliably mounted at that moment, which
     // left an empty, undismissable overlay with no form. Wrapping would also stack a modal
     // inside the modal's own modal.
-    return <div id={OTP_CONTAINER_ID} data-testid="email-verification-challenge-container" />;
+    return (
+      <div id={OTP_CONTAINER_ID} data-testid="email-verification-challenge-container">
+        {injectedEmailVerifyCodeModal}
+      </div>
+    );
   };
 
   return <React.Fragment>{renderContent()}</React.Fragment>;

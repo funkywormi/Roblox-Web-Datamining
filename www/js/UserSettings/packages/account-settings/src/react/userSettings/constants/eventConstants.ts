@@ -17,6 +17,72 @@ enum AllowedExperiences {
   ThirteenPlus = "EG13AndOver",
 }
 
+// Which parental controls landing page a user sees, sent as the landing pageload's `state`.
+export enum ParentalControlsLandingLayout {
+  NoAddParent = "noAddParent",
+  AddParentRemoteOnly = "addParentRemoteOnly",
+  AddParentOdpAndRemote = "addParentOdpAndRemote",
+  AddParentOdpOnly = "addParentOdpOnly",
+  LinkedParents = "linkedParents",
+  ParentZone = "parentZone",
+  NoLinkedChildren = "noLinkedChildren",
+  SingleLinkedChild = "singleLinkedChild",
+  LinkedChildrenList = "linkedChildrenList",
+  Error = "error",
+}
+
+// Which add-parent buttons the page shows, so a click can name its page.
+export type TAddParentButtons = { onDevice: boolean; remote: boolean };
+
+export type TParentalControlsLanding =
+  | {
+      actor: "child";
+      hasError: boolean;
+      hasOnDeviceParent: boolean;
+      showParentList: boolean;
+      showAddParentUpsell: boolean;
+      buttons: TAddParentButtons;
+    }
+  | { actor: "parent"; hasError: boolean; childCount: number };
+
+const getAddParentLayout = ({
+  onDevice,
+  remote,
+}: TAddParentButtons): ParentalControlsLandingLayout => {
+  if (onDevice && remote) {
+    return ParentalControlsLandingLayout.AddParentOdpAndRemote;
+  }
+  return onDevice
+    ? ParentalControlsLandingLayout.AddParentOdpOnly
+    : ParentalControlsLandingLayout.AddParentRemoteOnly;
+};
+
+export const getParentalControlsLandingLayout = (
+  landing: TParentalControlsLanding,
+): ParentalControlsLandingLayout => {
+  if (landing.hasError) {
+    return ParentalControlsLandingLayout.Error;
+  }
+  if (landing.actor === "parent") {
+    if (landing.childCount === 0) {
+      return ParentalControlsLandingLayout.NoLinkedChildren;
+    }
+    return landing.childCount === 1
+      ? ParentalControlsLandingLayout.SingleLinkedChild
+      : ParentalControlsLandingLayout.LinkedChildrenList;
+  }
+  if (landing.hasOnDeviceParent) {
+    return ParentalControlsLandingLayout.ParentZone;
+  }
+  if (landing.showParentList) {
+    return ParentalControlsLandingLayout.LinkedParents;
+  }
+  if (!landing.showAddParentUpsell) {
+    return ParentalControlsLandingLayout.NoAddParent;
+  }
+  return getAddParentLayout(landing.buttons);
+};
+
 const ERROR_MESSAGE = "errorMessage";
 export const accountSettingsOrigin = "AccountSettings";
 
@@ -496,14 +562,39 @@ export const getEventParams = {
       },
     };
   },
-  authButtonClickSettingsPControlsAddParent: (): TEventParams => {
+  authButtonClickSettingsPControlsAddParent: (buttons?: TAddParentButtons): TEventParams => {
+    const layout = buttons === undefined ? undefined : getAddParentLayout(buttons);
     return {
       name: authEventNames.authButtonClick,
       type: authEventNames.authButtonClick,
       context: "settingsPControls",
       params: {
         btn: "addParent",
+        ...(layout === undefined ? {} : { state: layout }),
         associatedText: "Add Parent",
+      },
+    };
+  },
+  authButtonClickSettingsPControlsAddRemoteParent: (): TEventParams => {
+    return {
+      name: authEventNames.authButtonClick,
+      type: authEventNames.authButtonClick,
+      context: "settingsPControls",
+      params: {
+        btn: "addRemoteParent",
+        state: ParentalControlsLandingLayout.AddParentOdpAndRemote,
+        associatedText: "Send a parent an email",
+      },
+    };
+  },
+  authPageloadSettingsPControlsLanding: (layout: ParentalControlsLandingLayout): TEventParams => {
+    return {
+      name: authEventNames.authPageload,
+      type: authEventNames.authPageload,
+      context: "settingsPControls",
+      params: {
+        state: layout,
+        associatedText: "Parental controls",
       },
     };
   },

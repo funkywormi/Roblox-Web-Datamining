@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import pfas from "@rbx/core-scripts/payments-flow";
+import { paymentFlowAnalyticsService as pfas } from "@rbx/payments/payments-flow-analytics";
 import { Product } from "../../types/buyRobuxPageData";
 import { Tracking } from "../useTracking";
 

@@ -1,11 +1,15 @@
 import { useCallback, useContext } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useFullKeyTranslations, useTranslations } from "@rbx/www-common/i18n";
 import { window } from "@rbx/core-lib/browser";
 import { SectionBase, SectionGiftCard } from "../../types/buyRobuxPageData";
 import { BaseSectionProps, Section, SectionBody, SectionHeader } from "../sections/Section";
 import { SectionBodySimpleCTA } from "../sections/SectionBodySimpleCTA";
 import { TrackingContext } from "../../contexts/TrackingContext";
 import { getSectionTrackingProps } from "../../hooks/useScrollTracking";
+import {
+  getOpenExternalBrowserUrl,
+  shouldOpenInExternalBrowser,
+} from "../../utils/openExternalBrowser";
 
 type GiftCardProps = BaseSectionProps & {
   sectionBase: SectionBase;
@@ -15,25 +19,30 @@ type GiftCardProps = BaseSectionProps & {
 export function GiftCard({ isPrimary, sectionBase, giftCard }: GiftCardProps) {
   const { trackGiftCardClick } = useContext(TrackingContext);
 
-  const { translate } = useTranslation();
+  const { translateFullKey } = useFullKeyTranslations();
+  const translatePremium = useTranslations("Feature.Premium");
 
   const buttonClickHandler = useCallback(() => {
     trackGiftCardClick();
-    // The Android app (2.728+) loads target="_blank" popups in a hidden WebView, so window.open does
-    // nothing (MOBAPP-3220). Navigating in place lets the app's domain allow-list hand off to the browser.
-    window?.location.assign(giftCard.redirectUrl);
+    window?.location.assign(
+      shouldOpenInExternalBrowser()
+        ? getOpenExternalBrowserUrl(giftCard.redirectUrl)
+        : giftCard.redirectUrl,
+    );
   }, [trackGiftCardClick, giftCard.redirectUrl]);
 
   return (
     <Section {...getSectionTrackingProps(sectionBase)}>
-      <SectionHeader>{translate(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
+      <SectionHeader>{translateFullKey(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
       <SectionBody isPrimary={isPrimary}>
         <SectionBodySimpleCTA
-          // TODO: remove translation key fallback once BE is updated to return titleTranslationKey
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          titleTranslationKey={giftCard.titleTranslationKey ?? "Description.GiftCard"}
-          bodyTranslationKey={giftCard.bodyTranslationKey}
-          buttonTextTranslationKey={giftCard.buttonTextTranslationKey}
+          title={translateFullKey(
+            giftCard.titleTranslationKey,
+            undefined,
+            translatePremium("Description.GiftCard"),
+          )}
+          body={translateFullKey(giftCard.bodyTranslationKey)}
+          buttonText={translateFullKey(giftCard.buttonTextTranslationKey)}
           buttonClickHandler={buttonClickHandler}
         />
       </SectionBody>

@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useFullKeyTranslations } from "@rbx/www-common/i18n";
 import { SectionBase, SectionRedirect } from "../../types/buyRobuxPageData";
 import {
   BaseSectionProps,
@@ -25,7 +25,7 @@ type ProductListProps = BaseSectionProps & {
 
 // TODO: we don't need this separate RedirectProductList section and instead this can be combined with the ProductList section
 export function RedirectProductList({ isPrimary, sectionBase, redirectOptions }: ProductListProps) {
-  const { translate } = useTranslation();
+  const { translateFullKey } = useFullKeyTranslations();
   const { purchaseProduct } = useContext(PurchaseContext);
   const { atLeastOneProductHasBonusAmount, redirect } = useContext(BuyRobuxPageContext);
   const daysLeft = resolveLimitedTimeBonusDaysLeft(redirectOptions.promotionExpirationTimestampMs);
@@ -53,7 +53,7 @@ export function RedirectProductList({ isPrimary, sectionBase, redirectOptions }:
           {/* A running bonus promotion supplies its own section header, which supersedes the
               redirect section's own title. */}
           <SectionHeader>
-            {translate(
+            {translateFullKey(
               atLeastOneProductHasBonusAmount
                 ? sectionBase.sectionHeaderTranslationKey
                 : redirectOptions.titleTranslationKey,
@@ -62,7 +62,9 @@ export function RedirectProductList({ isPrimary, sectionBase, redirectOptions }:
           {daysLeft.success && <ExpirationBadge daysLeft={daysLeft.value} />}
         </div>
         {redirectOptions.bodyTranslationKey && (
-          <SectionSubHeader>{translate(redirectOptions.bodyTranslationKey)}</SectionSubHeader>
+          <SectionSubHeader>
+            {translateFullKey(redirectOptions.bodyTranslationKey)}
+          </SectionSubHeader>
         )}
       </div>
       <SectionBody isPrimary={isPrimary}>

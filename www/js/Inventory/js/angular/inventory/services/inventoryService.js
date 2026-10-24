@@ -1,5 +1,7 @@
 import angular from 'angular';
+import { CurrentUser } from 'Roblox';
 import inventoryModule from '../inventoryModule';
+import { loadMyPrivateServersPage } from '../utils/privateServersV2';
 
 function inventoryService($q, $filter, inventoryConstants, assetsConstants, assetsService, httpService) {
   'ngInject';
@@ -15,40 +17,70 @@ function inventoryService($q, $filter, inventoryConstants, assetsConstants, asse
     },
 
     getPrivateServers(pagingParameters) {
-      return $q(function (resolve, reject) {
-        const urlConfig = {
-          url: inventoryConstants.urls.getPrivateServers
-        };
+      const isMyPrivateServersTab =
+        pagingParameters.placeTab === assetsConstants.types.myPrivateServers;
 
+      const fetchV1 = cursor =>
         httpService
-          .httpGet(urlConfig, {
-            privateServersTab: pagingParameters.placeTab,
-            itemsPerPage: pagingParameters.count,
-            cursor: pagingParameters.cursor
-          })
-          .then(function (response) {
-            const items = response.data;
-            angular.forEach(items, function (item) {
-              assetsService.translatePrivateServer(item, pagingParameters.placeTab === assetsConstants.types.myPrivateServers, pagingParameters.inventoryUpdatesEnabled);
-            });
-
-            const isOtherServersTab =
-              pagingParameters.placeTab === assetsConstants.types.otherPrivateServers;
-            if (isOtherServersTab) {
-              angular.forEach(items, function (item) {
-                item.hidePrice = true;
-              });
+          .httpGet(
+            { url: inventoryConstants.urls.getPrivateServers },
+            {
+              privateServersTab: pagingParameters.placeTab,
+              itemsPerPage: pagingParameters.count,
+              cursor
             }
+          )
+          .then(response => ({ items: response.data, nextPageCursor: response.nextPageCursor }));
 
-            resolve({
-              nextPageCursor: response.nextPageCursor,
-              items
-            });
+      // v2 returns 403 for anyone but the signed-in user, who is also the only user v1's "my" endpoint serves.
+      const fetchV2 = pageToken =>
+        httpService
+          .httpGet(
+            {
+              url: $filter('formatString')(inventoryConstants.urls.getMyPrivateServersV2, {
+                userId: CurrentUser.userId
+              })
+            },
+            { pageSize: pagingParameters.count, pageToken: pageToken || undefined },
+            true
+          )
+          .then(response => response.data);
+
+      return $q
+        .when(
+          loadMyPrivateServersPage({
+            cursor: pagingParameters.cursor,
+            v2Enabled: isMyPrivateServersTab && pagingParameters.privateServersV2Enabled === true,
+            fetchV1,
+            fetchV2
           })
-          .catch(function (response) {
-            reject(response.Data || response.error || '');
+        )
+        .then(function (page) {
+          const { items } = page;
+          angular.forEach(items, function (item) {
+            assetsService.translatePrivateServer(
+              item,
+              isMyPrivateServersTab,
+              pagingParameters.inventoryUpdatesEnabled
+            );
           });
-      });
+
+          const isOtherServersTab =
+            pagingParameters.placeTab === assetsConstants.types.otherPrivateServers;
+          if (isOtherServersTab) {
+            angular.forEach(items, function (item) {
+              item.hidePrice = true;
+            });
+          }
+
+          return {
+            nextPageCursor: page.nextPageCursor,
+            items
+          };
+        })
+        .catch(function (response) {
+          return $q.reject(response.Data || response.error || '');
+        });
     },
 
     getPlaces(pagingParameters) {

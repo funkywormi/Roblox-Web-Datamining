@@ -12,6 +12,7 @@ const inventoryConstants = {
     getUser: `${EnvironmentUrls.usersApi}/v1/users/{userId}`,
     getCreatorStoreItemDetails: `${EnvironmentUrls.apiGatewayUrl}/toolbox-service/v1/items/details?assetIds={assetIds}`,
     getPrivateServers: `${EnvironmentUrls.gamesApi}/v1/private-servers/my-private-servers`,
+    getMyPrivateServersV2: `${EnvironmentUrls.apiGatewayUrl}/private-servers-api-v2/v2/users/{userId}/private-servers`,
     getUserInventoryV2: `${EnvironmentUrls.inventoryApi}/v2/users/{userId}/inventory/{assetTypeId}`,
     getBundles: `${EnvironmentUrls.catalogApi}/v1/users/{userId}/bundles`,
     getBundlesWithType: `${EnvironmentUrls.catalogApi}/v1/users/{userId}/bundles/{bundleType}`,

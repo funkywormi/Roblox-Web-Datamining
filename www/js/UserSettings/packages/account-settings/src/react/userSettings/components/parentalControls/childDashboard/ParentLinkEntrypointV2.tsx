@@ -6,6 +6,7 @@ import useStartOnDeviceParentLinking from "../../../hooks/useStartOnDeviceParent
 import useStartRemoteParentLinking from "../../../hooks/useStartRemoteParentLinking";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import { btnClickCreatePin } from "../../../services/eventServices/odpFamilyEventService";
+import { ParentalControlsLandingLayout } from "../../../constants/eventConstants";
 import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
 
 /**
@@ -15,16 +16,21 @@ import { useGetParentInfoQuery } from "../../../../apis/parentalControlsApi";
 export const ParentLinkEntrypointV2 = (): JSX.Element => {
   const { translate } = useTranslation();
 
-  const handleParentLinking = useStartRemoteParentLinking();
-  const startOnDeviceParentLinking = useStartOnDeviceParentLinking();
   const { addParentUpsellVariant, canAddOnDeviceParent, canAddRemoteParent } =
     useLinkedParentsState();
+  const startOnDeviceParentLinking = useStartOnDeviceParentLinking(canAddRemoteParent);
+  const handleParentLinking = useStartRemoteParentLinking(canAddOnDeviceParent);
   const { data: parentInfo } = useGetParentInfoQuery();
 
   const { addParentLink } = parentalControlsTranslationConstants;
 
   const startOnDeviceParentLinkingWithEventTracking = (): void => {
-    btnClickCreatePin(parentInfo?.parents);
+    btnClickCreatePin(
+      parentInfo?.parents,
+      canAddRemoteParent
+        ? ParentalControlsLandingLayout.AddParentOdpAndRemote
+        : ParentalControlsLandingLayout.AddParentOdpOnly,
+    );
     startOnDeviceParentLinking();
   };
 

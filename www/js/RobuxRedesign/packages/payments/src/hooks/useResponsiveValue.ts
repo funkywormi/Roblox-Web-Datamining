@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { window } from "@rbx/core-lib/browser";
 import { breakpoints } from "./useBreakpoint";
 
@@ -17,6 +17,13 @@ type ResponsiveConfig<T> = {
  */
 export function useResponsiveValue<T>(defaultValue: T, config: ResponsiveConfig<T>): T {
   const [windowWidth, setWindowWidth] = useState(window?.innerWidth ?? 0);
+  // null until the effect measures, and when no breakpoint matches. The rendered
+  // value is derived from the current arguments so a new object identity does not
+  // schedule another update.
+  const [matchedPx, setMatchedPx] = useState<number | null>(null);
+
+  const configRef = useRef(config);
+  configRef.current = config;
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window?.innerWidth ?? 0);
@@ -24,16 +31,25 @@ export function useResponsiveValue<T>(defaultValue: T, config: ResponsiveConfig<
     return () => window?.removeEventListener("resize", handleResize);
   }, []);
 
-  // 1. Convert all keys (strings or numbers) into a sorted array of [pixelValue, T]
-  const sortedResolutions = Object.entries(config)
-    .map(([key, value]) => {
-      const px = breakpoints[key as BreakpointKey] ?? Number(key);
-      return { px, value };
-    })
-    .sort((a, b) => b.px - a.px); // Sort descending (largest first)
+  useEffect(() => {
+    // 1. Convert all keys (strings or numbers) into a sorted array of pixel floors
+    const sortedResolutions = Object.keys(configRef.current)
+      .map(key => breakpoints[key as BreakpointKey] ?? Number(key))
+      .sort((a, b) => b - a); // Sort descending (largest first)
 
-  // 2. Find the first one that matches the current width
-  const match = sortedResolutions.find(res => windowWidth >= res.px);
+    // 2. Find the first one that matches the current width
+    const match = sortedResolutions.find(px => windowWidth >= px);
+    setMatchedPx(match ?? null);
+  }, [windowWidth]);
 
-  return match ? (match.value as T) : defaultValue;
+  if (matchedPx == null) {
+    return defaultValue;
+  }
+
+  const match = Object.entries(config).find(([key]) => {
+    const px = breakpoints[key as BreakpointKey] ?? Number(key);
+    return px === matchedPx;
+  });
+
+  return match ? (match[1] as T) : defaultValue;
 }

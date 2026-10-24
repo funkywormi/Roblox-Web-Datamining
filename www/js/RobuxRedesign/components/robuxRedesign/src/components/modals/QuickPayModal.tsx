@@ -1,7 +1,6 @@
 /* eslint-disable no-void */
 import { useState, useContext, useCallback, useMemo, Fragment, useEffect } from "react";
 import { PaymentIntentResult } from "@stripe/stripe-js";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import {
   Badge,
@@ -23,9 +22,9 @@ import {
 } from "@rbx/foundation-ui";
 import { FullScreenLoading } from "@rbx/payments/components";
 import { PriceTag } from "@rbx/payments/priceTag";
+import { useFullKeyTranslations, useTranslations } from "@rbx/www-common/i18n";
 import { window } from "@rbx/core-lib/browser";
 import { isIconVariant } from "../../utils/iconVariants";
-import { resolveBonusRobuxTagLabelKey } from "../../utils/bonusRobuxTag";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 import { ModalContext } from "../../contexts/ModalContext";
 import { convertProviderPayloadMoneyToDecimal, formatAmount } from "../../utils/formatMoney";
@@ -76,7 +75,11 @@ function QuickPayModal({
   const { trackQuickPayClose, trackQuickPayUseDifferentPaymentMethod } =
     useContext(TrackingContext);
 
-  const { translate } = useTranslation();
+  const translatePremium = useTranslations("Feature.Premium");
+  const translateBuyRobux = useTranslations("Feature.BuyRobux");
+  const translatePersonalizedBonus = useTranslations("Feature.PersonalizedBonus");
+  const translatePayment = useTranslations("Feature.Payment");
+  const { translateFullKey } = useFullKeyTranslations();
 
   const ltbItemMetadata = useMemo(() => {
     if (!selectedProduct) return undefined;
@@ -191,6 +194,10 @@ function QuickPayModal({
     return null;
   }
 
+  const fallbackBonusRobuxTagLabel = translatePremium("Label.PlusAmountMoreLower", {
+    amount: formatNumber(Number(selectedProduct.bonusRobuxAmount)),
+  });
+
   return (
     <Dialog
       open={isQuickPayModalOpen}
@@ -201,13 +208,13 @@ function QuickPayModal({
       }}
       size="Large"
       hasCloseAffordance
-      closeLabel={translate("Button.OneClickPay.Cancel")}
+      closeLabel={translatePremium("Button.OneClickPay.Cancel")}
       isModal
     >
       <DialogContent>
         <DialogBody>
           <DialogTitle className="text-heading-medium content-emphasis">
-            <div>{translate("Message.OneClickPay.Title")}</div>
+            <div>{translatePremium("Message.OneClickPay.Title")}</div>
           </DialogTitle>
           <Divider className="margin-y-small" />
           <div className="product">
@@ -219,7 +226,7 @@ function QuickPayModal({
               />
               <div className="product-detail">
                 <div className="product-name">
-                  {translate("Label.RobuxQuantity", {
+                  {translateBuyRobux("Label.RobuxQuantity", {
                     quantity: formatNumber(Number(selectedProduct.robuxAmount)),
                   })}
                 </div>
@@ -236,10 +243,17 @@ function QuickPayModal({
                     <Badge
                       variant="Contrast"
                       icon={selectedProduct.bonusRobuxTagIcon}
-                      label={translate(
-                        resolveBonusRobuxTagLabelKey(selectedProduct.bonusRobuxTagTranslationKey),
-                        { amount: formatNumber(Number(selectedProduct.bonusRobuxAmount)) },
-                      )}
+                      label={
+                        selectedProduct.bonusRobuxTagTranslationKey
+                          ? translateFullKey(
+                              selectedProduct.bonusRobuxTagTranslationKey,
+                              {
+                                amount: formatNumber(Number(selectedProduct.bonusRobuxAmount)),
+                              },
+                              fallbackBonusRobuxTagLabel,
+                            )
+                          : fallbackBonusRobuxTagLabel
+                      }
                       className="text-overflow"
                       size="XSmall"
                     />
@@ -274,9 +288,13 @@ function QuickPayModal({
                   <div className="description-container">
                     <div className="description-title">
                       {ltbItemMetadata
-                        ? translate(ltbItemMetadata.translationKey) || "Bonus Item"
+                        ? translateFullKey(ltbItemMetadata.translationKey, undefined, "Bonus Item")
                         : (bonusItemDisplayName ??
-                          translate(collectibleBonusItemMetadata?.translationKey ?? ""))}
+                          translateFullKey(
+                            collectibleBonusItemMetadata?.translationKey ?? "",
+                            undefined,
+                            "Bonus Item",
+                          ))}
                     </div>
                     <div className="description-subtitle">
                       {ltbItemMetadata?.creatorDisplayName ? (
@@ -287,11 +305,11 @@ function QuickPayModal({
                           {ltbItemMetadata.creatorIsVerified && <BlueCheckIcon size={12} />}
                         </div>
                       ) : bonusItemImageUrl ? (
-                        translate("Message.OneClickPay.BonusVirtualItem")
+                        translatePremium("Message.OneClickPay.BonusVirtualItem")
                       ) : collectibleBonusItemMetadata ? (
                         <div className="flex flex-row gap-xsmall self-stretch items-center justify-start margin-top-[8px]">
                           <div className="text-label-small medium:text-label-medium content-default">
-                            {translate("Label.ByRoblox")}
+                            {translatePersonalizedBonus("Label.ByRoblox")}
                           </div>
                           <BlueCheckIcon size={12} />
                         </div>
@@ -311,7 +329,7 @@ function QuickPayModal({
           )}
 
           <div className="price-info space-between-container">
-            <div className="subtotal">{translate("Message.OneClickPay.Subtotal")}</div>
+            <div className="subtotal">{translatePremium("Message.OneClickPay.Subtotal")}</div>
             <PriceTag
               tagClassName="subtotal-price"
               amount={Number(formatAmount(displayPriceAmount))}
@@ -322,24 +340,24 @@ function QuickPayModal({
             <div className="tax">
               {preparePaymentProviderPayload ? (
                 <Fragment>
-                  <span className="tax-text">{translate(taxTranslationKey)}</span>
+                  <span className="tax-text">{translatePremium.dynamic(taxTranslationKey)}</span>
                   <EducationalTooltip open={isTaxTooltipOpen} onOpenChange={setIsTaxTooltipOpen}>
                     <EducationalTooltipTrigger asChild>
                       <IconButton
                         icon="icon-regular-circle-question"
                         size="XSmall"
                         variant="Utility"
-                        ariaLabel={translate("Message.OneClickPay.TaxTooltip")}
+                        ariaLabel={translatePremium("Message.OneClickPay.TaxTooltip")}
                       />
                     </EducationalTooltipTrigger>
                     <EducationalTooltipContent
                       position="right-center"
                       hasCloseAffordance
-                      closeLabel={translate("Action.Close")}
+                      closeLabel={translatePremium("Action.Close")}
                     >
                       <EducationalTooltipBody>
                         <EducationalTooltipDescription>
-                          {translate("Message.OneClickPay.TaxTooltip")}
+                          {translatePremium("Message.OneClickPay.TaxTooltip")}
                         </EducationalTooltipDescription>
                       </EducationalTooltipBody>
                     </EducationalTooltipContent>
@@ -361,7 +379,7 @@ function QuickPayModal({
           </div>
           <Divider style={{ margin: "8px 0" }} />
           <div className="space-between-container">
-            <div className="total-due">{translate("Message.OneClickPay.TotalDue")}</div>
+            <div className="total-due">{translatePremium("Message.OneClickPay.TotalDue")}</div>
             {preparePaymentProviderPayload ? (
               <PriceTag
                 tagClassName="total-due-price"
@@ -373,7 +391,7 @@ function QuickPayModal({
             )}
           </div>
           <div className="payment-method-info flex flex-col gap-small">
-            <span>{translate("Message.OneClickPay.AmountChargedTo")}</span>
+            <span>{translatePremium("Message.OneClickPay.AmountChargedTo")}</span>
             <QuickPaySelectCardDropdown
               error={quickPayError}
               onSelectPaymentProfile={selectPaymentProfile}
@@ -384,7 +402,7 @@ function QuickPayModal({
           <div className="use-a-different-payment-method">
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
             <div role="button" tabIndex={0} onClick={handleUseDifferentPaymentMethodClick}>
-              {translate("Message.OneClickPay.RedirectToOldFlow")}
+              {translatePremium("Message.OneClickPay.RedirectToOldFlow")}
             </div>
           </div>
           <Divider style={{ margin: "8px 0" }} />
@@ -395,7 +413,10 @@ function QuickPayModal({
         <DialogFooter>
           <div className="loading">
             {isLoading && (
-              <ProgressCircle variant="Indeterminate" ariaLabel={translate("Label.Loading")} />
+              <ProgressCircle
+                variant="Indeterminate"
+                ariaLabel={translateBuyRobux("Label.Loading")}
+              />
             )}
           </div>
           {!isLoading && (
@@ -415,9 +436,9 @@ function QuickPayModal({
                   }
                 }}
               >
-                {translate(
-                  continueToSubscriptionCheckout ? "Action.Continue" : "Button.OneClickPay.PayNow",
-                )}
+                {continueToSubscriptionCheckout
+                  ? translatePayment("Action.Continue")
+                  : translatePremium("Button.OneClickPay.PayNow")}
               </Button>
               <Button
                 variant="Standard"
@@ -425,7 +446,7 @@ function QuickPayModal({
                 className="min-width-[90px]"
                 size="Medium"
               >
-                {translate("Button.OneClickPay.Cancel")}
+                {translatePremium("Button.OneClickPay.Cancel")}
               </Button>
             </div>
           )}
@@ -436,11 +457,13 @@ function QuickPayModal({
 }
 
 export const QuickPayModalWithLoading = (props: QuickPay) => {
-  const { translate } = useTranslation();
+  const translateBuyRobux = useTranslations("Feature.BuyRobux");
 
   return (
     <div>
-      {props.isQuickPayLoading && <FullScreenLoading ariaLabel={translate("Label.Loading")} />}
+      {props.isQuickPayLoading && (
+        <FullScreenLoading ariaLabel={translateBuyRobux("Label.Loading")} />
+      )}
       <QuickPayModal {...props} />
     </div>
   );

@@ -9,6 +9,8 @@ import ParentDashboardWelcomeScreen from "./ParentDashboardWelcomeScreen";
 import LinkedChildrenCardList from "./LinkedChildrenCardList";
 import { getLinkedChildDetailsPath } from "../../../constants/parentalControls/parentalControlsConstants";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
+import parentalControlsEventService from "../../../services/eventServices/parentalControlsEventService";
+import { getParentalControlsLandingLayout } from "../../../constants/eventConstants";
 
 export const ParentDashboardLandingPage = (): JSX.Element => {
   const { translate } = useTranslation();
@@ -27,6 +29,21 @@ export const ParentDashboardLandingPage = (): JSX.Element => {
       snackbarService.warning(translate(commonTranslationConstants.unknownError));
     }
   }, [childrenInfo, status]);
+
+  const childCount = childrenInfo?.childrenInfoList?.length;
+  const hasError =
+    status === QueryStatus.rejected || (status === QueryStatus.fulfilled && !childrenInfo);
+
+  const landingLayout =
+    hasError || childCount !== undefined
+      ? getParentalControlsLandingLayout({ actor: "parent", hasError, childCount: childCount ?? 0 })
+      : undefined;
+
+  useEffect(() => {
+    if (landingLayout !== undefined) {
+      parentalControlsEventService.authPageloadSettingsPControlsLanding(landingLayout);
+    }
+  }, [landingLayout]);
 
   useEffect(() => {
     // If there is only one child, redirect to the child details page

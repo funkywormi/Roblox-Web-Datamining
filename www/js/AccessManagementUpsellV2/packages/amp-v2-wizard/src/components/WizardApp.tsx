@@ -12,6 +12,8 @@ import { flowApi } from "../services/flowApi";
 import { WizardHost } from "./WizardHost";
 import { AmpV2WizardEvent, type StartWizardDetail } from "../services/wizardService";
 import type { FlowExitResult, FlowResponse, FlowSelector, OdpEventSurface } from "../types";
+import { trackCounter } from "../observability";
+import { WizardCounter } from "../observability/eventConstants";
 
 type Session = {
   detail: StartWizardDetail;
@@ -78,8 +80,10 @@ export function WizardApp(): JSX.Element | null {
     const handler = (evt: WindowEventMap["AmpV2Wizard.StartWizard"]): void => {
       const { detail } = evt;
 
+      trackCounter(WizardCounter.EntryRequested);
       if (busyRef.current) {
         // One flow at a time — reject the re-entrant start without touching the live flow.
+        trackCounter(WizardCounter.EntryRejectedBusy);
         detail.closeCallback({ reason: "Error", flowId: "" });
         return;
       }
@@ -102,14 +106,22 @@ export function WizardApp(): JSX.Element | null {
             // Nothing to run (granted / denied / no upsell) — resolve without rendering, and do NOT
             // fire onComplete: no flow ran, so there's nothing for the caller to refresh against.
             busyRef.current = false;
+            trackCounter(WizardCounter.EntryNothingToRun);
             detail.closeCallback({ reason: "Completed", flowId: fragment.flowId });
             return;
+          }
+          // The walker never starts these, so FlowStarted and the exit counters skip them.
+          if (fragment.outcome === "Error") {
+            trackCounter(WizardCounter.EntryFailed, { cause: "errorFragment" });
+          } else if (fragment.nodes[fragment.entry] == null) {
+            trackCounter(WizardCounter.EntryFailed, { cause: "missingEntry" });
           }
           activeDetailRef.current = detail;
           setSession({ detail, fragment });
         })
         .catch(() => {
           busyRef.current = false;
+          trackCounter(WizardCounter.EntryFailed, { cause: "request" });
           detail.closeCallback({ reason: "Error", flowId: "" });
         });
     };

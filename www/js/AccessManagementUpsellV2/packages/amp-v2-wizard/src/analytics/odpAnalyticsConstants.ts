@@ -42,6 +42,10 @@ export const OdpEventButton = {
 } as const;
 
 export const OdpAssociatedText = {
+  HandoffShown:
+    "Get a parent - Hand this device to your parent - Once they confirm they're a parent, they'll be able to help with the request, adjust your communication, content, and privacy settings.",
+  HandoffContinue: "Continue as a parent",
+  HandoffBack: "< back chevron",
   AskInPerson: "Ask in person / Continue on this device",
   AskViaEmail: "Send an email / Continue on parent's device",
   Cancel: "X icon",
@@ -53,7 +57,8 @@ export const OdpAssociatedText = {
   AgreementBack: "< back chevron",
   AgreementTerms: "Terms of Use",
   AgreementPrivacy: "Privacy Policy",
-  VerificationMethodSelector: "Identity verification - Choose a verification method",
+  VerificationMethodSelector:
+    "Identity verification - Choose a verification method - Confirm you're an adult to manage your child's settings. We'll delete your personal information after processing.",
   VerificationMethodOptions: "Facial age estimation / Credit card / Government ID",
   VerificationMethodContinue: "Continue",
   VerificationMethodBack: "< back chevron",
@@ -119,6 +124,9 @@ export const NeedToReverifyNode = "NeedToReverify";
 
 /** The node id the service serves the VPC prologue under, on the shared TextScreen node type. */
 export const PrologueNode = "Prologue";
+
+/** The node id the service serves the remote parent request screen under. */
+export const RemoteParentRequestNode = "RemoteParentRequest";
 
 /** The name the backend's age-group rule is configured under. */
 export const AgeGroupKey = "ageGroup";

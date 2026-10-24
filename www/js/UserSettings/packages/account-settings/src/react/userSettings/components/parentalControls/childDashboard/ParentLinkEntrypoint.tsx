@@ -8,7 +8,7 @@ import useWrappedTranslation from "../../../hooks/useWrappedTranslation";
 export const ParentLinkEntrypoint = (): JSX.Element => {
   const { translate } = useWrappedTranslation();
 
-  const handleParentLinking = useHandleParentLinking();
+  const handleParentLinking = useHandleParentLinking({ onDevice: false, remote: true });
 
   const { addParentLink } = parentalControlsTranslationConstants;
 

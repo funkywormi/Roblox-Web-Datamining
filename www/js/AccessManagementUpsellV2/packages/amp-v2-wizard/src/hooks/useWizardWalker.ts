@@ -12,10 +12,14 @@ import { useCallback, useEffect, useReducer, useRef } from "react";
 import { init, reduce, WalkerActionType } from "./walkerReducer";
 import { sendWizardEvent } from "../analytics/wizardAnalytics";
 import { WizardEventName } from "../analytics/wizardEventNames";
+import { sendWizardLaunchPageload } from "../analytics/vpcEntryAnalytics";
 import { TransitionKind } from "../types";
+import { trackCounter } from "../observability";
+import { WizardCounter } from "../observability/eventConstants";
 import type {
   FlowAnalyticsStrings,
   FlowApi,
+  FlowExitReason,
   FlowExitResult,
   FlowNode,
   FlowResponse,
@@ -29,6 +33,12 @@ import type {
 } from "../types";
 
 /** A reported outcome, for callers that observe outcomes directly alongside the framework's events. */
+const EXIT_COUNTER = {
+  Completed: WizardCounter.FlowCompleted,
+  Cancelled: WizardCounter.FlowCancelled,
+  Error: WizardCounter.FlowErrored,
+} as const satisfies Record<FlowExitReason, string>;
+
 export type WalkerEvent = {
   flowId: string;
   node: string;
@@ -77,6 +87,7 @@ function buildEventContext(
     surface,
     node: nodeId,
     nodeType: node?.type,
+    analyticsSessionId: state.analyticsSessionId !== "" ? state.analyticsSessionId : undefined,
   };
 }
 
@@ -123,6 +134,16 @@ export function useWizardWalker(options: UseWizardWalkerOptions): WizardWalker {
     }
     flowStartFiredRef.current = true;
     logEvent(WizardEventName.FlowStart);
+    const launch = stateRef.current;
+    sendWizardLaunchPageload(
+      launch.analyticsStrings,
+      launch.analyticsSessionId,
+      surface,
+      rootFlow,
+      launch.chosenFlow,
+      launch.currentNodeId,
+    );
+    trackCounter(WizardCounter.FlowStarted);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only: a flow starts once
   }, []);
 
@@ -133,6 +154,9 @@ export function useWizardWalker(options: UseWizardWalkerOptions): WizardWalker {
       return;
     }
     logEvent(WizardEventName.NodeShown);
+    trackCounter(WizardCounter.NodeShown, {
+      nodeType: state.nodes[state.currentNodeId]?.type ?? "unknown",
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one emission per node arrival; see above
   }, [state.currentNodeId, state.chosenFlow]);
 
@@ -154,6 +178,7 @@ export function useWizardWalker(options: UseWizardWalkerOptions): WizardWalker {
         reason: exitResult.reason,
         outcome: exitResult.outcome,
       });
+      trackCounter(EXIT_COUNTER[exitResult.reason]);
     }
     if (onExit) {
       onExit(exitResult);
@@ -218,6 +243,9 @@ export function useWizardWalker(options: UseWizardWalkerOptions): WizardWalker {
             continueInFlightRef.current = false;
             if (unmountedRef.current) return;
             sendEvent(WizardEventName.ContinueFailed, { ...base, errorMessage: String(err) });
+            trackCounter(WizardCounter.ContinueFailed, {
+              nodeType: current.nodes[nodeId]?.type ?? "unknown",
+            });
             dispatch({ type: WalkerActionType.ContinueFailed, message: String(err) });
           });
       }

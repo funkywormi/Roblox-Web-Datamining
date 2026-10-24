@@ -115,18 +115,21 @@ export function createOdpAnalytics(
     handoffShown: () => {
       sendEventWithTarget(OdpEventName.Pageload, OdpEventContext.Handoff, {
         state: buildState(analyticsSessionId, ageGroup),
+        associatedText: OdpAssociatedText.HandoffShown,
       });
     },
     handoffContinue: () => {
       sendEventWithTarget(OdpEventName.ButtonClick, OdpEventContext.Handoff, {
         btn: OdpEventButton.ContinueAsParent,
         state: buildState(analyticsSessionId, ageGroup),
+        associatedText: OdpAssociatedText.HandoffContinue,
       });
     },
     handoffBack: () => {
       sendEventWithTarget(OdpEventName.ButtonClick, OdpEventContext.Handoff, {
         btn: OdpEventButton.Back,
         state: buildState(analyticsSessionId, ageGroup),
+        associatedText: OdpAssociatedText.HandoffBack,
       });
     },
     prologueShown: () => {

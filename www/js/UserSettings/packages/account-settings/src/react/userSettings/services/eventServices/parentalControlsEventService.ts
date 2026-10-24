@@ -13,7 +13,11 @@ import ParentalControlsPageName from "../../../../enums/parentalControls/Parenta
 import SettingCategoryPageName from "../../../../enums/SettingCategoryPageName";
 import { TSettingsPage } from "../../../../types/commonTypes";
 import PrivacySettingName from "../../../../enums/privacy/PrivacySettingName";
-import { getEventParams } from "../../constants/eventConstants";
+import {
+  getEventParams,
+  type ParentalControlsLandingLayout,
+  type TAddParentButtons,
+} from "../../constants/eventConstants";
 import birthdayUtils from "../../utils/birthdayUtils";
 import { optionToString } from "../../utils/parentalControls/parentalConsentUtils";
 import settingsJourneyService from "../journeys/settingsJourneyService";
@@ -61,10 +65,22 @@ const parentalControlsEventService = {
       eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
     },
   ),
-  authButtonClickSettingsPControlsAddParent: wrapEventServiceWithTryCatch((): void => {
-    const params = getEventParams.authButtonClickSettingsPControlsAddParent();
+  authButtonClickSettingsPControlsAddParent: wrapEventServiceWithTryCatch(
+    (buttons?: TAddParentButtons): void => {
+      const params = getEventParams.authButtonClickSettingsPControlsAddParent(buttons);
+      eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
+    },
+  ),
+  authButtonClickSettingsPControlsAddRemoteParent: wrapEventServiceWithTryCatch((): void => {
+    const params = getEventParams.authButtonClickSettingsPControlsAddRemoteParent();
     eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
   }),
+  authPageloadSettingsPControlsLanding: wrapEventServiceWithTryCatch(
+    (layout: ParentalControlsLandingLayout): void => {
+      const params = getEventParams.authPageloadSettingsPControlsLanding(layout);
+      eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
+    },
+  ),
   authButtonClickSettingsPControlsUpdateAttempt: wrapEventServiceWithTryCatch(
     (request: TUpdateUserSettingValueRequest, child: TChildSettingsInfo): void => {
       settingsJourneyService.editAttempted("parental-controls", request.setting);

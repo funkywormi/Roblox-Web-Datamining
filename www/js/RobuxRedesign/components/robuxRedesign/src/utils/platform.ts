@@ -5,6 +5,7 @@ const deviceMeta = getDeviceMeta();
 export const isInUniversalApp = Boolean(deviceMeta?.isUniversalApp);
 export const isSamsungGalaxyStoreApp = Boolean(deviceMeta?.isSamsungGalaxyStoreApp);
 export const isAmazonApp = Boolean(deviceMeta?.isAmazonApp);
+export const isAndroidApp = Boolean(deviceMeta?.isAndroidApp);
 export const isPcGdkApp = Boolean(deviceMeta?.isPcGdkApp);
 
 export const isOnDesktop = (() => {

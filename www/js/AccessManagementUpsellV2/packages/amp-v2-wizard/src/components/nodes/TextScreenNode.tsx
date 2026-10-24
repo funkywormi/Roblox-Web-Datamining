@@ -11,6 +11,11 @@ import { useEffect, useMemo, useRef, type JSX } from "react";
 import { Button } from "@rbx/foundation-ui";
 
 import { useOdpAnalytics, type OdpAnalytics } from "../../analytics/odpAnalytics";
+import {
+  PrologueType,
+  useVpcEntryAnalytics,
+  type VpcEntryAnalytics,
+} from "../../analytics/vpcEntryAnalytics";
 import { NeedToReverifyNode, PrologueNode } from "../../analytics/odpAnalyticsConstants";
 import { asButtons, asText, type TextScreenButton } from "../../utils/nodeDetails";
 import { renderAnchoredCopy } from "../../utils/anchoredCopy";
@@ -35,16 +40,38 @@ export type TextScreenAnalytics = {
 
 // One node type serves many screens, so each screen's spec events are registered under the node id
 // the service serves it as. An unregistered screen sends nothing.
-const TEXT_SCREEN_ANALYTICS = new Map<string, (analytics: OdpAnalytics) => TextScreenAnalytics>([
+const TEXT_SCREEN_ANALYTICS = new Map<
+  string,
+  (
+    analytics: OdpAnalytics,
+    vpcEntry: VpcEntryAnalytics,
+    details: Record<string, unknown> | undefined,
+  ) => TextScreenAnalytics
+>([
   [
     PrologueNode,
-    analytics => ({
-      shown: analytics.prologueShown,
-      buttonClick: analytics.prologueButtonClick,
-      close: () => {
-        analytics.prologueButtonClick("Cancel");
-      },
-    }),
+    (analytics, vpcEntry, details) => {
+      const buttons = asButtons(details?.buttons);
+      let prologueType: PrologueType = PrologueType.OdpAndRemote;
+      if (buttons?.length === 1) {
+        prologueType =
+          buttons[0]?.outcome === "ODP" ? PrologueType.OdpOnly : PrologueType.RemoteOnly;
+      }
+      return {
+        shown: () => {
+          analytics.prologueShown();
+          vpcEntry.prologueShown(prologueType);
+        },
+        buttonClick: outcome => {
+          analytics.prologueButtonClick(outcome);
+          vpcEntry.prologueButtonClick(outcome, prologueType);
+        },
+        close: () => {
+          analytics.prologueButtonClick("Cancel");
+          vpcEntry.prologueButtonClick("Cancel", prologueType);
+        },
+      };
+    },
   ],
   [
     NeedToReverifyNode,
@@ -67,10 +94,12 @@ const NO_TEXT_SCREEN_ANALYTICS: TextScreenAnalytics = {
 /** The reporters registered for a text screen's node id, or ones that send nothing. */
 export function getTextScreenAnalytics(
   analytics: OdpAnalytics,
+  vpcEntry: VpcEntryAnalytics,
   node: string | undefined,
+  details?: Record<string, unknown>,
 ): TextScreenAnalytics {
   const build = node == null ? undefined : TEXT_SCREEN_ANALYTICS.get(node);
-  return build == null ? NO_TEXT_SCREEN_ANALYTICS : build(analytics);
+  return build == null ? NO_TEXT_SCREEN_ANALYTICS : build(analytics, vpcEntry, details);
 }
 
 // Sends "shown" on entering each node rather than on mount: the host keeps this node mounted when
@@ -80,10 +109,15 @@ function useTextScreenAnalytics(
     NodeContext,
     "analytics" | "analyticsStrings" | "analyticsSessionId" | "odpEventSurface"
   >,
+  details: Record<string, unknown>,
 ): TextScreenAnalytics {
   const odpAnalytics = useOdpAnalytics(ctx);
+  const vpcEntryAnalytics = useVpcEntryAnalytics(ctx);
   const { node } = ctx.analytics;
-  const screen = useMemo(() => getTextScreenAnalytics(odpAnalytics, node), [odpAnalytics, node]);
+  const screen = useMemo(
+    () => getTextScreenAnalytics(odpAnalytics, vpcEntryAnalytics, node, details),
+    [odpAnalytics, vpcEntryAnalytics, node, details],
+  );
 
   const shownNode = useRef<string | undefined>(undefined);
   useEffect(() => {
@@ -103,7 +137,7 @@ export function TextScreenNode({ props, ctx, report }: NodeProps): JSX.Element {
   const imageUrl = asText(props.imageUrl);
   const buttons = asButtons(props.buttons) ?? [];
   const footerText = asText(props.footerText);
-  const screenAnalytics = useTextScreenAnalytics(ctx);
+  const screenAnalytics = useTextScreenAnalytics(ctx, props);
 
   return (
     <div className="gap-large flex flex-col">

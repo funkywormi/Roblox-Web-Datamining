@@ -10,13 +10,16 @@ import { startOnDeviceParentLink } from "./startStandaloneParentLink";
 /**
  * Starts standalone on-device parent setup in the amp-v2 wizard.
  */
-const useStartOnDeviceParentLinking = (): (() => void) => {
+const useStartOnDeviceParentLinking = (hasRemoteOption = false): (() => void) => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
   const dispatch = useAppDispatch();
 
   return () => {
-    parentalControlsEventService.authButtonClickSettingsPControlsAddParent();
+    parentalControlsEventService.authButtonClickSettingsPControlsAddParent({
+      onDevice: true,
+      remote: hasRemoteOption,
+    });
     startOnDeviceParentLink(translate)
       .then(result => {
         // An empty flowId is a start that never opened. A real flowId already showed its own UI,

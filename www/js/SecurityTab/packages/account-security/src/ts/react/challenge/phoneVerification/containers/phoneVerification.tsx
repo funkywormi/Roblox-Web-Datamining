@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import type { UpsellService as UpsellServiceType } from "Roblox";
 import usePhoneVerificationContext from "../hooks/usePhoneVerificationContext";
 import { PhoneVerificationActionType } from "../store/action";
@@ -9,6 +9,8 @@ import {
   UPSELL_ORIGIN,
 } from "../app.config";
 import { ErrorCode } from "../interface";
+import { getChallengeModalLoaders } from "../../challengeModals";
+import ChallengeModalBoundary from "../../challengeModalBoundary";
 
 import InlineChallenge from "../../../common/inlineChallenge";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
@@ -24,10 +26,15 @@ const PhoneVerification: React.FC = () => {
     dispatch,
   } = usePhoneVerificationContext();
 
+  const [PhoneUpsell] = useState(() => {
+    const load = getChallengeModalLoaders().PhoneUpsell;
+    return load ? lazy(load) : undefined;
+  });
+
   const [isConfirmationModalVisible, setConfirmationModalVisible] = useState(false);
 
   const onModalAbandoned = useCallback(
-    (isPhoneVerified: boolean) => {
+    (isPhoneVerified?: boolean) => {
       if (isPhoneVerified) {
         dispatch({
           type: PhoneVerificationActionType.SET_CHALLENGE_COMPLETED,
@@ -63,8 +70,21 @@ const PhoneVerification: React.FC = () => {
     metricsService.fireChallengeInvalidatedEvent();
   }, [dispatch, eventService, metricsService]);
 
+  const phoneUpsellProps = useMemo(
+    () => ({
+      onClose: onModalAbandoned,
+      origin: UPSELL_ORIGIN,
+      addPhoneHeadingKey: VERIFICATION_UPSELL_TRASLATION_KEY.Header.VerifyYourAccountHeader,
+      addPhoneDescriptionKey:
+        VERIFICATION_UPSELL_TRASLATION_KEY.Description.SuspiciousActivityPhoneVerification,
+      addPhoneLegalTextKey: VERIFICATION_UPSELL_TRASLATION_KEY.Description.LegalText,
+      renderInWebview: renderInline,
+    }),
+    [onModalAbandoned, renderInline],
+  );
+
   useEffect(() => {
-    if (isModalVisible) {
+    if (isModalVisible && !PhoneUpsell) {
       const UpsellService = getUpsellService();
       if (!UpsellService) {
         console.error(LOG_PREFIX, "UpsellService is unavailable");
@@ -75,24 +95,34 @@ const PhoneVerification: React.FC = () => {
         return;
       }
       UpsellService.renderPhoneUpsell({
-        onClose: onModalAbandoned,
-        origin: UPSELL_ORIGIN,
-        addPhoneHeadingKey: VERIFICATION_UPSELL_TRASLATION_KEY.Header.VerifyYourAccountHeader,
-        addPhoneDescriptionKey:
-          VERIFICATION_UPSELL_TRASLATION_KEY.Description.SuspiciousActivityPhoneVerification,
+        ...phoneUpsellProps,
         containerId: PHONE_ROOT_ELEMENT_ID,
-        addPhoneLegalTextKey: VERIFICATION_UPSELL_TRASLATION_KEY.Description.LegalText,
-        renderInWebview: renderInline,
       });
     }
-  }, [onModalAbandoned, isModalVisible, dispatch]);
+  }, [phoneUpsellProps, isModalVisible, dispatch, PhoneUpsell]);
+
+  const onModalFailed = useCallback(() => {
+    dispatch({
+      type: PhoneVerificationActionType.SET_CHALLENGE_INVALIDATED,
+      errorCode: ErrorCode.UNKNOWN,
+    });
+  }, [dispatch]);
+
+  const injectedPhoneUpsell =
+    PhoneUpsell && isModalVisible ? (
+      <ChallengeModalBoundary onError={onModalFailed}>
+        <Suspense fallback={null}>
+          <PhoneUpsell {...phoneUpsellProps} />
+        </Suspense>
+      </ChallengeModalBoundary>
+    ) : null;
 
   /*
    * Rendering helpers
    */
   const getPageContent = () => (
     <InlineChallengeBody>
-      <div id={PHONE_ROOT_ELEMENT_ID} />
+      <div id={PHONE_ROOT_ELEMENT_ID}>{injectedPhoneUpsell}</div>
     </InlineChallengeBody>
   );
 
@@ -123,7 +153,11 @@ const PhoneVerification: React.FC = () => {
     // whose portaled content is not reliably mounted at that moment, which left
     // an empty, undismissable overlay with no form. Wrapping would also stack a
     // modal inside the upsell's own modal.
-    return <div id={PHONE_ROOT_ELEMENT_ID} data-testid="phone-verification-challenge-container" />;
+    return (
+      <div id={PHONE_ROOT_ELEMENT_ID} data-testid="phone-verification-challenge-container">
+        {injectedPhoneUpsell}
+      </div>
+    );
   };
 
   return <React.Fragment>{renderContent()}</React.Fragment>;

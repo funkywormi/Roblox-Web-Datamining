@@ -57,6 +57,16 @@
     padding-left: 0
 }
 
+.two-step-verification-section {
+    scroll-margin-top: 46px
+}
+
+@media (max-width:991px) {
+    .two-step-verification-section {
+        scroll-margin-top: 88px
+    }
+}
+
 .biometric-challenge-overlay {
     z-index: 1050;
     background-color: rgba(0, 0, 0, .8);

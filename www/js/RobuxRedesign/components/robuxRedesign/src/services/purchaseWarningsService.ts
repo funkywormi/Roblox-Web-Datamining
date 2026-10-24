@@ -2,6 +2,9 @@ import { EnvironmentUrls } from "@rbx/environment-urls";
 import { APICall, HTTPVerb, withApiEvents } from "../utils/apiEventsCounter";
 import { withApiEventsV2 } from "../observability";
 
+/**
+ * @deprecated - use PurchaseWarningAction from @rbx/payments/payments-flow-analytics instead
+ */
 export enum PurchaseWarningAction {
   U13PaymentModal = "U13PaymentModal",
   U13MonthlyThreshold1Modal = "U13MonthlyThreshold1Modal",

@@ -9,6 +9,8 @@ import SentRequestsList from "./SentRequestsList";
 import ChildWelcomeWithoutParentLinking from "./ChildWelcomeWithoutParentLinking";
 import useLinkedParentsState from "../../../hooks/useLinkedParentsState";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
+import parentalControlsEventService from "../../../services/eventServices/parentalControlsEventService";
+import { getParentalControlsLandingLayout } from "../../../constants/eventConstants";
 
 // Landing page for the child-side parental controls dashboard
 // Displays the linked parents list, sent requests list, or welcome screen when no parents are linked.
@@ -18,9 +20,12 @@ export const ChildDashboardLandingPage = (): JSX.Element => {
 
   const {
     isOdpLaunchEnabled,
+    hasOnDeviceParent,
     showParentList,
     showSentRequests,
     showAddParentUpsell,
+    canAddOnDeviceParent,
+    canAddRemoteParent,
     isLoading,
     hasError,
   } = useLinkedParentsState();
@@ -30,6 +35,25 @@ export const ChildDashboardLandingPage = (): JSX.Element => {
       snackbarService.warning(translate(commonTranslationConstants.unknownError));
     }
   }, [hasError]);
+
+  const landingLayout = isLoading
+    ? undefined
+    : getParentalControlsLandingLayout({
+        actor: "child",
+        hasError,
+        hasOnDeviceParent,
+        showParentList,
+        showAddParentUpsell,
+        buttons: isOdpLaunchEnabled
+          ? { onDevice: canAddOnDeviceParent, remote: canAddRemoteParent }
+          : { onDevice: false, remote: true },
+      });
+
+  useEffect(() => {
+    if (landingLayout !== undefined) {
+      parentalControlsEventService.authPageloadSettingsPControlsLanding(landingLayout);
+    }
+  }, [landingLayout]);
 
   if (isLoading) {
     return <Loading />;

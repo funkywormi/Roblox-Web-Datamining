@@ -1,5 +1,7 @@
-import { type JSX, type ReactNode } from "react";
+import { useContext, type JSX, type ReactNode } from "react";
 import { Dialog, DialogBody, DialogContent } from "@rbx/foundation-ui";
+
+import { WizardParentFacingContext } from "./WizardLoadingContext";
 
 export function Overlay({
   children,
@@ -8,6 +10,8 @@ export function Overlay({
   children: ReactNode;
   onClose?: () => void;
 }): JSX.Element {
+  const isParentFacing = useContext(WizardParentFacingContext);
+
   return (
     <Dialog
       open
@@ -23,7 +27,7 @@ export function Overlay({
         }
       }}
     >
-      <DialogContent>
+      <DialogContent className={isParentFacing ? "theme-default content-default" : undefined}>
         {/* The close affordance is positioned absolutely, so a heading that runs the dialog's full
             width renders underneath it; leave it room on the screens that draw one. The button is
             36px wide and sits 13px in from the edge, so 2.5rem clears it with a gap to spare. */}

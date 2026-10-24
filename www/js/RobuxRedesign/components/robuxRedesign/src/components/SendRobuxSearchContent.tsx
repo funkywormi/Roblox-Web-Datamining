@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { getCurrentUser, userIdToNumber } from "@rbx/www-common/user";
 import { SheetBody } from "@rbx/foundation-ui";
 import { TFriend } from "@rbx/friends-common/types/friendsCarousel";
@@ -37,7 +37,7 @@ export function SendRobuxSearchContent({
   isLoggedIn,
   onSelectUser,
 }: SendRobuxSearchContentProps) {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.BuyRobux");
   const currentUser = getCurrentUser();
   const currentUserId = currentUser === undefined ? undefined : userIdToNumber(currentUser.id);
   const excludedUserIds = useMemo(

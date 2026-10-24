@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { FaceFrownIcon, FaceSmileIcon } from "@heroicons/react/24/outline";
 import { Modal } from "@rbx/core-ui/legacy/react-style-guide";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import { FragmentModalHeader, HeaderButtonType } from "./ModalFragmentHeader";
@@ -82,7 +81,11 @@ const MessageModal: React.FC<MessageModalProps> = ({ config, onClose, t, isOpen 
           headerInfo={null}
         />
         <Modal.Body>
-          <div className="flex justify-center gray-300 my-2">{topIcon}</div>
+          {topIcon && (
+            <div className="flex justify-center gray-300 my-2" data-testid="message-modal-icon">
+              {topIcon}
+            </div>
+          )}
           <div className="text-center">
             <span className="inline-block">{bodyText}</span>
           </div>

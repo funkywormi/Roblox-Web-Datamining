@@ -1,6 +1,6 @@
 import { AccountIntegrityChallengeService } from "Roblox";
 import { authenticatedUser } from "header-scripts";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ProgressCircle } from "@rbx/foundation-ui";
 import { TwoStepVerificationError } from "../../../common/request/types/twoStepVerification";
 import { EppEnrollmentStatus } from "../../../common/request/types/userSettings";
@@ -11,6 +11,7 @@ import { HighlightableElement } from "../../common/HighlightableElement";
 import { LOG_PREFIX } from "../app.config";
 import useSecurityTabContext from "../hooks/useSecurityTabContext";
 import useRedesignFlags from "../hooks/useRedesignFlags";
+import useEppFlags from "../hooks/useEppFlags";
 import { SecurityTabActionType } from "../store/action";
 import ModalState from "../store/modalState";
 import { isGenericChallengeType, renderGenericSpendFriction } from "../utils/challengeParamData";
@@ -22,7 +23,12 @@ import SecurityKeyToggle from "./securityKeyToggle";
 import SmsTwoStepVerificationToggle from "./smsTwoStepVerificationToggle";
 import TwoStepVerificationRadioOptions from "./twoStepVerificationRadioOptions";
 
-const TwoStepVerification: React.FC = () => {
+type TwoStepVerificationProps = {
+  // Owned by the parent so it survives this section unmounting while EPP details are open.
+  shouldScrollIntoViewRef: React.MutableRefObject<boolean>;
+};
+
+const TwoStepVerification: React.FC<TwoStepVerificationProps> = ({ shouldScrollIntoViewRef }) => {
   const {
     state: {
       systemFeedbackService,
@@ -41,6 +47,7 @@ const TwoStepVerification: React.FC = () => {
   } = useSecurityTabContext();
 
   const { isRedesignEnabled, isSecurityTabRedesignEnabled } = useRedesignFlags();
+  const { isEppEligibilityPending } = useEppFlags();
 
   const isEppEnrolled = userSettings?.eppEnrollmentStatus === EppEnrollmentStatus.KEY_PLAN_ENROLLED;
   const isEppUIEnabled = twoStepVerificationMetadata?.isEppUIEnabled ?? false;
@@ -53,6 +60,7 @@ const TwoStepVerification: React.FC = () => {
   const [requestError, setRequestError] = useState<string | null>(null);
   const [requestInFlight, setRequestInFlight] = useState<boolean>(true);
   const [email2SVHasHighlight, setEmail2SVHasHighlight] = useState<boolean>(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   /*
    * Event Handlers
@@ -335,6 +343,23 @@ const TwoStepVerification: React.FC = () => {
     void initializeTwoStepVerification();
   }, []);
 
+  // Scroll to this section when linked with `?display=two-step-verification`. Wait for the section
+  // content and the EPP card above it to settle so the layout doesn't shift after scrolling. The
+  // `scroll-margin-top` on the section keeps the fixed nav bar from covering the heading.
+  useEffect(() => {
+    const { current } = sectionRef;
+    if (
+      current === null ||
+      !shouldScrollIntoViewRef.current ||
+      requestInFlight ||
+      isEppEligibilityPending
+    ) {
+      return;
+    }
+    shouldScrollIntoViewRef.current = false;
+    current.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [requestInFlight, isEppEligibilityPending, isSecurityTabRedesignEnabled]);
+
   /*
    * Component Markup
    */
@@ -394,7 +419,8 @@ const TwoStepVerification: React.FC = () => {
   return (
     <React.Fragment>
       <div
-        className={`section ${isRedesignEnabled ? "settings-redesign-enabled" : ""}`}
+        ref={sectionRef}
+        className={`section two-step-verification-section ${isRedesignEnabled ? "settings-redesign-enabled" : ""}`}
         data-testid="two-step-verification-section"
       >
         <div className="container-header margin-bottom-small">

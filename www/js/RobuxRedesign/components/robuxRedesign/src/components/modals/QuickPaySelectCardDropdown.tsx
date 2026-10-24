@@ -1,6 +1,6 @@
 import { useContext, type ReactNode } from "react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { Dropdown, Menu, MenuItem, MenuSection } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { TrackingContext } from "../../contexts/TrackingContext";
 import { Card, PaymentProfile, PayPal } from "../../services/paymentsGatewayService";
 import { isPayPalProviderPayload } from "../../utils/paymentProfile";
@@ -97,8 +97,7 @@ export function QuickPaySelectCardDropdown({
   selectedPaymentProfile,
 }: SelectCardDropdownProps) {
   const { trackQuickPayClickPaymentMethodDropdown } = useContext(TrackingContext);
-
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.Premium");
   const canSwitchPaymentMethod = paymentProfiles.length > 1;
 
   if (!selectedPaymentProfile?.providerPayload) {
@@ -114,7 +113,7 @@ export function QuickPaySelectCardDropdown({
         translate("QuickPay.Expiration"),
       )}
       hasError={Boolean(error)}
-      hint={error ? translate(error) : undefined}
+      hint={error && translate.has(error) ? translate(error) : undefined}
       onOpenChange={open => {
         if (open && canSwitchPaymentMethod) {
           trackQuickPayClickPaymentMethodDropdown();

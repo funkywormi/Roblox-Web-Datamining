@@ -8,3 +8,6 @@ export const WizardLoadingContext = createContext(false);
  * the presenting node's own UI (e.g. Persona on document.body) stays reachable.
  */
 export const WizardBackgroundedContext = createContext(false);
+
+/** True while the node is shown to the parent, whose screens drop the child's theme. */
+export const WizardParentFacingContext = createContext(false);

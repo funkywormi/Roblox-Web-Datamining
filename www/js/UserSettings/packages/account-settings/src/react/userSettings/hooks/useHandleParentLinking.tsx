@@ -7,8 +7,9 @@ import commonTranslationConstants from "../constants/contentConstants/commonTran
 import ApiCacheTag from "../../apis/common/cacheTagEnum";
 import { useAppDispatch } from "../../redux/hooks";
 import parentalControlsEventService from "../services/eventServices/parentalControlsEventService";
+import type { TAddParentButtons } from "../constants/eventConstants";
 
-export const useHandleParentLinking = (): (() => void) => {
+export const useHandleParentLinking = (buttons?: TAddParentButtons): (() => void) => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
   const dispatch = useAppDispatch();
@@ -20,7 +21,7 @@ export const useHandleParentLinking = (): (() => void) => {
   };
 
   const handleParentLinking = async () => {
-    parentalControlsEventService.authButtonClickSettingsPControlsAddParent();
+    parentalControlsEventService.authButtonClickSettingsPControlsAddParent(buttons);
     const parentLinkingFeatureParams = {
       featureName: AMPFeaturesConstants.allowParentLinkingAMPFeature,
     };
