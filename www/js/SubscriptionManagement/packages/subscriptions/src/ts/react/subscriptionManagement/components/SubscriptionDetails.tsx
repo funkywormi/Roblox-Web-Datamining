@@ -12,6 +12,7 @@ import { Link } from "@rbx/ui";
 import { TranslationProvider } from "@rbx/core-scripts/react";
 import {
   BenefitList,
+  PendingPlanChangeBanner,
   RobloxPlusGiftItemUpsellBanner,
   RobloxPlusFreeTrialBanner,
 } from "@rbx/subscriptions-common";
@@ -96,6 +97,10 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
 
   const isBlackbird =
     !subIsPremium(subscription, isPremium) && subscription.productType === ProductType.Blackbird;
+  const hasRobuxIcon =
+    !subIsPremium(subscription, isPremium) &&
+    (subscription.productType === ProductType.CurrencySubscription ||
+      subscription.productType === ProductType.RobuxSubscription);
 
   const navigateToExperience = useCallback(
     (e: React.MouseEvent) => {
@@ -146,7 +151,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
       subscription.productType === ProductType.CurrencySubscription ||
       subscription.productType === ProductType.RobuxSubscription
     ) {
-      return <span className="premium-icon" />;
+      return <Icon className="!size-900" name="icon-filled-robux" />;
     }
     return (
       <Thumbnail2d
@@ -312,10 +317,19 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
             />
           </div>
         )}
+        {isBlackbird && !subIsPremium(subscription, isPremium) && (
+          <PendingPlanChangeBanner
+            className="margin-bottom-small"
+            nextRenewalTimestampMs={subscription.renewal.getTime()}
+            style={{ gridColumn: "1 / 3" }}
+            subscriptionId={subscription.subscriptionId}
+          />
+        )}
         <div className="details-info">
           <div
             className={classNames("detail-card-icon-container", {
               "detail-card-icon-container--blackbird": isBlackbird,
+              "detail-card-icon-container--robux": hasRobuxIcon,
             })}
           >
             {renderIcon()}
@@ -353,7 +367,13 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
             )
           )}
           <div className="subscription-billing-cycle-info">
-            <CycleEndDate expiration={subscription.expiration} renewal={subscription.renewal} />
+            <CycleEndDate
+              expiration={subscription.expiration}
+              renewal={subscription.renewal}
+              productType={
+                subIsPremium(subscription, isPremium) ? undefined : subscription.productType
+              }
+            />
             {hasFreeTrialOffer((subscription as UserSubscription).subscriptionOffers) && (
               <Chip
                 as="button"
@@ -405,8 +425,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
             />
           )}
         </div>
-        {/* Sticky footer below 768px, the breakpoint the grid in subscriptionDetails.scss uses */}
-        <div className="height-fit justify-self-end empty:hidden max-[767px]:sticky max-[767px]:justify-self-stretch max-[767px]:bg-surface-0 max-[767px]:padding-top-medium max-[767px]:margin-top-[36px] max-[767px]:padding-bottom-[max(var(--padding-medium),env(safe-area-inset-bottom))] [grid-column:2/3] max-[767px]:[bottom:0] max-[767px]:[grid-column:1/3] max-[767px]:[order:4] max-[767px]:[z-index:1]">
+        <div className="margin-top-[16px] height-fit justify-self-start empty:hidden [grid-column:1/3]">
           {isExpiring(subscription.renewal, subscription.expiration) ? (
             <ResubscribeSubscription
               subscription={subscription}

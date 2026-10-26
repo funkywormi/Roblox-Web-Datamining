@@ -15,6 +15,13 @@ export const observabilityRegistry = {
         { name: "ListSubscriptionsV2Failed", dimensions: ["productType"] },
       ],
     },
+    listPrivateServerSubscriptions: {
+      counters: [
+        { name: "ListPrivateServerSubscriptionsCalled" },
+        { name: "ListPrivateServerSubscriptionsSucceeded" },
+        { name: "ListPrivateServerSubscriptionsFellBack" },
+      ],
+    },
   },
 } as const satisfies RegistryInput;
 

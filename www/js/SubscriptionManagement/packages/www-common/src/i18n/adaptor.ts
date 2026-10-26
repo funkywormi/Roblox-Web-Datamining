@@ -6,6 +6,7 @@ import {
   type FromColonToPeriodDelimited,
   type FromPeriodToColonDelimited,
   fromPeriodToColonDelimited,
+  toFullKeyPath,
 } from "./util";
 import type { Namespace } from "./types";
 import { trackError, type ErrorName } from "../observability";
@@ -15,9 +16,13 @@ type TranslationKey<N extends Namespace> = FromColonToPeriodDelimited<
   keyof Messages[FromPeriodToColonDelimited<N>] & string
 >;
 
+type TranslationValues = Record<string, string | number | Date>;
+
 type Translate<N extends Namespace> = (
   key: TranslationKey<N>,
-  values?: Record<string, string | number | Date>,
+  values?: TranslationValues,
+  /** Returned when `key` is absent from the messages loaded at runtime. */
+  fallback?: string,
 ) => string;
 
 type TranslateRich<N extends Namespace> = (
@@ -35,11 +40,7 @@ type Has<N extends Namespace> = (key: string) => key is TranslationKey<N>;
  * Looks up a key that only exists at runtime. Returns the translation when the key resolves, and
  * `fallback` (or `""`) when it does not, without the missing-key console error from `translate`.
  */
-type TranslateDynamic = (
-  key: string,
-  values?: Record<string, string | number | Date>,
-  fallback?: string,
-) => string;
+type TranslateDynamic = (key: string, values?: TranslationValues, fallback?: string) => string;
 
 /**
  * Renders a legacy `{tagStart}...{tagEnd}` string. `key` may be a catalogue key or a runtime
@@ -50,6 +51,32 @@ type TranslateHtml<N extends Namespace> = (
   tags: readonly HtmlTag[],
   values?: Record<string, string | number | Date>,
 ) => ReactNode;
+
+/**
+ * Renders a legacy `{tagStart}...{tagEnd}` string for a full `Namespace.Key`. A missing key or
+ * malformed segment is tracked and renders nothing.
+ */
+type TranslateFullKeyHtml = (
+  key: string,
+  tags: readonly HtmlTag[],
+  values?: Record<string, string | number | Date>,
+) => ReactNode;
+
+/**
+ * Translates a full `Namespace.Key` string (the namespace is the first two segments). The third
+ * argument is returned when the key is missing; when it is omitted, the result is `""`.
+ */
+export type FullKeyTranslator = ((
+  key: string,
+  values?: TranslationValues,
+  fallback?: string,
+) => string) & {
+  html: TranslateFullKeyHtml;
+};
+
+export type FullKeyTranslations = {
+  translateFullKey: FullKeyTranslator;
+};
 
 export type Translator<N extends Namespace> = Translate<N> & {
   rich: TranslateRich<N>;
@@ -67,6 +94,8 @@ type UntypedTranslator = {
   rich: (key: string, values?: Record<string, unknown>) => ReactNode;
   has: (key: string) => boolean;
 };
+
+const isUsableKey = (key: unknown): key is string => typeof key === "string" && key.length > 0;
 
 const trackTranslationError = (error: ErrorName, namespace: string, key: string) => {
   // The publisher is the browser counter. Server renders of getTranslations must not send it.
@@ -87,15 +116,27 @@ export const adaptTranslator = <N extends Namespace>(
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const untyped = translator as unknown as UntypedTranslator;
 
-  const translate: Translate<N> = (key, values) => untyped(fromPeriodToColonDelimited(key), values);
+  const translate: Translate<N> = (key, values, fallback) => {
+    const translatedKey = fromPeriodToColonDelimited(key);
+    if (fallback !== undefined && !untyped.has(translatedKey)) {
+      trackTranslationError("TranslationKeyNotFound", namespace, translatedKey);
+      return fallback;
+    }
+    return untyped(translatedKey, values);
+  };
 
   const rich: TranslateRich<N> = (key, values) =>
     untyped.rich(fromPeriodToColonDelimited(key), values);
 
   const has: Has<N> = (key): key is TranslationKey<N> =>
-    untyped.has(fromPeriodToColonDelimited(key));
+    isUsableKey(key) && untyped.has(fromPeriodToColonDelimited(key));
 
   const dynamic: TranslateDynamic = (key, values, fallback = "") => {
+    if (!isUsableKey(key)) {
+      trackTranslationError("TranslationKeyNotFound", namespace, String(key));
+      return fallback;
+    }
+
     const translatedKey = fromPeriodToColonDelimited(key);
     const isAvailable = untyped.has(translatedKey);
     if (!isAvailable) {
@@ -105,6 +146,11 @@ export const adaptTranslator = <N extends Namespace>(
   };
 
   const html: TranslateHtml<N> = (key, tags, values) => {
+    if (!isUsableKey(key)) {
+      trackTranslationError("TranslationKeyNotFound", namespace, String(key));
+      return null;
+    }
+
     const translatedKey = fromPeriodToColonDelimited(key);
     if (!untyped.has(translatedKey)) {
       trackTranslationError("TranslationKeyNotFound", namespace, translatedKey);
@@ -118,4 +164,59 @@ export const adaptTranslator = <N extends Namespace>(
   };
 
   return Object.assign(translate, { rich, has, dynamic, html });
+};
+
+/**
+ * Adapts an un-namespaced `use-intl` translator to full `Namespace.Key` strings.
+ * The argument is widened once: colon-delimited lookup paths are not part of the caller's key type.
+ */
+export const adaptFullKeyTranslator = (translator: unknown): FullKeyTranslator => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  const untyped = translator as UntypedTranslator;
+
+  const translateFullKey = (fullKey: string, values?: TranslationValues, fallback = "") => {
+    if (!isUsableKey(fullKey)) {
+      trackTranslationError("TranslationKeyNotFound", "unknown", String(fullKey));
+      return fallback;
+    }
+
+    const resolved = toFullKeyPath(fullKey);
+    if (!resolved) {
+      trackTranslationError("TranslationKeyNotFound", fullKey, fullKey);
+      return fallback;
+    }
+
+    if (!untyped.has(resolved.path)) {
+      trackTranslationError("TranslationKeyNotFound", resolved.namespace, resolved.key);
+      return fallback;
+    }
+
+    return untyped(resolved.path, values);
+  };
+
+  const html: TranslateFullKeyHtml = (fullKey, tags, values) => {
+    if (!isUsableKey(fullKey)) {
+      trackTranslationError("TranslationKeyNotFound", "unknown", String(fullKey));
+      return null;
+    }
+
+    const resolved = toFullKeyPath(fullKey);
+    if (!resolved) {
+      trackTranslationError("TranslationKeyNotFound", fullKey, fullKey);
+      return null;
+    }
+
+    if (!untyped.has(resolved.path)) {
+      trackTranslationError("TranslationKeyNotFound", resolved.namespace, resolved.key);
+      return null;
+    }
+
+    const result = renderHtml(interpolated => untyped(resolved.path, interpolated), tags, values);
+    if (result == null) {
+      trackTranslationError("TranslationMalformed", resolved.namespace, resolved.key);
+    }
+    return result;
+  };
+
+  return Object.assign(translateFullKey, { html });
 };

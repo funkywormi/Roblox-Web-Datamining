@@ -1,13 +1,15 @@
 import React from "react";
 import { useTranslation } from "react-utilities";
 import classNames from "classnames";
+import { ProductType } from "@rbx/client-subscriptions-api/v2";
 
 type CycleEndDateProps = {
   expiration: Date;
   renewal: Date;
+  productType?: string;
 };
 
-const CycleEndDate: React.FC<CycleEndDateProps> = ({ expiration, renewal }) => {
+const CycleEndDate: React.FC<CycleEndDateProps> = ({ expiration, renewal, productType }) => {
   const { translate } = useTranslation();
 
   // Backend returns renewal time ms as 0 if not renewing
@@ -19,8 +21,13 @@ const CycleEndDate: React.FC<CycleEndDateProps> = ({ expiration, renewal }) => {
     year: "numeric",
   });
 
+  const renewingLabel =
+    productType === ProductType.RobuxSubscription
+      ? translate("Label.Subscriptions.NextChargeAndDelivery")
+      : translate("Label.Subscriptions.Renews");
+
   const subscriptionDateString = `${
-    expiring ? translate("Label.Subscriptions.Expires") : translate("Label.Subscriptions.Renews")
+    expiring ? translate("Label.Subscriptions.Expires") : renewingLabel
   } ${subscriptionDisplayDate}`;
 
   return (

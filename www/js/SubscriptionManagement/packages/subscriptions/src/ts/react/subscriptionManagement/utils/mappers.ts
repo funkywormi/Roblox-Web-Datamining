@@ -93,7 +93,8 @@ export const mapV2ToUserSubscription = (sub: Subscription): UserSubscription => 
     name: productType,
     subscriptionProviderName: "Roblox",
     productType: productType || undefined,
-    price: mapV2DisplayPrice(sub.displayPrice),
+    // Subscribe and Save renews at a discount; the backend only sends this when it's lower.
+    price: mapV2DisplayPrice(sub.recurringDisplayPrice ?? sub.displayPrice),
     subscriptionPeriod: sub.periodType as PeriodType,
     periodCount: sub.productInfo?.periodCount,
     expiration: new Date(sub.expirationTimestampMs),

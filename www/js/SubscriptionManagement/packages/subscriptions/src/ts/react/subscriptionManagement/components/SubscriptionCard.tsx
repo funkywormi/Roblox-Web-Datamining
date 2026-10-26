@@ -86,13 +86,13 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       return <span className="premium-icon" />;
     }
     if (productType === ProductType.Blackbird) {
-      return <Icon className="blackbird-icon" name="icon-regular-roblox-plus" size="Large" />;
+      return <Icon className="!size-full" name="icon-regular-roblox-plus" size="Large" />;
     }
     if (
       productType === ProductType.CurrencySubscription ||
       productType === ProductType.RobuxSubscription
     ) {
-      return <span className="premium-icon" />;
+      return <Icon className="!size-full" name="icon-filled-robux" size="Large" />;
     }
     return (
       <Thumbnail2d
@@ -128,11 +128,11 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               className="subscription"
             />
           ) : (
-            <CycleEndDate expiration={expiration} renewal={renewal} />
+            <CycleEndDate expiration={expiration} renewal={renewal} productType={productType} />
           )}
           {showPrice && (
             <div className="subscription-billing-cycle-info">
-              <CycleEndDate expiration={expiration} renewal={renewal} />
+              <CycleEndDate expiration={expiration} renewal={renewal} productType={productType} />
               {hasFreeTrialOffer(subscriptionOffers) && (
                 <Chip
                   as="button"

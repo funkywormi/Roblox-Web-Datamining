@@ -15,7 +15,7 @@ export function useGetPrivateServersSystemSettings(options: Options = {}) {
   return useQuery<PrivateServersSystemSettingsResponse, Error>({
     queryKey: privateServerKeys.systemSettings(),
     queryFn: ({ signal }) =>
-      privateServersApi.privateServersGetPrivateServersSystemSettings(undefined, { signal }),
+      privateServersApi.privateServersGetPrivateServersSystemSettings({ signal }),
     retry: DEFAULT_RETRIES,
     ...options,
   });

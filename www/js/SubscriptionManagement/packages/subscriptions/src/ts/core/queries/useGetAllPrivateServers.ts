@@ -1,12 +1,19 @@
 import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { authenticatedUser } from "header-scripts";
 import * as httpService from "@rbx/core-scripts/http";
+import { trackCounter } from "../../../observability";
 import serviceConstants from "../constants/serviceConstants";
+import { privateServersApi } from "../services/privateServerServices";
 import type {
   GetMyPrivateServersParams,
   GetMyPrivateServersResponse,
   MyPrivateServerResponse,
 } from "../types/privateServerTypes";
 import { parsePrivateServerWithDate } from "../utils/privateServerUtils";
+import {
+  getIsPrivateServersV2Enabled,
+  mapPrivateServerV2ToResponse,
+} from "../utils/privateServersV2Utils";
 import { privateServerKeys } from "./constants";
 
 const getMyPrivateServers = async (
@@ -25,10 +32,10 @@ const getMyPrivateServers = async (
   return data;
 };
 
-const getAllPrivateServers = async (): Promise<MyPrivateServerResponse[]> => {
-  const SINGLE_PAGE_SIZE = 100;
-  const MAX_CALLS = 100; // To prevent infinite looping; very generous limit of 10k private servers
+const SINGLE_PAGE_SIZE = 100;
+const MAX_CALLS = 100; // To prevent infinite looping; very generous limit of 10k private servers
 
+const getAllPrivateServersV1 = async (): Promise<MyPrivateServerResponse[]> => {
   let cursor = "";
   let fullList: MyPrivateServerResponse[] = [];
   for (let i = 0; i < MAX_CALLS; i++) {
@@ -45,6 +52,49 @@ const getAllPrivateServers = async (): Promise<MyPrivateServerResponse[]> => {
   }
 
   return fullList;
+};
+
+const getMyPrivateServersV2Page = async (userId: number, pageToken?: string) => {
+  const response = await privateServersApi.privateServersListUserPrivateServers({
+    userId,
+    pageSize: SINGLE_PAGE_SIZE,
+    pageToken,
+  });
+  return {
+    servers: response.privateServers.map(mapPrivateServerV2ToResponse),
+    nextPageToken: response.nextPageToken,
+  };
+};
+
+const getAllPrivateServersV2 = async (userId: number): Promise<MyPrivateServerResponse[]> => {
+  trackCounter("ListPrivateServerSubscriptionsCalled");
+
+  let page: Awaited<ReturnType<typeof getMyPrivateServersV2Page>>;
+  try {
+    page = await getMyPrivateServersV2Page(userId);
+  } catch {
+    trackCounter("ListPrivateServerSubscriptionsFellBack");
+    return getAllPrivateServersV1();
+  }
+
+  // Later pages do not fall back: v1 cursors cannot resume a v2 listing, so the query errors like v1 does today.
+  const fullList = [...page.servers];
+  for (let i = 1; i < MAX_CALLS && page.nextPageToken; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    page = await getMyPrivateServersV2Page(userId, page.nextPageToken);
+    fullList.push(...page.servers);
+  }
+
+  trackCounter("ListPrivateServerSubscriptionsSucceeded");
+  return fullList;
+};
+
+export const getAllPrivateServers = async (): Promise<MyPrivateServerResponse[]> => {
+  const userId = authenticatedUser.id;
+  if (userId && (await getIsPrivateServersV2Enabled())) {
+    return getAllPrivateServersV2(userId);
+  }
+  return getAllPrivateServersV1();
 };
 
 type AllPrivateServersResponse = Awaited<ReturnType<typeof getAllPrivateServers>>;

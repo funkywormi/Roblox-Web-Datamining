@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import type { SubscriptionProductInfo } from "@rbx/client-subscriptions-api/v2";
 import {
   getEntitledRobux,
+  getPlusProductName,
+  usePendingPlanChange,
   usePlanChangeProducts,
   usePreparePlanChange,
   useReservePlanChange,
@@ -24,7 +26,13 @@ const OtherPackagesSection: React.FC<OtherPackagesSectionProps> = ({ subscriptio
   const format = useFormatter();
   const { systemFeedbackService } = useSystemFeedbackContext();
   const { subscriptionId } = subscription;
-  // A plan change is keyed on the subscription id, which V1-only rows don't have.
+  // The banner and this list describe the same fact. Keep the package query running so
+  // its result stays cached; hiding it by disabling the query makes the next enable
+  // refetch, and that refetch is empty until the provider webhook lands.
+  const { pendingPlanChange, isLoading: isPendingPlanChangeLoading } = usePendingPlanChange({
+    subscriptionId,
+    enabled: subscriptionId !== undefined,
+  });
   const { planChangeProducts } = usePlanChangeProducts({ enabled: subscriptionId !== undefined });
   const {
     mutate: preparePlanChange,
@@ -39,7 +47,12 @@ const OtherPackagesSection: React.FC<OtherPackagesSectionProps> = ({ subscriptio
   const packages = planChangeProducts.filter((product): product is PricedProduct =>
     Boolean(product.localizedPriceDisplayString),
   );
-  if (subscriptionId === undefined || packages.length === 0) {
+  if (
+    subscriptionId === undefined ||
+    isPendingPlanChangeLoading ||
+    pendingPlanChange !== undefined ||
+    packages.length === 0
+  ) {
     return null;
   }
 
@@ -49,11 +62,6 @@ const OtherPackagesSection: React.FC<OtherPackagesSectionProps> = ({ subscriptio
     month: "short",
     day: "numeric",
   });
-
-  const getProductName = (product: SubscriptionProductInfo) => {
-    const robux = getEntitledRobux(product);
-    return robux > 0 ? `${t("Label.BlackbirdShort")} ${robux}` : t("Label.Blackbird");
-  };
 
   const getBenefits = (product: SubscriptionProductInfo): PlanChangePackageBenefit[] => {
     const robux = getEntitledRobux(product);
@@ -108,7 +116,7 @@ const OtherPackagesSection: React.FC<OtherPackagesSectionProps> = ({ subscriptio
 
   const getDialogDescription = (product: PricedProduct) => {
     const robux = getEntitledRobux(product);
-    const productName = getProductName(product);
+    const productName = getPlusProductName(product, t);
     const price = product.localizedPriceDisplayString;
     if (robux === 0) {
       return t("Subtext.PlanChangeDialogNoRobux", { productName, price, date: changeDate });
@@ -139,15 +147,16 @@ const OtherPackagesSection: React.FC<OtherPackagesSectionProps> = ({ subscriptio
     if (isPreparing || isReserving || preparedPlanChangeId === undefined || !targetProduct) {
       return;
     }
-    const productName = getProductName(targetProduct);
     reservePlanChange(
-      { subscriptionId, planChangeId: preparedPlanChangeId },
+      {
+        subscriptionId,
+        planChangeId: preparedPlanChangeId,
+        targetSubscriptionProductKey: targetProduct.productKey,
+        targetProduct,
+      },
       {
         onSuccess: () => {
           setPreparedPlanChangeId(undefined);
-          systemFeedbackService.success(
-            t("Message.PlanChangeScheduled", { productName, date: changeDate }),
-          );
         },
         onError: onPlanChangeFailed,
       },
@@ -172,7 +181,7 @@ const OtherPackagesSection: React.FC<OtherPackagesSectionProps> = ({ subscriptio
           }
           price={product.localizedPriceDisplayString}
           strikethroughPrice={product.localizedStrikethroughPriceDisplayString}
-          title={getProductName(product)}
+          title={getPlusProductName(product, t)}
           onAction={() => {
             onChangePlan(product);
           }}
