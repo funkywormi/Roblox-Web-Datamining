@@ -1,8 +1,8 @@
-import { TranslateFunction } from 'react-utilities';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { useEffect } from 'react';
-import { IModalService } from 'react-style-guide';
+import type { IModalService } from '../../components/StyleGuide';
 import { useSelector } from 'react-redux';
-import { TFeatureSpecificData } from 'Roblox';
+import type { TFeatureSpecificData } from '@rbx/legacy-webapp-types/Roblox/accessManagementUpsellService';
 import { Recourse, UpsellStage } from '../../enums';
 import UserSetting from '../../../legallySensitiveContent/enums/UserSetting';
 import ExpNewChildModal from '../../enums/ExpNewChildModal';
@@ -27,9 +27,9 @@ const Prologue = ({
   expChildModalType?: ExpNewChildModal;
   featureSpecificParams?: TFeatureSpecificData;
   onVpcSelected?: () => void;
-}): JSX.Element => {
+}): React.JSX.Element => {
   const dispatch = useAppDispatch();
-  let [prologueModal, prologueModelService]: [JSX.Element, IModalService] = [null, null] as unknown as [JSX.Element, IModalService];
+  let [prologueModal, prologueModelService]: [React.JSX.Element, IModalService] = [null, null] as unknown as [React.JSX.Element, IModalService];
 
   const featureAccess = useSelector(selectFeatureAccess);
   const recourseResponses = featureAccess.data!.recourses;

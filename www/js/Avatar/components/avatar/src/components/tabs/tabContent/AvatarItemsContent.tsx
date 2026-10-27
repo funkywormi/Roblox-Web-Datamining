@@ -185,6 +185,11 @@ function AvatarItemsContent({
   // Request sequence tracking to detect race conditions
   const requestSequenceRef = useRef(0);
 
+  // Item details can resolve after the user equips something. Read selection through a ref so a
+  // late response doesn't apply the worn assets from when the request started.
+  const isItemSelectedRef = useRef(isItemSelected);
+  isItemSelectedRef.current = isItemSelected;
+
   // Outfit management hooks
   const {
     activeItem,
@@ -587,7 +592,7 @@ function AvatarItemsContent({
                       },
                       // Pass the asset type so selection logic that keys off it (e.g. profile
                       // backgrounds, which aren't in the worn-assets lookup) resolves correctly.
-                      selected: isItemSelected({
+                      selected: isItemSelectedRef.current({
                         id: inventoryItem.id,
                         type: "Asset",
                         assetType: {
@@ -646,7 +651,7 @@ function AvatarItemsContent({
                   selected: false, // Default to false, will be recalculated below with assets
                 };
                 // Recalculate selection after assets are set so checkOutfitEquipped works correctly
-                updatedItem.selected = isItemSelected(updatedItem);
+                updatedItem.selected = isItemSelectedRef.current(updatedItem);
 
                 let itemRestrictions: string[] = [];
                 if (

@@ -16,9 +16,10 @@ import { type SduiRendererInjectedProps, type SduiScaleType } from "@rbx/sdui-co
 import { SduiErrorBoundary, useSduiServices } from "@rbx/sdui-core/client";
 import { getVideoPlayerStyles } from "./videoPlayerStyleUtils";
 import { VideoPlayerLoadingFallback } from "./VideoPlayerLoadingFallback";
-import { VIDEO_PLAYBACK_BEHAVIOR } from "./sduiVideoPlayerConstants";
+import { resolveVideoMaxQuality, VIDEO_PLAYBACK_BEHAVIOR } from "./sduiVideoPlayerConstants";
 import { SduiVideoError } from "../../telemetry/sduiVideoErrorConstants";
 import {
+  getVideoAnalyticsContext,
   getVideoCmcdInstanceTypeFromSdui,
   getVideoEventPageContextFromSdui,
   reportSduiVideoError,
@@ -36,6 +37,9 @@ export interface SduiVideoPlayerProps extends SduiRendererInjectedProps {
   loadingImage?: string;
   disableControls?: boolean;
   scaleType?: SduiScaleType;
+  /** Arrives unvalidated from the template, so values outside known `standard` / `fhd` are possible. */
+  maxQuality?: string;
+  adaptiveResolution?: boolean;
 }
 
 type SduiVideoPlayerInnerProps = SduiVideoPlayerProps & { videoAssetId: string };
@@ -52,12 +56,23 @@ function SduiVideoPlayerInner({
   loadingImage,
   disableControls = true,
   scaleType,
+  maxQuality,
+  adaptiveResolution = false,
+  analyticsContext,
 }: SduiVideoPlayerInnerProps) {
   const theme = useTheme();
   const { errorReporter, pageContext } = useSduiServices();
   const videoRef = useRef<VideoPlayerRef | null>(null);
+  const isMountedRef = useRef(true);
   const [isReady, setIsReady] = useState(false);
   const [hasFailed, setHasFailed] = useState(false);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const environment = useMemo(() => getCurrentEnvironment(), []);
   const browserCompatibility = useMemo(() => isVideoPlayerSupportedByBrowser(), []);
@@ -83,17 +98,20 @@ function SduiVideoPlayerInner({
     [errorReporter, pageContext],
   );
 
-  const analyticsConfig: VideoAnalyticsConfig = useMemo(() => {
-    return {
+  const { source, sourceId } = getVideoAnalyticsContext(analyticsContext, videoAssetId);
+
+  const analyticsConfig: VideoAnalyticsConfig = useMemo(
+    () => ({
       target: "www",
       assetId: videoAssetId,
       environment,
-      source: "asset",
-      sourceId: videoAssetId,
+      source,
+      sourceId,
       completionThreshold: 100,
       pageContext: eventPageContext,
-    };
-  }, [environment, eventPageContext, videoAssetId]);
+    }),
+    [environment, eventPageContext, source, sourceId, videoAssetId],
+  );
 
   const handleFailure = useCallback(() => {
     setHasFailed(true);
@@ -139,6 +157,12 @@ function SduiVideoPlayerInner({
     try {
       await video.play();
     } catch (error) {
+      // Parent unmount (e.g. tile hover end) tears down MediaSource while play() is in flight,
+      // so don't report errors in this case.
+      if (!isMountedRef.current) {
+        return;
+      }
+
       const name = error instanceof Error ? error.name : "UnknownError";
       const message = error instanceof Error && error.message ? error.message : String(error);
       reportSduiVideoError(
@@ -151,6 +175,7 @@ function SduiVideoPlayerInner({
   }, [errorReporter, isBrowserSupported, pageContext]);
 
   const shouldPlayWhenReady = playbackBehavior === VIDEO_PLAYBACK_BEHAVIOR.PlayWhenReady;
+  const resolvedMaxQuality = resolveVideoMaxQuality(maxQuality);
 
   const handleVideoLoadEnd = useCallback(() => {
     setIsReady(true);
@@ -222,6 +247,7 @@ function SduiVideoPlayerInner({
             scaleType={scaleType}
             loadingStyles={loadingStyles}
             hasFailed={showFailedFallback}
+            isReady={isReady}
           />
 
           {isBrowserSupported && !hasFailed && (
@@ -241,6 +267,8 @@ function SduiVideoPlayerInner({
                 onLoadError={handleLoadError}
                 cmcdInstanceType={cmcdInstanceType}
                 cmcdUserKey={cmcdUserKey}
+                maxQuality={resolvedMaxQuality}
+                adaptiveResolution={adaptiveResolution}
               />
             </SduiErrorBoundary>
           )}

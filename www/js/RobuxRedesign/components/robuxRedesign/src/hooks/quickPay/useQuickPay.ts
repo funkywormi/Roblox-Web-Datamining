@@ -5,6 +5,7 @@ import { captureException } from "@rbx/payments/error";
 import { isAxiosError } from "@rbx/payments/utils";
 import Intl from "@rbx/core-scripts/intl";
 import { window } from "@rbx/core-lib/browser";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { getStripePublicAPIKeyForEnv } from "../../constants/stripe";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 import { TrackingContext } from "../../contexts/TrackingContext";
@@ -112,7 +113,7 @@ export type QuickPay = {
   selectPaymentProfile: (paymentProfile: PaymentProfile) => void;
   shouldRedirectToPurchase: boolean;
   stripe: Stripe | null;
-  taxTranslationKey: string;
+  taxTitle: string;
   isQuickPayLoading: boolean;
 };
 
@@ -137,6 +138,8 @@ export function useQuickPay({
   const { getPurchaseUrl, paymentSession, productIds, purchaseFlowId, urlParams } =
     useContext(BuyRobuxPageContext);
   const { trackQuickPayClick, trackQuickPayPurchase } = useContext(TrackingContext);
+
+  const translatePremium = useTranslations("Feature.Premium");
 
   const [checkoutSessionId, setCheckoutSessionId] = useState<number | null | undefined>();
   const [isBonusItem, setIsBonusItem] = useState<boolean>(false);
@@ -481,20 +484,20 @@ export function useQuickPay({
     ],
   );
 
-  const taxTranslationKey = useMemo(() => {
+  const taxTitle = useMemo(() => {
     if (!preparePaymentProviderPayload) {
-      return QuickPayTax.Default;
+      return translatePremium(QuickPayTax.Default);
     }
 
     const { taxType, taxAmountExclusive, billingCountryCode, taxPercentageDecimal } =
       preparePaymentProviderPayload;
 
     if (taxAmountExclusive.Units === 0 && taxAmountExclusive.Nanos === 0) {
-      return QuickPayTax.Default;
+      return translatePremium(QuickPayTax.Default);
     }
 
     if (!taxType) {
-      return QuickPayTax.Default;
+      return translatePremium(QuickPayTax.Default);
     }
 
     let percentString = "";
@@ -508,7 +511,7 @@ export function useQuickPay({
       trackError("QuickPayPercentStringException", null, e);
     }
 
-    let taxString: string;
+    let taxString: QuickPayTax;
     switch (taxType) {
       case StripeTaxType.GST: {
         taxString = QuickPayTax.GST;
@@ -569,8 +572,8 @@ export function useQuickPay({
       }
     }
 
-    return taxString + (percentString.length > 0 ? ` (${percentString}%)` : "");
-  }, [preparePaymentProviderPayload]);
+    return translatePremium(taxString) + (percentString.length > 0 ? ` (${percentString}%)` : "");
+  }, [preparePaymentProviderPayload, translatePremium]);
 
   const process3DSForQuickPay = useCallback(
     async (ev: MessageEvent<QuickPayIframeMessage>): Promise<string | undefined> => {
@@ -695,7 +698,7 @@ export function useQuickPay({
       selectedProduct,
       shouldRedirectToPurchase,
       stripe,
-      taxTranslationKey,
+      taxTitle,
       isQuickPayLoading,
       subscribedRobuxProductOffers,
       isSubscribeAndSaveChecked,
@@ -720,7 +723,7 @@ export function useQuickPay({
       subscribedRobuxProductOffers,
       isSubscribeAndSaveChecked,
       toggleSubscribeAndSave,
-      taxTranslationKey,
+      taxTitle,
       process3DSForQuickPay,
       isQuickPayLoading,
     ],

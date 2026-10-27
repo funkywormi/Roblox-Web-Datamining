@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@rbx/foundation-ui";
 import { usePendingPlusReferrals } from "@rbx/subscriptions-common";
 import { useFullKeyTranslations } from "@rbx/www-common/i18n";
-import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
 import { Section } from "../types/buyRobuxPageData";
 import { InlinePendingRequests } from "./InlinePendingRequests";
 import { RobuxBalance } from "./RobuxBalance";
@@ -16,7 +15,7 @@ import { getSectionTrackingProps } from "../hooks/useScrollTracking";
 import { getAppPolicy } from "../services/guacService";
 
 const HEADER_SHELL_CLASS =
-  "flex flex-col self-stretch medium:self-end medium:margin-top-[16px] medium:margin-right-[16px]";
+  "sticky medium:static top-[env(safe-area-inset-top)] medium:top-[auto] margin-top-[env(safe-area-inset-top)] [z-index:10] flex flex-col self-stretch medium:self-end medium:margin-top-[16px] medium:margin-right-[16px]";
 
 const HEADER_CARD_CLASS =
   "flex flex-col gap-large bg-surface-100 padding-y-medium padding-x-large small:padding-x-xlarge self-stretch";
@@ -31,7 +30,6 @@ export function Header({
   const {
     robuxGifting: { openModal },
   } = useContext(ModalContext);
-  const { breakpoint } = useContext(BuyRobuxPageContext);
   const { trackRobuxGiftClick } = useContext(TrackingContext);
 
   const { translateFullKey } = useFullKeyTranslations();
@@ -52,7 +50,6 @@ export function Header({
   const robuxGift = robuxGiftSection?.robuxGift;
   const hasTransfers = Boolean(transfers?.pendingTransfers?.length);
   const hasPendingRequests = hasTransfers || pendingReferrals.length > 0;
-  const isSmallView = !breakpoint.isAboveInclusive("medium");
 
   const pendingRequestsRow = hasPendingRequests ? (
     <div className="flex padding-y-medium padding-x-medium medium:padding-x-large self-stretch radius-medium justify-center bg-shift-100 stroke-standard stroke-default">
@@ -69,21 +66,7 @@ export function Header({
   // prompt still gets a home above the page content.
   if (!transfers) {
     return pendingRequestsRow ? (
-      // `.buy-robux-background` is an absolutely positioned 1080px overlay, so without a z-index
-      // it paints over this row and swallows the Review click.
-      <div
-        className={HEADER_SHELL_CLASS}
-        style={
-          isSmallView
-            ? {
-                position: "sticky",
-                top: "env(safe-area-inset-top)",
-                marginTop: "env(safe-area-inset-top)",
-                zIndex: 10,
-              }
-            : { zIndex: 10 }
-        }
-      >
+      <div className={HEADER_SHELL_CLASS}>
         <div className={classNames(HEADER_CARD_CLASS, "medium:radius-medium")}>
           {pendingRequestsRow}
         </div>
@@ -98,17 +81,6 @@ export function Header({
       // considered impressed.
       {...getSectionTrackingProps(transfersSection)}
       className={HEADER_SHELL_CLASS}
-      style={
-        isSmallView
-          ? {
-              position: "sticky",
-              top: "env(safe-area-inset-top)",
-              // need to offset the rest of the page by safe-area-inset-top when sticky
-              marginTop: "env(safe-area-inset-top)",
-              zIndex: 10,
-            }
-          : { zIndex: 10 }
-      }
     >
       <div
         className={classNames(HEADER_CARD_CLASS, {

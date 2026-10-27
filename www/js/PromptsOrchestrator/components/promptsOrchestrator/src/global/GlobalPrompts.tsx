@@ -12,6 +12,8 @@ import { OverlayRenderer } from "../overlay-orchestrator/types";
 import { submitPrompt } from "../overlay-orchestrator/scheduler/submitPrompt";
 import { GLOBAL_PROMPT_STYLES } from "../common/constants/promptStyleConstants";
 import { usePromptEntries } from "../common/hooks/usePromptEntries";
+import { SurfaceBanner } from "./components/SurfaceBanner";
+import { isValidSduiPromptEntry } from "../overlay-orchestrator/scheduler/utils";
 
 type BaseGlobalPromptsProps = {
   entryPoint: GlobalPromptEntryPoint;
@@ -20,6 +22,7 @@ type BaseGlobalPromptsProps = {
 
 const BaseGlobalPrompts = ({ entryPoint, clientAttributes }: BaseGlobalPromptsProps) => {
   const { configKey, surfaceKey, appPage } = getSurfaceRequestConfig(entryPoint, clientAttributes);
+
   const promptEntries = usePromptEntries({
     entryPoint,
     surfaceKey,
@@ -52,8 +55,14 @@ const BaseGlobalPrompts = ({ entryPoint, clientAttributes }: BaseGlobalPromptsPr
   }, [modalEntry, configKey]);
 
   const surfaceBanner = promptEntries.SurfaceBanner[0];
-  // TODO: Render the surface banner
-  return surfaceBanner ? <div data-testid="global-prompts" /> : null;
+  return isValidSduiPromptEntry(surfaceBanner) ? (
+    <SurfaceBanner
+      promptEntry={surfaceBanner}
+      appPage={appPage}
+      configKey={configKey}
+      clientAttributes={clientAttributes}
+    />
+  ) : null;
 };
 
 // This is a wrapper around BaseGlobalPrompts that ensures the entry point is set

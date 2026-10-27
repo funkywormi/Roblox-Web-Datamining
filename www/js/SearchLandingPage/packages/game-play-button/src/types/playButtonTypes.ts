@@ -13,6 +13,8 @@ export type TPlayabilityStatusWithUnplayableError = Exclude<
   | TPlayabilityStatuses["ContextualPlayabilityUnverifiedSeventeenPlusUser"]
   | TPlayabilityStatuses["ContextualPlayabilityAgeCheckRequired"]
   | TPlayabilityStatuses["ContextualPlayabilityCoreGated"]
+  | TPlayabilityStatuses["ContextualPlayabilityPlaytestDisabled"]
+  | TPlayabilityStatuses["ContextualPlayabilityTrustedFriendRequired"]
   | TPlayabilityStatuses["FiatPurchaseRequired"]
 >;
 
@@ -80,6 +82,11 @@ export type TUpsellUxTreatment = {
   data?: Record<string, string>;
 };
 
+export type TPrivatePlaytestInfo = {
+  isPlayable: boolean;
+  playabilityStatus?: TPlayabilityStatus;
+};
+
 export type TGetPlayabilityStatus = {
   playabilityStatus: TPlayabilityStatus;
   isPlayable: boolean;
@@ -88,6 +95,7 @@ export type TGetPlayabilityStatus = {
   playableUxTreatment?: TPlayableUxTreatment;
   upsellUxTreatment?: TUpsellUxTreatment;
   demoModeAvailable?: boolean;
+  privatePlaytestInfo?: TPrivatePlaytestInfo;
 };
 
 export type TGuacPlayButtonUIResponse = {

@@ -21,7 +21,9 @@ const HomepageReminderDialog = (): React.JSX.Element | null => {
 
   const [isDialogSeen, setIsDialogSeen] = useState<boolean>(false);
 
-  const isKids = document.body.classList.contains("age-kids-theme");
+  const isKids =
+    document.body.classList.contains("age-kids-theme") ||
+    document.body.classList.contains("theme-kids");
   const currentUser = authenticatedUser();
   const userId = currentUser?.id ?? undefined;
 

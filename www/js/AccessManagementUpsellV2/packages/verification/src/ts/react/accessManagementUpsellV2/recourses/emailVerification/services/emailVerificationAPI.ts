@@ -1,4 +1,4 @@
-import { httpService } from 'core-utilities';
+import httpService from '@rbx/amp-v2-wizard/services/requestTransport';
 import { getEmailUrlConfig, getEmailVerificationUrlConfig } from '../constants/urlConstants';
 
 export type UserEmailData = {

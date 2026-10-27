@@ -3,7 +3,7 @@ import { Button, Icon, ProgressCircle } from '@rbx/foundation-ui';
 import { getUrlWithQueries } from '@rbx/core-scripts/util/url';
 import { formatNumber } from '@rbx/core-scripts/format/number';
 import * as httpService from '@rbx/core-scripts/http';
-import { isAuthenticated, isPremiumUser } from '@rbx/core-scripts/meta/user';
+import { isAuthenticated, isPremiumUser } from '../../utils/currentUser';
 import createMultiItemPurchaseModal from '../factories/createMultiItemPurchaseModal';
 import { InsufficientFundsModal } from '../factories/createInsufficientFundsModal';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';

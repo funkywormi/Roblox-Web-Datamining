@@ -20,7 +20,7 @@ import {
   type RecordOf,
 } from "../../../utils/typeGuards";
 import { computedEqual } from "../../../signals/computedEqual";
-import { resolveInputDefs } from "../utils/resolveInputs";
+import { createInputDataSignals, resolveInputDefs } from "../utils/resolveInputs";
 import { resolveTemplate } from "../utils/resolveTemplate";
 import { childCtx } from "../utils/bindingContext";
 import { arrayRefEqual, isComponentVisible } from "./shared";
@@ -58,19 +58,24 @@ function buildItemListEntry(
       buildContext.builderConfig,
       buildContext.parentAnalyticsContext,
       request.dataSources,
+      undefined,
+      buildContext.poolBuildMetadata,
     );
   }
 
   // RCT path: isolated scope built from the item's `inputs` def map.
   const inputDefs = asRecordOrEmpty(itemRecord.inputs);
-  const itemInputDataSignal = computed(() =>
+  const { inputDataSignal, pendingInputKeysSignal } = createInputDataSignals(() =>
     resolveInputDefs(inputDefs, { ...request, ctx: itemCtx }),
   );
   return buildContext.builder.buildConfigForComponent(
     resolved.template,
-    itemInputDataSignal,
+    inputDataSignal,
     buildContext.builderConfig,
     buildContext.parentAnalyticsContext,
+    undefined,
+    pendingInputKeysSignal,
+    buildContext.poolBuildMetadata,
   );
 }
 

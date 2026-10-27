@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { Button, Modal } from 'react-style-guide';
-import { TranslateFunction } from 'react-utilities';
+import { Button, Modal } from '../components/StyleGuide';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import ClassNames from 'classnames';
 
 interface IModalService {
@@ -22,7 +22,7 @@ type TCreateSettingsModal = (props: {
   onHide?: () => void;
   onNeutral?: () => void;
   dualActionButton?: boolean;
-}) => [JSX.Element, IModalService];
+}) => [React.JSX.Element, IModalService];
 
 const useModal: TCreateSettingsModal = ({
   translate,

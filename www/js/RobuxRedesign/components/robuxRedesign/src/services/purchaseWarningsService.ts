@@ -10,7 +10,6 @@ export enum PurchaseWarningAction {
   U13MonthlyThreshold1Modal = "U13MonthlyThreshold1Modal",
   U13MonthlyThreshold2Modal = "U13MonthlyThreshold2Modal",
   ParentalConsentWarningPaymentModal13To17 = "ParentalConsentWarningPaymentModal13To17",
-  RequireEmailVerification = "RequireEmailVerification",
 }
 
 export type GetPurchaseWarningResponse = {

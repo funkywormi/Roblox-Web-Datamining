@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { IModalService } from 'react-style-guide';
-import { TranslateFunction } from 'react-utilities';
+import type { IModalService } from '../../../components/StyleGuide';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { useSelector } from 'react-redux';
 import { EpilogueConstants } from '../../constants/viewConstants';
 import useModal from '../../../hooks/useModal';
@@ -18,7 +18,7 @@ const VpcNotEligibleEpilogue = ({
 }: {
   translate: TranslateFunction;
   onHide: () => void;
-}): [JSX.Element, IModalService] => {
+}): [React.JSX.Element, IModalService] => {
   const featureName = useSelector(selectFeatureName)!;
   const translatedTitle = translate(EpilogueConstants.Title.VerifyYourAge);
   const translatedBody = (

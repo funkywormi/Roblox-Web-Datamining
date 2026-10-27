@@ -13,6 +13,7 @@ import {
   startAgeCheckAccessManagementUpsellFlow,
   sendUnlockPlayIntentEvent,
 } from "../utils/playButtonUtils";
+import { getStartAccessManagementUpsell } from "../utils/accessManagementUpsell";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import useGuacPlayButtonUI from "./useGuacPlayButtonUI";
@@ -153,7 +154,8 @@ const useContextualParentalControlsUpsell = (
 
             sendUnlockPlayIntent(requirement);
 
-            if (!window.Roblox.AccessManagementUpsellV2Service) {
+            const startAccessManagementUpsell = getStartAccessManagementUpsell();
+            if (!startAccessManagementUpsell) {
               fireEvent(counterEvents.PlayButtonUpsellParentalConsentError);
               break;
             }
@@ -180,9 +182,7 @@ const useContextualParentalControlsUpsell = (
                     },
                   };
 
-              await window.Roblox.AccessManagementUpsellV2Service.startAccessManagementUpsell(
-                upsellParams,
-              );
+              await startAccessManagementUpsell(upsellParams);
             } catch {
               launchGameFallback();
 

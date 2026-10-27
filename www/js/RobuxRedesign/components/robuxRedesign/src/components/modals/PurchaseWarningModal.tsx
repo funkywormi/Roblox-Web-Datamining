@@ -40,7 +40,6 @@ export function PurchaseWarningModal() {
       case PurchaseWarningAction.U13MonthlyThreshold2Modal: {
         return translatePremium("Description.ScaryModalThreshold2Body", { linebreak: lineBreak });
       }
-      case PurchaseWarningAction.RequireEmailVerification:
       case undefined:
       default:
         return null;

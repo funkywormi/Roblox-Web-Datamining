@@ -30,7 +30,7 @@ import {
 import { computedEqual } from "../../../signals/computedEqual";
 import { unwrapOneOf } from "../../../utils/oneOfHelper";
 import { resolveBindingPath } from "../../SduiDataBinder";
-import { resolveInputDefs } from "../utils/resolveInputs";
+import { createInputDataSignals, resolveInputDefs } from "../utils/resolveInputs";
 import { resolveTemplate } from "../utils/resolveTemplate";
 import { childCtx } from "../utils/bindingContext";
 import { arrayRefEqual, isComponentVisible, makeOverlayDataSources } from "./shared";
@@ -147,12 +147,14 @@ function buildOrderedEntryConfig(
       buildContext.builderConfig,
       buildContext.parentAnalyticsContext,
       overlaySources,
+      undefined,
+      buildContext.poolBuildMetadata,
     );
   } else {
     // Isolated scope: mapping `inputs` defs resolve reactively against
     // parent sources with the feed entry's `input_data` overlaid.
     const mappingInputDefs = asRecordOrEmpty(templateMapping?.inputs);
-    const inputDataSignal = computed(() =>
+    const { inputDataSignal, pendingInputKeysSignal } = createInputDataSignals(() =>
       resolveInputDefs(mappingInputDefs, { ...request, ctx }, overlayData),
     );
     config = buildContext.builder.buildConfigForComponent(
@@ -160,6 +162,9 @@ function buildOrderedEntryConfig(
       inputDataSignal,
       buildContext.builderConfig,
       buildContext.parentAnalyticsContext,
+      undefined,
+      pendingInputKeysSignal,
+      buildContext.poolBuildMetadata,
     );
   }
 

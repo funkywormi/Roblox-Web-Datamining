@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { withTranslations, TranslateFunction } from "@rbx/core-scripts/react";
-import experienceGuidelinesService from "../services/experienceGuidelinesService";
+import { useAgeRecommendationDataForUniverseId } from "@rbx/game-play-button";
 import gameGuidelinesTranslationsConfig from "../translation.config";
 import metadataConstants from "../../gameDetails/constants/metadataConstants";
 import gameGuidelinesConstants from "../constants/gameGuidelinesConstants";
-import { ExperienceGuidelines, AgeRecommendationDetailsResponse } from "../types";
 import assetTextFilterSettingsService from "../services/assetTextFilterSettingsService";
 import IgrsRatingLabel from "../components/IgrsRatingLabel";
 import ContentMaturityLabel from "../components/ContentMaturityLabel";
+import { ExperienceGuidelines } from "../types";
 
 export type AgeRecommendationTitleProps = {
   isDisplayAgeRecommendationDetails: boolean;
@@ -18,43 +18,51 @@ export const AgeRecommendationTitle = ({
   isDisplayAgeRecommendationDetails,
   translate,
 }: AgeRecommendationTitleProps): JSX.Element => {
-  const [isBusy, setIsBusy] = useState(false);
-  const [contentContainsStrongLanguage, setContentContainsStrongLanguage] = useState(false);
   const [communicationContainsStrongLanguage, setCommunicationContainsStrongLanguage] =
     useState(false);
-  const [experienceGuidelines, setExperienceGuidelines] = useState<ExperienceGuidelines | null>(
-    null,
-  );
-  const [headerDisplayName, setHeaderDisplayName] = useState<string | null>(null);
+  const [isLoadingCommunicationStrongLanguage, setIsLoadingCommunicationStrongLanguage] =
+    useState(false);
 
   const { universeId = "" } = metadataConstants.metadataData() || {};
 
-  const getCommunicationStrongLanguageSettingForUniverse = useCallback(async () => {
-    try {
-      const atfsResponse =
-        await assetTextFilterSettingsService.getAssetTextFilterSettings(universeId);
-      setCommunicationContainsStrongLanguage(atfsResponse?.Profanity === true);
-    } catch {
+  const { ageRecommendationData, isLoading: isLoadingAgeRecommendationData } =
+    useAgeRecommendationDataForUniverseId(universeId);
+  const ageRecommendationDetails = ageRecommendationData?.ageRecommendationDetails;
+  const headerDisplayName = ageRecommendationData?.headerDisplayName ?? null;
+
+  useEffect(() => {
+    if (!universeId) {
+      setIsLoadingCommunicationStrongLanguage(false);
       setCommunicationContainsStrongLanguage(false);
+      return;
     }
+
+    setIsLoadingCommunicationStrongLanguage(true);
+
+    assetTextFilterSettingsService
+      .getAssetTextFilterSettings(universeId)
+      .then(response => {
+        setCommunicationContainsStrongLanguage(response?.Profanity === true);
+      })
+      .catch(() => {
+        setCommunicationContainsStrongLanguage(false);
+      })
+      .finally(() => {
+        setIsLoadingCommunicationStrongLanguage(false);
+      });
   }, [universeId]);
 
-  const getAgeGuidelinesForUniverse = useCallback(async () => {
-    setIsBusy(true);
-    try {
-      const egsResponse = await experienceGuidelinesService.getAgeRecommendation(universeId);
-      const ageRecommendation = egsResponse.data as AgeRecommendationDetailsResponse;
+  const experienceGuidelines = useMemo<ExperienceGuidelines | null>(() => {
+    const ageRecommendation = ageRecommendationDetails?.summary.ageRecommendation;
+    if (!ageRecommendation) {
+      return null;
+    }
 
-      setHeaderDisplayName(ageRecommendation.headerDisplayName);
-      if (ageRecommendation.ageRecommendationDetails?.summary.ageRecommendation == null) {
-        setExperienceGuidelines(null);
-        return;
-      }
-      let descriptorDisplayNames = ageRecommendation.ageRecommendationDetails.descriptorUsages
-        ?.map(usage => usage.descriptor.displayName)
-        .join(", ");
+    let descriptorDisplayNames = ageRecommendationDetails?.descriptorUsages
+      ?.map(usage => usage.descriptor.displayName)
+      .join(", ");
 
-      /*
+    /*
       Two special cases when descriptorDisplayNames is null
       1. If the ageRec is All Ages, and there are no descriptors because
          the game doesn't have any, then we should show the suitable
@@ -62,63 +70,33 @@ export const AgeRecommendationTitle = ({
       2. If we get an age rec with no descriptors which is an error, we
          still show the age recommendation we have, just without any descriptors.
       */
-      if (!descriptorDisplayNames) {
-        if (ageRecommendation.ageRecommendationDetails.summary.ageRecommendation.minimumAge === 0) {
-          descriptorDisplayNames = gameGuidelinesConstants.SuitableForAllAgesText;
-        } else {
-          descriptorDisplayNames = "";
-        }
+    if (!descriptorDisplayNames) {
+      if (ageRecommendation.minimumAge === 0) {
+        descriptorDisplayNames = gameGuidelinesConstants.SuitableForAllAgesText;
+      } else {
+        descriptorDisplayNames = "";
       }
-
-      const newExperienceGuidelines: ExperienceGuidelines = {
-        descriptorDisplayNames,
-        ageRecommendationBracket:
-          ageRecommendation.ageRecommendationDetails.summary.ageRecommendation
-            .displayNameWithHeaderShort ??
-          ageRecommendation.ageRecommendationDetails.summary.ageRecommendation.displayName,
-        igrsRating: ageRecommendation.ageRecommendationDetails.summary.ageRecommendation.igrsRating,
-        igrsRatingDisplayMessage:
-          ageRecommendation.ageRecommendationDetails.summary.ageRecommendation
-            .igrsRatingDisplayMessage,
-      };
-
-      setExperienceGuidelines(newExperienceGuidelines);
-      const strongLanguageDescriptor =
-        ageRecommendation.ageRecommendationDetails.descriptorUsages?.find(
-          descriptor => descriptor.name === "strong-language",
-        );
-      setContentContainsStrongLanguage(strongLanguageDescriptor?.contains === true);
-    } catch {
-      setExperienceGuidelines(null);
-      setContentContainsStrongLanguage(false);
-      setHeaderDisplayName(null);
-    } finally {
-      setIsBusy(false);
     }
-  }, [universeId]);
 
-  const updateState = useCallback(async () => {
-    try {
-      setIsBusy(true);
-      await getAgeGuidelinesForUniverse();
-      await getCommunicationStrongLanguageSettingForUniverse();
-    } catch {
-      setExperienceGuidelines(null);
-      setCommunicationContainsStrongLanguage(false);
-      setHeaderDisplayName(null);
-      setContentContainsStrongLanguage(false);
-    } finally {
-      setIsBusy(false);
-    }
-  }, [getAgeGuidelinesForUniverse, getCommunicationStrongLanguageSettingForUniverse]);
+    return {
+      descriptorDisplayNames,
+      ageRecommendationBracket:
+        ageRecommendation.displayNameWithHeaderShort ?? ageRecommendation.displayName,
+      igrsRating: ageRecommendation.igrsRating,
+      igrsRatingDisplayMessage: ageRecommendation.igrsRatingDisplayMessage,
+    };
+  }, [ageRecommendationDetails]);
 
-  // update state on page load
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    updateState();
-  }, [updateState]);
+  const contentContainsStrongLanguage = useMemo(() => {
+    return (
+      ageRecommendationDetails?.descriptorUsages?.find(
+        descriptor => descriptor.name === "strong-language",
+      )?.contains === true
+    );
+  }, [ageRecommendationDetails]);
 
   const igrsRating = experienceGuidelines?.igrsRating;
+  const isBusy = isLoadingCommunicationStrongLanguage || isLoadingAgeRecommendationData;
 
   return (
     <React.Fragment>

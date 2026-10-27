@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Button, IModalService, Modal } from 'react-style-guide';
-import { TranslateFunction } from 'react-utilities';
-import { LegallySensitiveContentService } from 'Roblox';
+import { Button, IModalService, Modal } from '../../../components/StyleGuide';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
+import useLegallySensitiveContentAndActions from '../../../../legallySensitiveContent/useLegallySensitiveContentAndActions';
 import parentalRequestConstants from '../constants/parentalRequestConstants';
 import legallySensitiveContentConstants from '../constants/legallySensitiveContentConstants';
 import parentalRequestInlineErrorHandler, {
@@ -29,7 +29,7 @@ const useParentEmailModal = (
   onHidecallback: () => void,
   value?: Record<string, unknown> | null,
   source?: string
-): [JSX.Element, IModalService] => {
+): [React.JSX.Element, IModalService] => {
   const { privacyPolicyUrl, emailRegex, translationKeys } = parentalRequestConstants;
   const { gatherParentEmail } = translationKeys;
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -85,7 +85,7 @@ const useParentEmailModal = (
   const [
     vpcLegallySensitiveData,
     vpcLegallySensitiveActions
-  ] = LegallySensitiveContentService.useLegallySensitiveContentAndActions(
+  ] = useLegallySensitiveContentAndActions(
     consentName,
     legallySensitiveContentConstants.collectEmailModalSurfaceName
   );

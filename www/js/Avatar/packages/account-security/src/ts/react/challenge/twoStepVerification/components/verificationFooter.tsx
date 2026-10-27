@@ -1,6 +1,5 @@
 import React from "react";
-import { Modal } from "react-style-guide";
-import { Button } from "@rbx/foundation-ui";
+import { Button, DialogFooter } from "@rbx/foundation-ui";
 import useTwoStepVerificationContext from "../hooks/useTwoStepVerificationContext";
 
 export type VerificationFooterButton = {
@@ -48,8 +47,6 @@ const VerificationFooter: React.FC<Props> = ({ positiveButton, children }: Props
     </Button>
   );
 
-  // `Modal.Footer` only forwards `className`, so the modal path needs its own wrapper for the
-  // test id. Descendant selectors in the challenge CSS still match through this element.
   const footer = (
     <div data-testid="verification-footer">
       {button}
@@ -61,7 +58,7 @@ const VerificationFooter: React.FC<Props> = ({ positiveButton, children }: Props
     return <div className="inline-challenge-footer">{footer}</div>;
   }
 
-  return <Modal.Footer>{footer}</Modal.Footer>;
+  return <DialogFooter className="challenge-dialog-footer">{footer}</DialogFooter>;
 };
 
 export default VerificationFooter;

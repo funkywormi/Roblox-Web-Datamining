@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Modal } from "react-style-guide";
+import { DialogBody } from "@rbx/foundation-ui";
 import * as TwoStepVerification from "../../../../common/request/types/twoStepVerification";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
-import InputControl, { validateTrue } from "../../../common/inputControl";
+import ChallengeInputControl from "../../../common/challengeInputControl";
+import { validateTrue } from "../../../common/inputValidation";
 import RememberDeviceCheckBox from "../components/rememberDeviceCheckBox";
 import VerificationFooter, { VerificationFooterButton } from "../components/verificationFooter";
 import ResendCodeButton from "../components/resendCodeButton";
@@ -126,7 +127,7 @@ const EmailInput: React.FC<Props> = ({
     action: verifyCode,
   };
 
-  const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
+  const BodyElement = renderInline ? InlineChallengeBody : DialogBody;
   const lockIconClassName = renderInline
     ? "inline-challenge-protection-shield-icon"
     : "modal-protection-shield-icon";
@@ -155,7 +156,7 @@ const EmailInput: React.FC<Props> = ({
             {maybeDelayedText ?? ""}
           </p>
 
-          <InputControl
+          <ChallengeInputControl
             id="two-step-verification-code-input"
             inputType="text"
             disabled={requestInFlight}
@@ -173,7 +174,6 @@ const EmailInput: React.FC<Props> = ({
             placeholder={resources.Label.CodeInputPlaceholderText(metadata.emailCodeLength)}
             maxLength={metadata.emailCodeLength}
             validCharactersRegEx={REGEX_CODE}
-            hideFeedback
             concealInput
             autoFocus
           />
@@ -196,7 +196,9 @@ const EmailInput: React.FC<Props> = ({
         <VerificationFooter positiveButton={positiveButton}>
           {children}
           <SupportHelp className={marginBottomClassName} />
-          <p className="text-footer">{resources.Description.SecurityWarningShort}</p>
+          <p className="text-caption-small content-default">
+            {resources.Description.SecurityWarningShort}
+          </p>
         </VerificationFooter>
       </React.Fragment>
     )

@@ -5,6 +5,7 @@ import {
 } from "./deferredDeeplinkConstants";
 import getExperienceAffiliateReferralUrl from "./getExperienceAffiliateReferralUrlParams";
 import createDeeplinkToken from "./deferredDeeplinkTokenService";
+import fireGameJoinDeeplinkCounter from "./gameJoinDeeplinkTelemetry";
 
 function getDeferredDeeplinkUrl(url: string): string | null {
   const affiliateReferralUrl = getExperienceAffiliateReferralUrl(url);
@@ -26,18 +27,28 @@ function getDeferredDeeplinkUrl(url: string): string | null {
   return null;
 }
 
-async function getDeferredDeeplinkQueryParams(url: string): Promise<string> {
+async function getDeferredDeeplinkQueryParams(
+  url: string,
+  launchContext?: string,
+): Promise<string> {
   let queryParams = "";
 
   const deeplinkUrl = getDeferredDeeplinkUrl(url);
   if (!deeplinkUrl) {
+    if (launchContext) {
+      fireGameJoinDeeplinkCounter("unsupportedPage");
+    }
     return queryParams;
   }
 
   const token = await createDeeplinkToken(deeplinkUrl, {
     ...(await resolveDeeplinkTokenParams()),
     downloadSource: downloadSourceType.Installer,
+    ...(launchContext ? { launchContext } : {}),
   });
+  if (launchContext) {
+    fireGameJoinDeeplinkCounter(token ? "minted" : "tokenFailed");
+  }
   if (token) {
     queryParams = `?${deferredDeeplinkTokenQueryParameterKey}=${token}`;
   }

@@ -1,10 +1,11 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import classNames from "classnames";
+import { document as browserDocument } from "@rbx/core-lib/browser";
 import { getRestrictionIconClassName } from "@rbx/www-common/components/itemCard";
 import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
+import { Badge, Icon, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
 import AvatarAccoutrementService from "../../../../utils/avatarAccoutrementService";
 import { useAvatarTranslate } from "../../../../utils/translate";
-import { Badge, Icon, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
 import { OUTFIT_MENU_OPTIONS, OutfitOption } from "../../../../types";
 import { OUTFIT_SETTINGS } from "../../../../constants/avatarConstants";
 import {
@@ -18,6 +19,9 @@ import { isCatalogItemUnavailable } from "../../../../utils/itemAvailability";
 import { getLicenseBadgeLabelKey } from "../../../../utils/itemLicense";
 import { useAssetManagerContext } from "../../../../contexts/AssetManagerContext";
 import { useAvatarEditingAccessContext } from "../../../../contexts/AvatarEditingAccessContext";
+import AnimatedAssetThumbnail from "../../../AnimatedAssetThumbnail";
+import useAnimationItemCardHoverPreviewIxp from "../../../../hooks/useAnimationItemCardHoverPreviewIxp";
+import useAnimationPreviewHover from "../../../../hooks/useAnimationPreviewHover";
 
 type AvatarItemCardProps = {
   item: CatalogItem;
@@ -56,8 +60,45 @@ function AvatarItemCard({
   // `/v1/avatar-inventory`. Mirror the Avatars→Purchased treatment: render a
   // dark placeholder, hide the link, and no-op the click handler.
   const isUnavailable = isCatalogItemUnavailable(item);
+  const isHoverPreviewIxpEnabled = useAnimationItemCardHoverPreviewIxp();
+  const previewKey = `avatar-item-${item.id}`;
+  const canPreviewAnimation =
+    isHoverPreviewIxpEnabled &&
+    !isUnavailable &&
+    isCatalogItemAsset(item) &&
+    AvatarAccoutrementService.isAnimation(item.assetType?.name || "");
+  const {
+    isPlaying: isAnimationPlaying,
+    onHoverStart,
+    onHoverEnd,
+  } = useAnimationPreviewHover(previewKey, canPreviewAnimation);
   const isCardDisabled =
     avatarCallLimiterItemCardsDisabled || (isAvatarEditingBlocked && !isEmote) || isUnavailable;
+
+  // IXP can settle while the pointer is already over the card; mouseenter will not re-fire.
+  useEffect(() => {
+    if (!canPreviewAnimation || browserDocument == null) {
+      return;
+    }
+    const previewEl = browserDocument.querySelector(`[data-animation-preview-key="${previewKey}"]`);
+    if (
+      previewEl != null &&
+      "matches" in previewEl &&
+      typeof previewEl.matches === "function" &&
+      previewEl.matches(":hover")
+    ) {
+      onHoverStart();
+    }
+  }, [canPreviewAnimation, onHoverStart, previewKey]);
+
+  const onFocusOut = useCallback(
+    (event: React.FocusEvent<HTMLDivElement>) => {
+      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+        onHoverEnd();
+      }
+    },
+    [onHoverEnd],
+  );
 
   const getItemLink = (): string | undefined => {
     if (isUnavailable) {
@@ -97,6 +138,10 @@ function AvatarItemCard({
         "locked-card": isCardDisabled,
       })}
       aria-disabled={isCardDisabled}
+      onMouseEnter={canPreviewAnimation ? onHoverStart : undefined}
+      onMouseLeave={canPreviewAnimation ? onHoverEnd : undefined}
+      onFocus={canPreviewAnimation ? onHoverStart : undefined}
+      onBlur={canPreviewAnimation ? onFocusOut : undefined}
     >
       <div className="item-card-link">
         <a
@@ -140,6 +185,14 @@ function AvatarItemCard({
                 aria-hidden="true"
                 data-availability-status={item.availabilityStatus}
               />
+            ) : canPreviewAnimation ? (
+              <AnimatedAssetThumbnail
+                targetId={item.id}
+                isPlaying={isAnimationPlaying}
+                previewKey={previewKey}
+              >
+                <Thumbnail2d targetId={item.id} type={item.thumbnailType} />
+              </AnimatedAssetThumbnail>
             ) : (
               <Thumbnail2d
                 targetId={item.id}

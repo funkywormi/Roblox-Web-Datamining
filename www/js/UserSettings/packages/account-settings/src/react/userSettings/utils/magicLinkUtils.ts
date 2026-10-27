@@ -2,6 +2,13 @@ import { AccountSwitcherService } from "Roblox";
 import { httpService } from "core-utilities";
 import { authenticatedUser } from "header-scripts";
 import { childrenInfoUrl } from "@rbx/user-settings";
+import {
+  getParentEmailTokenMetricsType,
+  ParentEmailTokenRedemptionResult,
+  ParentEmailTokenSurface,
+  ParentEmailTokenType,
+  sendParentEmailTokenRedemptionEvent,
+} from "@rbx/authentication-common/utils/parentEmailTokenRedemptionUtils";
 import MagicLinkEntryAction from "../../../enums/MagicLinkEntryAction";
 import MagicLinkLoginState from "../../../enums/MagicLinkLoginState";
 import MagicLinkTarget from "../../../enums/MagicLinkTarget";
@@ -182,6 +189,19 @@ export const stripMagicLinkToken = (location: Location = window.location): void 
   window.history.replaceState(null, "", getSettingsUrlWithoutMagicLinkToken(location));
 };
 
+const sendRedemptionEvent = (
+  magicLinkToken: string,
+  result: ParentEmailTokenRedemptionResult,
+  location: Location,
+): Promise<void> =>
+  sendParentEmailTokenRedemptionEvent({
+    token: magicLinkToken,
+    tokenType: ParentEmailTokenType.VpcMagicLink,
+    metricsType: getParentEmailTokenMetricsType(`${location.pathname}${location.search}`),
+    surface: ParentEmailTokenSurface.AccountSettings,
+    result,
+  });
+
 /**
  * Decides what the settings entry point does for a magic link. Validation runs before the page
  * renders so a wrong account never sees another user's parental controls, and so a signed-in
@@ -195,6 +215,9 @@ export const resolveMagicLinkEntryAction = async (
   if (!magicLinkToken) {
     return MagicLinkEntryAction.RenderApp;
   }
+
+  // Sent before any redirect. Login reports the result for signed-out visitors.
+  await sendRedemptionEvent(magicLinkToken, ParentEmailTokenRedemptionResult.Opened, location);
 
   if (!isAuthenticatedUser()) {
     const loginUrl = getMagicLinkLoginUrl(location);
@@ -217,15 +240,22 @@ export const resolveMagicLinkEntryAction = async (
 
   switch (status) {
     case MagicLinkLoginState.UserLoggedIn:
+      await sendRedemptionEvent(magicLinkToken, ParentEmailTokenRedemptionResult.Success, location);
       stripMagicLinkToken(location);
       return MagicLinkEntryAction.RenderApp;
     case MagicLinkLoginState.WrongUserLoggedIn:
+      // No result yet: switching accounts sends the parent to login, which reports it.
       return MagicLinkEntryAction.ShowSwitchAccountModal;
     case MagicLinkLoginState.TokenInvalid: {
       const childUserId = getLinkedChildId(location);
       if (childUserId !== undefined) {
         try {
           if (await isCurrentUserLinkedToChild(childUserId)) {
+            await sendRedemptionEvent(
+              magicLinkToken,
+              ParentEmailTokenRedemptionResult.ExpiredAlreadyLoggedIn,
+              location,
+            );
             stripMagicLinkToken(location);
             return MagicLinkEntryAction.RenderApp;
           }
@@ -236,6 +266,9 @@ export const resolveMagicLinkEntryAction = async (
       // The route carries no child id, or the signed-in account is not linked to that child.
       // `TokenInvalid` cannot tell us which account owned the link, so prompt for the right one
       // rather than assuming this account is the parent. Cancelling strips the token and renders.
+      // The modal stays on this page, so the event does not need to finish before it opens.
+      // eslint-disable-next-line no-void
+      void sendRedemptionEvent(magicLinkToken, ParentEmailTokenRedemptionResult.Expired, location);
       return MagicLinkEntryAction.ShowExpiredSwitchAccountModal;
     }
     default:

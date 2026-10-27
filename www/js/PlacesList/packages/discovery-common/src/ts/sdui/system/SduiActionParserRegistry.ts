@@ -22,20 +22,24 @@ export type TSduiActionConfig = {
  * External type for parsed action that is passed to SDUI components
  * onActivated: required (since it will at least contain analytics, even for navigation links)
  * linkPath: optional
+ * openInNewTab: optional, opens linkPath in a new tab
  */
 export type TSduiParsedAction = {
   onActivated: () => void;
   linkPath?: string;
+  openInNewTab?: boolean;
 };
 
 /*
  * Internal type for a parsed action that is passed to executeActionWithAnalytics
  * callback: optional (since it may not be needed for analytics-only use cases like navigation links)
  * linkPath: optional
+ * openInNewTab: optional, opens linkPath in a new tab
  */
 export type TSduiParsedActionConfig = {
   callback?: () => void;
   linkPath?: string;
+  openInNewTab?: boolean;
 };
 
 export type TSduiActionParser = (

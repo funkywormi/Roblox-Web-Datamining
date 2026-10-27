@@ -1,8 +1,7 @@
 import { Checkbox, Icon } from "@rbx/foundation-ui";
 import { PriceTag } from "@rbx/payments/priceTag";
-import { useTranslation } from "@rbx/core-scripts/react";
 import { formatNumber } from "@rbx/core-scripts/format/number";
-import { translateHtml } from "@rbx/translation-utils";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { SubscribedRobuxProductOffer } from "../services/paymentsGatewayService";
 
 type Props = {
@@ -20,7 +19,7 @@ export default function SubscribeAndSaveQuickPayOffer({
   onToggle,
   offer: { initialPrice, recurringPrice, robuxAmount },
 }: Props) {
-  const { translate } = useTranslation();
+  const translate = useTranslations("Feature.Payment");
 
   return (
     <div className="margin-top-small" data-testid="quick-pay-subscribe-and-save-offer">
@@ -28,8 +27,7 @@ export default function SubscribeAndSaveQuickPayOffer({
         label={
           // Checkbox renders the rich ReactNode[] despite typing label as string.
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-          translateHtml(
-            translate,
+          translate.html(
             "Label.SubscribeAndSaveV2",
             [
               {

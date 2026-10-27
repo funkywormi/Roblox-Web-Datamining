@@ -1,14 +1,13 @@
 import Persona from 'persona';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useTheme, TranslateFunction } from 'react-utilities';
-import {
-  DeepLinkService,
-  ExperimentationService,
-  Guac,
-  TFeatureSpecificData,
-  Intl
-} from 'Roblox';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
+import useTheme from '@rbx/amp-v2-wizard/hooks/useTheme';
+import type { TFeatureSpecificData } from '@rbx/legacy-webapp-types/Roblox/accessManagementUpsellService';
+import ExperimentationService from '@rbx/experimentation';
+import { navigateToInAppDeepLink } from '@rbx/amp-v2-wizard/services/inAppDeepLink';
+import { getLocale } from '@rbx/amp-v2-wizard/utils/locale';
+import { callBehaviour } from '@rbx/core-scripts/guac';
 import { getDeviceMeta } from '@rbx/core-scripts/meta/device';
 import { userId } from '@rbx/core-scripts/meta/user';
 import { QRDeepLinkDialog } from '@rbx/identity-verification';
@@ -250,7 +249,7 @@ function FAEPersonaFlow({
   // start FAE embedded flow
   function startFAEEmbeddedFlow() {
     // Get user locale for Persona
-    const userLocale = new Intl().getLocale();
+    const userLocale = getLocale();
 
     personaClientRef.current = new Persona.Client({
       inquiryId: sessionIdentifier,
@@ -432,7 +431,7 @@ function FAEContainer({
       if (featureSpecificParams?.source === 'parent') return;
 
       try {
-        const policy = await Guac.callBehaviour<TAmpWizardPolicy>('amp-wizard');
+        const policy = await callBehaviour<TAmpWizardPolicy>('amp-wizard');
         const deviceMeta = getDeviceMeta();
         const isMobile = deviceMeta && (deviceMeta.isPhone || deviceMeta.isTablet);
         const isDesktopOrConsole = deviceMeta && (deviceMeta.isDesktop || deviceMeta.isConsole);
@@ -441,7 +440,7 @@ function FAEContainer({
         if (isMobile && !isAmazon && policy?.faeMobileWebDeeplinkEnabled) {
           const namespaceParam = namespace ? `&namespace=${namespace}` : '';
           const deepLink = `roblox://navigation/amp_wizard?feature_name=${featureName}${namespaceParam}&entry_point=web`;
-          await DeepLinkService.navigateToDeepLink(deepLink);
+          await navigateToInAppDeepLink(deepLink);
           window.dispatchEvent(new Event(ModalEvent.ShowDownloadAppModal));
           onHidecallback();
           return;
@@ -476,6 +475,7 @@ function FAEContainer({
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- the .NET external is a global that may be absent
     if (isExperimentLoaded && ExperimentationService?.logLayerExposure) {
       ExperimentationService.logLayerExposure(faeQrCodeExperimentLayer);
     }

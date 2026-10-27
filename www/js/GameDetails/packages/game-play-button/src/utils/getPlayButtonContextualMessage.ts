@@ -1,4 +1,4 @@
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/react";
 import playButtonConstants, { FeatureExperienceDetails } from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import { TPlayabilityStatus } from "../types/playButtonTypes";

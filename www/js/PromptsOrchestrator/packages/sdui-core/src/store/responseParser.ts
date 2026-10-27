@@ -64,6 +64,9 @@ export interface HandleResponseOptions {
   pageContext?: SduiPageContext;
   errorReporter?: SduiErrorReporter;
   paginateResponse: boolean;
+  enableStreaming: boolean;
+  /** Identifiers seen in a content-first, non-paginated streaming request. */
+  streamingInputIdentifiers?: Set<string>;
   mergeStrategy?: SduiInputDataMergeStrategyResolver;
   /**
    * Lazily-creating accessor for the store-owned input-data signal.
@@ -98,6 +101,8 @@ export interface ParsePageEntriesOptions {
   pageContext?: SduiPageContext;
   errorReporter?: SduiErrorReporter;
   paginateResponse: boolean;
+  enableStreaming: boolean;
+  streamingInputIdentifiers?: Set<string>;
   mergeStrategy?: SduiInputDataMergeStrategyResolver;
   getInputDataSignal: (identifier: string) => InputDataSignal;
   hasComponentConfig?: (identifier: string) => boolean;
@@ -163,6 +168,8 @@ export function parsePageEntries(
     errorReporter,
     paginateResponse,
     mergeStrategy,
+    enableStreaming,
+    streamingInputIdentifiers,
     getInputDataSignal,
     hasComponentConfig,
   } = options;
@@ -173,8 +180,14 @@ export function parsePageEntries(
     const { pageEntry, inputData } = entry;
     const inputDataSignal = getInputDataSignal(pageEntry.identifier);
     const existingInputData = inputDataSignal.peek();
+    const shouldReplaceStreamingInput =
+      streamingInputIdentifiers !== undefined &&
+      !streamingInputIdentifiers.has(pageEntry.identifier);
+    // Record input even when no template/config can be built yet.
+    streamingInputIdentifiers?.add(pageEntry.identifier);
     const shouldMergeOnly =
-      paginateResponse &&
+      !shouldReplaceStreamingInput &&
+      (paginateResponse || enableStreaming) &&
       existingInputData !== undefined &&
       ((hasComponentConfig?.(pageEntry.identifier) ?? true) ||
         identifiersBuiltInThisParse.has(pageEntry.identifier));
@@ -184,7 +197,10 @@ export function parsePageEntries(
       continue;
     }
 
-    inputDataSignal.value = inputData;
+    inputDataSignal.value =
+      !shouldReplaceStreamingInput && enableStreaming && existingInputData !== undefined
+        ? mergeInputData(existingInputData, inputData, mergeStrategy)
+        : inputData;
 
     const template = templateStore.getTemplateByRobloxComponent(pageEntry.robloxComponent);
     if (!template) {

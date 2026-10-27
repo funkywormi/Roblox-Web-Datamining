@@ -56,7 +56,7 @@ function QuickPayModal({
   selectedPaymentProfile,
   selectedProduct,
   stripe,
-  taxTranslationKey,
+  taxTitle,
   subscribedRobuxProductOffers = [],
   isSubscribeAndSaveChecked = false,
   toggleSubscribeAndSave = () => undefined,
@@ -340,7 +340,7 @@ function QuickPayModal({
             <div className="tax">
               {preparePaymentProviderPayload ? (
                 <Fragment>
-                  <span className="tax-text">{translatePremium.dynamic(taxTranslationKey)}</span>
+                  <span className="tax-text">{taxTitle}</span>
                   <EducationalTooltip open={isTaxTooltipOpen} onOpenChange={setIsTaxTooltipOpen}>
                     <EducationalTooltipTrigger asChild>
                       <IconButton
@@ -411,7 +411,7 @@ function QuickPayModal({
           </div>
         </DialogBody>
         <DialogFooter>
-          <div className="loading">
+          <div className="loading text-align-x-center">
             {isLoading && (
               <ProgressCircle
                 variant="Indeterminate"

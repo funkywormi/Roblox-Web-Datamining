@@ -16,7 +16,7 @@ import type {
 import { asRecordOrEmpty, isRecord, stringFieldOr, type RecordOf } from "../../../utils/typeGuards";
 import { asShallowEqualValue, computedEqual, shallowEqual } from "../../../signals/computedEqual";
 import { generateDynamicBindingPropValue } from "../utils/sduiPropSignalUtils";
-import { resolveInputDefs } from "../utils/resolveInputs";
+import { createInputDataSignals, resolveInputDefs } from "../utils/resolveInputs";
 import { resolveTemplate, type ResolvedTemplate } from "../utils/resolveTemplate";
 import { childCtx } from "../utils/bindingContext";
 import { arrayRefEqual, isComponentVisible, makeOverlayDataSources } from "./shared";
@@ -56,19 +56,24 @@ function buildArrayMapItem(
       buildContext.builderConfig,
       buildContext.parentAnalyticsContext,
       overlaySources,
+      undefined,
+      buildContext.poolBuildMetadata,
     );
   }
 
   // RCT path: isolated scope. Each item gets its own `computed()` so
   // child entity-ID resolution stays reactive to parent data changes.
-  const itemInputDataSignal = computed(() =>
+  const { inputDataSignal, pendingInputKeysSignal } = createInputDataSignals(() =>
     resolveInputDefs(defaultInputDefs, { ...request, ctx }, itemRecord),
   );
   return buildContext.builder.buildConfigForComponent(
     itemResolved.template,
-    itemInputDataSignal,
+    inputDataSignal,
     buildContext.builderConfig,
     buildContext.parentAnalyticsContext,
+    undefined,
+    pendingInputKeysSignal,
+    buildContext.poolBuildMetadata,
   );
 }
 

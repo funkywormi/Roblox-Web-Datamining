@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { window as browserWindow } from "@rbx/core-lib/browser";
 import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
 import { parseQueryString } from "./parsingUtils";
 
@@ -13,7 +14,7 @@ export const PageSessionContext = createContext<TPageSessionContext>({
 });
 
 export const PageSessionProvider: React.FC = ({ children }) => {
-  const paramString = window.location.href?.split("?")[1];
+  const paramString = browserWindow?.location?.href?.split("?")[1];
   const urlParams = paramString && parseQueryString(paramString);
   const referredSession =
     urlParams &&

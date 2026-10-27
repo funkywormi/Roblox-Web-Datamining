@@ -12,6 +12,7 @@ import { DEFAULT_SDUI_ENTRY_POINT_MESSAGES } from "../const/clientConstants";
 import { SduiProvider } from "../context/SduiProvider";
 import { SduiQueryClientProvider } from "../context/SduiQueryClientProvider";
 import { useSduiCacheEntry } from "../hooks/useSduiCacheEntry";
+import { useSduiPageLoadPaint } from "../hooks/useSduiPageLoadPaint";
 import type { SduiEntryPointMessages } from "../types/SduiEntryPointMessages";
 import { SduiClientRenderer } from "./SduiClientRenderer";
 import {
@@ -55,6 +56,7 @@ function SduiFeatureEntryPointContent({
   onRetry,
 }: SduiFeatureEntryPointContentProps) {
   const { rootConfig, hasErrored } = useSduiCacheEntry(configKey, identifier);
+  useSduiPageLoadPaint(configKey, Boolean(rootConfig) && !hasErrored);
 
   const resolvedMessages = useMemo(
     () => ({ ...DEFAULT_SDUI_ENTRY_POINT_MESSAGES, ...messages }),
@@ -104,7 +106,11 @@ function SduiFeatureEntryPointContent({
   return (
     <div className={className} style={style}>
       {loadingSlot ?? (
-        <div className="flex items-center justify-center p-large" role="status" aria-busy="true">
+        <div
+          className="flex items-center justify-center padding-large"
+          role="status"
+          aria-busy="true"
+        >
           <FoundationProgressCircle
             ariaLabel={resolvedMessages.loadingAriaLabel}
             size="Medium"

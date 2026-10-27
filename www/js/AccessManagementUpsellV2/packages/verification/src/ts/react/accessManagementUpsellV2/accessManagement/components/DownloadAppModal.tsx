@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { TranslateFunction } from 'react-utilities';
-import { Intl } from 'Roblox';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
+import { getRobloxLocale } from '@rbx/amp-v2-wizard/utils/locale';
+import { assetUrl } from '@rbx/www-common/asset';
 import { EnvironmentUrls } from '@rbx/environment-urls';
 import { Dialog, DialogContent, DialogTitle, DialogBody } from '@rbx/foundation-ui';
 import { ModalEvent } from '../constants/viewConstants';
@@ -15,11 +16,11 @@ type TStoreBadges = {
 };
 
 const getStoreBadges = (): TStoreBadges => {
-  const locale = Intl ? new Intl().getRobloxLocale() : 'en_us';
+  const locale = getRobloxLocale();
   if (locale === 'ja_jp') {
-    return { apple: appleBadgeJa, google: googleBadgeJa };
+    return { apple: assetUrl(appleBadgeJa), google: assetUrl(googleBadgeJa) };
   }
-  return { apple: appleBadgeEn, google: googleBadgeEn };
+  return { apple: assetUrl(appleBadgeEn), google: assetUrl(googleBadgeEn) };
 };
 
 function DownloadAppModal({ translate }: { translate: TranslateFunction }): React.ReactElement {

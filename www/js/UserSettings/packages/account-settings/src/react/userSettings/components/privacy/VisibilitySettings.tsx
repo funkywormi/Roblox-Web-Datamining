@@ -29,6 +29,7 @@ import { TChildSettingsInfo } from "../../../../types/childrenInfoTypes";
 import { shareActivityUpdatesHelpPageUrl } from "../../constants/urlConstants";
 import { ThirdPartyFriendAccess } from "./ThirdPartyFriendAccess";
 import { TSettingUpdateProps } from "../../../../types/settingUpdateTypes";
+import { ProfileVisibilityControls } from "./ProfileVisibilityControls";
 
 export const VisibilitySettings = ({
   child,
@@ -205,6 +206,10 @@ export const VisibilitySettings = ({
             : settingsAndOptions)?.[UserSetting.whoCanSeeMySocialNetworks] && (
             <SocialNetworkVisibility onUpdateSetting={onUpdateSetting} child={child} />
           )}
+
+        {uiPolicy?.showProfileVisibilitySettings && (
+          <ProfileVisibilityControls child={child} onUpdateSetting={onUpdateSetting} />
+        )}
 
         {showThirdPartyFriendAccess &&
           settingsAndOptionsV2?.[UserSetting.allowThirdPartyFriendAccess] && (

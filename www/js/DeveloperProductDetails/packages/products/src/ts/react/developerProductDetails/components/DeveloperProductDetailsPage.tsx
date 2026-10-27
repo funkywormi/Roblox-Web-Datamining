@@ -1,40 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   Thumbnail2d,
   ThumbnailFormat,
   ThumbnailGamePassIconSize,
-  ThumbnailTypes
-} from '@rbx/thumbnails';
+  ThumbnailTypes,
+} from "@rbx/thumbnails";
 import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
 import { usePlayabilityStatus } from "@rbx/game-play-button";
-import { Container, Grid } from '@rbx/ui';
+import { Container, Grid } from "@rbx/ui";
 import { Loading } from "@rbx/core-ui/legacy/react-style-guide";
-import { developerProductsTranslationConfig } from '../translation.config';
-import DeveloperProductTitle from './DeveloperProductTitle';
-import { TDeveloperProductDetails } from '../../common/types/types';
-import { TGetGameDetails } from '../../common/types/bedev1Types';
-import { getDeveloperProductDetails } from '../services/developerProductDetailsService';
-import { getGameDetails } from '../../common/services/bedev1Services';
-import DeveloperProductMetadata from './DeveloperProductMetadata';
+import { developerProductsTranslationConfig } from "../translation.config";
+import DeveloperProductTitle from "./DeveloperProductTitle";
+import { TDeveloperProductDetails } from "../../common/types/types";
+import { TGetGameDetails } from "../../common/types/bedev1Types";
+import { getDeveloperProductDetails } from "../services/developerProductDetailsService";
+import { getGameDetails } from "../../common/services/bedev1Services";
+import DeveloperProductMetadata from "./DeveloperProductMetadata";
 
 const DeveloperProductDetailsPage = ({ translate }: WithTranslationsProps): JSX.Element => {
-  const WINDOW_BREAKPOINT_QUERY = '(max-width: 768px)';
+  const WINDOW_BREAKPOINT_QUERY = "(max-width: 768px)";
 
   const [screenSizeMatch, setScreenSizeMatch] = useState(
-    window.matchMedia(WINDOW_BREAKPOINT_QUERY)
+    window.matchMedia(WINDOW_BREAKPOINT_QUERY),
   );
   useEffect(() => {
     const handleWindowResize = () => {
       setScreenSizeMatch(window.matchMedia(WINDOW_BREAKPOINT_QUERY));
     };
-    window.addEventListener('resize', handleWindowResize);
-    return () => { window.removeEventListener('resize', handleWindowResize); };
+    window.addEventListener("resize", handleWindowResize);
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
   }, []);
 
   const { universeId, productId } = useParams<{ universeId: string; productId: string }>();
 
-  const { isPlayable, isFetchingPlayability } = usePlayabilityStatus(universeId ?? '');
+  const { isPlayable, isFetchingPlayability } = usePlayabilityStatus(universeId ?? "");
 
   const [productDetails, setProductDetails] = useState<TDeveloperProductDetails | null>(null);
   const [gameDetails, setGameDetails] = useState<TGetGameDetails | null>(null);
@@ -53,7 +55,9 @@ const DeveloperProductDetailsPage = ({ translate }: WithTranslationsProps): JSX.
         .catch(() => {
           /* intentionally empty */
         })
-        .finally(() => { setIsLoading(false); });
+        .finally(() => {
+          setIsLoading(false);
+        });
     } else {
       setIsLoading(false);
     }
@@ -63,7 +67,9 @@ const DeveloperProductDetailsPage = ({ translate }: WithTranslationsProps): JSX.
   useEffect(() => {
     if (isPlayable !== true || !universeId) return;
     getGameDetails(universeId)
-      .then(data => { setGameDetails(data); })
+      .then(data => {
+        setGameDetails(data);
+      })
       .catch(() => {
         /* intentionally empty */
       });
@@ -75,14 +81,14 @@ const DeveloperProductDetailsPage = ({ translate }: WithTranslationsProps): JSX.
   if (!productDetails) return <React.Fragment />;
 
   const thumbnailHolder = (
-    <div className='thumbnail-holder'>
+    <div className="thumbnail-holder">
       <Thumbnail2d
         type={ThumbnailTypes.developerProductIcon}
         size={ThumbnailGamePassIconSize.size150}
         targetId={productDetails?.TargetId}
         format={ThumbnailFormat.webp}
         altName={productDetails?.Name}
-        imgClassName='thumbnail gear-passes-asset'
+        imgClassName="thumbnail gear-passes-asset"
       />
     </div>
   );
@@ -92,8 +98,9 @@ const DeveloperProductDetailsPage = ({ translate }: WithTranslationsProps): JSX.
     return (
       <Container
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        maxWidth={'md' as any /* Overwrite strict type check for "Breakpoint" */}
-        className='developer-product-details-page-container small-screen'>
+        maxWidth={"md" as any /* Overwrite strict type check for "Breakpoint" */}
+        className="developer-product-details-page-container small-screen"
+      >
         <DeveloperProductTitle developerProductDetailsData={productDetails} translate={translate} />
         {thumbnailHolder}
         {gameDetails && (
@@ -110,10 +117,11 @@ const DeveloperProductDetailsPage = ({ translate }: WithTranslationsProps): JSX.
   return (
     <Container
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      maxWidth={'md' as any /* Overwrite strict type check for "Breakpoint" */}
-      className='developer-product-details-page-container'>
+      maxWidth={"md" as any /* Overwrite strict type check for "Breakpoint" */}
+      className="developer-product-details-page-container"
+    >
       {thumbnailHolder}
-      <Grid className='title-and-details-container' direction='column'>
+      <Grid className="title-and-details-container" direction="column">
         <DeveloperProductTitle developerProductDetailsData={productDetails} translate={translate} />
         {gameDetails && (
           <DeveloperProductMetadata

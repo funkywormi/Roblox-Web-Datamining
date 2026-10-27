@@ -1,4 +1,4 @@
-import { httpService } from 'core-utilities';
+import httpService from '@rbx/amp-v2-wizard/services/requestTransport';
 import { SettingValue } from '../types/settingTypes';
 import urlConstants from '../constants/urlConstants';
 import UserSetting from '../enums/UserSetting';

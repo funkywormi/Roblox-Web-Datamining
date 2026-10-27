@@ -5,8 +5,25 @@ import { Icon } from "@rbx/foundation-ui";
 import { Section, SectionHeader } from "./sections/Section";
 import { isOnDesktop } from "../utils/platform";
 
-const FAQ_BASE_KEYS = ["Action.WhatAreRobux", "Action.WhereAreMyRobux", "Action.DoRobuxExpire"];
-const DESKTOP_FAQ_BASE_KEY = "Action.HowToRedeemGiftCard";
+const FAQ_TRANSLATION_KEYS = [
+  {
+    questionKey: "Action.WhatAreRobuxQuestion",
+    answerKey: "Action.WhatAreRobuxAnswer",
+  },
+  {
+    questionKey: "Action.WhereAreMyRobuxQuestion",
+    answerKey: "Action.WhereAreMyRobuxAnswer",
+  },
+  {
+    questionKey: "Action.DoRobuxExpireQuestion",
+    answerKey: "Action.DoRobuxExpireAnswer",
+  },
+] as const;
+
+const DESKTOP_FAQ_TRANSLATION_KEYS = {
+  questionKey: "Action.HowToRedeemGiftCardQuestion",
+  answerKey: "Action.HowToRedeemGiftCardAnswer",
+} as const;
 
 export function FAQ() {
   const translate = useTranslations("Feature.BuyRobux");
@@ -17,7 +34,9 @@ export function FAQ() {
     setShowDesktopFaq(isOnDesktop);
   }, []);
 
-  const faqKeys = showDesktopFaq ? [...FAQ_BASE_KEYS, DESKTOP_FAQ_BASE_KEY] : FAQ_BASE_KEYS;
+  const faqKeys = showDesktopFaq
+    ? [...FAQ_TRANSLATION_KEYS, DESKTOP_FAQ_TRANSLATION_KEYS]
+    : FAQ_TRANSLATION_KEYS;
 
   const toggleItem = useCallback((id: string) => {
     setOpenIds(prev => {
@@ -37,9 +56,7 @@ export function FAQ() {
     <Section>
       <SectionHeader>{translate("Heading.FAQ")}</SectionHeader>
       <div className="self-stretch flex flex-col items-stretch gap-medium large:gap-large">
-        {faqKeys.map(baseKey => {
-          const questionKey = `${baseKey}Question`;
-          const answerKey = `${baseKey}Answer`;
+        {faqKeys.map(({ questionKey, answerKey }) => {
           const hasQuestionKey = translate.has(questionKey);
           const hasAnswerKey = translate.has(answerKey);
 
@@ -48,7 +65,7 @@ export function FAQ() {
           }
 
           let answerTags: HtmlTag[] = [];
-          if (baseKey === "Action.WhereAreMyRobux") {
+          if (answerKey === "Action.WhereAreMyRobuxAnswer") {
             answerTags = [
               {
                 opening: "transactionsLinkStart",
@@ -60,7 +77,7 @@ export function FAQ() {
                 ),
               },
             ];
-          } else if (baseKey === DESKTOP_FAQ_BASE_KEY) {
+          } else if (answerKey === DESKTOP_FAQ_TRANSLATION_KEYS.answerKey) {
             answerTags = [
               {
                 opening: "redeemLinkStart",
@@ -74,11 +91,11 @@ export function FAQ() {
             ];
           }
 
-          const isOpen = openIds.has(baseKey);
-          const contentRegionId = `faq-panel-${baseKey}`;
+          const isOpen = openIds.has(questionKey);
+          const contentRegionId = `faq-panel-${questionKey}`;
           return (
             <div
-              key={baseKey}
+              key={questionKey}
               className="radius-medium stroke-standard stroke-default overflow-hidden padding-x-medium padding-y-small"
             >
               <div
@@ -88,12 +105,12 @@ export function FAQ() {
                 tabIndex={0}
                 className="width-full cursor-pointer flex flex-row items-center justify-between height-1000 content-default"
                 onClick={() => {
-                  toggleItem(baseKey);
+                  toggleItem(questionKey);
                 }}
                 onKeyDown={e => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    toggleItem(baseKey);
+                    toggleItem(questionKey);
                   }
                 }}
               >

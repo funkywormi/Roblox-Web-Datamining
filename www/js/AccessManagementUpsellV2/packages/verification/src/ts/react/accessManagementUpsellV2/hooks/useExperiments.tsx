@@ -1,10 +1,10 @@
-import { ExperimentationService } from 'Roblox';
-
 import { useEffect, useState } from 'react';
+import ExperimentationService from '@rbx/experimentation';
 
 const getExperimentsForLayer = async (
   experimentLayer: string
 ): Promise<{ [parameter: string]: unknown }> => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- the .NET external is a global that may be absent
   if (ExperimentationService?.getAllValuesForLayer) {
     const ixpResult = await ExperimentationService.getAllValuesForLayer(experimentLayer);
     return ixpResult;

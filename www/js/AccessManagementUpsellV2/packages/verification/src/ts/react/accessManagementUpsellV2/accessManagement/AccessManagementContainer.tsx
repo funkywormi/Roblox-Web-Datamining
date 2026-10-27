@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TranslateFunction } from 'react-utilities';
-import { Modal } from 'react-style-guide';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
+import { Modal } from '../components/StyleGuide';
 import { useSelector } from 'react-redux';
-import { TFeatureSpecificData } from 'Roblox';
+import type { TFeatureSpecificData } from '@rbx/legacy-webapp-types/Roblox/accessManagementUpsellService';
 import {
   resetAccessManagementStore,
   selectAccessManagement,

@@ -13,7 +13,10 @@ export const observabilityRegistry = {
   features: {
     health: {
       counters: [{ name: "PageView", dimensions: ["host"] }],
-      criticalErrors: [{ name: "EditorLoadFailed", dimensions: ["host", "statusCode"] }],
+      // step: which page-load request failed; pageHidden: whether the user had already left.
+      criticalErrors: [
+        { name: "EditorLoadFailed", dimensions: ["host", "statusCode", "step", "pageHidden"] },
+      ],
     },
     editor: {
       counters: [
@@ -92,6 +95,9 @@ export type EditAction =
 
 export type ItemsRequest = "firstPage" | "nextPage";
 
+// "setup" covers anything thrown after the requests resolve.
+export type EditorLoadStep = "rules" | "avatar" | "catalogMetadata" | "setup";
+
 // Same inlining as the HTTP transport switch; the Rspack SCS build leaves it undefined.
 export const host = process.env.NEXT_PUBLIC_IS_NEXTJS === "true" ? "nextjs" : "dotnet";
 
@@ -133,4 +139,17 @@ export const trackItemsLoaded = (request: ItemsRequest): void => {
 
 export const trackItemsLoadFailed = (request: ItemsRequest, error: unknown): void => {
   trackError("ItemsLoadFailed", { request, statusCode: getStatusCode(error) }, error);
+};
+
+export const trackEditorLoadFailed = (step: EditorLoadStep, error: unknown): void => {
+  trackCriticalError(
+    "EditorLoadFailed",
+    {
+      host,
+      statusCode: getStatusCode(error),
+      step,
+      pageHidden: String(document.visibilityState === "hidden"),
+    },
+    error,
+  );
 };

@@ -98,6 +98,9 @@ export type TUserSettingsBody = {
   [UserSetting.robuxTransferLimits]?: string;
   [UserSetting.iarcAgeRating]?: IarcAgeRating;
   [UserSetting.allowThirdPartyFriendAccess]?: EnabledStatusValue;
+  [UserSetting.whoCanSeeMyFriendsList]?: UserPrivacyLevel;
+  [UserSetting.whoCanSeeMyPastUsernames]?: UserPrivacyLevel;
+  [UserSetting.whoCanSeeMyAboutSection]?: UserPrivacyLevel;
 };
 
 export type TOptionValue =
@@ -230,6 +233,9 @@ export type TUserSettingsAndOptionsV2Body = {
   [UserSetting.robuxTransferLimits]?: TUserSettingsAndOptionsV2<TRobuxTransferLimitsInput>;
   [UserSetting.iarcAgeRating]?: TUserSettingsAndOptionsV2<IarcAgeRating>;
   [UserSetting.allowThirdPartyFriendAccess]?: TUserSettingsAndOptionsV2<EnabledStatusValue>;
+  [UserSetting.whoCanSeeMyFriendsList]?: TUserSettingsAndOptionsV2<UserPrivacyLevel>;
+  [UserSetting.whoCanSeeMyPastUsernames]?: TUserSettingsAndOptionsV2<UserPrivacyLevel>;
+  [UserSetting.whoCanSeeMyAboutSection]?: TUserSettingsAndOptionsV2<UserPrivacyLevel>;
 };
 
 type TCascadingSettingUpdatesResponse = {

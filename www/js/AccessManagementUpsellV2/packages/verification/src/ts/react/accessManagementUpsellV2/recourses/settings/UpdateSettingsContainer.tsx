@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { TranslateFunction, withTranslations } from 'react-utilities';
-import { TUpdateSettingsModalProps } from 'Roblox';
-import { updateSettingsTranslationConfig } from '../../app.config';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
+import { useUpdateSettingsTranslate } from '../../hooks/useAmpTranslate';
+import type { TUpdateSettingsModalProps } from '@rbx/legacy-webapp-types/Roblox/accessManagementUpsellService';
 import useUpdateSettingsModal from './hooks/useUpdateSettingsModal';
 import { RecourseResponse } from '../../types/AmpTypes';
 import { getModalShownEvent } from './services/eventService';
@@ -14,7 +14,7 @@ const UpdateSettingsContainer = ({
   translate: TranslateFunction;
   recourse: RecourseResponse;
   updateSettingsModalProps: TUpdateSettingsModalProps;
-}): JSX.Element => {
+}): React.JSX.Element => {
   const [updateSettingsModal, updateSettingsModalService] = useUpdateSettingsModal(
     translate,
     updateSettingsModalProps,
@@ -29,4 +29,11 @@ const UpdateSettingsContainer = ({
   return <div>{updateSettingsModal}</div>;
 };
 
-export default withTranslations(UpdateSettingsContainer, updateSettingsTranslationConfig);
+const UpdateSettingsContainerWithTranslations = (
+  props: Omit<React.ComponentProps<typeof UpdateSettingsContainer>, 'translate'> & { translate?: TranslateFunction }
+): React.JSX.Element => {
+  const translate = useUpdateSettingsTranslate();
+  return <UpdateSettingsContainer {...props} translate={translate} />;
+};
+
+export default UpdateSettingsContainerWithTranslations;

@@ -1,4 +1,5 @@
 import { ReactElement, useCallback, useState } from "react";
+import { useTranslation } from "@rbx/core-scripts/react";
 import { useReports } from "../api/useReports";
 import PageHeader from "../shared/components/PageHeader";
 import InlineError from "../shared/components/InlineError";
@@ -12,6 +13,8 @@ import { SafetyDashboardEventType } from "../telemetry/eventTypes";
 import { sendSafetyDashboardEvent } from "../telemetry/sendSafetyDashboardEvent";
 
 const ReportInboxPage = (): ReactElement => {
+  const { translate } = useTranslation();
+
   const {
     inboxPageHeader,
     reports,
@@ -89,6 +92,9 @@ const ReportInboxPage = (): ReactElement => {
       {status === "list" && (
         <div className="flex flex-col gap-large">
           <ReportList reports={reports} />
+          {reports.length > 0 && !hasNextPage && (
+            <span className="text-body-medium">{translate("Description.NoReportsYetIllegal")}</span>
+          )}
           {hasNextPage && <LoadMoreSentinel onVisible={handleLoadMore} />}
           <LoadMoreFooter
             isLoading={isFetchingNextPage}

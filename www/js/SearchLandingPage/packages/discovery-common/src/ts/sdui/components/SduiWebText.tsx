@@ -26,7 +26,7 @@ const SduiWebText = ({
   return (
     <WebText
       text={text}
-      textFontStyle={textFontStyle ?? tokens.Typography.BodyMedium}
+      textFontStyle={textFontStyle ?? { ...tokens.Typography.BodyMedium, FontFamily: "inherit" }}
       textColor={textColor ?? tokens.Color.Content.Default}
       webTextElement={webTextElement}
     />

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import playButtonService from "../services/playButtonService";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
@@ -74,7 +75,7 @@ export const usePlayabilityStatus = (
     queryKey: [PLAYABILITY_QUERY_KEY, universeId],
     queryFn: async () => {
       if (!universeId) {
-        window.EventTracker?.fireEvent(counterEvents.PlayabilityStatusFetchInvalidUniverseId);
+        fireEvent(counterEvents.PlayabilityStatusFetchInvalidUniverseId);
         throw new Error("Invalid universe ID for playability status fetch");
       }
 
@@ -82,14 +83,14 @@ export const usePlayabilityStatus = (
       try {
         response = await playButtonService.getPlayabilityStatus([universeId]);
       } catch {
-        window.EventTracker?.fireEvent(counterEvents.PlayabilityStatusFetchFailed);
+        fireEvent(counterEvents.PlayabilityStatusFetchFailed);
         throw new Error("Playability status fetch failed");
       }
 
       // Runtime validation of the API response
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!response?.playabilityStatus || response.isPlayable === undefined) {
-        window.EventTracker?.fireEvent(counterEvents.PlayabilityStatusFetchInvalidResponse);
+        fireEvent(counterEvents.PlayabilityStatusFetchInvalidResponse);
         throw new Error("Invalid playability status response");
       }
 

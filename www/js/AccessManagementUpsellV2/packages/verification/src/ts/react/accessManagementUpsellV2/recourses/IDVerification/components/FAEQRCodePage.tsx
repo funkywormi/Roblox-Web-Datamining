@@ -1,5 +1,5 @@
 import React from 'react';
-import { TranslateFunction } from 'react-utilities';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { Dialog, DialogContent, DialogBody } from '@rbx/foundation-ui';
 import { HeadingConstants, LabelConstants } from '../constants/textConstants';
 

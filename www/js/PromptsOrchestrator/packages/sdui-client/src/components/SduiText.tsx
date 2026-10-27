@@ -1,22 +1,28 @@
 "use client";
-import { useMemo, type CSSProperties } from "react";
+import { useMemo, type CSSProperties, type ReactNode } from "react";
 import { clsx } from "clsx";
-import domPurify from "dompurify";
 import {
   buildFoundationTokenCss,
   buildPositionAndAnchorPointCss,
   buildSizeCss,
+  buildTextTruncateCss,
+  buildTextXAlignmentCss,
+  buildTextYAlignmentCss,
+  parseTextTruncate,
+  parseTextXAlignment,
+  parseTextYAlignment,
   toHtmlElement,
   type SduiAutomaticSize,
   type SduiDim2,
   type SduiRendererInjectedProps,
   type SduiVector2,
 } from "@rbx/sdui-core";
+import { renderRobloxGlyphText } from "@rbx/sdui-common";
+import { renderSanitizedRichText } from "./sanitizedRichText";
 
-const DOM_PURIFY_CONFIG = {
-  ALLOWED_TAGS: ["em", "i", "strong", "b", "u", "a", "br"],
-  ALLOWED_ATTR: ["href", "target", "rel"],
-};
+function textTruncateClass(mode: ReturnType<typeof parseTextTruncate>): string {
+  return mode == null ? "text-truncate-end" : buildTextTruncateCss(mode);
+}
 
 export interface SduiTextProps extends SduiRendererInjectedProps {
   // TODO: Support the remaining Text schema features
@@ -31,6 +37,14 @@ export interface SduiTextProps extends SduiRendererInjectedProps {
   headingLevel?: string;
   fontFamily?: string;
   fontWeight?: CSSProperties["fontWeight"];
+  textWrapped?: boolean;
+  textTruncate?: string;
+  textXAlignment?: string;
+  textYAlignment?: string;
+  /** Web-only class names from `TextSchema.WebProps.class_names`. App `tag` is ignored. */
+  classNames?: string;
+  /** Rendered in place of `text`. */
+  children?: ReactNode;
 }
 
 /**
@@ -49,46 +63,59 @@ export function SduiText({
   headingLevel,
   fontFamily,
   fontWeight,
+  textWrapped,
+  textTruncate,
+  textXAlignment,
+  textYAlignment,
+  classNames,
+  children,
 }: SduiTextProps) {
   const Element = toHtmlElement(headingLevel);
 
   const positionAndAnchorPointCss = buildPositionAndAnchorPointCss(position, anchorPoint);
   const sizeCss = buildSizeCss(size, automaticSize);
+  const truncateMode = parseTextTruncate(textTruncate);
+  const truncateClass = textTruncateClass(truncateMode);
+  const textXAlignmentMode = parseTextXAlignment(textXAlignment);
+  const textYAlignmentMode = parseTextYAlignment(textYAlignment);
+  const needsTextBox =
+    (truncateMode != null && truncateMode !== "none") ||
+    textXAlignmentMode != null ||
+    textYAlignmentMode != null;
 
   const style: CSSProperties = {
     wordWrap: "break-word",
-    whiteSpace: "pre-line",
+    whiteSpace: textWrapped === false ? "nowrap" : "pre-line",
     fontFamily,
     fontWeight,
     ...positionAndAnchorPointCss,
     ...sizeCss,
   };
 
-  const className = clsx(
-    "text-truncate-end",
+  // In order for truncation and x-alignment to work correctly for inline elements,
+  // we use inline-flex display and a bounded width.
+  // We also use the flex properties to correctly y-align text inside the entire box.
+  const parentClassName = clsx(
+    needsTextBox && "inline-flex max-width-full",
+    textYAlignmentMode != null && buildTextYAlignmentCss(textYAlignmentMode),
     buildFoundationTokenCss(fontStyle),
     buildFoundationTokenCss(textStyle, "content"),
+    classNames,
+  );
+  const contentClassName = clsx(
+    needsTextBox && "width-full min-width-0",
+    truncateClass,
+    textXAlignmentMode != null && buildTextXAlignmentCss(textXAlignmentMode),
   );
 
-  const sanitizedHtml = useMemo(
-    () => (isRenderedText ? domPurify.sanitize(text, DOM_PURIFY_CONFIG) : undefined),
+  const content = useMemo(
+    () => (isRenderedText ? renderSanitizedRichText(text) : renderRobloxGlyphText(text)),
     [text, isRenderedText],
   );
 
-  if (sanitizedHtml != null) {
-    return (
-      <Element
-        data-testid="sdui-text"
-        className={className}
-        style={style}
-        dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-      />
-    );
-  }
-
   return (
-    <Element data-testid="sdui-text" className={className} style={style}>
-      {text}
+    <Element data-testid="sdui-text" className={parentClassName} style={style}>
+      <span className={contentClassName}>{children ?? content}</span>
     </Element>
   );
 }

@@ -1,7 +1,18 @@
-import { localStorageService } from 'core-roblox-utilities';
-import { httpService } from 'core-utilities';
+import { window } from '@rbx/core-lib/browser';
+import httpService from '@rbx/amp-v2-wizard/services/requestTransport';
 import RequestType from '../enums/RequestType';
 import { newParentalRequest, broadcastParentalRequest } from '../constants/urlConstants';
+
+const rememberCooldown = (settingName: string | undefined, lockedUntil: string): void => {
+  try {
+    window?.localStorage.setItem(
+      `Roblox.ParentalRequest.${String(settingName)}CooldownExpirationTime`,
+      JSON.stringify(lockedUntil)
+    );
+  } catch {
+    // Storage is only a client-side cooldown hint; the request itself already succeeded.
+  }
+};
 
 type TNewParentalRequestParams = {
   email: string;
@@ -35,10 +46,7 @@ const parentalRequestService = {
     const response = await httpService.post<TParentalRequestResponse>(urlConfig, requestBody);
     if (requestDetails) {
       const settingName = Object.keys(requestDetails)[0];
-      localStorageService.setLocalStorage(
-        `Roblox.ParentalRequest.${settingName}CooldownExpirationTime`,
-        response.data.lockedUntil
-      );
+      rememberCooldown(settingName, response.data.lockedUntil);
     }
     return response.data;
   },
@@ -51,10 +59,7 @@ const parentalRequestService = {
     const response = await httpService.post<TParentalRequestResponse>(urlConfig, params);
     if (requestDetails) {
       const settingName = Object.keys(requestDetails)[0];
-      localStorageService.setLocalStorage(
-        `Roblox.ParentalRequest.${settingName}CooldownExpirationTime`,
-        response.data.lockedUntil
-      );
+      rememberCooldown(settingName, response.data.lockedUntil);
     }
     return response.data;
   }

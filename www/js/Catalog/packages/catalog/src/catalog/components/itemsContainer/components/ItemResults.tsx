@@ -1,32 +1,10 @@
 import React, { useCallback } from "react";
-import { ItemCard, ItemCardUtils, ShoppingCardProps } from "react-style-guide";
-import {
-  DefaultThumbnailSize,
-  Thumbnail2d,
-  ThumbnailAssetsSize,
-  ThumbnailTypes,
-} from "roblox-thumbnails";
-import { BadgeSizes, VerifiedBadgeIconContainer } from "roblox-badges";
 import classNames from "classnames";
 import { WithTranslationsProps, withTranslations } from "react-utilities";
-import { TTimedOption } from "../../../../itemDetailsHydrationService/constants/itemDetailsHydrationConstants";
 import ShimmerContainer from "../../shimmerContainer/ShimmerContainer";
 import { Layout, ItemWithDetails } from "../../../constants/types";
-import useShoppingCart from "../../../../shoppingCart/hooks/useShoppingCart";
-import { TAssetItemDetails } from "../../../../itemDetailsInfo/constants/types";
-import { processTimedOptionsForCart } from "../../../../shoppingCart/utils/cartUtils";
 import { translationConfig } from "../../../translation.config";
-import {
-  trackItemCardClick,
-  trackShoppingCartAddClick,
-  trackShoppingCartRemoveClick,
-  TItemCardSource,
-  TCartActionSource,
-} from "../../../../analytics/axTrackingEvents";
-
-type ItemWithTimedOptions = ItemWithDetails & {
-  timedOptions?: TTimedOption[];
-};
+import useCatalogItemCardRenderer from "./useCatalogItemCardRenderer";
 
 export type ItemResultsProps = {
   layout: Layout;
@@ -50,7 +28,10 @@ function ItemResults(props: ItemResultsProps & WithTranslationsProps): JSX.Eleme
     numberOfItemsToDisplay,
   } = props;
 
-  const { isItemInCart, addItemToCart, removeItemFromCart } = useShoppingCart();
+  const renderItemCard = useCatalogItemCardRenderer({
+    enableThumbnailPrice,
+    enableCatalogRevampExperiment,
+  });
 
   const showError = layout.searchItemsError && !layout.loading;
 
@@ -65,107 +46,6 @@ function ItemResults(props: ItemResultsProps & WithTranslationsProps): JSX.Eleme
       </div>
     );
   }, [layout.searchItemsError, translate]);
-
-  const renderItemCard = useCallback(
-    (item: ItemWithDetails) => {
-      let { price, lowestPrice } = item;
-      const itemKey = `${item.itemType}_${item.id}`;
-      const shoppingCartProps: ShoppingCardProps = {
-        isItemInCart: isItemInCart(item.id),
-        addItemToCart: (itemInfo, displaySystemFeedback) => {
-          trackShoppingCartAddClick(TCartActionSource.CatalogItemCard, {
-            itemId: itemInfo.itemId,
-            itemType: itemInfo.itemType,
-          });
-          return addItemToCart(itemInfo, displaySystemFeedback);
-        },
-        removeItemFromCart: (itemId, itemType, displaySystemFeedback) => {
-          trackShoppingCartRemoveClick(TCartActionSource.CatalogItemCard, { itemId, itemType });
-          return removeItemFromCart(itemId, itemType, displaySystemFeedback);
-        },
-      };
-      // Process timed options to ensure permanent option is included
-      const itemWithTimedOptions = item as ItemWithTimedOptions;
-      const processedTimedOptions = processTimedOptionsForCart(
-        itemWithTimedOptions.timedOptions,
-        item.price ?? 0,
-      );
-
-      if (processedTimedOptions && processedTimedOptions.length > 0) {
-        const selectedTimedOption = processedTimedOptions.find(option => option.selected);
-        if (selectedTimedOption) {
-          price = selectedTimedOption.price;
-          lowestPrice = selectedTimedOption.price;
-        }
-      }
-      return (
-        // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
-        <div
-          key={itemKey}
-          style={{ display: "contents" }}
-          onClick={() =>
-            trackItemCardClick(TItemCardSource.Catalog, {
-              itemId: item.id,
-              itemType: item.itemType,
-            })
-          }
-        >
-          <ItemCard
-            key={itemKey}
-            id={item.id}
-            name={item.name}
-            type={item.itemType}
-            creatorName={item.creatorName}
-            creatorType={item.creatorType}
-            creatorTargetId={item.creatorTargetId}
-            price={price}
-            lowestPrice={lowestPrice}
-            unitsAvailableForConsumption={item.unitsAvailableForConsumption}
-            itemStatus={(item as TAssetItemDetails).itemStatus}
-            priceStatus={item.priceStatus}
-            premiumPricing={item.premiumPricing?.premiumPriceInRobux}
-            itemRestrictions={item.itemRestrictions}
-            thumbnail2d={
-              <Thumbnail2d
-                type={
-                  ItemCardUtils.checkIfBundle(item.itemType)
-                    ? ThumbnailTypes.bundleThumbnail
-                    : ThumbnailTypes.assetThumbnail
-                }
-                targetId={item.id}
-                size={
-                  enableCatalogRevampExperiment ? ThumbnailAssetsSize.size420 : DefaultThumbnailSize
-                }
-              />
-            }
-            iconToRender={
-              item.creatorHasVerifiedBadge ? (
-                <VerifiedBadgeIconContainer
-                  overrideImgClass="verified-badge-icon-catalog-item-rendered"
-                  size={BadgeSizes.TITLE}
-                  titleText={item.creatorTargetId.toString()}
-                />
-              ) : undefined
-            }
-            shoppingCartProps={shoppingCartProps}
-            containerClassName={
-              enableCatalogRevampExperiment ? "catalog-item-container" : undefined
-            }
-            enableThumbnailPrice={enableThumbnailPrice}
-            timedOptions={processedTimedOptions}
-            licenseType={item.license?.licenseType}
-          />
-        </div>
-      );
-    },
-    [
-      addItemToCart,
-      enableCatalogRevampExperiment,
-      enableThumbnailPrice,
-      isItemInCart,
-      removeItemFromCart,
-    ],
-  );
 
   const renderItemCards = useCallback(() => {
     return (

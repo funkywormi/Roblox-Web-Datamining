@@ -6,25 +6,21 @@ const { apiGatewayUrl, websiteUrl } = EnvironmentUrls;
 const url = {
   getDeveloperProductDetails: (productId: string): UrlConfig => ({
     url: `${apiGatewayUrl}/developer-products/v1/developer-products/${productId}/details`,
-    withCredentials: true
+    withCredentials: true,
   }),
-  getGameTransactions: {
-    url: `${apiGatewayUrl}/developer-products/v1/game-transactions`,
-    withCredentials: true
-  },
   reportAbuseRevamp: (targetId: string, submitterId: string, abuseVector: string): string => {
     const params = new URLSearchParams({
       targetId,
       submitterId,
-      abuseVector
+      abuseVector,
     });
     return `/report-abuse/?${params.toString()}`;
   },
   reportAbuse: (targetId: string, redirectUrlEncoded: string): UrlConfig => ({
-    url: `https://www.${EnvironmentUrls.domain}/abusereport/developerproduct?id=${targetId}&RedirectUrl=${redirectUrlEncoded}`
+    url: `https://www.${EnvironmentUrls.domain}/abusereport/developerproduct?id=${targetId}&RedirectUrl=${redirectUrlEncoded}`,
   }),
   gameEDP: (rootPlaceId: string): UrlConfig => ({
-    url: `https://www.${EnvironmentUrls.domain}/games/${rootPlaceId}`
+    url: `https://www.${EnvironmentUrls.domain}/games/${rootPlaceId}`,
   }),
   userProfile: (userId: string): string => `${websiteUrl}/users/${userId}/profile`,
   groupProfile: (groupId: string): string => `${websiteUrl}/communities/${groupId}`,
@@ -32,10 +28,10 @@ const url = {
     `https://create.${EnvironmentUrls.domain}/dashboard/creations/experiences/${universeId}/passes/${gamePassId}/configure`,
   reportGamePass: (gamePassId: string, redirectUrl: string): string =>
     `${websiteUrl}/abusereport/gamePass?id=${gamePassId}&redirectUrl=${encodeURIComponent(
-      redirectUrl
-    )}`
+      redirectUrl,
+    )}`,
 };
 
 export default {
-  url
+  url,
 };

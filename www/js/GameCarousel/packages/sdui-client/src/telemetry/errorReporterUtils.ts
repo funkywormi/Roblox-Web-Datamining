@@ -1,6 +1,8 @@
 import { sendEvent } from "@rbx/core-scripts/event-stream";
+import { captureException } from "@rbx/core-scripts/sentry";
 import type { SduiPageContext } from "@rbx/sdui-core";
 import { parseEventParams } from "@rbx/unified-logging";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 
 import type { CaptureErrorInput, CaptureErrorInSentryInput } from "./types";
 
@@ -24,13 +26,11 @@ export function shouldFireChannel(rate: number | undefined): boolean {
 }
 
 /**
- * Fires the real-time error counter keyed by error name. No-op when the host
- * `EventTracker` isn't present.
+ * Fires the real-time error counter keyed by error name. Works on .NET and
+ * Next.js; never throws.
  */
 export function fireErrorCounter(errorName: string): void {
-  if (typeof window !== "undefined" && window.EventTracker) {
-    window.EventTracker.fireEvent(errorName);
-  }
+  fireEvent(errorName);
 }
 
 /**
@@ -68,21 +68,19 @@ export function captureErrorInSentry({
   additionalContext,
   additionalFingerprint,
 }: CaptureErrorInSentryInput): void {
-  if (typeof window !== "undefined" && window.Sentry) {
-    const error = new Error(errorMessage);
-    error.name = errorName;
+  const error = new Error(errorMessage);
+  error.name = errorName;
 
-    window.Sentry.captureException(error, {
-      tags: {
-        [errorNameTagKey]: errorName,
-        appPage,
-        ...additionalTags,
-      },
-      extra: {
-        errorMessage,
-        ...additionalContext,
-      },
-      fingerprint: [applicationName, errorName, ...(additionalFingerprint ?? [])],
-    });
-  }
+  captureException(error, {
+    tags: {
+      [errorNameTagKey]: errorName,
+      appPage,
+      ...additionalTags,
+    },
+    extra: {
+      errorMessage,
+      ...additionalContext,
+    },
+    fingerprint: [applicationName, errorName, ...(additionalFingerprint ?? [])],
+  });
 }

@@ -5,6 +5,7 @@ import { getAvatarAccessStatus, AvatarAccessStatus } from "../utils/featureAcces
 
 interface AvatarEditingAccessContextType {
   isAvatarEditingBlocked: boolean;
+  hasTimeoutAction: boolean;
   blockEndTime: Date | null;
   formattedBlockEndTime: string | null;
   isLoading: boolean;
@@ -33,6 +34,7 @@ export const AvatarEditingAccessProvider: React.FC<AvatarEditingAccessProviderPr
 }) => {
   const [accessStatus, setAccessStatus] = useState<AvatarAccessStatus>({
     isBlocked: false,
+    hasTimeoutAction: false,
     endTime: null,
     durationSeconds: null,
   });
@@ -69,11 +71,18 @@ export const AvatarEditingAccessProvider: React.FC<AvatarEditingAccessProviderPr
   const contextValue = useMemo(
     () => ({
       isAvatarEditingBlocked: accessStatus.isBlocked,
+      hasTimeoutAction: accessStatus.hasTimeoutAction,
       blockEndTime: accessStatus.endTime,
       formattedBlockEndTime,
       isLoading,
     }),
-    [accessStatus.isBlocked, accessStatus.endTime, formattedBlockEndTime, isLoading],
+    [
+      accessStatus.isBlocked,
+      accessStatus.hasTimeoutAction,
+      accessStatus.endTime,
+      formattedBlockEndTime,
+      isLoading,
+    ],
   );
 
   return (

@@ -1,5 +1,5 @@
-import { cryptoUtil } from 'core-roblox-utilities';
-import { TranslateFunction } from 'react-utilities';
+import { hashStringWithFnv1a32, stringToUrlSafeBase64 } from '@rbx/www-common/auth';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { TAuditData, TAuditHeaderPayload } from '../types/legallySensitiveContentTypes';
 import legallySensitiveContentConstants from '../constants/legallySensitiveContentConstants';
 import ConsentName from '../enums/ConsentName';
@@ -472,7 +472,7 @@ export const getAuditHeaderPayload = (
       (acc, data) => ({
         ...acc,
         [data.sourceContentId]: {
-          hash: cryptoUtil.hashStringWithFnv1a32(data.consentStringTemplate),
+          hash: hashStringWithFnv1a32(data.consentStringTemplate),
           ...data.vars
         }
       }),
@@ -499,7 +499,7 @@ export const getEncodedAuditHeader = (
 ): string => {
   const auditHeaderPayload = getAuditHeaderPayload(auditData, surface, additionalContextualData);
   const json = JSON.stringify(auditHeaderPayload);
-  const encodedHeaderValue = cryptoUtil.stringToUrlSafeBase64(json);
+  const encodedHeaderValue = stringToUrlSafeBase64(json);
 
   return encodedHeaderValue;
 };

@@ -8,7 +8,8 @@ import type { ResolvedThumbnail, ThumbnailRequest } from "./types";
 const DEFAULT_SIZE = "150x150";
 const DEFAULT_FORMAT = "webp";
 
-const thumbnailsUrl = Url.parse(environmentUrls.thumbnailsApi).getOrThrow();
+// Getters, not module-scope consts: parsing at import throws for importers that never fetch (e.g. under jest).
+const thumbnailsUrl = () => Url.parse(environmentUrls.thumbnailsApi).getOrThrow();
 
 // Stable per-request key used both as the batch `requestId` we send and to pick each result back out.
 const requestId = (request: ThumbnailRequest): string =>
@@ -41,7 +42,7 @@ const parseBatchResponse = (response: ThumbnailBatchResponse): Map<string, Resol
 const fetchThumbnailBatch = async (
   requests: readonly ThumbnailRequest[],
 ): Promise<Map<string, ResolvedThumbnail>> => {
-  const url = thumbnailsUrl.withPath("/v1/batch");
+  const url = thumbnailsUrl().withPath("/v1/batch");
   const body = requests.map(request => ({
     requestId: requestId(request),
     type: request.type,

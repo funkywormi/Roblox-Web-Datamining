@@ -218,7 +218,7 @@ export const verificationSlice = createSlice({
         } else {
           // tHis is the regular IDV flow
           const vendorData = action.payload as VerificationStatus;
-          let completionPageState;
+          let completionPageState: PageText | undefined;
           let { page } = state.IDVerificationState;
           switch (vendorData.sessionStatus) {
             case VerificationStatusCode.RequiresRetry:
@@ -273,7 +273,7 @@ export const verificationSlice = createSlice({
             ...state.IDVerificationState,
             loading: false,
             status: vendorData,
-            completionPageState,
+            completionPageState: completionPageState as PageText,
             page
           };
         }

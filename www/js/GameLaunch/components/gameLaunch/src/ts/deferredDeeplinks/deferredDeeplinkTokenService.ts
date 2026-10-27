@@ -13,19 +13,21 @@ export type CreateDeeplinkTokenOptions = {
   authTicket?: string;
   btId?: string;
   downloadSource?: string;
+  launchContext?: string;
 };
 
 const createDeeplinkToken = async (
   experienceAffiliateReferralUrl: string,
   options: CreateDeeplinkTokenOptions = {},
 ): Promise<string | null> => {
-  const { authTicket, btId, downloadSource } = options;
+  const { authTicket, btId, downloadSource, launchContext } = options;
   const createDeeplinkTokenRequestBody: {
     linkId: string;
     group: string;
     authTicket?: string;
     btId?: string;
     downloadSource?: string;
+    launchContext?: string;
   } = {
     linkId: experienceAffiliateReferralUrl,
     group: deferredDeeplinkGroupName,
@@ -39,6 +41,9 @@ const createDeeplinkToken = async (
   }
   if (downloadSource) {
     createDeeplinkTokenRequestBody.downloadSource = downloadSource;
+  }
+  if (launchContext) {
+    createDeeplinkTokenRequestBody.launchContext = launchContext;
   }
 
   const urlConfig = {

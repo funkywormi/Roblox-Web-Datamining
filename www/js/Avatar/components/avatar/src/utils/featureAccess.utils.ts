@@ -2,6 +2,7 @@ import { GetFeatureAccessResponse } from "../services/avatarAPIService";
 
 export type AvatarAccessStatus = {
   isBlocked: boolean;
+  hasTimeoutAction: boolean;
   endTime: Date | null;
   durationSeconds: number | null;
 };
@@ -27,6 +28,7 @@ export function getAvatarAccessStatus(response: GetFeatureAccessResponse): Avata
   if (!avatarChangeFeature) {
     return {
       isBlocked: false,
+      hasTimeoutAction: false,
       endTime: null,
       durationSeconds: null,
     };
@@ -35,11 +37,13 @@ export function getAvatarAccessStatus(response: GetFeatureAccessResponse): Avata
   if (avatarChangeFeature.access === GRANTED_ACCESS) {
     return {
       isBlocked: false,
+      hasTimeoutAction: false,
       endTime: null,
       durationSeconds: null,
     };
   }
 
+  let hasTimeoutAction = false;
   let endTime: Date | null = null;
   let durationSeconds: number | null = null;
 
@@ -59,6 +63,7 @@ export function getAvatarAccessStatus(response: GetFeatureAccessResponse): Avata
       recourseObject?.timeoutActions || recourseObject?.timedOutActions || [];
 
     if (timeoutActions.length > 0) {
+      hasTimeoutAction = true;
       const timeoutAction = timeoutActions[0]!;
       if (timeoutAction.endTime) {
         endTime = new Date(timeoutAction.endTime);
@@ -71,6 +76,7 @@ export function getAvatarAccessStatus(response: GetFeatureAccessResponse): Avata
 
   return {
     isBlocked: true,
+    hasTimeoutAction,
     endTime,
     durationSeconds,
   };

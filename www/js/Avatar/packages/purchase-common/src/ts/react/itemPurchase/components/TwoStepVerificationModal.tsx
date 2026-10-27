@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { getAbsoluteUrl } from '@rbx/core-scripts/endpoints';
-import { userId } from '@rbx/core-scripts/meta/user';
 import { TwoStepVerificationChallenge } from '@rbx/account-security/challenge/twoStepVerification';
 import { TwoStepVerification } from '@rbx/account-security/challenge';
+import { userId } from '../../utils/currentUser';
 import {
   checkTwoStepVerificationEnabled,
   generateTwoStepVerificationToken,

@@ -16,17 +16,23 @@ const getReportStatsUrl = () =>
     .withPath("/game/report-stats");
 
 // Fire-and-forget: core-lib captures errors in the Result; keepalive survives a page transition.
-const post = (url: Url, name: string, extraParams?: Record<string, string>): void => {
-  http.postUntyped(url.withSearchParams({ name, ...extraParams }), "", {
-    credentials: "include",
-    keepalive: true,
-    signal: AbortSignal.timeout(30_000),
-  });
+// Never throws, like the legacy `window.EventTracker?.fireEvent`: callers fire counters during
+// render and in catch blocks, so a bad host or a missing AbortSignal.timeout must not reach them.
+const post = (getUrl: () => Url, name: string, extraParams?: Record<string, string>): void => {
+  try {
+    http.postUntyped(getUrl().withSearchParams({ name, ...extraParams }), "", {
+      credentials: "include",
+      keepalive: true,
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch {
+    // A counter is never worth breaking the caller.
+  }
 };
 
 export const fireEvent = (...names: string[]): void => {
   names.forEach(name => {
-    post(getReportEventUrl(), name);
+    post(getReportEventUrl, name);
   });
 };
 
@@ -47,7 +53,7 @@ const end = (reason: "Success" | "Cancel" | "Failure", statSequenceNames: string
       return;
     }
     startTimes.delete(name);
-    post(getReportStatsUrl(), `${name}_${reason}`, { value: String(now - startedAt) });
+    post(getReportStatsUrl, `${name}_${reason}`, { value: String(now - startedAt) });
   });
 };
 

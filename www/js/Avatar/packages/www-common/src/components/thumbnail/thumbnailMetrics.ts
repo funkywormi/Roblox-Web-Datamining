@@ -8,9 +8,10 @@ import { Url } from "@rbx/core-lib/url";
 // metadata-driven sampling, but transport is @rbx/core-lib/http (no jQuery) and the host
 // comes from @rbx/environment-urls, so it works on both .NET and Next.js.
 
-const metricsUrl = Url.parse(environmentUrls.metricsApi).getOrThrow();
-const loadUrl = metricsUrl.withPath("/v1/thumbnails/load");
-const metadataUrl = metricsUrl.withPath("/v1/thumbnails/metadata");
+// Getters, not module-scope consts: parsing at import throws for importers that never fetch (e.g. under jest).
+const metricsUrl = () => Url.parse(environmentUrls.metricsApi).getOrThrow();
+const loadUrl = () => metricsUrl().withPath("/v1/thumbnails/load");
+const metadataUrl = () => metricsUrl().withPath("/v1/thumbnails/metadata");
 
 const loadStates = { complete: "complete", timeout: "timeout" } as const;
 
@@ -23,14 +24,14 @@ let logProbability: ReturnType<typeof fetchLogProbability> | null = null;
 
 const fetchLogProbability = () =>
   http
-    .get(metadataUrl, metadataSchema, {
+    .get(metadataUrl(), metadataSchema, {
       credentials: "include",
       signal: AbortSignal.timeout(3_000),
     })
     .map(data => data.logRatio);
 
 const post = (params: Record<string, string>): void => {
-  http.postUntyped(loadUrl.withSearchParams(params), "", {
+  http.postUntyped(loadUrl().withSearchParams(params), "", {
     credentials: "include",
     keepalive: true,
     signal: AbortSignal.timeout(3_000),

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { isAuthenticated } from '@rbx/core-scripts/meta/user';
+import { isAuthenticated } from '../../utils/currentUser';
 import itemDetailsService from '../services/itemDetailsService';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
 import itemDetailParsingUtils from '../util/itemDetailParsingUtils';

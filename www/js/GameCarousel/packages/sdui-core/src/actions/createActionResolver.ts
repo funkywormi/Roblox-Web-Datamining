@@ -57,6 +57,8 @@ export function createActionResolver(
           currentActionData.analyticsContext,
         )
       : undefined;
+    const actionParams = currentActionData?.actionParams ?? {};
+    const target = href == null ? undefined : handlerConfig?.resolveTarget?.(actionParams);
 
     const onActivatedAsync = (paramOverrides?: Record<string, unknown>): Promise<void> => {
       if (snapshot.status !== DataStatus.Ready) {
@@ -84,6 +86,7 @@ export function createActionResolver(
 
     return {
       href,
+      target,
       clientNavigation: href != null && handlerConfig?.clientNavigation === true,
       onActivatedAsync,
       onActivated: (paramOverrides?: Record<string, unknown>) => {

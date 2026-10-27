@@ -1,12 +1,11 @@
 import React, { useCallback } from "react";
-import { TranslateFunction, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
 import ActionNeededButton from "./ActionNeededButton";
 import LoadingButton from "./LoadingButton";
 import SelfUpdateSettingModal from "./SelfUpdateSettingModal";
-import { translations } from "../constants/translations";
 import RestrictedUnplayableModal from "./RestrictedUnplayableModal";
 import useFetchParentalControlsUpsellData from "../hooks/useFetchParentalControlsUpsellData";
 import useContextualParentalControlsUpsell from "../hooks/useContextualParentalControlsUpsell";
+import { usePlayButtonTranslate } from "../hooks/usePlayButtonTranslate";
 import {
   TAppsFlyerReferralProperties,
   type TPlayButtonPageContext,
@@ -34,10 +33,8 @@ const ParentalControlsActionNeededButton = ({
   eventProperties,
   appsFlyerReferralProperties,
   pageContext,
-  translate,
-}: TParentalControlsActionNeededButtonProps & {
-  translate: TranslateFunction;
-}) => {
+}: TParentalControlsActionNeededButtonProps) => {
+  const translate = usePlayButtonTranslate();
   const { contentAgeRestriction, contentMaturityRating, isFetching, hasError } =
     useFetchParentalControlsUpsellData(universeId);
 
@@ -106,7 +103,4 @@ ParentalControlsActionNeededButton.defaultProps = {
   appsFlyerReferralProperties: {},
 };
 
-export default withTranslations<TParentalControlsActionNeededButtonProps>(
-  ParentalControlsActionNeededButton,
-  translations,
-);
+export default ParentalControlsActionNeededButton;

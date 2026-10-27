@@ -37,6 +37,7 @@ const parameterNames = {
   ],
   avatarMarketplaceRelevanceRecommendations: ["recommendationNumRows"],
   avatarMarketplaceEditor: ["recommendationNumRows"],
+  avatarShopRecommendationsAndSearchWeb: ["animatedItemCardEnabled"],
 };
 
 const defaultProjectId = 1;

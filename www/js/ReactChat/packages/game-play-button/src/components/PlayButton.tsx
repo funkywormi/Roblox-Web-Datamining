@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
 import { getCurrentUser } from "@rbx/www-common/user";
 import { Button } from "@rbx/foundation-ui";
-import * as NavigationService from "@rbx/navigation";
+import * as NavigationService from "@rbx/navigation/auth-links";
 import ExperimentationService from "@rbx/experimentation";
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
 import { fireEvent } from "@rbx/www-common/event-tracker";

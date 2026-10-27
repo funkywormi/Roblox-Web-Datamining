@@ -1,5 +1,6 @@
 import React from "react";
-import { isSduiListValue } from "../binding/propValues";
+import { materializeSduiComponentConfig } from "../binding/deferredSduiComponentConfig";
+import { isSduiListValue, isSduiPooledConfigList } from "../binding/propValues";
 import { SduiErrorName } from "../errors/SduiErrors";
 import { reportError } from "../errors/SduiLogger";
 import type { SduiComponentRegistry } from "../registry/SduiComponentRegistry";
@@ -11,6 +12,8 @@ import {
   type SduiErrorReporter,
   type SduiManagedChildList,
   type SduiPageContext,
+  type SduiPooledConfigList,
+  type PoolSectionLayoutMetadata,
 } from "../types";
 import { peekPropStatuses } from "../utils/builderHelpers";
 import { componentTypeName } from "../utils/protoEnum";
@@ -40,10 +43,21 @@ export interface SduiRendererProps {
 }
 
 type SduiRendererChildContext = Omit<SduiRendererProps, "config">;
-type RootSduiConfigValue = SduiComponentConfig | SduiComponentConfig[];
+type RootSduiConfigValue = SduiComponentConfig | SduiComponentConfig[] | SduiPooledConfigList;
 
 function isRootSduiConfigValue(value: unknown): value is RootSduiConfigValue {
-  return !isSduiListValue(value) && (isSduiConfig(value) || isSduiConfigArray(value));
+  return (
+    isSduiPooledConfigList(value) ||
+    (!isSduiListValue(value) && (isSduiConfig(value) || isSduiConfigArray(value)))
+  );
+}
+
+function normalizeChildConfigs(value: RootSduiConfigValue): SduiComponentConfig[] {
+  if (isSduiPooledConfigList(value)) {
+    return value.configs;
+  }
+
+  return Array.isArray(value) ? value : [value];
 }
 
 function renderSduiChild(
@@ -67,9 +81,10 @@ function renderSduiChild(
 }
 
 function addListItemAnalytics(childConfig: SduiComponentConfig, index: number): void {
+  const itemPosition = (childConfig.poolPlacement?.poolIndex ?? index) + 1;
   childConfig.analyticsContext?.setLocalAnalyticsData?.({
     feedItemPosition: index + 1,
-    itemPosition: index + 1,
+    itemPosition,
     itemComponentType: componentTypeName(childConfig.componentType),
   });
 }
@@ -78,14 +93,24 @@ function createManagedChildList(
   configs: SduiComponentConfig[],
   propName: string,
   ctx: SduiRendererChildContext,
+  poolLayout?: PoolSectionLayoutMetadata,
 ): SduiManagedChildList {
   return {
     configs,
+    ...(poolLayout ? { poolLayout } : {}),
     renderItem: (childConfig, index, reactKey) => {
-      addListItemAnalytics(childConfig, index);
+      const materializedConfig = materializeSduiComponentConfig(childConfig);
+      // Deferred builds that throw or return nothing are skipped, like the eager path.
+      if (materializedConfig == null) {
+        return null;
+      }
+      addListItemAnalytics(materializedConfig, index);
       return renderSduiChild(
-        childConfig,
-        reactKey ?? childConfig.reactKey ?? childConfig.identifier ?? `${propName}-${index}`,
+        materializedConfig,
+        reactKey ??
+          materializedConfig.reactKey ??
+          materializedConfig.identifier ??
+          `${propName}-${index}`,
         ctx,
       );
     },
@@ -167,16 +192,22 @@ export const SduiRenderer: React.FC<SduiRendererProps> = ({
     const componentPropName = propNameMapping?.[propName] ?? propName;
 
     if (isRootSduiConfigValue(propValue)) {
-      const configs = Array.isArray(propValue) ? propValue : [propValue];
+      const pooledList = isSduiPooledConfigList(propValue) ? propValue : undefined;
+      const configs = normalizeChildConfigs(propValue);
       if (manageChildren) {
-        const managedList = createManagedChildList(configs, propName, childContext);
+        const managedList = createManagedChildList(
+          configs,
+          propName,
+          childContext,
+          pooledList?.poolLayout,
+        );
         if (componentPropName === "children") {
           injectedManagedChildrenList = managedList;
         } else {
           resolvedProps[componentPropName] = managedList;
         }
-      } else if (Array.isArray(propValue)) {
-        const renderedChildren = propValue.map((childConfig, index) => {
+      } else if (Array.isArray(propValue) || pooledList) {
+        const renderedChildren = configs.map((childConfig, index) => {
           addListItemAnalytics(childConfig, index);
           return renderSduiChild(
             childConfig,
@@ -190,7 +221,12 @@ export const SduiRenderer: React.FC<SduiRendererProps> = ({
           resolvedProps[componentPropName] = renderedChildren;
         }
       } else {
-        const renderedChild = renderSduiChild(propValue, undefined, childContext);
+        const childConfig = configs[0];
+        if (!childConfig) {
+          continue;
+        }
+
+        const renderedChild = renderSduiChild(childConfig, undefined, childContext);
         if (componentPropName === "children") {
           childElements.push(renderedChild);
         } else {

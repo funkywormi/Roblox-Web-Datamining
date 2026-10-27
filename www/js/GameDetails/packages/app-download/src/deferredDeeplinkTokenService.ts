@@ -1,7 +1,7 @@
-import * as http from "@rbx/core-scripts/http";
+import * as http from "@rbx/core-lib/http";
+import { Url } from "@rbx/core-lib/url";
 import environmentUrls from "@rbx/environment-urls";
 import { deferredDeeplinkGroupName } from "./deferredDeeplinkConstants";
-import createDeeplinkTokenNextJs from "./deferredDeeplinkTokenService.nextjs";
 import sendDeeplinkTokenCreateAttempt from "./deferredDeeplinkEvents";
 
 export type TCreateDeeplinkTokenResponse = {
@@ -15,12 +15,15 @@ export type CreateDeeplinkTokenOptions = {
   downloadSource?: string;
 };
 
-// Legacy Axios transport for .NET pages. The core-scripts http client attaches the bound-auth-token
-// per request; on Next.js the sibling deferredDeeplinkTokenService.nextjs.ts (core-lib fetch) is
-// selected instead.
-const deferredDeeplinkTokenServiceUrl = `${environmentUrls.apiGatewayUrl}/deferred-deep-link/token-api`;
+// Built per call so importing never parses environmentUrls, which test mocks leave as placeholders.
+const getCreateDeeplinkTokenUrl = () =>
+  Url.parse(environmentUrls.apiGatewayUrl)
+    .getOrThrow()
+    .withPath("/deferred-deep-link/token-api/create-token");
 
-const createDeeplinkTokenLegacy = async (
+// CSRF and the bound-auth token come from the host's setClientInterceptors (coreUtilities on .NET,
+// instrumentation-client on Next.js).
+const createDeeplinkToken = async (
   linkId: string,
   options: CreateDeeplinkTokenOptions = {},
 ): Promise<string | null> => {
@@ -47,29 +50,28 @@ const createDeeplinkTokenLegacy = async (
     createDeeplinkTokenRequestBody.downloadSource = downloadSource;
   }
 
-  const urlConfig = {
-    withCredentials: true,
-    url: `${deferredDeeplinkTokenServiceUrl}/create-token`,
-  };
-
   try {
-    const res = await http.post<TCreateDeeplinkTokenResponse>(
-      urlConfig,
-      createDeeplinkTokenRequestBody,
-    );
-    const token = res.data.token ?? null;
-    sendDeeplinkTokenCreateAttempt(token, linkId, res.status);
+    const response = await http
+      .fetch(getCreateDeeplinkTokenUrl(), {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(createDeeplinkTokenRequestBody),
+      })
+      .getOrThrow();
+    const data: unknown = await response.json();
+    const token =
+      typeof data === "object" &&
+      data !== null &&
+      "token" in data &&
+      (typeof data.token === "string" || data.token === null)
+        ? data.token
+        : null;
+    sendDeeplinkTokenCreateAttempt(token, linkId, response.status);
     return token;
   } catch {
     return null;
   }
 };
-
-// NEXT_PUBLIC_IS_NEXTJS is inlined at build time by Next.js; it is undefined in the Rspack SCC build
-// for .NET, so the Axios transport is used there. The nextjs sibling is statically imported so the
-// .NET build resolves it — it never *executes* on the .NET path.
-const isNextJs = process.env.NEXT_PUBLIC_IS_NEXTJS === "true";
-
-const createDeeplinkToken = isNextJs ? createDeeplinkTokenNextJs : createDeeplinkTokenLegacy;
 
 export default createDeeplinkToken;

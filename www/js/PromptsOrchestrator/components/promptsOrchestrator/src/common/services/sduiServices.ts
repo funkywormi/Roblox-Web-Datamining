@@ -1,6 +1,6 @@
-import "@rbx/core-scripts/http/core-intercept";
-import { composeSduiRegistries, getOrCreatePageServices, SduiCommonModule } from "@rbx/sdui-core";
+import { composeSduiRegistries, getOrCreatePageServices } from "@rbx/sdui-core";
 import { createSduiCsrTelemetry, SduiClientModule } from "@rbx/sdui-client";
+import { SduiCommonModule } from "@rbx/sdui-common";
 import type { AppPage } from "../constants/pageConstants";
 import { getSduiPageContext } from "../utils/sduiUtils";
 import { PromptsSduiModule } from "../registry/promptsSduiModule";
@@ -19,6 +19,7 @@ export const getSduiServices = (appPage: AppPage) => {
     impressionHandlerRegistry: registries.impressionHandlerRegistry,
     analyticsReporter: telemetry.analyticsReporter,
     errorReporter: telemetry.errorReporter,
+    pageLoadPlatformAdapter: telemetry.pageLoadPlatformAdapter,
   });
 };
 

@@ -26,10 +26,11 @@ type MrRouterConfig = {
   envName: string;
 };
 
-// The cookie is shared by every subdomain of the current site, e.g. `.sitetest1.robloxlabs.com`.
 const cookieDomain = (): string => {
   const { hostname } = window.location;
-  return `.${hostname.substring(hostname.indexOf(".") + 1)}`;
+  return /^\d\d?\d?\.\d\d?\d?\.\d\d?\d?\.\d\d?\d?$/.test(hostname)
+    ? hostname
+    : hostname.substring(hostname.indexOf(".") + 1);
 };
 
 // The cookie is the source of truth: the gateway routes on it, and it is shared across subdomains.

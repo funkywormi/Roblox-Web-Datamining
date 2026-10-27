@@ -136,6 +136,45 @@ export const getSocialNetworkVisibilityOptions = (): TRadioButtonOptionV2[] => {
   return [everyone, followers, following, friends, noOne];
 };
 
+export const getUserPrivacyOptions = (idPrefix: string): TRadioButtonOptionV2[] => [
+  {
+    label: privacyOptionLabels.everyone,
+    value: UserPrivacyLevel.AllUsers,
+    name: `${idPrefix}-everyone`,
+    id: `${idPrefix}-everyone`,
+  },
+  {
+    label: privacyOptionLabels.friendsFollowersAndFollowing,
+    value: UserPrivacyLevel.FriendsFollowingAndFollowers,
+    name: `${idPrefix}-followers`,
+    id: `${idPrefix}-followers`,
+  },
+  {
+    label: privacyOptionLabels.friendsAndFollowing,
+    value: UserPrivacyLevel.FriendsAndFollowing,
+    name: `${idPrefix}-following`,
+    id: `${idPrefix}-following`,
+  },
+  {
+    label: privacyOptionLabels.friends,
+    value: UserPrivacyLevel.Friends,
+    name: `${idPrefix}-friends`,
+    id: `${idPrefix}-friends`,
+  },
+  {
+    label: privacyOptionLabels.trustedFriends,
+    value: UserPrivacyLevel.TrustedFriends,
+    name: `${idPrefix}-trustedFriends`,
+    id: `${idPrefix}-trustedFriends`,
+  },
+  {
+    label: privacyOptionLabels.noOne,
+    value: UserPrivacyLevel.NoOne,
+    name: `${idPrefix}-noOne`,
+    id: `${idPrefix}-noOne`,
+  },
+];
+
 export const getPrivateServerPrivacyOptions = (): TRadioButtonOptionV2[] => {
   const everyone: TRadioButtonOptionV2 = {
     label: privacyOptionLabels.everyone,
@@ -170,45 +209,8 @@ export const getPrivateServerPrivacyOptions = (): TRadioButtonOptionV2[] => {
   return [everyone, followers, following, friends, noOne];
 };
 
-export const getOnlineStatusOptions = (): TRadioButtonOptionV2[] => {
-  const everyone: TRadioButtonOptionV2 = {
-    label: privacyOptionLabels.everyone,
-    value: UserPrivacyLevel.AllUsers,
-    name: "online-status-everyone",
-    id: "online-status-everyone",
-  };
-  const followers: TRadioButtonOptionV2 = {
-    label: privacyOptionLabels.friendsFollowersAndFollowing,
-    value: UserPrivacyLevel.FriendsFollowingAndFollowers,
-    name: "online-status-followers",
-    id: "online-status-followers",
-  };
-  const following: TRadioButtonOptionV2 = {
-    label: privacyOptionLabels.friendsAndFollowing,
-    value: UserPrivacyLevel.FriendsAndFollowing,
-    name: "online-status-following",
-    id: "online-status-following",
-  };
-  const friends: TRadioButtonOptionV2 = {
-    label: privacyOptionLabels.friends,
-    value: UserPrivacyLevel.Friends,
-    name: "online-status-friends",
-    id: "online-status-friends",
-  };
-  const trustedFriends: TRadioButtonOptionV2 = {
-    label: privacyOptionLabels.trustedFriends,
-    value: UserPrivacyLevel.TrustedFriends,
-    name: "online-status-trustedFriends",
-    id: "online-status-trustedFriends",
-  };
-  const noOne: TRadioButtonOptionV2 = {
-    label: privacyOptionLabels.noOne,
-    value: UserPrivacyLevel.NoOne,
-    name: "online-status-noOne",
-    id: "online-status-noOne",
-  };
-  return [everyone, followers, following, friends, trustedFriends, noOne];
-};
+export const getOnlineStatusOptions = (): TRadioButtonOptionV2[] =>
+  getUserPrivacyOptions("online-status");
 
 export const getJoinPrivacyOptions = (): TRadioButtonOptionV2[] => {
   const everyone: TRadioButtonOptionV2 = {

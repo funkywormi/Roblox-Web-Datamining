@@ -11,16 +11,13 @@ import {
   setListeningToThemeChanges,
   AppTheme,
 } from "@rbx/core-scripts/theme";
-import { Badge, Chip, Icon } from "@rbx/foundation-ui";
+import { Chip, Icon } from "@rbx/foundation-ui";
 import { UserSetting } from "@rbx/user-settings";
 import { useUpdateUserSettingValueMutation } from "../../../apis/userSettingsApi";
 import { useGetSettingsUiPolicyQuery } from "../../../apis/universalAppConfigurationApi";
 import { useGetPlusSubscriptionProductQuery } from "../../../apis/subscriptionsApi";
 import { AppThemesAccess } from "../../../../types/policyTypes";
-import {
-  appThemeLabel,
-  newBadgeLabel,
-} from "../../constants/contentConstants/browserPreferencesTranslationConstants";
+import { appThemeLabel } from "../../constants/contentConstants/browserPreferencesTranslationConstants";
 import { appThemeCategories, AppThemeCategoryId, AppThemeDef } from "../../constants/appThemes";
 import appThemeEventService from "../../services/eventServices/appThemeEventService";
 import AppThemeCard from "./AppThemeCard";
@@ -205,7 +202,6 @@ const AppThemeSettingSection = ({
             <h4 className="text-title-large content-emphasis padding-none">
               {translate("Heading.ExclusiveThemes")}
             </h4>
-            <Badge variant="Contrast" shape="Box" size="XSmall" label={translate(newBadgeLabel)} />
           </div>
           {isEligible && (
             <div className="flex gap-medium">

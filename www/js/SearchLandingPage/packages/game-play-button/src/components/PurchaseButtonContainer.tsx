@@ -1,17 +1,17 @@
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
-import { Button, Loading } from "@rbx/core-ui/legacy/react-style-guide";
-import { TranslateFunction, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
-import { translations } from "../constants/translations";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import usePurchaseProductData from "../hooks/usePurchaseProductData";
+import { usePlayButtonTranslate } from "../hooks/usePlayButtonTranslate";
 import {
   TGetProductDetails,
   TPlayabilityStatusPurchaseRequired,
-  ValueOf,
   type TPlayButtonPageContext,
 } from "../types/playButtonTypes";
+import { buttonWidths, TButtonWidth } from "../constants/buttonWidths";
 import FiatPurchaseButton from "./FiatPurchaseButton";
 import RobuxPurchaseButton from "./RobuxPurchaseButton";
+import LoadingButton from "./LoadingButton";
+import "./playButton.css";
 
 enum PurchaseType {
   Robux = "Robux",
@@ -35,7 +35,7 @@ export type TPurchaseButtonContainerProps = {
   universeId: string;
   placeId: string;
   iconClassName?: string;
-  buttonWidth?: ValueOf<typeof Button.widths>;
+  buttonWidth?: TButtonWidth;
   buttonClassName?: string;
   refetchPlayabilityStatus: () => void;
   hideButtonText?: boolean;
@@ -46,11 +46,10 @@ export type TPurchaseButtonContainerProps = {
 };
 
 export const PurchaseButtonContainer = ({
-  translate,
   universeId,
   placeId,
   iconClassName = "icon-robux-white",
-  buttonWidth = Button.widths.full,
+  buttonWidth = buttonWidths.full,
   buttonClassName = "btn-economy-robux-white-lg",
   refetchPlayabilityStatus,
   hideButtonText = false,
@@ -58,13 +57,12 @@ export const PurchaseButtonContainer = ({
   playabilityStatus,
   showDefaultPurchaseText = false,
   pageContext,
-}: TPurchaseButtonContainerProps & {
-  translate: TranslateFunction;
-}): React.JSX.Element => {
+}: TPurchaseButtonContainerProps): React.JSX.Element => {
+  const translate = usePlayButtonTranslate();
   const { productInfo, productDetails, isLoading } = usePurchaseProductData(universeId, placeId);
 
   if (isLoading) {
-    return <Loading />;
+    return <LoadingButton buttonClassName={buttonClassName} buttonWidth={buttonWidth} />;
   }
 
   return getPurchaseType(playabilityStatus, productDetails) === PurchaseType.Fiat ? (
@@ -97,7 +95,4 @@ export const PurchaseButtonContainer = ({
   );
 };
 
-export default withTranslations<TPurchaseButtonContainerProps>(
-  PurchaseButtonContainer,
-  translations,
-);
+export default PurchaseButtonContainer;

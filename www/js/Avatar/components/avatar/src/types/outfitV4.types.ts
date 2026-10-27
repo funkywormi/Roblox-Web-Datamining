@@ -90,7 +90,7 @@ export type MutateOutfitDefinitionResponseV4 = {
  *
  * NOTE: The exact field names of `OutfitModelV4` / `OutfitConfigurations` are inferred from the
  * parallel V4 avatar read shape (`GET /v4/avatar`). Confirm against the backend models; the
- * mapping in `avatarAPIService.mapGetOutfitDefinitionV4ToV3` is the single place to adjust.
+ * mapping in `outfitV4.mapGetOutfitDefinitionV4ToV3` is the single place to adjust.
  */
 export type OutfitModelV4 = {
   id: number;

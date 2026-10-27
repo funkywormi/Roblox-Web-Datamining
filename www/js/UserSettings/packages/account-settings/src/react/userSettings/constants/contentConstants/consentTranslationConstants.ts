@@ -55,6 +55,9 @@ export const requestSettingLabels = {
   [UserSetting.whoCanPartyWithMe]: "Label.PartySetting",
   [UserSetting.whoCanUsePartyChatWithMe]: "Heading.PartyChatSetting",
   [UserSetting.whoCanUsePartyVoiceWithMe]: "Heading.PartyVoiceChatSetting",
+  [UserSetting.whoCanSeeMyFriendsList]: "Label.WhoCanSeeMyFriendsList",
+  [UserSetting.whoCanSeeMyPastUsernames]: "Label.WhoCanSeeMyPastUsernames",
+  [UserSetting.whoCanSeeMyAboutSection]: "Label.WhoCanSeeMyAboutSection",
 
   birthday: "Label.BirthdayLowercase",
   chargebackUnlock: "Description.UnlockTheirAccount",
@@ -105,6 +108,9 @@ export const requestSettingHeadings = {
   [UserSetting.whoCanPartyWithMe]: "Label.PartySetting",
   [UserSetting.whoCanUsePartyChatWithMe]: "Heading.PartyChatSetting",
   [UserSetting.whoCanUsePartyVoiceWithMe]: "Heading.PartyVoiceChatSetting",
+  [UserSetting.whoCanSeeMyFriendsList]: "Label.WhoCanSeeMyFriendsList",
+  [UserSetting.whoCanSeeMyPastUsernames]: "Label.WhoCanSeeMyPastUsernames",
+  [UserSetting.whoCanSeeMyAboutSection]: "Label.WhoCanSeeMyAboutSection",
 
   birthday: "Heading.BirthdayUpdate",
   chargebackUnlock: "Description.UnlockChildAccount",

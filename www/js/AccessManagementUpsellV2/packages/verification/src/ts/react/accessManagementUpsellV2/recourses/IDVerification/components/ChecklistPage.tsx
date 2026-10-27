@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
 import React from 'react';
-import { Button, Modal } from 'react-style-guide';
+import { Button, Modal } from '../../../components/StyleGuide';
 import { useSelector } from 'react-redux';
-import { TranslateFunction } from 'react-utilities';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { selectIDVState } from '../verificationSlice';
 import { ReportEvent, Recourse, VerificationStatusCode } from '../../../enums';
 import reportEvent from '../../../services/reportEventService';

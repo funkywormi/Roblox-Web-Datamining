@@ -8,7 +8,6 @@ import {
   TGetFriendsResponse,
   TGetPlaceDetails,
   TGetGameDetails,
-  TMetaData,
   TGameData,
   TGetUniverseVoiceStatus,
   TGamePassesResponse,
@@ -62,22 +61,6 @@ export const getOmniRecommendationsMetadata = async (
     Contents: recommendationList,
   });
   return data as TGetOmniRecommendationsMetadataResponse;
-};
-
-export const getGameList = async (
-  keyword: string,
-  start: number,
-  max: number,
-): Promise<{ metaData: TMetaData; games: TGameData[] }> => {
-  const {
-    data: { games = [], ...metaData },
-  } = await http.get<{ games: TGameData[] } & TMetaData>(url.getGameList, {
-    keyword,
-    startRows: start,
-    maxRows: max,
-    isKeywordSuggestionEnabled: true,
-  });
-  return { games, metaData };
 };
 
 export const getFriendsPresence = (): Promise<{ userData?: TGetFriendsResponse[] }> => {
@@ -142,7 +125,6 @@ const getPlayabilityStatus = async (
 export default {
   getFriendsPresence,
   getGameDetails,
-  getGameList,
   getGamePasses,
   getGameRecommendations,
   getGameSorts,

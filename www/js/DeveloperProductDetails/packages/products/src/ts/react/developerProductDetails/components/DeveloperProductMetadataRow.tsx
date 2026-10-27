@@ -1,5 +1,5 @@
-import React from 'react';
-import { Grid, Typography } from '@rbx/ui';
+import React from "react";
+import { Grid, Typography } from "@rbx/ui";
 
 type DeveloperProductMetadataProps = {
   label: string;
@@ -8,11 +8,11 @@ type DeveloperProductMetadataProps = {
 
 const DeveloperProductMetadata = ({
   label,
-  children
+  children,
 }: DeveloperProductMetadataProps): JSX.Element => {
   return (
-    <Grid className='metadata-row-container'>
-      <Grid className='metadata-label'>
+    <Grid className="metadata-row-container">
+      <Grid className="metadata-label">
         <Typography>{label}</Typography>
       </Grid>
       {children}

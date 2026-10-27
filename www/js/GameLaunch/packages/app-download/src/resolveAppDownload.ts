@@ -1,4 +1,4 @@
-import type { ValueOf } from "@rbx/core-types";
+import type { ValueOf } from "@rbx/core-lib";
 import { AnyUrl } from "@rbx/core-lib/url/any";
 import { appDownloadLinkConstants, appDownloadType } from "./constants";
 import type { AppDownloadLink } from "./constants";

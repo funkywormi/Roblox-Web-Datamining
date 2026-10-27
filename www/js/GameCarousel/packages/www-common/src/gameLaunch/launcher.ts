@@ -22,6 +22,9 @@ export type GameLaunchEvent = {
   params: GameLaunchParams | Record<string, never>;
 };
 
+// What the install dialog gets; empty for a deep link with no place, as on .NET.
+export type LaunchDialogParams = GameLaunchEvent["params"];
+
 export type GameLaunchConfig = {
   placeLauncherUrl: string;
   robloxLocale: ParamValue;
@@ -39,7 +42,7 @@ export type GameLaunchHost = {
   isWindowsOrMac: () => boolean;
   onEvent: (name: GameLaunchEventName, event: GameLaunchEvent) => void;
   // Shows the install dialog; `launch` retries the same launch from it.
-  onLaunchStarted: (params: GameLaunchParams, launch: () => Promise<void>) => void;
+  onLaunchStarted: (params: LaunchDialogParams, launch: () => Promise<void>) => void;
   onLaunchSucceeded: () => void;
   onLaunchFailed: (error: unknown) => void;
   openProtocolUrl?: (url: string) => void;
@@ -73,6 +76,10 @@ export type GameLauncher = {
   joinGameInstance: (params: GameInstanceParams) => Promise<void>;
   joinPrivateGame: (params: PrivateGameParams) => Promise<void>;
   playTogetherGame: (params: PlayTogetherGameParams) => Promise<void>;
+  // Opens a roblox:// deep link behind the install dialog.
+  startDeepLinkFlow: (deepLinkUrl: string) => void;
+  // Same, but the install dialog keeps the place for its referral.
+  startGameWithDeepLinkUrl: (deepLinkUrl: string, placeId: ParamValue) => void;
   // Call when the user starts the installer, so the next successful launch logs successfulInstall.
   beginInstall: (params: GameLaunchParams | Record<string, never>) => void;
   manualDownload: () => void;
@@ -164,6 +171,18 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
     return flow;
   };
 
+  // No auth ticket or success event; the install dialog closes once the client starts.
+  const openDeepLink = (deepLinkUrl: string, params: LaunchDialogParams) => {
+    const open = () => {
+      openProtocolUrl(deepLinkUrl);
+    };
+    host.onLaunchStarted(params, () => {
+      open();
+      return Promise.resolve();
+    });
+    open();
+  };
+
   const placeLauncherUrl = (request: PlaceLauncherRequest, params: Params) =>
     buildPlaceLauncherUrl(
       host.getConfig().placeLauncherUrl,
@@ -202,6 +221,17 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
         placeId: params.placeId,
         conversationId: params.conversationId,
       }),
+    startDeepLinkFlow: deepLinkUrl => {
+      openDeepLink(deepLinkUrl, {});
+    },
+    startGameWithDeepLinkUrl: (deepLinkUrl, placeId) => {
+      openDeepLink(deepLinkUrl, {
+        protocolName: protocolName(),
+        launchMode: "play",
+        otherParams: {},
+        placeId,
+      });
+    },
     beginInstall: params => {
       host.onEvent("beginInstall", event(params));
       installState.set(true);

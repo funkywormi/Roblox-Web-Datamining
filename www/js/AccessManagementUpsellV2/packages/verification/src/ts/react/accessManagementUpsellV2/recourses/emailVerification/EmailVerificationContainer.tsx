@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { withTranslations, WithTranslationsProps } from 'react-utilities';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
+import { useEmailUpsellTranslate } from '../../hooks/useAmpTranslate';
 import { useAppDispatch } from '../../store';
-import { emailUpsellTranslationConfig } from '../../app.config';
 import {
   fetchFeatureAccess,
   selectAmpFeatureCheckData,
@@ -15,9 +15,9 @@ const EmailVerificationContainer = ({
   translate,
   onHide
 }: {
-  translate: WithTranslationsProps['translate'];
+  translate: TranslateFunction;
   onHide: () => void;
-}): JSX.Element => {
+}): React.JSX.Element => {
   const EmailRecourse = 'AddedEmail';
   const dispatch = useAppDispatch();
   const emailVerificationState = useSelector(selectEmailVerification);
@@ -48,4 +48,11 @@ const EmailVerificationContainer = ({
   return <div>{emailModal}</div>;
 };
 
-export default withTranslations(EmailVerificationContainer, emailUpsellTranslationConfig);
+const EmailVerificationContainerWithTranslations = (
+  props: Omit<React.ComponentProps<typeof EmailVerificationContainer>, 'translate'> & { translate?: TranslateFunction }
+): React.JSX.Element => {
+  const translate = useEmailUpsellTranslate();
+  return <EmailVerificationContainer {...props} translate={translate} />;
+};
+
+export default EmailVerificationContainerWithTranslations;

@@ -1,6 +1,6 @@
 export const developerProductsTranslationConfig: string[] = [
-  'CommonUI.Controls',
-  'Feature.DeveloperProducts'
+  "CommonUI.Controls",
+  "Feature.DeveloperProducts",
 ];
 
 export default { developerProductsTranslationConfig };

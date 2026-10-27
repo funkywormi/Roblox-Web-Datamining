@@ -2,6 +2,7 @@ import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@rbx/core-scripts/react";
+import ready from "@rbx/core-scripts/util/ready";
 import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import type { Namespace } from "@rbx/www-common/i18n";
 import AvatarPageContainer from "../containers/AvatarPageContainer";
@@ -39,9 +40,11 @@ function renderApp() {
 
 /*
 Tries to mount and render the AvatarPage React component.
+
+Waits for DOM ready so translation scripts have populated Roblox.Lang.
 */
 function renderAvatarReactComponent(): void {
-  renderApp();
+  ready(renderApp);
 }
 
 export function unmountAvatarReactComponent(): void {

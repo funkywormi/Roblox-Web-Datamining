@@ -1,6 +1,6 @@
 import { AxiosResponse } from "@rbx/core-scripts/http";
 import * as http from "@rbx/core-scripts/http";
-import { dataStores } from "@rbx/core-scripts/legacy/core-roblox-utilities";
+import dataStores from "@rbx/core-scripts/data-store";
 import { callBehaviour } from "@rbx/core-scripts/guac";
 import environmentUrls from "@rbx/environment-urls";
 import {

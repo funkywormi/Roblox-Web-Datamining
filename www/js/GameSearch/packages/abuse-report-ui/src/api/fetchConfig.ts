@@ -1,6 +1,7 @@
 import { EnvironmentUrls } from "@rbx/core-scripts/legacy/Roblox";
 import { httpService } from "@rbx/core-scripts/legacy/core-utilities";
 import { RawConfig } from "../hooks/abuseSheetFlow/types";
+import { SUPPORTED_CONFIG_VERSION } from "../configVersion";
 
 /**
  * Fetch the config object that describes the abuse report UI
@@ -14,9 +15,7 @@ const fetchConfig = async (
     abuseVector,
     locale,
     entryPoint: "web",
-    // Bump only after checking the schema changelog in @rbx/abuse-report-config-types
-    // for changes Web must handle; fetchConfig.test.ts fails until this matches CONFIG_VERSION.
-    version: "5",
+    version: String(SUPPORTED_CONFIG_VERSION),
   });
   if (serializedAttributes) {
     params.set("attributes", serializedAttributes);

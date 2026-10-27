@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { IModalService } from 'react-style-guide';
+import type { IModalService } from '../../components/StyleGuide';
 import { useSelector } from 'react-redux';
-import { TranslateFunction } from 'react-utilities';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { selectFeatureAccess } from '../accessManagementSlice';
 import VpcNotEligibleEpilogue from './DefaultEpilogue.tsx/VpcNotEligibleEpilogue';
 
@@ -11,8 +11,8 @@ const Epilogue = ({
 }: {
   translate: TranslateFunction;
   onHide?: () => void;
-}): JSX.Element => {
-  let [epilogueModal, epilogueModelService]: [JSX.Element, IModalService] = [null, null] as unknown as [JSX.Element, IModalService];
+}): React.JSX.Element => {
+  let [epilogueModal, epilogueModelService]: [React.JSX.Element, IModalService] = [null, null] as unknown as [React.JSX.Element, IModalService];
   const featureAccess = useSelector(selectFeatureAccess);
   switch (featureAccess?.data?.featureName) {
     case 'CanCorrectAge':

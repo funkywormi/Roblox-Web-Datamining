@@ -1,6 +1,8 @@
 import { sendEvent } from "@rbx/core-scripts/event-stream";
+import { captureException } from "@rbx/core-scripts/sentry";
 import type { SduiPageContext } from "@rbx/sdui-core";
 import { parseEventParams } from "@rbx/unified-logging";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 
 import type { CaptureErrorInput, CaptureErrorInSentryInput } from "./types";
 
@@ -9,23 +11,38 @@ export function getErrorPageContext(pageContext?: SduiPageContext): string {
 }
 
 /**
- * Fires the real-time error counter keyed by error name. No-op when the host
- * `EventTracker` isn't present.
+ * Decides whether a channel should fire for the given per-channel sample rate.
+ * An unset rate (or any rate `>= 1`) always fires; `0` never fires; otherwise a
+ * fresh random draw must fall under the rate.
  */
-export function fireErrorCounter(errorName: string): void {
-  if (typeof window !== "undefined" && window.EventTracker) {
-    window.EventTracker.fireEvent(errorName);
+export function shouldFireChannel(rate: number | undefined): boolean {
+  if (rate === undefined || rate >= 1) {
+    return true;
   }
+  if (rate <= 0) {
+    return false;
+  }
+  return Math.random() < rate;
 }
 
-export function captureError({
+/**
+ * Fires the real-time error counter keyed by error name. Works on .NET and
+ * Next.js; never throws.
+ */
+export function fireErrorCounter(errorName: string): void {
+  fireEvent(errorName);
+}
+
+/**
+ * Emits the error to the eventstream table. Kept separate from the counter so
+ * the two channels can be sampled independently.
+ */
+export function sendErrorEvent({
   eventName,
   errorName,
   errorMessage,
   errorContext,
 }: CaptureErrorInput): void {
-  fireErrorCounter(errorName);
-
   const params = { errorName, errorMessage };
   sendEvent(
     {
@@ -51,21 +68,19 @@ export function captureErrorInSentry({
   additionalContext,
   additionalFingerprint,
 }: CaptureErrorInSentryInput): void {
-  if (typeof window !== "undefined" && window.Sentry) {
-    const error = new Error(errorMessage);
-    error.name = errorName;
+  const error = new Error(errorMessage);
+  error.name = errorName;
 
-    window.Sentry.captureException(error, {
-      tags: {
-        [errorNameTagKey]: errorName,
-        appPage,
-        ...additionalTags,
-      },
-      extra: {
-        errorMessage,
-        ...additionalContext,
-      },
-      fingerprint: [applicationName, errorName, ...(additionalFingerprint ?? [])],
-    });
-  }
+  captureException(error, {
+    tags: {
+      [errorNameTagKey]: errorName,
+      appPage,
+      ...additionalTags,
+    },
+    extra: {
+      errorMessage,
+      ...additionalContext,
+    },
+    fingerprint: [applicationName, errorName, ...(additionalFingerprint ?? [])],
+  });
 }

@@ -1,7 +1,7 @@
 import React from "react";
-import { TranslateFunction, withTranslations } from "@rbx/core-scripts/react";
 import { Button } from "@rbx/foundation-ui";
 import environmentUrls from "@rbx/environment-urls";
+import { useTranslations } from "@rbx/www-common/i18n";
 import playButtonConstants from "../constants/playButtonConstants";
 import { fuiButtonStyle } from "../constants/buttonWidths";
 
@@ -11,10 +11,8 @@ export type TPlayOnWebButtonProps = {
   placeId: string;
 };
 
-const PlayOnWebButtonContent = ({
-  translate,
-  placeId,
-}: TPlayOnWebButtonProps & { translate: TranslateFunction }): React.JSX.Element => {
+export const PlayOnWebButton = ({ placeId }: TPlayOnWebButtonProps): React.JSX.Element => {
+  const tExperienceDetails = useTranslations("Feature.ExperienceDetails");
   return (
     <Button
       data-testid="play-on-web-button"
@@ -26,13 +24,9 @@ const PlayOnWebButtonContent = ({
       href={`${environmentUrls.playWebsite}/games/start?placeId=${placeId}`}
       target="_blank"
     >
-      {translate(playButtonTextTranslationMap.PlayOnWeb) || "Play on Web"}
+      {tExperienceDetails.dynamic(playButtonTextTranslationMap.PlayOnWeb, undefined, "Play on Web")}
     </Button>
   );
 };
-
-export const PlayOnWebButton = withTranslations<TPlayOnWebButtonProps>(PlayOnWebButtonContent, [
-  "Feature.ExperienceDetails",
-]);
 
 export default PlayOnWebButton;

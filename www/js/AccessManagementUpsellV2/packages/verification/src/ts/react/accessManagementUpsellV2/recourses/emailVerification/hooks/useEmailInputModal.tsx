@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { Button, IModalService, Modal } from 'react-style-guide';
-import { TranslateFunction } from 'react-utilities';
+import { Button, IModalService, Modal } from '../../../components/StyleGuide';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { useAppDispatch } from '../../../store';
 import emailRequestConstants from '../constants/emailRequestConstants';
 import emailVerificationEventService from '../services/emailVerificationEventService';
@@ -9,7 +9,7 @@ import { updateUserEmail, resetEmailVerificationStore } from '../emailVerificati
 const useEmailInputModal = (
   translate: TranslateFunction,
   onHide: () => void
-): [JSX.Element, IModalService] => {
+): [React.JSX.Element, IModalService] => {
   const dispatch = useAppDispatch();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [sendEmailBtnLoadingStatus, setSendEmailBtnLoadingStatus] = useState<boolean>(false);

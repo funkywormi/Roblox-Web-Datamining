@@ -59,6 +59,7 @@ const playButtonTextTranslationMap = {
   Unplayable: "PlayButtonText.Unavailable",
   Buy: "PlayButtonText.Buy",
   PlayDemo: "PlayButtonText.PlayDemo",
+  PlayOnWeb: "PlayButtonText.PlayOnWeb",
 };
 
 const counterEvents = {

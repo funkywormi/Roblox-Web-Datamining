@@ -25,9 +25,11 @@ export function usePlusBillingPeriodSelection(isEligible: boolean): PlusBillingP
     if (!isEligible) {
       return;
     }
-    plusBillingPeriodSelectionService.logLayerExposure().catch((error: unknown) => {
+    try {
+      plusBillingPeriodSelectionService.logLayerExposure();
+    } catch (error: unknown) {
       trackError("PlusBillingPeriodSelectionLayerExposureError", null, error);
-    });
+    }
   }, [isEligible]);
 
   return { isTreatment: isEligible && isTreatment, logExposure };

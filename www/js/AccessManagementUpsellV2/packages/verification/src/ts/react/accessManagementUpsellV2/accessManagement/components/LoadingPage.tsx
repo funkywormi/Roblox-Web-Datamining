@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loading } from 'react-style-guide';
+import { Loading } from '../../components/StyleGuide';
 
 function LoadingPage(): React.ReactElement {
   return <Loading />;

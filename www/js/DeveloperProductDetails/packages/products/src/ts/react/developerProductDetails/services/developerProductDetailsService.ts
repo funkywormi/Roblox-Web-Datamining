@@ -1,12 +1,12 @@
 import { httpService } from "@rbx/core-scripts/legacy/core-utilities";
-import constants from '../../common/constants/constants';
+import constants from "../../common/constants/constants";
 import {
   TDeveloperProductDetails,
-  TDeveloperProductDetailsResponse
-} from '../../common/types/types';
+  TDeveloperProductDetailsResponse,
+} from "../../common/types/types";
 
 export const getDeveloperProductDetails = async (
-  productId: string
+  productId: string,
 ): Promise<TDeveloperProductDetails> => {
   const urlConfig = constants.url.getDeveloperProductDetails(productId);
   const result = await httpService
@@ -24,7 +24,7 @@ export const getDeveloperProductDetails = async (
     TargetId: result.TargetId,
     UniverseId: result.UniverseId ?? null,
     PriceDiscountDetails: result.PriceDiscountDetails ?? null,
-    UserBasePriceInRobux: result.UserBasePriceInRobux ?? null
+    UserBasePriceInRobux: result.UserBasePriceInRobux ?? null,
   };
 };
 

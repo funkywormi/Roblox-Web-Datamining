@@ -1,14 +1,9 @@
 import React, { useCallback, useRef } from "react";
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/react";
 import "@rbx/core-scripts/global";
-import { createItemPurchase } from "@rbx/purchase-common/item-purchase";
-import {
-  DefaultThumbnailSize,
-  Thumbnail2d,
-  ThumbnailFormat,
-  ThumbnailTypes,
-} from "@rbx/thumbnails";
+import { createItemPurchase } from "@rbx/purchase-common/create-item-purchase";
+import { Thumbnail2d, ThumbnailGameIconSize } from "@rbx/www-common/components/thumbnail";
 import { TGetProductDetails, TGetProductInfo } from "../types/playButtonTypes";
 import { TButtonWidth } from "../constants/buttonWidths";
 import PurchaseButtonUI from "./PurchaseButtonUI";
@@ -40,7 +35,7 @@ const RobuxPurchaseButton: React.FC<RobuxPurchaseButtonProps> = ({
   translate,
   refetchPlayabilityStatus,
 }) => {
-  const itemPurchaseRef = useRef<ReturnType<typeof createItemPurchase>>();
+  const itemPurchaseRef = useRef<ReturnType<typeof createItemPurchase> | undefined>(undefined);
   itemPurchaseRef.current ??= createItemPurchase();
   const [ItemPurchase, itemPurchaseService] = itemPurchaseRef.current;
 
@@ -71,11 +66,10 @@ const RobuxPurchaseButton: React.FC<RobuxPurchaseButtonProps> = ({
           expectedPrice: productInfo.price,
           thumbnail: (
             <Thumbnail2d
-              type={ThumbnailTypes.gameIcon}
-              size={DefaultThumbnailSize}
-              targetId={parseInt(universeId, 10)}
+              type="GameIcon"
+              size={ThumbnailGameIconSize.size150}
+              targetId={universeId}
               imgClassName="game-card-thumb"
-              format={ThumbnailFormat.jpeg}
             />
           ),
           assetName: productDetails.name,

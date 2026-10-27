@@ -9,6 +9,9 @@ import { buildSessionAnalyticsData } from "../sdui/utils/analyticsParsingUtils";
 import { usePageSession } from "../common/utils/PageSessionContext";
 import { SduiActionType } from "../sdui/system/SduiActionParserRegistry";
 import { ContentType } from "@rbx/unified-logging";
+import configConstants from "../common/constants/configConstants";
+
+const { gameTileGutterWidth } = configConstants.gamesPage;
 
 type TSongCarouselFeedItemProps = {
   sort: TSongSort;
@@ -73,6 +76,7 @@ export const SongCarouselFeedItem = ({
         items,
         layoutOverrides: {
           sideMargin: 10, // 10px (as per design of other carousels. Ref - gameCarousel.scss > .games-list-container)
+          columnGap: gameTileGutterWidth,
         },
         scrollingEnabledOverride: true,
         collectionItemSize: "Small",

@@ -1,8 +1,10 @@
 import Persona from 'persona';
 import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { useTheme, TranslateFunction } from 'react-utilities';
-import { Intl, TFeatureSpecificData } from 'Roblox';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
+import useTheme from '@rbx/amp-v2-wizard/hooks/useTheme';
+import type { TFeatureSpecificData } from '@rbx/legacy-webapp-types/Roblox/accessManagementUpsellService';
+import { getLocale } from '@rbx/amp-v2-wizard/utils/locale';
 import { getDeviceMeta } from '@rbx/core-scripts/meta/device';
 import openVerificationLink from '../../utils/verificationUtils';
 import {
@@ -109,7 +111,7 @@ function IDVerification({
   // ===============================
   // Hosted flow (webview)
   // ===============================
-  let IDVComponent: JSX.Element | null = null;
+  let IDVComponent: React.JSX.Element | null = null;
   if (isWebview || page === IDVPage.Complete) {
     switch (page) {
       case IDVPage.VendorLink:
@@ -188,7 +190,7 @@ function IDVerification({
   useEffect(() => {
     if (!isWebview && sessionIdentifier) {
       // Get user locale for Persona
-      const userLocale = new Intl().getLocale();
+      const userLocale = getLocale();
 
       personaClientRef.current = new Persona.Client({
         inquiryId: sessionIdentifier,

@@ -1,4 +1,12 @@
 import { UnkeyedStore } from "../UnkeyedStore";
+import {
+  observePreferredInput,
+  PreferredInput,
+  readInitialPreferredInput,
+  type PreferredInput as PreferredInputType,
+} from "./preferredInput";
+
+export { PreferredInput } from "./preferredInput";
 
 /** Content-type key under which viewport state is registered on the data binder. */
 export const RESPONSIVE_CONTENT_TYPE = "responsive";
@@ -7,8 +15,11 @@ export interface ResponsiveData {
   screenWidth: number;
   screenHeight: number;
   isPortrait: boolean;
+  preferredInput: PreferredInputType;
   [key: string]: unknown;
 }
+
+type ViewportData = Pick<ResponsiveData, "screenWidth" | "screenHeight" | "isPortrait">;
 
 // TODO(sdui-ssr): Replace these hard-coded fallbacks with per-request device
 // metadata (User-Agent / Client Hints) so SSR renders match the requesting
@@ -20,9 +31,10 @@ const SSR_DEFAULTS: ResponsiveData = {
   screenWidth: SSR_VIEWPORT_WIDTH,
   screenHeight: SSR_VIEWPORT_HEIGHT,
   isPortrait: false,
+  preferredInput: PreferredInput.Pointer,
 };
 
-function readViewport(): ResponsiveData {
+function readViewport(): ViewportData {
   return {
     screenWidth: window.innerWidth,
     screenHeight: window.innerHeight,
@@ -57,12 +69,23 @@ export class ResponsiveStore extends UnkeyedStore<ResponsiveData> {
     // listener would eventually re-seed after the base zero-out, but
     // consumers would read `undefined` until the user resizes the window.
     const isBrowser = typeof window !== "undefined";
-    const reseed = (): ResponsiveData => (isBrowser ? readViewport() : SSR_DEFAULTS);
+    const reseed = (): ResponsiveData =>
+      isBrowser ? { ...readViewport(), preferredInput: readInitialPreferredInput() } : SSR_DEFAULTS;
     super({ initial: reseed(), reseed });
     if (isBrowser) {
       window.addEventListener("resize", () => {
-        this.applyUpdate(readViewport());
+        this.applyPartialUpdate(readViewport());
+      });
+      observePreferredInput(preferredInput => {
+        this.applyPartialUpdate({ preferredInput });
       });
     }
+  }
+
+  private applyPartialUpdate(update: Partial<ResponsiveData>): void {
+    // UnkeyedStore updates are whole-record replacements. Retain fields that
+    // did not change so input events cannot clear viewport data and resizes
+    // cannot clear preferredInput.
+    this.applyUpdate({ ...this.readSnapshot(), ...update });
   }
 }

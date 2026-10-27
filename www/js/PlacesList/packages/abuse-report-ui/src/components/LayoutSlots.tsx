@@ -28,9 +28,8 @@ const SheetBodySlot = forwardRef<HTMLDivElement, BodyProps>(
       ref={ref}
       className={`padding-bottom-large fill ${className ?? ""}`}
       hasPaddingX={hasPaddingX}
-      // Focusable so D-pad spatial navigation (e.g. Android TV webviews) can move into the scrollable
-      // list. Spread because SheetBody's props type omits tabIndex, though it passes it to the div.
-      {...{ tabIndex: 0 }}
+      // Focusable so D-pad spatial navigation (e.g. Android TV webviews) can move into the scrollable list.
+      tabIndex={0}
     >
       {children}
     </SheetBody>

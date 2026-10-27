@@ -8,9 +8,11 @@ import { parseFloat } from "@rbx/core-lib/number";
 import { reportBindingError, SduiErrorName } from "../../../errors";
 import {
   SDUI_AUTOMATIC_SIZE_VALUES,
+  SDUI_TEXT_X_ALIGNMENT_VALUES,
   SDUI_SCALE_BASIS_VALUES,
   SDUI_SCALE_TYPE_VALUES,
   type SduiAutomaticSize,
+  type SduiTextXAlignment,
   type BindingContext,
   type SduiDim,
   type SduiDim2,
@@ -52,11 +54,15 @@ function normalizeColorToCss(color: unknown, ctx: BindingContext): string {
  * Parse icon prop value.
  * On web, icon names are passed as strings (e.g. "icons/status/games/rating_small").
  * Map supported SDUI icon paths to the CSS classes -- mirrors app behavior.
+ * Discovery sprites use the `sdui-icon` prefix. Robux uses the Foundation
+ * `icon` mask plus `icon-filled-robux` so it does not depend on a core-ui sprite.
  */
-const SUPPORTED_ICON_CLASSES: Record<string, string> = {
+export const SUPPORTED_ICON_CLASSES: Record<string, string> = {
   "icons/status/games/rating_small": "sdui-icon icon-rating-16x16",
   "icons/status/games/people-playing_small": "sdui-icon icon-current-players-16x16",
   "icons/navigation/pushRight_small": "sdui-icon icon-push-right-16x16",
+  "icons/common/robux": "icon icon-filled-robux",
+  "icons/actions/info_small": "icon-moreinfo-16x16",
 };
 
 export function parseIconProp(value: unknown, ctx: BindingContext): unknown {
@@ -356,6 +362,29 @@ export function parseScaleBasisProp(
     `scale basis prop expected one of ${SDUI_SCALE_BASIS_VALUES.join(", ")}`,
     {
       parserName: "parseScaleBasisProp",
+      message: typeof value === "string" ? value : typeof value,
+    },
+  );
+  return undefined;
+}
+
+/** Parses a `TextXAlignmentProp` enum name into a horizontal text alignment. */
+export function parseTextAlignmentProp(
+  value: unknown,
+  ctx: BindingContext,
+): SduiTextXAlignment | undefined {
+  if (value == null) return undefined;
+  const stripped = stripEnumPrefix(value, "TEXT_X_ALIGNMENT_");
+  if (isMemberOf(SDUI_TEXT_X_ALIGNMENT_VALUES, stripped)) {
+    return stripped;
+  }
+
+  reportBindingError(
+    SduiErrorName.FailedToParseProp,
+    ctx,
+    `text alignment prop expected one of ${SDUI_TEXT_X_ALIGNMENT_VALUES.join(", ")}`,
+    {
+      parserName: "parseTextAlignmentProp",
       message: typeof value === "string" ? value : typeof value,
     },
   );

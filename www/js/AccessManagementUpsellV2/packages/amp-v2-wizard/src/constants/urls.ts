@@ -1,4 +1,4 @@
-import { EnvironmentUrls } from "@rbx/core-scripts/legacy/Roblox";
+import { EnvironmentUrls } from "@rbx/environment-urls";
 
 const AMP_V2_WIZARD_API_BASE = `${EnvironmentUrls.apiGatewayUrl}/amp-v2-wizard-service/v1`;
 

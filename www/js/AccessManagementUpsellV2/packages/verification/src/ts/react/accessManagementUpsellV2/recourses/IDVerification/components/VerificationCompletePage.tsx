@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Modal } from 'react-style-guide';
+import { Button, Modal } from '../../../components/StyleGuide';
 import { useSelector } from 'react-redux';
-import { TranslateFunction } from 'react-utilities';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { VerificationStatusCode } from '../../../enums';
 import { selectIDVState } from '../verificationSlice';
 

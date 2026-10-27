@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { TranslateFn } from "../../../../utils/translate";
 import { mapItemRestrictionIcons } from "@rbx/www-common/components/itemCard";
 import { reportAXError } from "../../../../utils/axAnalyticsService";
@@ -28,6 +28,10 @@ function useAssetsList({ isItemSelected, translate }: AvatarListParams) {
   const [emptyMessage, setEmptyMessage] = useState<string>("");
 
   const [recommendationsData, setRecommendationsData] = useState<RecommendationsData>();
+
+  // Item details can resolve after the user equips something, so read the latest selection.
+  const isItemSelectedRef = useRef(isItemSelected);
+  isItemSelectedRef.current = isItemSelected;
 
   const isActiveTab = useCallback(() => {
     return selectedTab?.tabType === "Assets";
@@ -91,7 +95,7 @@ function useAssetsList({ isItemSelected, translate }: AvatarListParams) {
 
             const catalogItemWithSelection: CatalogItemWithSelection = {
               ...catalogItem,
-              selected: isItemSelected(catalogItem),
+              selected: isItemSelectedRef.current(catalogItem),
             };
 
             assets.push(catalogItemWithSelection);
@@ -135,7 +139,7 @@ function useAssetsList({ isItemSelected, translate }: AvatarListParams) {
           });
         });
     },
-    [isItemSelected, updateEmptyMessage],
+    [updateEmptyMessage],
   );
 
   const systemFeedback = useSystemFeedback();

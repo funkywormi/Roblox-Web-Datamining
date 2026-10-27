@@ -219,9 +219,12 @@ function evaluateRawCondition(
       const compareValue = extractCompareValue(body.kind);
       const { value, deferral } = readField(body.field, dataSources, dataBinder, ctx);
       if (deferral) return deferral;
-      // Mirror lua: a missing value short-circuits to "unknown" rather
-      // than coercing to false.
-      if (value == null) return deferred(DataStatus.NotReady);
+      // Ready + undefined means the field isn't on this payload. Skip this
+      // option (false) so later branches can run. Do not treat missing as
+      // `NE` — that would make the first option win. Use isNull / isEmpty
+      // to match "not set". Explicit null still waits (NotReady).
+      if (value === undefined) return READY_FALSE;
+      if (value === null) return deferred(DataStatus.NotReady);
       // Unknown / OP_INVALID: do not evaluate as false — that would commit to
       // a branch; schema drift should surface as Failed like unknown kinds.
       if (operator === undefined) {

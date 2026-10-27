@@ -1,4 +1,4 @@
-import { eventStreamService } from 'core-roblox-utilities';
+import * as eventStreamService from '@rbx/core-scripts/event-stream';
 import { getPhoneDiscoverabilityConsentEventParams, EventType } from '../constants/eventConstants';
 import UserSetting from '../../../../legallySensitiveContent/enums/UserSetting';
 

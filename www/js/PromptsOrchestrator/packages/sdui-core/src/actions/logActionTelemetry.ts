@@ -8,6 +8,7 @@ import type {
   SduiActionData,
   SduiActionHandlerConfig,
 } from "../types";
+import { actionTypeName } from "../utils/protoEnum";
 
 /**
  * Single entry point for action telemetry.
@@ -16,8 +17,9 @@ import type {
  *   1. Server-named handler from `actionData.telemetryHandler` — wins if set
  *      (even on miss; an unknown name reports an error and skips later custom
  *      branches).
- *   2. Else client default from `handlerConfig.telemetryHandler`.
- *   3. Else if `actionData.actionEventName` is set → fire itemAction-shaped
+ *   2. Else a name resolved from the merged action params by the handler config.
+ *   3. Else client default from `handlerConfig.telemetryHandler`.
+ *   4. Else if `actionData.actionEventName` is set → fire itemAction-shaped
  *      payload under that name (from `Action.action_event_name`).
  *
  * Then generic `itemAction` fires unless `handlerConfig.skipUnifiedLogging`.
@@ -35,19 +37,23 @@ export function logActionTelemetry(
   const { analyticsReporter, errorReporter, pageContext } = actionContext;
   const { telemetryHandler: serverNamedHandler, actionEventName } = actionData;
   const skipUnifiedLogging = handlerConfig.skipUnifiedLogging === true;
+  const namedHandlerName =
+    serverNamedHandler ??
+    handlerConfig.resolveTelemetryHandlerName?.(actionConfig, analyticsContext, actionContext);
 
   const fromParams = actionConfig.actionParams.interactionUuid;
   const interactionUuid = typeof fromParams === "string" ? fromParams : createInteractionUuid();
 
-  if (serverNamedHandler) {
-    const namedHandler = telemetryHandlerNameRegistry.getTelemetryHandler(serverNamedHandler);
+  if (namedHandlerName) {
+    const namedHandler = telemetryHandlerNameRegistry.getTelemetryHandler(namedHandlerName);
     if (namedHandler) {
       namedHandler(actionConfig, analyticsContext, actionContext);
     } else {
       errorReporter.reportSduiError(
         SduiErrorName.FailedToExecuteAction,
-        `Unknown telemetry handler name: ${serverNamedHandler} (actionType=${actionConfig.actionType})`,
+        `Unknown telemetry handler name: ${namedHandlerName} (actionType=${actionConfig.actionType})`,
         pageContext,
+        { name: namedHandlerName, actionType: actionTypeName(actionConfig.actionType) },
       );
     }
   } else if (handlerConfig.telemetryHandler) {

@@ -47,10 +47,10 @@ const RecoveryRedirect: React.FC<Props> = ({ username, actionType, recoverySessi
   }
 
   return (
-    <div className="text-center forgot-credentials-link">
+    <div className="text-align-x-center forgot-credentials-link">
       <a
         id="forgot-credentials-link"
-        className="text-link"
+        className="content-emphasis hover:underline focus-visible:underline"
         href={recoveryUrl}
         target={target}
         rel="noreferrer"

@@ -6,7 +6,13 @@ import {
 } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/ui_component_type_pb.js";
 import { AnalyticsContext, SduiAnalyticsReporter, SduiPageContext } from "./analytics";
 import { SduiApiStore } from "./api";
-import { PropParserContext, PropValidator, SduiComponentConfig, SduiDataBinder } from "./binding";
+import {
+  PoolSectionLayoutMetadata,
+  PropParserContext,
+  PropValidator,
+  SduiComponentConfig,
+  SduiDataBinder,
+} from "./binding";
 import { SduiErrorReporter } from "./error";
 import { DataStatus } from "./hydration";
 
@@ -30,6 +36,7 @@ export {
   AutomaticSizeSchema,
   ScaleTypeSchema,
   TextTruncateSchema,
+  TextXAlignmentSchema,
 } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/prop_types_engine_pb.js";
 export { UiComponentType, UiComponentTypeSchema };
 export type {
@@ -67,6 +74,7 @@ export type {
 
 export type {
   ApiRequestConfig,
+  SduiPostConfig,
   CacheEntry,
   FeedEntry,
   LoadMoreStatus,
@@ -77,6 +85,7 @@ export type {
   SduiFetchReason,
   SduiInputDataMergeStrategy,
   SduiInputDataMergeStrategyResolver,
+  SduiPostBody,
   SduiTargetedRefreshInput,
   SduiTargetedRefreshParamValue,
   SduiTargetedRefreshResult,
@@ -95,6 +104,9 @@ export type {
   DataBindingSources,
   NestedComponentBuildContext,
   Parser,
+  PoolBuildMetadata,
+  PoolItemPlacementMetadata,
+  PoolSectionLayoutMetadata,
   PropBuilder,
   PropBuildOptions,
   PropBuildRequest,
@@ -105,6 +117,7 @@ export type {
   SduiBuilderDeps,
   SduiComponentConfig,
   SduiDataBinder,
+  SduiPooledConfigList,
 } from "./binding";
 
 export type {
@@ -117,14 +130,24 @@ export type {
   SduiErrorDimensions,
   SduiErrorReporter,
   ReportSduiErrorAdditionalOptions,
+  SduiErrorChannel,
+  SduiErrorChannelSampleRates,
 } from "./error";
 
-export { SduiLoadPhase, SduiLoadTimerMilestone } from "./performance";
+export {
+  SduiLoadPhase,
+  SduiLoadTimerMilestone,
+  SDUI_PAGE_LOAD_LCP_FALLBACK_DELAY_MS,
+  SDUI_PAGE_LOAD_NO_PAINT_FALLBACK_DELAY_MS,
+} from "./performance";
 export type {
   CreateSduiLoadTimerOptions,
   SduiLoadTimer,
   SduiLoadTimerStatus,
+  SduiPageLoadPlatformAdapter,
   SduiRequestStatus,
+  SduiWebVitalsObserver,
+  SduiWebVitalsSnapshot,
 } from "./performance";
 
 // ─── Prop Definitions (from proto) ───
@@ -202,6 +225,7 @@ export const PROP_DESCRIPTOR_NAMES = [
   "ActionProp",
   "FocusNavActionsProp",
   "NestedComponentProp",
+  "LazyNestedComponentProp",
   "NestedComponentListProp",
   "LazyNestedComponentListProp",
   "StringArrayProp",
@@ -249,7 +273,12 @@ export interface PropDefinition {
 /** Nested configs + render callback when `doesManageChildren` is true (SSR-safe closure). */
 export interface SduiManagedChildList {
   configs: SduiComponentConfig[];
-  renderItem: (childConfig: SduiComponentConfig, index: number, reactKey?: Key) => ReactElement;
+  renderItem: (
+    childConfig: SduiComponentConfig,
+    index: number,
+    reactKey?: Key,
+  ) => ReactElement | null;
+  poolLayout?: PoolSectionLayoutMetadata;
 }
 
 /**
@@ -337,19 +366,31 @@ export type SduiActionTelemetryHandler = (
   ctx: SduiActionContext,
 ) => void;
 
+export type SduiTelemetryHandlerNameResolver = (
+  actionConfig: ActionConfig,
+  analyticsContext: AnalyticsContext | undefined,
+  ctx: SduiActionContext,
+) => string | undefined;
+
 export type SduiActionExecutionResult = void | Promise<void>;
 
+export type SduiActionHandler = (
+  actionConfig: ActionConfig,
+  analyticsContext: AnalyticsContext,
+  ctx: SduiActionContext,
+) => SduiActionExecutionResult;
+
 export interface SduiActionHandlerConfig {
-  handler?: (
-    actionConfig: ActionConfig,
-    analyticsContext: AnalyticsContext,
-    ctx: SduiActionContext,
-  ) => SduiActionExecutionResult;
+  handler?: SduiActionHandler;
   skipUnifiedLogging?: boolean;
   /**
+   * Resolves an action param to a named telemetry handler at activation time.
+   * An explicit `Action.telemetry_handler` takes precedence.
+   */
+  resolveTelemetryHandlerName?: SduiTelemetryHandlerNameResolver;
+  /**
    * Per-`ActionType` custom telemetry hook. Suppressed when the
-   * server-named handler resolves successfully — the named handler
-   * wins.
+   * explicit or resolved named-handler branch is selected.
    */
   telemetryHandler?: SduiActionTelemetryHandler;
   /**
@@ -368,6 +409,8 @@ export interface SduiActionHandlerConfig {
    * but the renderer suppresses the browser default on plain left clicks.
    */
   clientNavigation?: boolean;
+  /** Resolves the anchor `target` (e.g. `_blank`) for the resolved `href`. */
+  resolveTarget?: (actionParams: Record<string, unknown>) => string | undefined;
 }
 
 export type ActionParams = Record<string, unknown>;
@@ -405,6 +448,8 @@ export interface SduiResolvedAction {
   /** Awaitable activation for consumers that manage pending, success, or failure state. */
   onActivatedAsync: (overrides?: Record<string, unknown>) => Promise<void>;
   href?: string;
+  /** Anchor `target` for `href`; only set when `href` is. */
+  target?: string;
   clientNavigation?: boolean;
 }
 
@@ -463,6 +508,19 @@ export type SduiScaleType = (typeof SDUI_SCALE_TYPE_VALUES)[number];
 /** Parsed value of a `ScaleBasisProp` — prefix-stripped proto enum name. */
 export const SDUI_SCALE_BASIS_VALUES = ["parent", "viewport"] as const;
 export type SduiScaleBasis = (typeof SDUI_SCALE_BASIS_VALUES)[number];
+
+export const SDUI_UI_FLEX_MODE_VALUES = ["none", "grow", "shrink", "fill"] as const;
+export type SduiUIFlexMode = (typeof SDUI_UI_FLEX_MODE_VALUES)[number];
+
+export const SDUI_TEXT_X_ALIGNMENT_VALUES = ["left", "center", "right"] as const;
+export type SduiTextXAlignment = (typeof SDUI_TEXT_X_ALIGNMENT_VALUES)[number];
+
+export const SDUI_TEXT_Y_ALIGNMENT_VALUES = ["top", "center", "bottom"] as const;
+export type SduiTextYAlignment = (typeof SDUI_TEXT_Y_ALIGNMENT_VALUES)[number];
+
+/** Prefix-stripped `TextTruncate` names. `"atEnd"` and `"splitWord"` keep their camelCase. */
+export const SDUI_TEXT_TRUNCATE_MODE_VALUES = ["none", "atEnd", "splitWord"] as const;
+export type SduiTextTruncateMode = (typeof SDUI_TEXT_TRUNCATE_MODE_VALUES)[number];
 
 export type SduiTextTruncate = "text-truncate-none" | "text-truncate-end" | "text-truncate-split";
 

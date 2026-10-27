@@ -12,7 +12,6 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@rbx/foundation-ui";
-import "@rbx/core-types";
 import {
   MobileAppQrPanel,
   resolveAppDownload,

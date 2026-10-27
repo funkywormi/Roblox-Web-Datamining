@@ -16,10 +16,22 @@ import { useSystemFeedback } from "../contexts/SystemFeedbackContext";
 import { useAvatarTabsContext } from "../contexts/AvatarTabsContext";
 import { useCurrentlyWearingAssetsStoreContext } from "../contexts/CurrentlyWearingAssetsStoreContext";
 import parseError from "../utils/parseErrorUtil";
-import { getStatusCode } from "../utils/getStatusCode";
-import { host, trackCriticalError, trackError } from "../observability";
+import { trackEditorLoadFailed, trackError, type EditorLoadStep } from "../observability";
 
 export type HeadShape = AvatarInventoryItem["headShape"];
+
+// Carries which page-load request rejected, so EditorLoadFailed can be split by step.
+class EditorLoadStepError extends Error {
+  constructor(
+    readonly step: EditorLoadStep,
+    readonly failure: unknown,
+  ) {
+    super(`Avatar editor load failed at ${step}`);
+  }
+}
+
+const tagStep = <T,>(step: EditorLoadStep, request: Promise<T>): Promise<T> =>
+  request.catch((error: unknown) => Promise.reject(new EditorLoadStepError(step, error)));
 
 interface ThumbnailOptions {
   size: string;
@@ -249,9 +261,12 @@ const useLoadAvatarPage = () => {
         // (below) honors the V4 read/write flags.
         AvatarAPIService.configure(defaultSettings);
 
-        const getRulesRequest = AvatarAPIService.getAvatarRules();
-        const getAvatarRequest = AvatarAPIService.getAvatarV2(false);
-        const getCatalogMetaDataRequest = AvatarAPIService.getCatalogMetaData(false);
+        const getRulesRequest = tagStep("rules", AvatarAPIService.getAvatarRules());
+        const getAvatarRequest = tagStep("avatar", AvatarAPIService.getAvatarV2(false));
+        const getCatalogMetaDataRequest = tagStep(
+          "catalogMetadata",
+          AvatarAPIService.getCatalogMetaData(false),
+        );
 
         setAvatarType(avatarConstants.avatarType.defaultOnPageLoad as AvatarType);
 
@@ -270,13 +285,17 @@ const useLoadAvatarPage = () => {
         ]);
 
         loadAvatarPageCallBackSuccess(results);
-      } catch (error) {
+      } catch (caught) {
+        const { step, failure: error } =
+          caught instanceof EditorLoadStepError
+            ? caught
+            : { step: "setup" as const, failure: caught };
         reportAXError({
           itemName: "AvatarPageCallbackError",
           counterName: "AvatarEditorError",
           log: parseError(error),
         });
-        trackCriticalError("EditorLoadFailed", { host, statusCode: getStatusCode(error) }, error);
+        trackEditorLoadFailed(step, error);
 
         systemFeedback.error(avatarConstants.page.errorLoadingPage);
       }

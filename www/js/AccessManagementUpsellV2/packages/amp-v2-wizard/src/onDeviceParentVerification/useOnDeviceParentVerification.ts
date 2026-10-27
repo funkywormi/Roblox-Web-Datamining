@@ -7,9 +7,9 @@
 
 import { Client as PersonaClient } from "persona";
 import { useEffect, useRef, useState } from "react";
-import Intl from "@rbx/core-scripts/intl";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
-import { useTheme } from "@rbx/core-scripts/react";
+import useTheme from "../hooks/useTheme";
+import { getLocale } from "../utils/locale";
 
 import { startOnDeviceParentVerification } from "./api";
 import openVerificationLink from "../utils/verificationUtils";
@@ -68,7 +68,7 @@ export function useOnDeviceParentVerification(
     };
 
     const startEmbedded = (inquiryId: string) => {
-      const locale = new Intl().getLocale();
+      const locale = getLocale();
       personaClient = new PersonaClient({
         inquiryId,
         styleVariant: styleVariantRef.current,

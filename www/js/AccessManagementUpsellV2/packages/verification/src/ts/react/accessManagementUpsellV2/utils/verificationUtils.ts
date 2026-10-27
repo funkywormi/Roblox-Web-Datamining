@@ -1,4 +1,4 @@
-import { Intl } from 'Roblox';
+import { getLocale } from '@rbx/amp-v2-wizard/utils/locale';
 
 export default function openVerificationLink(
   verificationLink?: string | null,
@@ -6,7 +6,7 @@ export default function openVerificationLink(
 ): void {
   if (!verificationLink) return;
   // Get user locale and append language parameter if available
-  const userLocale = new Intl().getLocale();
+  const userLocale = getLocale();
   let linkWithParams = verificationLink;
 
   if (userLocale) {

@@ -127,6 +127,13 @@ export default {
   parentSideShareActivityUpdatesDescriptionV2: "Description.ParentSide.ShareActivityUpdatesV3",
   thirdPartyFriendAccessLabel: "Label.ThirdPartyFriendAccess",
   thirdPartyFriendAccessDescription: "Description.ThirdPartyFriendAccess",
+  profileVisibilityHeading: "Heading.ProfileVisibility",
+  profileFriendsListVisibilityLabel: "Label.WhoCanSeeMyFriendsList",
+  profileFriendsListVisibilityDescription: "Description.ProfileVisibilityFriendList",
+  profilePastUsernamesVisibilityLabel: "Label.WhoCanSeeMyPastUsernames",
+  profilePastUsernamesVisibilityDescription: "Description.ProfileVisibilityPreviousUsernames",
+  profileAboutSectionVisibilityLabel: "Label.WhoCanSeeMyAboutSection",
+  profileAboutSectionVisibilityDescription: "Description.ProfileVisibilityAbout",
 
   // Inventory & trade privacy
   inventoryPrivacyLabel: "Label.WhoCanSeeInventory",

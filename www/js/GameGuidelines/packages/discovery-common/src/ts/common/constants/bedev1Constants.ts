@@ -15,7 +15,6 @@ const url = {
     url: `${gamesApi}/v1/games/omni-recommendations-metadata`,
     withCredentials: true,
   },
-  getGameList: { url: `${gamesApi}/v1/games/list`, withCredentials: true },
   getGamePasses: (universeId: string, max: number): TUrl => ({
     url: `${gamesApi}/v1/games/${universeId}/game-passes?limit=${max}`,
     withCredentials: true,

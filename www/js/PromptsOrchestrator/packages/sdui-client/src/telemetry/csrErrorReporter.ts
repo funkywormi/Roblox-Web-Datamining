@@ -4,7 +4,13 @@ import type {
   SduiPageContext,
   ReportSduiErrorAdditionalOptions,
 } from "@rbx/sdui-core";
-import { captureError, captureErrorInSentry, getErrorPageContext } from "./errorReporterUtils";
+import {
+  captureErrorInSentry,
+  fireErrorCounter,
+  getErrorPageContext,
+  sendErrorEvent,
+  shouldFireChannel,
+} from "./errorReporterUtils";
 
 const ERROR_EVENT_NAME = "webDiscoverySduiError";
 const SDUI_APPLICATION_NAME = "sdui";
@@ -81,14 +87,28 @@ export function createCsrErrorReporter(
     ): void {
       const appPage = getErrorPageContext(pageContext);
 
-      captureError({
-        eventName,
-        errorContext: appPage,
-        errorName,
-        errorMessage,
-      });
+      const { additionalTags, additionalContext, additionalFingerprint, sampleRates } =
+        additionalOptions ?? {};
 
-      const { additionalTags, additionalContext, additionalFingerprint } = additionalOptions ?? {};
+      // Each channel is sampled independently so callers can trim a high-volume
+      // expected error in one channel (e.g. Sentry) without losing accuracy in
+      // the others. An unset rate keeps the channel at full volume.
+      if (shouldFireChannel(sampleRates?.counter)) {
+        fireErrorCounter(errorName);
+      }
+
+      if (shouldFireChannel(sampleRates?.eventStream)) {
+        sendErrorEvent({
+          eventName,
+          errorContext: appPage,
+          errorName,
+          errorMessage,
+        });
+      }
+
+      if (!shouldFireChannel(sampleRates?.sentry)) {
+        return;
+      }
 
       const sduiComponentType = dimensions?.componentType;
 

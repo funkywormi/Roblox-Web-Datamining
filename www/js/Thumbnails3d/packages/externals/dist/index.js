@@ -36,6 +36,7 @@ var externals = {
   "@rbx/legacy-webapp-types/roblox-item-purchase": "RobloxItemPurchase",
   // Set by the ItemPurchase component, which imports the module by its ts/react/... path.
   "@rbx/purchase-common/item-purchase": "RobloxItemPurchase",
+  "@rbx/purchase-common/create-item-purchase": "RobloxItemPurchase",
   "@rbx/core-scripts/local-storage": ["Roblox", "core-scripts", "localStorage", "localStorage"],
   "@rbx/core-scripts/local-storage/keys": ["Roblox", "core-scripts", "localStorage", "keys"],
   "@rbx/core-scripts/meta/device": ["Roblox", "core-scripts", "meta", "device"],
@@ -84,6 +85,8 @@ var externals = {
   "@rbx/prompts-orchestrator": ["Roblox", "PromptsOrchestrator"],
   "@rbx/sdui-core-module": ["Roblox", "SduiCoreModule"],
   "@rbx/navigation": ["Roblox", "NavigationService"],
+  // Next.js-safe subset of @rbx/navigation; on .NET it's the same NavigationService global.
+  "@rbx/navigation/auth-links": ["Roblox", "NavigationService"],
   "@rbx/thumbnails": "RobloxThumbnails",
   "@rbx/thumbnails3d": "RobloxThumbnail3d",
   "@rbx/user-profiles": "RobloxUserProfiles",

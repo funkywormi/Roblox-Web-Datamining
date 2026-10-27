@@ -2,8 +2,8 @@
 import { toDataURL } from 'qrcode';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { TranslateFunction } from 'react-utilities';
-import { TFeatureSpecificData } from 'Roblox';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
+import type { TFeatureSpecificData } from '@rbx/legacy-webapp-types/Roblox/accessManagementUpsellService';
 import {
   fetchFeatureAccess,
   selectAmpFeatureCheckData,

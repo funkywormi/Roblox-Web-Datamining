@@ -1,5 +1,5 @@
 import React from 'react';
-import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
+import { paymentFlowAnalyticsService } from '@rbx/payments/payments-flow-analytics';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
 import FoundationPurchaseModal from '../components/FoundationPurchaseModal';
 import { SelfProvidedTranslate } from '../SelfProvidedTranslate';
@@ -33,13 +33,13 @@ export default function createLeaveRobloxWarningModal() {
         neutralButtonText={translate(resources.cancelAction)}
         actionButtonText={translate(resources.continueToPaymentAction) || 'Continue To Payment'}
         onAction={() => {
-          paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-            paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-            true,
-            paymentFlowAnalyticsService.ENUM_VIEW_NAME.LEAVE_ROBLOX_WARNING,
-            paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-            paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CONTINUE_TO_VNG
-          );
+          paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+            triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+            isMidPurchaseStep: true,
+            viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.LEAVE_ROBLOX_WARNING,
+            purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+            viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CONTINUE_TO_VNG
+          });
           onContinueToPayment?.();
         }}
         onNeutral={onClose}

@@ -33,6 +33,8 @@ export type TGameTileOverflowMenuEligibility = {
   setIsHidden?: (isHidden: boolean) => void;
   enableSponsoredFeedback?: boolean;
   isSponsored?: boolean;
+  enableReportExperience?: boolean;
+  reportExperienceAttributes?: Record<string, string>;
   enableReportAd?: boolean;
   encryptedAdTrackingData?: string;
   enableRemoveFromFavorites?: boolean;
@@ -44,6 +46,8 @@ export const getGameTileOverflowMenuItemsToShow = ({
   setIsHidden,
   enableSponsoredFeedback,
   isSponsored,
+  enableReportExperience,
+  reportExperienceAttributes,
   enableReportAd,
   encryptedAdTrackingData,
   enableRemoveFromFavorites,
@@ -52,6 +56,14 @@ export const getGameTileOverflowMenuItemsToShow = ({
   const items: GameTileOverflowMenuItems[] = [];
   if (enableExplicitFeedback && (!isSponsored || enableSponsoredFeedback) && setIsHidden) {
     items.push(GameTileOverflowMenuItems.NotInterested);
+  }
+  if (
+    enableReportExperience &&
+    reportExperienceAttributes &&
+    !isSponsored &&
+    authenticatedUser()?.isAuthenticated
+  ) {
+    items.push(GameTileOverflowMenuItems.ReportExperience);
   }
   if (enableSponsoredFeedback && isSponsored) {
     items.push(GameTileOverflowMenuItems.WhyThisAd);
@@ -94,6 +106,7 @@ type TGameTileOverflowMenuProps = {
   enableReportAd?: boolean;
   encryptedAdTrackingData?: string;
   adCreativeAssetId?: string;
+  onReportExperience?: () => void;
   onRemoveFromFavorites?: () => void;
   translate: TranslateFunction;
 };
@@ -117,6 +130,7 @@ const GameTileOverflowMenu = ({
   enableReportAd,
   encryptedAdTrackingData,
   adCreativeAssetId,
+  onReportExperience,
   onRemoveFromFavorites,
   translate,
 }: TGameTileOverflowMenuProps): JSX.Element | null => {
@@ -191,6 +205,22 @@ const GameTileOverflowMenu = ({
             },
           });
           break;
+        case GameTileOverflowMenuItems.ReportExperience:
+          items.push({
+            iconName: "icon-regular-flag",
+            value: GameTileOverflowMenuItems.ReportExperience,
+            title: translate(FeatureGameDetails.ActionReport),
+            onSelect: () => {
+              onReportExperience?.();
+              sendActionEvent(
+                GameTileOverflowMenuActionType.GameTileOverflowMenuItemActivated,
+                menuItemsToShow,
+                GameTileOverflowMenuItems.ReportExperience,
+              );
+              closeMenu(menuItemsToShow);
+            },
+          });
+          break;
         case GameTileOverflowMenuItems.WhyThisAd:
           items.push({
             iconName: "icon-regular-circle-i",
@@ -256,6 +286,7 @@ const GameTileOverflowMenu = ({
     sendNotInterestedUserSignal,
     closeMenu,
     redirectToReportAd,
+    onReportExperience,
     onRemoveFromFavorites,
   ]);
 
@@ -273,7 +304,7 @@ const GameTileOverflowMenu = ({
             size="Small"
             variant="OverMedia"
             isCircular
-            onClick={(e: React.MouseEvent<Element>) => {
+            onClick={(e: React.MouseEvent) => {
               // need to prevent default because when the overflow menu is on a tile, clicking it will activate the link and navigate to the game page
               // preventing default also prevents the icon button from triggering the menu as normal so we need to control open state ourselves
               e.preventDefault();

@@ -15,6 +15,7 @@ import { AnnouncementModel, GroupDetailsPolicies } from '../types';
 import { groupAnnouncementsConfig } from '../translation.config';
 import { logGroupPageClickEvent } from '../../shared/utils/logging';
 import { EventContext as SharedEventContext } from '../../shared/constants/eventConstants';
+import { getPlainText } from '../../shared/utils/messageContentUtils';
 import announcementsService from '../services/announcementsService';
 import Message from '../../shared/components/content/MessageContent';
 import ContentReactions from '../../shared/components/reactions/ContentReactions';
@@ -242,7 +243,7 @@ const AnnouncementDisplay = ({
       </div>
       {policies.displayMarketplaceEmbed && (
         <AnnouncementEmbeds
-          content={announcement.originalContent.plainText || ''}
+          content={getPlainText(announcement.originalContent)}
           groupId={groupId}
         />
       )}

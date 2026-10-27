@@ -1,5 +1,5 @@
 import * as httpService from '@rbx/core-scripts/http';
-import { userId } from '@rbx/core-scripts/meta/user';
+import { userId } from '../../utils/currentUser';
 import urlConstants from '../constants/urlConstants';
 
 const {

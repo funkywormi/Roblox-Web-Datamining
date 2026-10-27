@@ -33,6 +33,7 @@ type BatchReciprocalBlockResponse = {
 const batchCheckReciprocalBlock = async (
   userIds: number[],
 ): Promise<BatchReciprocalBlockResponse> => {
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- keep the legacy reader until that bundle can absorb it
   const requesterId = authenticatedUser()?.id;
   if (requesterId == null) {
     return {

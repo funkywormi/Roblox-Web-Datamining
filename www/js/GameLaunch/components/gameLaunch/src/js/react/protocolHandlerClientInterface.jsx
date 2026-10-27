@@ -20,6 +20,7 @@ import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { translations } from "../../../component.json";
 import GameLauncher from "../gameLauncher";
 import { getDeferredDeeplinkQueryParams } from "../../ts/deferredDeeplinks/deferredDeeplinkUtilities";
+import resolveLaunchContext from "../../ts/deferredDeeplinks/gameJoinDeeplink";
 import DownloadDialog from "../../ts/DownloadDialog";
 import { resetClientStatus, getAuthTicket } from "../../ts/api";
 import { createSharedGameLauncherHost } from "../../ts/sharedGameLauncherHost";
@@ -560,13 +561,16 @@ function playTogetherGame(placeLauncherParams) {
   return startGame(startGameParams);
 }
 
-async function startDownload() {
+async function startDownload(launchContext) {
   const iframe = document.getElementById("downloadInstallerIFrame");
   const downloadUrl = "/download/client";
 
   // NOTE: This policy is needed for deferred deeplinking from Chrome on Windows. Otherwise, the deeplink URL is wiped from the installer
   iframe.referrerPolicy = "no-referrer";
-  const queryParams = await getDeferredDeeplinkQueryParams(window.location.toString());
+  const queryParams = await getDeferredDeeplinkQueryParams(
+    window.location.toString(),
+    launchContext,
+  );
 
   iframe.src = `${downloadUrl}${queryParams}`;
 }
@@ -608,7 +612,14 @@ function showDialog(gameLaunchParams, launchGame = () => startGameFlow(gameLaunc
           startStudioDownload();
           unmount();
         } else {
-          await startDownload();
+          // Play -> Download: carry the game-join intent so the client can rebuild the join
+          // after install. Falls back to a plain LinkId deep link when there is no join URL.
+          const launchContext = await resolveLaunchContext(
+            gameLaunchParams?.otherParams?.placelauncherurl,
+            gameLaunchParams?.otherParams?.LaunchExp,
+            gameLaunchParams?.referredByPlayerId,
+          );
+          await startDownload(launchContext);
         }
       },
       launchGame: async () => await launchGame(),

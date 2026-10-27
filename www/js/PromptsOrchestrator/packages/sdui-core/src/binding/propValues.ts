@@ -1,8 +1,13 @@
-import type { SduiActionSnapshot } from "../types";
+import type {
+  PoolSectionLayoutMetadata,
+  SduiActionSnapshot,
+  SduiComponentConfig,
+  SduiPooledConfigList,
+} from "../types";
 import { DataStatus } from "../types";
-import { asRecord, hasSduiKind, isRecord, readSduiKind } from "../utils/typeGuards";
+import { asRecord, hasSduiKind, isRecord, isSduiConfig, readSduiKind } from "../utils/typeGuards";
 
-type SduiPropValueKind = "propRecord" | "propList" | "action";
+type SduiPropValueKind = "propRecord" | "propList" | "action" | "pooledConfigList";
 
 interface SduiPropValue<K extends SduiPropValueKind> {
   readonly __sduiKind: K;
@@ -24,6 +29,17 @@ export function createSduiListValue(items: readonly unknown[]): SduiListValue {
 
 export function createSduiActionValue(snapshot: SduiActionSnapshot): SduiActionValue {
   return { ...snapshot, __sduiKind: "action" };
+}
+
+export function createSduiPooledConfigList(
+  configs: SduiComponentConfig[],
+  poolLayout: PoolSectionLayoutMetadata,
+): SduiPooledConfigList {
+  return {
+    __sduiKind: "pooledConfigList",
+    configs,
+    poolLayout,
+  };
 }
 
 export function isSduiRecordValue(value: unknown): value is SduiRecordValue {
@@ -51,5 +67,24 @@ export function isSduiActionValue(value: unknown): value is SduiActionValue {
   return (
     (snapshot.status === DataStatus.NotReady || snapshot.status === DataStatus.Failed) &&
     !Object.hasOwn(snapshot, "actionData")
+  );
+}
+
+export function isSduiPooledConfigList(value: unknown): value is SduiPooledConfigList {
+  if (!hasSduiKind(value, "pooledConfigList")) {
+    return false;
+  }
+
+  const pooledList = asRecord(value);
+  const poolLayout = asRecord(pooledList?.poolLayout);
+
+  return (
+    pooledList !== undefined &&
+    Array.isArray(pooledList.configs) &&
+    pooledList.configs.every(isSduiConfig) &&
+    poolLayout !== undefined &&
+    typeof poolLayout.columnCount === "number" &&
+    typeof poolLayout.rowCount === "number" &&
+    typeof poolLayout.startRow === "number"
   );
 }

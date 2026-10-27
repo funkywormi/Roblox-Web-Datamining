@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { IModalService, Modal } from 'react-style-guide';
-import { LegallySensitiveContentService } from 'Roblox';
+import { IModalService, Modal } from '../../../components/StyleGuide';
+import useLegallySensitiveContentAndActions from '../../../../legallySensitiveContent/useLegallySensitiveContentAndActions';
 import { Button } from '@rbx/foundation-ui';
 import settingTranslationConstants from '../constants/settingTranslationConstants';
 import { TCreateSettingsModal } from '../../../types/AmpTypes';
@@ -29,7 +29,7 @@ const useUpdateSettingsModal: TCreateSettingsModal = (
   const [
     legallySensitiveContent,
     legallySensitiveActions
-  ] = LegallySensitiveContentService.useLegallySensitiveContentAndActions(consentName, surface!);
+  ] = useLegallySensitiveContentAndActions(consentName, surface!);
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const modalService: IModalService = useMemo(
@@ -47,7 +47,7 @@ const useUpdateSettingsModal: TCreateSettingsModal = (
     }
   }, [consentFormType]);
 
-  const getConsentForm = (): JSX.Element => {
+  const getConsentForm = (): React.JSX.Element => {
     const ConsentFormInnerComponent =
       ConsentFormInnerComponents[consentFormType as ConsentFormType];
     if (!ConsentFormInnerComponent) return <React.Fragment />;

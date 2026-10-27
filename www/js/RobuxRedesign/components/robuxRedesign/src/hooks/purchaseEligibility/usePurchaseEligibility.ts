@@ -4,7 +4,7 @@ import { getCurrentUser } from "@rbx/www-common/user";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { RequirementType } from "@rbx/user-settings";
 import { useToast } from "@rbx/payments/components";
-import { window } from "@rbx/core-lib/browser";
+import { startAccessManagementUpsell } from "@rbx/www-common/access-management-upsell";
 import {
   checkUserPurchaseSetting,
   UserPurchaseSettingFailureReason,
@@ -102,7 +102,7 @@ export function usePurchaseEligibility(): {
 
   const startAccessManagementUpsellFlow = useCallback(async (): Promise<void> => {
     try {
-      await window?.Roblox.AccessManagementUpsellV2Service?.startAccessManagementUpsell({
+      const result = await startAccessManagementUpsell({
         ampRecourseData: {
           enablePurchases: "Enabled",
         },
@@ -111,6 +111,9 @@ export function usePurchaseEligibility(): {
         isAsyncCall: false,
         usePrologue: true,
       });
+      if (typeof result === "boolean") {
+        trackCounter("AccessManagementUpsellResult", { result: String(result) });
+      }
     } catch (e) {
       trackError("AccessManagementUpsellException", null, e);
     }

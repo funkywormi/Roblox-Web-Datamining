@@ -1,10 +1,10 @@
 import React from "react";
 import classNames from "classnames";
 import { TranslateFunction } from "@rbx/core-scripts/react";
+import { IgrsRating } from "@rbx/game-play-button";
 import gameGuidelinesConstants from "../constants/gameGuidelinesConstants";
 import getIgrsImage from "../utils/getIgrsImage";
 import urlConstants from "../constants/urlConstants";
-import { IgrsRating } from "../types";
 
 export type IgrsRatingLabelProps = {
   igrsRating: IgrsRating;

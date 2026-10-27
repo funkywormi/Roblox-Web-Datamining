@@ -27,9 +27,11 @@ ready(() => {
   );
   if (ageRecommendationDetailContainer) {
     renderWithErrorBoundary(
-      <TranslationProvider config={translations}>
-        <AgeRecommendationTitle isDisplayAgeRecommendationDetails />
-      </TranslationProvider>,
+      <QueryClientProvider client={queryClient}>
+        <TranslationProvider config={translations}>
+          <AgeRecommendationTitle isDisplayAgeRecommendationDetails />
+        </TranslationProvider>
+      </QueryClientProvider>,
       ageRecommendationDetailContainer,
     );
   }
@@ -39,9 +41,11 @@ ready(() => {
   );
   if (ageRecommendationTitleContainer) {
     renderWithErrorBoundary(
-      <TranslationProvider config={translations}>
-        <AgeRecommendationTitle isDisplayAgeRecommendationDetails={false} />
-      </TranslationProvider>,
+      <QueryClientProvider client={queryClient}>
+        <TranslationProvider config={translations}>
+          <AgeRecommendationTitle isDisplayAgeRecommendationDetails={false} />
+        </TranslationProvider>
+      </QueryClientProvider>,
       ageRecommendationTitleContainer,
     );
     insertLicensedBadge(ageRecommendationTitleContainer);

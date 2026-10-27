@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@rbx/www-common/user";
+import ExperimentationService from "@rbx/experimentation";
 import { trackCounter, trackError } from "../observability";
-import { waitForExperimentationService } from "./experimentationService";
 
 export const PLUS_BILLING_PERIOD_SELECTION_LAYER = "Payments.BuyRobux.PlusBillingPeriodSelection";
 const ExperimentParameterName = "plusBillingPeriodSelectionVariant";
@@ -27,8 +27,9 @@ export class PlusBillingPeriodSelectionService {
     }
 
     try {
-      const service = await waitForExperimentationService();
-      const res = await service.getAllValuesForLayer(PLUS_BILLING_PERIOD_SELECTION_LAYER);
+      const res = await ExperimentationService.getAllValuesForLayer(
+        PLUS_BILLING_PERIOD_SELECTION_LAYER,
+      );
       const variant = res[ExperimentParameterName];
       if (variant !== 0 && variant !== 1) {
         trackCounter("PlusBillingPeriodSelectionExperimentEvaluated", { variant: "unknown" });
@@ -45,7 +46,7 @@ export class PlusBillingPeriodSelectionService {
     }
   }
 
-  async logLayerExposure() {
+  logLayerExposure() {
     if (!this.isResolved) {
       trackCounter("PlusBillingPeriodSelectionExposureBeforeAssignment");
       return;
@@ -55,8 +56,7 @@ export class PlusBillingPeriodSelectionService {
     }
     this.hasLoggedExposure = true;
     try {
-      const service = await waitForExperimentationService();
-      service.logLayerExposure(PLUS_BILLING_PERIOD_SELECTION_LAYER);
+      ExperimentationService.logLayerExposure(PLUS_BILLING_PERIOD_SELECTION_LAYER);
       trackCounter("PlusBillingPeriodSelectionExperimentExposed");
     } catch (error) {
       this.hasLoggedExposure = false;

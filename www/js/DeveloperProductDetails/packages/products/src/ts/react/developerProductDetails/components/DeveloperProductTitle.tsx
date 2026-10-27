@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { Grid, Typography, IconButton, Menu, MoreHorizIcon, MenuItem } from '@rbx/ui';
+import { useEffect, useRef, useState } from "react";
+import { Grid, Typography, IconButton, Menu, MoreHorizIcon, MenuItem } from "@rbx/ui";
 import { CurrentUser, EnvironmentUrls } from "@rbx/core-scripts/legacy/Roblox";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
-import { TDeveloperProductDetails } from '../../common/types/types';
-import constants from '../../common/constants/constants';
-import { FeatureDeveloperProducts } from '../../common/constants/translationConstants';
-import guacService from '../../common/services/guacService';
+import { TDeveloperProductDetails } from "../../common/types/types";
+import constants from "../../common/constants/constants";
+import { FeatureDeveloperProducts } from "../../common/constants/translationConstants";
+import guacService from "../../common/services/guacService";
 
 type DeveloperProductTitleProps = {
   developerProductDetailsData: TDeveloperProductDetails;
@@ -14,7 +14,7 @@ type DeveloperProductTitleProps = {
 
 const DeveloperProductTitle = ({
   developerProductDetailsData,
-  translate
+  translate,
 }: DeveloperProductTitleProps): JSX.Element => {
   const currentUrl = EnvironmentUrls.domain + window.location.pathname;
 
@@ -27,7 +27,7 @@ const DeveloperProductTitle = ({
 
   const abuseReportLink = constants.url.reportAbuse(
     developerProductDetailsData.TargetId.toString(),
-    encodeURIComponent(currentUrl)
+    encodeURIComponent(currentUrl),
   );
   const [abuseReportUrl, setAbuseReportUrl] = useState<string>(abuseReportLink.url);
 
@@ -38,7 +38,7 @@ const DeveloperProductTitle = ({
         return constants.url.reportAbuseRevamp(
           developerProductDetailsData.ProductId.toString(),
           CurrentUser!.userId,
-          'developerproduct'
+          "developerproduct",
         );
       }
       return abuseReportLink.url;
@@ -54,31 +54,35 @@ const DeveloperProductTitle = ({
   }, [
     abuseReportLink.url,
     developerProductDetailsData.ProductId,
-    developerProductDetailsData.TargetId
+    developerProductDetailsData.TargetId,
   ]);
 
   return (
-    <Grid className='product-title-container'>
-      <Typography className='h1'>{developerProductDetailsData.Name}</Typography>
+    <Grid className="product-title-container">
+      <Typography className="h1">{developerProductDetailsData.Name}</Typography>
       <IconButton
-        aria-label='developer-product-details-menu'
+        aria-label="developer-product-details-menu"
         onClick={handleMenuButtonClick}
-        ref={buttonRef}>
+        ref={buttonRef}
+      >
         <MoreHorizIcon />
       </IconButton>
       <Menu
         open={menuOpen}
-        onClose={() => { setMenuOpen(false); }}
+        onClose={() => {
+          setMenuOpen(false);
+        }}
         anchorEl={buttonRef.current}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
+          vertical: "bottom",
+          horizontal: "right",
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right'
-        }}>
-        <MenuItem component='a' href={abuseReportUrl}>
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <MenuItem component="a" href={abuseReportUrl}>
           <Typography>{translate(FeatureDeveloperProducts.LabelReportAbuse)}</Typography>
         </MenuItem>
       </Menu>

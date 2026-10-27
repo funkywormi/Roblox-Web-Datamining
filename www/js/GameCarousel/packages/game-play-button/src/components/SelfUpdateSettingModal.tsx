@@ -1,4 +1,4 @@
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/react";
 import UpsellModal from "./UpsellModal";
 
 type TSelfUpdateSettingModalProps = {

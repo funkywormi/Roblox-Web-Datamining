@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { useContext, Fragment } from "react";
 import { Icon } from "@rbx/foundation-ui";
 import { formatNumber } from "@rbx/core-scripts/format/number";
@@ -24,13 +25,11 @@ const RobuxBalance = () => {
 
 export function Banner({ transfers }: { transfers?: SectionTransfers }) {
   const {
-    breakpoint,
     buyRobuxPageData: { pageHeaderMetadata },
     urlParams,
   } = useContext(BuyRobuxPageContext);
   const { translateFullKey } = useFullKeyTranslations();
 
-  const isAboveLarge = breakpoint.isAboveInclusive("large");
   const showWebviewHeader = urlParams.showHeader === "true";
 
   const stickyRobuxBalance =
@@ -95,12 +94,12 @@ export function Banner({ transfers }: { transfers?: SectionTransfers }) {
 
   const heading = (
     <h1
-      className="self-stretch text-align-x-left text-section-title content-emphasis large:text-align-x-center padding-y-none"
-      style={
-        isAboveLarge && !hasStrikethroughHeading
-          ? { marginLeft: "120px", marginRight: "120px" }
-          : undefined
-      }
+      className={classNames(
+        "self-stretch text-align-x-left text-section-title content-emphasis large:text-align-x-center padding-y-none",
+        // Side inset only at `large` (1141px) and only for the shorter heading.
+        // A media query keeps the class stable across server and client.
+        !hasStrikethroughHeading && "large:margin-x-[120px]",
+      )}
     >
       {hasComparisonHeading
         ? comparisonHeading

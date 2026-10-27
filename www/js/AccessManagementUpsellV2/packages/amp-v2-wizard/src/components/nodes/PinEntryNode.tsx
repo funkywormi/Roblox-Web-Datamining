@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useRef, useState, type JSX } from "react";
 import { Link, ProgressCircle } from "@rbx/foundation-ui";
-import { CodeInput } from "@rbx/user-settings";
+import { CodeInput } from "@rbx/user-settings/code-input";
 
 import { FullPageChrome } from "../FullPageChrome";
 import { useOdpAnalytics } from "../../analytics/odpAnalytics";

@@ -10,7 +10,7 @@ const layerNames = {
 
 const parameterNames = {
   avatarShopPage: ["avatarShopPlacement", "isItemDetailsEnabled"],
-  avatarShopRecommendationsAndSearchWeb: [],
+  avatarShopRecommendationsAndSearchWeb: ["animatedItemCardEnabled"],
   avatarShopRecommendationsAndSearch: ["infiniteScroll"],
   avatarMarketplaceGuidedFeatures: ["topicsEnabledWeb"],
   avatarMarketplaceShoppingCart: [],

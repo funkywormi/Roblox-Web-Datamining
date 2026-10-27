@@ -12,6 +12,7 @@ type AvatarShopRecommendationsAndSearchWeb = {
   shoppingCartEnabled: boolean;
   shoppingCartTreatment: string;
   directPurchaseEnabled?: boolean | null;
+  animatedItemCardEnabled?: boolean | null;
 };
 
 type AvatarShopMarketplaceGuidedFeaturesEnrollment = {

@@ -1,3 +1,6 @@
+export const ABUSE_VECTOR_PLACE = "place";
+export const ABUSE_VECTOR_GAME_TILE = "game_tile";
+
 /**
  * Retrieves the abuse report URL with the specified parameters.
  *

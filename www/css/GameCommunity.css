@@ -7,39 +7,39 @@
 }
 
 .game-community-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 94px;
-    padding: 12px;
     border: 1px solid #000;
     border-radius: 8px;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -ms-flex-align: center;
+    align-items: center;
+    height: 94px;
+    padding: 12px;
+    display: -ms-flexbox;
+    display: flex;
     overflow: hidden
 }
 
-.light-theme .game-community-link {
-    background-color: #f7f7f8;
-    border-color: rgba(27, 37, 75, .12)
-}
-
+.light-theme .game-community-link,
 .dark-theme .game-community-link {
-    background-color: #272930;
-    border-color: rgba(208, 217, 251, .12)
+    background-color: var(--color-surface-300);
+    border-color: var(--color-stroke-default)
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .game-community-link {
         height: 84px
     }
 }
 
 .game-community-icon-container {
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
     width: 70px;
-    height: 70px;
-    flex-shrink: 0
+    height: 70px
 }
 
-@media(max-width:543px) {
+@media (max-width:543px) {
     .game-community-icon-container {
         width: 60px;
         height: 60px
@@ -47,21 +47,25 @@
 }
 
 .game-community-icon {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzAiIGhlaWdodD0iNzAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfOTg1XzEzNDI3KSI+PHJlY3QgeT0iLjUiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcng9IjQiIGZpbGw9IiNGNUM0MDAiLz48cGF0aCBkPSJNMTguODI4IDIzLjQyNHMuMDMzIDQuNzQ1IDIuNDcgOS42NTFjMi41MDIgNC43MjMgNS45NTMgNy43NTcgOC44IDguOTY2IDIuOTQtMS4zNzUgNS43ODItMy43NjIgNy4zMzItNi4zMzNoLTguMDc0Yy0yLjA5LTEuNzMyLTMuNzM0LTQuNjA1LTQuMTEtNy45MjVoMjMuNjg3Yy0xLjE2OCA1LjMzOC0zLjY0NyAxMC4xOTQtNi4wMDggMTMuMjg1YTI4LjUxMyAyOC41MTMgMCAwMS0xMi44MSA5LjQzMmgtLjA3NWMtOC40OTYtMy4zODUtMTMuMDY3LTguNzE3LTE2LjA4My0xNC43MzNDMTIuMDIzIDMxLjkxMiAxMCAyNC45MTIgMTAgMTUuNWg0MGE1Ny4wMzkgNTcuMDM5IDAgMDEtLjUzNCA3LjkyNEgxOC44Mjh6IiBmaWxsPSIjMTExODIwIi8+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDBfOTg1XzEzNDI3Ij48cmVjdCB5PSIuNSIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iNCIgZmlsbD0iI2ZmZiIvPjwvY2xpcFBhdGg+PC9kZWZzPjwvc3ZnPg==);
-    background-size: contain;
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MCIgaGVpZ2h0PSI3MCIgZmlsbD0ibm9uZSIgdmlld0JveD0iMCAwIDYwIDYwIj48ZyBjbGlwLXBhdGg9InVybCgjYSkiPjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgeT0iLjUiIGZpbGw9IiNmNWM0MDAiIHJ4PSI0Ii8+PHBhdGggZmlsbD0iIzExMTgyMCIgZD0iTTE4LjgyOCAyMy40MjVzLjAzMyA0Ljc0NCAyLjQ3IDkuNjVjMi41MDIgNC43MjMgNS45NTMgNy43NTcgOC44IDguOTY2IDIuOTQtMS4zNzUgNS43ODItMy43NjIgNy4zMzItNi4zMzNoLTguMDc0Yy0yLjA5LTEuNzMyLTMuNzM0LTQuNjA1LTQuMTEtNy45MjVoMjMuNjg3Yy0xLjE2OCA1LjMzOC0zLjY0NyAxMC4xOTQtNi4wMDggMTMuMjg1YTI4LjUgMjguNSAwIDAgMS0xMi44MSA5LjQzMmgtLjA3NWMtOC40OTYtMy4zODUtMTMuMDY3LTguNzE3LTE2LjA4My0xNC43MzNDMTIuMDIzIDMxLjkxMiAxMCAyNC45MTIgMTAgMTUuNWg0MGE1NyA1NyAwIDAgMS0uNTM0IDcuOTI0eiIvPjwvZz48ZGVmcz48Y2xpcFBhdGggaWQ9ImEiPjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgeT0iLjUiIGZpbGw9IiNmZmYiIHJ4PSI0Ii8+PC9jbGlwUGF0aD48L2RlZnM+PC9zdmc+);
     background-repeat: no-repeat;
-    height: 100%;
-    width: 100%
+    background-size: contain;
+    width: 100%;
+    height: 100%
 }
 
 .game-community-info-container {
-    display: flex;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    -ms-flex-pack: center;
     justify-content: center;
+    min-width: 0;
     margin-left: 18px;
     margin-right: 18px;
-    flex-grow: 1;
-    min-width: 0
+    display: -ms-flexbox;
+    display: flex
 }
 
 .game-community-name {
@@ -71,20 +75,22 @@
 }
 
 .game-community-description {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     text-overflow: ellipsis;
-    overflow: hidden;
-    width: 100%
+    -webkit-box-orient: vertical;
+    width: 100%;
+    display: -webkit-box;
+    overflow: hidden
 }
 
 .game-community-visit-container {
+    -ms-flex-positive: 0;
     flex-grow: 0;
+    -ms-flex-negative: 0;
     flex-shrink: 0
 }
 
-@media(max-width:767px) {
+@media (max-width:767px) {
     .game-community-visit-container {
         display: none
     }

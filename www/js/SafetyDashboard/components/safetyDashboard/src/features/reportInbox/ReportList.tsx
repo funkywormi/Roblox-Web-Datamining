@@ -52,11 +52,11 @@ const ReportList = ({ reports }: ReportListProps) => {
       })}
     </List>
   ) : (
-    <div className="flex flex-col items-center justify-center gap-small">
+    <div className="flex flex-col items-center justify-center gap-small text-align-x-center">
       <img src={protectionShieldLight} alt="" className="dark:hidden" />
       <img src={protectionShieldDark} alt="" className="hidden dark:block" />
       <span className="text-heading-medium">{translate("Heading.NoReportsYet")}</span>
-      <span className="text-body-medium">{translate("Description.NoReportsYet")}</span>
+      <span className="text-body-medium">{translate("Description.NoReportsYetIllegal")}</span>
       <a
         className="content-link text-body-medium"
         href={HOW_TO_REPORT_URL}

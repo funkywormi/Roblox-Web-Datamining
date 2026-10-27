@@ -1,4 +1,4 @@
-import { TFeatureSpecificData } from 'Roblox';
+import type { TFeatureSpecificData } from '@rbx/legacy-webapp-types/Roblox/accessManagementUpsellService';
 import { Access, WizardIntent } from '../../enums';
 import { ExtraParameter } from '../../types/AmpTypes';
 

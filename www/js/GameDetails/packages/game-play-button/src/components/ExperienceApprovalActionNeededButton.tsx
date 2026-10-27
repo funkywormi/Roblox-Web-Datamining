@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import { fireEvent } from "@rbx/www-common/event-tracker";
 import { sendUnlockPlayIntentEvent } from "../utils/playButtonUtils";
+import { getStartAccessManagementUpsell } from "../utils/accessManagementUpsell";
 import ActionNeededButton from "./ActionNeededButton";
 import playButtonConstants from "../constants/playButtonConstants";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
@@ -33,12 +34,13 @@ const ExperienceApprovalActionNeededButton = ({
         pageContext,
       );
 
-      if (!window.Roblox.AccessManagementUpsellV2Service) {
+      const startAccessManagementUpsell = getStartAccessManagementUpsell();
+      if (!startAccessManagementUpsell) {
         fireEvent(counterEvents.PlayButtonUpsellExperienceApprovalError);
         return;
       }
 
-      window.Roblox.AccessManagementUpsellV2Service.startAccessManagementUpsell({
+      startAccessManagementUpsell({
         featureName: "CanApproveExperience",
         namespace: ampNamespaces.accountManagement,
         isAsyncCall: false,

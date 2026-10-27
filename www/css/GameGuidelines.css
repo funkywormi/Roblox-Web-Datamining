@@ -23,14 +23,10 @@
     display: flex
 }
 
-.light-theme .game-licensed-badges-container .game-licensed-badge {
-    color: #202227;
-    background-color: rgba(27, 37, 75, .12)
-}
-
+.light-theme .game-licensed-badges-container .game-licensed-badge,
 .dark-theme .game-licensed-badges-container .game-licensed-badge {
-    color: #f7f7f8;
-    background-color: rgba(208, 217, 251, .12)
+    background-color: var(--color-action-standard-background);
+    color: var(--color-action-standard-foreground)
 }
 
 .game-licensed-badges-container .game-licensed-badge .game-licensed-badge-info {
@@ -49,14 +45,10 @@
     max-width: 402px
 }
 
-.light-theme .igrs-rating-container {
-    background-color: #fff;
-    border-color: rgba(27, 37, 75, .12)
-}
-
+.light-theme .igrs-rating-container,
 .dark-theme .igrs-rating-container {
-    background-color: #121215;
-    border-color: rgba(208, 217, 251, .12)
+    background-color: var(--color-surface-0);
+    border-color: var(--color-stroke-default)
 }
 
 .igrs-rating-container .igrs-rating-content {
@@ -77,20 +69,14 @@
     font-size: var(--font-size-350)
 }
 
-.light-theme .igrs-rating-container .igrs-rating-content .igrs-rating-text {
-    color: #494d5a
-}
-
+.light-theme .igrs-rating-container .igrs-rating-content .igrs-rating-text,
 .dark-theme .igrs-rating-container .igrs-rating-content .igrs-rating-text {
-    color: #d5d7dd
+    color: var(--color-content-default)
 }
 
-.light-theme .igrs-rating-container .igrs-rating-content .igrs-rating-text.igrs-rating-text-unrated {
-    color: #202227
-}
-
+.light-theme .igrs-rating-container .igrs-rating-content .igrs-rating-text.igrs-rating-text-unrated,
 .dark-theme .igrs-rating-container .igrs-rating-content .igrs-rating-text.igrs-rating-text-unrated {
-    color: #f7f7f8
+    color: var(--color-content-emphasis)
 }
 
 #game-age-recommendation-container {
@@ -124,12 +110,9 @@
     border-radius: 8px
 }
 
-.light-theme .age-rating-details {
-    background-color: rgba(27, 37, 75, .08)
-}
-
+.light-theme .age-rating-details,
 .dark-theme .age-rating-details {
-    background-color: rgba(208, 217, 251, .08)
+    background-color: var(--color-shift-200)
 }
 
 .age-rating-details .age-rating-age-bracket {

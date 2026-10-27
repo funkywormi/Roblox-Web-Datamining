@@ -15,13 +15,19 @@ import type {
   SduiErrorReporter,
   SduiPageContext,
 } from "../types";
-import { DataStatus, NOT_READY_READ } from "../types";
-import { DEFAULT_PATHS_BY_CONTENT_TYPE } from "./stores";
+import { DataStatus, NOT_READY_READ, READY_UNDEFINED_READ } from "../types";
+import { CLIENT_PAGE_SCOPE_CONTENT_TYPE, DEFAULT_PATHS_BY_CONTENT_TYPE } from "./stores";
 import { tryGetPathFromData } from "./tryGetPathFromData";
 
 // `undefined | null | ""` all mean "no usable id" — fall back to default paths.
 function isMissingId(id: unknown): boolean {
   return id === undefined || id === null || id === "";
+}
+
+const EMPTY_KEY_SET: ReadonlySet<string> = new Set();
+
+function setsEqual(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
+  return a.size === b.size && [...a].every(key => b.has(key));
 }
 
 export interface CreateSduiDataBinderOptions {
@@ -202,24 +208,44 @@ export function buildDataBindingSourcesSignal(
   inputDataSignal: ReadonlySignal<Record<string, unknown> | undefined>,
   hydrationDataSpecs: HydrationDataSpec[] | undefined,
   ctx: BindingContext,
+  pendingInputKeysSignal?: ReadonlySignal<ReadonlySet<string>>,
 ): ReadonlySignal<DataBindingSources> {
+  // Truly unkeyed specs (`idSource: "none"` with no default ID path) must
+  // remain eligible for direct-store lookup. Every other spec is intended
+  // to resolve an entity ID, so retain its key even while that ID is absent;
+  // this prevents alias-less specs from falling through to an empty-ID read.
+  const entitySourceKeys = new Set(
+    hydrationDataSpecs
+      ?.filter(
+        spec =>
+          spec.idSource !== "none" || DEFAULT_PATHS_BY_CONTENT_TYPE[spec.contentType] !== undefined,
+      )
+      .map(spec => spec.alias || spec.contentType) ?? [],
+  );
+
   return computedEqual(
     () => {
       // Store-owned input-data signals start as `undefined` and flip to a
       // record on first seed.
-      const inputData = inputDataSignal.value ?? {};
+      const inputDataValue = inputDataSignal.value;
+      const inputData = inputDataValue ?? {};
+      const isInputDataReady = inputDataValue !== undefined;
+      const pendingInputKeys = pendingInputKeysSignal?.value ?? EMPTY_KEY_SET;
+      const pendingEntitySourceKeys = new Set<string>();
       const sources: DataBindingSource[] = [];
       const sourcesByKey = new Map<string, DataBindingSource>();
 
       if (hydrationDataSpecs) {
         for (const spec of hydrationDataSpecs) {
           let id: unknown;
+          let isEntityIdPending = false;
           switch (spec.idSource) {
             case "literal":
               id = spec.literalId;
               break;
             case "inputPath":
               id = resolveInputPath(inputData, spec.inputPath, ctx);
+              isEntityIdPending = pendingInputKeys.has(spec.inputPath.split(".")[0] ?? "");
               break;
             case "none":
               break;
@@ -230,9 +256,18 @@ export function buildDataBindingSourcesSignal(
             if (defaultPaths) {
               for (const defaultKey of defaultPaths) {
                 id = inputData[defaultKey];
-                if (!isMissingId(id)) break;
+                if (!isMissingId(id)) {
+                  isEntityIdPending = pendingInputKeys.has(defaultKey);
+                  break;
+                }
+                if (pendingInputKeys.has(defaultKey)) isEntityIdPending = true;
               }
             }
+          }
+
+          if (isEntityIdPending) {
+            pendingEntitySourceKeys.add(spec.alias || spec.contentType);
+            continue;
           }
 
           if (!isMissingId(id)) {
@@ -287,14 +322,26 @@ export function buildDataBindingSourcesSignal(
         }
       }
 
-      return { sources, sourcesByKey, inputData };
+      return {
+        sources,
+        sourcesByKey,
+        entitySourceKeys,
+        pendingInputKeys,
+        pendingEntitySourceKeys,
+        inputData,
+        isInputDataReady,
+      };
     },
     // Equality: structural compare on `sources` + reference equality on
-    // `inputData`. `sourcesByKey` parity follows from `sources` parity.
+    // `inputData`. `sourcesByKey` parity follows from `sources` parity, and
+    // `entitySourceKeys` is stable for the lifetime of this computed.
     // On equal, `computedEqual` returns the previous value so downstream
     // consumers don't re-run on no-op input flips.
     (prev, next) => {
       if (prev.inputData !== next.inputData) return false;
+      if (prev.isInputDataReady !== next.isInputDataReady) return false;
+      if (!setsEqual(prev.pendingInputKeys, next.pendingInputKeys)) return false;
+      if (!setsEqual(prev.pendingEntitySourceKeys, next.pendingEntitySourceKeys)) return false;
       if (prev.sources.length !== next.sources.length) return false;
       for (let i = 0; i < prev.sources.length; i += 1) {
         const prevSource = prev.sources[i];
@@ -334,12 +381,21 @@ function resolveFromSource(
  * the binder's stores. Returns a `HydrationRead` carrying value + status.
  *
  * Resolution order:
- * 1. Input data, full path — `Ready` (input data is page-load-time).
- * 2. Hydration source via `sourcesByKey[head]` — store's per-id status.
- * 3. Direct store lookup on `head` — for unkeyed stores (`responsive`,
- *    `auth`) and host-registered stores not declared as a hydration source.
- * 4. Miss — `NOT_READY_READ`. The wrapping `computed` stays subscribed,
- *    so a later write to the missing store flips the read to `Ready`.
+ * 1. Pending isolated-scope input key — `NOT_READY_READ`.
+ * 2. Present input data, full path — `Ready`.
+ * 3. Hydration source via `sourcesByKey[head]` — store's per-id status.
+ * 4. Hydration source whose entity ID input is pending — `NOT_READY_READ`.
+ * 5. Unresolved entity source — `NOT_READY_READ` before input seed,
+ *    `READY_UNDEFINED_READ` afterward.
+ * 6. Direct store lookup on `head` — `clientPageScope` uses `ctx.configKey`
+ *    as its entity id; unkeyed stores (`responsive`, `auth`) use an empty id.
+ * 7. Other miss before input data's first seed — `NOT_READY_READ`.
+ * 8. Other miss after input data is ready — `READY_UNDEFINED_READ`. At that point,
+ *    a head that is neither an alias nor a registered store names an absent
+ *    input-data field. Reporting `NotReady` would strand `conditional` props:
+ *    option selection stops at the first non-`Ready` condition, so a branch
+ *    testing a field that only exists on a few payloads (e.g.
+ *    `universe_items` on a song feed) would block every later branch forever.
  *
  * Telemetry: fires `InvalidBindingPath` for shape bugs (non-string, empty)
  * but not for paths that resolve to `undefined` — that's a legitimate
@@ -375,15 +431,27 @@ export function resolveBindingPath(
   const fieldPath = segments.slice(1);
   const bindingSources = dataSources.value;
 
+  if (bindingSources.pendingInputKeys.has(head)) return NOT_READY_READ;
+
   const inputValue = tryGetPathFromData(bindingSources.inputData, segments);
   if (inputValue !== undefined) return { value: inputValue, status: DataStatus.Ready };
 
   const source = bindingSources.sourcesByKey.get(head);
   if (source) return resolveFromSource(source, fieldPath, dataBinder);
 
+  if (bindingSources.pendingEntitySourceKeys.has(head)) return NOT_READY_READ;
+
+  if (bindingSources.entitySourceKeys.has(head)) {
+    return bindingSources.isInputDataReady ? READY_UNDEFINED_READ : NOT_READY_READ;
+  }
+
   if (dataBinder.hasStore(head)) {
+    if (head === CLIENT_PAGE_SCOPE_CONTENT_TYPE) {
+      if (!ctx.configKey || fieldPath.length === 0) return READY_UNDEFINED_READ;
+      return dataBinder.getField(head, fieldPath, ctx.configKey);
+    }
     return dataBinder.getField(head, fieldPath, "");
   }
 
-  return NOT_READY_READ;
+  return bindingSources.isInputDataReady ? READY_UNDEFINED_READ : NOT_READY_READ;
 }

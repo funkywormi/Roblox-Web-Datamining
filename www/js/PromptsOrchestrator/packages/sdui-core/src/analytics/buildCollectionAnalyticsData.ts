@@ -2,6 +2,7 @@ import { SduiErrorName } from "../errors/SduiErrors";
 import { reportError } from "../errors/SduiLogger";
 import type {
   AnalyticsContext,
+  AnalyticsFieldMap,
   CollectionAnalyticsData,
   ItemAnalyticsData,
   SduiErrorReporter,
@@ -28,8 +29,23 @@ export const DUMMY_COLLECTION_DATA: CollectionAnalyticsData = {
 
 const UNSET_COLLECTION_POSITION = -1;
 
+function parseCollectionId(input: AnalyticsFieldMap[string] | undefined): string | number {
+  if (typeof input === "string") {
+    if (input.trim() === "") {
+      return input;
+    }
+    const parsed = Number(input);
+    return Number.isFinite(parsed) ? parsed : input;
+  }
+  return typeof input === "number" ? input : DUMMY_COLLECTION_DATA.collectionId;
+}
+
 export function isValidCollectionAnalyticsData(data: CollectionAnalyticsData): boolean {
-  return data.collectionId >= 0 && data.collectionPosition >= 0 && data.totalNumberOfItems >= 0;
+  const hasValidCollectionId =
+    typeof data.collectionId === "string"
+      ? data.collectionId.trim() !== ""
+      : data.collectionId >= 0;
+  return hasValidCollectionId && data.collectionPosition >= 0 && data.totalNumberOfItems >= 0;
 }
 
 export function isValidItemAnalyticsData(data: ItemAnalyticsData): boolean {
@@ -58,10 +74,7 @@ export function buildCollectionAnalyticsData(
 
   const collectionData: CollectionAnalyticsData = {
     ...mergedFields,
-    collectionId: parseAnalyticsField(
-      mergedFields.collectionId,
-      DUMMY_COLLECTION_DATA.collectionId,
-    ),
+    collectionId: parseCollectionId(mergedFields.collectionId),
     collectionPosition: parseAnalyticsField(
       mergedFields.collectionPosition,
       UNSET_COLLECTION_POSITION,
@@ -98,13 +111,15 @@ export function buildCollectionAnalyticsData(
 
 /**
  * Builds per-item analytics for impressions. Requires template `id`;
- * uses list index (1-based) when `itemPosition` is not on the context.
+ * uses an explicit canonical position when supplied, otherwise context data
+ * followed by the one-based local list index.
  */
 export function buildItemAnalyticsData(
   childAnalyticsContext: AnalyticsContext | undefined,
   itemIndex: number,
   pageContext?: SduiPageContext,
   errorReporter?: SduiErrorReporter,
+  itemPositionOverride?: number,
 ): ItemAnalyticsData | null {
   if (!childAnalyticsContext) {
     return null;
@@ -116,7 +131,8 @@ export function buildItemAnalyticsData(
   const itemData: ItemAnalyticsData = {
     ...mergedFields,
     id: parseAnalyticsField(mergedFields.id, DUMMY_ITEM_DATA.id),
-    itemPosition: parseAnalyticsField(mergedFields.itemPosition, defaultItemPosition),
+    itemPosition:
+      itemPositionOverride ?? parseAnalyticsField(mergedFields.itemPosition, defaultItemPosition),
     itemComponentType: parseAnalyticsField(
       mergedFields.itemComponentType,
       DUMMY_ITEM_DATA.itemComponentType,

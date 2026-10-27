@@ -1,18 +1,5 @@
-import { CacheStatus, type SduiApiStore } from "@rbx/sdui-core";
+import { CacheStatus, isNonEmptyArray, isNonEmptyRecord, type SduiApiStore } from "@rbx/sdui-core";
 import { useSduiCacheSubscription } from "@rbx/sdui-core/client";
-
-function isNonEmptyRecord(value: unknown): boolean {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    !Array.isArray(value) &&
-    Object.keys(value).length > 0
-  );
-}
-
-function isNonEmptyArray(value: unknown): boolean {
-  return Array.isArray(value) && value.length > 0;
-}
 
 function isSearchResultsFeedEmpty(
   status: CacheStatus | undefined,

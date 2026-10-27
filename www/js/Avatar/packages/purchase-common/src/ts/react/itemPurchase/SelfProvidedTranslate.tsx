@@ -66,15 +66,14 @@ export type SelfProvidedTranslateProps = {
  *    (backed by `window.Roblox.Lang`) and source `translate` there, matching the old
  *    self-sufficient `withTranslations` behavior so external consumers need no provider.
  *
- * The injected path currently has NO callers — the `.NET` self-wrap path is the only one exercised
- * in production today. Two contracts a future Next.js host must honor when it starts injecting
- * `translate` (deferred to the avatar->Next.js migration, hence not enforced here yet):
- *  1. The injected translator must resolve keys across ALL itemPurchase namespaces (see the
- *     `*_NAMESPACES` lists in `useTranslate.ts`) — a translator scoped to only some of them renders
- *     blank strings for keys in the rest (e.g. the 2SV-required purchase flow).
- *  2. Propagation to nested boundaries is via React context, which does not cross a detached render
- *     root. A subtree rendered through `renderToString` or mounted into a separate root won't
- *     inherit the injected translator and must be passed `translate` explicitly.
+ * The Next.js avatar page injects through `PurchaseTranslateProvider`. A Next.js host must:
+ *  1. Inject a translator that covers every itemPurchase namespace (the `*_NAMESPACES` lists in
+ *     `useTranslate.ts`). Keys in a missing namespace render blank, e.g. the 2SV purchase flow.
+ *  2. Keep subtrees in the same React tree. Context doesn't reach `renderToString` output or a
+ *     separate root; those need `translate` passed explicitly. The upsell modals use the portal
+ *     host that ItemPurchase renders, so they're covered.
+ *  3. Render `ItemPurchase` inside the page's next-intl provider. The upsell service reads its
+ *     namespaces from there (see `useUpsellTranslationProvider`).
  */
 export const SelfProvidedTranslate = ({
   translate,

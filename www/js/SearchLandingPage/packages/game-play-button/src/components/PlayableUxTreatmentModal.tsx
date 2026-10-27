@@ -1,6 +1,5 @@
-import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
 import { TPlayableUxTreatmentData } from "../types/playButtonTypes";
-import { translations } from "../constants/translations";
+import { usePlayButtonTranslate } from "../hooks/usePlayButtonTranslate";
 import UpsellModal from "./UpsellModal";
 
 type TPlayableUxTreatmentModalProps = {
@@ -15,8 +14,8 @@ const PlayableUxTreatmentModal = ({
   isModalOpen,
   onConfirm,
   onDismiss,
-  translate,
-}: TPlayableUxTreatmentModalProps & WithTranslationsProps): React.JSX.Element => {
+}: TPlayableUxTreatmentModalProps): React.JSX.Element => {
+  const translate = usePlayButtonTranslate();
   return (
     <UpsellModal
       titleText={treatmentData.titleText}
@@ -32,7 +31,4 @@ const PlayableUxTreatmentModal = ({
   );
 };
 
-export default withTranslations<TPlayableUxTreatmentModalProps>(
-  PlayableUxTreatmentModal,
-  translations,
-);
+export default PlayableUxTreatmentModal;

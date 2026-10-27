@@ -19,7 +19,11 @@ export const pageName = "downloadV2";
 
 export const installInstructionsDelayMs = 1000;
 
-export const appDownloadTranslationConfig = ["Feature.DownloadLanding", "Common.VisitGame"];
+export {
+  appDownloadNamespaces,
+  downloadDialogNamespaces,
+  launchFailureDialogNamespaces,
+} from "./namespaces";
 
 export const downloadPageStrings = {
   downloadPageHeader: "Heading.DownloadPage",

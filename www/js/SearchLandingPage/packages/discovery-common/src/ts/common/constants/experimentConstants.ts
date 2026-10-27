@@ -41,6 +41,7 @@ const defaultValues = {
     HasUpdatedRecommendedSortTitle: true,
     IsGamePreviewVideoEnabled: false,
     HasTopSongsEnabled: false,
+    IsPlayOnWebEnabled: false,
   },
   gameDetailsBtid: {
     isDownloadButtonOverrideEnabled: false,

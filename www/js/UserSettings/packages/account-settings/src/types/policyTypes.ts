@@ -16,6 +16,7 @@ export type TSettingsUIPolicyBody = {
   displayAccountRestrictions: boolean;
   displayTradeQualityFilter: boolean;
   isTradeQualityFilterInSettingsRolledOut: boolean;
+  showProfileVisibilitySettings: boolean;
   displaySocialMedia: boolean;
   displayAccountDeletion: boolean;
   display17PlusDescription: boolean;

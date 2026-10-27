@@ -1,4 +1,4 @@
-import { arrayIncludes } from "@rbx/core-types";
+import { arrayIncludes } from "@rbx/core-lib";
 
 // We need these explicitly defined here because the presence of the explicit strings
 // tells the bundler which icon css classes to include in the bundle.

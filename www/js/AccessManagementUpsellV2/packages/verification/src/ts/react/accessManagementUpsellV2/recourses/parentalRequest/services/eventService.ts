@@ -1,4 +1,4 @@
-import { eventStreamService } from 'core-roblox-utilities';
+import * as eventStreamService from '@rbx/core-scripts/event-stream';
 import RequestType from '../enums/RequestType';
 import PunishmentType from '../enums/PunishmentType';
 import parentalRequestConstants from '../constants/parentalRequestConstants';
@@ -35,8 +35,11 @@ const generateState = (
   }
 };
 
-const getContext = (requestType: RequestType, details?: Record<string, unknown>) => {
-  let context;
+type TEventContext = Record<'parentalEntry' | 'settingsAge' | 'settingsRequestSent', string>;
+
+const getContext = (requestType: RequestType, details?: Record<string, unknown>): TEventContext => {
+  // Stays unassigned for a non-chargeback LiftPunishment.
+  let context!: TEventContext;
   switch (requestType) {
     case RequestType.LiftPunishment: {
       if (details?.punishmentType === PunishmentType.Chargeback) {

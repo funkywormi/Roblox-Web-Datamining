@@ -4,8 +4,6 @@ import { getUrlWithLocale } from "@rbx/core-scripts/util/url";
 const { apiGatewayUrl } = environmentUrls;
 
 export default {
-  getAgeRecommendationUrl: (): string =>
-    `${apiGatewayUrl}/experience-guidelines-api/experience-guidelines/get-age-recommendation`,
   getAssetTextFilterSettingsUrl: (universeId: string): string =>
     `${apiGatewayUrl}/asset-text-filter-settings/public/universe/${universeId}`,
   experienceGuidelinesPolicyPageUrl: (locale: string): string =>

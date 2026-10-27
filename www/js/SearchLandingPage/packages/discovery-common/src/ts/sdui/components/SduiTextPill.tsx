@@ -48,7 +48,7 @@ const SduiTextPill = ({
     <TextPill
       text={text}
       textColor={textColor ?? tokens.LightMode.Content.Emphasis}
-      fontStyle={fontStyle ?? tokens.Typography.LabelSmall}
+      fontStyle={fontStyle ?? { ...tokens.Typography.LabelSmall, FontFamily: "inherit" }}
       backgroundColor={backgroundColor ?? tokens.Color.Extended.White.White_100}
       backgroundTransparency={backgroundTransparency ?? 0}
       verticalPadding={tokens.Padding.XSmall}

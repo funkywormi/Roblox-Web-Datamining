@@ -3,7 +3,6 @@ import classNames from "classnames";
 import { Button } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../utils/translate";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
-import { useAvatarEditingAccessContext } from "../contexts/AvatarEditingAccessContext";
 import {
   LayeredClothingBodyTypeWarningDialog,
   ItemLimitExceededDialog,
@@ -29,6 +28,7 @@ import { useAvatarTabsContext } from "../contexts/AvatarTabsContext";
 import RedrawThumbnailButton from "./RedrawThumbnailButton";
 import FacialAnimationSwitch from "./FacialAnimationSwitch";
 import useOutfitHelpers from "../hooks/useOutfitHelpers";
+import useAvatarTimeoutDialog from "../hooks/useAvatarTimeoutDialog";
 import { useAvatarBodyColorsContext } from "../contexts/AvatarBodyColorsContext";
 import { trackAvatarEditorClick, AvatarEditorTrackingEvents } from "../utils/axTracking";
 import { sendAXTracking, AXAnalyticsConstants } from "../utils/axAnalyticsService";
@@ -38,13 +38,8 @@ function AvatarPage(): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const [version, setVersion] = useState<number>(0);
   const timeoutRef = useRef<number | undefined>(undefined);
-  const [isEditingBlockedDialogOpen, setIsEditingBlockedDialogOpen] = useState(false);
-
-  const {
-    isAvatarEditingBlocked,
-    formattedBlockEndTime,
-    isLoading: isAccessLoading,
-  } = useAvatarEditingAccessContext();
+  const { isEditingBlockedDialogOpen, closeEditingBlockedDialog, formattedBlockEndTime } =
+    useAvatarTimeoutDialog();
 
   // IXP flag - will be wired to experimentation service
   // When true, shows inline toggle instead of Advanced Editor modal button
@@ -71,12 +66,6 @@ function AvatarPage(): React.ReactElement {
     sendAXTracking({ itemName: AXAnalyticsConstants.AvatarEditorView });
     trackCounter("PageView", { host });
   }, []);
-
-  useEffect(() => {
-    if (!isAccessLoading && isAvatarEditingBlocked && formattedBlockEndTime) {
-      setIsEditingBlockedDialogOpen(true);
-    }
-  }, [isAccessLoading, isAvatarEditingBlocked, formattedBlockEndTime]);
 
   const forceRefreshThumbnail = useCallback(() => {
     setVersion(prevVersion => prevVersion + 1);
@@ -216,9 +205,7 @@ function AvatarPage(): React.ReactElement {
 
       <AvatarEditingBlockedDialog
         isOpen={isEditingBlockedDialogOpen}
-        closeDialog={() => {
-          setIsEditingBlockedDialogOpen(false);
-        }}
+        closeDialog={closeEditingBlockedDialog}
         formattedBlockEndTime={formattedBlockEndTime || ""}
       />
 

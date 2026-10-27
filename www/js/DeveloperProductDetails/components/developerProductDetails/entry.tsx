@@ -5,7 +5,7 @@ import { ready } from "@rbx/core-scripts/legacy/core-utilities";
 import "@rbx/products/css/common/developerProductDetailsPage.scss";
 
 const developerProductDetailsPageContainer = (): HTMLElement | null =>
-  document.getElementById('developer-product-details-container');
+  document.getElementById("developer-product-details-container");
 
 ready(() => {
   if (developerProductDetailsPageContainer()) {

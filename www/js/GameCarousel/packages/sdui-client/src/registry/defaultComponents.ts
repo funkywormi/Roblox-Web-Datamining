@@ -12,6 +12,7 @@ import { SduiTile } from "../components/sduiTile/SduiTile";
 import { SduiImage } from "../components/SduiImage";
 import { SduiPlayButton } from "../components/SduiPlayButton";
 import { SduiText } from "../components/SduiText";
+import { SduiLinkText } from "../components/SduiLinkText";
 import { SduiDownloadButton } from "../components/SduiDownloadButton";
 import { SduiDialog } from "../components/SduiDialog";
 import { SduiVideoPlayer } from "../components/sduiVideoPlayer/SduiVideoPlayer";
@@ -47,6 +48,9 @@ export const DEFAULT_CLIENT_COMPONENTS: Partial<Record<UiComponentType, SduiComp
     },
     [UiComponentType.TEXT]: {
       component: SduiText,
+    },
+    [UiComponentType.LINK_TEXT]: {
+      component: SduiLinkText,
     },
     [UiComponentType.COLLECTION_CAROUSEL]: {
       component: SduiCollectionCarousel,

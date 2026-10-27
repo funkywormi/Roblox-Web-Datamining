@@ -168,6 +168,9 @@ export enum UserSetting {
   robuxTransferLimits = "robuxTransferLimits",
   iarcAgeRating = "iarcAgeRating",
   allowThirdPartyFriendAccess = "allowThirdPartyFriendAccess",
+  whoCanSeeMyFriendsList = "whoCanSeeMyFriendsList",
+  whoCanSeeMyPastUsernames = "whoCanSeeMyPastUsernames",
+  whoCanSeeMyAboutSection = "whoCanSeeMyAboutSection",
 }
 
 // The type of a given option for a setting

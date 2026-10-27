@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { withTranslations, WithTranslationsProps } from 'react-utilities';
-import { parentalRequestTranslationConfig } from '../../app.config';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
+import { useParentalRequestTranslate } from '../../hooks/useAmpTranslate';
 import { Recourse } from '../../enums';
 import ParentalRequestBroadcast from './components/ParentalRequestBroadcast';
 import useModal from '../../hooks/useModal';
@@ -21,14 +21,14 @@ const ParentalRequestContainer = ({
   value = null,
   source
 }: {
-  translate: WithTranslationsProps['translate'];
+  translate: TranslateFunction;
   recourse: RecourseResponse;
   onHidecallback: () => void;
   onOutcome?: (didSend: boolean) => void;
   isPrologueUsed: boolean;
   value: Record<string, string> | null;
   source?: string;
-}): JSX.Element => {
+}): React.JSX.Element => {
   const { emailSentConfirmation } = parentalRequestConstants.translationKeys;
   const { action: recourseAction, parentConsentTypes } = recourse;
   const consentType = parentConsentTypes?.[0];
@@ -146,4 +146,11 @@ const ParentalRequestContainer = ({
   );
 };
 
-export default withTranslations(ParentalRequestContainer, parentalRequestTranslationConfig);
+const ParentalRequestContainerWithTranslations = (
+  props: Omit<React.ComponentProps<typeof ParentalRequestContainer>, 'translate'> & { translate?: TranslateFunction }
+): React.JSX.Element => {
+  const translate = useParentalRequestTranslate();
+  return <ParentalRequestContainer {...props} translate={translate} />;
+};
+
+export default ParentalRequestContainerWithTranslations;

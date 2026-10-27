@@ -1,16 +1,16 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from "react";
 import {
   Thumbnail2d,
   ThumbnailFormat,
   ThumbnailGamePassIconSize,
-  ThumbnailTypes
-} from '@rbx/thumbnails';
+  ThumbnailTypes,
+} from "@rbx/thumbnails";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
-import { Button } from '@rbx/ui';
-import { createItemPurchase } from '@rbx/legacy-webapp-types/roblox-item-purchase';
-import { TDeveloperProductDetails, TDiscount } from '../../common/types/types';
-import { TGetGameDetails } from '../../common/types/bedev1Types';
-import { FeatureDeveloperProducts } from '../../common/constants/translationConstants';
+import { Button } from "@rbx/ui";
+import { createItemPurchase } from "@rbx/legacy-webapp-types/roblox-item-purchase";
+import { TDeveloperProductDetails, TDiscount } from "../../common/types/types";
+import { TGetGameDetails } from "../../common/types/bedev1Types";
+import { FeatureDeveloperProducts } from "../../common/constants/translationConstants";
 
 type DiscountInformation = {
   originalPrice: number;
@@ -57,7 +57,7 @@ type DeveloperProductDetailsBuyButtonProps = {
 const DeveloperProductMetadataAndBuy = ({
   translate,
   developerProductDetailsData,
-  gameDetails
+  gameDetails,
 }: DeveloperProductDetailsBuyButtonProps): JSX.Element => {
   const [ItemPurchase, itemPurchaseService] = createItemPurchase();
 
@@ -73,8 +73,8 @@ const DeveloperProductMetadataAndBuy = ({
         targetId={developerProductDetailsData.TargetId}
         format={ThumbnailFormat.webp}
         altName={developerProductDetailsData.Name}
-        imgClassName='thumbnail'
-        containerClass='gear-passes-asset'
+        imgClassName="thumbnail"
+        containerClass="gear-passes-asset"
       />
     );
   }, [developerProductDetailsData.Name, developerProductDetailsData.TargetId]);
@@ -82,10 +82,11 @@ const DeveloperProductMetadataAndBuy = ({
   return (
     <React.Fragment>
       <Button
-        variant='contained'
-        className='buy-button'
+        variant="contained"
+        className="buy-button"
         data-product-id={developerProductDetailsData.ProductId}
-        onClick={onPurchase}>
+        onClick={onPurchase}
+      >
         {translate(FeatureDeveloperProducts.LabelBuy)}
       </Button>
       <ItemPurchase
@@ -93,7 +94,7 @@ const DeveloperProductMetadataAndBuy = ({
         thumbnail={thumbnailForPurchaseDialog}
         productId={developerProductDetailsData.ProductId}
         assetName={developerProductDetailsData.Name}
-        assetType='Product'
+        assetType="Product"
         sellerName={gameDetails.creator.name}
         expectedCurrency={1}
         expectedSellerId={gameDetails.creator.id} // sellerId is not used in dev product purchase request

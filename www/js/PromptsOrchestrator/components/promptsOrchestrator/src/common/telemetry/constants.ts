@@ -11,4 +11,5 @@ export const PromptErrorName = {
   UnsupportedOverlayRenderer: `${PROMPTS_APPLICATION_NAME}:UnsupportedOverlayRenderer`,
   InvalidOverlayPrompt: `${PROMPTS_APPLICATION_NAME}:InvalidOverlayPrompt`,
   OverlayTerminalCallbackError: `${PROMPTS_APPLICATION_NAME}:OverlayTerminalCallbackError`,
+  SiteHeaderDoesNotExist: `${PROMPTS_APPLICATION_NAME}:SiteHeaderDoesNotExist`,
 } as const;

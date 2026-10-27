@@ -1,36 +1,37 @@
 import React, { useEffect } from 'react';
-import Roblox from 'Roblox';
-import { TranslateFunction, withTranslations } from 'react-utilities';
+import { window } from '@rbx/core-lib/browser';
 import { useTranslatedLegallySensitiveContentAndActions } from './services/legallySensitiveContentService';
-import { legallySensitiveContentTranslationConfig } from '../accessManagementUpsellV2/app.config';
+import { useLegallySensitiveContentTranslate } from '../accessManagementUpsellV2/hooks/useAmpTranslate';
 import ConsentName from './enums/ConsentName';
 
+const isNextJs = process.env.NEXT_PUBLIC_IS_NEXTJS === 'true';
+
 // This container is used to expose the legally sensitive language service to the rest of the app
-export const LegallySensitiveContentContainer = ({
-  translate
-}: {
-  translate: TranslateFunction;
-}): JSX.Element => {
+export const LegallySensitiveContentContainer = (): React.JSX.Element => {
+  const translate = useLegallySensitiveContentTranslate();
+
   useEffect(() => {
-    Roblox.LegallySensitiveContentService = {
-      useLegallySensitiveContentAndActions: (
-        consentName: ConsentName,
-        surface: string,
-        translationArgs?: Record<string, unknown>
-      ) =>
-        useTranslatedLegallySensitiveContentAndActions(
-          translate,
-          consentName,
-          surface,
-          translationArgs
-        )
-    } as unknown as typeof Roblox.LegallySensitiveContentService;
+    if (isNextJs || !window?.Roblox) {
+      return;
+    }
+    Object.assign(window.Roblox, {
+      LegallySensitiveContentService: {
+        useLegallySensitiveContentAndActions: (
+          consentName: ConsentName,
+          surface: string,
+          translationArgs?: Record<string, unknown>
+        ) =>
+          useTranslatedLegallySensitiveContentAndActions(
+            translate,
+            consentName,
+            surface,
+            translationArgs
+          )
+      }
+    });
   }, [translate]);
 
   return <div id='legally-sensitive-content-component' />;
 };
 
-export default withTranslations(
-  LegallySensitiveContentContainer,
-  legallySensitiveContentTranslationConfig
-);
+export default LegallySensitiveContentContainer;

@@ -22,24 +22,24 @@ type GuacConfig = {
  */
 async function loadGuacConfigNonThrowing(): Promise<GuacConfig> {
   try {
-    const data = await callBehaviour<GuacResponse>('abuse-reporting-revamp');
+    const data = await callBehaviour<GuacResponse>("abuse-reporting-revamp");
 
     if (!data) {
       return {
-        EnableDevProducts: false
+        EnableDevProducts: false,
       };
     }
 
     return {
-      EnableDevProducts: Boolean(data.EnableDevProducts)
+      EnableDevProducts: Boolean(data.EnableDevProducts),
     };
   } catch (e) {
     return {
-      EnableDevProducts: false
+      EnableDevProducts: false,
     };
   }
 }
 
 export default {
-  loadGuacConfigNonThrowing
+  loadGuacConfigNonThrowing,
 };

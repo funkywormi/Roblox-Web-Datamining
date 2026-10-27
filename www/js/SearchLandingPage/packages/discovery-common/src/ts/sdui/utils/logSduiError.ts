@@ -1,5 +1,6 @@
 import { EventContext, parseEventParams } from "@rbx/unified-logging";
 import { sendEvent } from "@rbx/core-scripts/event-stream";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { homePage } from "../../common/constants/configConstants";
 import { SessionInfoType } from "../../common/constants/eventStreamConstants";
 import { TOmniRecommendationSort } from "../../common/types/bedev2Types";
@@ -128,7 +129,7 @@ export const logSduiError = (
   errorMessage: string,
   pageContext: TSduiPageContext | undefined,
 ): void => {
-  window.EventTracker?.fireEvent(errorName);
+  fireEvent(errorName);
 
   const params = {
     errorName,

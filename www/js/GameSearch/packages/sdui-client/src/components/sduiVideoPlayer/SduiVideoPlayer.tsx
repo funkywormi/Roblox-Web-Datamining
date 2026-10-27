@@ -13,7 +13,7 @@ import {
 } from "@rbx/video-player";
 import { CacheProvider, createCache, UIThemeProvider } from "@rbx/ui";
 import { type SduiRendererInjectedProps, type SduiScaleType } from "@rbx/sdui-core";
-import { SduiErrorBoundary, useSduiServices } from "@rbx/sdui-core/client";
+import { SduiErrorBoundary, useClientOnlyValue, useSduiServices } from "@rbx/sdui-core/client";
 import { getVideoPlayerStyles } from "./videoPlayerStyleUtils";
 import { VideoPlayerLoadingFallback } from "./VideoPlayerLoadingFallback";
 import { resolveVideoMaxQuality, VIDEO_PLAYBACK_BEHAVIOR } from "./sduiVideoPlayerConstants";
@@ -25,8 +25,12 @@ import {
   reportSduiVideoError,
 } from "../../utils/sduiVideoAnalyticsUtils";
 
-const videoPlayerCache = createCache();
+let videoPlayerCache: ReturnType<typeof createCache> | undefined;
 
+function getVideoPlayerCache(): ReturnType<typeof createCache> {
+  videoPlayerCache ??= createCache();
+  return videoPlayerCache;
+}
 export interface SduiVideoPlayerProps extends SduiRendererInjectedProps {
   videoAssetId?: string;
   loop?: boolean;
@@ -74,10 +78,17 @@ function SduiVideoPlayerInner({
     };
   }, []);
 
+  // TODO (sshetty): getCurrentEnvironment and @rbx/video-player should be updated to
+  // be isomorphic.
   const environment = useMemo(() => getCurrentEnvironment(), []);
-  const browserCompatibility = useMemo(() => isVideoPlayerSupportedByBrowser(), []);
-  const isBrowserSupported = browserCompatibility.isSupported;
-  const showFailedFallback = hasFailed || !isBrowserSupported;
+  // null until after mount so SSR HTML and the first client render match (loading
+  // poster, no player). Resolving during render would mark the browser unsupported
+  // on the server and supported after hydrate.
+  const browserCompatibility = useClientOnlyValue(isVideoPlayerSupportedByBrowser, null);
+  const isSupportResolved = browserCompatibility !== null;
+  const isBrowserSupported = browserCompatibility?.isSupported === true;
+  const isBrowserUnsupported = isSupportResolved && !isBrowserSupported;
+  const showFailedFallback = hasFailed || isBrowserUnsupported;
 
   const cmcdUserKey = useMemo(() => {
     const userId = authenticatedUser()?.id;
@@ -118,7 +129,7 @@ function SduiVideoPlayerInner({
   }, []);
 
   useEffect(() => {
-    if (isBrowserSupported) {
+    if (browserCompatibility === null || browserCompatibility.isSupported) {
       return;
     }
 
@@ -133,7 +144,7 @@ function SduiVideoPlayerInner({
       formatErrorDetails("BrowserUnsupported", message),
       pageContext,
     );
-  }, [browserCompatibility.errors, errorReporter, isBrowserSupported, pageContext]);
+  }, [browserCompatibility, errorReporter, pageContext]);
 
   const playVideo = useCallback(async () => {
     if (!isBrowserSupported) {
@@ -235,7 +246,7 @@ function SduiVideoPlayerInner({
   });
 
   return (
-    <CacheProvider cache={videoPlayerCache}>
+    <CacheProvider cache={getVideoPlayerCache()}>
       <UIThemeProvider
         theme={theme === "dark" ? "foundation-dark" : "foundation-light"}
         cssBaselineMode="disabled"

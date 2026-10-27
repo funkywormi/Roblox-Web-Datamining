@@ -54,7 +54,7 @@ const SduiTileFooter = ({
       onActivated={onActivated?.onActivated}
       linkPath={onActivated?.linkPath}
       textColor={textColor ?? tokens.Color.Content.Default}
-      fontStyle={fontStyle ?? tokens.Typography.BodyMedium}
+      fontStyle={fontStyle ?? { ...tokens.Typography.BodyMedium, FontFamily: "inherit" }}
       textIconGap={textIconGap ?? tokens.Gap.XSmall}
       sectionGap={sectionGap ?? tokens.Gap.Small}
       // We only support the icons in _sduiIcons.scss, which are 16px, so this is non-configurable

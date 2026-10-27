@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { TranslateFunction } from 'react-utilities';
-import { IModalService } from 'react-style-guide';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
+import type { IModalService } from '../../../components/StyleGuide';
 import { useSelector } from 'react-redux';
 import useModal from '../../../hooks/useModal';
 import { Recourse, UpsellStage } from '../../../enums';
@@ -31,7 +31,7 @@ const FaePrologue = ({
   onHide: () => void;
   recourseParameters: Record<string, string> | null;
   source?: string;
-}): [JSX.Element, IModalService] => {
+}): [React.JSX.Element, IModalService] => {
   const dispatch = useAppDispatch();
   const featureName = useSelector(selectFeatureName)!;
   const featureAccess = useSelector(selectFeatureAccess);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { WithTranslationsProps } from 'react-utilities';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { Recourse } from '../../enums';
 import { RecourseResponse } from '../../types/AmpTypes';
 import RequestType from './enums/RequestType';
@@ -16,12 +16,12 @@ function FAEVpcPrologue({
   onProceed,
   source
 }: {
-  translate: WithTranslationsProps['translate'];
+  translate: TranslateFunction;
   onHide: () => void;
   recourseParameters: Record<string, string>;
   onProceed: () => void;
   source?: string;
-}): JSX.Element {
+}): React.JSX.Element {
   const [el] = VpcPrologue({ translate, onHide, recourseParameters, onProceed, source });
   return el;
 }
@@ -34,12 +34,12 @@ function VPCForFAETransformContainer({
   isPrologueUsed,
   source
 }: {
-  translate: WithTranslationsProps['translate'];
+  translate: TranslateFunction;
   onHidecallback: () => void;
   value: Record<string, string> | null;
   isPrologueUsed: boolean;
   source?: string;
-}): JSX.Element {
+}): React.JSX.Element {
   const [syntheticRecourse, setSyntheticRecourse] = useState<RecourseResponse | null>(null);
   const [prologueCompleted, setPrologueCompleted] = useState(false);
 

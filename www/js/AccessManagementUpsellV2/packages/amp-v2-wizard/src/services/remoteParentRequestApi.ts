@@ -1,5 +1,5 @@
-import { get, post } from "@rbx/core-scripts/http";
 import { EnvironmentUrls } from "@rbx/environment-urls";
+import transport from "./requestTransport";
 
 export type ParentRequestResponse = {
   lockedUntil: string;
@@ -47,7 +47,7 @@ function rememberCooldown(
 
 export const remoteParentRequestApi: RemoteParentRequestApi = {
   async isChildSubjectToParentalControls() {
-    const response = await get<{ access?: string }>({
+    const response = await transport.get<{ access?: string }>({
       url: featureAccessUrl,
       withCredentials: true,
       retryable: true,
@@ -56,7 +56,7 @@ export const remoteParentRequestApi: RemoteParentRequestApi = {
   },
 
   async getLinkedParentEmails() {
-    const response = await get<{ parentEmails?: string[] }>({
+    const response = await transport.get<{ parentEmails?: string[] }>({
       url: parentEmailsUrl,
       withCredentials: true,
     });
@@ -64,7 +64,7 @@ export const remoteParentRequestApi: RemoteParentRequestApi = {
   },
 
   async sendToAllParents(requestType, requestDetails, analyticsSessionId) {
-    const response = await post<ParentRequestResponse>(
+    const response = await transport.post<ParentRequestResponse>(
       { url: sendToAllParentsUrl, withCredentials: true },
       { requestType, requestDetails, ...(analyticsSessionId ? { analyticsSessionId } : {}) },
     );
@@ -73,7 +73,7 @@ export const remoteParentRequestApi: RemoteParentRequestApi = {
   },
 
   async sendToNewParent(email, requestType, requestDetails, auditData, analyticsSessionId) {
-    const response = await post<ParentRequestResponse>(
+    const response = await transport.post<ParentRequestResponse>(
       {
         url: sendToNewParentUrl,
         withCredentials: true,

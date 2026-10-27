@@ -1,4 +1,4 @@
-import { TranslateFunction } from 'react-utilities';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { PrologueConstants } from './viewConstants';
 import ExpNewChildModal from '../../enums/ExpNewChildModal';
 import { Recourse } from '../../enums';

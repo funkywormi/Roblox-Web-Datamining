@@ -1,10 +1,9 @@
 import { useRef } from "react";
 import { EventContext } from "@rbx/unified-logging";
-import { TranslateFunction, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
-import { translations } from "../constants/translations";
 import { TPlayabilityStatus } from "../types/playButtonTypes";
 import { getPlayButtonContextualMessage } from "../utils/getPlayButtonContextualMessage";
 import useContextualMessageImpression from "../hooks/useContextualMessageImpression";
+import { usePlayButtonTranslate } from "../hooks/usePlayButtonTranslate";
 
 export type TContextualMessageAnalyticsConfig = {
   universeId: string;
@@ -22,16 +21,14 @@ export type TContextualMessageProps = {
 };
 
 const ContextualMessage = ({
-  translate,
   playabilityStatus,
   shouldShowVpcPlayButtonUpsells,
   unplayableDisplayText,
   shouldShowNoticeAgreementIfPlayable,
   contextualMessageClassName = "contextual-message",
   analyticsConfig,
-}: TContextualMessageProps & {
-  translate: TranslateFunction;
-}) => {
+}: TContextualMessageProps) => {
+  const translate = usePlayButtonTranslate();
   const containerRef = useRef<HTMLSpanElement>(null);
 
   const resolvedMessage = getPlayButtonContextualMessage(translate, {
@@ -64,4 +61,4 @@ const ContextualMessage = ({
   );
 };
 
-export default withTranslations<TContextualMessageProps>(ContextualMessage, translations);
+export default ContextualMessage;

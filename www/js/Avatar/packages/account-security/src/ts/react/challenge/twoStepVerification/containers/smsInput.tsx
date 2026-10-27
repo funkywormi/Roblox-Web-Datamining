@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Modal } from "react-style-guide";
+import { DialogBody } from "@rbx/foundation-ui";
 import * as TwoStepVerification from "../../../../common/request/types/twoStepVerification";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
-import InputControl, { validateTrue } from "../../../common/inputControl";
+import ChallengeInputControl from "../../../common/challengeInputControl";
+import { validateTrue } from "../../../common/inputValidation";
 import RememberDeviceCheckBox from "../components/rememberDeviceCheckBox";
 import VerificationFooter, { VerificationFooterButton } from "../components/verificationFooter";
 import ResendCodeButton from "../components/resendCodeButton";
@@ -121,7 +122,7 @@ const SmsInput: React.FC<Props> = ({ requestInFlight, setRequestInFlight, childr
     action: verifyCode,
   };
 
-  const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
+  const BodyElement = renderInline ? InlineChallengeBody : DialogBody;
   const lockIconClassName = renderInline
     ? "inline-challenge-protection-shield-icon"
     : "modal-protection-shield-icon";
@@ -143,7 +144,7 @@ const SmsInput: React.FC<Props> = ({ requestInFlight, setRequestInFlight, childr
           <div className={lockIconClassName} />
           <p className={marginBottomXLargeClassName}>{resources.Label.EnterTextCode}</p>
 
-          <InputControl
+          <ChallengeInputControl
             id="two-step-verification-code-input"
             inputType="text"
             disabled={requestInFlight}
@@ -161,7 +162,6 @@ const SmsInput: React.FC<Props> = ({ requestInFlight, setRequestInFlight, childr
             placeholder={resources.Label.CodeInputPlaceholderText(metadata.emailCodeLength)}
             maxLength={metadata.emailCodeLength}
             validCharactersRegEx={REGEX_CODE}
-            hideFeedback
             concealInput
             autoFocus
           />
@@ -184,7 +184,9 @@ const SmsInput: React.FC<Props> = ({ requestInFlight, setRequestInFlight, childr
         <VerificationFooter positiveButton={positiveButton}>
           {children}
           <SupportHelp className={marginBottomClassName} />
-          <p className="text-footer">{resources.Description.SecurityWarningShort}</p>
+          <p className="text-caption-small content-default">
+            {resources.Description.SecurityWarningShort}
+          </p>
         </VerificationFooter>
       </React.Fragment>
     )

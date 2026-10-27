@@ -1,4 +1,4 @@
-import { TranslateFunction } from 'react-utilities';
+import type { TranslateFunction } from '@rbx/core-scripts/react';
 import { UserSetting } from '../enums/UserSetting';
 import {
   TLegallySensitiveData,

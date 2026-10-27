@@ -1,4 +1,4 @@
-import { httpService } from 'core-utilities';
+import httpService, { parseErrorCode } from '@rbx/amp-v2-wizard/services/requestTransport';
 import {
   startPersonaIdVerificationUrlConfig,
   getPersonaVerificationStatusUrlConfig
@@ -25,7 +25,7 @@ export const startPersonaIdVerification = (
       return data;
     })
     .catch(err => {
-      const errorCode = httpService.parseErrorCode(err) as VerificationErrorCode;
+      const errorCode = parseErrorCode(err) as VerificationErrorCode;
       throw new Error(`Error to start ID verification: ${errorCode || 'unknown'}`);
     });
 };
@@ -39,7 +39,7 @@ export const getPersonaVerificationStatus = (token: string) => {
       return data;
     })
     .catch(err => {
-      const errorCode = httpService.parseErrorCode(err) as VerificationErrorCode;
+      const errorCode = parseErrorCode(err) as VerificationErrorCode;
       throw new Error(`Error to get ID verification status: ${errorCode || 'unknown'}`);
     });
 };

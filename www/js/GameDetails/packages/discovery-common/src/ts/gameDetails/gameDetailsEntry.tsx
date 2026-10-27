@@ -2,6 +2,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ShareLinks } from "@rbx/core-scripts/deep-link";
 import { renderWithErrorBoundary, queryClient } from "@rbx/core-scripts/react";
 import { appDownloadNamespaces } from "@rbx/app-download";
+import { gamePlayButtonNamespaces } from "@rbx/game-play-button";
 import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { gameDetailsPage } from "../common/constants/configConstants";
 import InviteLinkInvalidModal from "./components/InviteLinkInvalidModal";
@@ -26,6 +27,8 @@ import { ReviewCategoryType } from "./services/playerFeedbackService";
 import playerFeedbackConstants from "./constants/playerFeedbackConstants";
 import PlayerFeedbackContainer from "./components/PlayerFeedbackContainer";
 import instrumentCreatorByline from "./utils/instrumentCreatorByline";
+
+const playButtonNamespaces = [...appDownloadNamespaces, ...gamePlayButtonNamespaces];
 
 export default (): void => {
   // Don't show the rest of the details page if the experience is unavailable
@@ -85,7 +88,7 @@ export default (): void => {
   if (playButtonConstants.gameDetailsPlayButtonContainer()) {
     renderWithErrorBoundary(
       <QueryClientProvider client={queryClient}>
-        <TranslationProviderSCC namespaces={appDownloadNamespaces}>
+        <TranslationProviderSCC namespaces={playButtonNamespaces}>
           <PlayButton attributionId={attributionId} />
         </TranslationProviderSCC>
       </QueryClientProvider>,

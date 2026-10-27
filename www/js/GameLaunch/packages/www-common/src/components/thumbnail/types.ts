@@ -5,9 +5,15 @@ export const thumbnailTypes = [
   "Outfit",
   "AvatarHeadShot",
   "GameIcon",
+  "GameThumbnail",
+  "GamePass",
+  "Look",
 ] as const;
 
 export type ThumbnailType = (typeof thumbnailTypes)[number];
+
+export const isThumbnailType = (value: string): value is ThumbnailType =>
+  (thumbnailTypes as readonly string[]).includes(value);
 
 export type ThumbnailState = "Completed" | "Pending" | "Blocked" | "Error" | "InReview";
 
