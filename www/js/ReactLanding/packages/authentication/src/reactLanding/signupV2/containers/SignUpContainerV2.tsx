@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 import { TSignupParams } from "@rbx/authentication-common/types/signupTypes";
 import usePasskeyRegistration, {
@@ -68,6 +68,7 @@ export type SignUpContainerV2Props = {
   signupCompletionOptions: Omit<SubmitSignupOptions, "params">;
   submitSignupRequest?: (options: SubmitSignupOptions) => Promise<void>;
   onSignupError: (error: unknown) => void;
+  onPasskeyRegistrationRejected?: () => void;
   onPasskeyOutcome?: (outcome: PasskeyAttemptOutcome) => void;
   attemptPasskeyRegistration?: (
     username: string,
@@ -76,6 +77,7 @@ export type SignUpContainerV2Props = {
   isInitialSubmitDisabled?: boolean;
   isPasswordSubmitDisabled?: boolean;
   isPasskeySubmitDisabled?: boolean;
+  beginComplianceInterruption?: () => Promise<boolean> | null;
 };
 
 const getAddAuthMethodLayout = (treatment: SignUpV2Treatment): AddAuthMethodLayout => {
@@ -109,11 +111,13 @@ const SignUpContainerV2 = ({
   signupCompletionOptions,
   submitSignupRequest = submitProductionSignup,
   onSignupError,
+  onPasskeyRegistrationRejected,
   onPasskeyOutcome,
   attemptPasskeyRegistration,
   isInitialSubmitDisabled = false,
   isPasswordSubmitDisabled = false,
   isPasskeySubmitDisabled = false,
+  beginComplianceInterruption,
 }: SignUpContainerV2Props): JSX.Element => {
   const {
     step,
@@ -179,6 +183,7 @@ const SignUpContainerV2 = ({
           parseErrorCode(error),
         );
         formProps.onUsernameChange("");
+        onPasskeyRegistrationRejected?.();
         recoverFromPasskeyRegistrationFailure();
         return;
       }
@@ -193,6 +198,35 @@ const SignUpContainerV2 = ({
   const handleCreatePassword = async (): Promise<void> => {
     beginPassword();
     await submitParams(buildSignupParams(password), false);
+  };
+
+  // The compliance steps hand back the parent OTP and consent through parent state, so the
+  // resumed submit waits for the render that carries them into `buildSignupParams`.
+  const [isPasswordResumePending, setIsPasswordResumePending] = useState(false);
+
+  useEffect(() => {
+    if (!isPasswordResumePending) {
+      return;
+    }
+    setIsPasswordResumePending(false);
+    // eslint-disable-next-line no-void
+    void handleCreatePassword();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPasswordResumePending]);
+
+  const createPasswordAfterCompliance = (): void => {
+    const interruption = beginComplianceInterruption?.();
+    if (!interruption) {
+      // eslint-disable-next-line no-void
+      void handleCreatePassword();
+      return;
+    }
+    // eslint-disable-next-line no-void
+    void interruption.then(isComplete => {
+      if (isComplete) {
+        setIsPasswordResumePending(true);
+      }
+    });
   };
 
   const handleCreatePasskey = async (): Promise<void> => {
@@ -284,8 +318,7 @@ const SignUpContainerV2 = ({
             onSubmit={() => {
               telemetry.primaryActionClicked(authMethod.password);
               sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.password);
-              // eslint-disable-next-line no-void
-              void handleCreatePassword();
+              createPasswordAfterCompliance();
             }}
           />
         </div>
@@ -317,6 +350,23 @@ const SignUpContainerV2 = ({
             isSubmitDisabled={isInitialSubmitDisabled}
             onSubmit={() => {
               telemetry.primaryActionClicked(authMethod.unspecified);
+              const interruption = beginComplianceInterruption?.();
+              if (interruption) {
+                sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.complianceInterruption);
+                // The parent OTP or consent step consumes the click's user activation, so the
+                // passkey prompt can't open automatically afterwards.
+                // eslint-disable-next-line no-void
+                void interruption.then(isComplete => {
+                  if (isComplete) {
+                    sendAddAuthMethodPageReachedEvent(
+                      EVENT_CONSTANTS.state.signUpV2.addAuthMethodEntry.afterCompliance,
+                    );
+                    telemetry.stepReached(authStage.addAuthMethod);
+                    showAddAuthMethod();
+                  }
+                });
+                return;
+              }
               if (shouldSkipAutomaticPasskey) {
                 sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.autoPromptSuppressed);
                 sendAddAuthMethodPageReachedEvent(
@@ -361,12 +411,16 @@ const SignUpContainerV2 = ({
             onCreatePassword={() => {
               telemetry.primaryActionClicked(authMethod.password);
               sendAuthMethodChosenEvent(EVENT_CONSTANTS.btn.password);
-              // eslint-disable-next-line no-void
-              void handleCreatePassword();
+              createPasswordAfterCompliance();
             }}
             onCreatePasskey={() => {
               telemetry.primaryActionClicked(authMethod.passkey);
               sendAuthMethodChosenEvent(EVENT_CONSTANTS.btn.passkey);
+              // A rejected signup clears the single-use parent OTP. Collecting a new one consumes
+              // the click's user activation, so the user starts the passkey prompt again here.
+              if (beginComplianceInterruption?.()) {
+                return;
+              }
               // eslint-disable-next-line no-void
               void handleCreatePasskey();
             }}

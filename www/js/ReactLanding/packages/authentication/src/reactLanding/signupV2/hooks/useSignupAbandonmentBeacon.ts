@@ -32,6 +32,22 @@ const getAbandonmentStage = (step: SignUpV2Step, operation: SignUpV2Operation): 
   return authStage.formIncomplete;
 };
 
+export type SignupAbandonmentStep = { state: string; stage: AuthStage };
+
+const getSignUpV2AbandonmentStep = (): SignupAbandonmentStep => {
+  const { step, operation } = useSignUpContainerV2State.getState();
+  return {
+    state: getAbandonmentState(step, operation),
+    stage: getAbandonmentStage(step, operation),
+  };
+};
+
+export type SignupAbandonmentBeaconOptions = {
+  isEnabled?: boolean;
+  /** Read when the beacon fires. Defaults to the Signup V2 step and operation. */
+  getAbandonmentStep?: () => SignupAbandonmentStep;
+};
+
 /**
  * Reports that the signup page was left before signup completed.
  *
@@ -45,6 +61,10 @@ const getAbandonmentStage = (step: SignUpV2Step, operation: SignUpV2Operation): 
  */
 const useSignupAbandonmentBeacon = (
   telemetry?: AuthFlowTelemetry,
+  {
+    isEnabled = true,
+    getAbandonmentStep = getSignUpV2AbandonmentStep,
+  }: SignupAbandonmentBeaconOptions = {},
 ): { markSignupCompleted: () => void } => {
   const hasReportedRef = useRef(false);
   const isCompletedRef = useRef(false);
@@ -54,6 +74,9 @@ const useSignupAbandonmentBeacon = (
   }, []);
 
   useEffect(() => {
+    if (!isEnabled) {
+      return undefined;
+    }
     const reportAbandonment = (): void => {
       if (isCompletedRef.current || hasReportedRef.current) {
         return;
@@ -61,12 +84,9 @@ const useSignupAbandonmentBeacon = (
       hasReportedRef.current = true;
       // Read at fire time; this closure is created once and would otherwise
       // always report the stage the user started at.
-      const { step, operation } = useSignUpContainerV2State.getState();
-      sendSignupAbandonmentEvent(
-        EVENT_CONSTANTS.context.schematizedSignupForm,
-        getAbandonmentState(step, operation),
-      );
-      telemetry?.flowAbandoned(getAbandonmentStage(step, operation));
+      const { state, stage } = getAbandonmentStep();
+      sendSignupAbandonmentEvent(EVENT_CONSTANTS.context.schematizedSignupForm, state);
+      telemetry?.flowAbandoned(stage);
     };
 
     const reportIfHidden = (): void => {
@@ -82,7 +102,7 @@ const useSignupAbandonmentBeacon = (
       document.removeEventListener("visibilitychange", reportIfHidden);
       window.removeEventListener("pagehide", reportAbandonment);
     };
-  }, [telemetry]);
+  }, [telemetry, isEnabled, getAbandonmentStep]);
 
   return { markSignupCompleted };
 };

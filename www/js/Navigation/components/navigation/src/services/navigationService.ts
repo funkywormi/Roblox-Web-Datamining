@@ -1,4 +1,4 @@
-import { ValueOf } from "@rbx/core-types";
+import { ValueOf } from "@rbx/core-lib";
 import { callBehaviour } from "@rbx/core-scripts/guac";
 import * as http from "@rbx/core-scripts/http";
 import {

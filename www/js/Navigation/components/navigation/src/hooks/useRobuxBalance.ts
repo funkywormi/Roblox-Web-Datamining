@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ValueOf } from "@rbx/core-types";
+import { ValueOf } from "@rbx/core-lib";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { getCurrentUser, userIdToNumber } from "@rbx/www-common/user";
 import layoutConstants from "../constants/layoutConstants";

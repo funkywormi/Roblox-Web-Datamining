@@ -8,14 +8,17 @@ import { landingTranslationConfig } from "../translation.config";
 import ActionBar from "../components/ActionBar";
 import SignupHeader from "../components/SignupHeader";
 import SignupFormContainer from "./SignupFormContainer";
-import CountryRatingLogos from "../components/CountryRatingLogos";
+import { CountryRatingLogos } from "@rbx/content-rating-logos";
 import { getContentRatingLogoPolicy } from "../services/landingService";
 import { sendAppClickEvent } from "../services/eventService";
+import { qualifyAffiliateLogin } from "../services/affiliateLinksService";
 import { urlConstants, landingPageStrings, experimentLayer } from "../constants/landingConstants";
-import { isVerifiedParentConsentSignup } from "../utils/signupUtils";
+import { getReturnUrl, isVerifiedParentConsentSignup } from "../utils/signupUtils";
+import { navigateToPage } from "@rbx/authentication-common/utils/browserUtils";
 import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
 import useLandingBackground from "../hooks/useLandingBackground";
 import { SignUpV2Treatment } from "../signupV2/utils/signupV2ExperimentUtils";
+import SsoCompleteHandler from "../../shared/components/SsoCompleteHandler";
 import {
   accountSwitcherConfirmationModalContainer,
   otpModalConstants,
@@ -34,6 +37,14 @@ const treatmentsWithoutShellLogIn: SignUpV2Treatment[] = [
 ];
 
 const treatmentsWithFoundationSignIn: SignUpV2Treatment[] = [SignUpV2Treatment.FoundationControl];
+
+/* SSO can sign in to an existing account from this page; new accounts leave through
+ * `handlePostSignup` instead. */
+const navigateToSignupReturnUrl = (): void => {
+  const returnUrl = getReturnUrl();
+  qualifyAffiliateLogin(returnUrl);
+  navigateToPage(returnUrl);
+};
 
 export const LandingPageContainer = ({
   signupContent,
@@ -63,12 +74,10 @@ export const LandingPageContainer = ({
     ? "margin-top-large padding-top-xxlarge"
     : "padding-top-xxlarge";
 
+  // Only Italy's mark is clickable (it opens the PEGI guide), and its confirmation is only
+  // mounted when that mark is displayed, so this always navigates.
   const handleContentRatingModalAction = (): void => {
-    let ratingGuideUrl = "";
-    if (shouldDisplayItalyRatingLogo) {
-      ratingGuideUrl = urlConstants.italyContentRatingGuide;
-    }
-    window.open(ratingGuideUrl, "_blank");
+    window.open(urlConstants.italyContentRatingGuide, "_blank");
   };
 
   const handleContentRatingLogoPolicy = async () => {
@@ -123,8 +132,11 @@ export const LandingPageContainer = ({
               <CountryRatingLogos
                 shouldDisplayBrazilRatingLogo={shouldDisplayBrazilRatingLogo}
                 shouldDisplayItalyRatingLogo={shouldDisplayItalyRatingLogo}
-                onContentRatingLogoClick={() => modalService.open()}
-                translate={translate}
+                onItalyContentRatingLogoClick={() => modalService.open()}
+              />
+              <SsoCompleteHandler
+                navigateToDestination={navigateToSignupReturnUrl}
+                getSignupReturnUrl={getReturnUrl}
               />
               {shouldDisplayItalyRatingLogo && (
                 <ContentRatingModal

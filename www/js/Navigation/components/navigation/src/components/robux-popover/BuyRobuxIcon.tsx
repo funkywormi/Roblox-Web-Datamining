@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { Fragment, ReactNode } from "react";
-import { ValueOf } from "@rbx/core-types";
+import { ValueOf } from "@rbx/core-lib";
 import { Tooltip as FoundationTooltip, TooltipTrigger } from "@rbx/foundation-ui";
 import { truncNumber } from "@rbx/core-scripts/format/number";
 import layoutConstant from "../../constants/layoutConstants";

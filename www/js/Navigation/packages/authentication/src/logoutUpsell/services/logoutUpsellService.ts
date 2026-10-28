@@ -1,6 +1,4 @@
-import { hybridResponseService } from "core-roblox-utilities";
-// @ts-expect-error - Legacy Roblox module types
-import { EmailVerificationService } from "@rbx/core-scripts/legacy/Roblox";
+import * as hybridResponseService from "@rbx/core-scripts/auth/hybrid-response";
 import ExperimentationService from "@rbx/experimentation";
 import {
   defaultNotInApp,
@@ -58,6 +56,28 @@ const LOGOUT_UPSELL_LAYER = "Website.LogoutUpsell";
 const PROMPT_TYPE_LOGOUT_EMAIL_UPSELL_V1 = "LogoutEmailUpsellV1";
 const PROMPT_TYPE_LOGOUT_PASSKEY_UPSELL_V1 = "LogoutPasskeyUpsellV1";
 
+type LegacyEmailVerificationService = {
+  handleUserEmailUpsellAtLogout?: (
+    onLogout: () => void,
+  ) => Promise<{ emailAddress?: string } | null | undefined>;
+  openLogoutEmailUpsellModal?: (skipCallback: () => void) => Promise<void> | void;
+};
+
+// The email upsell modal is a .NET bundle global (components/verificationUpsell), read at call time
+// so this module also loads where window.Roblox doesn't exist (Next.js). There it is absent and the
+// email paths below log out directly.
+// TODO(WEB-3606): import the email upsell modal directly on Next.js if the email prompt stays on there.
+const getEmailVerificationService = (): LegacyEmailVerificationService | undefined => {
+  if (typeof window === "undefined") {
+    return undefined;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- legacy bundle global, absent on Next.js
+  const { Roblox } = window as {
+    Roblox?: { EmailVerificationService?: LegacyEmailVerificationService };
+  };
+  return Roblox?.EmailVerificationService;
+};
+
 export type HandleLogoutUpsellOptions = {
   /** Called when the upsell flow is finished and the page should log out. */
   onLogout: () => void;
@@ -103,22 +123,22 @@ const isPromptsServiceEnabled = async (): Promise<boolean> => {
 // This includes the legacy email service & authAPI checks that get skipped if
 // prompts service is enabled
 const runLegacyEmailUpsell = (onLogout: () => void): void => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-floating-promises -- untyped legacy module
-  EmailVerificationService?.handleUserEmailUpsellAtLogout(onLogout).then(
-    (data: { emailAddress?: string } | null | undefined) => {
-      if (!data || data.emailAddress) {
-        onLogout();
-      }
-    },
-  );
+  const emailVerificationService = getEmailVerificationService();
+  if (typeof emailVerificationService?.handleUserEmailUpsellAtLogout !== "function") {
+    onLogout();
+    return;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises -- legacy contract; the modal owns the flow
+  emailVerificationService.handleUserEmailUpsellAtLogout(onLogout).then(data => {
+    if (!data || data.emailAddress) {
+      onLogout();
+    }
+  });
 };
 
 // Skips email service & authAPI checks (done by prompts service)
 const openLegacyEmailUpsellModal = (onLogout: () => void): void => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- untyped legacy module
-  const openModal = EmailVerificationService?.openLogoutEmailUpsellModal as
-    | ((skipCallback: () => void) => Promise<void> | void)
-    | undefined;
+  const openModal = getEmailVerificationService()?.openLogoutEmailUpsellModal;
   if (typeof openModal !== "function") {
     // if new method is missing due to cached bundle, fall back to legacy path
     sendLogoutUpsellClientError(LogoutUpsellClientError.LegacyModalEntrypointMissing);

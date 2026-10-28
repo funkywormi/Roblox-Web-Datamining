@@ -219,6 +219,10 @@ export const errorCodes = {
   invalidIdentityVerificationResultToken: 109,
   invalidPassword: 7,
   invalidUsername: 5,
+  // The VPC sign up `dataToken` is expired or malformed.
+  invalidToken: 18,
+  // Signup collapses a failed token lookup that was not HTTP 400 into this code.
+  unknownError: 1,
   passwordSameAsUsername: 8,
   passwordTooSimple: 9,
   usernameTaken: 6,

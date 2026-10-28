@@ -1,4 +1,4 @@
-import { O18EligibilityTag, Transaction, TransactionOriginType } from '../../../../ts';
+import { Transaction, TransactionOriginType } from '../../../../ts';
 
 export interface O18BadgeProps {
   label: string;
@@ -31,9 +31,7 @@ export function getO18BadgeProps(
     return null;
   }
 
-  // robuxRateBreakdown is set only on one-time group payouts. Checked ahead of
-  // o18EligibilityTag so that if the API ever surfaces both on the same row, we
-  // prefer the breakdown.
+  // robuxRateBreakdown is set only on one-time group payouts.
   const rateBreakdown = transaction.robuxRateBreakdown;
   if (rateBreakdown) {
     const hasO18 = rateBreakdown.o18 != null && rateBreakdown.o18 > 0;
@@ -71,20 +69,6 @@ export function getO18BadgeProps(
     }
     // Standard-only or empty breakdown -> no badge
     return null;
-  }
-
-  if (
-    transaction.o18EligibilityTag === O18EligibilityTag.O18Eligible ||
-    transaction.o18EligibilityTag === O18EligibilityTag.O18EligibleAndPlus
-  ) {
-    const label = translate('Label.O18OneTimePayoutO18Only');
-    return {
-      label,
-      tooltipTitle: label,
-      tooltipDescription: translate('Tooltip.O18OneTimePayoutO18Only', {
-        devExIncreasePercent: DEV_EX_INCREASE_PERCENT
-      })
-    };
   }
 
   return null;

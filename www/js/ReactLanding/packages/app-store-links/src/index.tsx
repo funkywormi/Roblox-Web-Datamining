@@ -2,7 +2,6 @@
 import { JSX } from "react";
 import { Intl } from "@rbx/core-scripts/legacy/Roblox";
 import { WithTranslationsProps } from "@rbx/core-scripts/react";
-import "@rbx/core-types";
 import "./index.css";
 import { assetUrl } from "@rbx/www-common/asset";
 import amazon_en_us from "./images/amazon-badge-en_us.png";

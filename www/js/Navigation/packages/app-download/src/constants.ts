@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import type { ValueOf } from "@rbx/core-types";
+import type { ValueOf } from "@rbx/core-lib";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import type { Icon } from "@rbx/foundation-ui";
 

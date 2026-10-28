@@ -1,5 +1,24 @@
 import { getAbsoluteUrl, isAbsolute } from "@rbx/core-scripts/endpoints";
 import { urlService } from "@rbx/core-scripts/legacy/core-utilities";
+import { urlQueryConstants } from "@rbx/authentication-common/constants/urlConstants";
+
+/**
+ * Adds `param` (`key=value`) to the query string. Appending it to a url that ends in a `#!/...`
+ * route would make it part of the fragment instead, so the target page reads a corrupted route and
+ * never lands on the requested subpage.
+ */
+export const appendQueryParam = (url: string, param: string): string => {
+  const hashIndex = url.indexOf(urlQueryConstants.hashSign);
+  const beforeHash = hashIndex === -1 ? url : url.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? "" : url.slice(hashIndex);
+
+  const separator =
+    beforeHash.indexOf(urlQueryConstants.urlQueryStringPrefix) > -1
+      ? urlQueryConstants.urlQueryParameterSeparator
+      : urlQueryConstants.urlQueryStringPrefix;
+
+  return `${beforeHash}${separator}${param}${hash}`;
+};
 
 export const enum env {
   Production = "production",

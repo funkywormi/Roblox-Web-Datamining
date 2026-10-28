@@ -1,4 +1,4 @@
-import { eventStreamService } from "core-roblox-utilities";
+import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import AUTH_EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 import { LogoutUpsellScreen, LogoutUpsellScreenName } from "../constants/logoutUpsellScreens";
 
@@ -49,8 +49,7 @@ const send = (
   context: string = LOGOUT_UPSELL_CONTEXT,
 ): void => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- untyped legacy module
-    eventStreamService.sendEventWithTarget(eventName, context, params);
+    sendEventWithTarget(eventName, context, params);
   } catch {
     // Telemetry is best-effort: never let an event-stream failure break logout.
   }

@@ -35,6 +35,8 @@ export const landingPageProviderConfig: string[] = [
   "Common.Captcha",
   "CommonUI.Controls",
   "Authentication.AccountSwitch",
+  // The SSO provider labels and divider are shared with login.
+  "Authentication.Login",
   "Authentication.SignUp",
   "Feature.Landing",
   "Feature.IdVerification",

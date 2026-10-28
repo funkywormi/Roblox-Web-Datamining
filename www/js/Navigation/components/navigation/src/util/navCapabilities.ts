@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
-import type { ValueOf } from "@rbx/core-types";
+import type { ValueOf } from "@rbx/core-lib";
 import type { AuthenticatedUser } from "@rbx/core-scripts/meta/user";
 import type layoutConstants from "../constants/layoutConstants";
 import type { TIntAuthComplianceResponse } from "../services/complianceService";

@@ -7,7 +7,7 @@ import { sendLeftSidebarEvent } from "../services/eventService";
 import { getNavCapability } from "../util/navCapabilities";
 
 export default function LeftNavigation({ user }: { user: AuthenticatedUser }) {
-  // Changes the value of a CSS variable for the left nav width.
+  // TODO: remove this later once all other styling is deployed
   useEffect(() => {
     const e = document.getElementById("wrap") ?? document.body;
     e.classList.add("left-nav-new-width");

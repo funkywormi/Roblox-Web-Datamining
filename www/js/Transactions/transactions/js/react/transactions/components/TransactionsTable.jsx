@@ -102,8 +102,7 @@ TransactionsTable.propTypes = {
       currency: PropTypes.shape({
         amount: PropTypes.number.isRequired,
         type: PropTypes.string
-      }),
-      o18EligibilityTag: PropTypes.string
+      })
     })
   ).isRequired
 };

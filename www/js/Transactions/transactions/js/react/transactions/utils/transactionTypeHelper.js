@@ -106,6 +106,14 @@ function getUsedTransactionTypes(
     usedTransactionTypes[TransactionType.SubscriptionReferralPayout] = true;
   }
 
+  // Omission is what hides the category: a key that is never added is never rendered, so a user
+  // with no gift receipts sees no Gifts option at all. That also keeps the client from ever
+  // requesting transactionType=Gifts while the api's own gate is off -- the api answers 400 for
+  // Gifts until IsGiftsTransactionTypeEnabled is on, and it only reports HasGifts when it is.
+  if (usedTransactionTypeFlags.HasGifts) {
+    usedTransactionTypes[TransactionType.Gifts] = true;
+  }
+
   return usedTransactionTypes;
 }
 

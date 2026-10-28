@@ -28,7 +28,12 @@ enum TransactionType {
   CurrencyTransfer = 'CurrencyTransfer',
   RobloxSelectTransfer = 'RobloxSelectTransfer',
   CreatorRewardsPayout = 'CreatorRewardsPayout',
-  SubscriptionReferralPayout = 'SubscriptionReferralPayout'
+  SubscriptionReferralPayout = 'SubscriptionReferralPayout',
+  /**
+   * Gifts the viewer has received. The member name is sent verbatim as the transactionType query
+   * param and must stay equal to the api's enum member, which is `Gifts`.
+   */
+  Gifts = 'Gifts'
 }
 
 export default TransactionType;

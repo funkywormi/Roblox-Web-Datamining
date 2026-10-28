@@ -55,7 +55,7 @@ import {
   getLinkCode,
   getLinkType,
 } from "./affiliateLinksUtils";
-import { getSafeReturnUrlFromQueryString } from "../../reactLogin/utils/urlUtils";
+import { appendQueryParam, getSafeReturnUrlFromQueryString } from "../../reactLogin/utils/urlUtils";
 
 const getErrorCodeFromValidateUsernameResponse = (response: TValidateUsernameResponse): string => {
   let validationMessage = "";
@@ -218,7 +218,7 @@ export const isValidBirthday = (year: string, month: string, day: string): boole
   return true;
 };
 
-export const handlePostSignup = async (returnUrlValue?: string, userId?: string): Promise<void> => {
+export const handlePostSignup = async (returnUrl?: string, userId?: string): Promise<void> => {
   cleanupIdentityVerificationResultToken();
   incrementEphemeralCounter(counters.success);
   window.dispatchEvent(new CustomEvent(signupCustomEvent, { detail: { userId } }));
@@ -227,7 +227,6 @@ export const handlePostSignup = async (returnUrlValue?: string, userId?: string)
   } catch (e) {
     console.error("Error setting new user session flag:", e);
   }
-  let returnUrl = returnUrlValue;
   try {
     if (userId) {
       const {
@@ -265,14 +264,8 @@ export const handlePostSignup = async (returnUrlValue?: string, userId?: string)
         linkType,
       });
     }
-    if (returnUrl.indexOf("?") === -1) {
-      returnUrl += "?";
-    } else {
-      returnUrl += "&";
-    }
-    returnUrl += newUserParam;
-
-    sendConversionEvent(() => navigateToPage(returnUrl!));
+    const newUserReturnUrl = appendQueryParam(returnUrl, newUserParam);
+    sendConversionEvent(() => navigateToPage(newUserReturnUrl));
   } else {
     sendConversionEvent(() => navigateToPage(urlConstants.homePageNewUser));
   }

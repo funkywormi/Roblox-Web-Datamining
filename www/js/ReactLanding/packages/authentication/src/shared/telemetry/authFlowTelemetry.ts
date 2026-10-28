@@ -20,6 +20,8 @@ export const authVariant = {
   passwordFirst: "passwordFirst",
   passkeyFirst: "passkeyFirst",
   foundationControl: "foundationControl",
+  refreshSsoDialog: "refreshSsoDialog",
+  refreshSsoInline: "refreshSsoInline",
 } as const;
 
 export type AuthVariant = (typeof authVariant)[keyof typeof authVariant];
@@ -31,6 +33,8 @@ export const authMethod = {
   otp: "otp",
   authToken: "authToken",
   magicLink: "magicLink",
+  ssoGoogle: "ssoGoogle",
+  ssoApple: "ssoApple",
 } as const;
 
 export type AuthMethod = (typeof authMethod)[keyof typeof authMethod];
@@ -102,7 +106,8 @@ export type AuthFlowTelemetry = {
 export type AuthFlowTelemetryConfig = {
   flow: AuthFlow;
   source: AuthSource;
-  variant?: AuthVariant;
+  /** A resolver is read on first use, for variants that depend on page state at runtime. */
+  variant?: AuthVariant | (() => AuthVariant | undefined);
   now?: () => number;
 };
 
@@ -128,13 +133,18 @@ export const createAuthFlowTelemetry = ({
   variant,
   now = Date.now,
 }: AuthFlowTelemetryConfig): AuthFlowTelemetry => {
-  const baseAttributes: BaseAttributes = {
-    flow,
-    source,
-    variant: variant ?? "unspecified",
+  let attributes: { base: BaseAttributes; histogram: Record<string, string> } | undefined;
+  const getAttributes = () => {
+    if (!attributes) {
+      const resolvedVariant = typeof variant === "function" ? variant() : variant;
+      attributes = {
+        base: { flow, source, variant: resolvedVariant ?? "unspecified" },
+        // Histograms are not tracked by the framework; retain their existing labels.
+        histogram: { flow, source, ...(resolvedVariant ? { variant: resolvedVariant } : {}) },
+      };
+    }
+    return attributes;
   };
-  // Histograms are not tracked by the framework; retain their existing labels.
-  const histogramAttributes = { flow, source, ...(variant ? { variant } : {}) };
   let flowStartedAt: number | undefined;
   let requestStartedAt: number | undefined;
   let requestIsUserInitiated = true;
@@ -152,7 +162,7 @@ export const createAuthFlowTelemetry = ({
     suppressTelemetryFailure(() => {
       fireHistogram(
         name,
-        { ...histogramAttributes, method, ...attributes },
+        { ...getAttributes().histogram, method, ...attributes },
         Math.max(0, now() - startedAt),
       );
     });
@@ -163,26 +173,29 @@ export const createAuthFlowTelemetry = ({
       flowStartedAt = now();
       isFlowCompleted = false;
       suppressTelemetryFailure(() =>
-        trackCounter(authTelemetryCounters.pageMounted, baseAttributes),
+        trackCounter(authTelemetryCounters.pageMounted, getAttributes().base),
       );
     },
     formReady: (primaryActionEnabled = true) => {
       suppressTelemetryFailure(() =>
         trackCounter(authTelemetryCounters.formReady, {
-          ...baseAttributes,
+          ...getAttributes().base,
           primaryActionEnabled: String(primaryActionEnabled),
         }),
       );
     },
     primaryActionClicked: method => {
       suppressTelemetryFailure(() =>
-        trackCounter(authTelemetryCounters.primaryActionClicked, { ...baseAttributes, method }),
+        trackCounter(authTelemetryCounters.primaryActionClicked, {
+          ...getAttributes().base,
+          method,
+        }),
       );
     },
     submissionBlocked: (method, reason) => {
       suppressTelemetryFailure(() =>
         trackCounter(authTelemetryCounters.submissionBlocked, {
-          ...baseAttributes,
+          ...getAttributes().base,
           method,
           reason,
         }),
@@ -193,7 +206,7 @@ export const createAuthFlowTelemetry = ({
       requestIsUserInitiated = isUserInitiated;
       suppressTelemetryFailure(() =>
         trackCounter(authTelemetryCounters.requestStarted, {
-          ...baseAttributes,
+          ...getAttributes().base,
           method,
           isUserInitiated: String(isUserInitiated),
         }),
@@ -206,7 +219,7 @@ export const createAuthFlowTelemetry = ({
       requestStartedAt = undefined;
       suppressTelemetryFailure(() =>
         trackCounter(authTelemetryCounters.requestSucceeded, {
-          ...baseAttributes,
+          ...getAttributes().base,
           method,
           nextStep,
           isUserInitiated: String(requestIsUserInitiated),
@@ -220,7 +233,7 @@ export const createAuthFlowTelemetry = ({
       requestStartedAt = undefined;
       suppressTelemetryFailure(() =>
         trackCounter(authTelemetryCounters.requestFailed, {
-          ...baseAttributes,
+          ...getAttributes().base,
           method,
           reason,
           isUserInitiated: String(requestIsUserInitiated),
@@ -229,7 +242,7 @@ export const createAuthFlowTelemetry = ({
     },
     stepReached: stage => {
       suppressTelemetryFailure(() =>
-        trackCounter(authTelemetryCounters.stepReached, { ...baseAttributes, stage }),
+        trackCounter(authTelemetryCounters.stepReached, { ...getAttributes().base, stage }),
       );
     },
     flowCompleted: method => {
@@ -238,7 +251,7 @@ export const createAuthFlowTelemetry = ({
       }
       recordDuration(authTelemetryHistograms.flowCompletionDurationMs, flowStartedAt, method);
       suppressTelemetryFailure(() =>
-        trackCounter(authTelemetryCounters.flowCompleted, { ...baseAttributes, method }),
+        trackCounter(authTelemetryCounters.flowCompleted, { ...getAttributes().base, method }),
       );
       isFlowCompleted = true;
     },
@@ -247,7 +260,7 @@ export const createAuthFlowTelemetry = ({
         return;
       }
       suppressTelemetryFailure(() =>
-        trackCounter(authTelemetryCounters.flowAbandoned, { ...baseAttributes, stage }),
+        trackCounter(authTelemetryCounters.flowAbandoned, { ...getAttributes().base, stage }),
       );
     },
   };

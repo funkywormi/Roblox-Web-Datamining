@@ -5,7 +5,7 @@ import LandingPageContainer from "../../containers/LandingPageContainer";
 import SignUpContainer from "../../revamp/SignUpContainer";
 import isAccountExperienceRevampEnabled from "@rbx/authentication-common/utils/accountExperienceUtils";
 import { identityVerificationResultTokenName } from "../../constants/signupConstants";
-import { isVerifiedParentConsentSignup } from "../../utils/signupUtils";
+import { getBirthdayToPrefill, isVerifiedParentConsentSignup } from "../../utils/signupUtils";
 import {
   getSignUpV2Experiment,
   SignUpV2ExperimentResolution,
@@ -13,7 +13,7 @@ import {
 import SignUpV2Controller from "./SignUpV2Controller";
 
 const SignUpV2ExperimentRouter = (): JSX.Element => {
-  let resolution: SignUpV2ExperimentResolution = "legacy";
+  let resolution: SignUpV2ExperimentResolution = { isSignUpV2: false };
   try {
     resolution = getSignUpV2Experiment({
       isVerifiedParentConsentSignup: isVerifiedParentConsentSignup(),
@@ -21,16 +21,22 @@ const SignUpV2ExperimentRouter = (): JSX.Element => {
       hasIdentityVerificationContinuation: Boolean(
         localStorageService.getLocalStorage(identityVerificationResultTokenName),
       ),
+      hasKoreaIdBirthdayPrefill: Boolean(getBirthdayToPrefill()),
     });
   } catch {
     // Fail closed when local eligibility cannot be resolved.
   }
 
-  if (resolution !== "legacy") {
+  if (resolution.isSignUpV2) {
     return (
       <LandingPageContainer
-        signupV2Treatment={resolution}
-        signupContent={<SignUpV2Controller treatment={resolution} />}
+        signupV2Treatment={resolution.treatment}
+        signupContent={
+          <SignUpV2Controller
+            treatment={resolution.treatment}
+            authUiVariant={resolution.authUiVariant}
+          />
+        }
       />
     );
   }

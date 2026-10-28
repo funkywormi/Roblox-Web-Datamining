@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import classNames from "classnames";
-import { ValueOf } from "@rbx/core-types";
+import { ValueOf } from "@rbx/core-lib";
 import { useTranslations } from "@rbx/www-common/i18n";
 import analytics from "@rbx/core-scripts/payments-flow";
 import { formatNumber } from "@rbx/core-scripts/format/number";

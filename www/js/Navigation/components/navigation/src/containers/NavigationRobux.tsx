@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ValueOf } from "@rbx/core-types";
+import { ValueOf } from "@rbx/core-lib";
 
 import analytics from "@rbx/core-scripts/payments-flow";
 import { useTranslations } from "@rbx/www-common/i18n";

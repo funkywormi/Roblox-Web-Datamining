@@ -40,7 +40,8 @@ export const transactionTypeTranslationKeys: { [key in TransactionType]: string 
   [TransactionType.RobloxSelectTransfer]: 'Label.RobloxSelect',
   [TransactionType.PrivateServerEngagementPayout]: 'Label.PrivateServerEngagementPayouts',
   [TransactionType.CreatorRewardsPayout]: 'Label.TransactionTypeCreatorRewards',
-  [TransactionType.SubscriptionReferralPayout]: 'Label.ReferralPayouts'
+  [TransactionType.SubscriptionReferralPayout]: 'Label.ReferralPayouts',
+  [TransactionType.Gifts]: 'Label.TransactionTypeGifts'
 };
 
 export const transactionOriginTypeTranslationKeys: { [key in TransactionOriginType]: string } = {
@@ -116,6 +117,54 @@ export const licensedPaymentTransactionOriginTypeTranslationKeys: {
 };
 
 export const PURCHASE_REFUND_TRANSLATION_KEY = 'Description.RefundedItem';
+
+/**
+ * English fallbacks for category labels whose keys are not authored yet. Same reason as
+ * GIFT_TRANSLATION_FALLBACKS: an unresolved key renders an unreadable, selectable dropdown entry.
+ */
+export const TRANSACTION_TYPE_LABEL_FALLBACKS: { [key: string]: string } = {
+  'Label.TransactionTypeGifts': 'Gifts Received'
+};
+
+/**
+ * Gift wording keys. Three distinct rows come out of one gift, so each gets its own key:
+ * the recipient's receipt, the sender's purchase, and the creator's sale.
+ *
+ * `transactionSubtype` alone cannot pick between the last two -- both carry `Gift` -- so the
+ * transaction type is part of the decision. See getGiftTranslationKey.
+ */
+export const GIFT_RECEIPT_TRANSLATION_KEY = 'Description.AcceptedItem';
+export const GIFTED_PURCHASE_WITH_RECIPIENT_TRANSLATION_KEY = 'Description.GiftedItemToRecipient';
+export const GIFTED_PURCHASE_TRANSLATION_KEY = 'Description.GiftedItem';
+export const GIFTED_SALE_TRANSLATION_KEY = 'Description.SoldItemAsGift';
+
+/**
+ * English fallbacks for the gift keys, used until they are authored in the localization tool.
+ *
+ * The `translate(key) || 'English'` pattern is used throughout this app, but it does not survive
+ * token substitution -- a missing key returns falsy and the tokens are lost with it. These
+ * templates carry the same tokens so the fallback renders a complete sentence rather than a bare
+ * item name.
+ *
+ * **This deliberately applies to the sender's and the creator's rows too**, whose current wording
+ * ("Purchased {item}" / "Sold {item}") IS already translated, so for a non-English locale this
+ * swaps a translated string for an English one. Raised in review and accepted by the owner: the
+ * first use is an internal demo, not a worldwide release, so showing the gift wording in English
+ * is better than showing wording that does not mention the gift at all. Authoring the keys is the
+ * follow-up that makes this map, and this trade-off, go away.
+ */
+export const GIFT_TRANSLATION_FALLBACKS: { [key: string]: string } = {
+  [GIFT_RECEIPT_TRANSLATION_KEY]: 'Accepted {item}',
+  [GIFTED_PURCHASE_WITH_RECIPIENT_TRANSLATION_KEY]: 'Gifted {item} to {recipient}',
+  [GIFTED_PURCHASE_TRANSLATION_KEY]: 'Gifted {item}',
+  [GIFTED_SALE_TRANSLATION_KEY]: 'Sold {item} as a gift'
+};
+/**
+ * Shown in the Amount column for a row whose amount carries no meaning -- today only a gift
+ * receipt, which is always 0 Robux. A constant rather than an inline literal because
+ * react/jsx-no-literals forbids strings in JSX.
+ */
+export const EMPTY_AMOUNT_PLACEHOLDER = '\u2014';
 
 export const CFT_TRANSLATION_KEY = 'Description.CFT';
 

@@ -8,7 +8,9 @@ import {
   urlService,
   TransactionOriginType,
   TransactionItemType,
-  TransactionItem
+  TransactionItem,
+  TransactionSubType,
+  Agent
 } from '../../../../ts';
 import LicensedTooltip from './LicensedTooltip';
 import ItemDescription from './ItemDescription';
@@ -18,6 +20,8 @@ export interface ItemComponentProps {
   transactionType: TransactionOriginType;
   translate: TranslateFunction;
   created?: string;
+  transactionSubtype?: TransactionSubType | null;
+  recipient?: Agent | null;
 }
 
 // Set of transaction types that should have the 'item-sale-format' class
@@ -44,7 +48,9 @@ const ItemComponent: FunctionComponent<ItemComponentProps> = ({
   item,
   transactionType,
   translate,
-  created
+  created,
+  transactionSubtype,
+  recipient
 }) => {
   const { thumbnailTargetId, thumbnailType } = useThumbnailData(item);
 
@@ -72,6 +78,8 @@ const ItemComponent: FunctionComponent<ItemComponentProps> = ({
             transactionType={transactionType}
             translate={translate}
             created={created}
+            transactionSubtype={transactionSubtype}
+            recipient={recipient}
           />
         </div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>

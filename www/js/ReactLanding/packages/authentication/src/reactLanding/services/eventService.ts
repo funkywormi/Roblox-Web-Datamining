@@ -15,7 +15,11 @@ import {
   getSignupErrorState,
   SignupErrorOutcome,
 } from "../utils/signupErrorUtils";
-import { SignUpV2Treatment } from "../signupV2/utils/signupV2ExperimentUtils";
+import {
+  SignUpV2Treatment,
+  type SignUpV2RefreshVariant,
+} from "../signupV2/utils/signupV2ExperimentUtils";
+import type { SsoProvider } from "../../shared/types/ssoTypes";
 
 const { eventTypes } = eventStreamService;
 
@@ -787,15 +791,23 @@ const signUpV2ArmOrigin: Record<SignUpV2Treatment, string> = {
   [SignUpV2Treatment.FoundationControl]: EVENT_CONSTANTS.origin.signUpV2Arm.foundationControl,
 };
 
+const signUpV2RefreshArmOrigin: Record<SignUpV2RefreshVariant, string> = {
+  refreshSsoDialog: EVENT_CONSTANTS.origin.signUpV2Arm.refreshSsoDialog,
+  refreshSsoInline: EVENT_CONSTANTS.origin.signUpV2Arm.refreshSsoInline,
+};
+
 /**
  * The signup form was shown on a treatment arm. `origin` carries the arm so per-arm
- * rates need no join back to IXP enrollment.
+ * rates need no join back to IXP enrollment; the `auth-ui-data` arm wins over the treatment.
  */
-export const sendSignUpV2FormPageLoadEvent = (treatment: SignUpV2Treatment): void => {
+export const sendSignUpV2FormPageLoadEvent = (
+  treatment: SignUpV2Treatment,
+  authUiVariant?: SignUpV2RefreshVariant,
+): void => {
   sendAuthPageLoadEvent(
     EVENT_CONSTANTS.context.signupForm,
     undefined,
-    signUpV2ArmOrigin[treatment],
+    authUiVariant ? signUpV2RefreshArmOrigin[authUiVariant] : signUpV2ArmOrigin[treatment],
   );
 };
 
@@ -809,6 +821,53 @@ export const sendSignUpV2SubmitEvent = (ctype: string): void => {
     "",
     EVENT_CONSTANTS.context.schematizedSignupForm,
     ctype,
+  );
+};
+
+const ssoProviderButtons: Readonly<Record<SsoProvider, string>> = {
+  google: EVENT_CONSTANTS.btn.googleSso,
+  apple: EVENT_CONSTANTS.btn.appleSso,
+};
+
+// Signup only offers SSO under the divider. The button events have no `field` column, so the
+// placement goes in `state` to keep the shape of the login events.
+const signupSsoPlacement = "underDivider";
+
+export const sendSignupSsoButtonShownEvent = (provider: SsoProvider): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authButtonShown,
+    EVENT_CONSTANTS.context.schematizedSignupForm,
+    {
+      btn: ssoProviderButtons[provider],
+      state: signupSsoPlacement,
+    },
+  );
+};
+
+export const sendSignupSsoButtonClickEvent = (provider: SsoProvider): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authButtonClick,
+    EVENT_CONSTANTS.context.schematizedSignupForm,
+    {
+      btn: ssoProviderButtons[provider],
+      state: signupSsoPlacement,
+    },
+  );
+};
+
+/**
+ * `/v2/signup` succeeded, sent before the post-signup navigation. Both arms complete through
+ * here, so this is the client-side count to reconcile against server account creation.
+ * `authFormInteraction` has no `ctype` column, so the method is in `entered`.
+ */
+export const sendSignupSucceededEvent = (method: string): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authFormInteraction,
+    EVENT_CONSTANTS.context.schematizedSignupForm,
+    {
+      field: EVENT_CONSTANTS.field.signupSuccess,
+      entered: method,
+    },
   );
 };
 

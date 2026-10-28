@@ -4,8 +4,7 @@ import {
   useTranslation,
   WithTranslationsProps,
 } from "@rbx/core-scripts/legacy/react-utilities";
-import { Button } from "@rbx/foundation-ui";
-import { AccountIntegrityChallengeService } from "Roblox";
+import { AccountIntegrityChallengeService, AccountSwitcherService } from "Roblox";
 import { SilentPasskeyUpgradeVariant } from "../../../shared/silentPasskeyUpgradeCore";
 import {
   FormFieldStatus,
@@ -29,30 +28,24 @@ import {
   usernameRequirementLabels,
 } from "@rbx/authentication-common/utils/usernameRequirementUtils";
 import { experimentLayer } from "../../constants/landingConstants";
-import {
-  reactSignupCaptchaContainer,
-  signupFormStrings,
-  urlConstants,
-  USER_AGREEMENTS,
-  validationMessages,
-} from "../../constants/signupConstants";
 import { signupTranslationConfig } from "../../translation.config";
 import {
   getLocalizedBirthdayOptionTitle,
   getOrderedBirthdaySelects,
 } from "../../utils/birthdayUtils";
+import { classifySignupError } from "../../utils/signupErrorUtils";
 import {
   getLocale,
   getPasswordValidationMessage,
   getReturnUrl,
   getUsernameValidationMessage,
+  handleEmptyAccountSwitchBlobRequired,
   isValidBirthday,
 } from "../../utils/signupUtils";
 import {
   buildSignupBirthday,
   buildSignupParams as buildProductionSignupParams,
 } from "../../utils/signupRequestUtils";
-import { classifySignupError } from "../../utils/signupErrorUtils";
 import { getProductionSignupAgreementIds, SignupAgreement } from "../../utils/signupAgreementUtils";
 import {
   SubmitSignupOptions,
@@ -66,15 +59,30 @@ import {
   sendPasswordValidationEvent,
   sendSignupErrorShownEvent,
   sendSignupPasskeyRegistrationOutcomeEvent,
+  sendSignupSsoButtonClickEvent,
+  sendSignupSsoButtonShownEvent,
   sendSignUpV2FormPageLoadEvent,
   sendUsernameSuggestionShownEvent,
   sendUsernameValidationErrorEvent,
   sendUsernameValidationSuccessEvent,
 } from "../../services/eventService";
 import { parseErrorCode } from "@rbx/authentication-common/utils/requestUtils";
-import { navigateToPage } from "@rbx/authentication-common/utils/browserUtils";
+import { navigateToPage, navigateToLogin } from "@rbx/authentication-common/utils/browserUtils";
 import useAuditContentState from "../../state/auditContentState";
+import useLoggedInUsers from "@rbx/authentication-common/hooks/useLoggedInUsers";
+import useRedirectHomeIf from "@rbx/authentication-common/hooks/useRedirectHomeIf";
+import AccountSwitcherRestrictionComponent from "../../../shared/AccountSwitcherRestrictionComponent";
+import { confirmationModalOrigins } from "../../../accountSwitcher/constants/accountSwitcherConstants";
 import LegalText from "../../components/LegalText";
+import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
+import {
+  reactSignupCaptchaContainer,
+  reactSignupAccountLimitContainer,
+  signupFormStrings,
+  urlConstants,
+  USER_AGREEMENTS,
+  validationMessages,
+} from "../../constants/signupConstants";
 import {
   authFlow,
   authSource,
@@ -86,11 +94,25 @@ import useSignupAbandonmentBeacon from "../hooks/useSignupAbandonmentBeacon";
 import useSignUpV2Compliance from "../hooks/useSignUpV2Compliance";
 import useUsernameSuggestions from "@rbx/authentication-common/hooks/useUsernameSuggestions";
 import { SignUpFormV2BirthdayFieldName } from "../components/SignUpFormV2";
+import SignInPrompt from "../components/SignInPrompt";
 import {
   getPasswordRequirements,
   PasswordRequirement,
   passwordRequirementLabels,
 } from "../utils/passwordRequirementUtils";
+import type { SignUpV2RefreshVariant } from "../utils/signupV2ExperimentUtils";
+import { authUiVariants } from "@rbx/authentication-common/utils/authUiVariantUtils";
+import AuthenticationMethodDivider from "../../../shared/components/AuthenticationMethodDivider";
+import SsoProviderButtons from "../../../shared/components/SsoProviderButtons";
+import {
+  ssoDividerLabel,
+  ssoIdentityProviderIds,
+  ssoProviderLabels,
+} from "../../../shared/constants/ssoConstants";
+import useAuthUiPolicy from "../../../shared/hooks/useAuthUiPolicy";
+import { redirectToSsoProvider } from "../../../shared/services/ssoRedirectService";
+import { isSsoEligible, isStudioEmbeddedWebView } from "../../../shared/utils/ssoEligibilityUtils";
+import { getAvailableSsoProviders } from "../../../shared/utils/ssoProviderUtils";
 import SignUpContainerV2, {
   SignUpContainerV2FormProps,
   SignUpV2Treatment,
@@ -98,6 +120,7 @@ import SignUpContainerV2, {
 
 type SignUpV2ControllerProps = {
   treatment: SignUpV2Treatment;
+  authUiVariant?: SignUpV2RefreshVariant;
 };
 
 // Field-level interaction telemetry, matching the shape `revamp/SignUpForm` emits
@@ -124,8 +147,19 @@ const signupVariantByTreatment: Record<SignUpV2Treatment, AuthVariant> = {
   [SignUpV2Treatment.FoundationControl]: authVariant.foundationControl,
 };
 
-const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element => {
+const signupVariantByAuthUiVariant: Record<SignUpV2RefreshVariant, AuthVariant> = {
+  refreshSsoDialog: authVariant.refreshSsoDialog,
+  refreshSsoInline: authVariant.refreshSsoInline,
+};
+
+const SignUpV2Controller = ({ treatment, authUiVariant }: SignUpV2ControllerProps): JSX.Element => {
   const { translate } = useTranslation();
+  // Account-switcher restriction: mirrors the legacy form so a browser at or over the
+  // max-logged-in-accounts limit cannot create yet another session, over either submit path.
+  const [isAccountSwitchingEnabledForBrowser, isAccountSwitcherHookCompleted] =
+    AccountSwitcherService?.useIsAccountSwitcherAvailableForBrowser() ?? [false, false];
+  const [hasMaxLoggedInAccountsSignupError, setHasMaxLoggedInAccountsSignupError] = useState(false);
+  const { loggedInUsers } = useLoggedInUsers(false);
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
@@ -151,7 +185,10 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
   const [isConditionalCreateSupported, setIsConditionalCreateSupported] = useState(false);
   const [unifiedCaptchaId, setUnifiedCaptchaId] = useState("");
   const [dataExchange, setDataExchange] = useState("");
-  const [lastSubmission, setLastSubmission] = useState<SubmitSignupOptions | null>(null);
+  // Latest submission attempt, kept in a ref so callbacks created in the render
+  // in which a submit began (the logout-all confirm path) still see the failed
+  // attempt even though the state update lands only on later renders.
+  const lastSubmissionRef = useRef<SubmitSignupOptions | null>(null);
   const dayRef = useRef<HTMLSelectElement>(null);
   const monthRef = useRef<HTMLSelectElement>(null);
   const yearRef = useRef<HTMLSelectElement>(null);
@@ -165,9 +202,11 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
       createAuthFlowTelemetry({
         flow: authFlow.signup,
         source: authSource.signupV2,
-        variant: signupVariantByTreatment[treatment],
+        variant: authUiVariant
+          ? signupVariantByAuthUiVariant[authUiVariant]
+          : signupVariantByTreatment[treatment],
       }),
-    [treatment],
+    [authUiVariant, treatment],
   );
   // Not the container: this component owns every path that can complete signup,
   // including the post-captcha retry.
@@ -199,6 +238,9 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
     onSuggestionsShown: handleSuggestionsShown,
   });
   const compliance = useSignUpV2Compliance({
+    day,
+    month,
+    year,
     locale,
     translate,
     defaultLegalContent: (
@@ -210,6 +252,30 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
       />
     ),
   });
+  const authUiPolicy = useAuthUiPolicy();
+  const isSsoOffered =
+    authUiVariant === authUiVariants.refreshSsoInline &&
+    !authUiPolicy.isLoading &&
+    !authUiPolicy.isExternalIdentityLoginExcluded &&
+    isSsoEligible({ isStudioEmbeddedWebView: isStudioEmbeddedWebView() });
+  const ssoProviders = isSsoOffered ? getAvailableSsoProviders(ssoIdentityProviderIds) : [];
+  // The account limit is blob-derived, so it only applies in switcher-enabled browsers — the
+  // same population whose sessions the signup would otherwise silently extend.
+  const isAccountLimitReached =
+    isAccountSwitchingEnabledForBrowser && loggedInUsers.isAccountLimitReached;
+  useRedirectHomeIf(
+    authenticatedUser.isAuthenticated &&
+      isAccountSwitcherHookCompleted &&
+      !isAccountSwitchingEnabledForBrowser,
+  );
+  const handleAccountLimitConfirmation = (): void => {
+    if (authenticatedUser.isAuthenticated) {
+      navigateToPage(getReturnUrl() || "/");
+      return;
+    }
+    navigateToLogin();
+  };
+  const ssoProvidersKey = ssoProviders.join(",");
   const usesUsernameRequirements = treatment !== SignUpV2Treatment.FoundationControl;
   const usernameRequirements = usesUsernameRequirements
     ? getUsernameRequirements(username, usernameAvailability).map(({ id, isMet }) => ({
@@ -286,7 +352,7 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
   };
 
   useEffect(() => {
-    sendSignUpV2FormPageLoadEvent(treatment);
+    sendSignUpV2FormPageLoadEvent(treatment, authUiVariant);
     telemetry.pageMounted();
     telemetry.formReady();
 
@@ -322,8 +388,14 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
     void loadMetadata();
     // eslint-disable-next-line no-void
     void probeConditionalCreate();
-    // `treatment` never changes after first render, so this still runs once.
-  }, [telemetry, treatment]);
+    // The arm never changes after first render, so this still runs once.
+  }, [authUiVariant, telemetry, treatment]);
+
+  useEffect(() => {
+    ssoProviders.forEach(provider => sendSignupSsoButtonShownEvent(provider));
+    // The provider list is rebuilt every render; its joined key is the stable dependency.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ssoProvidersKey]);
 
   // The birthday dropdown reports its close before the selected value commits, so
   // validating on close alone reads a birthday that is one selection behind.
@@ -395,9 +467,20 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
     };
   });
 
+  const { parentalConsentAgreements, shouldExcludeOptionalPersonalInformationPolicy } = compliance;
   const agreementIds = useMemo(
-    () => getProductionSignupAgreementIds(userAgreements, isUserAgreementsEnabled, false),
-    [isUserAgreementsEnabled, userAgreements],
+    () =>
+      getProductionSignupAgreementIds(
+        [...userAgreements, ...parentalConsentAgreements],
+        isUserAgreementsEnabled,
+        shouldExcludeOptionalPersonalInformationPolicy,
+      ),
+    [
+      isUserAgreementsEnabled,
+      userAgreements,
+      parentalConsentAgreements,
+      shouldExcludeOptionalPersonalInformationPolicy,
+    ],
   );
 
   const buildSignupParams = (nextPassword: string): TSignupParams => {
@@ -405,6 +488,9 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
     const hasAuditContent =
       Object.keys(capturedAuditContent).length > 0 ||
       Object.keys(additionalAuditContent).length > 0;
+    const accountBlob = isAccountSwitchingEnabledForBrowser
+      ? AccountSwitcherService?.getStoredAccountSwitcherBlob()
+      : undefined;
 
     return buildProductionSignupParams({
       username,
@@ -415,10 +501,8 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
       birthdayYear: year,
       locale,
       agreementIds,
-      otpSession: {
-        otpSessionToken: "",
-        otpContactType: "",
-      },
+      otpSession: compliance.otpSession,
+      accountBlob,
       auditSystemContent: hasAuditContent
         ? { capturedAuditContent, additionalAuditContent }
         : undefined,
@@ -428,7 +512,29 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
   const clearCaptcha = (): void => {
     setUnifiedCaptchaId("");
     setDataExchange("");
-    setLastSubmission(null);
+    lastSubmissionRef.current = null;
+  };
+
+  // Code 21 recovery: the logout-all modal's confirm callback resubmits the
+  // failed request with params rebuilt after the blob was deleted, matching the
+  // legacy form's `handleSubmit(false)` recovery, which drops the stale blob.
+  // The rebuilt submission replaces the ref entry so a captcha challenge raised
+  // by the retry resends the blob-free params, not the original pre-logout ones.
+  const retryLastSubmission = (): void => {
+    const lastSubmission = lastSubmissionRef.current;
+    if (lastSubmission) {
+      const retrySubmission = {
+        ...lastSubmission,
+        params: buildSignupParams(lastSubmission.params.password),
+      };
+      lastSubmissionRef.current = retrySubmission;
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      submitProductionSignup(retrySubmission).then(() => {
+        lastSubmissionRef.current = null;
+        markSignupCompleted();
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      }, onSignupError);
+    }
   };
 
   const onSignupError = (error: unknown): void => {
@@ -441,6 +547,9 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
       parseErrorCode(error),
     );
 
+    if (outcome.type !== "captcha") {
+      compliance.clearParentOtp();
+    }
     if (outcome.type === "captcha") {
       const captchaData: TCaptchaInputParams = parseCaptchaData(error);
       setUnifiedCaptchaId(captchaData.unifiedCaptchaId);
@@ -477,14 +586,25 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
       setGeneralError(outcome.message);
       return;
     }
+    if (outcome.type === "accountSwitcher") {
+      if (outcome.reason === "maxAccounts") {
+        setHasMaxLoggedInAccountsSignupError(true);
+        return;
+      }
+      if (outcome.reason === "emptyBlob") {
+        handleEmptyAccountSwitchBlobRequired(retryLastSubmission, translate, false);
+        return;
+      }
+      // parentEmptyBlob is unreachable here: VPC signup fails closed to the legacy form.
+    }
     setGeneralError(validationMessages.unknownError);
   };
 
   const submitSignupRequest = async (options: SubmitSignupOptions): Promise<void> => {
-    setLastSubmission(options);
+    lastSubmissionRef.current = options;
     await submitProductionSignup(options);
     markSignupCompleted();
-    setLastSubmission(null);
+    lastSubmissionRef.current = null;
   };
 
   const formProps: SignUpContainerV2FormProps = {
@@ -520,33 +640,47 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
       treatment === SignUpV2Treatment.FoundationControl
         ? undefined
         : ({ isDisabled }) => (
-            <Button
-              className="width-full"
-              size="Medium"
-              variant="ActionUtility"
-              as="a"
+            <SignInPrompt
+              translate={translate}
+              translationKey={signupFormStrings.AlreadyHaveAccountSignIn}
               href={urlConstants.login}
-              isDisabled={isDisabled}
+              isDisabled={isDisabled || isAccountLimitReached}
               onClick={() => {
                 sendAuthButtonClickEvent(signIn, "", EVENT_CONSTANTS.context.schematizedSignupForm);
               }}
-            >
-              <span
-                // eslint-disable-next-line react/no-danger
-                dangerouslySetInnerHTML={{
-                  __html: translate(signupFormStrings.AlreadyHaveAccountSignIn, {
-                    startTag:
-                      '<span style="text-decoration: underline; text-decoration-skip-ink: none;">',
-                    endTag: "</span>",
-                  }),
-                }}
-              />
-            </Button>
+            />
           ),
+    alternativeAuthContent:
+      ssoProviders.length > 0
+        ? ({ isDisabled }) => (
+            <React.Fragment>
+              <AuthenticationMethodDivider label={translate(ssoDividerLabel)} />
+              <SsoProviderButtons
+                providers={ssoProviders.map(provider => ({
+                  provider,
+                  label: translate(ssoProviderLabels[provider]),
+                  isDisabled: isDisabled || isAccountLimitReached,
+                  onClick: () => {
+                    sendSignupSsoButtonClickEvent(provider);
+                    // Signup continues at the provider, so leaving for it isn't abandonment.
+                    markSignupCompleted();
+                    redirectToSsoProvider(
+                      provider,
+                      ssoIdentityProviderIds,
+                      EVENT_CONSTANTS.context.schematizedSignupForm,
+                      telemetry,
+                    );
+                  },
+                }))}
+              />
+            </React.Fragment>
+          )
+        : undefined,
     generalError: generalError ? translate(generalError) : undefined,
     onBirthdayChange: (field, value) => {
       sendAuthFormInteractionEvent(formInteractionCtx, birthdayInteractionField[field], value);
       invalidateUsernameValidation();
+      compliance.reset();
       birthdayValuesRef.current = {
         ...birthdayValuesRef.current,
         [field]: value,
@@ -610,45 +744,59 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
 
   return (
     <React.Fragment>
-      <SignUpContainerV2
-        treatment={treatment}
-        formProps={formProps}
-        addAuthMethodLabels={{
-          back: translate("Action.Back"),
-          heading: translate(signupFormStrings.CreateAccountSentenceCase),
-          greeting: translate("Heading.UserGreetingWithName", { username }),
-          subheading: translate("Description.ChooseHowYouSignIn"),
-          passwordLabel: translate(signupFormStrings.Password),
-          passwordPlaceholder: translate(signupFormStrings.PasswordPlaceholder),
-          showPassword: translate("Label.ShowPassword"),
-          hidePassword: translate("Label.HidePassword"),
-          createPassword: translate("Label.AddPassword"),
-          createPasskey: translate("Action.CreateAPasskey"),
-          or: translate("Description.Or"),
-        }}
-        passwordRequirements={passwordRequirements.map(({ id, isMet }) => ({
-          id,
-          isMet,
-          label: translate(passwordRequirementLabels[id]),
-        }))}
-        passkeyRegistrationError={translate(validationMessages.usernameAlreadyInUse)}
-        passkeyAttemptError={translate("Header.PleaseTryAgain")}
-        buildSignupParams={buildSignupParams}
-        signupCompletionOptions={{
-          returnUrl: getReturnUrl(),
-          isVerifiedParentConsentSignup: false,
-          isVietnamSignup: false,
-          isConditionalCreateSupported,
-          silentPasskeyUpgradeBrowserCheck: signupSilentUpgradeBrowserCheck,
-          telemetry,
-        }}
-        telemetry={telemetry}
-        submitSignupRequest={submitSignupRequest}
-        onSignupError={onSignupError}
-        onPasskeyOutcome={sendSignupPasskeyRegistrationOutcomeEvent}
-        isInitialSubmitDisabled={!isBaseFormValid}
-        isPasswordSubmitDisabled={!isBaseFormValid || !isPasswordValid}
-        isPasskeySubmitDisabled={!isBaseFormValid}
+      {compliance.interstitial}
+      {/* Stays mounted under the consent page so the pending Continue can resume. */}
+      <div hidden={Boolean(compliance.interstitial)}>
+        <SignUpContainerV2
+          treatment={treatment}
+          formProps={formProps}
+          addAuthMethodLabels={{
+            back: translate("Action.Back"),
+            heading: translate(signupFormStrings.CreateAccountSentenceCase),
+            greeting: translate("Heading.UserGreetingWithName", { username }),
+            subheading: translate("Description.ChooseHowYouSignIn"),
+            passwordLabel: translate(signupFormStrings.Password),
+            passwordPlaceholder: translate(signupFormStrings.PasswordPlaceholder),
+            showPassword: translate("Label.ShowPassword"),
+            hidePassword: translate("Label.HidePassword"),
+            createPassword: translate("Label.AddPassword"),
+            createPasskey: translate("Action.CreateAPasskey"),
+            or: translate("Description.Or"),
+          }}
+          passwordRequirements={passwordRequirements.map(({ id, isMet }) => ({
+            id,
+            isMet,
+            label: translate(passwordRequirementLabels[id]),
+          }))}
+          passkeyRegistrationError={translate(validationMessages.usernameAlreadyInUse)}
+          passkeyAttemptError={translate("Header.PleaseTryAgain")}
+          buildSignupParams={buildSignupParams}
+          signupCompletionOptions={{
+            returnUrl: getReturnUrl(),
+            isVerifiedParentConsentSignup: false,
+            isVietnamSignup: false,
+            isConditionalCreateSupported,
+            silentPasskeyUpgradeBrowserCheck: signupSilentUpgradeBrowserCheck,
+            telemetry,
+          }}
+          telemetry={telemetry}
+          submitSignupRequest={submitSignupRequest}
+          onSignupError={onSignupError}
+          onPasskeyRegistrationRejected={compliance.clearParentOtp}
+          onPasskeyOutcome={sendSignupPasskeyRegistrationOutcomeEvent}
+          isInitialSubmitDisabled={!isBaseFormValid || isAccountLimitReached}
+          isPasswordSubmitDisabled={!isBaseFormValid || !isPasswordValid || isAccountLimitReached}
+          isPasskeySubmitDisabled={!isBaseFormValid || isAccountLimitReached}
+          beginComplianceInterruption={compliance.beginInterruption}
+        />
+      </div>
+      <AccountSwitcherRestrictionComponent
+        origin={confirmationModalOrigins.SignupAccountLimit}
+        containerId={reactSignupAccountLimitContainer}
+        hasMaxLoggedInAccountsSignupError={hasMaxLoggedInAccountsSignupError}
+        isAccountLimitReached={isAccountLimitReached}
+        handleRedirectHome={handleAccountLimitConfirmation}
+        isParentUser={false}
       />
       {unifiedCaptchaId && dataExchange && (
         <CaptchaComponent
@@ -657,6 +805,7 @@ const SignUpV2Controller = ({ treatment }: SignUpV2ControllerProps): JSX.Element
           unifiedCaptchaId={unifiedCaptchaId}
           dataExchange={dataExchange}
           onCaptchaChallengeCompleted={(data: TOnCaptchaChallengeCompletedData) => {
+            const lastSubmission = lastSubmissionRef.current;
             if (lastSubmission) {
               const retrySubmission = {
                 ...lastSubmission,

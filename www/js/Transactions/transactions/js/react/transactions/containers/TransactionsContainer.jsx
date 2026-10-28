@@ -14,6 +14,7 @@ import {
   generateBitwiseFlagFromUsedTypes
 } from '../utils/transactionTypeHelper';
 import { getBuyRobuxUrl } from '../utils/urlHelper';
+import translateTransactionTypeLabel from '../utils/translateTransactionTypeLabel';
 import SummaryContainer from './SummaryContainer';
 import TransactionsListContainer from './TransactionsListContainer';
 import {
@@ -175,7 +176,7 @@ function TransactionsContainer({ translate, metadata }) {
           <Dropdown
             id='type-selection'
             labelledby='type-selection-label'
-            currSelectionLabel={translate(transactionTypeTranslationKeys[transactionType])}>
+            currSelectionLabel={translateTransactionTypeLabel(translate, transactionType)}>
             {Object.keys(transactionTypeOptions)
               .filter(
                 transactionTypeOption =>
@@ -192,7 +193,7 @@ function TransactionsContainer({ translate, metadata }) {
                       sendTransactionTypeClickEvent(transactionTypeOption);
                     }}
                     active={transactionType === transactionTypeOption}>
-                    {translate(transactionTypeTranslationKeys[transactionTypeOption])}
+                    {translateTransactionTypeLabel(translate, transactionTypeOption)}
                   </Dropdown.Item>
                 );
               })}

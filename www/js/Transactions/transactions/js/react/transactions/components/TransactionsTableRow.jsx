@@ -178,7 +178,6 @@ TransactionsTableRow.propTypes = {
       type: PropTypes.string
     }),
     amountInLocalCurrency: PropTypes.string,
-    o18EligibilityTag: PropTypes.string,
     robuxRateBreakdown: PropTypes.shape({
       o18: PropTypes.number,
       standard: PropTypes.number

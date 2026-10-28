@@ -1,6 +1,6 @@
 import { generateRandomUuid as generateSessionInfo } from "@rbx/core-lib/uuid";
 import { eventTypes } from "@rbx/core-scripts/event-stream";
-import { ValueOf } from "@rbx/core-types";
+import { ValueOf } from "@rbx/core-lib";
 import { DefaultSearchType, SearchType } from "../util/searchUtil";
 
 const searchAutocompleteContext = "searchAutocomplete";

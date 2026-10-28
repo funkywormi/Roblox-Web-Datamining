@@ -1,4 +1,4 @@
-import { ValueOf } from "@rbx/core-types";
+import { ValueOf } from "@rbx/core-lib";
 import { getItem, setItem } from "@rbx/core-lib/local-storage";
 import "../constants/localStorageRegistry";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";

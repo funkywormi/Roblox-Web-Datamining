@@ -1,6 +1,8 @@
 import { eventStreamService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
 import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 import { CredentialType } from "@rbx/authentication-common/types/loginTypes";
+import { getAssignedAuthUiVariant } from "@rbx/authentication-common/utils/authUiVariantUtils";
+import type { SsoProvider } from "../../shared/types/ssoTypes";
 import {
   getTraceIdFromUrl,
   STUDIO_TRACE_ID_PARAM,
@@ -219,4 +221,174 @@ export const sendAuthMsgShownEvent = (ctx: string, field: string, errorCode: str
     field,
     errorCode,
   });
+};
+
+const ssoProviderButtons: Readonly<Record<SsoProvider, string>> = {
+  google: EVENT_CONSTANTS.btn.googleSso,
+  apple: EVENT_CONSTANTS.btn.appleSso,
+};
+
+// The button events have no `field` column, so placement goes in `state`.
+export type LoginSsoButtonPlacement = "underDivider" | "otherSignInOptions";
+
+/**
+ * Both login UIs send the same events, so the arm on the page load is what splits their funnels
+ * without joining to IXP exposure. Later events don't repeat it; join them on BTID.
+ */
+export const sendLoginPageLoadEvent = (): void => {
+  const authUiVariant = getAssignedAuthUiVariant();
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authPageLoad,
+    EVENT_CONSTANTS.context.loginPage,
+    authUiVariant ? { origin: authUiVariant } : {},
+  );
+};
+
+export const sendLoginSsoButtonShownEvent = (
+  provider: SsoProvider,
+  placement: LoginSsoButtonPlacement,
+): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authButtonShown,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    {
+      btn: ssoProviderButtons[provider],
+      state: placement,
+    },
+  );
+};
+
+export const sendLoginSsoButtonClickEvent = (
+  provider: SsoProvider,
+  placement: LoginSsoButtonPlacement,
+): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authButtonClick,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    {
+      btn: ssoProviderButtons[provider],
+      state: placement,
+    },
+  );
+};
+
+export const sendLoginOtherSignInOptionsClickEvent = (): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authButtonClick,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    { btn: EVENT_CONSTANTS.btn.otherSignInOptions },
+  );
+};
+
+export const sendLoginOtherSignInOptionsShownEvent = (): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authModalShown,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    {
+      state: EVENT_CONSTANTS.aType.shown,
+      field: EVENT_CONSTANTS.field.loginOtherSignInOptionsModal,
+    },
+  );
+};
+
+/**
+ * The Foundation dialog doesn't say whether its X, Escape, or the backdrop closed it, so web
+ * sends one `dismiss` button where Lua splits `dismissCornerX` from `dismissSheet`.
+ */
+export const sendLoginOtherSignInOptionsDismissedEvent = (): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authButtonClick,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    {
+      btn: EVENT_CONSTANTS.btn.dismiss,
+      state: EVENT_CONSTANTS.field.loginOtherSignInOptionsModal,
+    },
+  );
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authModalShown,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    {
+      state: EVENT_CONSTANTS.aType.dismissed,
+      field: EVENT_CONSTANTS.field.loginOtherSignInOptionsModal,
+    },
+  );
+};
+
+export const sendLoginLinkClickEvent = (
+  btn: typeof EVENT_CONSTANTS.btn.signup | typeof EVENT_CONSTANTS.btn.forgotCredentials,
+): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authButtonClick,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    { btn },
+  );
+};
+
+/**
+ * A login request the server accepted. `state` is what comes next (`complete`, `twoStep`, or
+ * `identityVerification`), so two-step verification entry is visible without a separate event.
+ * `authFormInteraction` has no `ctype` column, so the method is in `entered`.
+ */
+export const sendLoginSucceededEvent = (method: string, nextStep: string): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authFormInteraction,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    {
+      field: EVENT_CONSTANTS.field.loginSuccess,
+      state: nextStep,
+      entered: method,
+    },
+  );
+};
+
+/**
+ * A login request the server rejected, including the captcha and challenge responses that
+ * interrupt it. `state` is the failure category and `errorCode` the server's code.
+ * `authMsgShown` has no `ctype` column, and passkey, magic link, and auth token logins send no
+ * submit event to join on, so the method is in `field`.
+ */
+export const sendLoginErrorShownEvent = (
+  method: string,
+  reason: string,
+  errorCode: number | null,
+): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authMsgShown,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    {
+      field: method,
+      state: reason,
+      errorCode: errorCode === null ? "" : String(errorCode),
+    },
+  );
+};
+
+/**
+ * Lua sends `authClientError` with the server's code on every failed login, so web does too for
+ * cross-platform queries. `authClientError` has no `errorCode` column, so the code is the `state`,
+ * falling back to the failure category when the server sent no code.
+ */
+export const sendLoginClientErrorEvent = (errorCode: number | null, reason: string): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authClientError,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    { state: errorCode === null ? reason : String(errorCode) },
+  );
+};
+
+export const passkeyLoginClientErrorSteps = {
+  challengeFetch: "passkeyChallengeFetch",
+  credential: "passkeyCredential",
+} as const;
+
+/** `detail` is the browser's DOMException name for credential errors, such as `NotAllowedError`. */
+export const sendPasskeyLoginClientErrorEvent = (
+  step: (typeof passkeyLoginClientErrorSteps)[keyof typeof passkeyLoginClientErrorSteps],
+  detail: string,
+): void => {
+  sendEventWithTraceId(
+    EVENT_CONSTANTS.schematizedEventTypes.authClientError,
+    EVENT_CONSTANTS.context.schematizedLoginForm,
+    { state: `${step}.${detail}` },
+  );
 };

@@ -138,7 +138,7 @@ const AddAuthMethodPage = ({
                 type="button"
                 icon={isPasswordVisible ? "icon-regular-eye" : "icon-regular-eye-slash"}
                 ariaLabel={isPasswordVisible ? labels.hidePassword : labels.showPassword}
-                size="Small"
+                size="XSmall"
                 variant="Utility"
                 isDisabled={isBusy}
                 onMouseDown={holdPasswordFocus}
@@ -212,7 +212,7 @@ const AddAuthMethodPage = ({
         {/* StyleGuide pads every heading element, pushing the title off the card's inset. */}
         <h1
           ref={headingRef}
-          className="content-emphasis text-heading-medium padding-y-none"
+          className="content-emphasis text-heading-small padding-y-none"
           tabIndex={-1}
         >
           {labels.heading}

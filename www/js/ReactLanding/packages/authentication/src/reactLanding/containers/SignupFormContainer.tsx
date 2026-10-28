@@ -49,7 +49,8 @@ import {
 } from "../utils/signupUtils";
 import { isUnderThresholdAge } from "../utils/identityVerificationUtils";
 import { isValidEmail } from "@rbx/authentication-common/utils/formUtils";
-import { fetchReturnUrl } from "@rbx/authentication-common/utils/requestUtils";
+import { fetchReturnUrl, parseErrorCode } from "@rbx/authentication-common/utils/requestUtils";
+import { getAssignedAuthUiVariant } from "@rbx/authentication-common/utils/authUiVariantUtils";
 import { parseCaptchaData } from "@rbx/authentication-common/utils/errorParsingUtils";
 import { SilentPasskeyUpgradeVariant } from "../../shared/silentPasskeyUpgradeCore";
 import {
@@ -57,6 +58,7 @@ import {
   authFlow,
   authMethod,
   authSource,
+  authStage,
   authVariant,
   createAuthFlowTelemetry,
 } from "../../shared/telemetry/authFlowTelemetry";
@@ -89,9 +91,11 @@ import {
   sendSignupUsernameKeystrokeEvent,
   sendSchematizedSignupCheckboxToggledEvent,
   sendPasswordPolicyMsgShownEvent,
+  sendSignupErrorShownEvent,
 } from "../services/eventService";
 import { getMetadataV2, getUserAgreements } from "../services/signupService";
 import { submitSignup } from "../services/signupSubmissionService";
+import { sendSignupTokenOpenedEvent } from "../utils/signupTokenRedemptionUtils";
 import logoutService from "@rbx/authentication-common/services/logoutService";
 
 // constants
@@ -160,11 +164,20 @@ import KoreaSignupComplianceComponent from "../components/KoreaSignupComplianceC
 import { usernameValidatorErrorMessages } from "@rbx/authentication-common/constants/validationConstants";
 import SignupAgreementCheckbox from "../components/SignupAgreementCheckbox";
 import useAuditContentState from "../state/auditContentState";
+import useSignupAbandonmentBeacon, {
+  SignupAbandonmentStep,
+} from "../signupV2/hooks/useSignupAbandonmentBeacon";
 
 const legacySignupTelemetry = createAuthFlowTelemetry({
   flow: authFlow.signup,
   source: authSource.legacy,
   variant: authVariant.control,
+});
+
+// The form is a single step, so leaving it is always an incomplete form.
+const getControlAbandonmentStep = (): SignupAbandonmentStep => ({
+  state: EVENT_CONSTANTS.state.signUpV2.abandoned.formIncomplete,
+  stage: authStage.formIncomplete,
 });
 
 interface SignupFormContainerProps {
@@ -236,6 +249,10 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
 
   // VPC signup
   const isVPCSignup = isVerifiedParentConsentSignup();
+  const { markSignupCompleted } = useSignupAbandonmentBeacon(legacySignupTelemetry, {
+    isEnabled: !isVPCSignup,
+    getAbandonmentStep: getControlAbandonmentStep,
+  });
   const dataToken = getDataToken();
   const requestType = urlService.getQueryParam(
     requestTypeParam,
@@ -383,7 +400,11 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
   });
 
   useEffect(() => {
-    sendAuthPageLoadEvent(EVENT_CONSTANTS.context.signupForm);
+    sendAuthPageLoadEvent(
+      EVENT_CONSTANTS.context.signupForm,
+      undefined,
+      getAssignedAuthUiVariant(),
+    );
     if (!isVPCSignup) {
       legacySignupTelemetry.pageMounted();
     }
@@ -708,6 +729,8 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
     void fetchBirthday();
     if (isVPCSignup) {
       sendVPCSignupPageLoadEvent(requestType, vpcSessionId, settingName);
+      // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation -- best-effort analytics event
+      void sendSignupTokenOpenedEvent(dataToken);
       if (!isAccountSwitchingEnabledForBrowser && authenticatedUser.isAuthenticated) {
         // account switcher has another modal for logout all users
         // this modal is only for when account switcher is not enabled
@@ -807,6 +830,15 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
     const outcome = classifySignupError(error, () =>
       AccountIntegrityChallengeService.Generic.ChallengeError.matchAbandoned(error),
     );
+    // Matches Signup V2, which reports every branch, including captcha and the ones that navigate
+    // away. An abandoned challenge shows the user nothing.
+    if (outcome.type !== "abandonedChallenge") {
+      sendSignupErrorShownEvent(
+        EVENT_CONSTANTS.context.schematizedSignupForm,
+        outcome,
+        parseErrorCode(error),
+      );
+    }
 
     switch (outcome.type) {
       case "captcha":
@@ -964,6 +996,7 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
         silentPasskeyUpgradeBrowserCheck: signupSilentUpgradeBrowserCheck,
         telemetry: isVPCSignup ? undefined : legacySignupTelemetry,
       });
+      markSignupCompleted();
     } catch (error) {
       handleSignupError(error);
     }

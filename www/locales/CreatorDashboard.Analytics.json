@@ -1243,5 +1243,7 @@
     "Label.Dimension.QueueServiceFailure.Expired": "Expired",
     "Label.Dimension.QueueServiceFailure.MaxRedeliveries": "Max redeliveries",
     "Description.Dimension.QueueServiceFailure.Expired": "Expired",
-    "Description.Dimension.QueueServiceFailure.MaxRedeliveries": "Max redeliveries"
+    "Description.Dimension.QueueServiceFailure.MaxRedeliveries": "Max redeliveries",
+    "Error.JourneyNameExceeds50Characters": "Journey name cannot exceed 50 characters.",
+    "HelperText.JourneyNameUpTo50Characters": "Name can only contain letters, numbers, '.', '-', and '_', up to 50 characters"
 }

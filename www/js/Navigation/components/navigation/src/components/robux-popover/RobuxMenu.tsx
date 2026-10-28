@@ -1,5 +1,5 @@
 import { useEffect, useState, Fragment } from "react";
-import { ValueOf } from "@rbx/core-types";
+import { ValueOf } from "@rbx/core-lib";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { Icon, Menu, MenuItem, MenuLabel, MenuSection, MenuSeparator } from "@rbx/foundation-ui";

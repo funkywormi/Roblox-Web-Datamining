@@ -12,6 +12,7 @@ const EVENT_CONSTANTS = {
     authOperationTiming: "authOperationTiming",
     usernameSuggestionShown: "usernameSuggestionShown",
     passkeyRegistrationEvent: "passkeyRegistrationEvent",
+    authButtonShown: "authButtonShown",
   },
   eventName: {
     loginOtherDevice: "loginOtherDevice",
@@ -74,6 +75,11 @@ const EVENT_CONSTANTS = {
     passkeyRegistration: "passkeyRegistration",
     addAuthMethodPage: "addAuthMethodPage",
     passkeyCeremony: "passkeyCeremony",
+    // The OAuth birthday-compliance modal on /not-approved (AA-7681). The warning modal's
+    // context is separate so the close funnel is cut per modal, mirroring
+    // EventStreamConstants.Context.AccountUpgrade/AccountUpgradeCloseWarning in lua-apps.
+    accountUpgrade: "accountUpgrade",
+    accountUpgradeCloseWarning: "accountUpgradeCloseWarning",
   },
   verifiedParentalConsentContext: {
     chargeback: {
@@ -143,10 +149,17 @@ const EVENT_CONSTANTS = {
     hasAuthIntent: "hasAuthIntent",
     tosCheckbox: "tosCheckbox",
     exitSignupConfirmation: "exitSignupConfirmation",
+    // The account upgrade agreement's links (mirrors EventStreamConstants.Field.TermsOfService/
+    // PrivacyPolicy in lua-apps; the signup forms' tos_link/pp_link are a different vocabulary).
+    termsOfService: "termsOfService",
+    privacyPolicy: "privacyPolicy",
+    signupSuccess: "signupSuccess",
     // How the OS passkey prompt was raised; dismissal rates differ between them.
     autoPrompt: "autoPrompt",
     deliberateRetry: "deliberateRetry",
     general: "general",
+    loginOtherSignInOptionsModal: "loginOtherSignInOptionsModal",
+    loginSuccess: "loginSuccess",
   },
   btn: {
     cancel: "cancel",
@@ -202,6 +215,19 @@ const EVENT_CONSTANTS = {
     exitSignupConfirmCancel: "exitSignupConfirmCancel",
     passkey: "passkey",
     password: "password",
+    // Account upgrade save button (mirrors EventStreamConstants.Button.Save in lua-apps).
+    save: "save",
+    // The dialog corner X (mirrors EventStreamConstants.Button.DismissCornerX).
+    dismissCornerX: "dismissCornerX",
+    // The close-warning's confirm button, which logs the user out (mirrors Button.Close).
+    close: "close",
+    // Sent when the account upgrade birthday becomes a complete date (mirrors
+    // EventStreamConstants.Button.ConfirmBirthday, which the Lua picker sends on confirm).
+    confirmBirthday: "confirmBirthday",
+    // Matches the Lua app's SSO button names so cross-platform SSO funnels share one value.
+    googleSso: "googleSso",
+    appleSso: "appleSso",
+    otherSignInOptions: "otherSignInOptions",
   },
   input: {
     redacted: "[Redacted]",
@@ -210,12 +236,18 @@ const EVENT_CONSTANTS = {
     webVerifiedSignup: "WebVerifiedSignup",
     signup: "signup",
     login: "login",
-    // Signup V2 arm on the form pageload. No legacy value: that arm renders the
-    // pre-existing form, which emits no origin. Identify it via IXP exposure.
+    // The OAuth birthday-compliance modal on /not-approved (AA-7681). Mirrors the Lua client's
+    // OAuth origin vocabulary (accountUpgradeOAuthDialog/FullPage); the web modal is a distinct
+    // surface, so it carries its own value.
+    accountUpgradeOAuthWeb: "accountUpgradeOAuthWeb",
+    // Signup V2 arm on the form pageload. The pre-existing form sends the assigned
+    // `auth-ui-data` arm (including `control`) and no origin under the `signup-v2-data` fallback.
     signUpV2Arm: {
       passwordFirst: "passwordFirst",
       passkeyFirst: "passkeyFirst",
       foundationControl: "foundationControl",
+      refreshSsoDialog: "refreshSsoDialog",
+      refreshSsoInline: "refreshSsoInline",
     },
   },
   text: {
@@ -298,6 +330,7 @@ const EVENT_CONSTANTS = {
         unsupported: "unsupported",
         error: "error",
         autoPromptSuppressed: "autoPromptSuppressed",
+        afterCompliance: "afterCompliance",
       },
       authMethodChosen: "authMethodChosen",
       // Step reached when the page was hidden. The `abandoned:` prefix keeps
@@ -333,6 +366,10 @@ const EVENT_CONSTANTS = {
     unfocused: "unfocused",
     selected: "selected",
     unselected: "unselected",
+    // Account upgrade outcomes (mirrors EventStreamConstants.State.UpgradeSuccess/
+    // UpgradeFailure in lua-apps; `unknown` is already the signupError value).
+    upgradeSuccess: "upgradeSuccess",
+    upgradeFailure: "upgradeFailure",
   },
   // Which step of the account-recovery passkey registration ceremony failed.
   // Carried in `origin` on the passkeyRegistrationFailure authMsgShown event
@@ -377,6 +414,7 @@ const EVENT_CONSTANTS = {
     passkeyCeremony: "passkeyCeremony",
     password: "password",
     autoPromptSuppressed: "autoPromptSuppressed",
+    complianceInterruption: "complianceInterruption",
   },
   passkeyRegistrationSource: {
     signup: "signup",

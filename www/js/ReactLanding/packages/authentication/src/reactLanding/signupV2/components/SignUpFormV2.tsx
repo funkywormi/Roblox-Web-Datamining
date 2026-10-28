@@ -70,6 +70,8 @@ type SignUpFormV2BaseProps = {
   /** Rendered as a function so the slot can share the form's busy state; the sign-in action
    * has to go inert while the card is submitting, like every other control in it. */
   signInContent?: (state: { isDisabled: boolean }) => ReactNode;
+  /** Other ways to create the account, such as SSO providers, rendered under the primary action. */
+  alternativeAuthContent?: (state: { isDisabled: boolean }) => ReactNode;
   generalError?: string;
   isSubmitting?: boolean;
   isSubmitDisabled?: boolean;
@@ -129,6 +131,7 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
     gender,
     legalContent,
     signInContent,
+    alternativeAuthContent,
     generalError,
     isSubmitting = false,
     isSubmitDisabled = false,
@@ -233,7 +236,7 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
             type="button"
             icon={isPasswordVisible ? "icon-regular-eye" : "icon-regular-eye-slash"}
             ariaLabel={isPasswordVisible ? labels.hidePassword : labels.showPassword}
-            size="Small"
+            size="XSmall"
             variant="Utility"
             isDisabled={isSubmitting}
             onClick={onPasswordVisibilityToggle}
@@ -262,7 +265,7 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
             otherwise push the title below the card's own inset. */}
         <h1
           ref={headingRef}
-          className="content-emphasis text-heading-medium padding-y-none margin-bottom-[4px]"
+          className="content-emphasis text-heading-small padding-y-none margin-bottom-[4px]"
           tabIndex={-1}
         >
           {labels.heading}
@@ -418,7 +421,21 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
             {submitLabel}
           </Button>
 
-          {signInContent?.({ isDisabled: isSubmitting })}
+          {alternativeAuthContent && (
+            <div className="flex width-full flex-col gap-medium padding-top-xsmall">
+              {alternativeAuthContent({ isDisabled: isSubmitting })}
+            </div>
+          )}
+
+          {signInContent && (
+            // The design sizes this row like a Medium button, 16px below the controls above it.
+            // Padding rather than margin-top-small, which legacy page CSS overrides to 20px.
+            <div className="width-full padding-top-small">
+              <div className="flex width-full items-center height-1000">
+                {signInContent({ isDisabled: isSubmitting })}
+              </div>
+            </div>
+          )}
 
           <div className="content-muted width-full text-caption-small [&_a]:underline">
             {legalContent}

@@ -2,8 +2,8 @@
  * A util lib for account switching settings and data.
  */
 import { memoize } from "lodash";
-import { localStorageService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
-import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
+import * as localStorage from "@rbx/core-lib/local-storage";
+import { getCurrentUser } from "@rbx/www-common/user";
 import ExperimentationService from "@rbx/experimentation";
 import { postUsersInfo } from "@rbx/authentication-common/services/usersService";
 import { TUserData } from "@rbx/authentication-common/types/userTypes";
@@ -22,6 +22,7 @@ import {
   accountSwitcherLayerName,
   accountSwitcherMaxAccounts,
 } from "../constants/accountSwitcherConstants";
+import "../constants/localStorageRegistry";
 
 /**
  * Check if account switching is enabled in account switching metadata from meta tag
@@ -29,6 +30,11 @@ import {
  * @returns {boolean}
  */
 export const isAccountSwitchingEnabled = (): boolean => {
+  // Next.js renders no account-switching meta tag. The setting is at a 100% rollout, so Next.js
+  // always treats it as on.
+  if (process.env.NEXT_PUBLIC_IS_NEXTJS === "true") {
+    return true;
+  }
   const metaTag = document.querySelector<HTMLElement>('meta[name="account-switching-data"]');
   const keyMap = metaTag?.dataset || {};
   return keyMap.isAccountSwitchingEnabled === "true";
@@ -39,7 +45,18 @@ export const getStoredAccountSwitcherBlob = (): string => {
     return "";
   }
   try {
-    return localStorageService.getLocalStorage(accountSwitcherBlobKey) as string;
+    const blob = localStorage.getItem(accountSwitcherBlobKey);
+    if (
+      blob == null &&
+      localStorage.hasItem(accountSwitcherBlobKey) &&
+      window.localStorage.getItem(accountSwitcherBlobKey) !== "null"
+    ) {
+      // A stored value that isn't JSON, which the legacy service's JSON.parse threw on. A stored
+      // JSON `null` parses fine, so it stays `null` like the legacy service returned.
+      throw new Error("Stored account switcher blob is not valid JSON");
+    }
+    // A missing blob stays `null`, as the legacy service returned it.
+    return blob as string;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn(e);
@@ -56,8 +73,8 @@ export const storeAccountSwitcherBlob = (blob: string): void => {
     return;
   }
   try {
-    localStorageService.setLocalStorage(accountSwitcherBlobKey, blob);
-    localStorageService.setLocalStorage(accountSwitcherBlobSyncedKey, true);
+    localStorage.setItem(accountSwitcherBlobKey, blob).getOrThrow();
+    localStorage.setItem(accountSwitcherBlobSyncedKey, true).getOrThrow();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn(e);
@@ -71,7 +88,7 @@ export const storeAccountSwitcherBlob = (blob: string): void => {
 export const deleteAccountSwitcherBlob = (): void => {
   try {
     // Allowing deletion even if the feature is turned off for privacy reason
-    localStorageService.removeLocalStorage(accountSwitcherBlobKey);
+    localStorage.removeItem(accountSwitcherBlobKey);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn(e);
@@ -118,7 +135,8 @@ export const isAccountSwitcherAvailable = async (): Promise<boolean> => {
   if (!isAccountSwitchingEnabled()) {
     return false;
   }
-  if (authenticatedUser?.isAuthenticated && authenticatedUser?.isUnder13) {
+  const currentUser = getCurrentUser();
+  if (currentUser?.isUnder13) {
     return false;
   }
   const blob = getStoredAccountSwitcherBlob();
@@ -127,7 +145,7 @@ export const isAccountSwitcherAvailable = async (): Promise<boolean> => {
     return true;
   }
 
-  if (!authenticatedUser?.isAuthenticated) {
+  if (currentUser == null) {
     // if the user is not authenticated and has no blob, account switching is not available. Skip experiment call
     return false;
   }
@@ -140,13 +158,14 @@ const parseUserMetaData = async (
   const blob = getStoredAccountSwitcherBlob();
   let userMetaData = {} as TGetLoggedInUsersMetadataResponse;
   let isAccountLimitReached = false;
-  if (!authenticatedUser.isAuthenticated && !blob) {
+  const currentUser = getCurrentUser();
+  if (currentUser == null && !blob) {
     // early return if user is not authed and blob is empty, to skip network calls
     // there are no accounts in the switcher and no accounts could be added
     return [userMetaData, isAccountLimitReached];
   }
   // exclude authenticated U13 accounts
-  if (!(authenticatedUser.isAuthenticated && authenticatedUser.isUnder13)) {
+  if (!currentUser?.isUnder13) {
     try {
       userMetaData = await getLoggedInUsersMetadata({
         encrypted_users_data_blob: blob,
@@ -159,8 +178,8 @@ const parseUserMetaData = async (
         let numOfLoggedInAccounts = userMetaData.logged_in_users_metadata.length;
         if (
           userMetaData.active_user_id &&
-          authenticatedUser.isAuthenticated &&
-          userMetaData.active_user_id !== authenticatedUser.id!.toString()
+          currentUser != null &&
+          userMetaData.active_user_id !== currentUser.id
         ) {
           numOfLoggedInAccounts += 1;
         }
@@ -249,7 +268,7 @@ export const parseLoggedInUsers = async (
 
 export const syncAccountSwitcherBlobIfNeeded = async (): Promise<void> => {
   try {
-    if (localStorageService.getLocalStorage(accountSwitcherBlobSyncedKey) as boolean) {
+    if (localStorage.getItem(accountSwitcherBlobSyncedKey)) {
       return;
     }
   } catch (e) {

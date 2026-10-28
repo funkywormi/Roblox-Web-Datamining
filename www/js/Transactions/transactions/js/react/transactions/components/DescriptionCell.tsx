@@ -65,6 +65,8 @@ const DescriptionCell: FunctionComponent<DescriptionCellProps> = ({ transaction,
       translate={translate}
       transactionType={getEffectiveTransactionOriginType(transaction)}
       created={transaction.created}
+      transactionSubtype={transaction.transactionSubtype}
+      recipient={transaction.recipient}
     />
   );
 };
