@@ -1,5 +1,5 @@
 import environmentUrls from "@rbx/environment-urls";
-import { isValueOf } from "@rbx/core-types";
+import { isStringEnum } from "@rbx/core-lib";
 import { get } from "@rbx/core-lib/cookie";
 import "@rbx/www-common/global";
 import { COOKIE_NAME, COOKIE_TIMESPAN, TRIGGERING_CONTEXT } from "./constants";
@@ -33,7 +33,7 @@ export default class PaymentFlowContext {
     const [uuid, context] = cookie.value.split(",");
     const purchaseFlowUuid = uuid ?? undefined;
     const triggerContext =
-      context != null && isValueOf(TRIGGERING_CONTEXT, context) ? context : undefined;
+      context != null && isStringEnum(TRIGGERING_CONTEXT, context) ? context : undefined;
     return new PaymentFlowContext(purchaseFlowUuid, triggerContext);
   }
 }

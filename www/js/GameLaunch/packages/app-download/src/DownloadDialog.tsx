@@ -19,6 +19,8 @@ import MobileAppQrPanel from "./MobileAppQrPanel";
 import { resolveAppDownload } from "./resolveAppDownload";
 import { sendPrimaryAppDownloadClickEvent } from "./appDownloadService";
 import { mergeTranslators } from "./useAppDownloadTranslate";
+// AppIcon's classes; .NET gets them from the core-ui style guide, Next.js doesn't load it.
+import "@rbx/branding-assets/css/app_icons.css";
 import "./DownloadDialog.css";
 
 // TODO: could we do something better here? Not sure if this is consistent across translations.

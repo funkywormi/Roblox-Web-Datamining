@@ -1,4 +1,5 @@
 import { UnkeyedStore } from "../UnkeyedStore";
+import { window as browserWindow } from "@rbx/core-lib/browser";
 import {
   observePreferredInput,
   PreferredInput,
@@ -36,9 +37,9 @@ const SSR_DEFAULTS: ResponsiveData = {
 
 function readViewport(): ViewportData {
   return {
-    screenWidth: window.innerWidth,
-    screenHeight: window.innerHeight,
-    isPortrait: window.innerHeight > window.innerWidth,
+    screenWidth: browserWindow ? browserWindow.innerWidth : SSR_VIEWPORT_WIDTH,
+    screenHeight: browserWindow ? browserWindow.innerHeight : SSR_VIEWPORT_HEIGHT,
+    isPortrait: browserWindow ? browserWindow.innerHeight > browserWindow.innerWidth : false,
   };
 }
 
@@ -68,18 +69,24 @@ export class ResponsiveStore extends UnkeyedStore<ResponsiveData> {
     // Re-seed on `clear()`: this store is a process singleton. The resize
     // listener would eventually re-seed after the base zero-out, but
     // consumers would read `undefined` until the user resizes the window.
-    const isBrowser = typeof window !== "undefined";
     const reseed = (): ResponsiveData =>
-      isBrowser ? { ...readViewport(), preferredInput: readInitialPreferredInput() } : SSR_DEFAULTS;
+      browserWindow
+        ? { ...readViewport(), preferredInput: readInitialPreferredInput() }
+        : SSR_DEFAULTS;
     super({ initial: reseed(), reseed });
-    if (isBrowser) {
-      window.addEventListener("resize", () => {
+    if (browserWindow) {
+      browserWindow.addEventListener("resize", () => {
         this.applyPartialUpdate(readViewport());
       });
       observePreferredInput(preferredInput => {
         this.applyPartialUpdate({ preferredInput });
       });
     }
+  }
+
+  public syncFromViewport(): void {
+    if (!browserWindow) return;
+    this.applyPartialUpdate(readViewport());
   }
 
   private applyPartialUpdate(update: Partial<ResponsiveData>): void {

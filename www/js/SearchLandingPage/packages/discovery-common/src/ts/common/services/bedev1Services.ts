@@ -3,16 +3,11 @@ import dataStores from "@rbx/core-scripts/data-store";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import bedev1Constants from "../constants/bedev1Constants";
 import {
-  TGetOmniRecommendationsMetadataResponse,
-  TOmniRecommendation,
   TGetFriendsResponse,
   TGetPlaceDetails,
   TGetGameDetails,
   TGameData,
   TGetUniverseVoiceStatus,
-  TGamePassesResponse,
-  TGamePass,
-  TSort,
   TGetUserLocaleResponse,
   TSupportedLocale,
   TAssetDataResponse,
@@ -23,15 +18,6 @@ const { url, defaultCacheCriteria } = bedev1Constants;
 const { gamesDataStore, userDataStoreV2, localeDataStore } = dataStores;
 const { FriendsUserSortType } = dataStores.userDataStore;
 
-export const getGameSorts = async (): Promise<{ sorts: TSort[] }> => {
-  const {
-    data: { sorts },
-  } = await http.get<{ sorts: TSort[] }>(bedev1Constants.url.getGameSorts, {
-    gameSortsContext: "GamesDefaultSorts",
-  });
-  return { sorts };
-};
-
 export const getGameRecommendations = async (
   universeId: string,
   max: number,
@@ -40,27 +26,6 @@ export const getGameRecommendations = async (
     maxRows: max,
   });
   return data as Promise<{ games: TGameData[] }>;
-};
-
-export const getGamePasses = async (placeId: string, max: number): Promise<TGamePass[]> => {
-  return http
-    .get<TGamePassesResponse>(bedev1Constants.url.getGamePasses(placeId, max))
-    .then(response => response.data)
-    .then(response => {
-      // If the price or productId is null, the pass is not for sale
-      return response.data.filter(
-        gamePass => gamePass?.price !== null && gamePass?.productId !== null,
-      );
-    });
-};
-
-export const getOmniRecommendationsMetadata = async (
-  recommendationList: TOmniRecommendation[],
-): Promise<TGetOmniRecommendationsMetadataResponse> => {
-  const { data } = await http.post(bedev1Constants.url.getOmniRecommendationsMetadata, {
-    Contents: recommendationList,
-  });
-  return data as TGetOmniRecommendationsMetadataResponse;
 };
 
 export const getFriendsPresence = (): Promise<{ userData?: TGetFriendsResponse[] }> => {
@@ -125,10 +90,7 @@ const getPlayabilityStatus = async (
 export default {
   getFriendsPresence,
   getGameDetails,
-  getGamePasses,
   getGameRecommendations,
-  getGameSorts,
-  getOmniRecommendationsMetadata,
   getVoiceStatus,
   getPlaceDetails,
   getUserLocale,

@@ -3,6 +3,7 @@ import {
   readArrayActionParam,
   SduiErrorName,
   type SduiActionHandlerConfig,
+  type SduiResolvedAction,
 } from "@rbx/sdui-core";
 
 function readChildActions(actionParams: Record<string, unknown>): unknown[] | undefined {
@@ -10,9 +11,7 @@ function readChildActions(actionParams: Record<string, unknown>): unknown[] | un
   return actions;
 }
 
-export function resolveActionSequenceHref(
-  actionParams: Record<string, unknown>,
-): string | undefined {
+function findNavigableChild(actionParams: Record<string, unknown>): SduiResolvedAction | undefined {
   const actions = readChildActions(actionParams);
   if (!actions) return undefined;
 
@@ -20,10 +19,23 @@ export function resolveActionSequenceHref(
   for (let index = actions.length - 1; index >= 0; index -= 1) {
     const child = actions[index];
     if (!isSduiResolvedAction(child) || child.href == null) continue;
-    return child.href;
+    return child;
   }
 
   return undefined;
+}
+
+export function resolveActionSequenceHref(
+  actionParams: Record<string, unknown>,
+): string | undefined {
+  return findNavigableChild(actionParams)?.href;
+}
+
+/** Uses the `target` of the child that supplies the sequence's href. */
+export function resolveActionSequenceTarget(
+  actionParams: Record<string, unknown>,
+): string | undefined {
+  return findNavigableChild(actionParams)?.target;
 }
 
 /**

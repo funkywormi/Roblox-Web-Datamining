@@ -1,10 +1,13 @@
 import { generateRandomUuid } from "@rbx/core-lib/uuid";
+import { currentBrowser } from "../currentBrowser";
 import { getAuthTicket, resetClientStatus } from "./api";
 import {
   buildPlaceLauncherUrl,
   buildProtocolUrl,
   GameLaunchParams,
   getProtocolNameForEnvironment,
+  isStudioLaunchMode,
+  LaunchMode,
   ParamValue,
   Params,
   PlaceLauncherRequest,
@@ -30,6 +33,7 @@ export type GameLaunchConfig = {
   robloxLocale: ParamValue;
   gameLocale: ParamValue;
   playerChannel: string;
+  studioChannel: string;
   isDuarAutoOptInEnabled: boolean;
   isDuarOptOutDisabled: boolean;
   isOmitPlayerChannelForWinAndMacEnabled: boolean;
@@ -39,6 +43,7 @@ export type GameLaunchHost = {
   getConfig: () => GameLaunchConfig;
   getBrowserTrackerId: () => string | false;
   isAuthenticated: () => boolean;
+  getUserId: () => number | string | null;
   isWindowsOrMac: () => boolean;
   onEvent: (name: GameLaunchEventName, event: GameLaunchEvent) => void;
   // Shows the install dialog; `launch` retries the same launch from it.
@@ -69,6 +74,13 @@ export type PrivateGameParams = Params & {
   linkCode?: ParamValue;
 };
 export type PlayTogetherGameParams = Params & { placeId: ParamValue; conversationId: ParamValue };
+export type EditGameInStudioParams = {
+  placeId: ParamValue;
+  universeId: ParamValue;
+  startTeamTest?: boolean;
+  instanceId?: string;
+  annotationId?: string;
+};
 
 export type GameLauncher = {
   joinMultiplayerGame: (params: MultiplayerGameParams) => Promise<void>;
@@ -76,6 +88,10 @@ export type GameLauncher = {
   joinGameInstance: (params: GameInstanceParams) => Promise<void>;
   joinPrivateGame: (params: PrivateGameParams) => Promise<void>;
   playTogetherGame: (params: PlayTogetherGameParams) => Promise<void>;
+  openStudio: () => Promise<void>;
+  editGameInStudio: (params: EditGameInStudioParams) => Promise<void>;
+  tryAssetInStudio: (params: { assetId: ParamValue }) => Promise<void>;
+  openPluginInStudio: (params: { pluginId: ParamValue }) => Promise<void>;
   // Opens a roblox:// deep link behind the install dialog.
   startDeepLinkFlow: (deepLinkUrl: string) => void;
   // Same, but the install dialog keeps the place for its referral.
@@ -119,7 +135,6 @@ const createInstallState = () => {
 export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
   const installState = host.installState ?? createInstallState();
   const openProtocolUrl = host.openProtocolUrl ?? openProtocolUrlInIframe;
-  const protocolName = () => getProtocolNameForEnvironment("roblox-player");
   const event = (params: GameLaunchEvent["params"]): GameLaunchEvent => ({
     launchMethod: "Protocol",
     params,
@@ -127,14 +142,22 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
 
   const startGameFlow = async (params: GameLaunchParams) => {
     try {
+      const studio = isStudioLaunchMode(params.launchMode);
       const reset = resetClientStatus();
       let ticket: string | undefined;
-      if (host.isAuthenticated()) {
+      // Studio signs in on its own, so it never gets a ticket.
+      if (host.isAuthenticated() && !studio) {
         [ticket] = await Promise.all([getAuthTicket(), reset]);
       } else {
         await reset;
       }
-      openProtocolUrl(buildProtocolUrl(params, ticket));
+      const studioUrlParams = studio
+        ? {
+            userId: host.isAuthenticated() ? host.getUserId() : null,
+            browser: currentBrowser(),
+          }
+        : undefined;
+      openProtocolUrl(buildProtocolUrl(params, ticket, studioUrlParams));
       host.onLaunchSucceeded();
       host.onEvent("startClientSucceeded", event(params));
       if (installState.get()) {
@@ -146,22 +169,28 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
     }
   };
 
-  const startGame = (defaults: Omit<GameLaunchParams, "protocolName" | "launchMode">) => {
+  const startGame = (
+    defaults: Omit<GameLaunchParams, "protocolName" | "launchMode">,
+    launchMode: LaunchMode = "play",
+  ) => {
     const config = host.getConfig();
+    const studio = isStudioLaunchMode(launchMode);
     const params: GameLaunchParams = {
       ...defaults,
-      protocolName: protocolName(),
-      launchMode: "play",
+      protocolName: getProtocolNameForEnvironment(studio ? "roblox-studio" : "roblox-player"),
+      launchMode,
       launchTime: Date.now(),
     };
     const { otherParams } = params;
     otherParams.browsertrackerid = host.getBrowserTrackerId();
     otherParams.robloxLocale = config.robloxLocale;
     otherParams.gameLocale = config.gameLocale;
-    if (!config.isOmitPlayerChannelForWinAndMacEnabled || !host.isWindowsOrMac()) {
+    if (studio) {
+      otherParams.channel = config.studioChannel;
+    } else if (!config.isOmitPlayerChannelForWinAndMacEnabled || !host.isWindowsOrMac()) {
       otherParams.channel = config.playerChannel;
     }
-    if (config.isDuarAutoOptInEnabled && !otherParams.LaunchExp) {
+    if (!studio && config.isDuarAutoOptInEnabled && !otherParams.LaunchExp) {
       otherParams.LaunchExp = config.isDuarOptOutDisabled ? "InApp" : "PreferInApp";
     }
 
@@ -221,12 +250,32 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
         placeId: params.placeId,
         conversationId: params.conversationId,
       }),
+    openStudio: () => startGame({ otherParams: { avatar: "avatar" } }, "edit"),
+    editGameInStudio: ({ placeId, universeId, startTeamTest = false, instanceId, annotationId }) =>
+      startGame(
+        {
+          otherParams: {
+            task: startTeamTest ? "StartTeamTest" : "EditPlace",
+            placeId,
+            universeId,
+            ...(!startTeamTest && instanceId ? { targetInstanceId: instanceId } : {}),
+            ...(!startTeamTest && annotationId ? { annotationId } : {}),
+            avatar: "avatar",
+          },
+          placeId,
+        },
+        "edit",
+      ),
+    tryAssetInStudio: ({ assetId }) =>
+      startGame({ otherParams: { assetid: assetId, avatar: "avatar" } }, "asset"),
+    openPluginInStudio: ({ pluginId }) =>
+      startGame({ otherParams: { pluginid: pluginId, avatar: "avatar" } }, "plugin"),
     startDeepLinkFlow: deepLinkUrl => {
       openDeepLink(deepLinkUrl, {});
     },
     startGameWithDeepLinkUrl: (deepLinkUrl, placeId) => {
       openDeepLink(deepLinkUrl, {
-        protocolName: protocolName(),
+        protocolName: getProtocolNameForEnvironment("roblox-player"),
         launchMode: "play",
         otherParams: {},
         placeId,

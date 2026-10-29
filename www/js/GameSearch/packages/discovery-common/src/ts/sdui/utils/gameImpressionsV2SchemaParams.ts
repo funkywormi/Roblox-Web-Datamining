@@ -1,17 +1,59 @@
-import { getOption } from "@bufbuild/protobuf";
-import { json } from "@rbx/event-stream-proto/event/event_field_options_pb";
-import { GameImpressionsV2EventSchema } from "@rbx/event-stream-proto/eventstream/webfrontend/game_impressions_event_v2_pb";
-
 /**
  * Transport parameter names declared by `GameImpressionsV2Event` via
- * `(event.json).parameter_name`. Derived once from the generated schema so
- * aliases stay in sync (e.g. `sort_id` → `gameSetTypeId`).
+ * `(event.json).parameter_name` in proto-schemas
+ * (eventstream/webfrontend/game_impressions_event_v2.proto). Kept as a static
+ * list so the generated schema stays out of the bundle; tests compare it against
+ * the `@rbx/event-stream-proto` devDependency, so bump that catalog version and
+ * update this list together.
  */
-export const GAME_IMPRESSIONS_V2_PARAMETER_NAMES: ReadonlySet<string> = new Set(
-  GameImpressionsV2EventSchema.fields
-    .map(field => getOption(field, json)?.parameterName)
-    .filter((name): name is string => typeof name === "string" && name.length > 0),
-);
+export const GAME_IMPRESSIONS_V2_PARAMETER_NAMES: ReadonlySet<string> = new Set([
+  "lt",
+  "page",
+  "ctx",
+  "url",
+  "gameSetTypeId",
+  "sortPos",
+  "rootPlaceIds",
+  "universeIds",
+  "absPositions",
+  "adsPositions",
+  "homePageSessionInfo",
+  "discoverPageSessionInfo",
+  "gameSearchSessionInfo",
+  "suggestionKwd",
+  "friendId",
+  "position",
+  "emphasisFlag",
+  "adIds",
+  "adFlags",
+  "numberOfLoadedTiles",
+  "thumbnailAssetIds",
+  "gameSetTargetId",
+  "rowsOnPage",
+  "positionsInRow",
+  "navigationUids",
+  "tileBadgeContexts",
+  "appliedFilters",
+  "thumbnailListIds",
+  "searchLandingPageSessionInfo",
+  "componentType",
+  "footerTextLiterals",
+  "footerLocalizationKeys",
+  "videoThumbnailAssetIds",
+  "positionsInTopic",
+  "sortSubId",
+  "sourceSortId_arr",
+  "newGameEnum_arr",
+  "selectedOption",
+  "sortId",
+  "omniSearchType",
+  "searchUuid",
+  "spotlightPageSessionInfo",
+  "preAuthLandingPageSessionInfo",
+  "contentType",
+  "interactionUuid",
+  "hasSponsoredContent",
+]);
 
 /**
  * Keeps only keys that `GameImpressionsV2Event` can parse. Broad SDUI analytics

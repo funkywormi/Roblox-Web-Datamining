@@ -7,7 +7,10 @@ import { UiComponentType } from "../types";
  * restrict deferral by parent type. Add a type here when a new parent
  * component is ready to consume deferred list shells.
  */
-export const DEFERRED_ITEM_BUILD_ALLOWED_COMPONENT_TYPES = [UiComponentType.VERTICAL_FEED] as const;
+export const DEFERRED_ITEM_BUILD_ALLOWED_COMPONENT_TYPES = [
+  UiComponentType.VERTICAL_FEED,
+  UiComponentType.COLLECTION_CAROUSEL,
+] as const;
 
 export type DeferredItemBuildAllowedComponentType =
   (typeof DEFERRED_ITEM_BUILD_ALLOWED_COMPONENT_TYPES)[number];

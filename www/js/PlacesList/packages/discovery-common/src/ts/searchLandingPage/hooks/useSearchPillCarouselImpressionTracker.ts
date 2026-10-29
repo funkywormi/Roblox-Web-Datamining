@@ -2,6 +2,7 @@ import { RefObject, useCallback } from "react";
 import "@rbx/core-scripts/global";
 import { eventStreamService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
 import { useCollectionItemsIntersectionTracker } from "@rbx/unified-logging";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import eventStreamConstants, {
   EventStreamMetadata,
   getEventContext,
@@ -58,9 +59,7 @@ const useSearchPillCarouselImpressionTracker = (
         const [eventConfig, eventParams] = eventStreamConstants.queryImpressions(params);
         eventStreamService.sendEvent(eventConfig, eventParams);
       } else {
-        window.EventTracker?.fireEvent(
-          searchLandingPage.SearchPillCarouselImpressionsUndefinedError,
-        );
+        fireEvent(searchLandingPage.SearchPillCarouselImpressionsUndefinedError);
       }
     },
     [buildSearchPillsImpressionsProperties],

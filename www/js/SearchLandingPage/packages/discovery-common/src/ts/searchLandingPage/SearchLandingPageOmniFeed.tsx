@@ -2,6 +2,7 @@ import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/react
 import "@rbx/core-scripts/global";
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { SearchLandingService } from "@rbx/legacy-webapp-types/Roblox";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import bedev2Services from "../common/services/bedev2Services";
 import getDeviceFeatures from "../common/utils/deviceFeaturesUtils";
 import { translationConfig } from "./app.config";
@@ -65,25 +66,21 @@ function SearchLandingPageOmniFeed({ translate }: WithTranslationsProps): JSX.El
 
   const fetchLandingRecommendations = useCallback(() => {
     if (!sessionInfo) {
-      window.EventTracker?.fireEvent(searchLandingPage.searchLandingPageMissingSessionInfoError);
+      fireEvent(searchLandingPage.searchLandingPageMissingSessionInfoError);
       return;
     }
     setIsLoading(true);
     bedev2Services
       .getSearchLandingRecommendations(sessionInfo, getDeviceFeatures())
       .then(data => {
-        window.EventTracker?.fireEvent(
-          searchLandingPage.searchLandingPageFetchRecommendationsSuccess,
-        );
+        fireEvent(searchLandingPage.searchLandingPageFetchRecommendationsSuccess);
         const recs = mapExploreApiSortsResponse(data);
         recs.sorts.forEach(sort => {
           if (
             sort.treatmentType !== TTreatmentType.Carousel &&
             sort.treatmentType !== TTreatmentType.SearchPillCarousel
           ) {
-            window.EventTracker?.fireEvent(
-              searchLandingPage.searchLandingPageUnexpectedTreatmentTypeError,
-            );
+            fireEvent(searchLandingPage.searchLandingPageUnexpectedTreatmentTypeError);
           }
         });
         setRecommendations(recs);
@@ -104,9 +101,7 @@ function SearchLandingPageOmniFeed({ translate }: WithTranslationsProps): JSX.El
         });
       })
       .catch(() => {
-        window.EventTracker?.fireEvent(
-          searchLandingPage.searchLandingPageFetchRecommendationsError,
-        );
+        fireEvent(searchLandingPage.searchLandingPageFetchRecommendationsError);
         setRecommendations(undefined);
       })
       .finally(() => {

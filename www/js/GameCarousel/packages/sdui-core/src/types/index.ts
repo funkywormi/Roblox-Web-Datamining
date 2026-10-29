@@ -23,6 +23,15 @@ export {
   ActionTypeSchema,
 } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/actions_pb.js";
 export {
+  Capability,
+  CapabilitySchema,
+} from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/capability_pb.js";
+export {
+  Platform,
+  PlatformSchema,
+} from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/client_capabilities_pb.js";
+export type { ClientCapabilities } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/client_capabilities_pb.js";
+export {
   HydrationContentType,
   HydrationContentTypeSchema,
 } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/hydration_content_type_pb.js";

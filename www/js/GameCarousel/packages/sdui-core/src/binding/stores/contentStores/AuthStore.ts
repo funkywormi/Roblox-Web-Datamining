@@ -1,4 +1,5 @@
 //TODO: Extend to support SSR authentication here for SDUI SSR support
+import { window as browserWindow } from "@rbx/core-lib/browser";
 import { UnkeyedStore } from "../UnkeyedStore";
 
 /** Content-type key under which auth state is registered on the data binder. */
@@ -34,8 +35,9 @@ const UNAUTHENTICATED_DEFAULTS: AuthData = {
 };
 
 function readCurrentUser(): AuthData {
+  if (!browserWindow) return UNAUTHENTICATED_DEFAULTS;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `window.Roblox` is provided by the host page at runtime; sdui-core deliberately does not augment the global `Window` typing (see `MaybeRobloxWindow` comment above), so this is the documented boundary cast.
-  const currentUser = (window as unknown as MaybeRobloxWindow).Roblox?.CurrentUser;
+  const currentUser = (browserWindow as unknown as MaybeRobloxWindow).Roblox?.CurrentUser;
   if (!currentUser) return UNAUTHENTICATED_DEFAULTS;
   return {
     isAuthenticated: true,
@@ -61,8 +63,12 @@ export class AuthStore extends UnkeyedStore<AuthData> {
     // Re-seed on `clear()`: this store is a process singleton and attaches
     // no listeners, so without a reseed the base zero-out would leave auth
     // permanently empty after page disposal until full reload.
-    const isBrowser = typeof window !== "undefined";
-    const reseed = (): AuthData => (isBrowser ? readCurrentUser() : UNAUTHENTICATED_DEFAULTS);
+    const reseed = (): AuthData => (browserWindow ? readCurrentUser() : UNAUTHENTICATED_DEFAULTS);
     super({ initial: reseed(), reseed });
+  }
+
+  public syncFromCurrentUser(): void {
+    if (!browserWindow) return;
+    this.applyUpdate(readCurrentUser());
   }
 }

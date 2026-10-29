@@ -1,6 +1,5 @@
 import React, { isValidElement } from "react";
 import { clsx } from "clsx";
-import { Thumbnail2d, ThumbnailFormat } from "@rbx/thumbnails";
 import {
   type SduiRendererInjectedProps,
   type SduiResolvedAction,
@@ -18,6 +17,7 @@ import { useHoverIntent } from "@rbx/sdui-core/client";
 import "./css/sduiGameTile.css";
 import { SDUI_GAME_TILE_DEFAULTS } from "../consts/defaults";
 import { useIsEligibleForVideoPreview } from "../hooks/useIsEligibleForVideoPreview";
+import { WwwThumbnail2d } from "./primitives/WwwThumbnail2d";
 
 const RATING_ICON_CLASS = SUPPORTED_ICON_CLASSES["icons/status/games/rating_small"];
 const PLAYER_COUNT_ICON_CLASS = SUPPORTED_ICON_CLASSES["icons/status/games/people-playing_small"];
@@ -68,8 +68,8 @@ export interface SduiGameTileProps extends SduiRendererInjectedProps {
  * Client-side game tile. Renders a thumbnail image with title text, an
  * optional footer, and an optional CTA button.
  *
- * Lives in sdui-client (not sdui-core) because it depends on @rbx/thumbnails
- * (Thumbnail2d), which is a browser-only package.
+ * Lives in sdui-client (not sdui-core) because it renders Thumbnail2d, a client component that
+ * fetches thumbnails.
  *
  * Structure:
  *   div.sdui-game-tile
@@ -134,14 +134,9 @@ export function SduiGameTile({
   const imageNode =
     imageComponent ??
     (parsedImage?.kind === "thumbnail" ? (
-      <Thumbnail2d
-        type={parsedImage.thumbnail.type}
-        targetId={parsedImage.thumbnail.targetId}
-        format={ThumbnailFormat.webp}
-        size={parsedImage.thumbnail.size}
-        includeBackground={parsedImage.thumbnail.includeBackground}
-        includeProfileFrame={parsedImage.thumbnail.includeProfileFrame}
-        containerClass="sdui-thumbnail-image-container"
+      <WwwThumbnail2d
+        thumbnail={parsedImage.thumbnail}
+        containerClassName="sdui-thumbnail-image-container"
       />
     ) : isValidElement(image) ? (
       image

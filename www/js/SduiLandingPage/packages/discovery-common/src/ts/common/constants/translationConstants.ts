@@ -126,14 +126,6 @@ export const FeatureCommunityLinks = {
   LabelViewButton: "Label.ViewButton",
 };
 
-export const FeatureGamePass = {
-  ActionAddPass: "Action.AddPass",
-  HeadingPassesForThisGame: "Heading.PassesForThisGame",
-  LabelBuy: "Label.Buy",
-  LabelOwned: "Label.Owned",
-  LabelNoPasses: "Label.NoPasses",
-};
-
 export const FeatureDeveloperProducts = {
   LabelBuy: "Label.Buy",
   LabelNoProducts: "Label.NoProducts",
@@ -180,7 +172,6 @@ export default {
   CommonUIControls,
   FeatureGameDetails,
   FeatureGamePage,
-  FeatureGamePass,
   FeaturePlacesList,
   FeatureSduiLandingPage,
   FeatureSocialShare,

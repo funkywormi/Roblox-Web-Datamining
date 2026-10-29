@@ -7,14 +7,6 @@ export enum TPageType {
   Games = "Games",
 }
 
-export enum TContentType {
-  Games = "Games",
-}
-
-export enum TTreatmentType {
-  Carousel = "Carousel",
-}
-
 export enum TMetainfoValue {
   Invalid = "Invalid",
   HasLootBoxes = "HasLootBoxes",
@@ -35,31 +27,6 @@ export enum TPaginationMethod {
   Scroll = "Scroll",
   Button = "Button",
 }
-
-export type TGamePassesResponse = {
-  data: TGamePass[];
-};
-
-export type TGamePass = {
-  id: number;
-  name: string;
-  displayName: string;
-  productId: number;
-  price: number;
-  sellerName: string;
-  sellerId: number;
-  isOwned: boolean;
-};
-
-export type TSort = {
-  token: string;
-  name: string;
-  displayName: string;
-  gameSetTargetId?: number;
-  gameSetTypeId: number;
-  contextCountryRegionId: number;
-  tokenExpiryInSeconds: number;
-};
 
 export type TMetaData = {
   suggestedKeyword?: string;
@@ -251,25 +218,6 @@ export type TRating = {
   RatingProvider: string;
   RatingInformation: TRatingInformation[];
   RatingProviderUrl: string;
-};
-
-// GetOmniRecommendations
-export type TOmniRecommendation = {
-  ContentType: TContentType.Games;
-  ContentId: number;
-};
-
-export type TOmniRecommendationSort = {
-  Topic: string;
-  TopicId: number;
-  TreatmentType: TTreatmentType;
-  RecommendationList: TOmniRecommendation[];
-};
-
-export type TGetOmniRecommendationsMetadataResponse = {
-  ContentMetadata: {
-    [TContentType.Games]: Record<number, TGameData>;
-  };
 };
 
 export type TRefundPolicy = {

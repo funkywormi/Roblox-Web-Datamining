@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import gamePreviewVideoConstants from "../constants/gamePreviewVideoConstants";
 
 const { gamePreviewVideoCounters } = gamePreviewVideoConstants;
@@ -30,7 +31,7 @@ const useAutoPlayVideoCarouselItem = (
       const result = playVideo();
       if (result instanceof Promise) {
         result.catch(() => {
-          window.EventTracker?.fireEvent(gamePreviewVideoCounters.GamePreviewVideoAutoPlayError);
+          fireEvent(gamePreviewVideoCounters.GamePreviewVideoAutoPlayError);
         });
       }
       isAutoPaused.current = false;

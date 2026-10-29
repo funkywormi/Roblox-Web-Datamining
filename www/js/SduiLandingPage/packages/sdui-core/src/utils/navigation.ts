@@ -14,3 +14,14 @@ export const isPlainLeftClick = (event: React.MouseEvent): boolean =>
   !event.ctrlKey &&
   !event.shiftKey &&
   !event.altKey;
+
+/** Returns `url` if it parses as an absolute http(s) URL, otherwise undefined. */
+export function resolveValidHttpUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  try {
+    const { protocol } = new URL(url);
+    return protocol === "https:" || protocol === "http:" ? url : undefined;
+  } catch {
+    return undefined;
+  }
+}

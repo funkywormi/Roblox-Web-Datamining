@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference -- .d.ts reference, not a runtime import, so the Next bundler doesn't try to resolve it as a module
 /// <reference path="./eventStream.d.ts" />
-import { arrayIncludes } from "@rbx/core-types";
+import { arrayIncludes } from "@rbx/core-lib";
 import "../global";
 
 export const eventTypes = {

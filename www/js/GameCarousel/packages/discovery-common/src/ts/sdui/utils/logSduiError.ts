@@ -231,7 +231,7 @@ export const logOmniFeedStats = (
     );
   } catch {
     // Fire counter, but do not block the main execution on the feed stat logs
-    window.EventTracker?.fireEvent(homePage.omniRecommendationFeedStatsLoggingErrorEvent);
+    fireEvent(homePage.omniRecommendationFeedStatsLoggingErrorEvent);
   }
 };
 

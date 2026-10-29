@@ -1,4 +1,9 @@
-import type { startSpan, getActiveSpan, flush, captureException } from "@sentry/browser";
+import type {
+  startSpan,
+  getActiveSpan,
+  flush,
+  captureException as sentryCaptureException,
+} from "@sentry/browser";
 
 /**
  * The Sentry surface `components/sentry` installs on the window.
@@ -10,7 +15,7 @@ export type SentryGlobal = {
   startSpan: typeof startSpan;
   getActiveSpan: typeof getActiveSpan;
   flush: typeof flush;
-  captureException: typeof captureException;
+  captureException: typeof sentryCaptureException;
 };
 
 /**
@@ -33,4 +38,12 @@ export const reportError = (error: unknown, context?: Record<string, unknown>): 
   console.error(error, context);
 
   getSentry()?.captureException(error, context ? { extra: context } : undefined);
+};
+
+/**
+ * Reports an exception with a full capture context (tags, extra, fingerprint). No-op until the
+ * Sentry pack installs its global.
+ */
+export const captureException = (...args: Parameters<SentryGlobal["captureException"]>): void => {
+  getSentry()?.captureException(...args);
 };

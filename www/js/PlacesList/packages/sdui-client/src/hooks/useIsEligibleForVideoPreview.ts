@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { window as browserWindow } from "@rbx/core-lib/browser";
 import { isVideoPlayerSupportedByBrowser } from "@rbx/video-player";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import {
@@ -30,6 +31,9 @@ export const useIsEligibleForVideoPreview = (
   isBrowserSupported: boolean;
 } => {
   const browserCompatibilityResult = useMemo(() => {
+    if (!browserWindow) {
+      return { isSupported: false, errors: ["SSR not supported"] };
+    }
     return isVideoPlayerSupportedByBrowser();
   }, []);
 

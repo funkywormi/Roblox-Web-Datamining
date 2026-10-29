@@ -511,7 +511,6 @@
             "url": "https://js.rbxcdn.com/48dba3f75eb97bd9a307468491aec7a595fce460337c472283615754b7df5d76.js",
             "sources": [
                 "/home",
-                "/",
                 "/CreateAccount"
             ]
         },
@@ -643,7 +642,6 @@
             "name": "Common.Captcha",
             "url": "https://js.rbxcdn.com/5f2ee2913bf919a8576bbe4120a6d41b933e814a4779a0a3fc1d9d941c5ee368.js",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -737,7 +735,7 @@
         },
         {
             "name": "Common.VisitGame",
-            "url": "https://js.rbxcdn.com/acb69086253120ce7945704ce42a0b684c9171ed587de439e2c0f9479fd4ad51.js",
+            "url": "https://js.rbxcdn.com/2ac893f3c3073cfc976d62b61eebd8e7ff86ad852e532b61d4bf97a2b0f1ee18.js",
             "sources": [
                 "/home",
                 "/",
@@ -1602,7 +1600,7 @@
         },
         {
             "name": "Feature.DoNotDisturb",
-            "url": "https://js.rbxcdn.com/16b1982e81eea1ebbb4ce73345c7d91850e4494a96c19c0adc4ce1a6647a5145.js",
+            "url": "https://js.rbxcdn.com/13c1fbc3a56762ca023a1023aa8bbee40bb461594b3a8a1b8ab46c8ee1a0c95a.js",
             "sources": [
                 "/my/account"
             ]
@@ -2392,7 +2390,6 @@
             "name": "Feature.Landing",
             "url": "https://js.rbxcdn.com/686bd55707be42af370b81d2f36f55b6e10c56edb105502b3f9f0a34f7412bf5.js",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -2531,7 +2528,7 @@
         },
         {
             "name": "Feature.Parents",
-            "url": "https://js.rbxcdn.com/9787f5e1530ba66f3a9fe9ba207839184ab4d103331e6d670173797cf1861fb6.js",
+            "url": "https://js.rbxcdn.com/36c95310844a9fff1c4308d8e843ca77c21136a714fd85a5209636198bc1867f.js",
             "sources": [
                 "/home",
                 "/",
@@ -2677,6 +2674,7 @@
             "url": "https://js.rbxcdn.com/7774e92ccee60b92717e18209b9060b35988362a9493cadb5234c96550e27d90.js",
             "sources": [
                 "/home",
+                "/",
                 "/charts",
                 "/discover/?Keyword=roblox",
                 "/users/1/profile"
@@ -3268,7 +3266,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/e523681ff6b2a56c63ac4b9420b791017075f72bb318271f57612814438b7200.js",
+            "url": "https://js.rbxcdn.com/d47d0920605774f2a80eee4eaf50bb85a62f6b94dffbc628b539cdd036d134d0.js",
             "sources": [
                 "/home",
                 "/",
@@ -3389,6 +3387,13 @@
             "url": "https://js.rbxcdn.com/46ec7856c5aa19b2bd5e4d7b745da33086769838558970c98610e983b70fe922.js",
             "sources": [
                 "/my/account"
+            ]
+        },
+        {
+            "name": "Feature.SduiLandingPage",
+            "url": "https://js.rbxcdn.com/07709f6b2cecb7b34d4779d27348293fa0d4058d95fc98bc601c2d0b8f7070aa.js",
+            "sources": [
+                "/"
             ]
         },
         {
@@ -4491,7 +4496,6 @@
             "name": "Captcha",
             "url": "https://js.rbxcdn.com/b604dac29d89b56aef30844f099c5640c2f1870a97a06f4e692208d24097f9ed-Captcha.js",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/support",
@@ -4705,7 +4709,7 @@
         },
         {
             "name": "CoreUtilities",
-            "url": "https://js.rbxcdn.com/15d017a16565756ad25af08bc0a574244c4f6d5035a40b3ede8b5e47f9bd7415-CoreUtilities.js",
+            "url": "https://js.rbxcdn.com/afa1d04c1d0d5244c427b1d395c7a8db59bad316fb7c72365e43915f31f0d526-CoreUtilities.js",
             "sources": [
                 "/home",
                 "/",
@@ -5175,7 +5179,7 @@
         },
         {
             "name": "GameCarousel",
-            "url": "https://js.rbxcdn.com/8eb34652902f4ffe2695f9a21dcaa6af7faf0d591e8ff7428e80926f9828897b-GameCarousel.js",
+            "url": "https://js.rbxcdn.com/ae038f9b08067157999eaf01ea4b459cb05c459dac200e53852bc10dceca4ae0-GameCarousel.js",
             "sources": [
                 "/charts"
             ]
@@ -5210,7 +5214,7 @@
         },
         {
             "name": "GameLaunch",
-            "url": "https://js.rbxcdn.com/3992d9345e8a9e0327427d37965de7bc9dc42821b71a90eb61d138275141b6a2-GameLaunch.js",
+            "url": "https://js.rbxcdn.com/edafe2a1d0192c224cbb8296422773c4e90cfa3964956be83c075c1135084079-GameLaunch.js",
             "sources": [
                 "/home",
                 "/",
@@ -5263,7 +5267,7 @@
         },
         {
             "name": "GameSearch",
-            "url": "https://js.rbxcdn.com/523e0b6a3d5fe287481e6193d4bcd68690651806da8d396af754c48dff4918a5-GameSearch.js",
+            "url": "https://js.rbxcdn.com/41547540bdf04bffa697dab0a98814236bb5c44cd790d3cafd9066ddaff626f9-GameSearch.js",
             "sources": [
                 "/discover/?Keyword=roblox"
             ]
@@ -5641,7 +5645,7 @@
         },
         {
             "name": "ItemDetails",
-            "url": "https://js.rbxcdn.com/45049da2125ead5016631d0fd75206f7cc28c6b7d8967d73d4a6d49f6d623b11-ItemDetails.js",
+            "url": "https://js.rbxcdn.com/aab723751bb9464eb3276bad7ff9eba7140f074dcb07c3386d2f2270e5436805-ItemDetails.js",
             "sources": [
                 "/catalog/3360689775",
                 "/bundles/591"
@@ -6060,7 +6064,7 @@
         },
         {
             "name": "PlacesList",
-            "url": "https://js.rbxcdn.com/4d7ae5862582dd193aeba4ec0ab6b1a75be37fa44fdf98174c835dc937d67278-PlacesList.js",
+            "url": "https://js.rbxcdn.com/bbe45c85182b3509e63b372143d9860ac14eb468f017bd2037e416bcd4d15038-PlacesList.js",
             "sources": [
                 "/home"
             ]
@@ -6136,7 +6140,6 @@
             "url": "https://js.rbxcdn.com/215fe9b0fe92491f665645f65f57db6668d716af72e02465db259b715f061118.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/catalog",
@@ -6376,7 +6379,6 @@
             "name": "ReactLanding",
             "url": "https://js.rbxcdn.com/c136503c34d93b6cd26711f368ed02b75ee487d08b4367adc12de541aaacc0fb-ReactLanding.js",
             "sources": [
-                "/",
                 "/CreateAccount"
             ]
         },
@@ -6679,6 +6681,13 @@
             ]
         },
         {
+            "name": "SduiLandingPage",
+            "url": "https://js.rbxcdn.com/e949ee7fd59e64b6e53ee40716fbf7e8b86923ef14e62a51c0968856ebc048ff-SduiLandingPage.js",
+            "sources": [
+                "/"
+            ]
+        },
+        {
             "name": "SearchDropdown",
             "url": "https://js.rbxcdn.com/d7b66604b6aed7454c982f0c5e055cb0a91bf6bf02ce81a9069db7578a9c7119.js",
             "sources": [
@@ -6688,7 +6697,7 @@
         },
         {
             "name": "SearchLandingPage",
-            "url": "https://js.rbxcdn.com/ccad86fb3fd2fbd1d700c26ba1e69a1cb555daded4efa7c1dc92d0e7e8418fc4-SearchLandingPage.js",
+            "url": "https://js.rbxcdn.com/24a1c1b49140b8e5c860d8aafcc93b47060955d2a61218cf181dd5f24d7c2ec8-SearchLandingPage.js",
             "sources": [
                 "/home",
                 "/",
@@ -7803,7 +7812,6 @@
             "name": "Captcha",
             "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-Captcha.css",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/support",
@@ -8289,7 +8297,7 @@
         },
         {
             "name": "GameCarousel",
-            "url": "https://css.rbxcdn.com/5ee3910922e5783a1ed1da75288a82a02ff8d9a09bd76890fcb91606b30f41b8-GameCarousel.css",
+            "url": "https://css.rbxcdn.com/caa746614755e8639007f13f36b96a1bb52411a34a2845cf96ce24f4e30c25e7-GameCarousel.css",
             "sources": [
                 "/charts"
             ]
@@ -8317,7 +8325,7 @@
         },
         {
             "name": "GameLaunch",
-            "url": "https://css.rbxcdn.com/c10af3ac18b43294d9d63e679baa3d26bc43a9132516b2561758ff6ad7f17316-GameLaunch.css",
+            "url": "https://css.rbxcdn.com/37516b83433828fa846f467949ed13bc2ffcd33ed34536e10785dc53f7feee8e-GameLaunch.css",
             "sources": [
                 "/home",
                 "/",
@@ -8815,7 +8823,7 @@
         },
         {
             "name": "PlacesList",
-            "url": "https://css.rbxcdn.com/8262d48415af93562f9765fce1b6e6b41b8e04adcd7995f0a1c0f4de27ee672f-PlacesList.css",
+            "url": "https://css.rbxcdn.com/4e65224c87d74a7fe6d1ea3c840ff246e9098b4fd4eec2435d73c8d5f99121dd-PlacesList.css",
             "sources": [
                 "/home"
             ]
@@ -8925,7 +8933,6 @@
             "name": "ReactLanding",
             "url": "https://css.rbxcdn.com/672c650634a0f1d200c89efaf6bb958539332db1a1c97aa30a591c4be0ab7a0a-ReactLanding.css",
             "sources": [
-                "/",
                 "/CreateAccount"
             ]
         },
@@ -9145,6 +9152,13 @@
             "url": "https://css.rbxcdn.com/4f18adca1119c32d0bc94f5d0dd663a22313b32342a77271cd9caa09d25f8083-SafetySupportPage.css",
             "sources": [
                 "/help-safety"
+            ]
+        },
+        {
+            "name": "SduiLandingPage",
+            "url": "https://css.rbxcdn.com/39b62f63a0c3fb25790acf7484cd98474e781fc9251f47e8480bf63a6e4e23a3-SduiLandingPage.css",
+            "sources": [
+                "/"
             ]
         },
         {

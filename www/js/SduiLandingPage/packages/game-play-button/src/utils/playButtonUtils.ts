@@ -1,11 +1,7 @@
 import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import "@rbx/core-scripts/global";
-import {
-  JoinDataProperties,
-  launchGame as launchPlayGame,
-  buildPlayGameProperties,
-} from "@rbx/core-scripts/game";
+import { JoinDataProperties, buildPlayGameProperties } from "@rbx/core-scripts/game";
 import {
   eventTypes,
   sendEvent,
@@ -16,6 +12,12 @@ import { composeQueryString } from "@rbx/core-scripts/util/url";
 import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
 import { fireEvent } from "@rbx/www-common/event-tracker";
+import {
+  showAvatarVideoOptInOverlay,
+  showVoiceOptInOverlay,
+  startVerificationFlow as startIdentityVerificationFlow,
+} from "@rbx/www-common/identity-verification";
+import { isJoinAttemptIdEnabled, launchPlayGame } from "./gameLauncher";
 import playButtonConstants from "../constants/playButtonConstants";
 import { getStartAccessManagementUpsell } from "./accessManagementUpsell";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
@@ -46,10 +48,6 @@ type TJoinAttemptProperties = {
   joinAttemptId?: string;
   joinAttemptOrigin?: string | number;
 };
-
-const isJoinAttemptIdEnabled = (): boolean =>
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- window.Roblox is absent on Next.js
-  window.Roblox?.GameLauncher?.isJoinAttemptIdEnabled() ?? false;
 
 function getJoinAttemptProperties(eventProperties: TEventProperties): TJoinAttemptProperties {
   if (!isJoinAttemptIdEnabled()) {
@@ -206,11 +204,21 @@ export const launchLogin = (
   }
 };
 
+// The global type declares this service as required, but it is only installed by the
+// IdVerification SCC and window.Roblox is absent in Next.js, so check it at runtime.
+type IdentityVerificationService = Window["Roblox"]["IdentityVerificationService"];
+
+const getIdentityVerificationService = (): IdentityVerificationService | undefined =>
+  (window as { Roblox?: { IdentityVerificationService?: IdentityVerificationService } }).Roblox
+    ?.IdentityVerificationService;
+
 export const startVerificationFlow = async (): Promise<[boolean, boolean]> => {
   try {
+    const service = getIdentityVerificationService();
+    const flow = service ? service.startVerificationFlow() : startIdentityVerificationFlow();
     // TODO: old, migrated code
     // eslint-disable-next-line @typescript-eslint/return-await
-    return window.Roblox.IdentityVerificationService.startVerificationFlow();
+    return flow;
   } catch {
     return [false, false];
   }
@@ -221,12 +229,13 @@ export const startVoiceOptInOverlayFlow = async (
   useVoiceUpsellV2Design: boolean,
 ): Promise<boolean> => {
   try {
+    const service = getIdentityVerificationService();
+    const flow = service
+      ? service.showVoiceOptInOverlay(requireExplicitVoiceConsent, useVoiceUpsellV2Design)
+      : showVoiceOptInOverlay(requireExplicitVoiceConsent, useVoiceUpsellV2Design);
     // TODO: old, migrated code
     // eslint-disable-next-line @typescript-eslint/return-await
-    return window.Roblox.IdentityVerificationService.showVoiceOptInOverlay(
-      requireExplicitVoiceConsent,
-      useVoiceUpsellV2Design,
-    );
+    return flow;
   } catch {
     return false;
   }
@@ -237,12 +246,13 @@ export const startAvatarVideoOptInOverlayFlow = async (
   useCameraU13Design: boolean,
 ): Promise<boolean> => {
   try {
+    const service = getIdentityVerificationService();
+    const flow = service
+      ? service.showAvatarVideoOptInOverlay(requireExplicitCameraConsent, useCameraU13Design)
+      : showAvatarVideoOptInOverlay(requireExplicitCameraConsent, useCameraU13Design);
     // TODO: old, migrated code
     // eslint-disable-next-line @typescript-eslint/return-await
-    return window.Roblox.IdentityVerificationService.showAvatarVideoOptInOverlay(
-      requireExplicitCameraConsent,
-      useCameraU13Design,
-    );
+    return flow;
   } catch {
     return false;
   }

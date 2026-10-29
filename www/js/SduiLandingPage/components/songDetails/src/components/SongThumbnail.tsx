@@ -1,5 +1,5 @@
 import { Icon } from "@rbx/foundation-ui";
-import { ThumbnailFormat } from "@rbx/thumbnails";
+import type { ThumbnailFormat } from "@rbx/www-common/components/thumbnail";
 
 import { useThumbnail } from "../hooks/useThumbnail";
 
@@ -31,7 +31,7 @@ const SongThumbnail = ({
   assetId,
   width = 768,
   height = 432,
-  format = ThumbnailFormat.webp,
+  format = "webp",
   altName = "",
   hideOnError = false,
 }: SongThumbnailProps) => {

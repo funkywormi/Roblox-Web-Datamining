@@ -1,6 +1,6 @@
 import * as queryString from "query-string";
 import normalizeUrl from "normalize-url";
-import { Brand } from "@rbx/core-types";
+import type { SubType } from "@rbx/core-lib/types";
 import environmentUrls from "@rbx/environment-urls";
 import * as endpoints from "../../endpoints";
 import {
@@ -140,9 +140,9 @@ export const getHelpDeskUrl = (
   return helpDeskUrl;
 };
 
-export type ValidHttpUrl = Brand<string, "ValidUrl">;
+export type ValidHttpUrl = SubType<"ValidUrl", string>;
 export type TValidHttpUrl = ValidHttpUrl;
-export type ValidStripeCheckoutUrl = Brand<string, "ValidStripeCheckoutUrl">;
+export type ValidStripeCheckoutUrl = SubType<"ValidStripeCheckoutUrl", string>;
 
 export const isValidHttpUrl = (urlString: string): urlString is ValidHttpUrl => {
   try {

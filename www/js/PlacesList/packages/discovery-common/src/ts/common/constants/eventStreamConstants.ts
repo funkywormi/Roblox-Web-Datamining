@@ -4,7 +4,8 @@ import {
   parseEventParams as parseEventParamsUnifiedLogging,
 } from "@rbx/unified-logging";
 import { eventTypes } from "@rbx/core-scripts/event-stream";
-import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { AttributionType, getAttributionId } from "../utils/attributionUtils";
 import { getHttpReferrer } from "../utils/browserUtils";
 import { PageContext } from "../types/pageContext";
@@ -34,7 +35,7 @@ export const getEventContext = (pageContext?: PageContext): EventContext | strin
     case PageContext.PreAuthLandingPage:
       return EventContext.PreAuthLanding;
     default:
-      window.EventTracker?.fireEvent(common.NoMatchingEventContextFoundCounterEvent);
+      fireEvent(common.NoMatchingEventContextFoundCounterEvent);
       return "UNKNOWN";
   }
 };
@@ -85,6 +86,7 @@ export enum EventStreamMetadata {
   FooterLocalizationKeys = "footerLocalizationKeys",
   GameSetTargetId = "gameSetTargetId",
   GameSetTypeId = "gameSetTypeId",
+  HasSponsoredContent = "hasSponsoredContent",
   HeroUnitId = "heroUnitId",
   ImageAssetId = "imageAssetId",
   ImpressionThreshold = "impressionThreshold",
@@ -182,6 +184,7 @@ export enum EventType {
   QueryImpressions = "queryImpressions",
   ExpandableTextImpression = "expandableTextImpression",
   GameDetailUnavailable = "gameDetailUnavailable",
+  SafetyResourceBanner = "safetyResourceBanner",
 }
 
 export enum SessionInfoType {
@@ -568,6 +571,19 @@ export type TQueryImpressions = {
   [SessionInfoType.SearchLandingPageSessionInfo]?: string;
 };
 
+/**
+ * Field names match the JSON names of the proto-schemas `SafetyResourceBannerEvent`.
+ * They are sent as-is instead of going through `parseEventParams`, which URL-encodes
+ * values and would mangle `url`.
+ */
+export type TSafetyResourceBanner = {
+  action: string;
+  moderationCategory: string;
+  url: string;
+  surface: string;
+  textFilterRequestId: string;
+};
+
 export type TGameDetailUnavailable = {
   [EventStreamMetadata.UniverseId]?: string;
   [EventStreamMetadata.PlaceId]?: string;
@@ -605,7 +621,11 @@ export default {
       context: formInteraction,
     },
     parseEventParams({
+      [EventStreamMetadata.InteractionUuid]: generateRandomUuid(),
+      [EventStreamMetadata.HasSponsoredContent]:
+        params[EventStreamMetadata.AdFlags]?.includes(1) ?? false,
       ...params,
+      [EventStreamMetadata.ContentType]: ContentTypeEnum.Game,
     }),
   ],
   [EventType.GameDetailReferral]: (params: TGameDetailReferral = {}): TEvent => [
@@ -619,7 +639,7 @@ export default {
       [EventStreamMetadata.HttpReferrer]: getHttpReferrer(),
       [EventStreamMetadata.ContentType]: ContentTypeEnum.Game,
       [EventStreamMetadata.ActionType]: "OpenGameDetails",
-      [EventStreamMetadata.InteractionUuid]: uuidService.generateRandomUuid(),
+      [EventStreamMetadata.InteractionUuid]: generateRandomUuid(),
       ...params,
     }),
   ],
@@ -761,8 +781,19 @@ export default {
     parseEventParamsUnifiedLogging({
       ...params,
       [EventStreamMetadata.PageContext]: getEventContext(pageContext),
-      [EventStreamMetadata.InteractionUuid]: uuidService.generateRandomUuid(),
+      [EventStreamMetadata.InteractionUuid]: generateRandomUuid(),
     }),
+  ],
+  [EventType.SafetyResourceBanner]: (params: TSafetyResourceBanner): TEvent => [
+    {
+      name: EventType.SafetyResourceBanner,
+      type: EventType.SafetyResourceBanner,
+      context: formInteraction,
+    },
+    Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined)) as Record<
+      string,
+      string
+    >,
   ],
   [EventType.GameDetailUnavailable]: (params: TGameDetailUnavailable = {}): TEvent => [
     {

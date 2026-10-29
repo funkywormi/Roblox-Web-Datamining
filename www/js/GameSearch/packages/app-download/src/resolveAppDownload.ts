@@ -61,13 +61,17 @@ const normalizeDownloadTypeOverride = (
   return undefined;
 };
 
+const resolveDownloadType = (
+  downloadTypeOverride?: ResolveAppDownloadOptions["downloadTypeOverride"],
+): AppDownloadType =>
+  normalizeDownloadTypeOverride(downloadTypeOverride) ??
+  getRecommendedAppDownloadType(getUserAgent());
+
 export const resolveAppDownload = ({
   downloadTypeOverride,
   translate,
 }: ResolveAppDownloadOptions = {}): ResolvedAppDownload | undefined => {
-  const downloadType =
-    normalizeDownloadTypeOverride(downloadTypeOverride) ??
-    getRecommendedAppDownloadType(getUserAgent());
+  const downloadType = resolveDownloadType(downloadTypeOverride);
   const link = appDownloadLinkConstants[downloadType];
 
   if (!link) {

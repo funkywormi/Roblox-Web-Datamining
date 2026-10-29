@@ -7,6 +7,7 @@ import itemDetailsService, {
   isClassicAssetType,
   TItemDetail,
 } from "../services/itemDetailsService";
+import { isMissingItemDetailsError } from "../utils/itemDetailsLoadError";
 import { getIsBundle, getItemType, getTargetId } from "../utils/pageIdentity";
 import { trackCounter, trackCriticalError } from "../../observability";
 
@@ -127,14 +128,12 @@ const ItemDetailsContainer = (): JSX.Element => {
           merge({ purchaseParamsLoaded: true });
         }
       } catch (e) {
-        const code = (e as { errors?: { code?: number }[] })?.errors?.[0]?.code;
-        if (code !== itemDetailsConstants.errorCodes.itemNotFound) {
-          trackCriticalError("ItemDetailsPageLoadFailed", null, e);
+        if (isMissingItemDetailsError(e)) {
+          window.location.href = `${environmentUrls.websiteUrl}/catalog`;
+          return;
         }
-        window.location.href =
-          code === itemDetailsConstants.errorCodes.itemNotFound
-            ? `${environmentUrls.websiteUrl}/catalog`
-            : `${environmentUrls.websiteUrl}/request-error`;
+        trackCriticalError("ItemDetailsPageLoadFailed", null, e);
+        window.location.href = `${environmentUrls.websiteUrl}/request-error`;
         return;
       }
 

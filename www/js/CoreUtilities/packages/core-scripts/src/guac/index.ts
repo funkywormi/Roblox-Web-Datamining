@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import environmentUrls from "@rbx/environment-urls";
-import { get } from "../http";
+import { get } from "@rbx/core-scripts/http";
 
 const BEHAVIOR_PATTERN = "<behaviour-name>";
 

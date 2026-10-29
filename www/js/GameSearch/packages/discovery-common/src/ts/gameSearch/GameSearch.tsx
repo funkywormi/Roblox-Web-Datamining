@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback, useMemo } from "react"
 import classNames from "classnames";
 import { WithTranslationsProps } from "@rbx/core-scripts/react";
 import { Button, Loading } from "@rbx/core-ui";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { TGameData, TMetaData, TPaginationMethod } from "../common/types/bedev1Types";
 import bedev2Services from "../common/services/bedev2Services";
 import { gameSearchPage } from "../common/constants/configConstants";
@@ -163,11 +164,11 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
       setGameTopicIds(data.gameTopicIds);
       setSortsData(data.sorts);
 
-      window.EventTracker?.fireEvent(gameSearchPage.omniSearchEndpointSuccessEvent);
+      fireEvent(gameSearchPage.omniSearchEndpointSuccessEvent);
     } catch (err) {
       setError(true);
 
-      window.EventTracker?.fireEvent(gameSearchPage.omniSearchEndpointErrorEvent);
+      fireEvent(gameSearchPage.omniSearchEndpointErrorEvent);
     }
 
     setLoading(false);

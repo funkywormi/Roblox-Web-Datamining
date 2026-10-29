@@ -61,11 +61,11 @@ export const buildPlayGameProperties = (
   joinData,
 });
 
-export const launchGame = (
+const joinGame = (
   playGameProperties: PlayGameProperties,
   eventStreamProperties: EventStreamProperties,
   actionType?: string,
-): void => {
+): PromiseLike<void> | void => {
   const { GameLauncher } = window.Roblox;
   if (GameLauncher) {
     const joinAttemptId = GameLauncher.isJoinAttemptIdEnabled()
@@ -103,7 +103,7 @@ export const launchGame = (
         joinAttemptId,
         actionType,
       );
-      GameLauncher.joinGameInstance(
+      return GameLauncher.joinGameInstance(
         placeId,
         gameInstanceId,
         true,
@@ -121,7 +121,7 @@ export const launchGame = (
         joinAttemptId,
         actionType,
       );
-      GameLauncher.followPlayerIntoGame(
+      return GameLauncher.followPlayerIntoGame(
         playerId,
         joinAttemptId,
         currentESProperties.gamePlayIntentEventCtx,
@@ -134,7 +134,7 @@ export const launchGame = (
         joinAttemptId,
         actionType,
       );
-      GameLauncher.joinPrivateGame(
+      return GameLauncher.joinPrivateGame(
         placeId,
         // @ts-expect-error TODO: old, migrated code
         null,
@@ -150,7 +150,7 @@ export const launchGame = (
         joinAttemptId,
         actionType,
       );
-      GameLauncher.joinMultiplayerGame(
+      return GameLauncher.joinMultiplayerGame(
         placeId,
         true,
         false,
@@ -161,4 +161,17 @@ export const launchGame = (
       );
     }
   }
+};
+
+// Share links wait for the returned launch before redirecting to the game page, because the
+// redirect cancels a launch that hasn't opened the client yet. Only the shared launcher
+// (is-www-common-game-launcher-enabled) returns it. With the switch off this returns nothing, so
+// the redirect happens right away, as before.
+export const launchGame = (
+  playGameProperties: PlayGameProperties,
+  eventStreamProperties: EventStreamProperties,
+  actionType?: string,
+): PromiseLike<void> | void => {
+  const launch = joinGame(playGameProperties, eventStreamProperties, actionType);
+  return window.Roblox.GameLauncher?.isSharedGameLauncherEnabled?.() ? launch : undefined;
 };

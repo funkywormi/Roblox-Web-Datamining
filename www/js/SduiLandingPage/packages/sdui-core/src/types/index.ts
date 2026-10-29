@@ -23,6 +23,15 @@ export {
   ActionTypeSchema,
 } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/actions_pb.js";
 export {
+  Capability,
+  CapabilitySchema,
+} from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/capability_pb.js";
+export {
+  Platform,
+  PlatformSchema,
+} from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/client_capabilities_pb.js";
+export type { ClientCapabilities } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/client_capabilities_pb.js";
+export {
   HydrationContentType,
   HydrationContentTypeSchema,
 } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/hydration_content_type_pb.js";
@@ -409,6 +418,8 @@ export interface SduiActionHandlerConfig {
    * but the renderer suppresses the browser default on plain left clicks.
    */
   clientNavigation?: boolean;
+  /** Resolves the anchor `target` (e.g. `_blank`) for the resolved `href`. */
+  resolveTarget?: (actionParams: Record<string, unknown>) => string | undefined;
 }
 
 export type ActionParams = Record<string, unknown>;
@@ -446,6 +457,8 @@ export interface SduiResolvedAction {
   /** Awaitable activation for consumers that manage pending, success, or failure state. */
   onActivatedAsync: (overrides?: Record<string, unknown>) => Promise<void>;
   href?: string;
+  /** Anchor `target` for `href`; only set when `href` is. */
+  target?: string;
   clientNavigation?: boolean;
 }
 

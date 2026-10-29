@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { TAnalyticsProps } from "../types/upsellCardTypes";
 import {
   logUpsellBannerShown,
@@ -24,7 +24,7 @@ export const useUpsellAnalytics = (
   } = analyticsConfigProp || {};
 
   const impressionId = useMemo(() => {
-    return providedImpressionId || uuidService.generateRandomUuid();
+    return providedImpressionId || generateRandomUuid();
   }, [providedImpressionId]);
 
   const prevImpressionIdRef = useRef<string | null>(null);

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import { usePrevious } from "@rbx/core-scripts/react";
 import { isEqual } from "es-toolkit";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import {
   TComponentType,
   TOmniRecommendationGame,
@@ -120,7 +121,7 @@ const useApportionGridRecommendationsWithResize = (
       }
 
       // BE did not send numberOfRows for this sort
-      window.EventTracker?.fireEvent(homePage.missingNumberOfRowsForLoggingErrorEvent);
+      fireEvent(homePage.missingNumberOfRowsForLoggingErrorEvent);
 
       return 1;
     };

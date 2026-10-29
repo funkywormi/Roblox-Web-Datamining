@@ -383,6 +383,9 @@ export type TDefaultPlayButtonProps = {
   appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
   disableLoadingState?: boolean;
   buttonClassName?: string;
+  iconClassName?: string;
+  purchaseIconClassName?: string;
+  unplayableIconClassName?: string;
   redirectPurchaseUrl?: ValidHttpUrl;
   showDefaultPurchaseText?: boolean;
   shouldShowVpcPlayButtonUpsells?: boolean;
@@ -410,6 +413,9 @@ export const DefaultPlayButton = ({
   appsFlyerReferralProperties = EMPTY_OBJECT,
   disableLoadingState,
   buttonClassName,
+  iconClassName,
+  purchaseIconClassName,
+  unplayableIconClassName,
   redirectPurchaseUrl,
   showDefaultPurchaseText,
   shouldShowVpcPlayButtonUpsells,
@@ -478,6 +484,7 @@ export const DefaultPlayButton = ({
           appsFlyerReferralProperties={appsFlyerReferralProperties}
           disableLoadingState={disableLoadingState}
           buttonClassName={buttonClassName}
+          iconClassName={iconClassName}
           pageContext={pageContext}
         />
       );
@@ -504,6 +511,7 @@ export const DefaultPlayButton = ({
           appsFlyerReferralProperties={appsFlyerReferralProperties}
           disableLoadingState={disableLoadingState}
           buttonClassName={buttonClassName}
+          iconClassName={iconClassName}
           pageContext={pageContext}
         />
       );
@@ -534,7 +542,11 @@ export const DefaultPlayButton = ({
         fireEvent(counterEvents.Unplayable);
 
         primaryButton = (
-          <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+          <UnplayableButton
+            hideButtonText={hideButtonText}
+            buttonClassName={buttonClassName}
+            iconClassName={unplayableIconClassName}
+          />
         );
         break;
       }
@@ -546,6 +558,7 @@ export const DefaultPlayButton = ({
           placeId={placeId}
           hideButtonText={hideButtonText}
           buttonClassName={buttonClassName}
+          iconClassName={purchaseIconClassName}
           redirectPurchaseUrl={redirectPurchaseUrl}
           playabilityStatus={playabilityStatus}
           showDefaultPurchaseText={showDefaultPurchaseText}
@@ -560,7 +573,11 @@ export const DefaultPlayButton = ({
       fireEvent(counterEvents.Unplayable);
 
       primaryButton = (
-        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        <UnplayableButton
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
+          iconClassName={unplayableIconClassName}
+        />
       );
       break;
     case PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls:
@@ -587,7 +604,11 @@ export const DefaultPlayButton = ({
       fireEvent(counterEvents.Unplayable);
 
       primaryButton = (
-        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        <UnplayableButton
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
+          iconClassName={unplayableIconClassName}
+        />
       );
       break;
     case PlayabilityStatus.ContextualPlayabilityRequireParentApproval:
@@ -607,7 +628,11 @@ export const DefaultPlayButton = ({
       fireEvent(counterEvents.Unplayable);
 
       primaryButton = (
-        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        <UnplayableButton
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
+          iconClassName={unplayableIconClassName}
+        />
       );
       break;
     case PlayabilityStatus.UnplayableOtherReason:
@@ -634,7 +659,11 @@ export const DefaultPlayButton = ({
       fireEvent(counterEvents.Unplayable);
 
       primaryButton = (
-        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        <UnplayableButton
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
+          iconClassName={unplayableIconClassName}
+        />
       );
       break;
   }

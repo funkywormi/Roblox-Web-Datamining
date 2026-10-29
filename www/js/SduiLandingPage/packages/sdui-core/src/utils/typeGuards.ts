@@ -34,6 +34,21 @@ export function isRecord(value: unknown): value is RecordOf {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
+/**
+ * Narrows `unknown` to a string-keyed plain object with at least one own key.
+ *
+ * Empty objects, arrays, and `null` are rejected. Callers that only need the
+ * object shape should use {@link isRecord}.
+ */
+export function isNonEmptyRecord(value: unknown): value is RecordOf {
+  return isRecord(value) && Object.keys(value).length > 0;
+}
+
+/** Narrows `unknown` to an array with at least one element. */
+export function isNonEmptyArray(value: unknown): value is unknown[] {
+  return isUnknownArray(value) && value.length > 0;
+}
+
 /** Reads the discriminant shared by object- and array-backed SDUI runtime values. */
 export function readSduiKind(value: unknown): unknown {
   if (value === null || typeof value !== "object") return undefined;
@@ -165,7 +180,7 @@ export function isSduiConfig(value: unknown): value is SduiComponentConfig {
 
 /** Homogeneous non-empty config list. Every entry must carry the config brand. */
 export function isSduiConfigArray(value: unknown): value is SduiComponentConfig[] {
-  if (!Array.isArray(value) || value.length === 0) return false;
+  if (!isNonEmptyArray(value)) return false;
   return value.every(isSduiConfig);
 }
 

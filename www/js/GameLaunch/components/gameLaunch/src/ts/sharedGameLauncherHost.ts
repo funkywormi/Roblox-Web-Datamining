@@ -1,6 +1,7 @@
 import { isMac, isWindows } from "@rbx/core-scripts/meta/device";
 import { isAuthenticated, userId } from "@rbx/core-scripts/meta/user";
 import { getBrowserTrackerId } from "@rbx/www-common/browser-tracker";
+import { trackDotnetAppShellCounter } from "@rbx/www-common/observability/app-shell/dotnet";
 import type {
   GameLaunchEvent,
   GameLaunchEventName,
@@ -55,7 +56,12 @@ export const createSharedGameLauncherHost = ({
   isAuthenticated,
   getUserId: userId,
   isWindowsOrMac: () => isWindows() || isMac(),
-  onEvent: triggerEvent,
+  onEvent: (name, event) => {
+    if (name === "startClientAttempted") {
+      trackDotnetAppShellCounter("GameLaunch", { outcome: "attempted" });
+    }
+    triggerEvent(name, event);
+  },
   // One flag shared with the legacy install dialog and download flows.
   installState: {
     get: () => state.isInstalling,
@@ -65,8 +71,12 @@ export const createSharedGameLauncherHost = ({
     },
   },
   onLaunchStarted: showDialog,
-  onLaunchSucceeded: closeDialog,
+  onLaunchSucceeded: () => {
+    trackDotnetAppShellCounter("GameLaunch", { outcome: "succeeded" });
+    closeDialog();
+  },
   onLaunchFailed: error => {
+    trackDotnetAppShellCounter("GameLaunch", { outcome: "failed" });
     console.error(error);
     showLaunchFailureDialog();
   },

@@ -2,7 +2,6 @@
 
 import "./css/sduiImage.css";
 import type { CSSProperties, ReactNode } from "react";
-import { Thumbnail2d, ThumbnailFormat } from "@rbx/thumbnails";
 import {
   buildFoundationTokenCss,
   buildObjectFitCss,
@@ -16,6 +15,7 @@ import {
 } from "@rbx/sdui-core";
 import { useResolvedImageUrl } from "../assets/useResolvedImageUrl";
 import { ImageWithShimmer } from "./primitives/ImageWithShimmer";
+import { WwwThumbnail2d } from "./primitives/WwwThumbnail2d";
 
 /**
  * Maps scaleType directly to a CSS `mask-size` value.
@@ -126,14 +126,9 @@ export function SduiImage({
   if (parsedImage.kind === "thumbnail") {
     const objectFitClass = objectFit != null ? `object-fit-${objectFit}` : undefined;
     return renderImageContainer(
-      <Thumbnail2d
-        type={parsedImage.thumbnail.type}
-        targetId={parsedImage.thumbnail.targetId}
-        format={ThumbnailFormat.webp}
-        size={parsedImage.thumbnail.size}
-        includeBackground={parsedImage.thumbnail.includeBackground}
-        includeProfileFrame={parsedImage.thumbnail.includeProfileFrame}
-        containerClass="sdui-thumbnail-image-container"
+      <WwwThumbnail2d
+        thumbnail={parsedImage.thumbnail}
+        containerClassName="sdui-thumbnail-image-container"
         imgClassName={objectFitClass}
         altName={alt}
       />,

@@ -30,7 +30,6 @@ ready(() => {
     <TranslationProviderSCC namespaces={namespaces}>
       <TranslationProvider config={translations}>
         <QueryClientProvider client={queryClient}>
-          {/* @ts-expect-error TODO: old, migrated code */}
           <SduiLandingPageContainer />
         </QueryClientProvider>
       </TranslationProvider>

@@ -33,6 +33,14 @@ const HYDRATION_CONTENT_TYPE_TO_FIELD_KEY: Record<ValidHydrationContentType, str
   [HydrationContentType.UNIVERSE_PRIVATE_SERVER]: "universePrivateServer",
   [HydrationContentType.NOTIFICATION_BADGE]: "notificationBadge",
   [HydrationContentType.COLLECTIBLE_ITEM]: "collectibleItem",
+  [HydrationContentType.LEADERBOARD_STATS]: "leaderboardStats",
+  [HydrationContentType.MARKETPLACE_ASSET_USER_FAVORITE]: "marketplaceAssetUserFavorite",
+  [HydrationContentType.MARKETPLACE_BUNDLE_USER_FAVORITE]: "marketplaceBundleUserFavorite",
+  [HydrationContentType.BUY_ROBUX_ONE_TIME_PRODUCT]: "buyRobuxOneTimeProduct",
+  [HydrationContentType.BUY_ROBUX_SUBSCRIPTION_PRODUCT]: "buyRobuxSubscriptionProduct",
+  [HydrationContentType.BUY_ROBUX_PENDING_TRANSFER]: "buyRobuxPendingTransfer",
+  [HydrationContentType.BUY_ROBUX_BONUS_ITEM]: "buyRobuxBonusItem",
+  [HydrationContentType.USER_LIBRARY_SAVED_STATE]: "userLibrarySavedState",
 };
 
 export function hydrationContentTypeToFieldKey(type: HydrationContentType): string {

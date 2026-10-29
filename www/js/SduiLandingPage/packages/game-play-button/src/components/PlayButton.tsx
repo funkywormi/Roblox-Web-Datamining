@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useQuery, QueryClientProvider } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
 import { getCurrentUser } from "@rbx/www-common/user";
 import { Button } from "@rbx/foundation-ui";
-import { queryClient } from "@rbx/core-scripts/react";
-import * as NavigationService from "@rbx/navigation";
+import * as NavigationService from "@rbx/navigation/auth-links";
 import ExperimentationService from "@rbx/experimentation";
 import { ValidHttpUrl } from "@rbx/core-scripts/util/url";
 import { fireEvent } from "@rbx/www-common/event-tracker";
@@ -181,7 +180,8 @@ export type TPlayButtonProps = {
   pageContext: TPlayButtonPageContext;
 };
 
-const PlayButtonContents = ({
+// Uses the host's QueryClientProvider, like usePlayabilityStatus, which every host already calls.
+export const PlayButton = ({
   universeId,
   placeId,
   rootPlaceId,
@@ -198,7 +198,7 @@ const PlayButtonContents = ({
   hideIcon = false,
   analyticsCallback = undefined,
   pageContext,
-}: TPlayButtonProps) => {
+}: TPlayButtonProps): React.JSX.Element => {
   const [isExperienceVoiceEnabled, setIsExperienceVoiceEnabled] = useState<boolean | undefined>(
     undefined,
   );
@@ -369,12 +369,6 @@ const PlayButtonContents = ({
   );
 };
 
-export const PlayButton = (props: TPlayButtonProps): React.JSX.Element => (
-  <QueryClientProvider client={queryClient}>
-    <PlayButtonContents {...props} />
-  </QueryClientProvider>
-);
-
 export type TDefaultPlayButtonProps = {
   placeId: string;
   rootPlaceId?: string;
@@ -389,6 +383,9 @@ export type TDefaultPlayButtonProps = {
   appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
   disableLoadingState?: boolean;
   buttonClassName?: string;
+  iconClassName?: string;
+  purchaseIconClassName?: string;
+  unplayableIconClassName?: string;
   redirectPurchaseUrl?: ValidHttpUrl;
   showDefaultPurchaseText?: boolean;
   shouldShowVpcPlayButtonUpsells?: boolean;
@@ -416,6 +413,9 @@ export const DefaultPlayButton = ({
   appsFlyerReferralProperties = EMPTY_OBJECT,
   disableLoadingState,
   buttonClassName,
+  iconClassName,
+  purchaseIconClassName,
+  unplayableIconClassName,
   redirectPurchaseUrl,
   showDefaultPurchaseText,
   shouldShowVpcPlayButtonUpsells,
@@ -484,6 +484,7 @@ export const DefaultPlayButton = ({
           appsFlyerReferralProperties={appsFlyerReferralProperties}
           disableLoadingState={disableLoadingState}
           buttonClassName={buttonClassName}
+          iconClassName={iconClassName}
           pageContext={pageContext}
         />
       );
@@ -510,6 +511,7 @@ export const DefaultPlayButton = ({
           appsFlyerReferralProperties={appsFlyerReferralProperties}
           disableLoadingState={disableLoadingState}
           buttonClassName={buttonClassName}
+          iconClassName={iconClassName}
           pageContext={pageContext}
         />
       );
@@ -540,7 +542,11 @@ export const DefaultPlayButton = ({
         fireEvent(counterEvents.Unplayable);
 
         primaryButton = (
-          <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+          <UnplayableButton
+            hideButtonText={hideButtonText}
+            buttonClassName={buttonClassName}
+            iconClassName={unplayableIconClassName}
+          />
         );
         break;
       }
@@ -552,6 +558,7 @@ export const DefaultPlayButton = ({
           placeId={placeId}
           hideButtonText={hideButtonText}
           buttonClassName={buttonClassName}
+          iconClassName={purchaseIconClassName}
           redirectPurchaseUrl={redirectPurchaseUrl}
           playabilityStatus={playabilityStatus}
           showDefaultPurchaseText={showDefaultPurchaseText}
@@ -566,7 +573,11 @@ export const DefaultPlayButton = ({
       fireEvent(counterEvents.Unplayable);
 
       primaryButton = (
-        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        <UnplayableButton
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
+          iconClassName={unplayableIconClassName}
+        />
       );
       break;
     case PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls:
@@ -593,7 +604,11 @@ export const DefaultPlayButton = ({
       fireEvent(counterEvents.Unplayable);
 
       primaryButton = (
-        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        <UnplayableButton
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
+          iconClassName={unplayableIconClassName}
+        />
       );
       break;
     case PlayabilityStatus.ContextualPlayabilityRequireParentApproval:
@@ -613,7 +628,11 @@ export const DefaultPlayButton = ({
       fireEvent(counterEvents.Unplayable);
 
       primaryButton = (
-        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        <UnplayableButton
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
+          iconClassName={unplayableIconClassName}
+        />
       );
       break;
     case PlayabilityStatus.UnplayableOtherReason:
@@ -640,7 +659,11 @@ export const DefaultPlayButton = ({
       fireEvent(counterEvents.Unplayable);
 
       primaryButton = (
-        <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        <UnplayableButton
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
+          iconClassName={unplayableIconClassName}
+        />
       );
       break;
   }

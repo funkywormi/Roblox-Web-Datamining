@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { clsx } from "clsx";
-import { Thumbnail2d, ThumbnailFormat } from "@rbx/thumbnails";
 import { buildObjectFitCss, parseImageString, type SduiScaleType } from "@rbx/sdui-core";
 import { SduiSkeleton } from "@rbx/sdui-common";
 import { useResolvedImageUrl } from "../../assets/useResolvedImageUrl";
 import { ImageWithShimmer } from "../primitives/ImageWithShimmer";
+import { WwwThumbnail2d } from "../primitives/WwwThumbnail2d";
 import { getVideoPlayerStyles } from "./videoPlayerStyleUtils";
 import "../css/sduiVideoPlayer.css";
 
@@ -61,14 +61,9 @@ function VideoPlayerLoadingFallbackInner({
 
   if (parsedImage?.kind === "thumbnail") {
     content = (
-      <Thumbnail2d
-        type={parsedImage.thumbnail.type}
-        targetId={parsedImage.thumbnail.targetId}
-        format={ThumbnailFormat.webp}
-        size={parsedImage.thumbnail.size}
-        includeBackground={parsedImage.thumbnail.includeBackground}
-        includeProfileFrame={parsedImage.thumbnail.includeProfileFrame}
-        containerClass="sdui-video-poster width-full height-full"
+      <WwwThumbnail2d
+        thumbnail={parsedImage.thumbnail}
+        containerClassName="sdui-video-poster width-full height-full"
       />
     );
   } else if (parsedImage?.kind === "asset" && !assetImageFailed) {
@@ -87,7 +82,7 @@ function VideoPlayerLoadingFallbackInner({
 
   return (
     // `sdui-video-loading` is load-bearing: sduiVideoPlayer.css needs a third class to outweigh
-    // @rbx/thumbnails' themed `.dark-theme .thumbnail-2d-container` background.
+    // the themed `.dark-theme .thumbnail-2d-container` background that .NET loads on every page.
     <div
       {...loadingStyles}
       className={clsx("sdui-video-loading", loadingStyles.className)}

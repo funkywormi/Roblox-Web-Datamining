@@ -1,4 +1,4 @@
-import { ValueOf } from "@rbx/core-types";
+import { ValueOf } from "@rbx/core-lib";
 import * as device from "@rbx/core-scripts/meta/device";
 import { eventTypes, sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import browserIdentifier from "./browserIdentifier";

@@ -3,13 +3,24 @@ import {
   AUTH_CONTENT_TYPE,
   clientOnly,
   readParam,
+  resolveValidHttpUrl,
   type ActionType,
   type SduiActionHandlerConfig,
 } from "@rbx/sdui-core";
-import { actionSequenceHandler, resolveActionSequenceHref } from "../actions/actionSequence";
+import {
+  actionSequenceHandler,
+  resolveActionSequenceHref,
+  resolveActionSequenceTarget,
+} from "../actions/actionSequence";
 import { resolveCustomAnalyticsTelemetryHandlerName } from "../actions/customAnalyticsEvent";
 import { loadMoreFromApiHandler } from "../actions/loadMoreFromApi";
 import { refreshFeedEntryFromApiHandler } from "../actions/refreshFeedEntryFromApi";
+
+/** Web-only `openBehavior` param for external links. Unset means `NewTab`. */
+const OpenBehavior = {
+  Default: "Default",
+  NewTab: "NewTab",
+} as const;
 
 /**
  * Default action handlers shared by all SDUI pages.
@@ -29,6 +40,15 @@ export const DEFAULT_ACTION_HANDLERS: Partial<Record<ActionType, SduiActionHandl
       if (!url) return undefined;
       return url;
     },
+  },
+
+  // Currently only http(s) URLs are supported. Deeplinks should also be supported in the future.
+  [ActionTypeEnum.OPEN_EXTERNAL_LINK]: {
+    resolveHref: params => resolveValidHttpUrl(readParam(params, "url")),
+    resolveTarget: params =>
+      readParam(params, "openBehavior", "open_behavior") === OpenBehavior.Default
+        ? undefined
+        : "_blank",
   },
 
   [ActionTypeEnum.OPEN_GAME_DETAILS]: {
@@ -94,5 +114,6 @@ export const DEFAULT_ACTION_HANDLERS: Partial<Record<ActionType, SduiActionHandl
     handler: clientOnly(actionSequenceHandler),
     skipUnifiedLogging: true,
     resolveHref: resolveActionSequenceHref,
+    resolveTarget: resolveActionSequenceTarget,
   },
 };

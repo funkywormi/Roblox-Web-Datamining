@@ -581,5 +581,9 @@
     "Description.VPCRequestDoNotDisturbTimeWindow": "Your child only gets notifications outside of the Do not disturb hours you set.",
     "Heading.ConversationalRequest.SpendNotifications": "Update notifications about your child's spending?",
     "Heading.ConversationalRequest.RevokeExperienceApproval": "Remove this game from your child’s list of allowed games?",
-    "Description.ConversationalRequest.RevokeExperienceApproval": "Your child won't be able to play it unless its content maturity rating is now considered right for their age."
+    "Description.ConversationalRequest.RevokeExperienceApproval": "Your child won't be able to play it unless its content maturity rating is now considered right for their age.",
+    "Label.RobloxKids": "Roblox Kids",
+    "Label.RobloxSelect": "Roblox Select",
+    "Label.Roblox": "Roblox",
+    "Label.ContentTierWithAges": "{tierName} • Ages {minAge}-{maxAge}"
 }

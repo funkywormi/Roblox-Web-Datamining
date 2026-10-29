@@ -69,11 +69,12 @@ const WebCatalogRevampCounters = {
 // Catalog user-interaction click events. The specific source/component and
 // item/filter details are passed through the telemetry `metaData` field (JSON
 // string) so a single counter can be sliced by source in telemetry, e.g.
-// { source: "Catalog", itemId, itemType } for ItemCardClick.
+// { source: "Catalog", itemId, itemType, animatedItemCardEnabled? } for ItemCardClick.
 const CatalogInteractionTrackingConstants = {
   // Fired when the user clicks an item card. `source` distinguishes where the
   // card was rendered (Catalog grid, item-details recommendations, bundle
-  // contents, complimentary recommendations, look details, ...).
+  // contents, complimentary recommendations, look details, ...). Catalog cards
+  // also send `animatedItemCardEnabled` (IXP hover-preview enrollment).
   ItemCardClick: "ItemCardClick",
   // Fired when the user changes any catalog filter. `filterType` + `value` in
   // metadata; `isSearch` indicates the filter was applied on a search results

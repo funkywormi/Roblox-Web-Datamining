@@ -3,6 +3,7 @@ import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/react
 import { useSystemFeedback } from "@rbx/core-ui";
 import dataStores from "@rbx/core-scripts/data-store";
 import { InlinePrompt } from "@rbx/prompts-orchestrator";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import bedev2Services, { TGetOmniRecommendationsResponse } from "../common/services/bedev2Services";
 import ErrorContainer from "../common/components/ErrorContainer";
 import OmniFeedItem from "../omniFeed/OmniFeedItem";
@@ -83,13 +84,13 @@ export const HomePageOmniFeed = ({ translate }: WithTranslationsProps): JSX.Elem
         )
         .then(data => {
           setRecommendations(data);
-          window.EventTracker?.fireEvent(homePage.omniRecommendationEndpointSuccessEvent);
+          fireEvent(homePage.omniRecommendationEndpointSuccessEvent);
 
           logOmniFeedStats(data, sessionId);
         })
         .catch(() => {
           setError(true);
-          window.EventTracker?.fireEvent(homePage.omniRecommendationEndpointErrorEvent);
+          fireEvent(homePage.omniRecommendationEndpointErrorEvent);
         });
     },
     [deviceFeatures, authIntentFeatures],
