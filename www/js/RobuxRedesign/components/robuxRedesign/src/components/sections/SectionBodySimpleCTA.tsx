@@ -1,7 +1,5 @@
-import { useContext } from "react";
 import { Button } from "@rbx/foundation-ui";
 import { BaseSectionProps } from "./Section";
-import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 
 export type SectionBodySimpleCTAProps = BaseSectionProps & {
   title: string;
@@ -17,8 +15,6 @@ export function SectionBodySimpleCTA({
   buttonText,
   buttonClickHandler,
 }: SectionBodySimpleCTAProps) {
-  const { breakpoint } = useContext(BuyRobuxPageContext);
-
   return (
     <div className="flex flex-col self-stretch medium:flex-row medium:justify-between medium:items-center">
       <div className="flex flex-col self-stretch gap-small padding-bottom-large medium:padding-bottom-none">
@@ -32,7 +28,7 @@ export function SectionBodySimpleCTA({
       {/* Section Button */}
       <Button
         onClick={buttonClickHandler}
-        className={`text-label-medium ${breakpoint.isAboveInclusive("medium") ? "button-extra-wide" : "width-full"}`}
+        className="text-label-medium width-full medium:width-[200px]"
         size="Medium"
         variant={isPrimary ? "Emphasis" : "Standard"}
       >

@@ -3,7 +3,7 @@ import { httpService } from "@rbx/core-scripts/legacy/core-utilities";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import environmentUrls from "@rbx/environment-urls";
 import { validationMessages } from "../constants/signupConstants";
-import { parseErrorCode } from "../utils/requestUtils";
+import { getHttpStatus, parseErrorCode } from "../utils/requestUtils";
 
 const ACCOUNT_UPGRADE_URL = `${environmentUrls.authApi}/v1/account/upgrade`;
 const NOT_APPROVED_URL = `${environmentUrls.userModerationApi}/v2/not-approved`;
@@ -46,14 +46,6 @@ const fieldFailures = new Map<number, UpgradeFailure>([
   ],
 ]);
 
-type MaybeHttpError = { status?: number; response?: { status?: number } } | null | undefined;
-
-const getStatus = (error: unknown): number | undefined => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- http rejects with a response, an AxiosError, or undefined
-  const failure = error as MaybeHttpError;
-  return failure?.status ?? failure?.response?.status;
-};
-
 export const upgradeAccount = async (
   birthday: Date,
   username?: string,
@@ -72,7 +64,7 @@ export const logout = async (): Promise<void> => {
 export const isRestrictionAlreadyLifted = (error: unknown): boolean => {
   const code = parseErrorCode(error);
   return (
-    getStatus(error) === http.HttpResponseCodes.forbidden &&
+    getHttpStatus(error) === http.HttpResponseCodes.forbidden &&
     (code === AccountUpgradeError.NotEligible ||
       code === AccountUpgradeError.AccountAlreadyUpgraded)
   );
@@ -81,7 +73,7 @@ export const isRestrictionAlreadyLifted = (error: unknown): boolean => {
 export const getUpgradeFailure = (error: unknown): UpgradeFailure => {
   const code = parseErrorCode(error);
   const fieldFailure =
-    getStatus(error) === http.HttpResponseCodes.badRequest && code !== null
+    getHttpStatus(error) === http.HttpResponseCodes.badRequest && code !== null
       ? fieldFailures.get(code)
       : undefined;
   return fieldFailure ?? { field: "form", message: validationMessages.unknownError };
@@ -162,13 +154,16 @@ const navigateHome = (): void => {
  * (loading state, disabled inputs) until the next document takes over — the promise resolves
  * as soon as the navigation starts, but the browser is still on the old page until then.
  * `navigate` defaults to /home; hosts with a pending destination (e.g. a login `returnUrl`)
- * pass their own.
+ * pass their own. `beforeNavigate` runs after the probe schedule, and the navigation waits
+ * for it. It must not reject, or the flow rejects and nothing navigates.
  */
 export const handleUpgradeComplete = async (
   onRedirecting?: () => void,
   navigate: () => void = navigateHome,
+  beforeNavigate?: () => Promise<void>,
 ): Promise<void> => {
   await waitForUpgradeUnblocked(checkNotApprovedCleared);
+  await beforeNavigate?.();
   onRedirecting?.();
   navigate();
 };

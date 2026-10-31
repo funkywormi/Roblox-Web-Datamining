@@ -1,10 +1,3 @@
-import * as hybridResponseService from "@rbx/core-scripts/auth/hybrid-response";
-import ExperimentationService from "@rbx/experimentation";
-import {
-  defaultNotInApp,
-  isPasskeyCompatible,
-} from "@rbx/authentication-common/passkey/compatibility";
-import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { AddEmailTranslations } from "../components/AddEmailContent";
 import { VerifyEmailTranslations } from "../components/VerifyEmailContent";
 import { PasskeyUpsellTranslations } from "../components/PasskeyUpsellContent";
@@ -14,14 +7,10 @@ import {
   LogoutPrompt,
   recordLogoutPromptImpression,
 } from "./logoutPromptApi";
-import {
-  LogoutUpsellClientError,
-  PasskeyEligibilityDecision,
-  sendLogoutUpsellClientError,
-  sendPasskeyEligibilityDecision,
-} from "./logoutUpsellEvents";
-import { isPlatformAuthenticatorAvailable } from "./platformAuthenticatorAvailability";
-import { showPasskeyUpsellModal } from "./showPasskeyUpsellModal";
+import type {
+  EmailLogoutUpsellOptions,
+  PasskeyLogoutUpsellOptions,
+} from "../components/LogoutUpsellFlow";
 
 /**
  * Single entry point for the logout upsell flow.
@@ -34,8 +23,8 @@ import { showPasskeyUpsellModal } from "./showPasskeyUpsellModal";
  *      and that preserves today's logout behavior.
  *   2. When prompts service is enabled, ask the modals service for an eligible
  *      logout prompt and dispatch on `promptType`:
- *        - `LogoutEmailUpsellV1` → record an impression and open the legacy
- *          email upsell modal directly via `openLogoutEmailUpsellModal`. The
+ *        - `LogoutEmailUpsellV1` → record an impression and ask the host to
+ *          open its email upsell modal. The
  *          prompts service has already decided this user should see the
  *          modal, so we skip the legacy eligibility checks (metadata flag +
  *          email-status GET) and just render.
@@ -50,111 +39,40 @@ import { showPasskeyUpsellModal } from "./showPasskeyUpsellModal";
  *          types render by adding a branch to `dispatchPrompt`.
  */
 
-const LOGOUT_UPSELL_LAYER = "Website.LogoutUpsell";
-
 // From modals-eligibility-service config
 const PROMPT_TYPE_LOGOUT_EMAIL_UPSELL_V1 = "LogoutEmailUpsellV1";
 const PROMPT_TYPE_LOGOUT_PASSKEY_UPSELL_V1 = "LogoutPasskeyUpsellV1";
 
-type LegacyEmailVerificationService = {
-  handleUserEmailUpsellAtLogout?: (
-    onLogout: () => void,
-  ) => Promise<{ emailAddress?: string } | null | undefined>;
-  openLogoutEmailUpsellModal?: (skipCallback: () => void) => Promise<void> | void;
-};
-
-// The email upsell modal is a .NET bundle global (components/verificationUpsell), read at call time
-// so this module also loads where window.Roblox doesn't exist (Next.js). There it is absent and the
-// email paths below log out directly.
-// TODO(WEB-3606): import the email upsell modal directly on Next.js if the email prompt stays on there.
-const getEmailVerificationService = (): LegacyEmailVerificationService | undefined => {
-  if (typeof window === "undefined") {
-    return undefined;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- legacy bundle global, absent on Next.js
-  const { Roblox } = window as {
-    Roblox?: { EmailVerificationService?: LegacyEmailVerificationService };
-  };
-  return Roblox?.EmailVerificationService;
-};
+export type ShowEmailUpsellOptions = Omit<EmailLogoutUpsellOptions, "kind">;
+export type ShowPasskeyUpsellOptions = Omit<PasskeyLogoutUpsellOptions, "kind">;
 
 export type HandleLogoutUpsellOptions = {
   /** Called when the upsell flow is finished and the page should log out. */
   onLogout: () => void;
+  /**
+   * Opens the passkey upsell modal. Each host passes its own mount, e.g. the .NET nav passes
+   * `showPasskeyUpsellModal`, so this module doesn't import a host-specific mount.
+   */
+  showPasskeyUpsell: (options: ShowPasskeyUpsellOptions) => void;
+  /** Opens the email-only prompt selected by prompts service. */
+  showEmailUpsell: (options: ShowEmailUpsellOptions) => void;
+  /** Reads the host's IXP implementation. */
+  isPromptsServiceEnabled: () => Promise<boolean>;
+  /** Checks whether this host can complete WebAuthn registration. */
+  browserSupportsPasskey: () => Promise<boolean>;
+  /** Preserves the metadata/email-status gated fallback when prompts service is off. */
+  runLegacyEmailUpsell: (onLogout: () => void) => void | Promise<void>;
 };
-
-const browserSupportsPasskey = (): Promise<boolean> =>
-  isPasskeyCompatible({
-    producer: () => getDeviceMeta() ?? defaultNotInApp(),
-    hybridCallback: () =>
-      hybridResponseService.getNativeResponse(
-        hybridResponseService.FeatureTarget.CREDENTIALS_PROTOCOL_AVAILABLE,
-        {},
-        2000,
-      ),
-    platformAuthenticatorCheck: async () => {
-      const available = await isPlatformAuthenticatorAvailable();
-      sendPasskeyEligibilityDecision(
-        available
-          ? PasskeyEligibilityDecision.Capable
-          : PasskeyEligibilityDecision.ExcludedNoPlatformAuthenticator,
-      );
-      return available;
-    },
-  });
 
 // Capabilities advertised to the prompts service so its eligibility resolvers
 // don't select an upsell this client can't render. `capableUpsells` is
 // "PasskeyV1" when the client can register a passkey, and "" otherwise — the
 // prompts service reads the empty value as "passkey upsell unavailable here".
-const buildClientAttributes = async (): Promise<ClientAttributes> => ({
+const buildClientAttributes = async (
+  browserSupportsPasskey: () => Promise<boolean>,
+): Promise<ClientAttributes> => ({
   capableUpsells: (await browserSupportsPasskey()) ? "PasskeyV1" : "",
 });
-
-const isPromptsServiceEnabled = async (): Promise<boolean> => {
-  try {
-    const ixp = await ExperimentationService.getAllValuesForLayer(LOGOUT_UPSELL_LAYER);
-    return ixp?.IsPromptsServiceEnabled === true;
-  } catch {
-    return false;
-  }
-};
-
-// This includes the legacy email service & authAPI checks that get skipped if
-// prompts service is enabled
-const runLegacyEmailUpsell = (onLogout: () => void): void => {
-  const emailVerificationService = getEmailVerificationService();
-  if (typeof emailVerificationService?.handleUserEmailUpsellAtLogout !== "function") {
-    onLogout();
-    return;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises -- legacy contract; the modal owns the flow
-  emailVerificationService.handleUserEmailUpsellAtLogout(onLogout).then(data => {
-    if (!data || data.emailAddress) {
-      onLogout();
-    }
-  });
-};
-
-// Skips email service & authAPI checks (done by prompts service)
-const openLegacyEmailUpsellModal = (onLogout: () => void): void => {
-  const openModal = getEmailVerificationService()?.openLogoutEmailUpsellModal;
-  if (typeof openModal !== "function") {
-    // if new method is missing due to cached bundle, fall back to legacy path
-    sendLogoutUpsellClientError(LogoutUpsellClientError.LegacyModalEntrypointMissing);
-    runLegacyEmailUpsell(onLogout);
-    return;
-  }
-  const failOpen = () => {
-    sendLogoutUpsellClientError(LogoutUpsellClientError.LegacyModalOpenFailed);
-    onLogout();
-  };
-  try {
-    Promise.resolve(openModal(onLogout)).catch(failOpen);
-  } catch {
-    failOpen();
-  }
-};
 
 const buildPasskeyTranslations = (
   promptTranslations: Record<string, string>,
@@ -196,10 +114,13 @@ const buildVerifyEmailTranslations = (
   };
 };
 
-const dispatchPasskeyUpsell = (prompt: LogoutPrompt, onLogout: () => void): void => {
+const dispatchPasskeyUpsell = (
+  prompt: LogoutPrompt,
+  { onLogout, showPasskeyUpsell }: HandleLogoutUpsellOptions,
+): void => {
   const withEmail = Boolean(prompt.translations.secondaryButton);
   recordLogoutPromptImpression(prompt.promptType);
-  showPasskeyUpsellModal({
+  showPasskeyUpsell({
     translations: buildPasskeyTranslations(prompt.translations, { withEmail }),
     showAddEmail: withEmail,
     addEmailTranslations: withEmail ? buildAddEmailTranslations(prompt.translations) : undefined,
@@ -210,34 +131,39 @@ const dispatchPasskeyUpsell = (prompt: LogoutPrompt, onLogout: () => void): void
   });
 };
 
-const dispatchPrompt = (prompt: LogoutPrompt, onLogout: () => void): void => {
+const dispatchPrompt = (prompt: LogoutPrompt, options: HandleLogoutUpsellOptions): void => {
   switch (prompt.promptType) {
     case PROMPT_TYPE_LOGOUT_EMAIL_UPSELL_V1:
       recordLogoutPromptImpression(prompt.promptType);
-      openLegacyEmailUpsellModal(onLogout);
+      options.showEmailUpsell({
+        closeLabel: prompt.translations.closeLabel ?? "",
+        addEmailTranslations: buildAddEmailTranslations(prompt.translations),
+        verifyEmailTranslations: buildVerifyEmailTranslations(prompt.translations),
+        onLogout: options.onLogout,
+      });
       return;
     case PROMPT_TYPE_LOGOUT_PASSKEY_UPSELL_V1:
-      dispatchPasskeyUpsell(prompt, onLogout);
+      dispatchPasskeyUpsell(prompt, options);
       return;
     default:
-      onLogout();
+      options.onLogout();
   }
 };
 
-export const handleLogoutUpsell = async ({
-  onLogout,
-}: HandleLogoutUpsellOptions): Promise<void> => {
+export const handleLogoutUpsell = async (options: HandleLogoutUpsellOptions): Promise<void> => {
+  const { browserSupportsPasskey, isPromptsServiceEnabled, onLogout, runLegacyEmailUpsell } =
+    options;
   const enabled = await isPromptsServiceEnabled();
   if (!enabled) {
-    runLegacyEmailUpsell(onLogout);
+    await runLegacyEmailUpsell(onLogout);
     return;
   }
 
-  const prompt = await getLogoutPrompt(await buildClientAttributes());
+  const prompt = await getLogoutPrompt(await buildClientAttributes(browserSupportsPasskey));
   if (!prompt) {
     onLogout();
     return;
   }
 
-  dispatchPrompt(prompt, onLogout);
+  dispatchPrompt(prompt, options);
 };

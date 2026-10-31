@@ -32,6 +32,7 @@ export const CHAT_NAMESPACES_BY_PRECEDENCE = [
   "Feature.AppealsPortal",
   "Feature.UniversalFeatureRestrictions",
   "Feature.Chat",
+  "CommonUI.Features",
 ] as const;
 
 const useChatTranslate = (): TChatTranslate => {
@@ -46,17 +47,30 @@ const useChatTranslate = (): TChatTranslate => {
   const t7 = useTranslations(asNamespace("Feature.AppealsPortal"));
   const t8 = useTranslations(asNamespace("Feature.UniversalFeatureRestrictions"));
   const t9 = useTranslations(asNamespace("Feature.Chat"));
+  const t10 = useTranslations(asNamespace("CommonUI.Features"));
 
   // Translators are memoized per namespace, so this stays stable like the legacy `translate`.
   return useMemo<TChatTranslate>(() => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- string keys at runtime
-    const translators = [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9] as unknown as TLooseTranslator[];
+    const translators = [
+      t0,
+      t1,
+      t2,
+      t3,
+      t4,
+      t5,
+      t6,
+      t7,
+      t8,
+      t9,
+      t10,
+    ] as unknown as TLooseTranslator[];
     return (key, params, fallback) => {
       const translator = translators.find(candidate => candidate.has(key));
       const result = translator ? translator(key, params) : "";
       return result.length > 0 ? result : (fallback ?? "");
     };
-  }, [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9]);
+  }, [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10]);
 };
 
 export default useChatTranslate;

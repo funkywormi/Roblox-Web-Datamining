@@ -29,15 +29,25 @@ export const chatQueryKeys = {
   friendsDirectory: (userId: number) => [...chatQueryKeys.all, "friendsDirectory", userId] as const,
   /** Prefix key matching the friends directory regardless of userId — for friend/user-tag refreshes. */
   friendsDirectoryAll: () => [...chatQueryKeys.all, "friendsDirectory"] as const,
+  // Share the directory prefix so friendship realtime events refresh member-menu eligibility too.
+  participantFriends: (userId: number, participantIdsKey: string) =>
+    [
+      ...chatQueryKeys.friendsDirectoryAll(),
+      "participantFriends",
+      userId,
+      participantIdsKey,
+    ] as const,
   presence: (participantIdsKey: string) =>
     [...chatQueryKeys.all, "presence", participantIdsKey] as const,
   /** Prefix key matching presence regardless of participant set — for live presence refreshes. */
   presenceAll: () => [...chatQueryKeys.all, "presence"] as const,
   modalSequence: (conversationId: string) =>
     [...chatQueryKeys.all, "modalSequence", conversationId] as const,
-  /** Per-conversation participant metadata (is_blocked) for the group-OSA consent modal. */
+  /** Raw per-conversation member metadata shared by details and the group-OSA consent modal. */
   participantsMetadata: (conversationId: string) =>
     [...chatQueryKeys.all, "participantsMetadata", conversationId] as const,
+  /** Prefix key matching every conversation's member metadata — for membership refreshes without an id. */
+  participantsMetadataAll: () => [...chatQueryKeys.all, "participantsMetadata"] as const,
   /** Trusted-connection status for a set of users (group-OSA consent modal Trusted badge). */
   trustedConnections: (userIdsKey: string) =>
     [...chatQueryKeys.all, "trustedConnections", userIdsKey] as const,
@@ -45,6 +55,10 @@ export const chatQueryKeys = {
   countryRegions: () => [...chatQueryKeys.all, "countryRegions"] as const,
   gamePlaceDetails: (placeId: string) =>
     [...chatQueryKeys.all, "gamePlaceDetails", placeId] as const,
+  gameShareLink: (version: number, linkId: string, linkType?: string) =>
+    [...chatQueryKeys.all, "gameShareLink", version, linkId, linkType] as const,
+  gameStats: (universeId: number | undefined) =>
+    [...chatQueryKeys.all, "gameStats", universeId] as const,
   /** IXP parameters of the two-pane chat window layer. */
   unifiedChatWindowLayer: () => [...chatQueryKeys.all, "unifiedChatWindowLayer"] as const,
 };

@@ -202,7 +202,7 @@ function buildComponentConfig(
  *   classes at render time, whereas Lua resolves to a token value at build time.
  */
 export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
-  const { dataBinder, templateStore, errorReporter, poolRegistry } = deps;
+  const { dataBinder, templateStore, errorReporter, poolRegistry, locale } = deps;
 
   const builder: SduiBuilder = {
     poolRegistry,
@@ -228,6 +228,7 @@ export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
         pageContext: builderConfig.pageContext,
         configKey: builderConfig.configKey,
         componentType: String(template.shared.componentType),
+        locale,
       };
 
       // Shared-scope (inline_component): reuse the parent's resolved

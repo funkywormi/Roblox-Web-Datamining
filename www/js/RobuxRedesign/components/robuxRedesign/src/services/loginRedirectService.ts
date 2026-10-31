@@ -1,4 +1,4 @@
-import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import { DeviceMeta } from "@rbx/www-common/device/types";
 import { getCurrentUser } from "@rbx/www-common/user";
 import ExperimentationService from "@rbx/experimentation";
 import { trackCounter } from "../observability";
@@ -13,14 +13,15 @@ const ExperimentParameterName = "variant";
 export class LoginRedirectService {
   private isExperimentAccessed = false;
 
-  async getExperimentBasedPathname(): Promise<{ pathname: string; isInExperiment: boolean }> {
+  async getExperimentBasedPathname(
+    deviceMeta: DeviceMeta,
+  ): Promise<{ pathname: string; isInExperiment: boolean }> {
     const userId = getCurrentUser()?.id;
     if (!userId) {
       return { pathname: DEFAULT_LOGIN_REDIRECT_PATHNAME, isInExperiment: false };
     }
 
-    const deviceMeta = getDeviceMeta();
-    const appType = (deviceMeta?.appType ?? "unknown").trim().replace(/\s+/g, "_");
+    const appType = deviceMeta.appType.trim().replace(/\s+/g, "_");
 
     // Bail before touching the layer so these users are never assigned or exposed.
     const iosMajorVersion = getIosMajorVersion();

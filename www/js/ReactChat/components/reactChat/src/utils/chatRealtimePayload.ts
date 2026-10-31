@@ -310,6 +310,7 @@ function inferCacheActionsFromEnvelope(record: UnknownRecord): TChatRealtimeCach
     type.includes("removedfromchannel")
   ) {
     actions.push({ kind: "invalidate_user_conversations" });
+    actions.push({ kind: "invalidate_participants_metadata", conversationId });
     if (conversationId !== undefined) {
       actions.push({
         kind: "invalidate_conversation_messages",

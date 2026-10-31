@@ -1,7 +1,6 @@
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
-import { Modal } from "react-style-guide";
-import { Icon, ListItem } from "@rbx/foundation-ui";
+import { DialogBody, Icon, List, ListItem } from "@rbx/foundation-ui";
 import * as TwoStepVerification from "../../../../common/request/types/twoStepVerification";
 import { TwoStepVerificationError } from "../../../../common/request/types/twoStepVerification";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
@@ -220,8 +219,8 @@ const MediaTypeList: React.FC<Props> = ({
   const renderMediaType = (
     mediaType: MediaType,
     key: number,
-    rowRef: React.RefObject<HTMLLIElement> | null,
-  ): JSX.Element | null => {
+    rowRef: React.RefObject<HTMLLIElement | null> | null,
+  ): React.ReactElement | null => {
     const mediaTypeLabel = getMediaTypeLabel(mediaType);
     if (!mediaTypeLabel) {
       return null;
@@ -322,14 +321,14 @@ const MediaTypeList: React.FC<Props> = ({
   const { title, body } = getModalText();
   setModalTitleText(title);
 
-  const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
+  const BodyElement = renderInline ? InlineChallengeBody : DialogBody;
   const lockIconClassName = renderInline
     ? "inline-challenge-protection-shield-icon"
     : "modal-protection-shield-icon";
   const marginBottomXLargeClassName = renderInline
     ? "inline-challenge-margin-bottom-xlarge"
     : "modal-margin-bottom-xlarge";
-  const tableMarginClassName = renderInline ? "" : "modal-margin-bottom-large";
+  const listMarginClassName = renderInline ? "" : "modal-margin-bottom-large";
   const errorTextMarginClassName = renderInline
     ? "inline-challenge-margin-top-large"
     : "modal-margin-bottom-large";
@@ -349,15 +348,15 @@ const MediaTypeList: React.FC<Props> = ({
     <BodyElement data-testid="media-type-list">
       <div className={lockIconClassName} />
       <p className={marginBottomXLargeClassName}>{body}</p>
-      <table className={`table table-striped media-type-list ${tableMarginClassName}`}>
-        <tbody className="[&>*:nth-child(even)]:bg-surface-300">
-          {enabledMediaTypes.map((mediaType, index) =>
-            renderMediaType(mediaType, index, index === 0 ? rowRef : null),
-          )}
-        </tbody>
-      </table>
+      <List className={`width-full [&>*:nth-child(even)]:bg-surface-300 ${listMarginClassName}`}>
+        {enabledMediaTypes.map((mediaType, index) =>
+          renderMediaType(mediaType, index, index === 0 ? rowRef : null),
+        )}
+      </List>
       {sendCodeError ? (
-        <p className={`text-error xsmall ${errorTextMarginClassName}`}>{sendCodeError}</p>
+        <p className={`text-caption-small content-system-alert ${errorTextMarginClassName}`}>
+          {sendCodeError}
+        </p>
       ) : null}
       {children}
       {/* TODO: update SupportHelp to allow conditional rendering of copy text */}

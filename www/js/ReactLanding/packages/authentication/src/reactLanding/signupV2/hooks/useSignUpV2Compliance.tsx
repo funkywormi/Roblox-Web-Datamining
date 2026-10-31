@@ -3,7 +3,6 @@ import { EmailVerifyCodeModalService } from "Roblox";
 import type { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
 import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 import { FeatureSignupComplianceModal } from "@rbx/authentication-common/constants/translationConstants";
-import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
 import useIntlAuthCompliance from "@rbx/authentication-common/hooks/useIntlAuthCompliance";
 import useOtpMetadata from "@rbx/authentication-common/hooks/useOtpMetadata";
 import { KoreaSignupCompliancePolicyCheckboxType } from "@rbx/authentication-common/types/signupTypes";
@@ -13,10 +12,8 @@ import KoreaSignupComplianceComponent from "../../components/KoreaSignupComplian
 import PrivacyPolicyCheckbox from "../../components/PrivacyPolicyCheckbox";
 import SignupAgreementCheckbox from "../../components/SignupAgreementCheckbox";
 import TosCheckbox from "../../components/TosCheckbox";
-import { playerAppSignupLayer } from "../../constants/landingConstants";
 import {
   complianceConstants,
-  experimentVariables,
   otpModalConstants,
   USER_AGREEMENTS,
 } from "../../constants/signupConstants";
@@ -78,9 +75,6 @@ const useSignUpV2Compliance = ({
     shouldDisableSignupCheckbox,
   } = useIntlAuthCompliance();
   const { otpCodeLength, isOtpEnabled } = useOtpMetadata(otpModalConstants.origin);
-  const playerAppSignupExperiments = useExperiments(playerAppSignupLayer);
-  const shouldSkipVPCSignupFlow =
-    playerAppSignupExperiments[experimentVariables.shouldSkipVPCSignupFlow] === true;
   const { isSignupCheckboxEnabled, signupAgreementsTranslationKey } = useSignupCheckboxExperiment();
 
   const [isTosChecked, setIsTosChecked] = useState(false);
@@ -177,9 +171,7 @@ const useSignUpV2Compliance = ({
   };
 
   const needsParentOtp = (): boolean => {
-    // KISA experiment: U14 Korean users skip the parent email flow; the platform-locked
-    // /not-approved page handles the post-signup state.
-    if (shouldSkipVPCSignupFlow && isUnderCountryThreshold) {
+    if (isUnderThresholdForKorea) {
       if (!hasLoggedVpcSkipRef.current) {
         hasLoggedVpcSkipRef.current = true;
         sendAuthPageLoadEvent(EVENT_CONSTANTS.context.kisaU14Signup, EVENT_CONSTANTS.state.skipVPC);
@@ -195,7 +187,7 @@ const useSignUpV2Compliance = ({
   };
 
   const needsKoreaConsentPage = (): boolean =>
-    isKoreaEnhancedConsentRequired && !isUnderThresholdForKorea && koreaPoliciesType === undefined;
+    isKoreaEnhancedConsentRequired && koreaPoliciesType === undefined;
 
   const handleOtpComplete = (session: IOtpSession): void => {
     setOtpSession(session);

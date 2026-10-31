@@ -1,4 +1,7 @@
-import { TPlayabilityStatusWithUnplayableError } from "../types/playButtonTypes";
+import {
+  TPlayabilityStatusWithUnplayableError,
+  TPlayButtonActionTypes,
+} from "../types/playButtonTypes";
 import { PlayabilityStatus } from "./playabilityStatus";
 
 // NOTE: This does not override the true event name since it is set in:
@@ -129,6 +132,9 @@ const defaultAfReferralProperties = {
   pid: "experiencestart_mobileweb",
   is_retargeting: "false",
 };
+
+export const demoPlayActionType: TPlayButtonActionTypes = "DemoPlayButtonClick";
+export const playOnWebActionType: TPlayButtonActionTypes = "PlayOnWebButtonClick";
 
 export default {
   playButtonErrorStatusTranslationMap,

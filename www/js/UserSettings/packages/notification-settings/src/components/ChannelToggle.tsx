@@ -99,7 +99,9 @@ export const ChannelToggle = ({
   const requiredActions = new Set(
     availableOptions.flatMap(opt => opt.requiredActions.map(a => a.actionType)),
   );
-  const isReadOnly = requiredActions.has(RequirementType.ReadableButNotActionable);
+  const isReadOnly =
+    requiredActions.has(RequirementType.ReadableButNotActionable) ||
+    requiredActions.has(RequirementType.Inherited);
   const isParentDisabled = requiredActions.has(RequirementType.ParentalConsent);
   const canToggle = availableOptions.length > 1 && !isReadOnly && !isParentDisabled;
 
@@ -152,11 +154,16 @@ export const ChannelToggle = ({
         notificationChannel: lowercaseLabelKey ? translate(lowercaseLabelKey) : channelLabel,
       });
     }
-    // The channel aggregate toggle is off, making this per-type channel read-only.
+
     if (isReadOnly) {
-      return translate(translationConstants.channelDisabledDescription, {
-        channel: lowercaseLabelKey ? translate(lowercaseLabelKey) : channelLabel,
-      });
+      if (requiredActions.has(RequirementType.Inherited)) {
+        // The channel aggregate toggle is off, making this per-type channel read-only.
+        return translate(translationConstants.channelDisabledDescription, {
+          channel: lowercaseLabelKey ? translate(lowercaseLabelKey) : channelLabel,
+        });
+      }
+
+      return translate(translationConstants.readonlyChannelDescription);
     }
     if (useLegallySensitiveChannelCopy && lscConsent) {
       return lscConsent;

@@ -14,5 +14,8 @@
     "PreAuth.Subtitle.PageHeader": "Play immersive games, watch interactive clips, chat with friends, and build worlds of your own.",
     "Action.SignIn": "Sign in",
     "Action.CreateAccount": "Create account",
-    "Action.Download": "Download"
+    "Action.Download": "Download",
+    "Action.ContinueToApp": "Continue to app",
+    "Description.OpensRobloxOrDownload": "Opens Roblox or takes you to download it.",
+    "Action.ContinueInBrowser": "Continue in browser"
 }

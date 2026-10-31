@@ -1,38 +1,22 @@
-import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import { DeviceMeta } from "@rbx/www-common/device/types";
 
-const deviceMeta = getDeviceMeta();
-
-export const isInUniversalApp = Boolean(deviceMeta?.isUniversalApp);
-export const isSamsungGalaxyStoreApp = Boolean(deviceMeta?.isSamsungGalaxyStoreApp);
-export const isAmazonApp = Boolean(deviceMeta?.isAmazonApp);
-export const isAndroidApp = Boolean(deviceMeta?.isAndroidApp);
-export const isPcGdkApp = Boolean(deviceMeta?.isPcGdkApp);
-
-export const isOnDesktop = (() => {
-  if (!deviceMeta) {
-    return false;
-  }
-
+export const getIsWebCheckoutPlatform = (device: DeviceMeta) => {
   return (
-    (deviceMeta.isDesktop && !deviceMeta.isUWPApp && !deviceMeta.isPcGdkApp) ||
-    (!deviceMeta.isAmazonApp &&
-      !deviceMeta.isUWPApp &&
-      !deviceMeta.isIosApp &&
-      !deviceMeta.isAndroidApp &&
-      !deviceMeta.isPcGdkApp)
+    (device.isDesktop && !device.isUWPApp && !device.isPcGdkApp) ||
+    (!device.isAmazonApp &&
+      !device.isUWPApp &&
+      !device.isIosApp &&
+      !device.isAndroidApp &&
+      !device.isPcGdkApp)
   );
-})();
+};
 
-export const isInApp = (() => {
-  if (!deviceMeta) {
-    return false;
-  }
-
+export const getIsNativePurchasePlatform = (device: DeviceMeta) => {
   return (
-    deviceMeta.isAmazonApp ||
-    deviceMeta.isUWPApp ||
-    deviceMeta.isIosApp ||
-    deviceMeta.isAndroidApp ||
-    deviceMeta.isPcGdkApp
+    device.isAmazonApp ||
+    device.isUWPApp ||
+    device.isIosApp ||
+    device.isAndroidApp ||
+    device.isPcGdkApp
   );
-})();
+};

@@ -15,6 +15,7 @@ import ViolationResolvedItem from "./ViolationResolvedItem";
  */
 const flattenAppealsHistory = (violation: EnrichedViolation) => {
   const { appeals } = violation;
+  const userId = Number(violation.user.replace("users/", ""));
   const flat: {
     content: React.ReactNode;
     id: string;
@@ -22,17 +23,26 @@ const flattenAppealsHistory = (violation: EnrichedViolation) => {
 
   // We show the most recent appeals first (i.e. reverse-chronological order)
   appeals.forEach((appeal, index) => {
+    // No submitter means the violation's user sent it; older MAS versions don't return one
+    const submitterId = appeal.submitter ? Number(appeal.submitter.replace("users/", "")) : userId;
+    const isFromSomeoneElse = submitterId !== userId;
+
     if (appeal.state === Appeal.state.APPEAL_STATE_DENIED) {
       const isFinalAppeal = violation.remaining_appeal_attempts === 0 && index === 0;
       flat.push({
         content: (
-          <AppealRejectedItem appeal={appeal} isFinal={isFinalAppeal} violation={violation} />
+          <AppealRejectedItem
+            appeal={appeal}
+            isFinal={isFinalAppeal}
+            isFromSomeoneElse={isFromSomeoneElse}
+            violation={violation}
+          />
         ),
         id: `${appeal.uid}-denied`,
       });
     } else if (appeal.state === Appeal.state.APPEAL_STATE_ACCEPTED) {
       flat.push({
-        content: <AppealApprovedItem appeal={appeal} />,
+        content: <AppealApprovedItem appeal={appeal} isFromSomeoneElse={isFromSomeoneElse} />,
         id: `${appeal.uid}-approved`,
       });
     } else if (appeal.state === Appeal.state.APPEAL_STATE_EDUCATIONAL_PASS) {
@@ -49,7 +59,13 @@ const flattenAppealsHistory = (violation: EnrichedViolation) => {
      */
     if (appeal.state !== Appeal.state.APPEAL_STATE_EDUCATIONAL_PASS) {
       flat.push({
-        content: <AppealRequestedItem appeal={appeal} />,
+        content: (
+          <AppealRequestedItem
+            appeal={appeal}
+            isFromSomeoneElse={isFromSomeoneElse}
+            submitterId={submitterId}
+          />
+        ),
         id: `${appeal.uid}-initial`,
       });
     }

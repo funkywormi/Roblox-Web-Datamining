@@ -1,8 +1,6 @@
 import { paymentFlowAnalyticsService as pfas } from "@rbx/payments/payments-flow-analytics";
-import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
-import { isInApp } from "./platform";
-
-const isDesktop = getDeviceMeta()?.isDesktop;
+import { DeviceMeta } from "@rbx/www-common/device/types";
+import { getIsNativePurchasePlatform } from "./platform";
 
 const {
   ENUM_TRIGGERING_CONTEXT: {
@@ -15,12 +13,12 @@ const {
   },
 } = pfas;
 
-export function getTriggerContext(isSubscriptionProduct = false) {
-  if (isInApp) {
+export function getTriggerContext(deviceMeta: DeviceMeta, isSubscriptionProduct = false) {
+  if (getIsNativePurchasePlatform(deviceMeta)) {
     return isSubscriptionProduct ? WEBVIEW_PREMIUM_PURCHASE : WEBVIEW_ROBUX_PURCHASE;
   }
 
-  if (isDesktop) {
+  if (deviceMeta.isDesktop) {
     return isSubscriptionProduct ? WEB_PREMIUM_PURCHASE : WEB_ROBUX_PURCHASE;
   }
 

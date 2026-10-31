@@ -20,13 +20,13 @@ import { trackCounter } from "../../observability";
 
 export function RobuxGiftingModal() {
   const [isCopiedTooltipOpen, setIsCopiedTooltipOpen] = useState(false);
-  const { giftingAvatarImageUrl, giftingUrl } = useContext(BuyRobuxPageContext);
+  const { deviceMeta, giftingAvatarImageUrl, giftingUrl } = useContext(BuyRobuxPageContext);
   const {
     robuxGifting: { closeModal, isOpen },
   } = useContext(ModalContext);
 
   const translate = useTranslations("Feature.GiftingProducts");
-  const { handleCopyUrl, handleShareLink, qrImgSrc } = useRobuxGifting(giftingUrl);
+  const { handleCopyUrl, handleShareLink, qrImgSrc } = useRobuxGifting(giftingUrl, deviceMeta);
   const currentUser = getCurrentUser();
   const isLoggedIn = currentUser != null;
   const wasOpenRef = useRef(false);

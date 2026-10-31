@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable no-case-declarations */
 import Roblox, { EnvironmentUrls, Hybrid } from "Roblox";
-import "../../../../css/challenge/captcha/captcha.scss";
 import * as Option from "fp-ts/Option";
 import * as boolean from "fp-ts/boolean";
 import { pipe } from "fp-ts/lib/function";

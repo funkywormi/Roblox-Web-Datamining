@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { HtmlTag, useTranslations } from "@rbx/www-common/i18n";
 import { getAbsoluteUrl } from "@rbx/core-scripts/util/url";
 import { Icon } from "@rbx/foundation-ui";
+import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
+import { getIsWebCheckoutPlatform } from "../utils/platform";
 import { Section, SectionHeader } from "./sections/Section";
-import { isOnDesktop } from "../utils/platform";
 
 const FAQ_TRANSLATION_KEYS = [
   {
@@ -27,12 +28,9 @@ const DESKTOP_FAQ_TRANSLATION_KEYS = {
 
 export function FAQ() {
   const translate = useTranslations("Feature.BuyRobux");
+  const { deviceMeta } = useContext(BuyRobuxPageContext);
   const [openIds, setOpenIds] = useState<Set<string>>(() => new Set());
-  const [showDesktopFaq, setShowDesktopFaq] = useState(false);
-
-  useEffect(() => {
-    setShowDesktopFaq(isOnDesktop);
-  }, []);
+  const showDesktopFaq = getIsWebCheckoutPlatform(deviceMeta);
 
   const faqKeys = showDesktopFaq
     ? [...FAQ_TRANSLATION_KEYS, DESKTOP_FAQ_TRANSLATION_KEYS]

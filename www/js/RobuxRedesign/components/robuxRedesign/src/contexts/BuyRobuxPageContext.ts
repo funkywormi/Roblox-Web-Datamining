@@ -1,11 +1,12 @@
 import { createContext } from "react";
+import { DeviceMeta } from "@rbx/www-common/device/types";
+import { defaultDeviceMeta } from "@rbx/www-common/device/utils";
 import {
   BuyRobuxPageData,
   CollectibleItemMetadata,
   PaymentSession,
   Product,
 } from "../types/buyRobuxPageData";
-import { BreakpointResult } from "../hooks/useBreakpoint";
 import { UseRedirectResult } from "../hooks/useRedirect";
 
 export type LimitedTimeBonusItemFields = {
@@ -30,7 +31,6 @@ export type BuyRobuxPageContextProps = {
   bonusItemDisplayName: string | undefined;
   bonusItemId: number | undefined;
   bonusItemImageUrl: string;
-  breakpoint: BreakpointResult;
   buyRobuxPageData: BuyRobuxPageData;
   getPurchaseUrl: (product: Product, isSubscriptionProduct: boolean) => string;
   giftingAvatarImageUrl: string;
@@ -52,6 +52,7 @@ export type BuyRobuxPageContextProps = {
   markConsentAcknowledged: () => void;
   productBadgeSlotCount: number;
   atLeastOneProductHasBonusAmount: boolean;
+  deviceMeta: DeviceMeta;
 };
 
 export const BuyRobuxPageContext = createContext<BuyRobuxPageContextProps>({
@@ -66,10 +67,6 @@ export const BuyRobuxPageContext = createContext<BuyRobuxPageContextProps>({
   bonusItemDisplayName: "",
   bonusItemId: undefined,
   bonusItemImageUrl: "",
-  breakpoint: {
-    isAboveInclusive: () => false,
-    value: "xsmall",
-  },
   buyRobuxPageData: {
     sections: [],
   },
@@ -94,4 +91,5 @@ export const BuyRobuxPageContext = createContext<BuyRobuxPageContextProps>({
   markConsentAcknowledged: () => undefined,
   productBadgeSlotCount: 0,
   atLeastOneProductHasBonusAmount: false,
+  deviceMeta: defaultDeviceMeta,
 });

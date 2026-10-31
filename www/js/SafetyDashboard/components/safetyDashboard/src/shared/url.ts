@@ -64,3 +64,7 @@ export const getCreateAppealUrl = (userId: number | null): string =>
  */
 export const getAppealEligibilityUrl = (userId: number | null, violationId: string): string =>
   `${environmentUrls.apiGatewayUrl}/moderation-appeal-service/v2/users/${userId}/violations/${violationId}/appeal-eligibility`;
+
+/** Users API endpoint that returns a user's public info, such as their username. */
+export const getUserUrl = (userId: number): string =>
+  `${environmentUrls.usersApi}/v1/users/${userId}`;

@@ -1245,5 +1245,9 @@
     "Description.Dimension.QueueServiceFailure.Expired": "Expired",
     "Description.Dimension.QueueServiceFailure.MaxRedeliveries": "Max redeliveries",
     "Error.JourneyNameExceeds50Characters": "Journey name cannot exceed 50 characters.",
-    "HelperText.JourneyNameUpTo50Characters": "Name can only contain letters, numbers, '.', '-', and '_', up to 50 characters"
+    "HelperText.JourneyNameUpTo50Characters": "Name can only contain letters, numbers, '.', '-', and '_', up to 50 characters",
+    "Description.Instrumentation.Skill": "Use the /rbx-instrument-analytics skill with Studio MCP or Assistant to start now.",
+    "Action.Instrumentation.CopySkill": "Copy the skill",
+    "Action.Instrumentation.OpenStudio": "Open Studio",
+    "Message.Instrumentation.SkillCopied": "Skill copied"
 }

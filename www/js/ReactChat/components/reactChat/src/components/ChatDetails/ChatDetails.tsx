@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Button,
   IconButton,
@@ -12,6 +12,8 @@ import {
 } from "@rbx/foundation-ui";
 import { useChatMetadataConfig } from "../../hooks/useChatMetadataConfig";
 import useChatTranslate from "../../hooks/useChatTranslate";
+import { useConversationParticipantsMetadata } from "../../hooks/useConversationParticipantsMetadata";
+import { useParticipantFriendIds } from "../../hooks/useParticipantFriendIds";
 import { getCurrentUserId } from "../../utils/currentUser";
 import type { TChatConversation, TDialogScreen, TRenameResult } from "../../types/chat";
 import { getPresenceLabel } from "../../utils/chatPresenceLabels";
@@ -34,6 +36,8 @@ type TChatDetailsProps = {
   onRequestRemoveParticipant: (layoutId: string, participantId: number) => void;
   onSetScreen: (layoutId: string, screen: TDialogScreen) => void;
   onReportParticipant: (layoutId: string, participantId: number) => void;
+  /** Open or create the friend's 1:1 without changing the group's details screen. */
+  onChatWithParticipant?: (participantId: number) => void;
 };
 
 const ChatDetails = ({
@@ -44,12 +48,25 @@ const ChatDetails = ({
   onRequestRemoveParticipant,
   onSetScreen,
   onReportParticipant,
+  onChatWithParticipant,
 }: TChatDetailsProps) => {
   const translate = useChatTranslate();
   const { isGroupChatEnabled } = useChatMetadataConfig();
   const [isAddingFriends, setIsAddingFriends] = useState(false);
   const [isEditingGroupName, setIsEditingGroupName] = useState(false);
   const [menuParticipantId, setMenuParticipantId] = useState<number | null>(null);
+  const participantsMetadata = useConversationParticipantsMetadata(
+    conversation.id,
+    conversation.dialogType === "Group",
+  );
+  const participantIds = useMemo(
+    () => conversation.participants.map(participant => participant.id),
+    [conversation.participants],
+  );
+  const friendIds = useParticipantFriendIds(
+    participantIds,
+    conversation.dialogType === "Group" && onChatWithParticipant != null,
+  );
 
   // Only the group's creator may remove other members (parity with the legacy
   // canConversationRemoveMember gate). `participants` already exclude the local user, so
@@ -163,6 +180,7 @@ const ChatDetails = ({
         {conversation.participants.map(participant => (
           <div
             key={participant.id}
+            data-testid={`react-chat-details-participant-${participant.id}`}
             className="react-chat-details-row relative flex shrink-0 items-center gap-small padding-x-small padding-y-small"
           >
             <span className="relative shrink-0">
@@ -185,9 +203,15 @@ const ChatDetails = ({
                 {participant.displayName}
               </div>
               <div className="text-caption-medium content-muted text-truncate-end">
-                {getPresenceLabel(participant.presence, translate)}
+                {getPresenceLabel(participant.presence, translate, participant.gameName)}
               </div>
             </div>
+            {conversation.dialogType === "Group" &&
+              participantsMetadata[participant.id]?.is_pending === true && (
+                <span className="shrink-0 radius-small bg-shift-100 padding-x-small padding-y-xxsmall text-caption-small content-muted">
+                  {translate("Label.Pending", undefined, "Pending")}
+                </span>
+              )}
             <Popover
               open={menuParticipantId === participant.id}
               onOpenChange={isOpen => {
@@ -206,6 +230,20 @@ const ChatDetails = ({
               <PopoverContent side="bottom" align="end" ariaLabel={translate("Label.ChatDetails")}>
                 <Menu size="Medium">
                   <MenuSection>
+                    {conversation.dialogType === "Group" &&
+                      participant.id !== currentUserId &&
+                      friendIds.has(participant.id) &&
+                      onChatWithParticipant && (
+                        <MenuItem
+                          value="chat"
+                          title={translate("Label.Chat", undefined, "Chat")}
+                          as="button"
+                          onSelect={() => {
+                            setMenuParticipantId(null);
+                            onChatWithParticipant(participant.id);
+                          }}
+                        />
+                      )}
                     <MenuItem
                       value="view-profile"
                       title={translate("Label.ViewProfile")}

@@ -5,7 +5,10 @@ export const LOG_PREFIX = "Proof-of-Work:" as const;
  * Translation namespaces used by this web app. Keep in sync with the challenge
  * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const TRANSLATION_NAMESPACES = ["Feature.ProofOfWorkChallenge"] as const;
+export const TRANSLATION_NAMESPACES = [
+  "Feature.ProofOfWorkChallenge",
+  "CommonUI.Messages",
+] as const;
 
 /**
  * Constants for event stream events.

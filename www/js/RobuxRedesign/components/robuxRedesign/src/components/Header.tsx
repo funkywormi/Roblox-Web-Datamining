@@ -10,7 +10,8 @@ import { RobuxBalance } from "./RobuxBalance";
 import { SendRobuxButton } from "./SendRobuxButton";
 import { TrackingContext } from "../contexts/TrackingContext";
 import { ModalContext } from "../contexts/ModalContext";
-import { isInApp } from "../utils/platform";
+import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
+import { getIsNativePurchasePlatform } from "../utils/platform";
 import { getSectionTrackingProps } from "../hooks/useScrollTracking";
 import { getAppPolicy } from "../services/guacService";
 
@@ -31,6 +32,8 @@ export function Header({
     robuxGifting: { openModal },
   } = useContext(ModalContext);
   const { trackRobuxGiftClick } = useContext(TrackingContext);
+  const { deviceMeta } = useContext(BuyRobuxPageContext);
+  const isNativePurchasePlatform = getIsNativePurchasePlatform(deviceMeta);
 
   const { translateFullKey } = useFullKeyTranslations();
   const { pendingReferrals: allPendingReferrals } = usePendingPlusReferrals();
@@ -39,12 +42,13 @@ export function Header({
     queryKey: ["guac/app-policy"],
     queryFn: getAppPolicy,
     staleTime: Infinity,
-    enabled: isInApp,
+    enabled: isNativePurchasePlatform,
   });
   const shouldDeeplinkToReferral =
-    isInApp && appPolicyQuery.data?.ShouldDeeplinkToReferral === true;
+    isNativePurchasePlatform && appPolicyQuery.data?.ShouldDeeplinkToReferral === true;
 
-  const pendingReferrals = isInApp && !shouldDeeplinkToReferral ? [] : allPendingReferrals;
+  const pendingReferrals =
+    isNativePurchasePlatform && !shouldDeeplinkToReferral ? [] : allPendingReferrals;
 
   const transfers = transfersSection?.transfers;
   const robuxGift = robuxGiftSection?.robuxGift;
@@ -91,7 +95,7 @@ export function Header({
         <div
           className={classNames(
             "flex flex-row items-center gap-large medium:padding-left-none justify-between medium:justify-end",
-            { "padding-left-[58px]": isInApp },
+            { "padding-left-[58px]": isNativePurchasePlatform },
           )}
         >
           <div className="flex flex-row justify-center items-center gap-xsmall medium:padding-left-none">

@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ready from "@rbx/core-scripts/util/ready";
-import { isValueOf } from "@rbx/core-types";
+import { isStringEnum } from "@rbx/core-lib";
 import { renderWithErrorBoundary, TranslationProvider } from "@rbx/core-scripts/react";
 import { SystemFeedbackProvider } from "@rbx/core-ui";
 import { ProfileType } from "@rbx/profile-platform";
@@ -31,7 +31,7 @@ ready(() => {
   const profileId = profilePlatformContainer?.getAttribute("data-profile-id") ?? "0";
   const profileType = profilePlatformContainer?.getAttribute("data-profile-type") ?? "";
 
-  if (isValueOf(ProfileType, profileType)) {
+  if (isStringEnum(ProfileType, profileType)) {
     renderWithErrorBoundary(
       <QueryClientProvider client={queryClient}>
         <SystemFeedbackProvider>

@@ -3,6 +3,13 @@ import environmentUrls from "@rbx/environment-urls";
 export const FEATURE_NAME = "CaptchaV2" as const;
 
 /**
+ * Telemetry value used for the action type when GCS did not resolve a recognized
+ * action type for the challenge. Mirrors the captcha `ActionType` enum zero value
+ * so the metrics label and client events always carry an allow-listed value.
+ */
+export const DEFAULT_ACTION_TYPE = "ACTION_TYPE_INVALID" as const;
+
+/**
  * Translation namespaces used by this web app. Keep in sync with the challenge
  * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */

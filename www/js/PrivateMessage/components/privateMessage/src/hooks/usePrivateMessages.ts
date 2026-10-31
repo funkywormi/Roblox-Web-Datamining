@@ -6,6 +6,7 @@ import {
   MESSAGE_TABS,
   NEWS_OPEN_CONTENT_CONTEXT,
   NEWS_OPEN_CONTENT_EVENT,
+  RULES_WAIT_MS,
 } from "../constants";
 import {
   dispatchLegacyMessageEvent,
@@ -15,7 +16,9 @@ import {
 import {
   getAnnouncementsMetadata,
   getMessageDetailById,
+  getMessagesByPageToken,
   getPrivateMessagesRules,
+  isInvalidPageTokenError,
   markMessagesRead,
   sendMessage,
   setArchiveMessages,
@@ -35,7 +38,10 @@ import type {
   MessageItem,
   MessageModuleState,
   MessagePage,
+  MessagePagination,
+  MessageRoute,
   MessageTab,
+  PageTarget,
   PrivateMessagesRules,
   SendReplyState,
 } from "../types";
@@ -67,6 +73,44 @@ const getErrorMessage = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
+// Cursor mode applies to inbox, sent, and archive when the GUAC flag is on. A page past the first
+// without a token (an offset bookmark, or the offset pager shown when the server ignored cursor
+// mode) still loads by page number.
+export const shouldLoadByPageToken = (rules: PrivateMessagesRules, route: MessageRoute): boolean =>
+  rules.enableCursorPagination === true &&
+  route.tab !== MESSAGE_TABS.notifications &&
+  (route.pageToken != null || route.page <= 1);
+
+// Resolves to no rules if `rulesRequest` is still pending after RULES_WAIT_MS, so a slow GUAC
+// response cannot block the list. That load uses offset paging; later loads see the real rules.
+export const awaitRulesForListLoad = (
+  rulesRequest: Promise<PrivateMessagesRules>,
+): Promise<PrivateMessagesRules> =>
+  Promise.race([
+    rulesRequest,
+    new Promise<PrivateMessagesRules>(resolve => {
+      setTimeout(() => {
+        resolve({});
+      }, RULES_WAIT_MS);
+    }),
+  ]);
+
+// Cursor paging when the response carries a page window; otherwise offset paging from the 0-based
+// `pageNumber` and `totalPages`, falling back to the route's page while nothing is loaded.
+export const toMessagePagination = (
+  page: MessagePage | null,
+  routePage: number,
+): MessagePagination => {
+  if (page?.cursorPagination) {
+    return { kind: "cursor", ...page.cursorPagination };
+  }
+  return {
+    kind: "offset",
+    currentPage: page ? page.pageNumber + 1 : routePage,
+    totalPages: page?.totalPages ?? 1,
+  };
+};
+
 // Records the failure without changing the caller's rejection behaviour.
 const trackAndRethrow =
   (name: ErrorName) =>
@@ -77,6 +121,14 @@ const trackAndRethrow =
 
 export const usePrivateMessages = ({ translate }: { translate: (key: string) => string }) => {
   const { route, setRoute } = useMessageRoute();
+  // List loads wait for this, up to RULES_WAIT_MS, so the first request knows whether to use cursor
+  // mode.
+  const [rulesRequest] = useState(() =>
+    getPrivateMessagesRules().catch((rulesError: unknown): PrivateMessagesRules => {
+      trackError("RulesLoadFailed", { statusCode: getStatusCode(rulesError) }, rulesError);
+      return {};
+    }),
+  );
   const [rules, setRules] = useState<PrivateMessagesRules>({});
   const [page, setPage] = useState<MessagePage | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<MessageItem | null>(null);
@@ -131,7 +183,9 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
           );
         }
       } else {
-        const result = await updateMessages(route.tab, route.page - 1);
+        const result = shouldLoadByPageToken(await awaitRulesForListLoad(rulesRequest), route)
+          ? await getMessagesByPageToken(route.tab, route.pageToken)
+          : await updateMessages(route.tab, route.page - 1);
         setPage(result);
         setModuleState(
           route.messageIdx == null ? MESSAGE_MODULE_STATE.list : MESSAGE_MODULE_STATE.detail,
@@ -147,6 +201,15 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
         dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
       }
     } catch (loadError) {
+      if (
+        route.conversationId == null &&
+        route.pageToken != null &&
+        isInvalidPageTokenError(loadError)
+      ) {
+        setRoute({ ...route, page: 1, pageToken: null, messageIdx: null }, { replace: true });
+        return;
+      }
+
       trackCriticalError(
         "LoadFailed",
         { host, tab: route.tab, statusCode: getStatusCode(loadError) },
@@ -159,17 +222,13 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
     } finally {
       setLoading(false);
     }
-  }, [route, translate]);
+  }, [route, rulesRequest, setRoute, translate]);
 
   useEffect(() => {
     trackCounter("PageView", { host, tab: initialTab.current });
 
-    getPrivateMessagesRules()
-      .then(setRules)
-      .catch((rulesError: unknown) => {
-        trackError("RulesLoadFailed", { statusCode: getStatusCode(rulesError) }, rulesError);
-        setRules({});
-      });
+    // eslint-disable-next-line no-void
+    void rulesRequest.then(setRules);
 
     getAnnouncementsMetadata()
       .then(metadata => {
@@ -183,7 +242,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
         );
         setNewsCount(0);
       });
-  }, []);
+  }, [rulesRequest]);
 
   useEffect(() => {
     if (skipNextRouteLoad.current) {
@@ -209,7 +268,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
     setSelectedMessage(null);
     setSelectedMessageIds(new Set());
     setSendReplyState(initialSendReplyState);
-    setRoute({ tab, page: 1, messageIdx: null, conversationId: null });
+    setRoute({ tab, page: 1, pageToken: null, messageIdx: null, conversationId: null });
   };
 
   const openMessage = async (message: MessageItem, index: number) => {
@@ -313,9 +372,17 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
     dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
   };
 
-  const changePage = (pageNumber: number) => {
+  const pagination = useMemo(() => toMessagePagination(page, route.page), [page, route.page]);
+
+  const changePage = ({ pageNumber, pageToken }: PageTarget) => {
     setSendReplyState(initialSendReplyState);
-    setRoute({ tab: route.tab, page: pageNumber, messageIdx: null, conversationId: null });
+    setRoute({
+      tab: route.tab,
+      page: pageNumber,
+      pageToken,
+      messageIdx: null,
+      conversationId: null,
+    });
   };
 
   const updateReplyContent = (replyContent: string) => {
@@ -358,6 +425,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
     rules,
     tabs,
     page,
+    pagination,
     selectedMessage,
     selectedMessageIds,
     moduleState,

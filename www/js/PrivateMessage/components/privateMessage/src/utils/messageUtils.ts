@@ -3,11 +3,14 @@ import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { escapeHtml } from "@rbx/core-scripts/format/string";
 import { MESSAGE_EVENTS, ROBLOX_USER } from "../constants";
 import type {
+  CursorPagination,
   MessageItem,
   MessagePage,
+  MessagePageEntry,
   MessageUser,
   RawMessage,
   RawMessagePage,
+  RawMessagePageEntry,
   RawUser,
 } from "../types";
 
@@ -69,6 +72,32 @@ export const normalizeMessage = (rawMessage: RawMessage): MessageItem => {
   };
 };
 
+const nonEmptyOrNull = (value: string | undefined): string | null =>
+  value != null && value.length > 0 ? value : null;
+
+const normalizePageEntry = (rawEntry: RawMessagePageEntry): MessagePageEntry => ({
+  pageNumber: coalesce(rawEntry.pageNumber, rawEntry.PageNumber, 0) ?? 0,
+  pageToken: coalesce(rawEntry.pageToken, rawEntry.PageToken, "") ?? "",
+});
+
+// A cursor-mode response always includes the current page in `pageWindow`, so an absent or empty
+// window means the server answered with offset paging.
+const normalizeCursorPagination = (rawPage: RawMessagePage): CursorPagination | null => {
+  const rawWindow = coalesce(rawPage.pageWindow, rawPage.PageWindow);
+  if (!Array.isArray(rawWindow) || rawWindow.length === 0) {
+    return null;
+  }
+
+  return {
+    pageNumber: coalesce(rawPage.pageNumber, rawPage.PageNumber, 1) ?? 1,
+    pageWindow: rawWindow
+      .map(normalizePageEntry)
+      .filter(entry => entry.pageNumber > 0 && entry.pageToken.length > 0),
+    firstPageToken: nonEmptyOrNull(coalesce(rawPage.firstPageToken, rawPage.FirstPageToken)),
+    hasMore: Boolean(coalesce(rawPage.hasMore, rawPage.HasMore, false)),
+  };
+};
+
 export const normalizeMessagePage = (rawPage: RawMessagePage): MessagePage => {
   const collection = coalesce(rawPage.collection, rawPage.Collection, []) ?? [];
 
@@ -79,6 +108,7 @@ export const normalizeMessagePage = (rawPage: RawMessagePage): MessagePage => {
       coalesce(rawPage.totalCollectionSize, rawPage.TotalCollectionSize, collection.length) ??
       collection.length,
     collection: collection.map(normalizeMessage),
+    cursorPagination: normalizeCursorPagination(rawPage),
   };
 };
 

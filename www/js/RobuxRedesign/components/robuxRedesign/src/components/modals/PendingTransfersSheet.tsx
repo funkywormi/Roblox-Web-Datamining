@@ -6,6 +6,7 @@ import { PendingTransfer } from "../../types/buyRobuxPageData";
 import { UserAvatar } from "../UserAvatar";
 import { navigateToAcceptTransferDeepLink } from "../../utils/robuxTransfersDeepLinks";
 import { TrackingContext } from "../../contexts/TrackingContext";
+import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 
 const ROW_CLASS =
   "flex flex-row items-center justify-between gap-small padding-medium radius-medium stroke-standard stroke-default";
@@ -19,6 +20,7 @@ function PendingTransferRow({
 }) {
   const { translateFullKey } = useFullKeyTranslations();
   const { trackPendingTransfersAcceptClick } = useContext(TrackingContext);
+  const { deviceMeta } = useContext(BuyRobuxPageContext);
 
   return (
     <div className={ROW_CLASS}>
@@ -52,7 +54,7 @@ function PendingTransferRow({
           variant="Standard"
           onClick={() => {
             trackPendingTransfersAcceptClick();
-            navigateToAcceptTransferDeepLink(transfer.transferRequestId);
+            navigateToAcceptTransferDeepLink(transfer.transferRequestId, deviceMeta);
           }}
         >
           {translateFullKey(acceptTranslationKey)}

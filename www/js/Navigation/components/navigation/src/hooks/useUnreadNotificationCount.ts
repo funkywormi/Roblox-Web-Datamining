@@ -1,33 +1,27 @@
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import * as http from "@rbx/core-scripts/http";
-import environmentUrls from "@rbx/environment-urls";
-import { withApiMetrics } from "../topNav/observability";
-import { useRealTime } from "../leftNav/useRealTime";
+import { getNavCapability } from "../util/navCapabilities";
 
 export const NOTIFICATION_STREAM_UNREAD_COUNT_QUERY_KEY = ["notification-stream-unread-count"];
 const QUERY_KEY = NOTIFICATION_STREAM_UNREAD_COUNT_QUERY_KEY;
 
 export const useUnreadNotificationCount = (): number => {
   const queryClient = useQueryClient();
+  const getCount = getNavCapability("getNotificationUnreadCount");
 
   const { data: unreadCount = 0 } = useQuery({
     queryKey: QUERY_KEY,
-    queryFn: () =>
-      withApiMetrics("NotificationUnreadCount", () =>
-        http.get<{ unreadNotifications: number }>({
-          url: `${environmentUrls.notificationApi}/v2/stream-notifications/unread-count`,
-          withCredentials: true,
-        }),
-      ).then(({ data }) => data.unreadNotifications),
+    queryFn: () => getCount?.() ?? Promise.resolve(0),
+    enabled: getCount != null,
     staleTime: Infinity,
   });
 
-  useRealTime({
-    event: "NotificationStream",
-    queryKey: QUERY_KEY,
-    queryClient,
-  });
+  useEffect(() => {
+    const subscribe = getNavCapability("subscribeRealTime");
+    return subscribe?.("NotificationStream", () =>
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+    );
+  }, [queryClient]);
 
   useEffect(() => {
     const handler = () => {

@@ -327,5 +327,6 @@
     "Label.UKOSAIntimateImage.ReporterStanding.DepictedPerson": "I'm the person shown in the content.",
     "Label.UKOSAIntimateImage.ReporterStanding.AuthorizedRep": "I'm acting on behalf of the person shown in the content.",
     "Question.UKOSAIntimateImage.RelationshipToDepictedPerson": "Please describe your relationship to the person shown in the content.",
-    "Message.SendCodeError": "We couldn't send a verification code to this email right now. Please try again later."
+    "Message.SendCodeError": "We couldn't send a verification code to this email right now. Please try again later.",
+    "Message.IpInfringementV2": "To report content that infringes on your intellectual property rights please email {emailLinkStart}{emailAddress}{emailLinkEnd} following the instructions located in {docLinkStart}Section 6 of the Roblox User Terms of Use{docLinkEnd}"
 }

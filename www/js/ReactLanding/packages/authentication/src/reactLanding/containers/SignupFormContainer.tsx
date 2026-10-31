@@ -118,7 +118,7 @@ import {
   keystrokeSampleRate,
   experimentVariables,
 } from "../constants/signupConstants";
-import { experimentLayer, playerAppSignupLayer } from "../constants/landingConstants";
+import { experimentLayer } from "../constants/landingConstants";
 import { FeatureSignupComplianceModal } from "@rbx/authentication-common/constants/translationConstants";
 import {
   logoutMessage,
@@ -203,9 +203,6 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
   const experiments = useExperiments(experimentLayer);
   const shouldDisableClearingUsernameSuggestions =
     experiments[experimentVariables.shouldDisableClearingUsernameSuggestions];
-  const playerAppSignupExperiments = useExperiments(playerAppSignupLayer);
-  const shouldSkipVPCSignupFlow =
-    playerAppSignupExperiments[experimentVariables.shouldSkipVPCSignupFlow] === true;
 
   const signupSilentUpgradeBrowserCheck =
     experiments.signupSilentUpgradeBrowserCheck as SilentPasskeyUpgradeVariant;
@@ -324,6 +321,7 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
   const userAgreementIds = useMemo(() => [] as SignupAgreement[], []);
 
   const [otpSession, setOtpSession] = useState({} as IOtpSession);
+  const hasLoggedVpcSkipRef = useRef(false);
   const { otpCodeLength, isOtpEnabled } = useOtpMetadata(otpModalConstants.origin);
   const {
     verifiedSignupCountry,
@@ -628,6 +626,7 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
     setUnifiedCaptchaId("");
     // reset otp token
     setOtpSession({} as IOtpSession);
+    hasLoggedVpcSkipRef.current = false;
     // reset isSubmitting
     setIsSubmitting(false);
   };
@@ -919,20 +918,24 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
   };
 
   const shouldOpenOtpModal = (): boolean => {
+    const isUnderCountryThreshold = isUnderThresholdAgeForCountry(
+      year,
+      month,
+      day,
+      verifiedSignupCountry,
+    );
+    const isUnderThresholdForKorea =
+      verifiedSignupCountry === complianceConstants.Korea.name && isUnderCountryThreshold;
+
     if (verifiedSignupCountry === complianceConstants.Korea.name) {
-      setIsUnderThresholdAgeForKorea(
-        isUnderThresholdAgeForCountry(year, month, day, verifiedSignupCountry),
-      );
+      setIsUnderThresholdAgeForKorea(isUnderCountryThreshold);
     }
 
-    // KISA experiment: U14 Korean users in the experiment skip the
-    // VPC (parent email) signup flow. Their account is registered as normal and
-    // the platform-locked /not-approved page handles the post-signup state.
-    if (
-      shouldSkipVPCSignupFlow &&
-      isUnderThresholdAgeForCountry(year, month, day, verifiedSignupCountry)
-    ) {
-      sendAuthPageLoadEvent(EVENT_CONSTANTS.context.kisaU14Signup, EVENT_CONSTANTS.state.skipVPC);
+    if (isUnderThresholdForKorea) {
+      if (!hasLoggedVpcSkipRef.current) {
+        hasLoggedVpcSkipRef.current = true;
+        sendAuthPageLoadEvent(EVENT_CONSTANTS.context.kisaU14Signup, EVENT_CONSTANTS.state.skipVPC);
+      }
       return false;
     }
 
@@ -940,7 +943,7 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
       isOtpEnabled &&
       !otpSession.otpSessionToken &&
       shouldEnableStrictCompliance &&
-      isUnderThresholdAgeForCountry(year, month, day, verifiedSignupCountry)
+      isUnderCountryThreshold
     );
   };
 
@@ -948,7 +951,6 @@ export const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
     return (
       shouldEnableStrictCompliance &&
       shouldEnableKoreaEnhancedCompliance &&
-      !isUnderThresholdAgeForKorea &&
       !isKoreaSingupCompliancePoliciesAgreed
     );
   };

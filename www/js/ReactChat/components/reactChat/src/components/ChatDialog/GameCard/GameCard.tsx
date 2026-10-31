@@ -1,7 +1,11 @@
 import classNames from "classnames";
 import { useContext, useEffect, useRef } from "react";
+import { abbreviateNumber } from "@rbx/core-scripts/format/number";
+import { Icon } from "@rbx/foundation-ui";
 import { Thumbnail2d, ThumbnailGameIconSize } from "@rbx/www-common/components/thumbnail";
 import { useGamePlaceDetails } from "../../../hooks/useGamePlaceDetails";
+import { useGameStats } from "../../../hooks/useGameStats";
+import useChatTranslate from "../../../hooks/useChatTranslate";
 import {
   sendClickGameLinkCardEvent,
   sendClickPlayFromGameLinkCardEvent,
@@ -17,6 +21,9 @@ type TGameCardProps = {
   /** Owning conversation, sent with card eventstream events. */
   conversationId: string;
   privateServerLinkCode?: string;
+  gameInstanceId?: string;
+  launchData?: string;
+  isShareLink?: boolean;
 };
 
 /** A card counts as an impression once it is at least half visible (threshold 0.5). */
@@ -28,14 +35,26 @@ const IMPRESSION_VISIBILITY_THRESHOLD = 0.5;
 const IMPRESSION_DEBOUNCE_MS = 500;
 
 /**
- * Renders a Roblox game link as a game card (thumbnail + title + description + play button). Falls
- * back to the plain link when place details can't be fetched (invalid/moderated place).
+ * Renders a Roblox game link as a game card (thumbnail + title + description + play button). When
+ * place details can't be fetched (invalid/moderated place), a direct game link shows an error card
+ * and a share link keeps the plain link.
  * Play/purchase/launch is handled by the host's GameCardPlayButtonContext (no play button without
  * one). Fires load/impression/click eventstream events.
  */
-const GameCard = ({ placeId, url, conversationId, privateServerLinkCode }: TGameCardProps) => {
-  const { data: place } = useGamePlaceDetails(placeId);
+const GameCard = ({
+  placeId,
+  url,
+  conversationId,
+  privateServerLinkCode,
+  gameInstanceId,
+  launchData,
+  isShareLink,
+}: TGameCardProps) => {
+  const { data: place, isSuccess, isError } = useGamePlaceDetails(placeId);
   const universeId = place?.universeId;
+  const { data: stats } = useGameStats(universeId);
+  const ratingText = stats?.rating != null ? `${stats.rating}%` : undefined;
+  const translate = useChatTranslate();
   const PlayButton = useContext(GameCardPlayButtonContext);
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -85,10 +104,20 @@ const GameCard = ({ placeId, url, conversationId, privateServerLinkCode }: TGame
     };
   }, [rootPlaceId, universeId]);
 
-  // Invalid/moderated place → keep the plain link.
   if (!place || universeId == null) {
+    // Share links and still-loading cards keep the plain link.
+    if (!isShareLink && (isSuccess || isError)) {
+      return (
+        <div
+          className="react-chat-game-card padding-small content-muted text-body-small"
+          role="status"
+        >
+          {translate("Label.ContentLoadingFailed", undefined, "We couldn't load this content")}
+        </div>
+      );
+    }
     return (
-      <a href={url} className="text-body-small content-link">
+      <a href={url} className="text-body-small content-link react-chat-game-card-fallback-link">
         {url}
       </a>
     );
@@ -97,7 +126,7 @@ const GameCard = ({ placeId, url, conversationId, privateServerLinkCode }: TGame
   return (
     <div ref={cardRef} className="react-chat-game-card flex flex-col">
       <a
-        href={place.url ?? url}
+        href={isShareLink ? url : (place.url ?? url)}
         className="flex gap-small content-default"
         onClick={() => {
           sendClickGameLinkCardEvent(placeId, conversationId);
@@ -128,6 +157,22 @@ const GameCard = ({ placeId, url, conversationId, privateServerLinkCode }: TGame
               {place.description}
             </span>
           )}
+          {stats && (
+            <span className="text-caption-small content-muted flex items-center gap-small">
+              {ratingText != null && (
+                <span className="flex items-center gap-xxsmall" data-testid="game-card-rating">
+                  <Icon name="icon-filled-thumb-up" size="XSmall" />
+                  {ratingText}
+                </span>
+              )}
+              {stats.playing != null && (
+                <span className="flex items-center gap-xxsmall" data-testid="game-card-players">
+                  <Icon name="icon-filled-person-play" size="XSmall" />
+                  {abbreviateNumber(stats.playing)}
+                </span>
+              )}
+            </span>
+          )}
         </span>
       </a>
       {/* The play button owns the launch + its own game-play intent; capture the click here to
@@ -144,6 +189,8 @@ const GameCard = ({ placeId, url, conversationId, privateServerLinkCode }: TGame
             rootPlaceId={place.rootPlaceId != null ? String(place.rootPlaceId) : undefined}
             universeId={String(universeId)}
             privateServerLinkCode={privateServerLinkCode}
+            {...(gameInstanceId != null ? { gameInstanceId } : {})}
+            {...(launchData != null ? { launchData } : {})}
           />
         </span>
       )}

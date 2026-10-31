@@ -245,7 +245,6 @@ export const experimentVariables = {
   shouldCleanUsernameSuggestionInput: "shouldCleanUsernameSuggestionInput",
   shouldDisableClearingUsernameSuggestions: "shouldDisableClearingUsernameSuggestions",
   isParentSignUpDescriptionExperimentEnabled: "IsParentSignUpDescriptionExperimentEnabled",
-  shouldSkipVPCSignupFlow: "shouldSkipVPCSignupFlow",
 };
 
 export const vpcExperimentLayer = "AccountManagement.VerifiedParentalConsent.ParentExperience";

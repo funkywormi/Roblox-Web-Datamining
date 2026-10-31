@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { SheetRoot, SheetContent, SheetTitle, IconButton } from "@rbx/foundation-ui";
 import { Intl } from "@rbx/core-scripts/legacy/Roblox";
 import useAbuseSheetFlow from "../hooks/abuseSheetFlow/useAbuseSheetFlow";
-import { RawConfig } from "../hooks/abuseSheetFlow/types";
+import type { RawConfig, NodeRendererRegistry } from "../hooks/abuseSheetFlow/types";
 import { ArTranslationProvider, useArTranslation } from "../util/translate/arTranslation";
 import { AbuseReportAnalyticsProvider } from "../analytics/AbuseReportAnalyticsContext";
 import { fetchCachedConfig } from "../api/fetchConfig";
@@ -65,6 +65,7 @@ type AbuseReportDialogWithConfigBaseProps = {
   onCloseAutoFocus?: () => void;
   loaders?: LoaderRegistry;
   clientActions?: ClientActionRegistry;
+  nodeRenderers?: NodeRendererRegistry;
 };
 
 export type AbuseReportDialogWithConfigProps = AbuseReportDialogWithConfigBaseProps &
@@ -119,6 +120,7 @@ const AbuseReportDialogInner = ({
   onCloseAutoFocus,
   loaders,
   clientActions,
+  nodeRenderers,
 }: {
   open: boolean;
   onClose: () => void;
@@ -128,6 +130,7 @@ const AbuseReportDialogInner = ({
   onCloseAutoFocus?: () => void;
   loaders?: LoaderRegistry;
   clientActions?: ClientActionRegistry;
+  nodeRenderers?: NodeRendererRegistry;
 }): React.ReactElement => {
   const {
     currentPageElement,
@@ -144,6 +147,7 @@ const AbuseReportDialogInner = ({
     abuseVector,
     analyticsTargetId,
     clientActions,
+    nodeRenderers,
   });
 
   const { translateToStringOnly } = useArTranslation();
@@ -169,6 +173,13 @@ const AbuseReportDialogInner = ({
               mobilePortraitClassName="height-[90vh]"
               largeScreenClassName="height-[calc(min(700px,50vh))] min-height-[500px]"
               onCloseAutoFocus={onCloseAutoFocus}
+              onOpenAutoFocus={
+                disclosure?.openByDefault
+                  ? event => {
+                      event.preventDefault();
+                    }
+                  : undefined
+              }
             >
               <SheetTitle
                 navigation={
@@ -323,7 +334,16 @@ const AbuseReportDialog = (props: AbuseReportDialogProps): React.ReactElement | 
 export const AbuseReportDialogWithConfig = (
   props: AbuseReportDialogWithConfigProps,
 ): React.ReactElement => {
-  const { config, abuseVector, open, onClose, onCloseAutoFocus, loaders, clientActions } = props;
+  const {
+    config,
+    abuseVector,
+    open,
+    onClose,
+    onCloseAutoFocus,
+    loaders,
+    clientActions,
+    nodeRenderers,
+  } = props;
   const analyticsTargetId = getAnalyticsTargetId(props);
 
   return (
@@ -337,6 +357,7 @@ export const AbuseReportDialogWithConfig = (
         onCloseAutoFocus={onCloseAutoFocus}
         loaders={loaders}
         clientActions={clientActions}
+        nodeRenderers={nodeRenderers}
       />
     </ArTranslationProvider>
   );

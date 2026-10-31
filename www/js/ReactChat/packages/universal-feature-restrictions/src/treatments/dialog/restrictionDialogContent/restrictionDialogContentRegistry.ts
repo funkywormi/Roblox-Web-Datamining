@@ -31,6 +31,9 @@ const RESTRICTION_CONTENT_REGISTRY: Record<string, RestrictionContentEntry> = {
   rights_management: {
     labelKey: "AbuseVector.RightsManagement",
   },
+  avatar_change: {
+    labelKey: "AbuseVector.AvatarChange",
+  },
 };
 
 export function getRegistryEntry(abuseVector: string): RestrictionContentEntry | undefined {

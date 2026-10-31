@@ -2,11 +2,17 @@ import classNames from "classnames";
 import { useContext } from "react";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { Badge, Icon } from "@rbx/foundation-ui";
-import { useResponsiveValue } from "@rbx/payments/hooks";
 import { useFullKeyTranslations, useTranslations } from "@rbx/www-common/i18n";
-import { isInApp } from "../../utils/platform";
+import { getIsNativePurchasePlatform } from "../../utils/platform";
 import { isIconVariant } from "../../utils/iconVariants";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
+
+// Amount text floors: base, 361px, 400px, 1141px. Icon sizes are .robux-amount-icon and
+// .robux-amount-strike-icon in main.css; the size prop matches the base floor.
+const robuxTextClassName =
+  "text-title-large small:text-heading-small min-[400px]:text-heading-medium large:text-heading-large";
+const strikeThroughTextClassName =
+  "text-title-medium min-[400px]:text-title-large large:text-heading-small";
 
 const BadgeWrapper = ({ icon, label }: { icon?: string; label: string }) => {
   const hasIcon = icon && isIconVariant(icon);
@@ -40,38 +46,10 @@ export function RobuxAmount({
   bonusRobuxTagIcon,
   bonusRobuxTagTranslationKey,
 }: RobuxAmountProps) {
-  const { productBadgeSlotCount } = useContext(BuyRobuxPageContext);
+  const { productBadgeSlotCount, deviceMeta } = useContext(BuyRobuxPageContext);
+  const isNativePurchasePlatform = getIsNativePurchasePlatform(deviceMeta);
   const translatePremium = useTranslations("Feature.Premium");
   const { translateFullKey } = useFullKeyTranslations();
-
-  const responsiveStyle = useResponsiveValue(
-    {
-      robuxIcon: "Small",
-      robuxTextSize: "text-title-large",
-      strikeThroughRobuxIcon: "XSmall",
-      strikeThroughRobuxTextSize: "text-title-medium",
-    } as const,
-    {
-      small: {
-        robuxIcon: "Medium",
-        robuxTextSize: "text-heading-small",
-        strikeThroughRobuxIcon: "Small",
-        strikeThroughRobuxTextSize: "text-title-medium",
-      } as const,
-      400: {
-        robuxIcon: "Large",
-        robuxTextSize: "text-heading-medium",
-        strikeThroughRobuxIcon: "Medium",
-        strikeThroughRobuxTextSize: "text-title-large",
-      } as const,
-      large: {
-        robuxIcon: "XLarge",
-        robuxTextSize: "text-heading-large",
-        strikeThroughRobuxIcon: "Large",
-        strikeThroughRobuxTextSize: "text-heading-small",
-      } as const,
-    },
-  );
 
   const formattedBonusRobuxAmount = bonusRobuxAmount
     ? formatNumber(Number(bonusRobuxAmount))
@@ -92,11 +70,8 @@ export function RobuxAmount({
           data-testid="robux-amount-column"
         >
           <div className="flex flex-row justify-start items-center gap-xsmall content-emphasis">
-            <Icon name="icon-filled-robux" size={responsiveStyle.robuxIcon} />
-            <span
-              className={responsiveStyle.robuxTextSize}
-              style={{ lineHeight: "var(--line-height-100)" }}
-            >
+            <Icon name="icon-filled-robux" size="Small" className="robux-amount-icon" />
+            <span className={robuxTextClassName} style={{ lineHeight: "var(--line-height-100)" }}>
               {formatNumber(Number(amount))}
             </span>
           </div>
@@ -104,8 +79,8 @@ export function RobuxAmount({
           {nonPromotionalAmount && (
             <div className="flex flex-row justify-start items-center gap-xsmall relative text-overflow content-muted">
               <div className="robux-amount-strike-through" />
-              <Icon name="icon-filled-robux" size={responsiveStyle.strikeThroughRobuxIcon} />
-              <span className={responsiveStyle.strikeThroughRobuxTextSize}>
+              <Icon name="icon-filled-robux" size="XSmall" className="robux-amount-strike-icon" />
+              <span className={strikeThroughTextClassName}>
                 {formatNumber(Number(nonPromotionalAmount))}
               </span>
             </div>
@@ -134,7 +109,7 @@ export function RobuxAmount({
             ) : (
               // On non-large screens, only show for when in-app.
               <div
-                className={classNames(isInApp ? "block" : "hidden", "large:block")}
+                className={classNames(isNativePurchasePlatform ? "block" : "hidden", "large:block")}
                 data-testid="bonus-pill"
               >
                 <BadgeWrapper label={fallbackBonusRobuxTagLabel} />

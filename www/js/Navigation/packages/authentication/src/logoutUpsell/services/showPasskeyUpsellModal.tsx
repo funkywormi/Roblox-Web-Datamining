@@ -1,20 +1,12 @@
-import React, { useEffect, useState } from "react";
 // eslint-disable-next-line import-x/no-extraneous-dependencies -- react-dom is provided transitively via the host component's React 17 runtime; we only need the unmount helper here.
 import { unmountComponentAtNode } from "react-dom";
-import { renderWithErrorBoundary, TranslationProvider } from "@rbx/core-scripts/react";
-import LogoutUpsellModal from "../components/LogoutUpsellModal";
-import PasskeyUpsellContent, {
-  PasskeyUpsellTranslations,
-} from "../components/PasskeyUpsellContent";
-import AddEmailContent, { AddEmailTranslations } from "../components/AddEmailContent";
-import VerifyEmailContent, { VerifyEmailTranslations } from "../components/VerifyEmailContent";
-import { AddEmailOrigin, AddEmailOriginName, sendDismissClick } from "./logoutUpsellEvents";
-import { LogoutUpsellScreen, LogoutUpsellScreenName } from "../constants/logoutUpsellScreens";
+import { renderWithErrorBoundary } from "@rbx/core-scripts/react";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
+import LogoutUpsellFlow, { type PasskeyLogoutUpsellOptions } from "../components/LogoutUpsellFlow";
 
 /**
- * Imperative entry point for the passkey logout upsell. Dispatchers in
- * `logoutUpsellService` invoke this without needing to know how the modal is
- * mounted; the React tree owns its own DOM lifecycle (container creation +
+ * .NET entry point for the passkey logout upsell. The .NET nav passes it to
+ * `handleLogoutUpsell`, so shared code never imports this .NET-only mount; the React tree owns its own DOM lifecycle (container creation +
  * unmount on close, successful registration, or "sign out anyway") and its own
  * page state (passkey -> add email -> verify email).
  *
@@ -39,98 +31,11 @@ const CONTAINER_ID = "logout-upsell-container";
 
 // Loaded so `AddEmailContent` can resolve `Message.Error.Email.InvalidEmail`
 // and `VerifyEmailContent` can resolve `Message.Error.Email.*` resend errors
-// via `useTranslation()`. Other modal copy comes from prompts service via the
+// via `useTranslations()`. Other modal copy comes from prompts service via the
 // `translations` props.
 const EMAIL_TRANSLATION_NAMESPACES = ["Feature.AccountSettings"] as const;
 
-export type ShowPasskeyUpsellModalOptions = {
-  translations: PasskeyUpsellTranslations;
-  /**
-   * When `true`, opt into the passkey + email variant: render the secondary
-   * "Add email" CTA and swap to the add-email page on click. Caller must
-   * also provide `translations.addEmailLabel`, `addEmailTranslations`, and
-   * `verifyEmailTranslations`.
-   */
-  showAddEmail: boolean;
-  /** Required when `showAddEmail` is `true`; ignored otherwise. */
-  addEmailTranslations?: AddEmailTranslations;
-  /** Required when `showAddEmail` is `true`; ignored otherwise. */
-  verifyEmailTranslations?: VerifyEmailTranslations;
-  onLogout: () => void;
-};
-
-type LogoutUpsellRootProps = {
-  passkeyTranslations: PasskeyUpsellTranslations;
-  addEmailTranslations: AddEmailTranslations | undefined;
-  verifyEmailTranslations: VerifyEmailTranslations | undefined;
-  showAddEmail: boolean;
-  onSignOut: () => void;
-  onPasskeyRegistered: () => void;
-  /** Reports the active screen so the modal shell can attribute the dismiss event. */
-  onScreenChange: (screen: LogoutUpsellScreenName) => void;
-};
-
-const LogoutUpsellRoot: React.FC<LogoutUpsellRootProps> = ({
-  passkeyTranslations,
-  addEmailTranslations,
-  verifyEmailTranslations,
-  showAddEmail,
-  onSignOut,
-  onPasskeyRegistered,
-  onScreenChange,
-}) => {
-  const [screen, setScreen] = useState<LogoutUpsellScreenName>(LogoutUpsellScreen.PasskeyUpsell);
-  const [submittedEmail, setSubmittedEmail] = useState("");
-  const [addEmailOrigin, setAddEmailOrigin] = useState<AddEmailOriginName>(AddEmailOrigin.Passkey);
-
-  useEffect(() => {
-    onScreenChange(screen);
-  }, [screen, onScreenChange]);
-
-  if (screen === LogoutUpsellScreen.AddEmail && addEmailTranslations) {
-    return (
-      <AddEmailContent
-        translations={addEmailTranslations}
-        origin={addEmailOrigin}
-        onContinue={email => {
-          setSubmittedEmail(email);
-          setScreen(LogoutUpsellScreen.VerifyEmail);
-        }}
-      />
-    );
-  }
-
-  if (screen === LogoutUpsellScreen.VerifyEmail && verifyEmailTranslations) {
-    return (
-      <VerifyEmailContent
-        translations={verifyEmailTranslations}
-        email={submittedEmail}
-        onContinueToSignOut={onSignOut}
-        onChangeEmail={() => {
-          setAddEmailOrigin(AddEmailOrigin.ChangeEmail);
-          setScreen(LogoutUpsellScreen.AddEmail);
-        }}
-      />
-    );
-  }
-
-  return (
-    <PasskeyUpsellContent
-      translations={passkeyTranslations}
-      showAddEmail={showAddEmail}
-      onSignOut={onSignOut}
-      onPasskeyRegistered={onPasskeyRegistered}
-      onAddEmail={
-        showAddEmail && addEmailTranslations
-          ? () => {
-              setAddEmailOrigin(AddEmailOrigin.Passkey);
-              setScreen(LogoutUpsellScreen.AddEmail);
-            }
-          : undefined
-      }
-    />
-  );
-};
+export type ShowPasskeyUpsellModalOptions = Omit<PasskeyLogoutUpsellOptions, "kind">;
 
 export const showPasskeyUpsellModal = ({
   translations,
@@ -153,33 +58,20 @@ export const showPasskeyUpsellModal = ({
     }
   };
 
-  let currentScreen: LogoutUpsellScreenName = LogoutUpsellScreen.PasskeyUpsell;
-
   renderWithErrorBoundary(
-    <LogoutUpsellModal
-      closeLabel={translations.closeLabel}
-      onClose={() => {
-        sendDismissClick(currentScreen);
-        cleanup();
-      }}
-    >
-      <TranslationProvider config={[...EMAIL_TRANSLATION_NAMESPACES]}>
-        <LogoutUpsellRoot
-          passkeyTranslations={translations}
-          addEmailTranslations={addEmailTranslations}
-          verifyEmailTranslations={verifyEmailTranslations}
-          showAddEmail={showAddEmail}
-          onSignOut={() => {
-            cleanup();
-            onLogout();
-          }}
-          onPasskeyRegistered={cleanup}
-          onScreenChange={screen => {
-            currentScreen = screen;
-          }}
-        />
-      </TranslationProvider>
-    </LogoutUpsellModal>,
+    <TranslationProviderSCC namespaces={EMAIL_TRANSLATION_NAMESPACES}>
+      <LogoutUpsellFlow
+        options={{
+          kind: "passkey",
+          translations,
+          addEmailTranslations,
+          verifyEmailTranslations,
+          showAddEmail,
+          onLogout,
+        }}
+        onClose={cleanup}
+      />
+    </TranslationProviderSCC>,
     container,
   );
 };

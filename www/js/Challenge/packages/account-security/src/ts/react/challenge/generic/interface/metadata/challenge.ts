@@ -167,6 +167,8 @@ export type CaptchaV2 = {
   challengeId: string;
   // Optional JSON key `mode`; may be absent.
   mode?: CaptchaMode;
+  // Optional JSON key `actionType`; the canonical action that trigered the challenge.
+  actionType?: string;
 } & Shared;
 
 /**

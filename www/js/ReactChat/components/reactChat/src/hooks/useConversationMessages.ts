@@ -6,6 +6,8 @@ import type { TChatApiMessage, TGetConversationMessagesResponse } from "../types
 import type { TChatMessage } from "../types/chat";
 import { isHiddenMessage, toChatMessages } from "../utils/chatTransforms";
 import { isQueryPending } from "../utils/queryStatus";
+import { getStatusCode } from "../utils/getStatusCode";
+import { trackError } from "../observability";
 
 // An older page together with the cursor that loaded it, so the page can be loaded again.
 type TOlderPage = { cursor: string; page: TGetConversationMessagesResponse };
@@ -58,7 +60,11 @@ export const useConversationMessages = (
 
   const messagesQuery = useQuery<TGetConversationMessagesResponse, Error>({
     queryKey: chatQueryKeys.conversationMessages(normalizedConversationId),
-    queryFn: () => getConversationMessages(normalizedConversationId),
+    queryFn: () =>
+      getConversationMessages(normalizedConversationId).catch((error: unknown) => {
+        trackError("MessagesLoadFailed", { statusCode: getStatusCode(error) }, error);
+        throw error;
+      }),
     enabled: enabled && normalizedConversationId.length > 0,
   });
 
@@ -133,7 +139,9 @@ export const useConversationMessages = (
       .then(page => {
         setOlderPages(currentPages => [...currentPages, { cursor: nextCursor, page }]);
       })
-      .catch(() => undefined)
+      .catch((error: unknown) => {
+        trackError("MessagesLoadFailed", { statusCode: getStatusCode(error) }, error);
+      })
       .finally(() => {
         isFetchingNextPageRef.current = false;
       });

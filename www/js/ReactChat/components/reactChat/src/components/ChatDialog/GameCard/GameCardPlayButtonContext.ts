@@ -6,6 +6,8 @@ export type TGameCardPlayButtonProps = {
   rootPlaceId?: string;
   universeId: string;
   privateServerLinkCode?: string;
+  gameInstanceId?: string;
+  launchData?: string;
 };
 
 // Supplied by the host so game-play-button stays out of bundles that can't run it yet (Next.js).

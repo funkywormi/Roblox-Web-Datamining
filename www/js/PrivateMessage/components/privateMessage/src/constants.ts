@@ -1,5 +1,8 @@
 export const MESSAGE_PAGE_SIZE = 20;
 
+// Longest a list load waits for the GUAC rules before it loads with offset paging.
+export const RULES_WAIT_MS = 2000;
+
 export const MESSAGE_TABS = {
   inbox: "inbox",
   sent: "sent",

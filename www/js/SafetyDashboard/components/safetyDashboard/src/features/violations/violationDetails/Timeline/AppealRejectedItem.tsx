@@ -7,6 +7,7 @@ import EvidenceField from "../EvidenceField";
 interface Props {
   appeal: Appeal;
   isFinal: boolean;
+  isFromSomeoneElse: boolean;
   violation: EnrichedViolation;
 }
 
@@ -83,22 +84,40 @@ const getDenialDescription = (
 };
 
 /**
+ * For an appeal someone other than the violation's user sent, we don't say "you" or list the
+ * abuse types.
+ */
+const getDenialDescriptionForSomeoneElse = (
+  abuseTypeChanged: boolean,
+  translate: (key: string) => string,
+): string =>
+  translate(
+    abuseTypeChanged
+      ? "Description.AppealDeniedCategoryChangedNeutral"
+      : "Description.AppealDeniedNeutral",
+  );
+
+/**
  * Shown on the appeal timeline when an appeal is denied (i.e. the user submitted an appeal
  * and we rejected it).
  *
  * In some cases, the violation abuse types may have changed after we take a look
  * at the evidence again so we need to show the user the new abuse types.
  */
-const AppealRejectedItem = ({ appeal, isFinal, violation }: Props) => {
+const AppealRejectedItem = ({ appeal, isFinal, isFromSomeoneElse, violation }: Props) => {
   const { translate } = useTranslation();
 
   const abuseTypeChanged = hasAbuseTypeChanged(appeal, violation);
   const abuseTypes = getFilteredAbuseTypes(appeal.abuse_type_keys, translate);
-  const description = getDenialDescription(abuseTypes, abuseTypeChanged, translate);
+  const description = isFromSomeoneElse
+    ? getDenialDescriptionForSomeoneElse(abuseTypeChanged, translate)
+    : getDenialDescription(abuseTypes, abuseTypeChanged, translate);
 
   return (
     <div className="flex flex-col gap-xxsmall">
-      <span className="text-title-medium">{translate("Header.AppealDenied")}</span>
+      <span className="text-title-medium">
+        {translate(isFromSomeoneElse ? "Label.AppealDenied" : "Header.AppealDenied")}
+      </span>
       <Timestamp timestamp={appeal.decision_time} />
 
       <div className="flex flex-col gap-small padding-top-medium">

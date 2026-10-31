@@ -7,6 +7,7 @@ import {
 } from "../utils/chatLayoutStorage";
 import type { TTypingEventDetail } from "../utils/chatRealtimeEvents";
 import { getCurrentUserId } from "../utils/currentUser";
+import { trackCounter } from "../observability";
 import { useChatMetadataConfig } from "./useChatMetadataConfig";
 
 export type TUseChatLayoutResult = {
@@ -533,8 +534,16 @@ export const useChatLayout = (
     layout.openedConversationLayoutIds,
   ]);
 
+  const isCollapsedRef = useRef(layout.isCollapsed);
+  isCollapsedRef.current = layout.isCollapsed;
+
   const openConversation = useCallback(
     (layoutId: string) => {
+      trackCounter("ConversationOpened");
+      // Opening a conversation also opens the unified window.
+      if (isUnifiedWindow && isCollapsedRef.current) {
+        trackCounter("ChatOpened");
+      }
       // The user's choice wins over a saved chat that has not loaded yet, now and after a reload.
       if (isUnifiedWindow) {
         pendingRestoreRef.current = null;
@@ -710,6 +719,9 @@ export const useChatLayout = (
   }, []);
 
   const toggleCollapsed = useCallback(() => {
+    if (isCollapsedRef.current) {
+      trackCounter("ChatOpened");
+    }
     setLayout(current => ({ ...current, isCollapsed: !current.isCollapsed }));
   }, []);
 

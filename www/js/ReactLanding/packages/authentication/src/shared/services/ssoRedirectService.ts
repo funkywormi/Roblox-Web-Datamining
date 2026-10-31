@@ -1,14 +1,10 @@
 import { EnvironmentUrls } from "@rbx/environment-urls";
 import type { SsoProvider } from "../types/ssoTypes";
-import {
-  authFailureReason,
-  authMethod,
-  type AuthFlowTelemetry,
-  type AuthMethod,
-} from "../telemetry/authFlowTelemetry";
+import { authFailureReason, type AuthFlowTelemetry } from "../telemetry/authFlowTelemetry";
 import {
   sendSsoClientErrorEvent,
   ssoClientErrorReasons,
+  ssoTelemetryMethods,
   startSsoAttempt,
 } from "./ssoTelemetryService";
 
@@ -59,14 +55,10 @@ export const buildSsoOAuthInitUrl = (
   return `${getAuthApiUrl()}/v1/external/${identityProviderId}/sso/oauth/init?postAuthenticationIntentId=${webRedirectIntentId}`;
 };
 
-const ssoTelemetryMethods: Readonly<Record<SsoProvider, AuthMethod>> = {
-  google: authMethod.ssoGoogle,
-  apple: authMethod.ssoApple,
-};
-
 /**
  * `ctx` is the event context of the page the user started from, and `telemetry` is that page's
- * auth flow telemetry. Success isn't reported here: authentication completes in the SSO popup.
+ * auth flow telemetry. The outcome isn't reported here: authentication completes in the SSO
+ * popup, and its handoff message settles the attempt.
  */
 export const redirectToSsoProvider = (
   provider: SsoProvider,
@@ -95,6 +87,6 @@ export const redirectToSsoProvider = (
     throw error;
   }
   telemetry.requestStarted(method);
-  startSsoAttempt(provider, ctx);
+  startSsoAttempt(provider, ctx, telemetry);
   navigate(url);
 };

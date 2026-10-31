@@ -4,8 +4,8 @@ import { Icon } from "@rbx/foundation-ui";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { useFullKeyTranslations } from "@rbx/www-common/i18n";
 import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
-import { isInApp } from "../utils/platform";
 import type { SectionTransfers } from "../types/buyRobuxPageData";
+import { getIsNativePurchasePlatform } from "../utils/platform";
 
 const RobuxBalance = () => {
   const { robuxBalance } = useContext(BuyRobuxPageContext);
@@ -27,7 +27,9 @@ export function Banner({ transfers }: { transfers?: SectionTransfers }) {
   const {
     buyRobuxPageData: { pageHeaderMetadata },
     urlParams,
+    deviceMeta,
   } = useContext(BuyRobuxPageContext);
+  const isNativePurchasePlatform = getIsNativePurchasePlatform(deviceMeta);
   const { translateFullKey } = useFullKeyTranslations();
 
   const showWebviewHeader = urlParams.showHeader === "true";
@@ -116,7 +118,7 @@ export function Banner({ transfers }: { transfers?: SectionTransfers }) {
     </Fragment>
   ) : (
     <div className="flex flex-col justify-center items-center self-stretch padding-bottom-medium large:padding-y-xxlarge large:gap-large gap-small padding-top-xlarge">
-      {!isInApp && !transfers && (
+      {!isNativePurchasePlatform && !transfers && (
         <div className="self-stretch flex flex-row justify-end items-center large:hidden">
           <div className="flex flex-row justify-center items-center gap-small height-1000 padding-left-medium padding-right-large radius-circle bg-surface-0">
             <RobuxBalance />

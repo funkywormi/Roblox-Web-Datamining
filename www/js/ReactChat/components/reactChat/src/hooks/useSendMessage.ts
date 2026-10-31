@@ -11,6 +11,8 @@ import { buildModeratedMessage, isModeratedSendResponse } from "../utils/chatMod
 import { buildFailedMessage, classifySendFailure } from "../utils/chatSendFailure";
 import { sendConversationMessageSent } from "../utils/chatAnalytics";
 import { getCurrentUserId } from "../utils/currentUser";
+import { getStatusCode } from "../utils/getStatusCode";
+import { trackCounter, trackError } from "../observability";
 
 type TSendMessageVariables = {
   conversationId: string;
@@ -109,6 +111,7 @@ export const useSendMessage = () => {
       };
     },
     onError: (error, variables, context) => {
+      trackError("SendFailed", { statusCode: getStatusCode(error) }, error);
       // The send-message error path emits conversationMessageSent ONLY for an HTTP 409 conflict (as
       // "Conflict"); every other failure (network, 429, 5xx, validation) is silent.
       if (isSendConflictError(error)) {
@@ -152,6 +155,9 @@ export const useSendMessage = () => {
         .catch(() => undefined);
     },
     onSuccess: (data, { conversationId, recipientIds, isRetry }, context) => {
+      if (!isModeratedSendResponse(data)) {
+        trackCounter("MessageSent");
+      }
       // conversationMessageSent — derive the result from the returned message's status, falling back
       // to "moderated" for a filtered send, else the "NoMessageStatus"/"NoResponseBody" sentinels.
       // recipientIds are the conversation's other participants; there is no client-side retry here.

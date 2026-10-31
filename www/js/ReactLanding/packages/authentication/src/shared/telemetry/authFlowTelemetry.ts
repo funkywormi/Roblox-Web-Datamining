@@ -57,6 +57,7 @@ export const authFailureReason = {
   rateLimited: "rateLimited",
   network: "network",
   server: "server",
+  ssoCallback: "ssoCallback",
   unknown: "unknown",
 } as const;
 
@@ -117,6 +118,13 @@ type BaseAttributes = {
   variant: AuthVariant | "unspecified";
 };
 
+/* SSO settles in a popup that can outlive other requests on the page, so it stays off the shared
+ * request timer; its duration is reported to Event Stream instead. */
+const untimedRequestMethods: ReadonlySet<AuthMethod> = new Set([
+  authMethod.ssoGoogle,
+  authMethod.ssoApple,
+]);
+
 const fireHistogram = createFireTelemetryHistogram(observabilityRegistry.featureName, {});
 
 const suppressTelemetryFailure = (send: () => void): void => {
@@ -168,6 +176,18 @@ export const createAuthFlowTelemetry = ({
     });
   };
 
+  /** Ends the timed request and returns whether it was user initiated. */
+  const settleRequest = (method: AuthMethod): boolean => {
+    if (untimedRequestMethods.has(method)) {
+      return true;
+    }
+    recordDuration(authTelemetryHistograms.requestDurationMs, requestStartedAt, method, {
+      isUserInitiated: requestIsUserInitiated,
+    });
+    requestStartedAt = undefined;
+    return requestIsUserInitiated;
+  };
+
   return {
     pageMounted: () => {
       flowStartedAt = now();
@@ -202,8 +222,10 @@ export const createAuthFlowTelemetry = ({
       );
     },
     requestStarted: (method, isUserInitiated = true) => {
-      requestStartedAt = now();
-      requestIsUserInitiated = isUserInitiated;
+      if (!untimedRequestMethods.has(method)) {
+        requestStartedAt = now();
+        requestIsUserInitiated = isUserInitiated;
+      }
       suppressTelemetryFailure(() =>
         trackCounter(authTelemetryCounters.requestStarted, {
           ...getAttributes().base,
@@ -213,30 +235,24 @@ export const createAuthFlowTelemetry = ({
       );
     },
     requestSucceeded: (method, nextStep = authNextStep.complete) => {
-      recordDuration(authTelemetryHistograms.requestDurationMs, requestStartedAt, method, {
-        isUserInitiated: requestIsUserInitiated,
-      });
-      requestStartedAt = undefined;
+      const isUserInitiated = settleRequest(method);
       suppressTelemetryFailure(() =>
         trackCounter(authTelemetryCounters.requestSucceeded, {
           ...getAttributes().base,
           method,
           nextStep,
-          isUserInitiated: String(requestIsUserInitiated),
+          isUserInitiated: String(isUserInitiated),
         }),
       );
     },
     requestFailed: (method, reason) => {
-      recordDuration(authTelemetryHistograms.requestDurationMs, requestStartedAt, method, {
-        isUserInitiated: requestIsUserInitiated,
-      });
-      requestStartedAt = undefined;
+      const isUserInitiated = settleRequest(method);
       suppressTelemetryFailure(() =>
         trackCounter(authTelemetryCounters.requestFailed, {
           ...getAttributes().base,
           method,
           reason,
-          isUserInitiated: String(requestIsUserInitiated),
+          isUserInitiated: String(isUserInitiated),
         }),
       );
     },

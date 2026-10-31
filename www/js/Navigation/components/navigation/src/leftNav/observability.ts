@@ -2,7 +2,7 @@ import type { RegistryInput } from "@rbx/observability-framework/schema";
 import type { MakeObservabilityTypes } from "@rbx/observability-framework/types";
 import { createTrackers } from "@rbx/observability-framework/trackers";
 import { createObsErrorBoundary } from "@rbx/observability-framework/react";
-import { reportError } from "@rbx/core-scripts/sentry";
+import { captureException as captureSentryException } from "@rbx/core-scripts/sentry";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import { createFireTelemetryHistogram } from "@rbx/web-telemetry/v2/histogram";
@@ -34,8 +34,19 @@ export const publishMetric = createFireTelemetryCounter(observabilityRegistry.fe
 
 export const publishHistogram = createFireTelemetryHistogram(observabilityRegistry.featureName, {});
 
-const captureException = (error: unknown, tags?: Record<string, string>) => {
-  reportError(error, tags);
+const captureException = (error: unknown, context?: Record<string, string>) => {
+  console.error(error, context);
+
+  if (!context) {
+    captureSentryException(error);
+    return;
+  }
+
+  const { error_counter: errorCounter, ...extra } = context;
+  captureSentryException(error, {
+    ...(errorCounter != null ? { tags: { error_counter: errorCounter } } : {}),
+    ...(Object.keys(extra).length > 0 ? { extra } : {}),
+  });
 };
 
 export const { trackCounter, trackError } = createTrackers(observabilityRegistry, {

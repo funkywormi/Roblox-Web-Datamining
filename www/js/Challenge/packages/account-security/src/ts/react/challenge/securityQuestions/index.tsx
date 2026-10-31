@@ -1,15 +1,12 @@
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
-import "../../../../css/challenge/securityQuestions/securityQuestions.scss";
-import "../../../../css/common/modalModern.scss";
-import "../../../../css/common/spinner.scss";
+import "../../../../css/challenge/securityQuestions/securityQuestions.css";
 import { RequestServiceDefault } from "../../../common/request";
 import App from "./App";
 import { TRANSLATION_NAMESPACES } from "./app.config";
 import { RenderChallenge } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
+import { mountChallenge, unmountChallenge } from "../challengeMount";
 
 // Global instance since we do not need Security Questions parameters for
 // instantiation.
@@ -44,7 +41,7 @@ export const renderChallenge: RenderChallenge = ({
   const container = document.getElementById(containerId);
   if (container !== null) {
     // Remove any existing instances of the app.
-    unmountComponentAtNode(container);
+    unmountChallenge(container);
 
     // Instantiate services externally to the app, which will offer future
     // flexibility (e.g. for mocking).
@@ -52,21 +49,20 @@ export const renderChallenge: RenderChallenge = ({
     const metricsService = new MetricsServiceDefault({ appType, requestServiceDefault });
 
     // Render the app on the selected element.
-    render(
-      <TranslationProviderSCC namespaces={TRANSLATION_NAMESPACES}>
-        <App
-          userId={userId}
-          sessionId={sessionId}
-          renderInline={renderInline}
-          eventService={eventService}
-          metricsService={metricsService}
-          requestService={requestServiceDefault}
-          onChallengeCompleted={onChallengeCompleted}
-          onChallengeInvalidated={onChallengeInvalidated}
-          onModalChallengeAbandoned={onModalChallengeAbandoned}
-        />
-      </TranslationProviderSCC>,
+    mountChallenge(
       container,
+      <App
+        userId={userId}
+        sessionId={sessionId}
+        renderInline={renderInline}
+        eventService={eventService}
+        metricsService={metricsService}
+        requestService={requestServiceDefault}
+        onChallengeCompleted={onChallengeCompleted}
+        onChallengeInvalidated={onChallengeInvalidated}
+        onModalChallengeAbandoned={onModalChallengeAbandoned}
+      />,
+      TRANSLATION_NAMESPACES,
     );
     metricsService.fireInitializedEvent();
     return true;

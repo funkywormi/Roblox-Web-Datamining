@@ -10,4 +10,5 @@ const presenceLabelKeys: Record<TPresenceType, string> = {
 export const getPresenceLabel = (
   presence: TPresenceType,
   translate: (key: string) => string,
-): string => translate(presenceLabelKeys[presence]);
+  gameName?: string,
+): string => gameName ?? translate(presenceLabelKeys[presence]);

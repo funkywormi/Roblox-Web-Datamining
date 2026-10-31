@@ -12,6 +12,7 @@ export type TChatRealtimeCacheAction =
       reason: "partial" | "full";
     }
   | { kind: "refetch_conversation_messages"; conversationId: string }
+  | { kind: "invalidate_participants_metadata"; conversationId?: string }
   | { kind: "invalidate_friends_directory" }
   | { kind: "invalidate_friend_profiles" }
   | { kind: "invalidate_presence" }
@@ -84,6 +85,14 @@ export async function applyChatRealtimeCacheActions(
         await client.refetchQueries({
           queryKey: chatQueryKeys.conversationMessages(action.conversationId),
           type: "all",
+        });
+        return;
+      case "invalidate_participants_metadata":
+        await client.invalidateQueries({
+          queryKey:
+            action.conversationId === undefined
+              ? chatQueryKeys.participantsMetadataAll()
+              : chatQueryKeys.participantsMetadata(action.conversationId),
         });
         return;
       case "invalidate_friends_directory":

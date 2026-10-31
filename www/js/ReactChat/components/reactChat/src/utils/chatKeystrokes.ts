@@ -1,6 +1,5 @@
-// Keystroke telemetry buffering for the `appChatKeyStrokes` eventstream event. Legacy source of
-// truth: WebApps/Roblox.Chat.WebApp/.../chat/controllers/dialogController.js ($scope.keyStroke) and
-// constants/apiParamsInitialization.js (dialogParams).
+// Keystroke telemetry buffering for the `appChatKeyStrokes` eventstream event. The wire format
+// matches the removed AngularJS chat's, so keep it unchanged.
 
 /** Wire values for the keystroke phase; keydown is 0 and keyup is 1. */
 export const KEYSTROKE_EVENT_TYPE = {

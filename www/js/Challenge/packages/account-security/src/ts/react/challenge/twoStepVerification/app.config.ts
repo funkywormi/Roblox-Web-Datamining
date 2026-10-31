@@ -6,7 +6,10 @@ export const TIMEOUT_BEFORE_CALLBACK_MILLISECONDS = 100;
  * Translation namespaces required by this web app. Keep in sync with the challenge SCC's
  * `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const TRANSLATION_NAMESPACES = ["Authentication.TwoStepVerification"] as const;
+export const TRANSLATION_NAMESPACES = [
+  "Authentication.TwoStepVerification",
+  "CommonUI.Messages",
+] as const;
 
 /**
  * Constants for event stream events.

@@ -1,6 +1,7 @@
 import { complianceConstants, experimentVariables } from "../constants/signupConstants";
 import { experimentLayer } from "../constants/landingConstants";
 import { getExperimentsForLayer } from "../services/ixpService";
+import { isUnderAge } from "./birthdayUtils";
 
 const GLOBAL_THRESHOLD_AGE = 13;
 
@@ -42,10 +43,7 @@ export const isUnderThresholdAgeForCountry = (
     default:
       break;
   }
-  const inputDate = new Date(`${month} ${day} ${year}`);
-  const cutOffDate = new Date();
-  cutOffDate.setFullYear(cutOffDate.getFullYear() - thresholdAge);
-  return inputDate > cutOffDate;
+  return isUnderAge(new Date(`${month} ${day} ${year}`), thresholdAge);
 };
 
 export const isStrictComplianceIXPEnabledForCountryBtid = async (

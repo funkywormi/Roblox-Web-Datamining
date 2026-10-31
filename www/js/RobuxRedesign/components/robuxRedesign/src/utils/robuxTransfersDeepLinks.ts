@@ -1,8 +1,9 @@
-import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
-import { getGameLauncher } from "@rbx/www-common/game-launch";
+import { isIos13Ipad } from "@rbx/core-scripts/meta/device";
 import { window } from "@rbx/core-lib/browser";
+import { DeviceMeta } from "@rbx/www-common/device/types";
+import { getGameLauncher } from "@rbx/www-common/game-launch";
 import { trackCounter } from "../observability";
-import { isInApp } from "./platform";
+import { getIsNativePurchasePlatform } from "./platform";
 
 const APPSFLYER_BASE_URL = "https://ro.blox.com/Ebh5";
 const APPSFLYER_PID = "buy-robux-currency-transfer";
@@ -17,22 +18,21 @@ function getAppsFlyerUrl(deepLinkUrl: string): string {
   return url.toString();
 }
 
-export function navigateToDeepLink(deepLinkUrl: string): void {
+export function navigateToDeepLink(deepLinkUrl: string, deviceMeta: DeviceMeta): void {
   if (window === undefined) {
     return;
   }
 
-  const deviceMeta = getDeviceMeta();
-  if (isInApp) {
+  if (getIsNativePurchasePlatform(deviceMeta)) {
     window.location.href = deepLinkUrl;
   } else if (
-    deviceMeta?.isIosDevice ||
-    deviceMeta?.isAndroidDevice ||
+    deviceMeta.isIosDevice ||
+    deviceMeta.isAndroidDevice ||
     isIos13Ipad() ||
-    deviceMeta?.isChromeOs
+    deviceMeta.isChromeOs
   ) {
     window.location.href = getAppsFlyerUrl(deepLinkUrl);
-  } else if (deviceMeta?.isDesktop && !deviceMeta.isUniversalApp) {
+  } else if (deviceMeta.isDesktop && !deviceMeta.isUniversalApp) {
     const launcher = getGameLauncher();
     if (launcher) {
       launcher.startDeepLinkFlow(deepLinkUrl);
@@ -52,7 +52,7 @@ function buildCurrencyTransferDeepLink(params: Record<string, string>): string {
   return url.toString();
 }
 
-export function navigateToSendTransferDeepLink(userId: number): void {
+export function navigateToSendTransferDeepLink(userId: number, deviceMeta: DeviceMeta): void {
   trackCounter("SendTransferDeepLink");
   navigateToDeepLink(
     buildCurrencyTransferDeepLink({
@@ -60,15 +60,20 @@ export function navigateToSendTransferDeepLink(userId: number): void {
       userid: String(userId),
       transferorigination: "buyRobux",
     }),
+    deviceMeta,
   );
 }
 
-export function navigateToAcceptTransferDeepLink(transferRequestId: string): void {
+export function navigateToAcceptTransferDeepLink(
+  transferRequestId: string,
+  deviceMeta: DeviceMeta,
+): void {
   trackCounter("PendingTransferDeepLink");
   navigateToDeepLink(
     buildCurrencyTransferDeepLink({
       direction: "receive",
       transferrequestid: `RXT-${transferRequestId}`,
     }),
+    deviceMeta,
   );
 }

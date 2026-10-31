@@ -6,6 +6,12 @@ import {
   STUDIO_TRACE_ID_PARAM,
 } from "@rbx/authentication-common/utils/traceIdUtils";
 import type { SsoProvider } from "../types/ssoTypes";
+import {
+  authFailureReason,
+  authMethod,
+  type AuthFlowTelemetry,
+  type AuthMethod,
+} from "../telemetry/authFlowTelemetry";
 
 export const ssoClientErrorReasons = {
   invalidConfig: "invalidConfig",
@@ -19,10 +25,17 @@ export const ssoClientErrorReasons = {
 export type SsoClientErrorReason =
   (typeof ssoClientErrorReasons)[keyof typeof ssoClientErrorReasons];
 
+export const ssoTelemetryMethods: Readonly<Record<SsoProvider, AuthMethod>> = {
+  google: authMethod.ssoGoogle,
+  apple: authMethod.ssoApple,
+};
+
 export type SsoAttempt = {
   provider: SsoProvider;
   ctx: string;
   startedAt: number;
+  /** The starting page's telemetry, so the outcome carries the same flow and variant as the click. */
+  telemetry: AuthFlowTelemetry;
 };
 
 const SSO_ATTEMPT_STARTED_EVENT = "ssoAttemptStarted";
@@ -55,9 +68,10 @@ const getSsoState = (provider: SsoProvider, outcome: string): string =>
 export const startSsoAttempt = (
   provider: SsoProvider,
   ctx: string,
+  telemetry: AuthFlowTelemetry,
   now: () => number = Date.now,
 ): void => {
-  pendingAttempt = { provider, ctx, startedAt: now() };
+  pendingAttempt = { provider, ctx, startedAt: now(), telemetry };
   try {
     pubSub.publish(SSO_ATTEMPT_STARTED_EVENT, String(pendingAttempt.startedAt));
   } catch {
@@ -91,6 +105,12 @@ const endSsoAttempt = (
       state: getSsoState(attempt.provider, outcome),
       elapsedTime: Math.round(now() - attempt.startedAt).toString(),
     });
+    const method = ssoTelemetryMethods[attempt.provider];
+    if (outcome === "success") {
+      attempt.telemetry.requestSucceeded(method);
+    } else {
+      attempt.telemetry.requestFailed(method, authFailureReason.ssoCallback);
+    }
   }
   return attempt;
 };

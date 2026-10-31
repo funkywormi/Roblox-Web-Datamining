@@ -1,5 +1,6 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "react-dom";
+import { getDeviceClient } from "@rbx/www-common/device/client";
 import { window, document } from "@rbx/core-lib/browser";
 import dataStores from "@rbx/core-scripts/data-store";
 import { registerReferrerLookup } from "@rbx/subscriptions-common";
@@ -18,6 +19,7 @@ import "./src/main.css";
 import "./src/stylesheets/robuxRedesign.scss";
 import "./src/stylesheets/styleGuidePatch.scss";
 import { reportPageLoad, reportPageView, ObsErrorBoundary } from "./src/observability";
+import { reportInteractive } from "./src/utils/publishMetric";
 import { getBuyRobuxPageDataFromDOM } from "./src/utils/getBuyRobuxPageDataFromDOM";
 import { getEnhancedBuyRobuxPageData } from "./src/utils/getEnhancedBuyRobuxPageData";
 
@@ -65,6 +67,7 @@ ready(() => {
     urlProductId: urlParams.product_id,
   });
 
+  reportInteractive();
   reportPageView();
 
   // Set the payment flow UUID before React mounts so no child effect fires
@@ -80,7 +83,11 @@ ready(() => {
         <TranslationProviderSCC namespaces={namespaces}>
           <PaymentsTranslationProvider config={translations} context="RobuxRedesign">
             <ToastWrapper>
-              <App enhancedBuyRobuxPageData={enhancedBuyRobuxPageData} urlParams={urlParams} />
+              <App
+                enhancedBuyRobuxPageData={enhancedBuyRobuxPageData}
+                urlParams={urlParams}
+                deviceMeta={getDeviceClient()}
+              />
             </ToastWrapper>
           </PaymentsTranslationProvider>
         </TranslationProviderSCC>

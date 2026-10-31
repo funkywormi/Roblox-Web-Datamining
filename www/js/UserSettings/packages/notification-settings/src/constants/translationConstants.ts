@@ -30,6 +30,7 @@ const translationConstants = {
   parentDisabledNotificationChannelLabel: "Label.ParentDisabledNotificationChannel",
   parentDisabledDescription: "Description.ParentDisabled",
   channelDisabledDescription: "Label.DisabledChannelNotifications",
+  readonlyChannelDescription: "Label.ReadonlyChannelNotifications",
 
   // Push notification upsell prompt
   notificationsDisabledLabel: "Label.PushNotificationsDisabled",

@@ -51,6 +51,17 @@ export const parseErrorCode = (error: unknown): number | null => {
   return errorCodes[0] || null;
 };
 
+type MaybeHttpError = { status?: number; response?: { status?: number } } | null | undefined;
+
+/**
+ * Gets the HTTP status from a rejection of `@rbx/core-scripts/http`.
+ */
+export const getHttpStatus = (error: unknown): number | undefined => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- http rejects with a response, an AxiosError, or undefined
+  const failure = error as MaybeHttpError;
+  return failure?.status ?? failure?.response?.status;
+};
+
 /**
  * Fetch the returnUrl returned in response
  */

@@ -24,11 +24,14 @@ import { urlConstants as landingUrlConstants } from "../constants/landingConstan
 import BirthdayInput from "./BirthdayInput";
 import GenderChips from "./GenderChips";
 import LegalText from "./LegalText";
+import MarketingConsentCheckbox from "./MarketingConsentCheckbox";
 import UsernameInput from "./UsernameInput";
+import { MARKETING_CONSENT_TRANSLATION_KEY } from "../constants/marketingConsentConstants";
 import { signupFormStrings, urlConstants, validationMessages } from "../constants/signupConstants";
 import { Gender } from "../types/signupTypes";
 import { Birthday, constructValidUTCBirthdate } from "../utils/birthdayUtils";
 import { usernameValidationMessage } from "../utils/signupUsernameValidation";
+import useMarketingConsent from "../hooks/useMarketingConsent";
 import useUsernameSuggestions from "../hooks/useUsernameSuggestions";
 import UsernameSuggestions from "./UsernameSuggestions";
 import {
@@ -47,6 +50,7 @@ import {
   logout,
   upgradeAccount,
 } from "../services/accountUpgradeService";
+import { waitForMarketingConsentWrite } from "../services/marketingConsentService";
 import { parseErrorCode } from "../utils/requestUtils";
 import * as accountUpgradeAnalytics from "../services/accountUpgradeAnalytics";
 import {
@@ -160,15 +164,25 @@ function BirthdayComplianceModalContent({
     accountUpgradeAnalytics.reportOpened();
   }, []);
 
+  const marketingConsent = useMarketingConsent({
+    birthday,
+    consentText: translate(MARKETING_CONSENT_TRANSLATION_KEY),
+  });
+
   const { mutate: submitUpgrade, isPending: isSubmitting } = useMutation({
     mutationFn: async (validBirthday: Date) => {
+      let isAlreadyLifted = false;
       try {
         await upgradeAccount(validBirthday, isUsernameChanged ? username : undefined, gender);
       } catch (error) {
         if (!isRestrictionAlreadyLifted(error)) {
           throw error;
         }
+        isAlreadyLifted = true;
       }
+      // The consent write is legal proof of consent, so only a 200 from this upgrade starts
+      // it. An "already upgraded" 403 never does.
+      const pendingWrite = isAlreadyLifted ? undefined : marketingConsent.startWrite();
       // Reported before the poll starts, like Lua's reportSucceeded; an "already upgraded"
       // 403 counts as success because the modal treats it as one.
       accountUpgradeAnalytics.reportSucceeded();
@@ -177,9 +191,14 @@ function BirthdayComplianceModalContent({
       // Redirecting resolves the flow, but the browser stays on this page until the next
       // document loads — hold the loading state across that window so nothing re-enables
       // and no second upgrade can be submitted.
-      await handleUpgradeComplete(() => {
-        setIsRedirecting(true);
-      }, navigateAfterUpgrade);
+      // The page unload can cancel the consent write, so the redirect waits a bounded time for it.
+      await handleUpgradeComplete(
+        () => {
+          setIsRedirecting(true);
+        },
+        navigateAfterUpgrade,
+        pendingWrite === undefined ? undefined : () => waitForMarketingConsentWrite(pendingWrite),
+      );
     },
     onError: error => {
       setFailure(getUpgradeFailure(error));
@@ -449,10 +468,20 @@ function BirthdayComplianceModalContent({
                   size="Large"
                   onChange={handleGenderChange}
                 />
+
+                {marketingConsent.text !== undefined && (
+                  <MarketingConsentCheckbox
+                    text={marketingConsent.text}
+                    isChecked={marketingConsent.isChecked}
+                    isDisabled={isUpgradeFlowBusy || marketingConsent.isDisabled}
+                    onToggle={marketingConsent.onToggle}
+                  />
+                )}
               </div>
 
-              {/* 20px between the gender picker and the CTA per the design (margin-top-small);
-                the inner 20px gap only spaces a form-level error from the CTA. */}
+              {/* 20px between the last field (the gender picker or the consent box) and the CTA
+                per the design (margin-top-small); the inner 20px gap only spaces a form-level
+                error from the CTA. */}
               <div className="flex flex-col gap-xlarge margin-top-small">
                 {failure?.field === "form" && (
                   <p

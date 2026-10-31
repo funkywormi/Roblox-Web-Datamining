@@ -1,7 +1,6 @@
 // Influx counter telemetry, fired through the wwwroot EventTracker alongside — never instead of —
 // the eventstream events in chatAnalytics.ts. Do NOT rename these strings: they are the dashboard
-// and alert contract already indexed by Influx. Legacy source of truth:
-// WebApps/Roblox.Chat.WebApp/.../chat/constants/diagActionList.js and analyticsService.js.
+// and alert contract already indexed by Influx; they match the removed AngularJS chat's names.
 
 export const CHAT_COUNTER = {
   chatLandingConversationClicked: "ChatLandingConversationClickedWeb",

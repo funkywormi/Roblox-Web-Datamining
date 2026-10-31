@@ -32,7 +32,13 @@ const getApprovalDescription = (
  * Shown on the appeal timeline when an appeal is approved and a user's violation
  * has been revsersed.
  */
-const AppealApprovedItem = ({ appeal }: { appeal: Appeal }) => {
+const AppealApprovedItem = ({
+  appeal,
+  isFromSomeoneElse,
+}: {
+  appeal: Appeal;
+  isFromSomeoneElse: boolean;
+}) => {
   const { translate } = useTranslation();
 
   const abuseTypes = getFilteredAbuseTypes(appeal.abuse_type_keys, translate);
@@ -40,10 +46,12 @@ const AppealApprovedItem = ({ appeal }: { appeal: Appeal }) => {
 
   return (
     <div className="flex flex-col gap-xxsmall">
-      <span className="text-title-medium">{translate("Header.AppealAccepted")}</span>
+      <span className="text-title-medium">
+        {translate(isFromSomeoneElse ? "Label.AppealAccepted" : "Header.AppealAccepted")}
+      </span>
       <Timestamp timestamp={appeal.decision_time} />
 
-      <p className="text-body-medium padding-top-medium">{description}</p>
+      {!isFromSomeoneElse && <p className="text-body-medium padding-top-medium">{description}</p>}
     </div>
   );
 };

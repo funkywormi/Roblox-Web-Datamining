@@ -1,13 +1,12 @@
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
-import "../../../../css/challenge/rostile/rostile.scss";
+import "../../../../css/challenge/rostile/rostile.css";
 import { RequestServiceDefault } from "../../../common/request";
 import App from "./App";
 import { TRANSLATION_NAMESPACES } from "./app.config";
 import { RenderChallenge } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
+import { mountChallenge, unmountChallenge } from "../challengeMount";
 
 // Export some additional enums that are declared in the shared interface (they
 // are also defined in the shared interface, but we need to expose them in the
@@ -36,7 +35,7 @@ export const renderChallenge: RenderChallenge = ({
   const container = document.getElementById(containerId);
   if (container !== null) {
     // Remove any existing instances of the app.
-    unmountComponentAtNode(container);
+    unmountChallenge(container);
 
     // Instantiate services externally to the app, which will offer future
     // flexibility (e.g. for mocking).
@@ -44,22 +43,21 @@ export const renderChallenge: RenderChallenge = ({
     const metricsService = new MetricsServiceDefault(appType, puzzleType, requestServiceDefault);
 
     // Render the app on the selected element.
-    render(
-      <TranslationProviderSCC namespaces={TRANSLATION_NAMESPACES}>
-        <App
-          challengeId={challengeId}
-          puzzleType={puzzleType}
-          renderInline={renderInline}
-          eventService={eventService}
-          metricsService={metricsService}
-          requestService={requestServiceDefault}
-          onChallengeDisplayed={onChallengeDisplayed}
-          onChallengeCompleted={onChallengeCompleted}
-          onChallengeInvalidated={onChallengeInvalidated}
-          onModalChallengeAbandoned={onModalChallengeAbandoned}
-        />
-      </TranslationProviderSCC>,
+    mountChallenge(
       container,
+      <App
+        challengeId={challengeId}
+        puzzleType={puzzleType}
+        renderInline={renderInline}
+        eventService={eventService}
+        metricsService={metricsService}
+        requestService={requestServiceDefault}
+        onChallengeDisplayed={onChallengeDisplayed}
+        onChallengeCompleted={onChallengeCompleted}
+        onChallengeInvalidated={onChallengeInvalidated}
+        onModalChallengeAbandoned={onModalChallengeAbandoned}
+      />,
+      TRANSLATION_NAMESPACES,
     );
     return true;
   }

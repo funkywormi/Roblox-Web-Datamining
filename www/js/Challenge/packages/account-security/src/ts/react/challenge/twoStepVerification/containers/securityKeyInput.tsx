@@ -1,8 +1,7 @@
 import * as fido2Util from "@rbx/core-scripts/auth/fido2";
+import { Button, DialogBody } from "@rbx/foundation-ui";
 import * as hybridResponseService from "@rbx/core-scripts/auth/hybrid-response";
 import React, { useEffect, useRef, useState } from "react";
-import { Modal } from "react-style-guide";
-import { Button } from "@rbx/foundation-ui";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import * as TwoStepVerification from "../../../../common/request/types/twoStepVerification";
 import InlineChallengeBody from "../../../common/inlineChallengeBody";
@@ -196,7 +195,7 @@ const SecurityKeyInput: React.FC<Props> = ({
    * Render Properties
    */
 
-  const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
+  const BodyElement = renderInline ? InlineChallengeBody : DialogBody;
   const lockIconClassName = renderInline
     ? "inline-challenge-protection-shield-icon"
     : "modal-protection-shield-icon";
@@ -204,9 +203,12 @@ const SecurityKeyInput: React.FC<Props> = ({
     ? "inline-challenge-margin-bottom"
     : "modal-margin-bottom";
   const marginBottomLargeClassName = renderInline
-    ? "inline-margin-bottom-xlarge"
+    ? "inline-challenge-margin-bottom-xlarge"
     : "modal-margin-bottom-xlarge";
-  const textErrorClassName = marginBottomLargeClassName.concat(" ", "text-error xsmall");
+  const textErrorClassName = marginBottomLargeClassName.concat(
+    " ",
+    "text-caption-small content-system-alert",
+  );
   const marginBottomSmallClassName = renderInline
     ? "inline-challenge-margin-bottom-sm"
     : "modal-margin-bottom-sm";

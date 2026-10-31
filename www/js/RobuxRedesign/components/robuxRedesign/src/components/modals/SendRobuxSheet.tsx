@@ -23,14 +23,15 @@ function RobuxBalanceUtility() {
 export function SendRobuxSheet() {
   const translate = useTranslations("Feature.BuyRobux");
   const { trackTransferSendUserSelected } = useContext(TrackingContext);
+  const { deviceMeta } = useContext(BuyRobuxPageContext);
   const { friends, isLoading, error, isLoggedIn } = useMyFriends();
 
   const handleSelectUser = useCallback(
     ({ userId, context }: SendRobuxUserSelection) => {
       trackTransferSendUserSelected(context);
-      navigateToSendTransferDeepLink(userId);
+      navigateToSendTransferDeepLink(userId, deviceMeta);
     },
-    [trackTransferSendUserSelected],
+    [deviceMeta, trackTransferSendUserSelected],
   );
 
   return (

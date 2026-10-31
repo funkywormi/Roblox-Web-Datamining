@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import ixp from "@rbx/experimentation";
+import { DOWNLOAD_FUNNEL_LAYER_NAME } from "./topNavDownloadExposureUtil";
 
-const downloadFunnelLayerName = "Website.DownloadFunnel";
 const downloadModalEnabledKey = "IsDownloadModalEnabled";
 
 type UseDownloadModalIxpResult = {
@@ -11,10 +11,10 @@ type UseDownloadModalIxpResult = {
 
 export const useDownloadModalIxp = (): UseDownloadModalIxpResult => {
   const { data, isLoading } = useQuery({
-    queryKey: [`ixp/${downloadFunnelLayerName}`],
+    queryKey: [`ixp/${DOWNLOAD_FUNNEL_LAYER_NAME}`],
     queryFn: async () => {
       try {
-        return await ixp.getAllValuesForLayer(downloadFunnelLayerName);
+        return await ixp.getAllValuesForLayer(DOWNLOAD_FUNNEL_LAYER_NAME);
       } catch {
         return {};
       }
@@ -29,5 +29,5 @@ export const useDownloadModalIxp = (): UseDownloadModalIxpResult => {
 };
 
 export const logDownloadModalExposure = (): void => {
-  ixp.logLayerExposure(downloadFunnelLayerName);
+  ixp.logLayerExposure(DOWNLOAD_FUNNEL_LAYER_NAME);
 };

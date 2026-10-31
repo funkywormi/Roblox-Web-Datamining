@@ -1,26 +1,50 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+import { document as browserDocument, window as browserWindow } from "@rbx/core-lib/browser";
 
 const UNREAD_PREFIX_REGEX = /^\(\d+\)\s*/;
 
+const stripUnreadPrefix = (title: string) => title.replace(UNREAD_PREFIX_REGEX, "");
+
+const isTitleNode = (node: Node | null) => node?.nodeName === "TITLE";
+
+const touchesTitle = (record: MutationRecord) =>
+  isTitleNode(record.target) ||
+  isTitleNode(record.target.parentNode) ||
+  Array.from(record.addedNodes).some(isTitleNode);
+
 /**
- * Reflects the global unread chat count in the browser tab title — e.g. `(3) Roblox` — and restores
- * the page's own title when the count returns to 0 or the chat unmounts. The base title is captured
- * once (with any stale unread prefix stripped) so re-renders never compound the prefix.
+ * Puts the unread chat count in front of the tab title, e.g. `(3) Roblox`, and removes it when the
+ * count is 0 or chat unmounts. Next.js can change the title after chat mounts, so the count is added
+ * again whenever the title changes.
  */
 export const useUnreadTabTitle = (unreadCount: number): void => {
-  const baseTitleRef = useRef<string | null>(null);
-
   useEffect(() => {
-    baseTitleRef.current ??= document.title.replace(UNREAD_PREFIX_REGEX, "");
-    const baseTitle = baseTitleRef.current;
-    document.title = unreadCount > 0 ? `(${unreadCount}) ${baseTitle}` : baseTitle;
+    if (browserDocument == null || browserWindow == null) {
+      return undefined;
+    }
+    const doc = browserDocument;
+
+    const applyPrefix = () => {
+      const baseTitle = stripUnreadPrefix(doc.title);
+      const title = unreadCount > 0 ? `(${unreadCount}) ${baseTitle}` : baseTitle;
+      // Writing the title triggers the observer, so skip writes that change nothing.
+      if (doc.title !== title) {
+        doc.title = title;
+      }
+    };
+
+    applyPrefix();
+    // Watch the whole document: Next.js can render <title> in <body> when it streams metadata.
+    const observer = new browserWindow.MutationObserver(records => {
+      if (records.some(touchesTitle)) {
+        applyPrefix();
+      }
+    });
+    observer.observe(doc.documentElement, { childList: true, characterData: true, subtree: true });
 
     return () => {
-      if (baseTitleRef.current !== null) {
-        document.title = baseTitleRef.current;
-      }
+      observer.disconnect();
+      doc.title = stripUnreadPrefix(doc.title);
     };
   }, [unreadCount]);
 };
-
-export default useUnreadTabTitle;

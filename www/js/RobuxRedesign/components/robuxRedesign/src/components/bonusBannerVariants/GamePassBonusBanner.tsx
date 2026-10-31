@@ -4,7 +4,7 @@ import { useTranslations } from "@rbx/www-common/i18n";
 import { window } from "@rbx/core-lib/browser";
 import { GamePassMetadata } from "../../types/buyRobuxPageData";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
-import { isInApp, isOnDesktop } from "../../utils/platform";
+import { getIsNativePurchasePlatform, getIsWebCheckoutPlatform } from "../../utils/platform";
 
 type BannerProps = {
   metadata: GamePassMetadata;
@@ -12,19 +12,22 @@ type BannerProps = {
 
 export function GamePassBonusBanner({ metadata }: BannerProps) {
   const translate = useTranslations("Feature.PersonalizedBonus");
-  const { bonusItemBannerImageUrl, bonusItemImageUrl } = useContext(BuyRobuxPageContext);
+  const { bonusItemBannerImageUrl, bonusItemImageUrl, deviceMeta } =
+    useContext(BuyRobuxPageContext);
+  const isNativePurchasePlatform = getIsNativePurchasePlatform(deviceMeta);
+  const isWebCheckoutPlatform = getIsWebCheckoutPlatform(deviceMeta);
 
   const iconReportHandler = useCallback(() => {
     if (window === undefined) {
       return;
     }
 
-    if (isInApp || isOnDesktop) {
+    if (isNativePurchasePlatform || isWebCheckoutPlatform) {
       window.location.href = "/support";
     } else {
       window.open("/support", "_blank");
     }
-  }, []);
+  }, [isNativePurchasePlatform, isWebCheckoutPlatform]);
 
   return (
     // Note: this component is always rendered in the dark theme with --color-extended-gray-1200 as the main background color

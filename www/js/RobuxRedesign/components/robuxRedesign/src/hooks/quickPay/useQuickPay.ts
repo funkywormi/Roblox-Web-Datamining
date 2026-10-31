@@ -26,7 +26,7 @@ import {
 } from "../../services/paymentsGatewayService";
 import { Product } from "../../types/buyRobuxPageData";
 import { trackCounter, trackError } from "../../observability";
-import { isInApp, isInUniversalApp } from "../../utils/platform";
+import { getIsNativePurchasePlatform } from "../../utils/platform";
 import { isCardProviderPayload, isPayPalProviderPayload } from "../../utils/paymentProfile";
 import { Modals } from "../useModals";
 import { QuickPayError } from "./QuickPayError";
@@ -135,8 +135,9 @@ export function useQuickPay({
     url: quickPay3DSUrl,
   },
 }: Modals): QuickPay {
-  const { getPurchaseUrl, paymentSession, productIds, purchaseFlowId, urlParams } =
+  const { getPurchaseUrl, paymentSession, productIds, purchaseFlowId, urlParams, deviceMeta } =
     useContext(BuyRobuxPageContext);
+  const isNativePurchasePlatform = getIsNativePurchasePlatform(deviceMeta);
   const { trackQuickPayClick, trackQuickPayPurchase } = useContext(TrackingContext);
 
   const translatePremium = useTranslations("Feature.Premium");
@@ -181,7 +182,7 @@ export function useQuickPay({
 
   const fetchQuickPayMetadata = useCallback(async () => {
     let quickPayFlowType: QuickPayFlowType = QuickPayFlowType.BuyRobuxPage;
-    if (urlParams.product_id && isInUniversalApp) {
+    if (urlParams.product_id && deviceMeta.isUniversalApp) {
       quickPayFlowType = QuickPayFlowType.BuyRobuxPagePreselectedProduct;
     }
 
@@ -229,7 +230,12 @@ export function useQuickPay({
     setSelectedPaymentProfile(eligibleProfiles[0]);
 
     firePaymentMethodSelectedCounter(eligibleProfiles[0]);
-  }, [urlParams.product_id, firePaymentMethodSelectedCounter, productIds]);
+  }, [
+    deviceMeta.isUniversalApp,
+    urlParams.product_id,
+    firePaymentMethodSelectedCounter,
+    productIds,
+  ]);
 
   const fetchStripe = useCallback(async () => {
     if (window === undefined) {
@@ -665,20 +671,20 @@ export function useQuickPay({
   }, []);
 
   useEffect(() => {
-    if (isInApp) {
+    if (isNativePurchasePlatform) {
       return;
     }
 
     fetchQuickPayMetadata().catch(captureException);
-  }, [fetchQuickPayMetadata]);
+  }, [fetchQuickPayMetadata, isNativePurchasePlatform]);
 
   useEffect(() => {
-    if (isInApp || !isQuickPay) {
+    if (isNativePurchasePlatform || !isQuickPay) {
       return;
     }
 
     fetchStripe().catch(captureException);
-  }, [isQuickPay, fetchStripe]);
+  }, [isNativePurchasePlatform, isQuickPay, fetchStripe]);
 
   return useMemo(
     () => ({

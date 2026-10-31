@@ -17,6 +17,9 @@ export type TChatMetadataConfig = {
   isGroupChatEnabled: boolean;
 };
 
+/** queryFn for the `chatSettings` query, shared by every reader. useChatData tracks its failures. */
+export const fetchChatSettings = () => getChatMetadata();
+
 /**
  * Resolves the chat settings served by `platform-chat-api/v1/metadata` into a fully-defaulted config
  * object. Reads the same `chatSettings` query as `useChatData` (deduped by react-query, so no extra
@@ -26,7 +29,7 @@ export type TChatMetadataConfig = {
 export const useChatMetadataConfig = (): TChatMetadataConfig => {
   const { data } = useQuery({
     queryKey: chatQueryKeys.chatSettings(),
-    queryFn: getChatMetadata,
+    queryFn: fetchChatSettings,
     staleTime: Infinity,
   });
 

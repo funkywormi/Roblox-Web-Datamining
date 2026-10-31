@@ -1,4 +1,4 @@
-import { MouseEvent } from "react";
+import { MouseEvent, useEffect } from "react";
 import DownloadButton from "@rbx/app-download/DownloadButton";
 import {
   InstallInstructionsList,
@@ -15,21 +15,25 @@ import { useTranslations } from "@rbx/www-common/i18n";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { useAppDownloadTranslate } from "@rbx/app-download/useAppDownloadTranslate";
 import { useTopNavDownloadButton } from "../util/topNavDownloadButtonIxp";
+import { getNavCapability } from "../util/navCapabilities";
 
 export default function DownloadAppNavItem() {
   const t = useTranslations("Feature.DownloadLanding");
   const translate = useAppDownloadTranslate();
   const isEnabled = useTopNavDownloadButton();
   const download = resolveAppDownload({ translate });
-
-  if (!isEnabled) {
-    return null;
-  }
   const deviceMeta = getDeviceMeta();
-  if (deviceMeta?.isPhone || deviceMeta?.isTablet) {
-    return null;
-  }
-  if (!download) {
+  const isEligible = !deviceMeta?.isPhone && !deviceMeta?.isTablet && download != null;
+
+  // The layer allocates on exposure, so log both arms wherever the button could appear.
+  useEffect(() => {
+    if (isEligible) {
+      // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation -- exposure logging, not a data fetch
+      void getNavCapability("logTopNavDownloadExposure")?.();
+    }
+  }, [isEligible]);
+
+  if (!isEnabled || !isEligible) {
     return null;
   }
 
@@ -83,7 +87,7 @@ export default function DownloadAppNavItem() {
   );
 
   return (
-    <li className="!padding-y-xsmall !padding-left-xsmall !padding-right-medium">
+    <li className="download-app-nav-item !padding-y-xsmall !padding-left-medium !padding-right-xsmall">
       <DownloadButton
         text={t.has("Action.Download") ? t("Action.Download") : "Download"}
         variant="Emphasis"

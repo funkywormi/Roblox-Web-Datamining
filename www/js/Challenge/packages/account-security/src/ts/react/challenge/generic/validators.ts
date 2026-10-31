@@ -137,6 +137,9 @@ const CaptchaV2Validator = z
     // Optional string (not `z.nativeEnum`) so an unlisted value never fails parsing.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     mode: z.string().optional() as unknown as z.ZodType<CaptchaMode | undefined>,
+    // Optional; carried from GCS as the canonical captcha ActionType enum name
+    // for telemetry only, so an unlisted value never fails parsing.
+    actionType: z.string().optional(),
   })
   .and(SharedChallengeMetadataValidator);
 

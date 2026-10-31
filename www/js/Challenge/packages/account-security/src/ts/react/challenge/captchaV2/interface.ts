@@ -72,6 +72,10 @@ export type ChallengeParameters = {
    * The optional captcha mode resolved by GCS. May be absent.
    */
   mode?: CaptchaMode;
+  /**
+   * The action that triggered the challenge.
+   */
+  actionType?: string;
   onChallengeDisplayed: OnChallengeDisplayedCallback;
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;

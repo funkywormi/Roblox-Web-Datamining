@@ -57,6 +57,8 @@ import { applyModerationTimeouts } from "../utils/chatTransforms";
 import { seedPendingConversation } from "../utils/chatQueryCache";
 import { clearAllPersistedChatLayouts, readPersistedChatLayout } from "../utils/chatLayoutStorage";
 import { getCurrentUserId } from "../utils/currentUser";
+import { getStatusCode } from "../utils/getStatusCode";
+import { trackError, trackGroupActionFailed } from "../observability";
 
 type TChatJQueryEventTarget = {
   on: (
@@ -297,7 +299,10 @@ const AppContainer = () => {
   // (legacy chat likewise put the started conversation at the front of its list).
   const startConversationWithUser = useCallback(
     async (userId: number) => {
-      const created = await createOneToOneConversation(userId);
+      const created = await createOneToOneConversation(userId).catch((error: unknown) => {
+        trackError("StartConversationFailed", { statusCode: getStatusCode(error) }, error);
+        throw error;
+      });
       const conversationId = created.id;
       if (!conversationId) {
         return;
@@ -313,6 +318,37 @@ const AppContainer = () => {
         .catch((): undefined => undefined);
     },
     [openConversation, queryClient],
+  );
+
+  const pendingMemberChatsRef = useRef(new Set<number>());
+  const handleChatWithParticipant = useCallback(
+    (userId: number) => {
+      const existing = conversationsRef.current.find(
+        conversation =>
+          conversation.dialogType === "Direct" &&
+          conversation.participants.some(participant => participant.id === userId),
+      );
+      if (existing) {
+        openConversation(existing.layoutId);
+        if (existing.unreadCount > 0 && !isConsentBlocked(existing)) {
+          scheduleMarkRead(existing.id);
+        }
+        return;
+      }
+      // Closing/reopening the member menu while the request is pending must not create twice.
+      if (pendingMemberChatsRef.current.has(userId)) {
+        return;
+      }
+      pendingMemberChatsRef.current.add(userId);
+      startConversationWithUser(userId)
+        .catch(() => {
+          setFeedback({ id: Date.now(), type: "warning", message: translate("Message.Error") });
+        })
+        .finally(() => {
+          pendingMemberChatsRef.current.delete(userId);
+        });
+    },
+    [isConsentBlocked, openConversation, scheduleMarkRead, startConversationWithUser, translate],
   );
 
   // "Chat with" and incoming-message events can arrive before the layer answers. Listen from the
@@ -794,7 +830,8 @@ const AppContainer = () => {
         if (result.id) {
           openConversation(`conv_${result.id}`);
         }
-      } catch {
+      } catch (error) {
+        trackGroupActionFailed("create", error);
         setFeedback({
           id: Date.now(),
           type: "warning",
@@ -818,7 +855,8 @@ const AppContainer = () => {
         await removeUsersFromConversation(match.id, [currentUserId]);
         closeConversation(layoutId);
         await queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() });
-      } catch {
+      } catch (error) {
+        trackGroupActionFailed("leave", error);
         setFeedback({
           id: Date.now(),
           type: "warning",
@@ -849,7 +887,8 @@ const AppContainer = () => {
         renameConversation(layoutId, updatedTitle);
         await queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() });
         return "success";
-      } catch {
+      } catch (error) {
+        trackGroupActionFailed("rename", error);
         // Includes HTTP 429 from the server's per-group rename limit, which a moderated attempt uses
         // up too. The panel shows the failure, so there is no toast here.
         return "failed";
@@ -868,8 +907,14 @@ const AppContainer = () => {
       }
       try {
         await addUsersToConversation(conversationId, newUserIds);
-        await queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() });
-      } catch {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() }),
+          queryClient.invalidateQueries({
+            queryKey: chatQueryKeys.participantsMetadata(conversationId),
+          }),
+        ]);
+      } catch (error) {
+        trackGroupActionFailed("addParticipants", error);
         setFeedback({
           id: Date.now(),
           type: "warning",
@@ -912,8 +957,14 @@ const AppContainer = () => {
       }
       try {
         await removeUsersFromConversation(conversationId, [userId]);
-        await queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() });
-      } catch {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() }),
+          queryClient.invalidateQueries({
+            queryKey: chatQueryKeys.participantsMetadata(conversationId),
+          }),
+        ]);
+      } catch (error) {
+        trackGroupActionFailed("removeParticipant", error);
         setFeedback({
           id: Date.now(),
           type: "warning",
@@ -933,7 +984,8 @@ const AppContainer = () => {
           type: "success",
           message: translate("TrustedFriend.Toast.TrustedFriendRemoved"),
         });
-      } catch {
+      } catch (error) {
+        trackGroupActionFailed("removeTrustedConnection", error);
         setFeedback({
           id: Date.now(),
           type: "warning",
@@ -1003,6 +1055,7 @@ const AppContainer = () => {
       onSetScreen={setConversationScreen}
       onRequestRemoveParticipant={confirmRemoveParticipant}
       onReportParticipant={reportParticipant}
+      onChatWithParticipant={handleChatWithParticipant}
       onPromoteFriendPlaceholder={handlePromoteFriendPlaceholder}
       onRemoveTrustedConnection={friendId => {
         handleRemoveTrustedConnection(friendId).catch(() => undefined);

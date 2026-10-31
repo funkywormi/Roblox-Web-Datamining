@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import realtimeFactory from "@rbx/core-scripts/realtime";
 import { applyChatRealtimeCacheActions } from "../utils/chatRealtimeCacheActions";
 import { dispatchRealtimeDetail } from "../utils/chatRealtimeDispatcher";
+import { trackError } from "../observability";
 import { useChatUiPolicies } from "./useChatUiPolicies";
 
 type TConnectionEventHandler = (dataReloadRequired: boolean) => void;
@@ -239,6 +240,7 @@ export function useChatRealtimeBridge({
       maskTimerRef.current = setTimeout(() => {
         maskTimerRef.current = null;
         if (isMountedRef.current) {
+          trackError("RealtimeDisconnected");
           setIsConnectionLost(true);
         }
       }, CONNECTION_LOST_MASK_DELAY_MS);

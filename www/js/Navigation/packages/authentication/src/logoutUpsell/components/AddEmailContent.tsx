@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, DialogBody, DialogFooter, DialogTitle, TextInput } from "@rbx/foundation-ui";
-import { useTranslation } from "@rbx/core-scripts/react";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { validateEmailAddress } from "@rbx/authentication-common/utils/emailValidation";
 import { getEmailSubmissionErrorKey, submitEmailAddress } from "../services/emailService";
 import {
@@ -10,6 +10,7 @@ import {
   sendAddEmailContinueClick,
   sendAddEmailError,
   sendAddEmailShown,
+  sendAddEmailSignOutClick,
   sendEmailFieldInteraction,
 } from "../services/logoutUpsellEvents";
 
@@ -20,6 +21,8 @@ export type AddEmailTranslations = {
   placeholder: string;
   /** Primary action label (e.g. "Continue"). */
   continueLabel: string;
+  /** Label for signing out without adding an email. Shown only with `onSignOut`. */
+  signOutLabel?: string;
 };
 
 export type AddEmailContentProps = {
@@ -28,14 +31,21 @@ export type AddEmailContentProps = {
   onContinue: (email: string) => void;
   /** How the user reached this screen; reported on the "modal shown" event. */
   origin: AddEmailOriginName;
+  /** Signs out without adding an email. */
+  onSignOut?: () => void;
 };
 
 const INVALID_EMAIL_KEY = "Message.Error.Email.InvalidEmail";
 const INVALID_EMAIL_FALLBACK = "Please enter a valid email address.";
 const GENERIC_ERROR_FALLBACK = "Something went wrong. Please try again.";
 
-const AddEmailContent: React.FC<AddEmailContentProps> = ({ translations, onContinue, origin }) => {
-  const { translate } = useTranslation();
+const AddEmailContent: React.FC<AddEmailContentProps> = ({
+  translations,
+  onContinue,
+  origin,
+  onSignOut,
+}) => {
+  const translate = useTranslations("Feature.AccountSettings");
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,7 +76,7 @@ const AddEmailContent: React.FC<AddEmailContentProps> = ({ translations, onConti
           return;
         }
         const key = getEmailSubmissionErrorKey(result.errorCode);
-        setErrorMessage(translate(key, undefined, GENERIC_ERROR_FALLBACK));
+        setErrorMessage(translate.dynamic(key, undefined, GENERIC_ERROR_FALLBACK));
         sendAddEmailError(origin, addEmailServerError(result.errorCode));
         setIsSubmitting(false);
       })
@@ -107,16 +117,32 @@ const AddEmailContent: React.FC<AddEmailContentProps> = ({ translations, onConti
         </div>
       </DialogBody>
       <DialogFooter>
-        <Button
-          className="width-full"
-          variant="Emphasis"
-          size="Medium"
-          isDisabled={email.length === 0 || isSubmitting}
-          isLoading={isSubmitting}
-          onClick={handleContinue}
-        >
-          {translations.continueLabel}
-        </Button>
+        <div className="flex flex-col gap-small width-full">
+          <Button
+            className="width-full"
+            variant="Emphasis"
+            size="Medium"
+            isDisabled={email.length === 0 || isSubmitting}
+            isLoading={isSubmitting}
+            onClick={handleContinue}
+          >
+            {translations.continueLabel}
+          </Button>
+          {onSignOut && translations.signOutLabel ? (
+            <Button
+              className="width-full"
+              variant="Standard"
+              size="Medium"
+              isDisabled={isSubmitting}
+              onClick={() => {
+                sendAddEmailSignOutClick();
+                onSignOut();
+              }}
+            >
+              {translations.signOutLabel}
+            </Button>
+          ) : null}
+        </div>
       </DialogFooter>
     </React.Fragment>
   );

@@ -2,7 +2,6 @@ import { EnvironmentUrls } from "@rbx/environment-urls";
 import { getClassNameWithLocale } from "../utils/landingUtils";
 
 export const experimentLayer = "Website.LandingPage";
-export const playerAppSignupLayer = "PlayerApp.Signup";
 
 export const urlConstants = {
   loginLink: `${EnvironmentUrls.websiteUrl}/login`,

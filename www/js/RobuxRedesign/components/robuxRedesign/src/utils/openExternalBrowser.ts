@@ -1,5 +1,5 @@
 import { window } from "@rbx/core-lib/browser";
-import { isAndroidApp } from "./platform";
+import { DeviceMeta } from "@rbx/www-common/device/types";
 import { getRobloxAppMinorVersion } from "./appVersion";
 
 const OPEN_EXTERNAL_BROWSER_DEEP_LINK = "roblox://open-external";
@@ -8,8 +8,8 @@ const MIN_OPEN_EXTERNAL_BROWSER_APP_MINOR_VERSION = 743;
 // The Android app (2.728+) loads target="_blank" links in a hidden WebView; 2.743+ supports the
 // open-external deep link (MOBAPP-3220) to hand those off to the external browser instead.
 // Fails closed when the app version can't be read from the user agent.
-export const shouldOpenInExternalBrowser = (): boolean => {
-  if (!isAndroidApp) {
+export const shouldOpenInExternalBrowser = (device: DeviceMeta): boolean => {
+  if (!device.isAndroidApp) {
     return false;
   }
   const minorVersion = getRobloxAppMinorVersion();
@@ -22,7 +22,10 @@ export const getOpenExternalBrowserUrl = (url: string): string => {
   return `${OPEN_EXTERNAL_BROWSER_DEEP_LINK}?url=${encodeURIComponent(absoluteUrl)}`;
 };
 
-export const getExternalLinkProps = (url: string): { href: string; target?: "_blank" } =>
-  shouldOpenInExternalBrowser()
+export const getExternalLinkProps = (
+  url: string,
+  device: DeviceMeta,
+): { href: string; target?: "_blank" } =>
+  shouldOpenInExternalBrowser(device)
     ? { href: getOpenExternalBrowserUrl(url) }
     : { href: url, target: "_blank" };

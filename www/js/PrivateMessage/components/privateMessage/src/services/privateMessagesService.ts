@@ -1,6 +1,7 @@
 import environmentUrls from "@rbx/environment-urls";
 import { userId } from "@rbx/core-scripts/meta/user";
 import { MESSAGE_PAGE_SIZE, MESSAGE_TABS } from "../constants";
+import { getStatusCode } from "../utils/getStatusCode";
 import { normalizeMessage, normalizeMessagePage } from "../utils/messageUtils";
 import transport, { type MessageUrlConfig } from "./privateMessagesRequests";
 import type {
@@ -40,6 +41,38 @@ export const getMessages = async (
 
   return normalizeMessagePage(data);
 };
+
+/**
+ * Loads one cursor-mode page of `tabName`. A null `pageToken` loads the first page, as does the
+ * response's `firstPageToken`. The response
+ * carries `cursorPagination` with a numbered page window whose tokens open the neighboring pages.
+ * Servers without cursor mode ignore these parameters and return the first offset page, which
+ * normalizes with `cursorPagination: null`.
+ */
+export const getMessagesByPageToken = async (
+  tabName: MessageTab,
+  pageToken: string | null,
+): Promise<MessagePage> => {
+  const data = await transport.get<RawMessagePage>(
+    messageUrlConfig(endpoint("/v1/messages"), true),
+    {
+      pageSize: MESSAGE_PAGE_SIZE,
+      messageTab: tabName,
+      useCursor: true,
+      ...(pageToken ? { pageToken } : {}),
+    },
+  );
+
+  return normalizeMessagePage(data);
+};
+
+/**
+ * Whether `error` is the 400 that GET /v1/messages returns for a page token it cannot verify or
+ * whose cursor the service rejects, for example a token edited in the URL or signed with a
+ * rotated key. Accepts the rejection from either transport: the Axios response on .NET, or the
+ * error wrapping a core-lib `HttpError` on Next.js.
+ */
+export const isInvalidPageTokenError = (error: unknown): boolean => getStatusCode(error) === "400";
 
 export const getAnnouncements = async (): Promise<MessagePage> => {
   const data = await transport.get<RawMessagePage>(

@@ -1,11 +1,16 @@
 import classNames from "classnames";
 import { Button, TButtonProps } from "@rbx/foundation-ui";
 import { PriceTag } from "@rbx/payments/priceTag";
-import { useResponsiveValue } from "@rbx/payments/hooks";
 import { Product } from "../../types/buyRobuxPageData";
 import { RobuxAmount } from "../sections/RobuxAmount";
 import { formatAmount } from "../../utils/formatMoney";
 import { getRobuxProductTrackingProps } from "../../hooks/useScrollTracking";
+
+// TODO: Make @rbx/foundation-ui Button Next.js SSR compatible so `size` can follow the
+// viewport and this override can go away. `size="Small"` is the base; from `small` (361px)
+// these classes match Medium, including the icon Button renders inside itself.
+const mediumFromSmallClassName =
+  "small:height-1000 small:padding-x-medium small:text-label-medium small:[&_.icon]:size-[var(--icon-size-medium)] small:[&>span]:gap-small";
 
 export type ProductItemDefaultProps = {
   product: Product;
@@ -29,10 +34,6 @@ export const ProductItemDefault = ({
 
   const { className: buttonClassName, ...restButtonProps } = buttonProps ?? {};
 
-  const buttonSize = useResponsiveValue("Small" as const, {
-    small: "Medium" as const,
-  });
-
   return (
     <div
       key={product.productId}
@@ -53,8 +54,12 @@ export const ProductItemDefault = ({
 
       <Button
         variant={product.isCallToAction ? "Emphasis" : "Standard"}
-        size={buttonSize}
-        className={classNames(buttonClassName, "text-label-medium shrink-0")}
+        size="Small"
+        className={classNames(
+          buttonClassName,
+          "text-label-medium shrink-0",
+          mediumFromSmallClassName,
+        )}
         onClick={handleClick}
         {...restButtonProps}
         icon={

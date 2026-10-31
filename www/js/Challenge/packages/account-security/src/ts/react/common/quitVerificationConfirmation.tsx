@@ -1,8 +1,9 @@
 import React from "react";
-import { Modal } from "react-style-guide";
-import { FragmentModalHeader, HeaderButtonType } from "./modalHeader";
+import { DialogBody } from "@rbx/foundation-ui";
+import ChallengeDialog from "./challengeDialog";
+import { ChallengeDialogHeader, HeaderButtonType } from "./challengeDialogHeader";
 import InlineChallengeBody from "./inlineChallengeBody";
-import { FooterButtonConfig, FragmentModalFooter } from "./modalFooter";
+import { FooterButtonConfig, ChallengeDialogFooter } from "./challengeDialogFooter";
 import { InlineChallengeFooter, InlineFooterButtonConfig } from "./inlineChallengeFooter";
 import InlineChallenge from "./inlineChallenge";
 
@@ -23,8 +24,8 @@ const getPageContent = (
   continueButton: InlineFooterButtonConfig,
   abandonButton: InlineFooterButtonConfig | null,
 ) => {
-  const BodyElement = renderInline ? InlineChallengeBody : Modal.Body;
-  const FooterElement = renderInline ? InlineChallengeFooter : FragmentModalFooter;
+  const BodyElement = renderInline ? InlineChallengeBody : DialogBody;
+  const FooterElement = renderInline ? InlineChallengeFooter : ChallengeDialogFooter;
   return (
     <React.Fragment>
       <BodyElement>
@@ -71,13 +72,8 @@ const QuitVerificationConfirmation: React.FC<Props> = ({
           )}
         </InlineChallenge>
       ) : (
-        <Modal
-          className="modal-modern"
-          show={isConfirmationModalVisible}
-          onHide={handleConfirmAbandon}
-          backdrop="static"
-        >
-          <FragmentModalHeader
+        <ChallengeDialog open={isConfirmationModalVisible} onClose={handleConfirmAbandon}>
+          <ChallengeDialogHeader
             headerText={abandonConfirmationTitle}
             buttonType={HeaderButtonType.CLOSE}
             buttonAction={handleConfirmAbandon}
@@ -90,7 +86,7 @@ const QuitVerificationConfirmation: React.FC<Props> = ({
             continueButton,
             abandonButton,
           )}
-        </Modal>
+        </ChallengeDialog>
       )}
     </React.Fragment>
   );

@@ -8,7 +8,6 @@ import { Section, SectionHeader, SectionBody, BaseSectionProps } from "../sectio
 import { RobuxAmount } from "../sections/RobuxAmount";
 import { formatAmount } from "../../utils/formatMoney";
 import { PurchaseContext, BuyRobuxPageSectionType } from "../../contexts/PurchaseContext";
-import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 import {
   getRobuxProductTrackingProps,
   getSectionTrackingProps,
@@ -21,8 +20,6 @@ type RecommendedProps = BaseSectionProps & {
 
 export function Recommended({ isPrimary, sectionBase }: RecommendedProps) {
   const { purchaseNonRedirectProduct } = useContext(PurchaseContext);
-
-  const { breakpoint } = useContext(BuyRobuxPageContext);
   const { translateFullKey } = useFullKeyTranslations();
 
   const buttonClickHandler = useCallback(
@@ -56,7 +53,7 @@ export function Recommended({ isPrimary, sectionBase }: RecommendedProps) {
               buttonClickHandler(product);
             }}
             {...getRobuxProductTrackingProps(product.productId)}
-            className={`text-label-medium shrink-0 ${breakpoint.isAboveInclusive("medium") ? "button-extra-wide" : "width-full"}`}
+            className="text-label-medium shrink-0 width-full medium:width-[200px]"
             variant={product.isCallToAction ? "Emphasis" : "Standard"}
             size="Medium"
           >

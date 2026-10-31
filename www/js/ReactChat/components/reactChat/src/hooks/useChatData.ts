@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { chatQueryKeys } from "../constants/queryKeys";
 import {
-  getChatMetadata,
   getConversationMetadata,
   getConversations,
   getUserConversations,
@@ -11,7 +10,9 @@ import { getUserPresences } from "../services/presenceService";
 import { canFetchModerationStatusesForConversation } from "../adapters/chatPolicyAdapters";
 import { configureChatEventSampling } from "../utils/chatAnalytics";
 import { configureChatPerformanceSampling } from "../utils/chatTelemetry";
-import { useChatMetadataConfig } from "./useChatMetadataConfig";
+import { getStatusCode } from "../utils/getStatusCode";
+import { trackCriticalError, trackError } from "../observability";
+import { fetchChatSettings, useChatMetadataConfig } from "./useChatMetadataConfig";
 import type {
   TChatApiConversation,
   TGetUserConversationsResponse,
@@ -108,9 +109,42 @@ export const useChatData = (): TUseChatDataResult => {
   // that refetch (and a cold reload) reads fresh enablement instead of a cached "disabled" body.
   const chatSettingsQuery = useQuery({
     queryKey: chatQueryKeys.chatSettings(),
-    queryFn: getChatMetadata,
+    queryFn: fetchChatSettings,
     staleTime: Infinity,
   });
+
+  // Tracked from query state so a load counts once after its retries. Without settings chat cannot
+  // tell whether it is enabled, so it never renders; a failed refresh keeps the cached settings.
+  const { error: chatSettingsError, errorUpdatedAt: chatSettingsErrorUpdatedAt } =
+    chatSettingsQuery;
+  const hasChatSettings = chatSettingsQuery.data !== undefined;
+  useEffect(() => {
+    if (chatSettingsErrorUpdatedAt === 0) {
+      return;
+    }
+    const dimensions = { statusCode: getStatusCode(chatSettingsError) };
+    if (hasChatSettings) {
+      trackError("SettingsRefreshFailed", dimensions, chatSettingsError);
+    } else {
+      trackCriticalError("ChatLoadFailed", dimensions, chatSettingsError);
+    }
+    // Reports each failure once; the error and data are read as of that failure.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatSettingsErrorUpdatedAt]);
+
+  const { error: conversationsError, errorUpdatedAt: conversationsErrorUpdatedAt } =
+    conversationsQuery;
+  useEffect(() => {
+    if (conversationsErrorUpdatedAt === 0) {
+      return;
+    }
+    trackError(
+      "ConversationsLoadFailed",
+      { statusCode: getStatusCode(conversationsError) },
+      conversationsError,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationsErrorUpdatedAt]);
 
   // Fix the web-chat eventstream sampling decision once, when the settings metadata is known: the
   // rate is applied as `Math.random()*100 <= webChatEventSampleRate`, computed a single time.
@@ -262,10 +296,7 @@ export const useChatData = (): TUseChatDataResult => {
   const presencesByUserId = useMemo(
     () =>
       Object.fromEntries(
-        presenceQuery.data?.userPresences.map(presence => [
-          presence.userId,
-          presence.userPresenceType,
-        ]) ?? [],
+        presenceQuery.data?.userPresences.map(presence => [presence.userId, presence]) ?? [],
       ),
     [presenceQuery.data?.userPresences],
   );

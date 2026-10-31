@@ -89,3 +89,10 @@ export const constructValidUTCBirthdate = ({
 
   return minimumBirthday <= birthdate && birthdate <= maximumBirthday ? birthdate : null;
 };
+
+/** @returns whether `birthday` is less than `age` years before now. */
+export const isUnderAge = (birthday: Date, age: number): boolean => {
+  const cutOffDate = new Date();
+  cutOffDate.setFullYear(cutOffDate.getFullYear() - age);
+  return birthday > cutOffDate;
+};

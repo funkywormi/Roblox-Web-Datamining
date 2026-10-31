@@ -14,12 +14,12 @@ const SupportHelp: React.FC<{ className?: string }> = ({ className }) => {
   // IMPORTANT: Do not inject user input into this variable; this content is
   // rendered as HTML.
   const supportLink = resources.Label.NeedHelpContactSupport(
-    `<a class="text-name text-footer contact" href="${SUPPORT_URL}" target="_blank" rel="noopener noreferrer">${resources.Label.RobloxSupport}</a>`,
+    `<a class="content-emphasis hover:underline focus-visible:underline" href="${SUPPORT_URL}" target="_blank" rel="noopener noreferrer">${resources.Label.RobloxSupport}</a>`,
   );
 
   return (
     <p
-      className={`text-footer${className ? ` ${className}` : ""}`}
+      className={`text-caption-small content-default${className ? ` ${className}` : ""}`}
       // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: supportLink }}
     />

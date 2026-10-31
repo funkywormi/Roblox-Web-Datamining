@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useContext, useMemo, useState } from "react";
 import { useFormatter, useTranslations } from "@rbx/www-common/i18n";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { SheetContent, SheetTitle, SheetBody, SheetRoot } from "@rbx/foundation-ui";
@@ -14,6 +14,7 @@ import { PendingRequestRow } from "./PendingRequestRow";
 import { PendingTransfersSheet } from "./PendingTransfersSheet";
 import { PendingTransfer } from "../../types/buyRobuxPageData";
 import { navigateToDeepLink } from "../../utils/robuxTransfersDeepLinks";
+import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 
 function PendingTransfersRequestRow({
   pendingTransfers,
@@ -79,6 +80,7 @@ function PendingReferralRow({
   const translate = useTranslations("Feature.RobloxSubscription");
   const format = useFormatter();
   const { handle, isLoading } = useReferrerHandle(String(referral.senderUserId));
+  const { deviceMeta } = useContext(BuyRobuxPageContext);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   const reward = translate(
@@ -120,6 +122,7 @@ function PendingReferralRow({
                 entrypoint: "BuyRobuxPage",
                 referrerId: referral.senderUserId,
               }),
+              deviceMeta,
             );
             return;
           }

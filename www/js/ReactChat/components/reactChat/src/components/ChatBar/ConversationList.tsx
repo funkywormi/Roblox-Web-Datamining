@@ -81,7 +81,7 @@ const ConversationList = ({
         ) : chatDisabledReason === "privacy" ? (
           // Message.ChatPrivacySetting embeds a link via {frontLink}/{endLink}; pass them empty
           // (the whole line is already the link) so the tokens resolve instead of rendering raw.
-          <a className="text-body-medium text-link" href={PRIVACY_SETTINGS_URL}>
+          <a className="text-body-medium content-link" href={PRIVACY_SETTINGS_URL}>
             {translate(
               "Message.ChatPrivacySetting",
               { frontLink: "", endLink: "" },

@@ -5,4 +5,5 @@ export const RECOMMENDED_RULES_QUERY_KEY = "recommended-rules";
 export const APPEAL_ELIGIBILITY_QUERY_KEY = "appeal-eligibility";
 export const SETTINGS_AND_OPTIONS_QUERY_KEY = "settings-and-options";
 export const REPORTS_QUERY_KEY = "reports";
+export const USER_QUERY_KEY = "user";
 export const getGuacQueryKey = (namespace: string) => `guac/${namespace}`;

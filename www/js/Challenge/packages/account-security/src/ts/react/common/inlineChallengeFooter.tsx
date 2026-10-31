@@ -1,7 +1,8 @@
 import React from "react";
+import { Button } from "@rbx/foundation-ui";
 
 export type InlineFooterButtonConfig = {
-  content: JSX.Element | string;
+  content: React.ReactElement | string;
   /** Used primarily for accessibility labeling. */
   label: string;
   enabled: boolean;
@@ -28,25 +29,27 @@ export const InlineChallengeFooter: React.FC<Props> = ({
     <div className="inline-challenge-footer">
       <div className="inline-challenge-footer-buttons">
         {negativeButton !== null && (
-          <button
-            type="button"
-            className="btn-secondary-md inline-challenge-footer-button focus-visible:outline-focus"
+          <Button
+            variant="Standard"
+            size="Small"
+            className="inline-challenge-footer-button !text-label-large"
             aria-label={negativeButton.label}
-            disabled={!negativeButton.enabled}
+            isDisabled={!negativeButton.enabled}
             onClick={negativeButton.action}
           >
             {negativeButton.content}
-          </button>
+          </Button>
         )}
-        <button
-          type="button"
-          className="btn-cta-md inline-challenge-footer-button focus-visible:outline-focus"
+        <Button
+          variant="Emphasis"
+          size="Small"
+          className="inline-challenge-footer-button !text-label-large !bg-[var(--color-content-emphasis)] !content-[var(--color-surface-0)]"
           aria-label={positiveButton.label}
-          disabled={!positiveButton.enabled}
+          isDisabled={!positiveButton.enabled}
           onClick={positiveButton.action}
         >
           {positiveButton.content}
-        </button>
+        </Button>
       </div>
       {children}
     </div>

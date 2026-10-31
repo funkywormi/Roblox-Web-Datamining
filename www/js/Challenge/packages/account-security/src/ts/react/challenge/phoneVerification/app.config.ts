@@ -8,7 +8,10 @@ export const PHONE_ROOT_ELEMENT_ID = "phoneverification-challenge-container" as 
  * Translation namespaces used by this web app. Keep in sync with the challenge
  * SCC's `component.json` (.NET) and `www-nextjs/src/i18n/config.ts` (Next.js).
  */
-export const TRANSLATION_NAMESPACES = ["Feature.PhoneVerificationChallenge"] as const;
+export const TRANSLATION_NAMESPACES = [
+  "Feature.PhoneVerificationChallenge",
+  "CommonUI.Messages",
+] as const;
 
 export const VERIFICATION_UPSELL_TRASLATION_KEY = {
   Description: {

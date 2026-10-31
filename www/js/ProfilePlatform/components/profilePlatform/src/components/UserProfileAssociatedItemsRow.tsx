@@ -21,11 +21,12 @@ interface SocialCountItem {
   count: number;
   text: string;
   href?: string;
+  isDisabled?: boolean;
 }
 
 const UserProfileAssociatedItemsRow = () => {
   const { translate } = useTranslation();
-  const { profileId } = useProfilePlatformContext();
+  const { profileId, profileData } = useProfilePlatformContext();
   const headerData = useProfileJsonComponent(Component.UserProfileHeader);
   const counts: CountsData = headerData?.counts ?? {};
   const {
@@ -36,6 +37,7 @@ const UserProfileAssociatedItemsRow = () => {
     isFollowingsCountEnabled = false,
     isFriendsCountEnabled = false,
   } = counts;
+  const canOpenFriendsList = isFriendsCountEnabled && profileData?.components.Friends !== undefined;
 
   const formatCount = useCallback((count: number) => {
     let truncatedNumber = truncNumber(count, 1000, SuffixNames.withoutPlus, 1);
@@ -57,7 +59,8 @@ const UserProfileAssociatedItemsRow = () => {
         text: `${formatCount(friendsCount)} ${translate(
           friendsCount === 1 ? "Label.Friend" : "Label.Friends",
         )}`,
-        href: isFriendsCountEnabled ? `/users/${profileId}/friends#!/friends` : undefined,
+        href: canOpenFriendsList ? `/users/${profileId}/friends#!/friends` : undefined,
+        isDisabled: !canOpenFriendsList,
       },
       {
         id: "followers",
@@ -78,7 +81,7 @@ const UserProfileAssociatedItemsRow = () => {
       followingsCount,
       translate,
       formatCount,
-      isFriendsCountEnabled,
+      canOpenFriendsList,
       isFollowersCountEnabled,
       isFollowingsCountEnabled,
       profileId,
@@ -87,7 +90,13 @@ const UserProfileAssociatedItemsRow = () => {
 
   const renderSocialCountItem = useCallback(
     (item: SocialCountItem) => (
-      <Chip key={item.id} as="a" text={item.text} href={item.href} isDisabled={item.count === 0} />
+      <Chip
+        key={item.id}
+        as="a"
+        text={item.text}
+        href={item.href}
+        isDisabled={item.count === 0 || item.isDisabled}
+      />
     ),
     [],
   );

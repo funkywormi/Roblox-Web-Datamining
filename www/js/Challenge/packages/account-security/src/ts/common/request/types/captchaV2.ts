@@ -1,5 +1,5 @@
-import { UrlConfig } from "@rbx/core-scripts/http";
 import environmentUrls from "@rbx/environment-urls";
+import type { RequestConfig } from "../requestConfig";
 
 const { apiGatewayUrl } = environmentUrls;
 
@@ -18,7 +18,7 @@ export enum CaptchaMode {
   MONITOR = "CAPTCHA_MODE_MONITOR",
 }
 
-export const SUBMIT_CAPTCHA_V2_CONFIG: UrlConfig = {
+export const SUBMIT_CAPTCHA_V2_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${apiGatewayUrl}/v2/captcha`,
   timeout: 10000,
@@ -26,23 +26,6 @@ export const SUBMIT_CAPTCHA_V2_CONFIG: UrlConfig = {
     Accept: "application/json",
   },
 };
-
-/**
- * Alternate verification endpoint. Same request/response shape as
- * `SUBMIT_CAPTCHA_V2_CONFIG`.
- */
-export const SUBMIT_ALT_CAPTCHA_V2_CONFIG: UrlConfig = {
-  ...SUBMIT_CAPTCHA_V2_CONFIG,
-  url: `${apiGatewayUrl}/v2/alt-captcha`,
-};
-
-/**
- * Selects the verification endpoint for a CaptchaV2 challenge. The optional
- * `mode` selects the alternate config when set to `MONITOR`; otherwise
- * (including when absent) the default config is used.
- */
-export const getSubmitCaptchaV2Config = (mode?: CaptchaMode): UrlConfig =>
-  mode === CaptchaMode.MONITOR ? SUBMIT_ALT_CAPTCHA_V2_CONFIG : SUBMIT_CAPTCHA_V2_CONFIG;
 
 export type SubmitCaptchaV2Request = {
   // eslint-disable-next-line camelcase

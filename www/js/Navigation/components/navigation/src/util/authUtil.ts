@@ -1,11 +1,15 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Should be removed / fixed once React Chat is out
-import angular from "angular";
 import { setItem } from "@rbx/core-lib/local-storage";
 import "../constants/localStorageRegistry";
 import * as http from "@rbx/core-scripts/http";
 import { AccountSwitcherService } from "@rbx/core-scripts/legacy/Roblox";
 import { handleLogoutUpsell } from "@rbx/authentication";
+import { showPasskeyUpsellModal } from "@rbx/authentication/logoutUpsell/services/showPasskeyUpsellModal";
+import {
+  isLegacyPromptsServiceEnabled,
+  legacyBrowserSupportsPasskey,
+  openLegacyEmailUpsellModal,
+  runLegacyEmailUpsell,
+} from "@rbx/authentication/logoutUpsell/services/logoutUpsellLegacy";
 import { userCacheKey } from "../constants/cacheConstants";
 import layoutConstants from "../constants/layoutConstants";
 import { getLoginUrl, getHomeUrl, getRefreshSessionUrl } from "../constants/urlConstants";
@@ -27,10 +31,6 @@ const { logoutEvent } = layoutConstants;
 const logoutAndRedirect = () =>
   logout().then(() => {
     document.dispatchEvent(new CustomEvent(logoutEvent.name));
-    if (!angular.isUndefined(angular.element("#chat-container").scope())) {
-      const scope = angular.element("#chat-container").scope();
-      scope.$digest(scope.$broadcast("Roblox.Chat.destroyChatCookie"));
-    }
 
     // clear cached user id
     setItem(userCacheKey, null);
@@ -47,6 +47,11 @@ const logoutUser = async () => {
       // TODO: onLogout should accept Promise functions
       logoutAndRedirect();
     },
+    showPasskeyUpsell: showPasskeyUpsellModal,
+    showEmailUpsell: ({ onLogout }) => openLegacyEmailUpsellModal(onLogout),
+    isPromptsServiceEnabled: isLegacyPromptsServiceEnabled,
+    browserSupportsPasskey: legacyBrowserSupportsPasskey,
+    runLegacyEmailUpsell,
   });
 };
 
@@ -66,12 +71,6 @@ const openAccountSwitcher = () => {
 
   // clear cached user id
   setItem(userCacheKey, null);
-
-  // destroy chat cookie after account switching
-  if (!angular.isUndefined(angular.element("#chat-container").scope())) {
-    const scope = angular.element("#chat-container").scope();
-    scope.$digest(scope.$broadcast("Roblox.Chat.destroyChatCookie"));
-  }
 
   const containerId = "navigation-account-switcher-container";
 

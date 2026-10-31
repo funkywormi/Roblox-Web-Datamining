@@ -1,12 +1,11 @@
 import React from "react";
-import { render, unmountComponentAtNode } from "react-dom";
-import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { RequestServiceDefault } from "../../../common/request";
 import App from "./App";
 import { LOG_PREFIX, TRANSLATION_NAMESPACES } from "./app.config";
 import { RenderChallenge } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
+import { mountChallenge, unmountChallenge } from "../challengeMount";
 
 // Global instance since we do not need challenge parameters for instantiation.
 const requestServiceDefault = new RequestServiceDefault();
@@ -36,7 +35,7 @@ export const renderChallenge: RenderChallenge = async ({
   }
 
   // Remove any existing instances of the app.
-  unmountComponentAtNode(container);
+  unmountChallenge(container);
 
   // Query for the Turnstile site key, which is necessary to render the widget.
   // The site key is resolved from the session, so the challenge ID must be
@@ -57,23 +56,22 @@ export const renderChallenge: RenderChallenge = async ({
   const metricsService = new MetricsServiceDefault(appType, requestServiceDefault);
 
   // Render the app on the selected element.
-  render(
-    <TranslationProviderSCC namespaces={TRANSLATION_NAMESPACES}>
-      <App
-        challengeId={challengeId}
-        appType={appType}
-        siteKey={metadata.value.cloudflare_turnstile_site_key}
-        renderInline={renderInline}
-        eventService={eventService}
-        metricsService={metricsService}
-        requestService={requestServiceDefault}
-        onChallengeDisplayed={onChallengeDisplayed}
-        onChallengeCompleted={onChallengeCompleted}
-        onChallengeInvalidated={onChallengeInvalidated}
-        onModalChallengeAbandoned={onModalChallengeAbandoned}
-      />
-    </TranslationProviderSCC>,
+  mountChallenge(
     container,
+    <App
+      challengeId={challengeId}
+      appType={appType}
+      siteKey={metadata.value.cloudflare_turnstile_site_key}
+      renderInline={renderInline}
+      eventService={eventService}
+      metricsService={metricsService}
+      requestService={requestServiceDefault}
+      onChallengeDisplayed={onChallengeDisplayed}
+      onChallengeCompleted={onChallengeCompleted}
+      onChallengeInvalidated={onChallengeInvalidated}
+      onModalChallengeAbandoned={onModalChallengeAbandoned}
+    />,
+    TRANSLATION_NAMESPACES,
   );
   return true;
 };

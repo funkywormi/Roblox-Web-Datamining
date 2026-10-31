@@ -3,29 +3,28 @@ import { useTranslations } from "@rbx/www-common/i18n";
 import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { Popover as FoundationPopover, PopoverContent, PopoverTrigger } from "@rbx/foundation-ui";
-import { NotificationStreamShell } from "@rbx/notifications/notificationStreamShell";
 import { useUnreadNotificationCount } from "../hooks/useUnreadNotificationCount";
 import { useClearUnreadOnOpen } from "../hooks/useClearUnreadOnOpen";
-import { getIsReactNotificationBellEnabled } from "../util/getIsReactNotificationBellEnabled";
-import { getIsReactNotificationStreamEnabled } from "../util/getIsReactNotificationStreamEnabled";
-import { logNotificationStreamExposureIfEnabled } from "../util/notificationStreamIxpUtil";
-import NotificationStreamIcon from "../containers/NotificationStreamIcon";
 import ReactNotificationBell from "./ReactNotificationBell";
-import NotificationStreamBase from "../containers/NotificationStreamBase";
 import events from "../constants/notificationsEventStreamConstants";
+import { getNavCapability } from "../util/navCapabilities";
 import { popoverDismissGuard } from "../util/popoverDismissGuard";
 import { trackOpenToVisible } from "../topNav/observability";
 
 export default function NotificationStreamPopover({
   containerRef,
 }: {
-  containerRef: RefObject<HTMLLIElement>;
+  containerRef: RefObject<HTMLLIElement | null>;
 }) {
   const t = useTranslations("CommonUI.Features");
 
   const unreadCount = useUnreadNotificationCount();
-  const isReactBell = getIsReactNotificationBellEnabled();
-  const isReactStream = getIsReactNotificationStreamEnabled();
+  const isReactBell = getNavCapability("getIsReactNotificationBellEnabled")?.() ?? true;
+  const isReactStream = getNavCapability("getIsReactNotificationStreamEnabled")?.() ?? true;
+  const AngularBell = getNavCapability("NotificationStreamIcon");
+  const StreamContent = getNavCapability(
+    isReactStream ? "NotificationStreamShell" : "NotificationStreamBase",
+  );
 
   // Flag-on only: React owns clear-unread-on-open, since the Angular indicator
   // directive that used to do it isn't bootstrapped when the React bell renders.
@@ -49,15 +48,15 @@ export default function NotificationStreamPopover({
 
   const handleStreamOpen = useCallback(() => {
     trackOpenToVisible("Notifications");
-    logNotificationStreamExposureIfEnabled();
+    getNavCapability("logNotificationStreamExposure")?.();
     sendEventWithTarget(events.openContent.name, events.openContent.context, {
       countOfUnreadNotification: unreadCount,
       sendrVersion: 0,
     });
-    if (isReactBell) {
+    if (isReactBell && StreamContent != null) {
       handleReactBellStreamOpen();
     }
-  }, [isReactBell, handleReactBellStreamOpen, unreadCount]);
+  }, [isReactBell, StreamContent, handleReactBellStreamOpen, unreadCount]);
 
   const formattedCount = formatNumber(unreadCount);
   const ariaLabel =
@@ -88,12 +87,12 @@ export default function NotificationStreamPopover({
       {isReactBell ? (
         <ReactNotificationBell unreadCount={unreadCount} />
       ) : (
-        <NotificationStreamIcon />
+        AngularBell && <AngularBell />
       )}
     </button>
   );
 
-  const streamContent = isReactStream ? <NotificationStreamShell /> : <NotificationStreamBase />;
+  const streamContent = StreamContent ? <StreamContent /> : null;
 
   return (
     <FoundationPopover

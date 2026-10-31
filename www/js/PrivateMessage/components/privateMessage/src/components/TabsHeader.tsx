@@ -1,21 +1,23 @@
-import { Badge, Tabs, TabsList, TabsTrigger } from "@rbx/foundation-ui";
+import { Badge, Tabs, TabsContent, TabsList, TabsTrigger } from "@rbx/foundation-ui";
 import type { MessageTab } from "../types";
 
 const TabsHeader = ({
   activeTab,
   tabs,
   onSelectTab,
+  children,
 }: {
   activeTab: MessageTab;
   tabs: { name: MessageTab; label: string; count?: number }[];
   onSelectTab: (tab: MessageTab) => void;
+  // Rendered as the active tab's panel, so each trigger's aria-controls points at it.
+  children: React.ReactNode;
 }): React.ReactElement => (
   <Tabs
     value={activeTab}
     variant="Contained"
     size="Large"
     fitBehavior="Fill"
-    className="radius-none overflow-hidden"
     onValueChange={value => {
       const tab = tabs.find(item => item.name === value);
       if (tab) {
@@ -23,7 +25,7 @@ const TabsHeader = ({
       }
     }}
   >
-    <TabsList>
+    <TabsList className="radius-none overflow-hidden">
       {tabs.map(tab => (
         <TabsTrigger key={tab.name} value={tab.name}>
           <span className="flex items-center justify-center gap-small">
@@ -33,6 +35,10 @@ const TabsHeader = ({
         </TabsTrigger>
       ))}
     </TabsList>
+    {/* TabsContent adds padding-top-large; MessageActions already spaces itself. */}
+    <TabsContent value={activeTab} style={{ paddingTop: 0 }}>
+      {children}
+    </TabsContent>
   </Tabs>
 );
 

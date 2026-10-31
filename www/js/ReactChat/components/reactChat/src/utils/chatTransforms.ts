@@ -3,6 +3,7 @@ import type {
   TChatApiMessage,
   TChatApiUser,
   TGetUserConversationsResponse,
+  TPresenceApiPresence,
 } from "../types/api";
 import type {
   TChatConversation,
@@ -329,14 +330,21 @@ export const flattenConversationPages = (
 
 export const applyPresences = (
   conversations: TChatConversation[],
-  presencesByUserId: Record<number, number | string | undefined>,
+  presencesByUserId: Record<number, TPresenceApiPresence | undefined>,
 ): TChatConversation[] =>
   conversations.map(conversation => ({
     ...conversation,
-    participants: conversation.participants.map(participant => ({
-      ...participant,
-      presence: toPresence(presencesByUserId[participant.id]),
-    })),
+    participants: conversation.participants.map(participant => {
+      const apiPresence = presencesByUserId[participant.id];
+      const presence = toPresence(apiPresence?.userPresenceType);
+      const gameName = apiPresence?.lastLocation?.trim();
+      return {
+        ...participant,
+        presence,
+        gameName:
+          presence === "InGame" && apiPresence?.rootPlaceId && gameName ? gameName : undefined,
+      };
+    }),
   }));
 
 /** Layers moderation-timeout state (`isTimedOut` + `timeoutExpiresAtMs`) onto conversations. */

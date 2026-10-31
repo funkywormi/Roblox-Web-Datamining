@@ -25,6 +25,28 @@ export const fetchFriendsPage = async (userId: number, limit = 200): Promise<TFr
   return { data: body.data ?? [], nextPageCursor: body.nextPageCursor };
 };
 
+/** Check only the supplied participants, including friends beyond the directory's first page. */
+export const fetchParticipantFriendIds = async (
+  currentUserId: number,
+  userIds: readonly number[],
+): Promise<number[]> => {
+  const targetIds = new Set(userIds.filter(id => id !== currentUserId));
+  if (targetIds.size === 0) {
+    return [];
+  }
+  const body = await chatHttpTransport.get<{ data?: { id: number | string; status: string }[] }>(
+    {
+      url: `${environmentUrls.friendsApi}/v1/users/${currentUserId}/friends/statuses`,
+      retryable: true,
+      withCredentials: true,
+    },
+    { userIds: [...targetIds].join(",") },
+  );
+  return (body.data ?? [])
+    .filter(entry => entry.status === "Friends" && targetIds.has(Number(entry.id)))
+    .map(entry => Number(entry.id));
+};
+
 // Subset of the given users that are the current viewer's trusted connections, from the friends-api
 // batch endpoint (one call, not one per user). Empty when trusted-friends is off or none are trusted.
 export const fetchTrustedFriendIds = async (

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { ComponentType, ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter, MemoryRouter } from "react-router-dom";
+import { HashRouter as LegacyHashRouter, HashRouterProps, MemoryRouter } from "react-router-dom";
 import { RequestService } from "../../../common/request";
 import TwoStepVerification from "./containers/twoStepVerification";
 import {
@@ -14,6 +14,9 @@ import { EventService } from "./services/eventService";
 import { MetricsService } from "./services/metricsService";
 import { TwoStepVerificationContextProvider } from "./store/contextProvider";
 import { DelayParameters } from "./delay";
+
+// @types/react-router-dom 5.1.3 leaves `children` off HashRouterProps, which React 19's types need.
+const HashRouter = LegacyHashRouter as ComponentType<HashRouterProps & { children: ReactNode }>;
 
 const queryClient = new QueryClient({
   defaultOptions: {

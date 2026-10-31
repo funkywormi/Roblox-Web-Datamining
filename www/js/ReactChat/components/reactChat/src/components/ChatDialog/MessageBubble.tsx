@@ -6,6 +6,7 @@ import { parseGameLinkSegments } from "../../utils/gameLinkCard";
 import type { TChatConversation, TChatMessage } from "../../types/chat";
 import AvatarHeadshot from "../AvatarHeadshot";
 import GameCard from "./GameCard/GameCard";
+import ShareLinkGameCard from "./GameCard/ShareLinkGameCard";
 import HiddenMessage from "./HiddenMessage";
 
 type TMessageBubbleProps = {
@@ -48,6 +49,15 @@ const MessageBubble = ({
             url={segment.url}
             conversationId={conversation.id}
             privateServerLinkCode={segment.privateServerLinkCode}
+          />,
+        );
+      } else if (segment.type === "shareLink") {
+        gameCards.push(
+          <ShareLinkGameCard
+            key={`${piece.id}-share-${segment.url}`}
+            shareLink={segment.shareLink}
+            url={segment.url}
+            conversationId={conversation.id}
           />,
         );
       } else if (segment.content.length > 0) {

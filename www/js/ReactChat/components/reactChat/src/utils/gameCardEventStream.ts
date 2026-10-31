@@ -1,3 +1,4 @@
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 
 // Game-card eventstream telemetry. Do NOT rename these strings — they are the analytics contract
@@ -37,6 +38,9 @@ export function sendGameLinkCardImpressionEvent(rootPlaceId: number, universeId:
     universeIds: JSON.stringify([universeId]),
     absPositions: JSON.stringify([0]),
     sortPos: 0,
+    contentType: "Game",
+    interactionUuid: generateRandomUuid(),
+    hasSponsoredContent: 0,
   });
 }
 

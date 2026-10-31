@@ -15,6 +15,7 @@ import { PendingTransfersAvatars } from "./PendingTransfersAvatars";
 import { PendingRequestsSheet } from "./modals/PendingRequestsSheet";
 import { PendingTransfersSheet } from "./modals/PendingTransfersSheet";
 import { TrackingContext } from "../contexts/TrackingContext";
+import { BuyRobuxPageContext } from "../contexts/BuyRobuxPageContext";
 import { UserAvatar } from "./UserAvatar";
 import { useAvatarThumbnails } from "../hooks/useAvatarThumbnails";
 import { navigateToDeepLink } from "../utils/robuxTransfersDeepLinks";
@@ -132,6 +133,7 @@ export function InlinePendingRequests({
   const { translateFullKey } = useFullKeyTranslations();
   const { trackPendingTransfersImpression, trackPendingTransfersSheetView } =
     useContext(TrackingContext);
+  const { deviceMeta } = useContext(BuyRobuxPageContext);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
@@ -219,6 +221,7 @@ export function InlinePendingRequests({
             entrypoint: "BuyRobuxPage",
             referrerId: referral.senderUserId,
           }),
+          deviceMeta,
         );
         return;
       }

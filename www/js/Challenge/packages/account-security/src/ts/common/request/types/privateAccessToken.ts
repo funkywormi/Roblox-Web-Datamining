@@ -1,5 +1,5 @@
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const apiGatewayUrl = EnvironmentUrls.apiGatewayUrl ?? URL_NOT_FOUND;
@@ -13,7 +13,7 @@ export enum PrivateAccessTokenError {
 /**
  * Request Type: `POST`.
  */
-export const GET_PAT_TOKEN_CONFIG: UrlConfig = {
+export const GET_PAT_TOKEN_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${privateAccessTokenServiceUrl}/v1/getPATToken`,
   timeout: 10000,

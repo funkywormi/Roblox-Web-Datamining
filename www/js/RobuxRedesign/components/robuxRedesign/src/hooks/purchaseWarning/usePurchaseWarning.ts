@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { document } from "@rbx/core-lib/browser";
-import { isInApp, isOnDesktop } from "../../utils/platform";
+import { getIsNativePurchasePlatform, getIsWebCheckoutPlatform } from "../../utils/platform";
 import { Product } from "../../types/buyRobuxPageData";
 import { getPurchaseWarning, PurchaseWarningAction } from "../../services/purchaseWarningsService";
 import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
@@ -23,7 +23,9 @@ export function usePurchaseWarning(): {
     continuePurchase: ContinuePurchaseFn,
   ) => Promise<boolean>;
 } {
-  const { isSubscriber } = useContext(BuyRobuxPageContext);
+  const { isSubscriber, deviceMeta } = useContext(BuyRobuxPageContext);
+  const isNativePurchasePlatform = getIsNativePurchasePlatform(deviceMeta);
+  const isWebCheckoutPlatform = getIsWebCheckoutPlatform(deviceMeta);
   const {
     purchaseWarning: { openModal: openPurchaseWarningModal },
   } = useContext(ModalContext);
@@ -46,7 +48,7 @@ export function usePurchaseWarning(): {
       purchaseUrl: string,
       continuePurchase: ContinuePurchaseFn,
     ): Promise<boolean> => {
-      if (isOnDesktop && !isPurchaseWarningModalEnabled) {
+      if (isWebCheckoutPlatform && !isPurchaseWarningModalEnabled) {
         // Only desktop respect this on the Robux package selection page.
         // On desktop, users above 13 won’t see any purchase warnings on the **Robux package selection page**.
         // On desktop, users 13 - 17 will see the parentalAuthorization13To17Required on the **payment method selection page**.
@@ -56,7 +58,8 @@ export function usePurchaseWarning(): {
       }
 
       // Only show the scary modal for 13-17 when it's not on desktop & user is not premium & not buying a subscription package
-      const is13To17ScaryModalEnabled = !isOnDesktop && !isSubscriber && !isSubscriptionProduct;
+      const is13To17ScaryModalEnabled =
+        !isWebCheckoutPlatform && !isSubscriber && !isSubscriptionProduct;
 
       const purchaseWarning = await getPurchaseWarning(
         is13To17ScaryModalEnabled,
@@ -72,7 +75,8 @@ export function usePurchaseWarning(): {
         action === PurchaseWarningAction.U13MonthlyThreshold1Modal ||
         action === PurchaseWarningAction.U13MonthlyThreshold2Modal;
       const showsParentalConsentInApp =
-        action === PurchaseWarningAction.ParentalConsentWarningPaymentModal13To17 && isInApp;
+        action === PurchaseWarningAction.ParentalConsentWarningPaymentModal13To17 &&
+        isNativePurchasePlatform;
 
       if (showsScaryModal || showsParentalConsentInApp) {
         trackCounter("PurchaseWarningModalShown", { action });
@@ -84,7 +88,13 @@ export function usePurchaseWarning(): {
 
       return false;
     },
-    [isPurchaseWarningModalEnabled, isSubscriber, openPurchaseWarningModal],
+    [
+      isNativePurchasePlatform,
+      isWebCheckoutPlatform,
+      isPurchaseWarningModalEnabled,
+      isSubscriber,
+      openPurchaseWarningModal,
+    ],
   );
 
   return {

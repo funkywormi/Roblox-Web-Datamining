@@ -34,6 +34,8 @@ export const ACCOUNT_UPGRADE_COUNTERS = {
   closeWarningCloseButtonClicked: "CloseWarningCloseButtonClicked",
   success: "Success",
   failure: "Failure",
+  marketingConsentWriteSuccess: "MarketingConsentWriteSuccess",
+  marketingConsentWriteFailure: "MarketingConsentWriteFailure",
 } as const;
 
 const safely = (report: () => void): void => {
@@ -196,4 +198,42 @@ export const reportSuggestionSelected = (suggestion: string): void => {
     state: suggestion,
     origin: ORIGIN,
   });
+};
+
+// Like Lua, the marketing email box events carry the box's checked state as `entered`.
+const sendMarketingConsentEvent = (state: string, isChecked: boolean): void => {
+  sendEvent(EVENT_CONSTANTS.schematizedEventTypes.authFormInteraction, CONTEXT_UPGRADE, {
+    field: EVENT_CONSTANTS.field.marketingEmailConsent,
+    state,
+    origin: ORIGIN,
+    entered: String(isChecked),
+  });
+};
+
+export const reportMarketingConsentShown = (): void => {
+  sendMarketingConsentEvent(EVENT_CONSTANTS.aType.shown, false);
+};
+
+export const reportMarketingConsentToggled = (isChecked: boolean): void => {
+  sendMarketingConsentEvent(EVENT_CONSTANTS.aType.click, isChecked);
+};
+
+export const reportMarketingConsentSubmitted = (isChecked: boolean): void => {
+  sendMarketingConsentEvent(EVENT_CONSTANTS.aType.submit, isChecked);
+};
+
+export const reportMarketingConsentAutoOptIn = (): void => {
+  sendEvent(EVENT_CONSTANTS.schematizedEventTypes.authFormInteraction, CONTEXT_UPGRADE, {
+    field: EVENT_CONSTANTS.field.marketingEmailAutoOptIn,
+    state: EVENT_CONSTANTS.aType.submit,
+    origin: ORIGIN,
+  });
+};
+
+export const reportMarketingConsentWriteSucceeded = (): void => {
+  fireCounter(ACCOUNT_UPGRADE_COUNTERS.marketingConsentWriteSuccess);
+};
+
+export const reportMarketingConsentWriteFailed = (errorCode: string): void => {
+  fireCounter(ACCOUNT_UPGRADE_COUNTERS.marketingConsentWriteFailure, { errorCode });
 };

@@ -15,6 +15,7 @@ import type { SduiTelemetryHandlerNameRegistry } from "../registry/SduiTelemetry
 import { createSduiApiStore } from "../store/SduiApiStore";
 import { createSduiTemplateStore } from "../store/SduiTemplateStore";
 import { createDeduplicatingErrorReporter } from "../errors/DeduplicatingSduiErrorReporter";
+import { readAccountLocaleTag } from "../utils/readAccountLocaleTag";
 import type {
   HydrationContent,
   HydrationStore,
@@ -70,6 +71,11 @@ export interface CreateSduiServicesOptions {
 
   /** Locale-aware translate function. */
   translate?: TranslateFunction;
+  /**
+   * BCP-47 locale for number formatters, such as `en-US`.
+   * Defaults to the account language on the document.
+   */
+  locale?: string;
 }
 
 // ─── Service Construction ───
@@ -127,11 +133,13 @@ export function createSduiServicesWithStores(
     dataBinder.updateDataStores(options.initialHydrationData);
   }
 
+  const locale = options.locale ?? readAccountLocaleTag();
   const builder = createSduiBuilder({
     dataBinder,
     templateStore,
     errorReporter,
     poolRegistry,
+    locale,
   });
 
   const apiStore = createSduiApiStore({

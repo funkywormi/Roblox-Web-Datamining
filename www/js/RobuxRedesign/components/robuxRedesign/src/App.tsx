@@ -2,6 +2,7 @@ import { useMemo, useEffect } from "react";
 import { setItem } from "@rbx/core-lib/local-storage";
 import { getCurrentUser } from "@rbx/www-common/user";
 import { useFirstTimePurchaseConsent } from "@rbx/payments/firstTimePurchaseConsent";
+import { DeviceMeta } from "@rbx/www-common/device/types";
 import {
   BuyRobuxPageContext,
   BuyRobuxPageContextProps,
@@ -14,9 +15,7 @@ import { EnhancedBuyRobuxPageData, PaymentSession } from "./types/buyRobuxPageDa
 import { TrackingContainer } from "./containers/TrackingContainer";
 import { PurchasingContainer } from "./containers/PurchasingContainer";
 import { usePurchaseUrls } from "./hooks/purchase/usePurchaseUrls";
-import { useStyleOverrides } from "./hooks/useStyleOverrides";
 import { BuyRobuxPage } from "./components/BuyRobuxPage";
-import { useBreakpoint } from "./hooks/useBreakpoint";
 import useRedirect from "./hooks/useRedirect";
 import { isRedirectPlatformEligible } from "./utils/isRedirectPlatformEligible";
 import { withApiMetrics } from "./utils/publishMetric";
@@ -31,13 +30,11 @@ const persistPaymentSessionToLocalStorage = (paymentSession: PaymentSession): vo
 export type AppProps = {
   enhancedBuyRobuxPageData: EnhancedBuyRobuxPageData;
   urlParams: BuyRobuxUrlParams;
+  deviceMeta: DeviceMeta;
 };
 
-export const App = ({ enhancedBuyRobuxPageData, urlParams }: AppProps) => {
-  const breakpoint = useBreakpoint();
+export const App = ({ enhancedBuyRobuxPageData, urlParams, deviceMeta }: AppProps) => {
   useBonusItem();
-
-  useStyleOverrides(urlParams.ctx);
 
   const {
     limitedTimeBonusItem,
@@ -66,14 +63,15 @@ export const App = ({ enhancedBuyRobuxPageData, urlParams }: AppProps) => {
     persistPaymentSessionToLocalStorage(paymentSession);
   }, [paymentSession]);
 
-  const getPurchaseUrl = usePurchaseUrls(paymentSession);
+  const getPurchaseUrl = usePurchaseUrls(paymentSession, deviceMeta);
   const robuxBalance = useRobuxBalance();
   const { shouldShowFirstTimePurchaseConsent, markConsentAcknowledged } =
     useFirstTimePurchaseConsent(getCurrentUser()?.id, withApiMetrics);
   const redirect = useRedirect({
+    deviceMeta,
     paymentSession,
     isEnabled:
-      isRedirectPlatformEligible() &&
+      isRedirectPlatformEligible(deviceMeta) &&
       buyRobuxPageData.sections.some(
         section =>
           section.redirect ??
@@ -90,12 +88,12 @@ export const App = ({ enhancedBuyRobuxPageData, urlParams }: AppProps) => {
 
   const buyRobuxPageContextValue = useMemo(
     (): BuyRobuxPageContextProps => ({
+      deviceMeta,
       limitedTimeBonusItem,
       bonusItemBannerImageUrl,
       bonusItemDisplayName,
       bonusItemId,
       bonusItemImageUrl,
-      breakpoint,
       buyRobuxPageData,
       getPurchaseUrl,
       giftingAvatarImageUrl,
@@ -122,7 +120,6 @@ export const App = ({ enhancedBuyRobuxPageData, urlParams }: AppProps) => {
       bonusItemBannerImageUrl,
       bonusItemDisplayName,
       bonusItemImageUrl,
-      breakpoint,
       buyRobuxPageData,
       getPurchaseUrl,
       giftingAvatarImageUrl,
@@ -142,6 +139,7 @@ export const App = ({ enhancedBuyRobuxPageData, urlParams }: AppProps) => {
       markConsentAcknowledged,
       productBadgeSlotCount,
       atLeastOneProductHasBonusAmount,
+      deviceMeta,
     ],
   );
 

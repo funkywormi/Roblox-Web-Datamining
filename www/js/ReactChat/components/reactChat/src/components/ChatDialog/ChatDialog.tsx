@@ -40,6 +40,7 @@ type TChatDialogProps = {
   onSetScreen: (layoutId: string, screen: TDialogScreen) => void;
   /** Routes the dialog to the in-app abuse-report confirmation screen for a participant. */
   onReportParticipant: (layoutId: string, participantId: number) => void;
+  onChatWithParticipant?: (participantId: number) => void;
   onPromoteFriendPlaceholder?: (layoutId: string, newConversationId: string) => void;
   onRemoveTrustedConnection: (friendId: number) => void;
   /** Opens the current Party Chat feature restriction when the disabled input bar is clicked. */
@@ -88,6 +89,7 @@ const ChatDialog = ({
   onRequestRemoveParticipant,
   onSetScreen,
   onReportParticipant,
+  onChatWithParticipant,
   onPromoteFriendPlaceholder,
   onRemoveTrustedConnection,
   onOpenPartyChatRestriction,
@@ -320,6 +322,7 @@ const ChatDialog = ({
           onRequestRemoveParticipant={onRequestRemoveParticipant}
           onSetScreen={onSetScreen}
           onReportParticipant={onReportParticipant}
+          onChatWithParticipant={onChatWithParticipant}
         />
       ) : conversation.currentScreen === "LeaveGroupConfirmation" ? (
         <ConfirmNegativeAction

@@ -32,6 +32,7 @@ export function useTracking(): Tracking {
     sectionNames,
     subscriptionProductIds,
     urlParams,
+    deviceMeta,
   } = useContext(BuyRobuxPageContext);
 
   const applePayAvailability = useApplePayAvailabilityTracking();
@@ -78,7 +79,7 @@ export function useTracking(): Tracking {
       eventMetadata?: Record<string, string>,
     ) => {
       pfas.sendUserPurchaseFlowEvent({
-        triggerContext: getTriggerContext(viewName === PREMIUM_PURCHASE),
+        triggerContext: getTriggerContext(deviceMeta, viewName === PREMIUM_PURCHASE),
         isMidPurchaseStep: true,
         viewName,
         purchaseEventType,
@@ -89,19 +90,19 @@ export function useTracking(): Tracking {
         },
       });
     },
-    [contextMetadata, PREMIUM_PURCHASE],
+    [contextMetadata, PREMIUM_PURCHASE, deviceMeta],
   );
 
   const trackStatus = useCallback(
     (viewName: ViewName, status: PurchaseStatus, viewMessage?: string) => {
       pfas.sendUserPurchaseStatusEvent({
-        triggerContext: getTriggerContext(viewName === PREMIUM_PURCHASE),
+        triggerContext: getTriggerContext(deviceMeta, viewName === PREMIUM_PURCHASE),
         status,
         viewMessage,
         viewName,
       });
     },
-    [PREMIUM_PURCHASE],
+    [PREMIUM_PURCHASE, deviceMeta],
   );
 
   useEffect(() => {

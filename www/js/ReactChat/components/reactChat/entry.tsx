@@ -4,6 +4,7 @@ import { queryClient, renderWithErrorBoundary } from "@rbx/core-scripts/react";
 import { gamePlayButtonNamespaces } from "@rbx/game-play-button";
 import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import type { Namespace } from "@rbx/www-common/i18n";
+import { trackDotnetAppShellCounter } from "@rbx/www-common/observability/app-shell/dotnet";
 import App from "./src/App";
 import GameCardPlayButton from "./src/components/ChatDialog/GameCard/GameCardPlayButton";
 import GameCardPlayButtonContext from "./src/components/ChatDialog/GameCard/GameCardPlayButtonContext";
@@ -32,5 +33,12 @@ ready(() => {
       </TranslationProviderSCC>
     </QueryClientProvider>,
     container,
+    () => {
+      trackDotnetAppShellCounter("ChatLoad", { outcome: "loaded" });
+    },
+    undefined,
+    () => {
+      trackDotnetAppShellCounter("ChatLoad", { outcome: "crashed" });
+    },
   );
 });

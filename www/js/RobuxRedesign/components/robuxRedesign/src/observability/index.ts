@@ -237,7 +237,6 @@ export const observabilityRegistry = {
         },
         "SubscriptionV2LearnMoreClick",
         "SubscriptionV2NoPrimaryProduct",
-        "SubscriptionV2NoDeviceMeta",
         {
           name: "SubscriptionV2SectionShown",
           dimensions: ["variant", "tierCount", "isFreeTrial"],

@@ -1,9 +1,5 @@
-import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import { DeviceMeta } from "@rbx/www-common/device/types";
 
-export const isRedirectPlatformEligible = () => {
-  const deviceMeta = getDeviceMeta();
-  if (!deviceMeta) {
-    return false;
-  }
-  return deviceMeta.isIosApp || deviceMeta.isAndroidApp;
+export const isRedirectPlatformEligible = (device: DeviceMeta) => {
+  return device.isIosApp || device.isAndroidApp;
 };

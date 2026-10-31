@@ -4,6 +4,7 @@ import { window } from "@rbx/core-lib/browser";
 import { SectionBase, SectionGiftCard } from "../../types/buyRobuxPageData";
 import { BaseSectionProps, Section, SectionBody, SectionHeader } from "../sections/Section";
 import { SectionBodySimpleCTA } from "../sections/SectionBodySimpleCTA";
+import { BuyRobuxPageContext } from "../../contexts/BuyRobuxPageContext";
 import { TrackingContext } from "../../contexts/TrackingContext";
 import { getSectionTrackingProps } from "../../hooks/useScrollTracking";
 import {
@@ -18,6 +19,7 @@ type GiftCardProps = BaseSectionProps & {
 
 export function GiftCard({ isPrimary, sectionBase, giftCard }: GiftCardProps) {
   const { trackGiftCardClick } = useContext(TrackingContext);
+  const { deviceMeta } = useContext(BuyRobuxPageContext);
 
   const { translateFullKey } = useFullKeyTranslations();
   const translatePremium = useTranslations("Feature.Premium");
@@ -25,11 +27,11 @@ export function GiftCard({ isPrimary, sectionBase, giftCard }: GiftCardProps) {
   const buttonClickHandler = useCallback(() => {
     trackGiftCardClick();
     window?.location.assign(
-      shouldOpenInExternalBrowser()
+      shouldOpenInExternalBrowser(deviceMeta)
         ? getOpenExternalBrowserUrl(giftCard.redirectUrl)
         : giftCard.redirectUrl,
     );
-  }, [trackGiftCardClick, giftCard.redirectUrl]);
+  }, [deviceMeta, trackGiftCardClick, giftCard.redirectUrl]);
 
   return (
     <Section {...getSectionTrackingProps(sectionBase)}>
