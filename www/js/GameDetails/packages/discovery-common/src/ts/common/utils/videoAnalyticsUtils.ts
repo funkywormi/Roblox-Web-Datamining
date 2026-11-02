@@ -1,4 +1,5 @@
 import { CmcdInstanceType, VideoEventPageContext } from "@rbx/video-player";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { PageContext } from "../types/pageContext";
 import { common } from "../constants/configConstants";
 
@@ -20,7 +21,7 @@ export const getVideoEventPageContext = (
     case PageContext.GameDetailPage:
       return VideoEventPageContext.GameDetails;
     default:
-      window.EventTracker?.fireEvent(common.NoMatchingVideoEventPageContextFoundCounterEvent);
+      fireEvent(common.NoMatchingVideoEventPageContextFoundCounterEvent);
       return undefined;
   }
 };
@@ -35,7 +36,7 @@ export const getVideoCmcdInstanceType = (pageContext?: PageContext): CmcdInstanc
     case PageContext.GameDetailPage:
       return CmcdInstanceType.ExperiencePage;
     default:
-      window.EventTracker?.fireEvent(common.NoMatchingVideoCmcdInstanceTypeFoundCounterEvent);
+      fireEvent(common.NoMatchingVideoCmcdInstanceTypeFoundCounterEvent);
       return CmcdInstanceType.Home;
   }
 };

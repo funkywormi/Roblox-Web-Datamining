@@ -1,18 +1,23 @@
 import { EnvironmentUrls } from "@rbx/environment-urls";
-import { httpService } from "@rbx/core-scripts/legacy/core-utilities";
+import * as http from "@rbx/core-lib/http";
+import type { JsonSerializable } from "@rbx/core-lib/json";
+import { Url } from "@rbx/core-lib/url";
 import { TUserData, TUserResponse } from "../types/userTypes";
 
-const getUsersApiUrl = (endpoint: string): string => EnvironmentUrls.usersApi + endpoint;
+// Built per call so importing never parses EnvironmentUrls.
+const getUsersApiUrl = (path: string): Url =>
+  Url.parse(EnvironmentUrls.usersApi).getOrThrow().withPath(path);
+
+// Responses are cast, not schema-validated, to match the previous Axios behavior.
+const postForJson = async <T>(path: string, params: JsonSerializable): Promise<T> => {
+  const result = await http.postUntyped(getUsersApiUrl(path), params, { credentials: "omit" });
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  return result.getOrThrow() as T;
+};
 
 export const postUsersInfo = async (userIds: string[]): Promise<TUserData[]> => {
-  const url = getUsersApiUrl("/v1/users");
-  const params = { userIds };
-  const urlConfig = {
-    url,
-    withCredentials: false,
-  };
-  const { data } = await httpService.post<TUserResponse>(urlConfig, params);
-  return data.data;
+  const { data } = await postForJson<TUserResponse>("/v1/users", { userIds });
+  return data;
 };
 
 export default {

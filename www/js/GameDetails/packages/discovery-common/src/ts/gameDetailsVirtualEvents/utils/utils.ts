@@ -1,6 +1,6 @@
 import Intl from "@rbx/core-scripts/intl";
-import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
 import { launchGame } from "@rbx/game-play-button";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { getGameLaunchEventStreamProperties } from "./analytics";
 import { EVENT_LIVENESS_STATE } from "../constants/constants";
 import { TDiscoverySessionInfo } from "../../common/constants/eventStreamConstants";
@@ -23,7 +23,7 @@ export const tryParseDate = (utcTimestamp: number | string): number => {
 };
 
 export const generateSessionId = (): string => {
-  return uuidService.generateRandomUuid();
+  return generateRandomUuid();
 };
 
 export const joinExperience = (

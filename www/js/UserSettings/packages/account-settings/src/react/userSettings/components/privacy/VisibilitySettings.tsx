@@ -71,7 +71,11 @@ export const VisibilitySettings = ({
         snackbarService.success(translate(successMessageKey));
       }
     } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, childUserId);
+      const errorKey = handleChildSettingsUpdateError(
+        error,
+        childUserId,
+        UserSetting.whoCanJoinMeInExperiences,
+      );
       if (errorKey) {
         snackbarService.warning(translate(errorKey));
       }
@@ -95,7 +99,11 @@ export const VisibilitySettings = ({
         snackbarService.success(translate(successMessageKey));
       }
     } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, childUserId);
+      const errorKey = handleChildSettingsUpdateError(
+        error,
+        childUserId,
+        UserSetting.whoCanSeeMyOnlineStatus,
+      );
       if (errorKey) {
         snackbarService.warning(translate(errorKey));
       }

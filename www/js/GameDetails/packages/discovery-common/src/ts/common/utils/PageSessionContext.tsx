@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
+import { window as browserWindow } from "@rbx/core-lib/browser";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { parseQueryString } from "./parsingUtils";
 
 type TPageSessionContext = {
@@ -13,7 +14,7 @@ export const PageSessionContext = createContext<TPageSessionContext>({
 });
 
 export const PageSessionProvider: React.FC = ({ children }) => {
-  const paramString = window.location.href?.split("?")[1];
+  const paramString = browserWindow?.location?.href?.split("?")[1];
   const urlParams = paramString && parseQueryString(paramString);
   const referredSession =
     urlParams &&
@@ -22,12 +23,10 @@ export const PageSessionProvider: React.FC = ({ children }) => {
       urlParams.spotlightPageSessionInfo ||
       urlParams.preAuthLandingPageSessionInfo);
   const [session, setSession] = useState(
-    referredSession && typeof referredSession === "string"
-      ? referredSession
-      : uuidService.generateRandomUuid(),
+    referredSession && typeof referredSession === "string" ? referredSession : generateRandomUuid(),
   );
   const rotateSessionId = useCallback(() => {
-    const newId = uuidService.generateRandomUuid();
+    const newId = generateRandomUuid();
     setSession(newId);
     return newId;
   }, []);

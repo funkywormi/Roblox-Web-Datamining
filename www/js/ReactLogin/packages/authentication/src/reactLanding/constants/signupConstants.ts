@@ -53,8 +53,8 @@ export const urlConstants = {
   homePageNewUser: "/home?nu=true",
   termsOfUse: `${EnvironmentUrls.websiteUrl}/info/terms`,
   privacy: `${EnvironmentUrls.websiteUrl}/info/privacy`,
-  koreaComplianceTermsOfService: `https://en.help.roblox.com/hc/articles/15685174241172-Roblox-Terms-of-Use-Republic-of-Korea-`,
-  koreaCompliancePrivacyPolicy: `https://en.help.roblox.com/hc/articles/15685139483924-Additional-Information-for-users-in-Korea`,
+  koreaComplianceTermsOfService: `https://en.help.roblox.com/hc/ko/articles/115004647846`,
+  koreaCompliancePrivacyPolicy: `https://en.help.roblox.com/hc/ko/articles/115004630823`,
   koreaCompliancePersonalInformationPolicy: `https://en.help.roblox.com/hc/ko/articles/20308349061268`,
   koreaComplianceThirdPartyPersonalInformationPolicy: `https://en.help.roblox.com/hc/ko/articles/20308327256596`,
   koreaComplianceTransferPersonalInformationPolicy: `https://en.help.roblox.com/hc/ko/articles/20308327256596`,
@@ -161,6 +161,8 @@ export const validationMessages = {
   useDifferentPassword: "Response.DifferentPasswordRequired",
   passwordContainsUsernameError: "Response.PasswordContainsUsernameError",
   passwordTooSimple: "Response.PasswordComplexity",
+  passwordLowComplexity: "Response.PasswordLowComplexity",
+  passwordTooSimilarToUsername: "Response.PasswordTooSimilarToUsername",
   passwordInvalid: "Response.InvalidPassword",
   birthdayInvalid: "Response.InvalidBirthday",
   javascriptRequired: "Response.JavaScriptRequired",
@@ -217,6 +219,10 @@ export const errorCodes = {
   invalidIdentityVerificationResultToken: 109,
   invalidPassword: 7,
   invalidUsername: 5,
+  // The VPC sign up `dataToken` is expired or malformed.
+  invalidToken: 18,
+  // Signup collapses a failed token lookup that was not HTTP 400 into this code.
+  unknownError: 1,
   passwordSameAsUsername: 8,
   passwordTooSimple: 9,
   usernameTaken: 6,
@@ -227,6 +233,8 @@ export const errorCodes = {
   maxLoggedInAccountsLimitReached: 22,
   parentEmptyAccountSwitchBlobRequired: 23,
   passkeyRegistrationFailed: 27,
+  passwordLowComplexity: 36,
+  passwordTooSimilarToUsername: 37,
 };
 
 export const experimentVariables = {
@@ -237,7 +245,6 @@ export const experimentVariables = {
   shouldCleanUsernameSuggestionInput: "shouldCleanUsernameSuggestionInput",
   shouldDisableClearingUsernameSuggestions: "shouldDisableClearingUsernameSuggestions",
   isParentSignUpDescriptionExperimentEnabled: "IsParentSignUpDescriptionExperimentEnabled",
-  shouldSkipVPCSignupFlow: "shouldSkipVPCSignupFlow",
 };
 
 export const vpcExperimentLayer = "AccountManagement.VerifiedParentalConsent.ParentExperience";
@@ -278,6 +285,7 @@ export const PARENTALCONSENT = "ParentalConsent";
 export const OPTIONAL_PERSONAL_INFORMATION_POLICY = "OptionalPersonalInformationPolicy";
 export const requestTypeParam = "requestType";
 export const sessionIdParam = "sessionId";
+export const analyticsSessionIdParam = "analyticsSessionId";
 export const settingNameParam = "target";
 export const defaultLandingBackgroundClass = "default-background";
 export const signupCustomEvent = "Roblox.Signup";

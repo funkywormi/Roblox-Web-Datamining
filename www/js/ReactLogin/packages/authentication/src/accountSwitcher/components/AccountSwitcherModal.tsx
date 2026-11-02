@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { DialogBody, DialogTitle, IconButton } from "@rbx/foundation-ui";
 import { Button, Modal } from "@rbx/core-ui/legacy/react-style-guide";
-import { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { TUserData } from "@rbx/authentication-common/types/userTypes";
 import AccountSelection from "./AccountSelection";
 import {
@@ -21,12 +21,10 @@ export type accountSwitcherModalProps = {
   onAccountSelection: (userId: number) => void;
   handleAddAccount: () => void;
   suppressAddAccountRow?: boolean;
-  handleShowLogoutAllModal: () => void;
   handleModalDismiss: () => void;
   activeUser?: TUserData;
   accountListVariant?: AccountSwitcherListVariant;
   isAccountListVariantResolved?: boolean;
-  translate: WithTranslationsProps["translate"];
 };
 
 export const AccountSwitcherModal = ({
@@ -35,13 +33,13 @@ export const AccountSwitcherModal = ({
   onAccountSelection,
   handleAddAccount,
   suppressAddAccountRow = false,
-  handleShowLogoutAllModal,
   handleModalDismiss,
   activeUser,
   accountListVariant = "legacy",
   isAccountListVariantResolved = true,
-  translate,
 }: accountSwitcherModalProps): JSX.Element => {
+  const translate = useTranslations("Authentication.AccountSwitch");
+  const translateControls = useTranslations("CommonUI.Controls");
   const [hasLogged, setHasLogged] = useState<boolean>(false);
 
   useEffect(() => {
@@ -64,7 +62,6 @@ export const AccountSwitcherModal = ({
         isAccountLimitReached={isAccountLimitReached}
         onAccountSelection={onAccountSelection}
         suppressAddAccountRow={suppressAddAccountRow}
-        translate={translate}
         users={users}
       />
     ) : (
@@ -77,7 +74,6 @@ export const AccountSwitcherModal = ({
               username={activeUser.name}
               displayName={activeUser.displayName}
               onAccountSelection={onAccountSelection}
-              translate={translate}
               showIcon
             />
           </li>
@@ -90,14 +86,13 @@ export const AccountSwitcherModal = ({
               username={user.name}
               displayName={user.displayName}
               onAccountSelection={onAccountSelection}
-              translate={translate}
               showIcon={false}
             />
           </li>
         ))}
         {!isAccountLimitReached && !suppressAddAccountRow && (
           <li className="account-selection-list-item">
-            <AddAccountRow handleAddAccount={handleAddAccount} translate={translate} />
+            <AddAccountRow handleAddAccount={handleAddAccount} />
           </li>
         )}
       </ul>
@@ -125,7 +120,7 @@ export const AccountSwitcherModal = ({
       <Fragment>
         <div className="account-switcher-foundation-header">
           <IconButton
-            ariaLabel={translate(commonUiTranslationKeys.ActionClose)}
+            ariaLabel={translateControls(commonUiTranslationKeys.ActionClose)}
             className="account-switcher-foundation-close"
             icon="icon-regular-x"
             onClick={handleModalDismiss}

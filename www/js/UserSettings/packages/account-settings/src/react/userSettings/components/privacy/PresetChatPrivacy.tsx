@@ -57,7 +57,11 @@ export const PresetChatPrivacy = ({
         snackbarService.success(translate(successMessageKey));
       }
     } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, child?.userId);
+      const errorKey = handleChildSettingsUpdateError(
+        error,
+        child?.userId,
+        UserSetting.allowPresetChat,
+      );
       if (errorKey) {
         snackbarService.warning(translate(errorKey));
       }

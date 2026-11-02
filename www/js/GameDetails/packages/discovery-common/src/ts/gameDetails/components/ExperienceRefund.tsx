@@ -2,6 +2,7 @@ import React from "react";
 import { getHelpDeskUrl } from "@rbx/core-scripts/util/url";
 import { Button, Link } from "@rbx/core-ui";
 import { TranslateFunction } from "@rbx/core-scripts/react";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { gameDetailsPage, homePage } from "../../common/constants/configConstants";
 import { FeatureGameDetails } from "../../common/constants/translationConstants";
 import { TGetGameDetails, TRefundPolicy } from "../../common/types/bedev1Types";
@@ -60,7 +61,7 @@ const ExperienceRefund: React.FC<TExperienceRefundProps> = ({ gameDetails, trans
                   if (rootPlaceId) {
                     sendRequestRefundEvent(rootPlaceId);
                   } else {
-                    window.EventTracker?.fireEvent(gameDetailsPage.requestRefundError);
+                    fireEvent(gameDetailsPage.requestRefundError);
                   }
                 }}
               >

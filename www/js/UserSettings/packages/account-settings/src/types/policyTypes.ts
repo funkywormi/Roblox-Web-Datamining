@@ -32,6 +32,8 @@ export type TSettingsUIPolicyBody = {
   displaySubscriptionsTab: boolean;
   displayParentalControlTab: boolean;
   displayAppPermissionsTab: boolean;
+  // Manage Recommendations (ANC-113). Absent until Guac serves it, which hides the tab.
+  displayManageRecommendationsTab?: boolean;
   displayBlockListV2: boolean;
   enableAccountCountrySubdivisionSetting: boolean;
   displayAccountDeactivation: boolean;
@@ -60,6 +62,7 @@ export type TSettingsUIPolicyBody = {
   enableChildSideParentDigestEmails: boolean;
   displayDesktopNotificationSettings: boolean;
   enableFoundationModals: boolean;
+  enableSetEmailModalV2: boolean;
   experienceChatTCBreakthroughEnabled: boolean;
   enforceAgeVerificationForSocialLinks: boolean;
   disableSocialLinkCreation: boolean;

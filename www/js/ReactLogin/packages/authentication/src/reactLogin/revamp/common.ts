@@ -44,6 +44,11 @@ import {
 import { sendAccountSelectorLoadEvent, sendOtpLoginErrorEvent } from "../services/eventService";
 import { FeatureLoginPage } from "@rbx/authentication-common/constants/translationConstants";
 import { parseErrorCode } from "@rbx/authentication-common/utils/requestUtils";
+import { ParentEmailTokenRedemptionResult } from "@rbx/authentication-common/utils/parentEmailTokenRedemptionUtils";
+import {
+  isMagicLinkTokenRejectedErrorCode,
+  sendMagicLinkLoginRedemptionEvent,
+} from "../utils/magicLinkLoginUtils";
 
 export type LoginMutationOptions = {
   onMagicLinkLoginError?: () => void;
@@ -198,6 +203,13 @@ const handleLoginError = (
         backToLogin(translate(errorTranslationKey));
         throw error;
       } else if (credential.type === CredentialType.MagicLink) {
+        if (isMagicLinkTokenRejectedErrorCode(errorCode)) {
+          // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation -- best-effort analytics event
+          void sendMagicLinkLoginRedemptionEvent(
+            credential.value,
+            ParentEmailTokenRedemptionResult.Expired,
+          );
+        }
         backToLogin();
         options.onMagicLinkLoginError?.();
         return;
@@ -256,6 +268,13 @@ export const useLoginMutation = (options: LoginMutationOptions = {}) => {
         incrementEphemeralCounter(eventCounters.successWithGameIntent);
       }
       incrementEphemeralCounter(eventCounters.success);
+      if (credential.type === CredentialType.MagicLink) {
+        // Before navigating away after login.
+        await sendMagicLinkLoginRedemptionEvent(
+          credential.value,
+          ParentEmailTokenRedemptionResult.Success,
+        );
+      }
 
       const challengeId = result.twoStepVerificationData?.ticket;
       const id = result.user.id.toString();

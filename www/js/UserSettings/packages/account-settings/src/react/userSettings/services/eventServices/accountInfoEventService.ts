@@ -44,6 +44,16 @@ const accountInfoEventService = {
     const params = getEventParams.changeDisplayNameCancel(oldName);
     eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
   }),
+  emailConsentCheckboxShown: wrapEventServiceWithTryCatch((isChangeEmail: boolean): void => {
+    const params = getEventParams.emailConsentCheckboxShown(isChangeEmail);
+    eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
+  }),
+  emailConsentSubmitted: wrapEventServiceWithTryCatch(
+    (isOptedIn: boolean, isOptInSaved: boolean): void => {
+      const params = getEventParams.emailConsentSubmitted(isOptedIn, isOptInSaved);
+      eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
+    },
+  ),
   passkeyPageLoad: wrapEventServiceWithTryCatch((eligible: boolean, timeout?: boolean): void => {
     const params = getEventParams.passkeyPageload(eligible, timeout);
     eventStreamService.sendEventWithTarget(params.type, params.context, params.params);

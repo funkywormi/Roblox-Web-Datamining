@@ -1,7 +1,7 @@
 import React from "react";
-import { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
 import { TLoggedInUsers } from "@rbx/authentication-common/types/accountSwitcherTypes";
 import AccountSwitcherContainer from "../../accountSwitcher/containers/AccountSwitcherContainer";
+import { ThumbnailsAvatarHeadshot } from "../../accountSwitcher/components/ThumbnailsAvatarHeadshot";
 import useIsAccountSwitcherAvailableForBrowser from "../../accountSwitcher/hooks/useIsAccountSwitcherAvailableForBrowser";
 
 export type loginAccountSwitcherProps = {
@@ -13,7 +13,6 @@ export type loginAccountSwitcherProps = {
   suppressAddAccountRow?: boolean;
   removeInvalidActiveUser: boolean;
   isModal?: boolean;
-  translate: WithTranslationsProps["translate"];
   loggedInUsers?: TLoggedInUsers;
 };
 
@@ -26,7 +25,6 @@ export const LoginAccountSwitcher = ({
   suppressAddAccountRow,
   removeInvalidActiveUser,
   isModal,
-  translate,
   loggedInUsers,
 }: loginAccountSwitcherProps): JSX.Element => {
   const [isAccountSwitchingEnabledForBrowser] = useIsAccountSwitcherAvailableForBrowser();
@@ -35,6 +33,7 @@ export const LoginAccountSwitcher = ({
     <div id={containerId}>
       {isAccountSwitchingEnabledForBrowser ? (
         <AccountSwitcherContainer
+          AvatarHeadshot={ThumbnailsAvatarHeadshot}
           titleText={titleText}
           helpText={helpText}
           onAccountSwitched={onAccountSwitched}
@@ -42,7 +41,6 @@ export const LoginAccountSwitcher = ({
           suppressAddAccountRow={suppressAddAccountRow}
           removeInvalidActiveUser={removeInvalidActiveUser}
           isModal={isModal}
-          translate={translate}
           loggedInUsers={loggedInUsers}
         />
       ) : null}

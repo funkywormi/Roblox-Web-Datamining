@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
 import { TUserData } from "@rbx/authentication-common/types/userTypes";
 import AccountSelection from "./AccountSelection";
 import AddAccountRow from "./AddAccountRow";
@@ -11,7 +10,6 @@ export type accountSwitcherProps = {
   onAccountSelection: (userId: number) => void;
   handleAddAccount: () => void;
   suppressAddAccountRow?: boolean;
-  translate: WithTranslationsProps["translate"];
 };
 
 export const AccountSwitcher = ({
@@ -21,7 +19,6 @@ export const AccountSwitcher = ({
   onAccountSelection,
   handleAddAccount,
   suppressAddAccountRow = false,
-  translate,
 }: accountSwitcherProps): JSX.Element => {
   const [hasAnyRowBeenClicked, setHasAnyRowBeenClicked] = useState<boolean>(false);
 
@@ -51,14 +48,13 @@ export const AccountSwitcher = ({
                 displayName={user.displayName}
                 onAccountSelection={handleAccountSwitch}
                 showIcon={false}
-                translate={translate}
               />
             </div>
           </li>
         ))}
         {!suppressAddAccountRow && (
           <li className="account-selection-list-item">
-            <AddAccountRow handleAddAccount={handleAddAccount} translate={translate} />
+            <AddAccountRow handleAddAccount={handleAddAccount} />
           </li>
         )}
       </ul>

@@ -15,8 +15,13 @@ export const loginFormStrings = {
     "Action.ForgotPasswordOrUsernameQuestionCapitalized",
   ActionForgotPasswordOrUsernameQuestion: "Action.ForgotPasswordOrUsernameQuestion",
   LabelOr: "Label.Or",
+  LabelOR: "Label.OR",
   ActionEmailMeALoginCode: "Action.EmailMeALoginCode",
   ActionEmailACode: "Action.EmailACode",
+  ActionQrCode: "Action.QrCode",
+  ActionOtherSignInOptions: "Label.OtherSignInOptions",
+  ActionUsePasskey: "Action.UsePasskey",
+  ActionClose: "Action.Close",
   ActionUseAnotherDevice: "Action.UseAnotherDevice",
   ActionUseAnotherDeviceSentenceCase: "Action.UseAnotherDeviceSentenceCase",
   AuthenticationQuickSignInLowercase: "Authentication.QuickSignInLowercase",
@@ -98,6 +103,9 @@ export const errorCodes = {
   maxLoggedInAccountsLimitReached: 25,
   parentEmptyAccountSwitchBlobRequired: 26,
   passkeyOnlyAccount: 28,
+  magicLinkInvalid: 39,
+  magicLinkExpired: 40,
+  magicLinkAlreadyRedeemed: 41,
 };
 
 export const retryAttempts = {

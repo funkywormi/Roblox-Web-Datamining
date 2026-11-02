@@ -9,6 +9,7 @@ enum RouterPath {
   ParentalControls = "parental-controls",
   AppPermissions = "app-permissions",
   BrowserPreferences = "browser-preferences",
+  ManageRecommendations = "personalized-recommendations",
 }
 
 export default RouterPath;

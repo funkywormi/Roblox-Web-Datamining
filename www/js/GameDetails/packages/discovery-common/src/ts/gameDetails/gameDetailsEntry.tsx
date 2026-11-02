@@ -4,6 +4,7 @@ import { renderWithErrorBoundary, queryClient } from "@rbx/core-scripts/react";
 import { appDownloadNamespaces } from "@rbx/app-download";
 import { gamePlayButtonNamespaces } from "@rbx/game-play-button";
 import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { gameDetailsPage } from "../common/constants/configConstants";
 import InviteLinkInvalidModal from "./components/InviteLinkInvalidModal";
 import CarouselContainer from "./containers/CarouselContainer";
@@ -134,7 +135,7 @@ export default (): void => {
         },
       );
     } catch {
-      window.EventTracker?.fireEvent(gameDetailsPage.votingPanelLoadFailure);
+      fireEvent(gameDetailsPage.votingPanelLoadFailure);
     }
   }
 

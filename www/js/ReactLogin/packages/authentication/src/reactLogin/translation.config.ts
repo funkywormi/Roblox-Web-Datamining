@@ -7,6 +7,7 @@ export const loginTranslationConfig: TConfig = {
     "Common.Captcha",
     "CommonUI.Controls",
     "Authentication.AccountSwitch",
+    "Authentication.SignUp",
     "Feature.Landing",
   ],
   feature: "Authentication.Login",
@@ -36,6 +37,7 @@ export const loginPageProviderConfig: string[] = [
   "CommonUI.Features",
   "Authentication.AccountSwitch",
   "Authentication.Login",
+  "Authentication.SignUp",
   "Feature.Landing",
   "Feature.IdVerification",
 ];

@@ -1,6 +1,19 @@
+import {
+  getParentEmailTokenMetricsType,
+  ParentEmailTokenMetricsType,
+  ParentEmailTokenRedemptionResult,
+  ParentEmailTokenSurface,
+  ParentEmailTokenType,
+  sendParentEmailTokenRedemptionEvent,
+  skipParentEmailTokenRedemptionEventsQueryParam,
+} from "@rbx/authentication-common/utils/parentEmailTokenRedemptionUtils";
+import { errorCodes } from "../constants/loginConstants";
+
 export const magicLinkTokenQueryParam = "magicLinkToken";
 
 let cachedMagicLinkToken: string | null | undefined;
+// Whether the cached token was nested inside ReturnUrl rather than a top-level query param.
+let isCachedMagicLinkTokenFromReturnUrl = false;
 
 const returnUrlQueryParams = ["returnUrl", "ReturnUrl"];
 
@@ -28,6 +41,7 @@ const getMagicLinkTokenFromReturnUrl = (returnUrl: string): string | null => {
 
 export const resetMagicLinkTokenCache = (): void => {
   cachedMagicLinkToken = undefined;
+  isCachedMagicLinkTokenFromReturnUrl = false;
 };
 
 // Matches /parental-requests with an optional locale prefix, e.g. /ja/parental-requests.
@@ -101,7 +115,58 @@ export const getMagicLinkTokenFromQueryString = (): string | null => {
 
   const nestedToken = getMagicLinkTokenFromReturnUrl(returnUrl);
   cachedMagicLinkToken = nestedToken;
+  isCachedMagicLinkTokenFromReturnUrl = nestedToken !== null;
   return nestedToken;
+};
+
+const magicLinkTokenRejectedErrorCodes: ReadonlySet<number | null> = new Set([
+  errorCodes.magicLinkInvalid,
+  errorCodes.magicLinkExpired,
+  errorCodes.magicLinkAlreadyRedeemed,
+]);
+
+/** Whether a failed magic-link login was rejected for the token itself, rather than e.g. an outage. */
+export const isMagicLinkTokenRejectedErrorCode = (errorCode: number | null): boolean =>
+  magicLinkTokenRejectedErrorCodes.has(errorCode);
+
+/**
+ * Sends a redemption event for the magic link being redeemed on login. Nothing is sent for a
+ * token that was minted on the page rather than emailed (see
+ * skipParentEmailTokenRedemptionEventsQueryParam).
+ */
+export const sendMagicLinkLoginRedemptionEvent = async (
+  magicLinkToken: string,
+  result: ParentEmailTokenRedemptionResult,
+): Promise<void> => {
+  if (
+    new URLSearchParams(window.location.search).has(skipParentEmailTokenRedemptionEventsQueryParam)
+  ) {
+    return;
+  }
+
+  // The token was emailed for the page login returns to, so that page determines the email.
+  const returnUrl = getReturnUrlFromQueryString();
+  await sendParentEmailTokenRedemptionEvent({
+    token: magicLinkToken,
+    tokenType: ParentEmailTokenType.VpcMagicLink,
+    metricsType: returnUrl
+      ? getParentEmailTokenMetricsType(returnUrl)
+      : ParentEmailTokenMetricsType.Unknown,
+    surface: ParentEmailTokenSurface.Login,
+    result,
+  });
+};
+
+/**
+ * Sends opened only when login is the first page the parent landed on. Parental requests and
+ * account settings send opened themselves and hand the token to login as a top-level query param;
+ * a token nested in ReturnUrl means the server redirected a signed-out parent straight here.
+ */
+export const sendMagicLinkLoginOpenedEvent = async (magicLinkToken: string): Promise<void> => {
+  if (!isCachedMagicLinkTokenFromReturnUrl) {
+    return;
+  }
+  await sendMagicLinkLoginRedemptionEvent(magicLinkToken, ParentEmailTokenRedemptionResult.Opened);
 };
 
 /**

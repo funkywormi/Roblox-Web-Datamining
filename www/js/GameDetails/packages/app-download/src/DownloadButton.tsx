@@ -36,6 +36,7 @@ export type DownloadButtonProps = {
   useFoundationSize?: boolean;
   className?: ComponentProps<typeof Button>["className"];
   href?: string;
+  target?: "_self" | "_blank";
   download?: ResolvedAppDownload;
   downloadTypeOverride?: ResolveAppDownloadOptions["downloadTypeOverride"];
   onClick?: (
@@ -55,6 +56,7 @@ function DownloadButton({
   useFoundationSize = false,
   className,
   href,
+  target,
   download: downloadOverride,
   downloadTypeOverride,
   onClick,
@@ -74,6 +76,7 @@ function DownloadButton({
   }
 
   const resolvedHref = href ?? download.href.toString();
+  const linkTarget = target ?? (download.isDirectDownload ? "_self" : "_blank");
   const label = text ?? translate(download.link.title);
   const iconSize = iconSizeByButtonSize[size] ?? size;
   const sizeClassName = useFoundationSize ? undefined : buttonClassNameBySize[size];
@@ -112,8 +115,8 @@ function DownloadButton({
         size={size}
         className={buttonClassName}
         href={isInteractionBlocked ? undefined : resolvedHref}
-        target={download.isDirectDownload ? "_self" : "_blank"}
-        rel={download.isDirectDownload ? undefined : "noopener noreferrer"}
+        target={linkTarget}
+        rel={linkTarget === "_blank" ? "noopener noreferrer" : undefined}
         isDisabled={isDisabled}
         isLoading={isClickPending}
         onClick={event => {

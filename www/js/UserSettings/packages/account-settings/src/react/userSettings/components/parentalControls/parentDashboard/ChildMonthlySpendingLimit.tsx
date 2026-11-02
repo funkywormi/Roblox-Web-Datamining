@@ -69,7 +69,11 @@ const ChildMonthlySpendingLimit = ({
       await updateChildSettings(updateBody).unwrap();
       snackbarService.success(translate(commonTranslationConstants.successDialogMessage));
     } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, child.userId);
+      const errorKey = handleChildSettingsUpdateError(
+        error,
+        child.userId,
+        UserSetting.monthlySpendLimit,
+      );
       if (errorKey) {
         snackbarService.warning(translate(errorKey));
       }

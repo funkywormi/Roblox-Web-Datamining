@@ -1,4 +1,7 @@
-import { TPlayabilityStatusWithUnplayableError } from "../types/playButtonTypes";
+import {
+  TPlayabilityStatusWithUnplayableError,
+  TPlayButtonActionTypes,
+} from "../types/playButtonTypes";
 import { PlayabilityStatus } from "./playabilityStatus";
 
 // NOTE: This does not override the true event name since it is set in:
@@ -31,6 +34,8 @@ const playButtonErrorStatusTranslationMap: Record<TPlayabilityStatusWithUnplayab
   [PlayabilityStatus.InsufficientPermissionFriendsOnly]:
     "UnplayableError.CreatorHasntMadeAvailable",
   [PlayabilityStatus.InsufficientPermissionGroupOnly]: "UnplayableError.CreatorHasntMadeAvailable",
+  [PlayabilityStatus.InsufficientPermissionEditorsOnly]: "UnplayableError.UnplayableOther",
+  [PlayabilityStatus.InsufficientPermissionPlayTestersOnly]: "UnplayableError.UnplayableOther",
   [PlayabilityStatus.DeviceRestricted]: "UnplayableError.DeviceRestrictedDefault",
   [PlayabilityStatus.FiatPurchaseDeviceRestricted]: "UnplayableError.FiatPurchaseDeviceRestricted",
   [PlayabilityStatus.UnderReview]: "UnplayableError.Moderated",
@@ -46,6 +51,7 @@ const playButtonErrorStatusTranslationMap: Record<TPlayabilityStatusWithUnplayab
     "UnplayableError.ContextualPlayabilityAgeGated",
   [PlayabilityStatus.PlaceHasNoPublishedVersion]: "UnplayableError.CreatorHasntMadeAvailable",
   [PlayabilityStatus.ContextualPlayabilityUnrated]: "UnplayableError.ContextualPlayabilityUnrated",
+  [PlayabilityStatus.ContextualPlayabilityGeneral]: "UnplayableError.UnplayableOther",
   [PlayabilityStatus.ContextualPlayabilityAgeGatedByDescriptor]:
     "UnplayableError.ContextualPlayabilityAgeGatedByDescriptor",
   [PlayabilityStatus.ContextualPlayabilityExperienceBlockedParentalControls]:
@@ -60,6 +66,7 @@ const playButtonTextTranslationMap = {
   Buy: "PlayButtonText.Buy",
   PlayDemo: "PlayButtonText.PlayDemo",
   PlayOnWeb: "PlayButtonText.PlayOnWeb",
+  Playtest: "PlayButtonText.Playtest",
 };
 
 const counterEvents = {
@@ -129,6 +136,9 @@ const defaultAfReferralProperties = {
   pid: "experiencestart_mobileweb",
   is_retargeting: "false",
 };
+
+export const demoPlayActionType: TPlayButtonActionTypes = "DemoPlayButtonClick";
+export const playOnWebActionType: TPlayButtonActionTypes = "PlayOnWebButtonClick";
 
 export default {
   playButtonErrorStatusTranslationMap,

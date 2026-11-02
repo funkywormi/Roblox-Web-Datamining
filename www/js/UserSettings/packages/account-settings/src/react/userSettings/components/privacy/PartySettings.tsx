@@ -61,7 +61,11 @@ export const PartySettings = ({
         snackbarService.success(translate(successMessageKey));
       }
     } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, child?.userId);
+      const errorKey = handleChildSettingsUpdateError(
+        error,
+        child?.userId,
+        UserSetting.whoCanOneOnOnePartyWithMe,
+      );
       if (errorKey) {
         snackbarService.warning(translate(errorKey));
       }
@@ -85,7 +89,11 @@ export const PartySettings = ({
         snackbarService.success(translate(successMessageKey));
       }
     } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, child?.userId);
+      const errorKey = handleChildSettingsUpdateError(
+        error,
+        child?.userId,
+        UserSetting.whoCanGroupPartyWithMe,
+      );
       if (errorKey) {
         snackbarService.warning(translate(errorKey));
       }

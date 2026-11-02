@@ -143,10 +143,12 @@ export const getTrustedConnectionReviewPageUrl = (consentId: string, sessionId: 
     window.location.href,
   )}`;
 
-export const getVerificationPageUrl = (childUserId: number): string =>
-  `/parental-requests?requestType=UpdateUserSetting&source=SettingsPage&childUserId=${childUserId}&redirectUrl=${encodeURIComponent(
-    window.location.href,
-  )}`;
+// settingName is sent as the target, so the verification plans can apply setting-specific
+// requirements (e.g. AllowIdentityVerification does not accept FAE).
+export const getVerificationPageUrl = (childUserId: number, settingName?: string): string =>
+  `/parental-requests?requestType=UpdateUserSetting&source=SettingsPage&childUserId=${childUserId}${
+    settingName ? `&target=${encodeURIComponent(settingName)}` : ""
+  }&redirectUrl=${encodeURIComponent(window.location.href)}`;
 
 // parental friend actions
 export const findFriendsEndpointUrl = (userId: number): string => {

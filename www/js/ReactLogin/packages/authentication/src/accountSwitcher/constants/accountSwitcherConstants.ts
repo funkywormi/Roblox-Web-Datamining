@@ -9,7 +9,7 @@ export const accountSwitcherStrings = {
   LabelAddAccountWithoutLoggingOut: "Label.AddAccountWithoutLoggingOut",
   LabelAddOrSwitchAccount: "Label.AddOrSwitchAccount",
   DescriptionAccountLimit: "Description.AccountLimit",
-};
+} as const;
 
 export const accountLimitErrorStrings = {
   HeadingAccountLimitReached: "Heading.AccountLimitReached",
@@ -33,12 +33,12 @@ export const errorCasePlaceholderStrings = {
   UnavailableHeaderText: "Header.AccountSwitchingUnavailable",
   CannotBeSwitchedHelpText: "Description.InvalidAccountSwitch",
   NotWorkingTryLaterText: "Description.AccountSwitchingNotWorking",
-};
+} as const;
 
 export const commonUiTranslationKeys = {
   ActionClose: "Action.Close",
   ActionOK: "Action.OK",
-};
+} as const;
 
 // TODO swap these out for localized keys
 export const logoutAllAccountsPlaceholderStrings = {

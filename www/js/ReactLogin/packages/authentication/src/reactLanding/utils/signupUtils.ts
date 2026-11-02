@@ -21,6 +21,8 @@ import {
   validateUsernameContext,
   accountSwitcherConfirmationModalContainer,
   signupCustomEvent,
+  sessionIdParam,
+  analyticsSessionIdParam,
 } from "../constants/signupConstants";
 import { validateUsername } from "../services/signupService";
 import { qualifiedSignup } from "../services/affiliateLinksService";
@@ -29,6 +31,7 @@ import getInvalidPasswordMessage from "@rbx/authentication-common/utils/password
 import { parseErrorCode } from "@rbx/authentication-common/utils/requestUtils";
 import { getUrlParamValue, navigateToPage } from "@rbx/authentication-common/utils/browserUtils";
 import { cleanupIdentityVerificationResultToken } from "./identityVerificationUtils";
+import { buildSignupBirthday } from "./signupRequestUtils";
 import {
   incrementEphemeralCounter,
   sendConversionEvent,
@@ -52,7 +55,7 @@ import {
   getLinkCode,
   getLinkType,
 } from "./affiliateLinksUtils";
-import { getSafeReturnUrlFromQueryString } from "../../reactLogin/utils/urlUtils";
+import { appendQueryParam, getSafeReturnUrlFromQueryString } from "../../reactLogin/utils/urlUtils";
 
 const getErrorCodeFromValidateUsernameResponse = (response: TValidateUsernameResponse): string => {
   let validationMessage = "";
@@ -100,9 +103,9 @@ export const getUsernameValidationResult = async (
     context: validateUsernameContext,
   };
 
-  const birthday = new Date(Date.parse(`${birthdayMonth!} ${birthdayDay!}, ${birthdayYear!}`));
+  const birthday = buildSignupBirthday(birthdayDay!, birthdayMonth!, birthdayYear!);
 
-  if (!Number.isNaN(birthday.getMilliseconds())) {
+  if (!Number.isNaN(birthday.getTime())) {
     validateUsernameParams.birthday = birthday;
   }
 
@@ -215,7 +218,7 @@ export const isValidBirthday = (year: string, month: string, day: string): boole
   return true;
 };
 
-export const handlePostSignup = async (returnUrlValue?: string, userId?: string): Promise<void> => {
+export const handlePostSignup = async (returnUrl?: string, userId?: string): Promise<void> => {
   cleanupIdentityVerificationResultToken();
   incrementEphemeralCounter(counters.success);
   window.dispatchEvent(new CustomEvent(signupCustomEvent, { detail: { userId } }));
@@ -224,7 +227,6 @@ export const handlePostSignup = async (returnUrlValue?: string, userId?: string)
   } catch (e) {
     console.error("Error setting new user session flag:", e);
   }
-  let returnUrl = returnUrlValue;
   try {
     if (userId) {
       const {
@@ -262,14 +264,8 @@ export const handlePostSignup = async (returnUrlValue?: string, userId?: string)
         linkType,
       });
     }
-    if (returnUrl.indexOf("?") === -1) {
-      returnUrl += "?";
-    } else {
-      returnUrl += "&";
-    }
-    returnUrl += newUserParam;
-
-    sendConversionEvent(() => navigateToPage(returnUrl!));
+    const newUserReturnUrl = appendQueryParam(returnUrl, newUserParam);
+    sendConversionEvent(() => navigateToPage(newUserReturnUrl));
   } else {
     sendConversionEvent(() => navigateToPage(urlConstants.homePageNewUser));
   }
@@ -338,6 +334,14 @@ export const getDataToken = (): string => {
 export const isVerifiedParentConsentSignup = (): boolean => {
   const dataToken = getDataToken();
   return !!dataToken;
+};
+
+// Older email links only carry `sessionId`; drop the fallback once those links have expired.
+export const getVPCAnalyticsSessionId = (
+  search: string = window.location.search,
+): string | undefined => {
+  const params = new URLSearchParams(search);
+  return params.get(analyticsSessionIdParam) ?? params.get(sessionIdParam) ?? undefined;
 };
 
 export const getBirthdayToPrefill = (): string => {

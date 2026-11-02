@@ -19,7 +19,6 @@ import {
 } from "@rbx/authentication-common/constants/browserConstants";
 import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 import { FeatureLoginPage } from "@rbx/authentication-common/constants/translationConstants";
-import { urlQueryConstants } from "@rbx/authentication-common/constants/urlConstants";
 import RobloxEventTracker from "@rbx/authentication-common/eventTracker";
 import { CredentialType } from "@rbx/authentication-common/types/loginTypes";
 import { navigateToPage } from "@rbx/authentication-common/utils/browserUtils";
@@ -35,7 +34,7 @@ import {
 } from "../constants/loginConstants";
 import { sendLogoutAllAccountsOnLoginEvent } from "../services/eventService";
 import { stripMagicLinkTokenFromUrl } from "./magicLinkLoginUtils";
-import { env, getEnvironment, getSafeReturnUrlFromQueryString } from "./urlUtils";
+import { appendQueryParam, env, getEnvironment, getSafeReturnUrlFromQueryString } from "./urlUtils";
 
 const { composeQueryString } = urlService;
 
@@ -243,20 +242,7 @@ export const addNewLoginQueryStringToUrl = (url: string) => {
   if (!url) {
     return "/";
   }
-
-  // `nl=true` belongs to the query string. Appending it to a url that ends in a
-  // `#!/...` route would make it part of the fragment instead, so the target page
-  // reads a corrupted route and never lands on the requested subpage.
-  const hashIndex = url.indexOf(urlQueryConstants.hashSign);
-  const beforeHash = hashIndex === -1 ? url : url.slice(0, hashIndex);
-  const hash = hashIndex === -1 ? "" : url.slice(hashIndex);
-
-  const separator =
-    beforeHash.indexOf(urlQueryConstants.urlQueryStringPrefix) > -1
-      ? urlQueryConstants.urlQueryParameterSeparator
-      : urlQueryConstants.urlQueryStringPrefix;
-
-  return `${beforeHash}${separator}${isNewLoginQueryString}${hash}`;
+  return appendQueryParam(url, isNewLoginQueryString);
 };
 
 export const getRedirectUrl = () => {

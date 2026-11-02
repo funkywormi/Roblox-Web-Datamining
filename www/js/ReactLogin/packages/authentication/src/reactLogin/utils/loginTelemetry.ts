@@ -1,4 +1,5 @@
 import { CredentialType } from "@rbx/authentication-common/types/loginTypes";
+import { getAssignedAuthUiVariant } from "@rbx/authentication-common/utils/authUiVariantUtils";
 import { errorCodes } from "../constants/loginConstants";
 import {
   authFailureReason,
@@ -13,6 +14,8 @@ import {
 export const legacyLoginTelemetry = createAuthFlowTelemetry({
   flow: authFlow.login,
   source: authSource.legacy,
+  // Unenrolled visitors stay `unspecified` so the existing login v1 series are unchanged.
+  variant: getAssignedAuthUiVariant,
 });
 
 export const getLoginTelemetryMethod = (credentialType: CredentialType): AuthMethod => {

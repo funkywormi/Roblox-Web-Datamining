@@ -1,26 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
-import { AccountSwitcherService } from "Roblox";
 import { Dialog, DialogContent } from "@rbx/foundation-ui";
 import { Modal } from "@rbx/core-ui/legacy/react-style-guide";
-import { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
-import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
-import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
+import { useTranslations } from "@rbx/www-common/i18n";
+import { getCurrentUser } from "@rbx/www-common/user";
 import { TUserData } from "@rbx/authentication-common/types/userTypes";
 import {
   TLoggedInUsers,
+  TRenderBaseConfirmationModal,
   TSwitchParams,
 } from "@rbx/authentication-common/types/accountSwitcherTypes";
 import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 import AccountSwitcher from "../components/AccountSwitcher";
 import AccountSwitcherModal from "../components/AccountSwitcherModal";
-import { accountSwitcherConfig } from "../translation.config";
-import { logoutAllLoggedInUsers, switchAccount } from "../services/accountSwitcherService";
+import { switchAccount } from "../services/accountSwitcherService";
 import {
-  accountSwitcherStrings,
   commonUiTranslationKeys,
   confirmationModalOrigins,
   errorCasePlaceholderStrings,
-  logoutAllAccountsPlaceholderStrings,
   modalContainerId,
   ModalType,
 } from "../constants/accountSwitcherConstants";
@@ -28,22 +24,38 @@ import {
   storeAccountSwitcherBlob,
   getStoredAccountSwitcherBlob,
   parseLoggedInUsers,
-  deleteAccountSwitcherBlob,
   hasAccountSwitcherInvalidSessionError,
 } from "../utils/accountSwitcherUtils";
 import {
   getAccountSwitcherListExperiment,
   logAccountSwitcherListExperimentExposure,
 } from "../utils/accountSwitcherListVariantUtils";
-import { AccountSwitcherBaseConfirmationModal } from "../components/AccountSwitcherBaseConfirmationModal";
+import {
+  AccountSwitcherAvatarContext,
+  type AccountSwitcherAvatarHeadshot,
+} from "../components/AccountSwitcherAvatar";
 import type { AccountSwitcherListVariant } from "../components/FoundationAccountSwitcherList";
 import {
-  sendAuthClientErrorEvent,
   sendAccountSwitchEvent,
   sendAccountSwitcherSwitchResultEvent,
   sendDismissAccountSwitcherEvent,
   sendAuthButtonClickEvent,
 } from "../services/eventService";
+
+// The confirmation modal renders through the .NET AccountSwitcher bundle global, read at call time
+// so this container also loads where window.Roblox doesn't exist (Next.js); there it's a no-op.
+const renderBaseConfirmationModal: TRenderBaseConfirmationModal = params => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- legacy bundle global, absent on Next.js
+  const { Roblox } = window as {
+    Roblox?: {
+      AccountSwitcherService?: { renderBaseConfirmationModal?: TRenderBaseConfirmationModal };
+    };
+  };
+  return Roblox?.AccountSwitcherService?.renderBaseConfirmationModal?.(params) ?? false;
+};
 
 export type accountSwitcherContainerProps = {
   modalType?: ModalType;
@@ -55,11 +67,10 @@ export type accountSwitcherContainerProps = {
   suppressAddAccountRow?: boolean;
   removeInvalidActiveUser?: boolean;
   isModal?: boolean;
-  translate: WithTranslationsProps["translate"];
   loggedInUsers?: TLoggedInUsers;
 };
 
-export const AccountSwitcherContainer = ({
+const AccountSwitcherContainerContent = ({
   modalType = ModalType.AccountSwitcherModalType,
   titleText,
   helpText,
@@ -68,11 +79,12 @@ export const AccountSwitcherContainer = ({
   suppressAddAccountRow = false,
   removeInvalidActiveUser = false,
   isModal,
-  translate,
   loggedInUsers,
 }: accountSwitcherContainerProps): JSX.Element => {
+  const translate = useTranslations("Authentication.AccountSwitch");
+  const translateControls = useTranslations("CommonUI.Controls");
   const [isModalOpen, setIsModalOpen] = useState(!!loggedInUsers);
-  const [currentModal, setCurrentModal] = useState(modalType);
+  const [currentModal] = useState(modalType);
   const [accountListVariant, setAccountListVariant] =
     useState<AccountSwitcherListVariant>("legacy");
   const [isAccountListVariantResolved, setIsAccountListVariantResolved] = useState(false);
@@ -85,7 +97,7 @@ export const AccountSwitcherContainer = ({
   });
 
   // Only allow showing as modal if user is authenticated
-  const shouldShowAsModal = authenticatedUser.isAuthenticated && isModal;
+  const shouldShowAsModal = getCurrentUser() != null && isModal;
 
   function renderSwitchAccountErrorConfirmationModal() {
     const switcherErrorConfirmationModalParameters = {
@@ -93,13 +105,13 @@ export const AccountSwitcherContainer = ({
       origin: confirmationModalOrigins.UnavailableError,
       localizedTitleText: translate(errorCasePlaceholderStrings.UnavailableHeaderText),
       localizedBodyText: translate(errorCasePlaceholderStrings.CannotBeSwitchedHelpText),
-      localizedPrimaryButtonText: translate(commonUiTranslationKeys.ActionOK),
+      localizedPrimaryButtonText: translateControls(commonUiTranslationKeys.ActionOK),
       primaryButtonCallback: () => {
         // positive button takes user to login page
         handleAddAccount();
       },
     };
-    AccountSwitcherService.renderBaseConfirmationModal(switcherErrorConfirmationModalParameters);
+    renderBaseConfirmationModal(switcherErrorConfirmationModalParameters);
   }
 
   const getContextForLogging = () => {
@@ -115,9 +127,7 @@ export const AccountSwitcherContainer = ({
     const blob = getStoredAccountSwitcherBlob();
     if (blob) {
       const switchParam: TSwitchParams = {
-        switched_from_user_id: authenticatedUser.isAuthenticated
-          ? authenticatedUser.id!.toString()
-          : undefined,
+        switched_from_user_id: getCurrentUser()?.id,
         switched_to_user_id: accountSelectorUserId.toString(),
         encrypted_users_data_blob: blob,
       };
@@ -162,29 +172,6 @@ export const AccountSwitcherContainer = ({
     }
   };
 
-  const handleShowLogoutAllModal = () => {
-    setCurrentModal(ModalType.LogoutAllAccountsModalType);
-  };
-
-  const handleLogoutAllAccounts = async () => {
-    const blob = getStoredAccountSwitcherBlob();
-    if (blob) {
-      try {
-        await logoutAllLoggedInUsers({
-          encrypted_users_data_blob: blob,
-        });
-      } catch (error) {
-        sendAuthClientErrorEvent(
-          EVENT_CONSTANTS.context.accountSwitcherModal,
-          EVENT_CONSTANTS.clientErrorTypes.logoutAllAccountSwitcherAccounts,
-          getAccountListVariantEventParams(),
-        );
-      }
-      deleteAccountSwitcherBlob();
-      window.location.href = getAbsoluteUrl("/");
-    }
-  };
-
   const onUsersUpdated = (updatedUsers: TLoggedInUsers) => {
     // TODO: check if active user id is different from authenticated user id
     setUsers(updatedUsers);
@@ -206,12 +193,12 @@ export const AccountSwitcherContainer = ({
             origin: confirmationModalOrigins.UnavailableError,
             localizedTitleText: translate(errorCasePlaceholderStrings.UnavailableHeaderText),
             localizedBodyText: translate(errorCasePlaceholderStrings.NotWorkingTryLaterText),
-            localizedPrimaryButtonText: translate(commonUiTranslationKeys.ActionOK),
+            localizedPrimaryButtonText: translateControls(commonUiTranslationKeys.ActionOK),
             primaryButtonCallback: () => {
               // no op
             },
           };
-          AccountSwitcherService.renderBaseConfirmationModal(switcherModalPopulationFailureParams);
+          renderBaseConfirmationModal(switcherModalPopulationFailureParams);
           return;
         }
         const { activeUser, usersAvailableForSwitching, isAccountLimitReached, loggedOutUser } =
@@ -317,12 +304,10 @@ export const AccountSwitcherContainer = ({
               onAccountSelection={handleAccountSelection}
               handleAddAccount={handleAddAccountAndSendClickLog}
               suppressAddAccountRow={suppressAddAccountRow}
-              handleShowLogoutAllModal={handleShowLogoutAllModal}
               handleModalDismiss={handleModalDismiss}
               activeUser={users.activeUser}
               accountListVariant={accountListVariant}
               isAccountListVariantResolved={isAccountListVariantResolved}
-              translate={translate}
             />
           </DialogContent>
         </Dialog>
@@ -343,24 +328,10 @@ export const AccountSwitcherContainer = ({
             onAccountSelection={handleAccountSelection}
             handleAddAccount={handleAddAccountAndSendClickLog}
             suppressAddAccountRow={suppressAddAccountRow}
-            handleShowLogoutAllModal={handleShowLogoutAllModal}
             handleModalDismiss={handleModalDismiss}
             activeUser={users.activeUser}
             accountListVariant={accountListVariant}
             isAccountListVariantResolved={isAccountListVariantResolved}
-            translate={translate}
-          />
-        )}
-        {currentModal === ModalType.LogoutAllAccountsModalType && (
-          <AccountSwitcherBaseConfirmationModal
-            origin={confirmationModalOrigins.LogoutAll}
-            localizedTitleText={translate(accountSwitcherStrings.ActionLogOutAllAccounts)} // TODO switch to Header.LogoutAllAccounts when translations ready
-            localizedBodyText={logoutAllAccountsPlaceholderStrings.HelpText}
-            primaryButtonCallback={handleLogoutAllAccounts}
-            localizedPrimaryButtonText={logoutAllAccountsPlaceholderStrings.LogoutAllAccountsText}
-            secondaryButtonCallback={handleModalDismiss}
-            localizedSecondaryButtonText={logoutAllAccountsPlaceholderStrings.StayLoggedInText}
-            onClose={handleModalDismiss}
           />
         )}
       </Modal>
@@ -377,11 +348,21 @@ export const AccountSwitcherContainer = ({
           onAccountSelection={handleAccountSelection}
           handleAddAccount={handleAddAccountAndSendClickLog}
           suppressAddAccountRow={suppressAddAccountRow}
-          translate={translate}
         />
       )}
     </div>
   );
 };
+
+export const AccountSwitcherContainer = ({
+  AvatarHeadshot,
+  ...props
+}: accountSwitcherContainerProps & {
+  AvatarHeadshot: AccountSwitcherAvatarHeadshot;
+}): JSX.Element => (
+  <AccountSwitcherAvatarContext.Provider value={AvatarHeadshot}>
+    <AccountSwitcherContainerContent {...props} />
+  </AccountSwitcherAvatarContext.Provider>
+);
 
 export default AccountSwitcherContainer;

@@ -371,6 +371,11 @@ export type TOmniSearchTextDataModel = {
   contentId: number; // 0 for text data model
   name: string; // content of the text
   defaultLayoutData: TTopicLayoutData;
+  // Present only on safety resource banners (e.g. suicide/self-harm or terrorism hotlines).
+  safetyResource?: {
+    moderationCategory: string; // 'ssh' | 'tve', extensible to future categories
+    textFilterRequestId: string; // Nonempty, unique Text Filter request ID
+  };
 };
 
 export type TOmniSearchContentGroup = {

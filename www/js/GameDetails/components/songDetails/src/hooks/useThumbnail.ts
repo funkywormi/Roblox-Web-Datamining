@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  thumbnailService,
-  ThumbnailFormat,
-  ThumbnailStates,
-  ThumbnailTypes,
-} from "@rbx/thumbnails";
+  resolveThumbnail,
+  retryPendingThumbnail,
+  THUMBNAIL_PENDING,
+  type ThumbnailFormat,
+} from "@rbx/www-common/components/thumbnail";
 
 export type UseThumbnailParams = {
   assetId: number | string;
@@ -25,25 +25,23 @@ async function fetchAssetThumbnailImageUrl(
   height: number,
   format: ThumbnailFormat,
 ): Promise<string> {
-  const data = await thumbnailService.getThumbnailImage(
-    ThumbnailTypes.assetThumbnail,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- thumbnailService expects a string union we can't import
-    `${width}x${height}` as Parameters<typeof thumbnailService.getThumbnailImage>[1],
+  const resolved = await resolveThumbnail({
+    type: "Asset",
+    targetId: Number(assetId),
+    size: `${width}x${height}`,
     format,
-    Number(assetId),
-  );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- thumbnailService response shape not exported as a stable type
-  const { thumbnail } = data as { thumbnail: { state: string; imageUrl?: string } };
-  const { state, imageUrl } = thumbnail;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison -- comparing against known enum member
-  if (state === ThumbnailStates.complete && imageUrl) {
-    return imageUrl;
+  });
+  if (resolved.state === "Completed") {
+    return resolved.imageUrl;
+  }
+  if (resolved.state === "Pending") {
+    throw THUMBNAIL_PENDING;
   }
   throw new Error("Thumbnail not available");
 }
 
 /**
- * Loads a catalog asset thumbnail URL via {@link thumbnailService} (cached with React Query)
+ * Loads a catalog asset thumbnail URL via {@link resolveThumbnail} (cached with React Query)
  * and tracks decode / client load error state for the {@link HTMLImageElement}.
  */
 export function useThumbnail({ assetId, width, height, format }: UseThumbnailParams): {
@@ -61,6 +59,10 @@ export function useThumbnail({ assetId, width, height, format }: UseThumbnailPar
     queryKey: thumbnailQueryKeys.asset(assetId, width, height, format),
     queryFn: () => fetchAssetThumbnailImageUrl(assetId, width, height, format),
     enabled: Boolean(assetId),
+    // Matches www-common Thumbnail2d: a resolved thumbnail never refetches, and only a Pending one
+    // is polled. Set here so it holds under .NET's queryClient, which turns retry off.
+    staleTime: Infinity,
+    retry: retryPendingThumbnail,
   });
 
   useEffect(() => {

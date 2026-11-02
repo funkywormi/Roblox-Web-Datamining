@@ -1,8 +1,11 @@
 import "./src/main.css";
 import React from "react";
 import { renderWithErrorBoundary } from "@rbx/core-scripts/react";
-import { TranslationProvider } from "@rbx/core-scripts/legacy/react-utilities";
+import { queryClient, TranslationProvider } from "@rbx/core-scripts/legacy/react-utilities";
+import { QueryClientProvider } from "@tanstack/react-query";
 import ready from "@rbx/core-scripts/util/ready";
+import type { Namespace } from "@rbx/www-common/i18n";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { AccountIntegrityChallengeService } from "Roblox";
 import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
 import LoginBase from "@rbx/authentication/reactLogin/containers/LoginBase";
@@ -18,6 +21,11 @@ import {
 import isAccountExperienceRevampEnabled from "@rbx/authentication-common/utils/accountExperienceUtils";
 import { loginPageProviderConfig } from "@rbx/authentication/reactLogin/translation.config";
 import "@rbx/authentication/reactLogin/css/login.css";
+import { translations } from "./component.json";
+
+// The account switcher on the login page reads its strings through @rbx/www-common/i18n.
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- CI narrows Namespace; component.json is always valid
+const namespaces = translations as unknown as readonly Namespace[];
 
 const shouldRenderLoggedInU13Interstitial = shouldShowLoggedInU13Interstitial(
   authenticatedUser?.isAuthenticated ?? false,
@@ -47,10 +55,20 @@ function renderApp() {
     if (shouldRenderLoggedInU13Interstitial) {
       container = <LoggedInU13LoginInterstitial />;
     } else {
-      container = isAccountExperienceRevampEnabled() ? <LoginContainer /> : <LoginBase />;
+      // The legacy login reads the content rating policy through the shared react-query hook;
+      // the revamped container brings its own provider, so only this path needs one here.
+      container = isAccountExperienceRevampEnabled() ? (
+        <LoginContainer />
+      ) : (
+        <QueryClientProvider client={queryClient}>
+          <LoginBase />
+        </QueryClientProvider>
+      );
     }
     renderWithErrorBoundary(
-      <TranslationProvider config={loginPageProviderConfig}>{container}</TranslationProvider>,
+      <TranslationProviderSCC namespaces={namespaces}>
+        <TranslationProvider config={loginPageProviderConfig}>{container}</TranslationProvider>
+      </TranslationProviderSCC>,
       entryPoint,
     );
   } else {

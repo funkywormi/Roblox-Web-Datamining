@@ -8,6 +8,7 @@ import {
   VideoAnalyticsConfig,
 } from "@rbx/video-player";
 import { md5 } from "js-md5";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import useAutoPlayVideoCarouselItem from "../hooks/useAutoPlayVideoCarouselItem";
 import ErrorBoundary from "../../common/components/ErrorBoundary";
 import gamePreviewVideoConstants from "../constants/gamePreviewVideoConstants";
@@ -81,21 +82,21 @@ const GamePreviewVideoPlayer = ({
   const playVideo = useCallback(async () => {
     const video = videoRef.current;
     if (!video) {
-      window.EventTracker?.fireEvent(gamePreviewVideoCounters.GamePreviewVideoMissingOnPlayError);
+      fireEvent(gamePreviewVideoCounters.GamePreviewVideoMissingOnPlayError);
       return;
     }
 
     try {
       await video.play();
     } catch {
-      window.EventTracker?.fireEvent(gamePreviewVideoCounters.GamePreviewVideoPlayError);
+      fireEvent(gamePreviewVideoCounters.GamePreviewVideoPlayError);
     }
   }, []);
 
   const pauseVideo = useCallback(() => {
     const video = videoRef.current;
     if (!video) {
-      window.EventTracker?.fireEvent(gamePreviewVideoCounters.GamePreviewVideoMissingOnPauseError);
+      fireEvent(gamePreviewVideoCounters.GamePreviewVideoMissingOnPauseError);
       return;
     }
 
@@ -138,13 +139,13 @@ const GamePreviewVideoPlayer = ({
   }, [onEnd]);
 
   const handleErrorBoundaryError = useCallback(() => {
-    window.EventTracker?.fireEvent(gamePreviewVideoCounters.GamePreviewVideoErrorBoundaryError);
+    fireEvent(gamePreviewVideoCounters.GamePreviewVideoErrorBoundaryError);
 
     handleFailure();
   }, [handleFailure]);
 
   const handleError = useCallback(() => {
-    window.EventTracker?.fireEvent(gamePreviewVideoCounters.GamePreviewVideoErrorCallback);
+    fireEvent(gamePreviewVideoCounters.GamePreviewVideoErrorCallback);
 
     handleFailure();
   }, [handleFailure]);

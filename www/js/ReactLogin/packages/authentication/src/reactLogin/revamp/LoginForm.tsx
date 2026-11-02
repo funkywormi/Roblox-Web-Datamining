@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "@rbx/core-scripts/legacy/react-utilities";
 import { Button, Divider, Icon } from "@rbx/foundation-ui";
-import UsernameInput from "../../reactLanding/revamp/components/UsernameInput";
+import UsernameInput from "@rbx/authentication-common/components/UsernameInput";
 import PasswordInput from "../../reactLanding/revamp/components/PasswordInput";
 import { startOtp, startXdl, setIdentifier, setPassword, useLogin } from "./loginState";
 import {
@@ -28,6 +28,7 @@ import { useLoginMutation } from "./common";
 import {
   getMagicLinkTokenFromQueryString,
   removeMagicLinkTokenFromLoginUrl,
+  sendMagicLinkLoginOpenedEvent,
 } from "../utils/magicLinkLoginUtils";
 import MagicLinkLoginErrorModal from "../components/MagicLinkLoginErrorModal";
 import Login2sv from "./steps/2sv";
@@ -113,6 +114,8 @@ const LoginForm = (): JSX.Element => {
       return;
     }
 
+    // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation -- best-effort analytics event
+    void sendMagicLinkLoginOpenedEvent(magicLinkToken);
     removeMagicLinkTokenFromLoginUrl();
 
     login.mutate({

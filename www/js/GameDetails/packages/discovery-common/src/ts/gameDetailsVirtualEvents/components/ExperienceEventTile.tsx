@@ -4,6 +4,7 @@ import { TranslateFunction } from "@rbx/core-scripts/react";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { navigateToLoginWithRedirect } from "@rbx/navigation";
 import { launchLogin } from "@rbx/game-play-button";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { VirtualEvent } from "../services/services";
 import {
   tryParseDate,
@@ -102,7 +103,7 @@ const ExperienceEventTile = ({
         } else if (targetPlace) {
           launchLogin(targetPlace.toString(), {});
         } else {
-          window.EventTracker?.fireEvent(joinFailedEventName);
+          fireEvent(joinFailedEventName);
         }
         return;
       }
@@ -119,7 +120,7 @@ const ExperienceEventTile = ({
           );
         }
       } catch {
-        window.EventTracker?.fireEvent(joinFailedEventName);
+        fireEvent(joinFailedEventName);
       }
     },
     [

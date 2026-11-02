@@ -65,14 +65,18 @@ import {
   sendAccountSelectionEvent,
   sendAccountSelectorLoadEvent,
   sendAvailableAccountsForSwitchingOnPageLoadEvent,
-  sendAuthPageLoadEvent,
+  passkeyLoginClientErrorSteps,
   sendLoginButtonClickEvent,
+  sendLoginClientErrorEvent,
+  sendLoginErrorShownEvent,
+  sendLoginPageLoadEvent,
+  sendLoginSucceededEvent,
   sendOtpLoginButtonClickEvent,
   sendOtpLoginErrorEvent,
+  sendPasskeyLoginClientErrorEvent,
   sendPasskeyLoginPageLoadEvent,
   sendPlatformAuthenticatorSupportPageLoadEvent,
 } from "../services/eventService";
-import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 
 // utils
 import { detectInputMethod, InputMethod } from "@rbx/authentication-common/utils/inputMethodUtils";
@@ -113,35 +117,28 @@ import {
 
 import { EmailVerifyCodeModalParams } from "../../emailVerifyCodeModal/interface";
 import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
+import { getAuthUiVariant } from "@rbx/authentication-common/utils/authUiVariantUtils";
 import useLoggedInUsers from "@rbx/authentication-common/hooks/useLoggedInUsers";
 import useRedirectHomeIf from "@rbx/authentication-common/hooks/useRedirectHomeIf";
 import useCheckParentUrl from "@rbx/authentication-common/hooks/useCheckParentUrl";
-import {
-  getExperienceAffiliateReferralUrl,
-  getLinkCode,
-  getLinkType,
-} from "../../reactLanding/utils/affiliateLinksUtils";
-import { qualifiedLogin } from "../../reactLanding/services/affiliateLinksService";
+import { navigateToLoginReturnUrl } from "../utils/loginNavigationUtils";
 import useLoginBackground from "../hooks/useLoginBackground";
-import useContentRatingLogos from "../hooks/useContentRatingLogos";
+import { useContentRatingLogos } from "@rbx/content-rating-logos";
 import {
   getMagicLinkTokenFromQueryString,
+  isMagicLinkTokenRejectedErrorCode,
   removeMagicLinkTokenFromLoginUrl,
+  sendMagicLinkLoginOpenedEvent,
+  sendMagicLinkLoginRedemptionEvent,
 } from "../utils/magicLinkLoginUtils";
+import { ParentEmailTokenRedemptionResult } from "@rbx/authentication-common/utils/parentEmailTokenRedemptionUtils";
 import LoginPresentationRouter from "../components/LoginPresentationRouter";
 import type { LoginControllerViewModel } from "../types/loginControllerTypes";
 import { resolveLoginExperiments } from "../utils/loginExperimentUtils";
 import useForcePasswordlessLoginHandoff from "../hooks/useForcePasswordlessLoginHandoff";
 import { getLoginPageSupportAttributes } from "../../forcePasswordlessLogin/contract";
-
-type StudioEmbeddedWindow = Window & {
-  rbx?: {
-    postMessage?: unknown;
-  };
-};
-
-const isStudioEmbeddedWebView = (): boolean =>
-  typeof (window as StudioEmbeddedWindow).rbx?.postMessage === "function";
+import useAuthUiPolicy from "../../shared/hooks/useAuthUiPolicy";
+import { isStudioEmbeddedWebView } from "../../shared/utils/ssoEligibilityUtils";
 
 export type LoginControllerProps = {
   render: (viewModel: LoginControllerViewModel) => React.JSX.Element;
@@ -219,8 +216,7 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   const [showSecurityNotificationModal, setShowSecurityNotificationModal] = useState(false);
   const [isMagicLinkLoginErrorModalOpen, setIsMagicLinkLoginErrorModalOpen] = useState(false);
 
-  // Brazil content rating logo
-  const { shouldDisplayBrazilRatingLogo } = useContentRatingLogos();
+  const { shouldDisplayBrazilRatingLogo, shouldDisplayItalyRatingLogo } = useContentRatingLogos();
 
   // default state cannot be 0, as submit is triggered once code reaches code length
   const [otpLoginCodeLength, setOtpCodeLength] = useState(100);
@@ -230,6 +226,7 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   const [identityVerificationLoginTicket, setIdentityVerificationLoginTicket] = useState("");
 
   const loginExperiments = useExperiments(experimentLayer);
+  const loginUiPolicy = useAuthUiPolicy();
   const isOneTimeCodeDesignUpdated = loginExperiments.IsLoginUiUpdatesEnabled as boolean;
   const loginSilentUpgradeBrowserCheck =
     loginExperiments.loginSilentUpgradeBrowserCheck as SilentPasskeyUpgradeVariant;
@@ -258,32 +255,16 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
     setIdentityVerificationLoginTicket(result.identityVerificationLoginTicket);
   };
 
-  const navigateWithReturnUrl = (): void => {
-    const returnUrl = getRedirectUrl();
-    const affiliateLink = getExperienceAffiliateReferralUrl(returnUrl);
-    if (affiliateLink) {
-      const linkCode = getLinkCode(affiliateLink);
-      const linkType = getLinkType(affiliateLink);
-      qualifiedLogin({
-        referralUrl: affiliateLink ?? "",
-        linkId: linkCode,
-        linkType,
-        userDidLogIn: true,
-      });
-    }
-    navigateToPage(returnUrl);
-  };
-
   const navigatePostLogin = (postLoginUserId: string) => {
     setIsLoading(true);
-    navigateWithReturnUrl();
+    navigateToLoginReturnUrl();
   };
 
   const navigatePostAccountSwitch = () => {
     setIsNavigating(true);
     const redirectUrl = getRedirectUrl();
     if (isAuthorizeRobloxOAuthReturnUrl(redirectUrl)) {
-      navigateWithReturnUrl();
+      navigateToLoginReturnUrl();
     } else {
       defaultRedirect();
     }
@@ -570,6 +551,13 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
         incrementEphemeralCounter(mapErrorCodeToEphemeralEvent(errorCode));
         errorMessage = translate(mapLoginErrorCodeToTranslationKey(errorCode, cType));
         if (cType === CredentialType.MagicLink) {
+          if (magicLinkTokenRef.current && isMagicLinkTokenRejectedErrorCode(errorCode)) {
+            // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation -- best-effort analytics event
+            void sendMagicLinkLoginRedemptionEvent(
+              magicLinkTokenRef.current,
+              ParentEmailTokenRedemptionResult.Expired,
+            );
+          }
           setErrorMsg("");
           // The magic-link redemption has failed terminally (recoverable
           // challenges are handled by the cases above). Clear the single-use
@@ -867,21 +855,31 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
         incrementEphemeralCounter(eventCounters.successWithGameIntent);
       }
       incrementEphemeralCounter(eventCounters.success);
+      if (params.ctype === CredentialType.MagicLink) {
+        // Before handlePostLogin, which navigates away.
+        await sendMagicLinkLoginRedemptionEvent(
+          params.cvalue,
+          ParentEmailTokenRedemptionResult.Success,
+        );
+      }
       const nextStep = shouldTrigger2sv(result)
         ? authNextStep.twoStep
         : shouldTriggerIdVerification(result)
           ? authNextStep.identityVerification
           : authNextStep.complete;
       legacyLoginTelemetry.requestSucceeded(method, nextStep);
+      sendLoginSucceededEvent(method, nextStep);
       handlePostLogin(result, method);
     } catch (error) {
       const errorCode = parseErrorCode(error);
-      legacyLoginTelemetry.requestFailed(
-        method,
-        AccountIntegrityChallengeService.Generic.ChallengeError.match(error)
-          ? authFailureReason.challenge
-          : getLoginTelemetryFailureReason(errorCode, error, params.ctype),
-      );
+      const failureReason = AccountIntegrityChallengeService.Generic.ChallengeError.match(error)
+        ? authFailureReason.challenge
+        : getLoginTelemetryFailureReason(errorCode, error, params.ctype);
+      legacyLoginTelemetry.requestFailed(method, failureReason);
+      if (!AccountIntegrityChallengeService.Generic.ChallengeError.matchAbandoned(error)) {
+        sendLoginErrorShownEvent(method, failureReason, errorCode);
+        sendLoginClientErrorEvent(errorCode, failureReason);
+      }
       handleLoginError(error, params.ctype);
     }
   };
@@ -940,6 +938,17 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   };
 
   const attemptPasskeyLogin = async (mediation = "conditional") => {
+    const isRequired = mediation === "required";
+    // Only one WebAuthn request can be pending, so a pending autofill request would block the
+    // prompt; it is re-armed if the prompt doesn't sign in.
+    if (isRequired) {
+      passkeyAbortControllerRef.current.abort();
+    }
+    const rearmPasskeyAutofill = (): void => {
+      if (isRequired) {
+        setPasskeyAttempt(attempt => attempt + 1);
+      }
+    };
     // A signal is only replaced when a request fails on it, so one aborted with nothing pending
     // (as showing the force passwordless login challenge does) would fail this request too.
     if (passkeyAbortControllerRef.current.signal.aborted) {
@@ -951,7 +960,12 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
       challenge = await getPasskeyChallenge();
       // signed passkeyCredential to be sent.
     } catch (error) {
+      sendPasskeyLoginClientErrorEvent(
+        passkeyLoginClientErrorSteps.challengeFetch,
+        String(parseErrorCode(error) ?? "unknown"),
+      );
       forcePasswordlessLogin.notifyLoginFailed();
+      rearmPasskeyAutofill();
       return;
     }
 
@@ -973,11 +987,16 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
       if ((error as any)?.name === "AbortError") {
         passkeyAbortControllerRef.current = new AbortController();
       } else {
+        sendPasskeyLoginClientErrorEvent(
+          passkeyLoginClientErrorSteps.credential,
+          error instanceof Error ? error.name : "unknown",
+        );
         // A dismissed passkey prompt leaves the challenge's other options in place.
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
         if ((error as any)?.name !== "NotAllowedError") {
           forcePasswordlessLogin.notifyLoginFailed();
         }
+        rearmPasskeyAutofill();
         // This case is unexpected, but if it were to be hit, this information would likely be helpful to display to console.
         // eslint-disable-next-line no-console
         console.error(error);
@@ -999,8 +1018,12 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   useEffect(() => void setExperimentState(), []);
 
   useEffect(() => {
-    sendAuthPageLoadEvent(EVENT_CONSTANTS.context.loginPage);
+    sendLoginPageLoadEvent();
     legacyLoginTelemetry.pageMounted();
+    if (magicLinkTokenRef.current) {
+      // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation -- best-effort analytics event
+      void sendMagicLinkLoginOpenedEvent(magicLinkTokenRef.current);
+    }
   }, []);
 
   useEffect(() => {
@@ -1166,11 +1189,8 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
   const shouldShowAccountLimitModal =
     (loggedInUsers?.isAccountLimitReached ?? false) &&
     (authenticatedUser.isAuthenticated || !shouldShowAccountSwitcher);
-  const experiments = resolveLoginExperiments(loginExperiments, {
-    isMagicLinkLogin,
-    isAuthenticated: authenticatedUser.isAuthenticated,
-    isAccountSwitcherVisible: shouldShowAccountSwitcher,
-    isAccountLimitReached: loggedInUsers?.isAccountLimitReached ?? false,
+  const experiments = resolveLoginExperiments(loginUiPolicy, getAuthUiVariant(), {
+    isStudioEmbeddedWebView: isStudioEmbeddedWebView(),
   });
 
   useEffect(() => {
@@ -1190,9 +1210,12 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
     shouldShowLoginForm,
   ]);
 
-  const shouldShowPasskeyLoginButton = false;
-  // TODO: Debug why passkey doesn't work on studio before re-enabling
-  // isPasskeyLoginEnabled() && isPasskeyLoginSupported && !isConditionalMediationSupported;
+  // TODO: Debug why passkey doesn't work on studio before re-enabling it in the other arms.
+  // The inline SSO arm is already closed to Studio through SSO eligibility.
+  const shouldShowPasskeyLoginButton =
+    experiments.ssoPlacement === "underDivider" &&
+    isPasskeyLoginEnabled() &&
+    isPasskeyLoginSupported;
 
   if (isGettingLoggedInUsers || isNavigating) {
     return render({ status: "loading" });
@@ -1234,7 +1257,6 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
           suppressAddAccountRow: loggedInUsers?.isAccountLimitReached ?? false,
           removeInvalidActiveUser: !authenticatedUser.isAuthenticated,
           isModal: authenticatedUser.isAuthenticated,
-          translate,
           loggedInUsers: authenticatedUser.isAuthenticated ? undefined : loggedInUsers,
         }
       : null,
@@ -1246,6 +1268,9 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
             translate,
             !!loggedInUsers?.usersAvailableForSwitching?.length,
           ),
+          isAddingAccount:
+            authenticatedUser.isAuthenticated ||
+            !!loggedInUsers?.usersAvailableForSwitching?.length,
           formProps: {
             captchaId,
             captchaToken,
@@ -1304,7 +1329,10 @@ export const LoginController = ({ render }: LoginControllerProps): React.JSX.Ele
     isStudioWebView,
     isLoginBackgroundImageEnabled,
     loginBackgroundClass,
-    shouldDisplayBrazilRatingLogo,
+    compliance: {
+      shouldDisplayBrazilRatingLogo,
+      shouldDisplayItalyRatingLogo,
+    },
     translate,
   });
 };

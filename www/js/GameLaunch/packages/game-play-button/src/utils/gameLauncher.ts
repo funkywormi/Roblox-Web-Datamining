@@ -34,6 +34,7 @@ const launchSharedGame = (
     joinData,
     privateServerLinkCode,
     referredByPlayerId,
+    isEarlyTesting,
   } = playGameProperties;
   if (placeId == null) {
     return undefined;
@@ -84,6 +85,7 @@ const launchSharedGame = (
       launchData: joinData?.launchData,
       eventId: joinData?.eventId,
       referredByPlayerId,
+      isEarlyTesting: isEarlyTesting === true ? "true" : undefined,
     }),
   );
 };

@@ -84,7 +84,11 @@ export const PrivatePlaytestPrivacy = ({
         snackbarService.success(translate(successMessageKey));
       }
     } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, child?.userId);
+      const errorKey = handleChildSettingsUpdateError(
+        error,
+        child?.userId,
+        UserSetting.privatePlaytest,
+      );
       if (errorKey) {
         snackbarService.warning(translate(errorKey));
       }

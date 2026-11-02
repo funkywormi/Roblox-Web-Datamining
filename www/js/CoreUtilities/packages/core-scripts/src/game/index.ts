@@ -17,6 +17,7 @@ export type PlayGameProperties = {
   privateServerLinkCode?: string;
   referredByPlayerId?: string;
   joinData?: JoinDataProperties;
+  isEarlyTesting?: boolean;
 };
 
 type EventStreamProperties = {
@@ -51,6 +52,7 @@ export const buildPlayGameProperties = (
   privateServerLinkCode?: string,
   referredByPlayerId?: string,
   joinData?: JoinDataProperties,
+  isEarlyTesting?: boolean,
 ): PlayGameProperties => ({
   rootPlaceId,
   placeId,
@@ -59,6 +61,7 @@ export const buildPlayGameProperties = (
   privateServerLinkCode,
   referredByPlayerId,
   joinData,
+  isEarlyTesting,
 });
 
 const joinGame = (
@@ -88,6 +91,7 @@ const joinGame = (
       joinData,
       privateServerLinkCode,
       referredByPlayerId,
+      isEarlyTesting,
     } = playGameProperties;
 
     if (placeId == null) {
@@ -158,6 +162,7 @@ const joinGame = (
         currentESProperties.gamePlayIntentEventCtx,
         joinData,
         referredByPlayerId,
+        isEarlyTesting,
       );
     }
   }

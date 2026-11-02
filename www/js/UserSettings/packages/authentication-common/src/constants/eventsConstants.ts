@@ -110,6 +110,7 @@ const EVENT_CONSTANTS = {
     focus: "focus",
     shown: "shown",
     dismissed: "dismissed",
+    submit: "submit",
   },
   field: {
     loginOtherDevice: "loginOtherDevice",
@@ -153,6 +154,9 @@ const EVENT_CONSTANTS = {
     // PrivacyPolicy in lua-apps; the signup forms' tos_link/pp_link are a different vocabulary).
     termsOfService: "termsOfService",
     privacyPolicy: "privacyPolicy",
+    // Must match EventStreamConstants.Field in lua-apps, so the web and Lua consent funnels join.
+    marketingEmailConsent: "marketingEmailConsent",
+    marketingEmailAutoOptIn: "marketingEmailAutoOptIn",
     signupSuccess: "signupSuccess",
     // How the OS passkey prompt was raised; dismissal rates differ between them.
     autoPrompt: "autoPrompt",

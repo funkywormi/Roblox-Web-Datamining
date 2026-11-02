@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { resolveStartNode, type SubmissionTarget } from "@rbx/abuse-report-config-types";
-import { RawConfig, StoreData, NextSimpleValue } from "./types";
+import { RawConfig, StoreData, NextSimpleValue, type NodeRendererRegistry } from "./types";
 import { getInitialState, reducer, selectStore, State } from "./reducer";
 import { getNewRunId } from "../../util/runId";
 import { ContentNode } from "./ContentNode";
@@ -78,12 +78,14 @@ const useAbuseSheetFlow = (
     abuseVector,
     analyticsTargetId,
     clientActions,
+    nodeRenderers,
   }: {
     onClose: () => void;
     open?: boolean;
     abuseVector: string;
     analyticsTargetId?: string;
     clientActions?: ClientActionRegistry;
+    nodeRenderers?: NodeRendererRegistry;
   },
 ) => {
   const [state, dispatch] = useReducer(reducer, undefined, () => {
@@ -317,6 +319,7 @@ const useAbuseSheetFlow = (
         onNext={canGoNext ? onNext : undefined}
         store={store}
         isSubmitting={state.submissionState === "submitting"}
+        renderers={nodeRenderers}
       />
     ),
   };

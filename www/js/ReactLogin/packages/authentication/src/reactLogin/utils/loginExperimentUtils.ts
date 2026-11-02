@@ -1,54 +1,48 @@
-// TODO(AA-7602): These gate parameters, client-side resolution, and exposure behavior are
-// provisional and may change once the experiment approach is finalized.
-export const loginExperimentParameters = {
-  // TODO(AA-7602): Placeholder; replace with the final IXP parameter name.
-  loginRefresh: "IsLoginRefreshEnabled",
-  googleSso: "IsGoogleSsoLoginEnabled",
-  appleSso: "IsAppleSsoLoginEnabled",
-} as const;
+import {
+  type AuthUiVariant,
+  authUiVariants,
+} from "@rbx/authentication-common/utils/authUiVariantUtils";
+import type { AuthUiPolicy } from "../../shared/hooks/useAuthUiPolicy";
+import { isSsoEligible, type SsoEligibility } from "../../shared/utils/ssoEligibilityUtils";
+
+export type LoginSsoPlacement = "hidden" | "otherSignInOptions" | "underDivider";
 
 export type LoginExperimentResolution = {
+  authUiVariant: AuthUiVariant;
   isLoginRefreshEnabled: boolean;
-  isGoogleSsoLoginEnabled: boolean;
-  isAppleSsoLoginEnabled: boolean;
+  ssoPlacement: LoginSsoPlacement;
 };
 
-export type LoginExperimentStaticEligibility = {
-  isMagicLinkLogin: boolean;
-  isAuthenticated: boolean;
-  isAccountSwitcherVisible: boolean;
-  isAccountLimitReached: boolean;
-};
-
-const defaultResolution: LoginExperimentResolution = {
-  isLoginRefreshEnabled: false,
-  isGoogleSsoLoginEnabled: false,
-  isAppleSsoLoginEnabled: false,
+const getSsoPlacement = (
+  authUiVariant: AuthUiVariant,
+  loginUiPolicy: AuthUiPolicy,
+): LoginSsoPlacement => {
+  if (loginUiPolicy.isLoading) {
+    return "hidden";
+  }
+  switch (authUiVariant) {
+    case authUiVariants.refreshSsoInline:
+      return loginUiPolicy.isExternalIdentityLoginExcluded ? "hidden" : "underDivider";
+    case authUiVariants.refreshSsoDialog:
+      return loginUiPolicy.isExternalIdentityOtherSignInOptionsExcluded
+        ? "hidden"
+        : "otherSignInOptions";
+    case authUiVariants.control:
+    default:
+      return loginUiPolicy.isExternalIdentityOtherSignInOptionsExcluded
+        ? "hidden"
+        : "otherSignInOptions";
+  }
 };
 
 export const resolveLoginExperiments = (
-  values: Record<string, unknown> & { isLoading?: boolean },
-  staticEligibility: LoginExperimentStaticEligibility = {
-    isMagicLinkLogin: false,
-    isAuthenticated: false,
-    isAccountSwitcherVisible: false,
-    isAccountLimitReached: false,
-  },
-): LoginExperimentResolution => {
-  if (values.isLoading === true) {
-    return defaultResolution;
-  }
-
-  const isLoginRefreshEligible =
-    !staticEligibility.isMagicLinkLogin &&
-    !staticEligibility.isAuthenticated &&
-    !staticEligibility.isAccountSwitcherVisible &&
-    !staticEligibility.isAccountLimitReached;
-
-  return {
-    isLoginRefreshEnabled:
-      isLoginRefreshEligible && values[loginExperimentParameters.loginRefresh] === true,
-    isGoogleSsoLoginEnabled: values[loginExperimentParameters.googleSso] === true,
-    isAppleSsoLoginEnabled: values[loginExperimentParameters.appleSso] === true,
-  };
-};
+  loginUiPolicy: AuthUiPolicy,
+  authUiVariant: AuthUiVariant,
+  ssoEligibility: SsoEligibility,
+): LoginExperimentResolution => ({
+  authUiVariant,
+  isLoginRefreshEnabled: authUiVariant !== authUiVariants.control,
+  ssoPlacement: isSsoEligible(ssoEligibility)
+    ? getSsoPlacement(authUiVariant, loginUiPolicy)
+    : "hidden",
+});

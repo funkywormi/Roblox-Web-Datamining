@@ -112,6 +112,7 @@ const appThemeEventNames = {
 
 const eventContext = {
   settingsAppTheme: "settingsAppTheme",
+  settingsEmailConsent: "settingsEmailConsent",
   settingsPControlsFriends: "settingsPControlsFriends",
   settingsPControlsTrustedFriends: "settingsPControlsTrustedFriends",
   settingsPControlsBlockedUsers: "settingsPControlsBlockedUsers",
@@ -160,6 +161,10 @@ const settingsTabEventData: Record<RouterPath, { context: string; associatedText
     context: "settingsTabBrowserPreferences",
     associatedText: "Browser preferences",
   },
+  [RouterPath.ManageRecommendations]: {
+    context: "settingsTabManageRecommendations",
+    associatedText: "Personalized recommendations",
+  },
 };
 
 export const getEventParams = {
@@ -204,6 +209,18 @@ export const getEventParams = {
     type: "changeDisplayname",
     context: "cancel",
     params: { newDisplayName: "", originalDisplayName: oldName },
+  }),
+  emailConsentCheckboxShown: (isChangeEmail: boolean): TEventParams => ({
+    name: "emailConsentCheckboxShown",
+    type: eventTypes.modalAction,
+    context: eventContext.settingsEmailConsent,
+    params: { aType: "shown", state: isChangeEmail ? "changeEmail" : "addEmail" },
+  }),
+  emailConsentSubmitted: (isOptedIn: boolean, isOptInSaved: boolean): TEventParams => ({
+    name: "emailConsentSubmitted",
+    type: eventTypes.formInteraction,
+    context: eventContext.settingsEmailConsent,
+    params: { btn: "submitEmail", isOptedIn, isOptInSaved },
   }),
   verifyAgeButtonClicked: (): TEventParams => ({
     name: "verifyAgeBtnClicked",

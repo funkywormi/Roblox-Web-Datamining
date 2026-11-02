@@ -10,7 +10,8 @@ interface User {
 const getUser = async (userId: number): Promise<User> => {
   const req = await http.get<User>({
     url: getUserUrl(userId),
-    withCredentials: true,
+    // A moderated account's cookie gets 403 from every Users API call, and this lookup is public
+    withCredentials: false,
   });
 
   return req.data;

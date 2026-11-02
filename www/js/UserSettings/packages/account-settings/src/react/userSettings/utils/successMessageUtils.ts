@@ -47,12 +47,13 @@ export const getSuccessMessageKeyForUserSettingsUpdate = (
 export const handleChildSettingsUpdateError = (
   error: unknown,
   childUserId?: number,
+  settingName?: UserSetting,
 ): string | null => {
   const err = error as TUpdateChildSettingsError;
   const errorCode = err?.data?.code;
 
   if (errorCode === UpdateChildSettingsErrorCode.ParentNotVerified && childUserId) {
-    window.location.href = getVerificationPageUrl(childUserId);
+    window.location.href = getVerificationPageUrl(childUserId, settingName);
     return null;
   }
 

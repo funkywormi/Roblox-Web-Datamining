@@ -28,6 +28,7 @@ import { SubmitRequestBody, SubmitModal } from "./types";
 
 import {
   Urls,
+  IP_INFRINGEMENT_EMAIL_ADDRESS,
   Limit,
   IllegalTypeTranslationMap,
   IllegalContentSubCategoryKey,
@@ -160,9 +161,10 @@ const IllegalContentReportForm = ({
     getTranslationKey,
   ]);
 
-  const ipInfringementTranslationHtml = translateHtml("Message.IpInfringement", [
+  const ipInfringementTranslationHtml = translateHtml("Message.IpInfringementV2", [
+    ["emailAddress", IP_INFRINGEMENT_EMAIL_ADDRESS],
     [
-      "emailLink",
+      "emailLinkStart",
       "emailLinkEnd",
       text => (
         <a
@@ -178,7 +180,7 @@ const IllegalContentReportForm = ({
       ),
     ],
     [
-      "docLink",
+      "docLinkStart",
       "docLinkEnd",
       text => (
         <a

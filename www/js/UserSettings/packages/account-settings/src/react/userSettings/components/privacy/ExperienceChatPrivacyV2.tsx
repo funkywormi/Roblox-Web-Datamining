@@ -109,7 +109,11 @@ export const ExperienceChatPrivacyV2 = ({
           snackbarService.success(translate(successMessageKey));
         }
       } catch (error) {
-        const errorKey = handleChildSettingsUpdateError(error, child?.userId);
+        const errorKey = handleChildSettingsUpdateError(
+          error,
+          child?.userId,
+          UserSetting.whoCanChatWithMeInExperiences,
+        );
         if (errorKey) {
           snackbarService.warning(translate(errorKey));
         }
@@ -165,7 +169,11 @@ export const ExperienceChatPrivacyV2 = ({
           snackbarService.success(translate(successMessageKey));
         }
       } catch (error) {
-        const errorKey = handleChildSettingsUpdateError(error, child?.userId);
+        const errorKey = handleChildSettingsUpdateError(
+          error,
+          child?.userId,
+          UserSetting.whoCanWhisperChatWithMeInExperiences,
+        );
         if (errorKey) {
           snackbarService.warning(translate(errorKey));
         }

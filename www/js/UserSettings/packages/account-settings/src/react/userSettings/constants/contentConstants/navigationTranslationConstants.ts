@@ -11,4 +11,5 @@ export default {
   parentalControlsHeading: "Heading.Tab.ParentalControlsV2",
   appPermissionsHeading: "Heading.Tab.AppPermissionsV2",
   browserPreferencesHeading: "Heading.Tab.BrowserPreferences",
+  manageRecommendationsHeading: "Heading.Tab.PersonalizedRecommendations",
 };

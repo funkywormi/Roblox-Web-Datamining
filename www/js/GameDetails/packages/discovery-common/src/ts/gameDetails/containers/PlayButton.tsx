@@ -9,9 +9,7 @@ import {
   DefaultPlayButton,
   ContextualMessage,
   PlayabilityStatus,
-  shouldUsePlaytestActionNeeded,
 } from "@rbx/game-play-button";
-import { PlaytestActionNeededButton } from "@rbx/game-play-button/playtest-action-needed-button";
 import { EventContext } from "@rbx/unified-logging";
 import metadataConstants from "../constants/metadataConstants";
 import eventStreamConstants, {
@@ -195,24 +193,7 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
         />
       ) : undefined,
   };
-  const shouldShowPlaytestActionNeeded = shouldUsePlaytestActionNeeded(
-    playabilityStatus,
-    privatePlaytestInfo,
-  );
-
-  if (shouldShowPlaytestActionNeeded) {
-    const creatorId = gameDetails?.creator.type === "User" ? gameDetails.creator.id : undefined;
-
-    return (
-      <PlaytestActionNeededButton
-        universeId={universeId}
-        creatorId={creatorId}
-        privatePlaytestInfo={privatePlaytestInfo}
-        refetchPlayabilityStatus={refetchPlayabilityData}
-        pageContext={EventContext.GameDetail}
-      />
-    );
-  }
+  const creatorId = gameDetails?.creator.type === "User" ? gameDetails.creator.id : undefined;
 
   return (
     <React.Fragment>
@@ -225,6 +206,8 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
         refetchPlayabilityStatus={refetchPlayabilityData}
         playabilityStatus={playabilityStatus}
         demoModeAvailable={demoModeAvailable}
+        privatePlaytestInfo={privatePlaytestInfo}
+        creatorId={creatorId}
         hideButtonText={false}
         disableLoadingState={false}
         eventProperties={playButtonEventProperties}

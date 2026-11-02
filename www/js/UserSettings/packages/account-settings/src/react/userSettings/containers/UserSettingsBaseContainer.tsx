@@ -35,6 +35,8 @@ import BrowserPreferencesContainer from "./BrowserPreferencesContainer";
 import RedirectHandlers from "../components/RedirectHandlers";
 import { redirectionCheckCompleteEventName } from "../utils/hybridViewUtils";
 import eventTracker from "../../../common/eventTracker";
+import { getTabsToRemoveForPolicy, policyDrivenTabs } from "../utils/policyTabUtils";
+import ManageRecommendationsContainer from "./ManageRecommendationsContainer";
 
 export const UserSettingsBaseContainer = (): JSX.Element => {
   const { translate } = useTranslation();
@@ -150,6 +152,19 @@ export const UserSettingsBaseContainer = (): JSX.Element => {
       show: !deviceMeta.getDeviceMeta()?.isInApp,
       content: <BrowserPreferencesContainer />,
     },
+    {
+      id: RouterPath.ManageRecommendations,
+      path: `/${RouterPath.ManageRecommendations}`,
+      title: navigationTranslationConstants.manageRecommendationsHeading,
+      // Hidden from the nav until the policy turns it on, so it doesn't flash for everyone while
+      // the policy loads. The route stays, so a deep link works once the policy allows it. (The
+      // class also hides the tab content, which renders nothing until then anyway.)
+      hideInNav: true,
+      isDefault: false,
+      name: RouterPath.ManageRecommendations,
+      show: true,
+      content: <ManageRecommendationsContainer />,
+    },
   ]);
 
   // This mobile dropdown is hacky and breaks the routing abstraction
@@ -207,6 +222,12 @@ export const UserSettingsBaseContainer = (): JSX.Element => {
     setTabsData(prevTabsData => prevTabsData.filter(tab => !tabNames.includes(tab.name)));
   };
 
+  const showTabInNav = (tabId: RouterPath) => {
+    setTabsData(prevTabsData =>
+      prevTabsData.map(tab => (tab.id === tabId ? { ...tab, hideInNav: false } : tab)),
+    );
+  };
+
   const renameTab = (tabId: RouterPath, newTitle: string) => {
     setTabsData(prevTabsData =>
       prevTabsData.map(tab => (tab.id === tabId ? { ...tab, title: newTitle } : tab)),
@@ -220,13 +241,7 @@ export const UserSettingsBaseContainer = (): JSX.Element => {
 
     if (hasPolicyError) {
       // If we can't fetch settings UI policy, we should remove all policy-driven tabs
-      removeTabsFromTabsData([
-        RouterPath.Notifications,
-        RouterPath.Billing,
-        RouterPath.Subscriptions,
-        RouterPath.ParentalControls,
-        RouterPath.AppPermissions,
-      ]);
+      removeTabsFromTabsData(policyDrivenTabs);
     }
 
     let errorMetric:
@@ -277,24 +292,12 @@ export const UserSettingsBaseContainer = (): JSX.Element => {
   useEffect(() => {
     if (settingsUiPolicy) {
       // Remove policy-driven tabs
-      const tabsToRemove: RouterPath[] = [];
-      if (!settingsUiPolicy?.displayReactNotificationsTab) {
-        // GUAC policy excludes under 13 users because we can't prompt them to enable
-        // push notifications, so there's no reason for them to be
-        // configurable.
-        tabsToRemove.push(RouterPath.Notifications);
-      }
-      if (!settingsUiPolicy?.displaySubscriptionsTab) {
-        tabsToRemove.push(RouterPath.Subscriptions);
-      }
-      if (!settingsUiPolicy?.displayParentalControlTab) {
-        tabsToRemove.push(RouterPath.ParentalControls);
-      }
-      if (!settingsUiPolicy?.displayAppPermissionsTab) {
-        tabsToRemove.push(RouterPath.AppPermissions);
-      }
+      const tabsToRemove = getTabsToRemoveForPolicy(settingsUiPolicy);
       if (tabsToRemove.length > 0) {
         removeTabsFromTabsData(tabsToRemove);
+      }
+      if (settingsUiPolicy.displayManageRecommendationsTab) {
+        showTabInNav(RouterPath.ManageRecommendations);
       }
 
       // Rename policy-named tabs
@@ -317,40 +320,49 @@ export const UserSettingsBaseContainer = (): JSX.Element => {
 
   useEffect(() => {
     setTabsView(
-      tabsData.reduce((view: ReactChild[], { path, title, name, isDefault, id, show, content }) => {
-        if (show) {
-          view.push(
-            <SimpleTab
-              id={id}
-              key={name}
-              path={path}
-              title={translate(title)}
-              name={name}
-              isDefault={isDefault}
-            >
-              <React.Fragment>
-                {content}
-                {/* Dummy component so that mobile dropdown is set correctly based on the current path */}
-                <MobileDropdownNameUpdater
-                  key="mobile-dropdown-name-updater"
-                  setCurrMobileTab={setCurrMobileTab}
-                />
-                <SettingsTabViewLogger key="settings-tab-view-logger" tabId={id} />
-              </React.Fragment>
-            </SimpleTab>,
-          );
-        }
-        return view;
-      }, []),
+      tabsData.reduce(
+        (view: ReactChild[], { path, title, hideInNav, name, isDefault, id, show, content }) => {
+          if (show) {
+            view.push(
+              <SimpleTab
+                id={id}
+                key={name}
+                path={path}
+                title={translate(title)}
+                name={name}
+                isDefault={isDefault}
+                className={hideInNav ? "hide" : undefined}
+              >
+                <React.Fragment>
+                  {content}
+                  {/* Dummy component so that mobile dropdown is set correctly based on the current path */}
+                  <MobileDropdownNameUpdater
+                    key="mobile-dropdown-name-updater"
+                    setCurrMobileTab={setCurrMobileTab}
+                  />
+                  {/* A tab kept out of the nav may still be removed by the policy, so don't log a view yet */}
+                  {!hideInNav && (
+                    <SettingsTabViewLogger key="settings-tab-view-logger" tabId={id} />
+                  )}
+                </React.Fragment>
+              </SimpleTab>,
+            );
+          }
+          return view;
+        },
+        [],
+      ),
     );
     setMobileDropdownOptions(
-      tabsData.map(tab => {
-        return {
-          key: tab.id,
-          label: tab.title,
-          value: tab.id,
-        };
-      }),
+      tabsData
+        .filter(tab => !tab.hideInNav)
+        .map(tab => {
+          return {
+            key: tab.id,
+            label: tab.title,
+            value: tab.id,
+          };
+        }),
     );
   }, [tabsData]);
 

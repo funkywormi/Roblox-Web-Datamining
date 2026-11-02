@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Icon } from "@rbx/foundation-ui";
-import { Thumbnail2d, ThumbnailAvatarHeadshotSize, ThumbnailTypes } from "@rbx/thumbnails";
-import { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { TUserData } from "@rbx/authentication-common/types/userTypes";
 import { urlQueryConstants } from "@rbx/authentication-common/constants/urlConstants";
+import { AccountSwitcherAvatar } from "./AccountSwitcherAvatar";
 import { accountSwitcherStrings } from "../constants/accountSwitcherConstants";
 
 export type AccountSwitcherListVariant = "legacy" | "foundation";
@@ -14,7 +14,6 @@ export type FoundationAccountSwitcherListProps = {
   isAccountLimitReached: boolean;
   onAccountSelection: (userId: number) => void;
   suppressAddAccountRow?: boolean;
-  translate: WithTranslationsProps["translate"];
   users: TUserData[];
 };
 
@@ -30,16 +29,10 @@ const FoundationAccountSwitcherAccountContent = ({
 }: {
   isActive?: boolean;
   user: TUserData;
-}): JSX.Element => (
+}): React.ReactElement => (
   <React.Fragment>
     <div className="account-selection-thumbnail">
-      <Thumbnail2d
-        containerClass="avatar-card-image"
-        type={ThumbnailTypes.avatarHeadshot}
-        targetId={user.id}
-        size={ThumbnailAvatarHeadshotSize.size60}
-        includeProfileFrame
-      />
+      <AccountSwitcherAvatar userId={user.id} />
     </div>
     <div className="account-selection-name-container">
       <p className="account-selection-displayname">{user.displayName || user.name}</p>
@@ -61,7 +54,7 @@ const FoundationAccountSwitcherAccountRow = ({
   isActive = false,
   onAccountSelection,
   user,
-}: FoundationAccountSwitcherAccountRowProps): JSX.Element => {
+}: FoundationAccountSwitcherAccountRowProps): React.ReactElement => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isActive) {
@@ -106,11 +99,10 @@ const FoundationAccountSwitcherAccountRow = ({
 
 const FoundationAccountSwitcherAddAccountRow = ({
   handleAddAccount,
-  translate,
 }: {
   handleAddAccount: () => void;
-  translate: WithTranslationsProps["translate"];
-}): JSX.Element => {
+}): React.ReactElement => {
+  const translate = useTranslations("Authentication.AccountSwitch");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSelect = () => {
@@ -146,9 +138,8 @@ const FoundationAccountSwitcherList = ({
   isAccountLimitReached,
   onAccountSelection,
   suppressAddAccountRow = false,
-  translate,
   users,
-}: FoundationAccountSwitcherListProps): JSX.Element => (
+}: FoundationAccountSwitcherListProps): React.ReactElement => (
   <ul className="account-switcher-list account-switcher-foundation-list">
     {activeUser && (
       <FoundationAccountSwitcherAccountRow
@@ -166,10 +157,7 @@ const FoundationAccountSwitcherList = ({
       />
     ))}
     {!isAccountLimitReached && !suppressAddAccountRow && (
-      <FoundationAccountSwitcherAddAccountRow
-        handleAddAccount={handleAddAccount}
-        translate={translate}
-      />
+      <FoundationAccountSwitcherAddAccountRow handleAddAccount={handleAddAccount} />
     )}
   </ul>
 );

@@ -1,17 +1,17 @@
 import React from "react";
 import { Loading } from "@rbx/core-ui/legacy/react-style-guide";
 import { accountSwitcherConfirmationModalContainer } from "../../reactLanding/constants/signupConstants";
-import CountryRatingLogos from "../../reactLanding/components/CountryRatingLogos";
 import ForgotCredentialLink from "./ForgotCredentialLink";
 import LoginAccountSwitcher from "./LoginAccountSwitcher";
+import LegacyLoginSsoOptions from "./LegacyLoginSsoOptions";
 import LoginAlternative from "./LoginAlternative";
-import LoginChallengeOverlays from "./LoginChallengeOverlays";
 import LoginForm from "./LoginForm";
 import MagicLinkLoginErrorModal from "./MagicLinkLoginErrorModal";
 import SecurityNotificationModal from "./SecurityNotificationModal";
 import SignupLink from "./SignupLink";
 import StudioLegalLinks from "./StudioLegalLinks";
 import { containerConstants } from "../constants/loginConstants";
+import { ssoIdentityProviderIds } from "../../shared/constants/ssoConstants";
 import type { LoginControllerViewModel } from "../types/loginControllerTypes";
 
 export type LoginLegacyViewProps = {
@@ -23,21 +23,10 @@ const LoginLegacyView = ({ viewModel }: LoginLegacyViewProps): React.JSX.Element
     return <Loading />;
   }
 
-  const {
-    loginBaseContainerClass,
-    loginBaseAttributes,
-    accountSwitcherProps,
-    loginForm,
-    challengeOverlaysProps,
-    isStudioWebView,
-    isLoginBackgroundImageEnabled,
-    loginBackgroundClass,
-    shouldDisplayBrazilRatingLogo,
-    translate,
-  } = viewModel;
+  const { accountSwitcherProps, experiments, loginForm, isStudioWebView, translate } = viewModel;
 
-  const loginBase = (
-    <div id="login-base" className={loginBaseContainerClass} {...loginBaseAttributes}>
+  return (
+    <React.Fragment>
       {accountSwitcherProps && <LoginAccountSwitcher {...accountSwitcherProps} />}
       {loginForm && (
         <div
@@ -52,6 +41,12 @@ const LoginLegacyView = ({ viewModel }: LoginLegacyViewProps): React.JSX.Element
             translate={translate}
           />
           <LoginAlternative {...loginForm.alternativeProps} />
+          {experiments.ssoPlacement === "otherSignInOptions" && (
+            <LegacyLoginSsoOptions
+              identityProviderIds={ssoIdentityProviderIds}
+              translate={translate}
+            />
+          )}
           <div id="crossDeviceLoginDisplayCodeModal-container" />
           <div id={containerConstants.otpLoginContainer} />
           <div id={accountSwitcherConfirmationModalContainer} />
@@ -70,35 +65,6 @@ const LoginLegacyView = ({ viewModel }: LoginLegacyViewProps): React.JSX.Element
           {isStudioWebView && <StudioLegalLinks />}
         </div>
       )}
-      <LoginChallengeOverlays {...challengeOverlaysProps} />
-    </div>
-  );
-
-  const countryRatingLogos = (
-    <div>
-      <CountryRatingLogos
-        shouldDisplayBrazilRatingLogo={shouldDisplayBrazilRatingLogo}
-        shouldDisplayItalyRatingLogo={false}
-        translate={translate}
-      />
-    </div>
-  );
-
-  if (isLoginBackgroundImageEnabled && loginBackgroundClass) {
-    return (
-      <div id="background-image" className={`background-image ${loginBackgroundClass}`}>
-        <div className="login-content-wrapper">
-          {loginBase}
-          {countryRatingLogos}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <React.Fragment>
-      {loginBase}
-      {countryRatingLogos}
     </React.Fragment>
   );
 };

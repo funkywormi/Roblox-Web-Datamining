@@ -52,7 +52,6 @@ const SwitchAccount = ({ loggedInUsers }: { loggedInUsers: TLoggedInUsers }): JS
         handleAddAccount={handleAddAccount}
         suppressAddAccountRow
         removeInvalidActiveUser
-        translate={translate}
         loggedInUsers={loggedInUsers}
       />
       <div className="flex flex-col gap-medium">

@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { sendEvent } from "@rbx/core-scripts/event-stream";
 import { WithTranslationsProps } from "@rbx/core-scripts/react";
 import { Button } from "@rbx/foundation-ui";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { PageContext } from "../types/pageContext";
 import { FeatureGameDetails } from "../constants/translationConstants";
 import { userSignal } from "../constants/configConstants";
@@ -101,7 +102,7 @@ const NotInterestedHiddenTileContent = ({
     if (setIsHidden) {
       setIsHidden(false);
     } else {
-      window.EventTracker?.fireEvent(userSignal.HiddenStateUndoFailedDueToMissingSetter);
+      fireEvent(userSignal.HiddenStateUndoFailedDueToMissingSetter);
     }
     sendNotInterestedUserSignal(false);
   }, [setIsHidden, sendNotInterestedUserSignal]);

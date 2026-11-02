@@ -1,5 +1,7 @@
 import { EnvironmentUrls } from "@rbx/environment-urls";
-import { httpService } from "@rbx/core-scripts/legacy/core-utilities";
+import * as http from "@rbx/core-lib/http";
+import type { JsonSerializable } from "@rbx/core-lib/json";
+import { Url } from "@rbx/core-lib/url";
 import {
   TSwitchParams,
   TSwitchResponse,
@@ -8,38 +10,31 @@ import {
   TLogoutAllLoggedInUsersRequestParams,
 } from "@rbx/authentication-common/types/accountSwitcherTypes";
 
-// helper functions to build url
-const getApiGatewayUrl = (endpoint: string): string => EnvironmentUrls.apiGatewayUrl + endpoint;
+// CSRF and bound-auth headers come from the host's setClientInterceptors (coreUtilities on .NET,
+// instrumentation-client on Next.js). Built per call so importing never parses EnvironmentUrls.
+const getApiGatewayUrl = (path: string): Url =>
+  Url.parse(EnvironmentUrls.apiGatewayUrl).getOrThrow().withPath(path);
 
-export const getLoggedInUsersMetadata = async (
+// Responses are cast, not schema-validated, to match the previous Axios behavior: callers already
+// guard optional fields, and a strict schema would turn today's partial responses into failures.
+const postForJson = async <T>(path: string, params: JsonSerializable): Promise<T> => {
+  const result = await http.postUntyped(getApiGatewayUrl(path), params, {
+    credentials: "include",
+  });
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  return result.getOrThrow() as T;
+};
+
+export const getLoggedInUsersMetadata = (
   params: TGetLoggedInUsersMetadataRequestParams,
-): Promise<TGetLoggedInUsersMetadataResponse> => {
-  const url = getApiGatewayUrl("/account-switcher/v1/getLoggedInUsersMetadata");
-  const urlConfig = {
-    url,
-    withCredentials: true,
-  };
-  const { data } = await httpService.post<TGetLoggedInUsersMetadataResponse>(urlConfig, params);
-  return data;
-};
+): Promise<TGetLoggedInUsersMetadataResponse> =>
+  postForJson("/account-switcher/v1/getLoggedInUsersMetadata", params);
 
-export const switchAccount = async (params: TSwitchParams): Promise<TSwitchResponse> => {
-  const url = getApiGatewayUrl("/account-switcher/v1/switch");
-  const urlConfig = {
-    url,
-    withCredentials: true,
-  };
-  const { data } = await httpService.post<TSwitchResponse>(urlConfig, params);
-  return data;
-};
+export const switchAccount = (params: TSwitchParams): Promise<TSwitchResponse> =>
+  postForJson("/account-switcher/v1/switch", params);
 
 export const logoutAllLoggedInUsers = async (
   params: TLogoutAllLoggedInUsersRequestParams,
 ): Promise<void> => {
-  const url = getApiGatewayUrl("/account-switcher/v1/logoutAllLoggedInUsers");
-  const urlConfig = {
-    url,
-    withCredentials: true,
-  };
-  await httpService.post(urlConfig, params);
+  await postForJson("/account-switcher/v1/logoutAllLoggedInUsers", params);
 };

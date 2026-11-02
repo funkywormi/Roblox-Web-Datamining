@@ -64,7 +64,11 @@ export const InventoryTradePrivacy = ({
     } catch (error) {
       // Ignore challenge abandons for errors.
       if (error !== ChallengeAbandonedError) {
-        const errorKey = handleChildSettingsUpdateError(error, childUserId);
+        const errorKey = handleChildSettingsUpdateError(
+          error,
+          childUserId,
+          UserSetting.whoCanSeeMyInventory,
+        );
         if (errorKey) {
           snackbarService.warning(translate(errorKey));
         }
@@ -91,7 +95,11 @@ export const InventoryTradePrivacy = ({
     } catch (error) {
       // Ignore challenge abandons for errors.
       if (error !== ChallengeAbandonedError) {
-        const errorKey = handleChildSettingsUpdateError(error, childUserId);
+        const errorKey = handleChildSettingsUpdateError(
+          error,
+          childUserId,
+          UserSetting.whoCanTradeWithMe,
+        );
         if (errorKey) {
           snackbarService.warning(translate(errorKey));
         }
@@ -113,7 +121,11 @@ export const InventoryTradePrivacy = ({
       }
     } catch (error) {
       if (error !== ChallengeAbandonedError) {
-        const errorKey = handleChildSettingsUpdateError(error, childUserId);
+        const errorKey = handleChildSettingsUpdateError(
+          error,
+          childUserId,
+          UserSetting.tradeQualityFilter,
+        );
         if (errorKey) {
           snackbarService.warning(translate(errorKey));
         }

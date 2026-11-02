@@ -25,7 +25,10 @@ export const targetTypes = {
 export const sendEventWithTarget = (
   eventName: string,
   context: string,
-  additionalProperties: Record<string, string | number | boolean | null | undefined>,
+  additionalProperties: Record<
+    string,
+    string | number | boolean | null | undefined | (string | number)[]
+  >,
   targetType?: number,
 ): void => {
   const { EventStream } = window.Roblox;

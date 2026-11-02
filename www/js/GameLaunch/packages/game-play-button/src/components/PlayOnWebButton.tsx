@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import { Button } from "@rbx/foundation-ui";
 import environmentUrls from "@rbx/environment-urls";
+import { WASM_HASH_PARAM } from "@rbx/wasm-hash";
 import { useTranslations } from "@rbx/www-common/i18n";
 import playButtonConstants from "../constants/playButtonConstants";
 import { fuiButtonStyle } from "../constants/buttonWidths";
@@ -12,13 +13,15 @@ export type TPlayOnWebButtonProps = {
   placeId: string;
   universeId: string;
   eventProperties?: Record<string, string | number | undefined>;
+  wasmJoinId?: string;
 };
 
 const PlayOnWebButton = ({
   placeId,
   universeId,
   eventProperties,
-}: TPlayOnWebButtonProps): React.JSX.Element => {
+  wasmJoinId,
+}: TPlayOnWebButtonProps): React.JSX.Element | null => {
   const playOnWebUrl = `${environmentUrls.playWebsite}/games/start?placeId=${placeId}`;
   const tExperienceDetails = useTranslations("Feature.ExperienceDetails");
 
@@ -50,10 +53,17 @@ const PlayOnWebButton = ({
       if (joinAttemptOrigin != null) {
         url.searchParams.set("joinAttemptOrigin", String(joinAttemptOrigin));
       }
+      if (wasmJoinId) {
+        url.searchParams.set(WASM_HASH_PARAM, wasmJoinId);
+      }
       window.open(url.toString(), "_blank", "noopener");
     },
-    [placeId, universeId, eventProperties, playOnWebUrl],
+    [placeId, universeId, eventProperties, playOnWebUrl, wasmJoinId],
   );
+
+  if (!wasmJoinId) {
+    return null;
+  }
 
   return (
     <Button

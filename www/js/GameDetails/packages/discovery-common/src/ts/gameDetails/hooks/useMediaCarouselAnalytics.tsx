@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { sendEvent } from "@rbx/core-scripts/event-stream";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import eventStreamConstants, {
   EventStreamMetadata,
   MediaGalleryActionEventType,
@@ -44,7 +45,7 @@ export const getMediaItemAnalyticsData = (
         [EventStreamMetadata.IsYoutubeVideo]: false,
       };
     default:
-      window.EventTracker?.fireEvent(carouselErrorCounters.MediaGalleryMediaChangedUnknownItemType);
+      fireEvent(carouselErrorCounters.MediaGalleryMediaChangedUnknownItemType);
       return {
         [EventStreamMetadata.IsVideo]: false,
         [EventStreamMetadata.IsYoutubeVideo]: false,
@@ -73,7 +74,7 @@ const useMediaCarouselAnalytics = (
     (newIndex: number, previousIndex: number, isAutoAdvance: boolean) => {
       const nextItem = items[newIndex];
       if (!nextItem) {
-        window.EventTracker?.fireEvent(carouselErrorCounters.MediaGalleryMediaChangedMissingItem);
+        fireEvent(carouselErrorCounters.MediaGalleryMediaChangedMissingItem);
         return;
       }
 

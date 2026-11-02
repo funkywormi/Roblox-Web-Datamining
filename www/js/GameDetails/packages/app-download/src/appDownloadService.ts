@@ -1,4 +1,4 @@
-import { ValueOf } from "@rbx/core-types";
+import { ValueOf } from "@rbx/core-lib";
 import * as device from "@rbx/core-scripts/meta/device";
 import { eventTypes, sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import browserIdentifier from "./browserIdentifier";
@@ -76,9 +76,14 @@ export const getInstallInstructions = () => {
   return installInstructionStrings.windows.chrome;
 };
 
-export const sendPrimaryAppDownloadClickEvent = (appName: string) => {
+/**
+ * `source` names the surface that fired the click, since every download surface shares the
+ * downloadV2 context. It maps to `source` on webfrontend_form_interaction in proto-schemas.
+ */
+export const sendPrimaryAppDownloadClickEvent = (appName: string, source?: string) => {
   sendEventWithTarget(eventTypes.formInteraction, pageName, {
     field: `${appName}DownloadLink`,
     aType: "click",
+    ...(source ? { source } : {}),
   });
 };

@@ -132,7 +132,7 @@ export const ToggleWithParentalConsentV2 = ({
         snackbarService.success(translate(successMessageKey));
       }
     } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, childUserId);
+      const errorKey = handleChildSettingsUpdateError(error, childUserId, settingName);
       if (errorKey) {
         snackbarService.warning(translate(errorKey));
       }

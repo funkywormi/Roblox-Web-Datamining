@@ -1024,6 +1024,16 @@ const deepLinkNavigate = (host: DeepLinkHost, target: DeepLink): Promise<boolean
       }
       urlTarget = target.url;
     }
+  } else if (navigateSubPath === PathPart.Moments) {
+    // Pass through roblox:// unchanged for protocol / in-app handling (urlTarget = target.url).
+    // There is no web page for Moments. On desktop, return early to skip location fallback.
+    // roblox://navigation/moments
+    // roblox://navigation/moments?feedItemId={feedItemId}
+    const deviceMeta = host.getDeviceMeta();
+    if (deviceMeta?.isDesktop && host.startDeepLinkFlow(target.url)) {
+      return Promise.resolve(true);
+    }
+    urlTarget = target.url;
   } else if (navigateSubPath === PathPart.AmpWizard) {
     // Pass through roblox:// unchanged for protocol / in-app handling.
     // amp_wizard deeplinking is mobile-only, so no desktop fallback is needed here.

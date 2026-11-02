@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { TSortIdMapping } from "../../common/types/bedev2Types";
 import bedev2Services from "../../common/services/bedev2Services";
 
@@ -10,7 +11,7 @@ const useSortIdMapping = (): {
   sortIdMapping: TSortIdMapping | undefined;
 } => {
   const logSortIdFetchError = () => {
-    window.EventTracker?.fireEvent(ERROR_EVENT_NAME);
+    fireEvent(ERROR_EVENT_NAME);
   };
 
   const { data: sortIdMapping } = useQuery({

@@ -49,6 +49,7 @@ export enum PathPart {
   PlusSubscribe = "plus_subscribe",
   PlusWebview = "plus_webview",
   AcceptGift = "accept_gift",
+  Moments = "moments",
 }
 
 export enum ItemType {

@@ -52,7 +52,11 @@ const ChildSpendingNotifications = ({
       );
       snackbarService.success(translate(commonTranslationConstants.successDialogMessage));
     } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, child.userId);
+      const errorKey = handleChildSettingsUpdateError(
+        error,
+        child.userId,
+        UserSetting.monthlySpendLimitNotificationType,
+      );
       if (errorKey) {
         snackbarService.warning(translate(errorKey));
       }

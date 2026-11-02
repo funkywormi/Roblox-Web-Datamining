@@ -7,6 +7,10 @@ import {
   EnabledStatusValue,
   TUpdateUserSettingValueRequest,
   UserSetting,
+  TPromotionalOffersConsentResult,
+  useSetEmailModal as useSetEmailModalFromPackage,
+  useSettingsModal as useSettingsModalFromPackage,
+  translateWithLinks,
 } from "@rbx/user-settings";
 import useSettingsModal from "./useSettingsModal";
 import useNotificationTypePreference from "./useNotificationTypePreference";
@@ -26,11 +30,24 @@ import {
   emailMarketingVerificationSurface,
 } from "../../../userSettings/constants/privacy/privacyConstants";
 import { privacyPolicyLink } from "../../../userSettings/constants/urlConstants";
+import { useGetSettingsUiPolicyQuery } from "../../../apis/universalAppConfigurationApi";
+import {
+  fireSetEmailModalOpenedCounter,
+  fireSetEmailSucceededCounter,
+  fireSetEmailFailedCounter,
+  firePromotionalOffersOptInSavedCounter,
+} from "../../../userSettings/utils/accountInfoEventsCounters";
+import { eventConstants } from "../../../userSettings/constants/eventConstants";
+import accountInfoEventService from "../../../userSettings/services/eventServices/accountInfoEventService";
+import baseApi from "../../../apis/common/baseApi";
+import ApiCacheTag from "../../../apis/common/cacheTagEnum";
+import { useAppDispatch } from "../../../redux/hooks";
 
 const useSetEmailModal = (
   contextForSetEmail: string | undefined = undefined,
-): [JSX.Element, IModalService] => {
+): [React.JSX.Element, IModalService] => {
   const { translate } = useTranslation();
+  const dispatch = useAppDispatch();
 
   const [errorTranslationKey, setErrorTranslationKey] = useState("");
   const [newEmailAddress, setNewEmailAddress] = useState("");
@@ -42,6 +59,8 @@ const useSetEmailModal = (
   const [updateUserSettings] = useUpdateUserSettingValueV2Mutation();
   const { data: accountInfo } = useGetAccountInfoQuery();
   const { data: emailConsentCheckboxEnabled } = useGetEmailConsentCheckboxEnabledQuery();
+  const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
+  const enableSetEmailModalV2 = uiPolicy?.enableSetEmailModalV2 ?? false;
   const emailPreference = useNotificationTypePreference(
     NotificationTypes.PromotionalOffers,
     NotificationChannels.Email,
@@ -54,6 +73,8 @@ const useSetEmailModal = (
   const showEmailConsentCheckbox = emailPreference !== undefined && !isEmailPreferenceOptedIn;
 
   const changeEmail = accountInfo?.IsEmailOnFile; // If email is already on file, we are changing it
+  const emailAction = changeEmail ? eventConstants.changeEmailBtn : eventConstants.addEmailBtn;
+  const modalVersion = enableSetEmailModalV2 ? "V2" : "V1";
   const [
     marketingEmailConsentLegallySensitiveContent,
     marketingEmailConsentLegallySensitiveActions,
@@ -84,14 +105,12 @@ const useSetEmailModal = (
       emailTranslationConstants.parentRecoveryEmail.addParentEmailDescription;
   }
 
-  let actionButtonTranslationKey: string;
-  if (emailSetSuccess) {
-    actionButtonTranslationKey = commonTranslationConstants.modal.submitButtonText;
-  } else if (changeEmail) {
-    actionButtonTranslationKey = emailTranslationConstants.changeEmailLabel;
-  } else {
-    actionButtonTranslationKey = emailTranslationConstants.addEmailLabel;
-  }
+  const saveTranslationKey = changeEmail
+    ? emailTranslationConstants.changeEmailLabel
+    : emailTranslationConstants.addEmailLabel;
+  const actionButtonTranslationKey = emailSetSuccess
+    ? commonTranslationConstants.modal.submitButtonText
+    : saveTranslationKey;
 
   const regex = new RegExp(emailRegex);
   const getSetEmailErrorMessage = () => {
@@ -121,6 +140,7 @@ const useSetEmailModal = (
     try {
       const body = { emailAddress: newEmailAddress, password };
       await updateEmailAddress(body).unwrap();
+      fireSetEmailSucceededCounter(emailAction, modalVersion);
 
       // We try to save the email preference, but if it fails do not error out
       try {
@@ -138,6 +158,7 @@ const useSetEmailModal = (
             auditHeader: marketingEmailConsentLegallySensitiveActions.getBase64EncodedAuditHeader(),
           };
           await updateUserSettings(updateBody).unwrap();
+          firePromotionalOffersOptInSavedCounter(emailAction, modalVersion);
         }
         // eslint-disable-next-line no-empty
       } catch (e) {}
@@ -148,6 +169,7 @@ const useSetEmailModal = (
     } catch (err) {
       // Ignore challenge abandons for errors.
       if (err !== ChallengeAbandonedError) {
+        fireSetEmailFailedCounter(emailAction, modalVersion);
         setErrorTranslationKey(err as string);
       }
     }
@@ -221,7 +243,8 @@ const useSetEmailModal = (
     </React.Fragment>
   );
 
-  const [setEmailModal, setEmailModalService] = useSettingsModal({
+  // V1 (Bootstrap) modal
+  const [setEmailModalV1, setEmailModalServiceV1] = useSettingsModal({
     titleResourceId: titleTranslationKey,
     translatedBody: emailSetSuccess
       ? translate(emailTranslationConstants.verificationSentAfterChangeEmail)
@@ -239,13 +262,78 @@ const useSetEmailModal = (
     size: "md",
   });
 
-  const [emailRequiredPromptModal, emailRequiredPromptModalService] = useSettingsModal({
+  // V2 (Foundation UI) modal - using the user-settings package
+  const [setEmailModalV2, setEmailModalServiceV2] = useSetEmailModalFromPackage({
+    translatedTitle: translate(titleTranslationKey),
+    translatedDescription: translateWithLinks(translate, descriptionTranslationKey, [
+      { opening: "linkStart", closing: "linkEnd", href: privacyPolicyLink },
+    ]),
+    translatedSaveButtonText: translate(saveTranslationKey),
+    translatedSuccessDescription: translate(
+      emailTranslationConstants.verificationSentAfterChangeEmail,
+    ),
+    translatedSuccessButtonText: translate(commonTranslationConstants.modal.submitButtonText),
+    enableConsentCheckbox: Boolean(emailConsentCheckboxEnabled) && showEmailConsentCheckbox,
+    onSuccess: ({
+      isConsentCheckboxShown,
+      isConsentCheckboxChecked,
+      isConsentSaved,
+    }: TPromotionalOffersConsentResult) => {
+      dispatch(baseApi.util.invalidateTags([ApiCacheTag.AccountInfo]));
+      fireSetEmailSucceededCounter(emailAction, modalVersion);
+      if (isConsentSaved) {
+        firePromotionalOffersOptInSavedCounter(emailAction, modalVersion);
+      }
+      if (isConsentCheckboxShown) {
+        accountInfoEventService.emailConsentSubmitted(isConsentCheckboxChecked, isConsentSaved);
+      }
+    },
+    onError: () => {
+      fireSetEmailFailedCounter(emailAction, modalVersion);
+    },
+    onConsentShown: () => {
+      accountInfoEventService.emailConsentCheckboxShown(Boolean(changeEmail));
+    },
+  });
+
+  // Choose between V1 and V2
+  const setEmailModal = enableSetEmailModalV2 ? setEmailModalV2 : setEmailModalV1;
+  const baseSetEmailModalService = enableSetEmailModalV2
+    ? setEmailModalServiceV2
+    : setEmailModalServiceV1;
+
+  const setEmailModalService: IModalService = {
+    open: () => {
+      fireSetEmailModalOpenedCounter(emailAction, modalVersion);
+      baseSetEmailModalService.open();
+    },
+    close: baseSetEmailModalService.close,
+  };
+
+  const [emailRequiredPromptModalV1, emailRequiredPromptModalServiceV1] = useSettingsModal({
     titleResourceId: emailTranslationConstants.emailRequiredMessage,
     bodyResourceId: contextForSetEmail,
     actionButtonTextResourceId: emailTranslationConstants.addEmailLabel,
     onAction: () => setEmailModalService.open(),
     size: "sm",
   });
+
+  const [emailRequiredPromptModalV2, emailRequiredPromptModalServiceV2] =
+    useSettingsModalFromPackage({
+      translatedTitle: translate(emailTranslationConstants.emailRequiredMessage),
+      translatedBody: contextForSetEmail ? translate(contextForSetEmail) : "",
+      translatedActionButtonText: translate(emailTranslationConstants.addEmailLabel),
+      translatedCloseLabel: translate(commonTranslationConstants.modal.closeBtn),
+      onAction: () => setEmailModalService.open(),
+      size: "Small",
+    });
+
+  const emailRequiredPromptModal = enableSetEmailModalV2
+    ? emailRequiredPromptModalV2
+    : emailRequiredPromptModalV1;
+  const emailRequiredPromptModalService = enableSetEmailModalV2
+    ? emailRequiredPromptModalServiceV2
+    : emailRequiredPromptModalServiceV1;
 
   const modals = (
     <React.Fragment>

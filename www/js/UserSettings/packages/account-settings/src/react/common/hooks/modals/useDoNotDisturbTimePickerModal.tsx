@@ -53,7 +53,11 @@ const useDoNotDisturbTimePickerModal = (
         snackbarService.success(translate(successMessageKey));
       }
     } catch (error) {
-      const errorKey = handleChildSettingsUpdateError(error, childUserId);
+      const errorKey = handleChildSettingsUpdateError(
+        error,
+        childUserId,
+        UserSetting.doNotDisturbTimeWindow,
+      );
       if (errorKey) {
         snackbarService.warning(translate(errorKey));
       }

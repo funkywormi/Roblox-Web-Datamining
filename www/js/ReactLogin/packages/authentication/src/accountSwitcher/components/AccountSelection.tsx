@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Thumbnail2d, ThumbnailTypes, ThumbnailAvatarHeadshotSize } from "@rbx/thumbnails";
-import { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
 import { urlQueryConstants } from "@rbx/authentication-common/constants/urlConstants";
+import { AccountSwitcherAvatar } from "./AccountSwitcherAvatar";
 
 export type accountSelectionProps = {
   userId: number;
@@ -9,7 +8,6 @@ export type accountSelectionProps = {
   username?: string;
   onAccountSelection: (userId: number) => void;
   showIcon: boolean;
-  translate: WithTranslationsProps["translate"];
 };
 
 export const AccountSelection = ({
@@ -18,7 +16,6 @@ export const AccountSelection = ({
   username,
   onAccountSelection,
   showIcon,
-  translate,
 }: accountSelectionProps): JSX.Element => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -41,13 +38,7 @@ export const AccountSelection = ({
       onKeyDown={handleAccountSelection}
     >
       <div className="account-selection-thumbnail">
-        <Thumbnail2d
-          containerClass="avatar-card-image"
-          type={ThumbnailTypes.avatarHeadshot}
-          targetId={userId}
-          size={ThumbnailAvatarHeadshotSize.size60}
-          includeProfileFrame
-        />
+        <AccountSwitcherAvatar userId={userId} />
       </div>
       <div className="account-selection-name-container">
         <p className="account-selection-displayname">{displayName || username}</p>

@@ -1,3 +1,4 @@
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import { gameGuidelines } from "../../common/constants/configConstants";
 import { IgrsRating } from "@rbx/game-play-button";
 
@@ -29,7 +30,7 @@ const getIgrsImage = (igrsRating: IgrsRating): string | null => {
       return igrs18PlusImage;
 
     default:
-      window.EventTracker?.fireEvent(gameGuidelines.UnexpectedIgrsRatingCounterEvent);
+      fireEvent(gameGuidelines.UnexpectedIgrsRatingCounterEvent);
       return null;
   }
 };

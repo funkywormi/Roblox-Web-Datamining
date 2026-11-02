@@ -1,4 +1,4 @@
-import { eventStreamService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
+import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 import { confirmationModalOrigins } from "../constants/accountSwitcherConstants";
 import type { AccountSwitcherListVariant } from "../components/FoundationAccountSwitcherList";
@@ -27,7 +27,7 @@ export const sendShowAccountSwitcherShownEvent = (
   userIdsCsv: string,
   eventParams: AccountSwitcherShownEventParams = {},
 ): void => {
-  eventStreamService.sendEventWithTarget(
+  sendEventWithTarget(
     EVENT_CONSTANTS.schematizedEventTypes.authModalShown,
     EVENT_CONSTANTS.context.accountSwitcherModal,
     {
@@ -44,7 +44,7 @@ export const sendShowAccountSwitcherShownEvent = (
 export const sendDismissAccountSwitcherEvent = (
   eventParams: AccountSwitcherVariantEventParams = {},
 ): void => {
-  eventStreamService.sendEventWithTarget(
+  sendEventWithTarget(
     EVENT_CONSTANTS.schematizedEventTypes.authButtonClick,
     EVENT_CONSTANTS.context.accountSwitcherModal,
     {
@@ -64,15 +64,11 @@ export const sendAccountSwitchEvent = (
   userId: string,
   eventParams: AccountSwitcherVariantEventParams = {},
 ): void => {
-  eventStreamService.sendEventWithTarget(
-    EVENT_CONSTANTS.schematizedEventTypes.authButtonClick,
-    context,
-    {
-      btn: EVENT_CONSTANTS.btn.switch,
-      state: userId,
-      ...eventParams,
-    },
-  );
+  sendEventWithTarget(EVENT_CONSTANTS.schematizedEventTypes.authButtonClick, context, {
+    btn: EVENT_CONSTANTS.btn.switch,
+    state: userId,
+    ...eventParams,
+  });
 };
 
 /**
@@ -84,15 +80,11 @@ export const sendAccountSwitcherSwitchResultEvent = (
   elapsedTime: number,
   eventParams: AccountSwitcherVariantEventParams = {},
 ): void => {
-  eventStreamService.sendEventWithTarget(
-    EVENT_CONSTANTS.schematizedEventTypes.authOperationTiming,
-    context,
-    {
-      state: outcome,
-      elapsedTime: Math.round(elapsedTime).toString(),
-      ...eventParams,
-    },
-  );
+  sendEventWithTarget(EVENT_CONSTANTS.schematizedEventTypes.authOperationTiming, context, {
+    state: outcome,
+    elapsedTime: Math.round(elapsedTime).toString(),
+    ...eventParams,
+  });
 };
 
 /**
@@ -105,14 +97,10 @@ export const sendAuthClientErrorEvent = (
   state: string,
   eventParams: AccountSwitcherVariantEventParams = {},
 ): void => {
-  eventStreamService.sendEventWithTarget(
-    EVENT_CONSTANTS.schematizedEventTypes.authClientError,
-    context,
-    {
-      state,
-      ...eventParams,
-    },
-  );
+  sendEventWithTarget(EVENT_CONSTANTS.schematizedEventTypes.authClientError, context, {
+    state,
+    ...eventParams,
+  });
 };
 
 /**
@@ -120,7 +108,7 @@ export const sendAuthClientErrorEvent = (
  * @param state: what the confirmation modal is for
  */
 export const sendShowAccountSwitcherConfirmationModalShownEvent = (state: string): void => {
-  eventStreamService.sendEventWithTarget(
+  sendEventWithTarget(
     EVENT_CONSTANTS.schematizedEventTypes.authModalShown,
     EVENT_CONSTANTS.context.accountSwitcherConfirmation,
     {
@@ -137,7 +125,7 @@ export const sendAccountSwitcherConfirmationModalButtonClickEvent = (
   state: string,
   btn: Btn,
 ): void => {
-  eventStreamService.sendEventWithTarget(
+  sendEventWithTarget(
     EVENT_CONSTANTS.schematizedEventTypes.authButtonClick,
     EVENT_CONSTANTS.context.accountSwitcherConfirmation,
     {
@@ -152,12 +140,8 @@ export const sendAuthButtonClickEvent = (
   btn: Btn,
   eventParams: AccountSwitcherVariantEventParams = {},
 ): void => {
-  eventStreamService.sendEventWithTarget(
-    EVENT_CONSTANTS.schematizedEventTypes.authButtonClick,
-    context,
-    {
-      btn,
-      ...eventParams,
-    },
-  );
+  sendEventWithTarget(EVENT_CONSTANTS.schematizedEventTypes.authButtonClick, context, {
+    btn,
+    ...eventParams,
+  });
 };

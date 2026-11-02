@@ -36,7 +36,7 @@ const ShopGiftcardsPageContainer: React.FC<WithTranslationsProps> = ({
     <UIThemeProvider theme="dark" cssBaselineMode="disabled">
       <NavHeader translate={translate} intl={intl} />
 
-      <div className="container dark-theme">
+      <div className="container dark-theme color-mode-dark">
         <div className="main-content">
           <div className="hero-title">
             <div className="hero-title-wrapper">

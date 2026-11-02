@@ -1,16 +1,13 @@
 import React, { useState } from "react";
-import { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { accountSwitcherStrings } from "../constants/accountSwitcherConstants";
 
 export type accountSelectionProps = {
   handleAddAccount: () => void;
-  translate: WithTranslationsProps["translate"];
 };
 
-export const AccountSelection = ({
-  handleAddAccount,
-  translate,
-}: accountSelectionProps): JSX.Element => {
+export const AccountSelection = ({ handleAddAccount }: accountSelectionProps): JSX.Element => {
+  const translate = useTranslations("Authentication.AccountSwitch");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   return (
     <div

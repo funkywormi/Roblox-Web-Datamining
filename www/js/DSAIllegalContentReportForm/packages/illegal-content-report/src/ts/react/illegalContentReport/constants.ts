@@ -5,10 +5,12 @@ const Limit = {
   MAX_DESCRIPTION_LENGTH: 1000,
 };
 
+const IP_INFRINGEMENT_EMAIL_ADDRESS = "dsa-ip-reporting@roblox.com";
+
 const Urls = {
   SUPPORT_WEB_SUBSITE_BASE_PATH: "/illegal-content-reporting",
   SUPPORT_WEB_SUBSITE_COUNTRY_LIST_PATH: "/illegal-content-reporting/metadata",
-  IP_INFRINGEMENT_AGENT_EMAIL: "mailto:copyright_agent@roblox.com",
+  IP_INFRINGEMENT_AGENT_EMAIL: `mailto:${IP_INFRINGEMENT_EMAIL_ADDRESS}`,
   IP_INFRINGEMENT_AGENT_EMAIL_SUBJECT: "IP Infringement Report[DSA]",
   IP_INFRINGEMENT_ROBLOX_USER_TERMS_OF_USE:
     "https://en.help.roblox.com/hc/en-us/articles/115004647846#intellectual-property-and-ugc",
@@ -113,6 +115,7 @@ const BrazilECAChildSexualExploitationKey = "BrECAChildSexualExploitation";
 
 export {
   Limit,
+  IP_INFRINGEMENT_EMAIL_ADDRESS,
   Urls,
   IllegalTypeTranslationMap,
   IllegalContentSubCategoryKey,

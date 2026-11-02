@@ -1,5 +1,10 @@
 import { httpService } from "@rbx/core-scripts/legacy/core-utilities";
 import { urlConstants } from "../constants/affiliateLinksConstants";
+import {
+  getExperienceAffiliateReferralUrl,
+  getLinkCode,
+  getLinkType,
+} from "../utils/affiliateLinksUtils";
 import { sendQualifiedSignupEvent } from "./eventService";
 
 export const qualifiedSignup = async (params: {
@@ -35,6 +40,19 @@ export const qualifiedLogin = (params: {
     .catch(error => {
       console.error("Failed to send login event for affiliate links:", error);
     });
+};
+
+/** Reports a sign-in to an existing account whose return URL carries an experience affiliate link. */
+export const qualifyAffiliateLogin = (returnUrl: string): void => {
+  const affiliateLink = getExperienceAffiliateReferralUrl(returnUrl);
+  if (affiliateLink) {
+    qualifiedLogin({
+      referralUrl: affiliateLink,
+      linkId: getLinkCode(affiliateLink),
+      linkType: getLinkType(affiliateLink),
+      userDidLogIn: true,
+    });
+  }
 };
 
 export default {

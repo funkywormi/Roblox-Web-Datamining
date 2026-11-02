@@ -96,6 +96,7 @@ function joinMultiplayerGame(
   joinAttemptOrigin,
   joinData,
   referredByPlayerId,
+  isEarlyTesting,
 ) {
   let params = {
     placeId,
@@ -104,6 +105,10 @@ function joinMultiplayerGame(
     isPlayTogetherGame: isPlayTogetherGame === true,
     referredByPlayerId,
   };
+
+  if (isEarlyTesting === true) {
+    params.isEarlyTesting = "true";
+  }
 
   if (gameLauncher.gameLaunchInterface.isJoinAttemptIdEnabled) {
     params = generateGameLaunchParams(params, joinAttemptId, joinAttemptOrigin);
