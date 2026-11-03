@@ -1249,5 +1249,8 @@
     "Description.Instrumentation.Skill": "Use the /rbx-instrument-analytics skill with Studio MCP or Assistant to start now.",
     "Action.Instrumentation.CopySkill": "Copy the skill",
     "Action.Instrumentation.OpenStudio": "Open Studio",
-    "Message.Instrumentation.SkillCopied": "Skill copied"
+    "Message.Instrumentation.SkillCopied": "Skill copied",
+    "Header.OnboardHourlyMetrics": "Get hourly metrics, personalized to your game",
+    "Description.OnboardHourlyMetrics": "Track funnels, currency and custom events. Use the /rbx-instrument-analytics skill with Studio MCP or Assistant.",
+    "Action.SetUpAnalyticsInStudio": "Set up in Studio"
 }
