@@ -1,6 +1,7 @@
 import { ProductType } from "@rbx/client-subscriptions-api/v2";
+import { UrlSearchParams } from "@rbx/core-lib/url";
 import { Button } from "@rbx/foundation-ui";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { saveSubscriptionRedirectUrl } from "../../utils/redirectUrl";
 
@@ -70,26 +71,19 @@ const SubscriptionButton = ({
   // can see / share. Downstream consumers accept both.
   const urlProductType = productType === ProductType.Blackbird ? "RobloxPlus" : productType;
 
-  const purchaseUrl = useMemo(() => {
-    const path = isMobileInApp ? "/mobile-app-upgrades/buy" : "/upgrades/paymentmethods";
-    const url = new URL(path, window.location.origin);
-    url.searchParams.append("ctx", "subscription");
-    url.searchParams.append("type", urlProductType);
-    url.searchParams.append("id", productId);
-    if (paymentSessionId) {
-      url.searchParams.append("paymentSessionId", paymentSessionId);
-    }
-    if (referrerId) {
-      url.searchParams.append("referrerId", referrerId);
-    }
-    if (!isMobileInApp && redirectUrl) {
-      url.searchParams.append("redirectUrl", redirectUrl);
-    }
-    return url.toString();
-  }, [isMobileInApp, urlProductType, productId, paymentSessionId, referrerId, redirectUrl]);
+  const path = isMobileInApp ? "/mobile-app-upgrades/buy" : "/upgrades/paymentmethods";
+  const query = UrlSearchParams.new({
+    ctx: "subscription",
+    type: urlProductType,
+    id: productId,
+    ...(paymentSessionId ? { paymentSessionId } : {}),
+    ...(referrerId ? { referrerId } : {}),
+    ...(!isMobileInApp && redirectUrl ? { redirectUrl } : {}),
+  });
+  const purchaseUrl = `${path}?${query.toString()}`;
 
   const onClick = useCallback(() => {
-    if (isDisabled) {
+    if (isDisabled || !purchaseUrl) {
       return;
     }
 
@@ -112,6 +106,7 @@ const SubscriptionButton = ({
     setIsLoadingInternal(true);
   }, [
     isDisabled,
+    purchaseUrl,
     trackSubscriptionButtonClick,
     redirectUrl,
     onSubscribeClick,
@@ -124,7 +119,7 @@ const SubscriptionButton = ({
       as="a"
       className={className}
       href={purchaseUrl}
-      isDisabled={isDisabled}
+      isDisabled={isDisabled || !purchaseUrl}
       isLoading={loadingStateDisabled ? undefined : effectiveIsLoading}
       size={size}
       variant={variant}

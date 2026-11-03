@@ -13,6 +13,7 @@ import {
   SubscriptionsV2GetSubscriptionProductInfoRequest,
   SubscriptionsV2ListAvailableSubscriptionProductsRequest,
 } from "@rbx/client-subscriptions-api/v2";
+import { window } from "@rbx/core-lib/browser";
 
 const { apiGatewayUrl, domain } = EnvironmentUrls;
 
@@ -25,7 +26,7 @@ const configuration = new Configuration({
 export const subscriptionsV2Api = new SubscriptionsV2Api(configuration);
 
 const resolveReferrerIdFromUrl = (): number | undefined => {
-  if (typeof window === "undefined") {
+  if (!window) {
     return undefined;
   }
   const raw = new URLSearchParams(window.location.search).get("referrerId");

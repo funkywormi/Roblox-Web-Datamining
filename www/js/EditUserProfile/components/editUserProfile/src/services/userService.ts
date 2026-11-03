@@ -2,18 +2,25 @@ import environmentUrls from "@rbx/environment-urls";
 import * as http from "@rbx/core-scripts/http";
 import { UrlConfig } from "@rbx/core-scripts/http";
 
-const DESCRIPTION_URL = `${environmentUrls.usersApi}/v1/description`;
+const PROFILE_URL = `${environmentUrls.apiGatewayUrl}/profile-platform-api/v1/profiles/get`;
 
-export interface DescriptionResponse {
-  description: string;
+interface ProfileResponse {
+  components?: {
+    About?: { description?: string | null };
+  };
 }
 
-export async function getDescriptionAsync(): Promise<string> {
+export async function getDescriptionAsync(userId: number): Promise<string> {
   const urlConfig: UrlConfig = {
-    url: DESCRIPTION_URL,
+    url: PROFILE_URL,
     withCredentials: true,
   };
 
-  const response = await http.get<DescriptionResponse>(urlConfig);
-  return response.data.description;
+  const response = await http.post<ProfileResponse>(urlConfig, {
+    profileType: "User",
+    profileId: String(userId),
+    components: [{ component: "About" }],
+    includeComponentOrdering: false,
+  });
+  return response.data.components?.About?.description ?? "";
 }

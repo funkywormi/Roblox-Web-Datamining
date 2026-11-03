@@ -33,7 +33,7 @@ const useUserProfileData = (): UserProfileData => {
 
   const { data: description = undefined, refetch: refetchDescription } = useQuery<string>({
     queryKey: ["userDescription", userId],
-    queryFn: getDescriptionAsync,
+    queryFn: () => getDescriptionAsync(userId),
     enabled: Boolean(userId),
     staleTime: FIVE_MIN_MS,
     refetchOnWindowFocus: false,
