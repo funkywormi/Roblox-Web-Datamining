@@ -1963,5 +1963,6 @@
     "Description.ParentSide.RobuxTransferApprovals": "Choose when you want to approve your child's Robux transfers.",
     "Description.RobuxTransferApproval.AlwaysAsk": "I want to approve every transfer.",
     "Label.AlwaysAllowForTrustedFriends": "Always allow for Trusted Friends",
-    "Description.RobuxTransferApproval.TrustedFriends": "I want to allow transfers with trusted friends. You'll still be notified."
+    "Description.RobuxTransferApproval.TrustedFriends": "I want to allow transfers with trusted friends. You'll still be notified.",
+    "Label.UniverseAnalyticsDashboard": "Game Analytics Dashboard"
 }
