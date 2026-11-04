@@ -46,6 +46,7 @@ import {
 import UnplayableButton from "./UnplayableButton";
 import useLaunchGameWithPlayableUxTreatment from "../hooks/useLaunchGameWithPlayableUxTreatment";
 import usePurchaseProductData from "../hooks/usePurchaseProductData";
+import useWasmJoinId from "../hooks/useWasmJoinId";
 import { AgeCheckNeededButton } from "./AgeCheckNeededButton";
 import LoadingButton from "./LoadingButton";
 import "./playButton.css";
@@ -425,6 +426,8 @@ export const DefaultPlayButton = ({
     productDetails,
   } = usePurchaseProductData(universeId, placeId, isPurchaseStatus);
 
+  const wasmJoinId = useWasmJoinId();
+
   // Secondary CTAs that can stack under the primary button. Each case lists the primary
   // statuses it may appear alongside; the first enabled match is shown.
   const secondaryPlayButtonCases: TSecondaryPlayButtonCase[] = [
@@ -451,6 +454,7 @@ export const DefaultPlayButton = ({
           placeId={placeId}
           universeId={universeId}
           eventProperties={eventProperties}
+          wasmJoinId={wasmJoinId}
         />
       ),
     },

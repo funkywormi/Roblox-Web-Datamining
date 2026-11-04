@@ -6,6 +6,9 @@ import {
   readInitialPreferredInput,
   type PreferredInput as PreferredInputType,
 } from "./preferredInput";
+import { readDeviceType, type DeviceType } from "./readDeviceType";
+
+export type { DeviceType } from "./readDeviceType";
 
 export { PreferredInput } from "./preferredInput";
 
@@ -17,6 +20,11 @@ export interface ResponsiveData {
   screenHeight: number;
   isPortrait: boolean;
   preferredInput: PreferredInputType;
+  /**
+   * Device category from the host document. `""` when none was published.
+   * Does not change on resize.
+   */
+  deviceType: DeviceType;
   [key: string]: unknown;
 }
 
@@ -33,6 +41,7 @@ const SSR_DEFAULTS: ResponsiveData = {
   screenHeight: SSR_VIEWPORT_HEIGHT,
   isPortrait: false,
   preferredInput: PreferredInput.Pointer,
+  deviceType: "",
 };
 
 function readViewport(): ViewportData {
@@ -40,6 +49,18 @@ function readViewport(): ViewportData {
     screenWidth: browserWindow ? browserWindow.innerWidth : SSR_VIEWPORT_WIDTH,
     screenHeight: browserWindow ? browserWindow.innerHeight : SSR_VIEWPORT_HEIGHT,
     isPortrait: browserWindow ? browserWindow.innerHeight > browserWindow.innerWidth : false,
+  };
+}
+
+function readResponsiveData(): ResponsiveData {
+  const deviceType = readDeviceType();
+  if (!browserWindow) {
+    return { ...SSR_DEFAULTS, deviceType };
+  }
+  return {
+    ...readViewport(),
+    preferredInput: readInitialPreferredInput(),
+    deviceType,
   };
 }
 
@@ -63,16 +84,17 @@ function readViewport(): ViewportData {
  * requesting device. Until that lands, mobile-first templates rendered on
  * SSR will hydrate against desktop dimensions and may flash on the first
  * client `resize`.
+ *
+ * `deviceType` is separate from the viewport. In the browser it is read once
+ * from `<meta name="device-meta">`, which both .NET and Next.js render. It
+ * stays empty during SSR. A resized window does not change it.
  */
 export class ResponsiveStore extends UnkeyedStore<ResponsiveData> {
   constructor() {
     // Re-seed on `clear()`: this store is a process singleton. The resize
     // listener would eventually re-seed after the base zero-out, but
     // consumers would read `undefined` until the user resizes the window.
-    const reseed = (): ResponsiveData =>
-      browserWindow
-        ? { ...readViewport(), preferredInput: readInitialPreferredInput() }
-        : SSR_DEFAULTS;
+    const reseed = (): ResponsiveData => readResponsiveData();
     super({ initial: reseed(), reseed });
     if (browserWindow) {
       browserWindow.addEventListener("resize", () => {
