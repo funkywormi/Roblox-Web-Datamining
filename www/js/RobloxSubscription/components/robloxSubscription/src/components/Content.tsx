@@ -357,6 +357,7 @@ const Content = () => {
   if (isSubscribed) {
     return (
       <SubscriberView
+        deviceMeta={deviceMeta}
         isFaeFreeTrial={faeTrialCheckQuery.data === true}
         robloxPlusUserBenefits={robloxPlusUserBenefitsQuery.data}
         robloxSubscriptionMembership={robloxSubscriptionMembership}

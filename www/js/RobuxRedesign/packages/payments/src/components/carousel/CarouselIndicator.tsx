@@ -54,7 +54,7 @@ function CarouselIndicator({
           <button
             aria-label={formatDotLabel(index, itemCount)}
             aria-selected={isActive}
-            className="content-emphasis size-[8px]"
+            className="content-emphasis size-[8px] bg-action-standard"
             data-testid={`carousel-indicator-dot-${String(index)}`}
             key={index}
             onClick={() => {

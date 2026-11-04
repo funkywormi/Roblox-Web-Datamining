@@ -22,4 +22,5 @@ export enum Event {
   REFERRAL_COPY_LINK_CLICK = "ReferralCopyLinkClick",
   SHARE_CARD_SHOWN = "ShareCardShown",
   SHARE_CARD_INVITE_CLICK = "ShareCardInviteClick",
+  SUBSCRIBER_BENEFIT_CLICK = "SubscriberBenefitClick",
 }

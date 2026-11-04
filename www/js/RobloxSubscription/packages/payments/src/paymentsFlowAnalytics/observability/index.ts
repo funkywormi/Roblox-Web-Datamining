@@ -1,7 +1,7 @@
 import type { RegistryInput } from "@rbx/observability-framework/schema";
 import { createTrackers } from "@rbx/observability-framework/trackers";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
-import { captureException } from "../error";
+import { captureException } from "../../error";
 
 export const observabilityRegistry = {
   featureName: "PaymentsFlowAnalytics",

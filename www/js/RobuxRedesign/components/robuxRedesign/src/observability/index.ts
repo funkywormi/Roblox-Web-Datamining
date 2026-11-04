@@ -10,7 +10,7 @@ import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 export const observabilityRegistry = {
   featureName: "BuyRobuxRedesign",
   team: "Economy > Payments & Fraud",
-  internalPageName: ["Robux", "LeanerRobuxRedesignModel"],
+  internalPageName: ["Robux", "LeanerRobuxRedesignModel", "robuxRedesign"],
   features: {
     health: {
       counters: ["PageLoad", "PageView"],
@@ -60,6 +60,7 @@ export const observabilityRegistry = {
         "UnexpectedPurchaseRedirectCall",
         "PurchaseRedirectUrlEmpty",
         "QuickPayUpsell",
+        "IosPurchaseRestartAlertShown",
       ],
       errors: ["ApplePayAvailabilityException"],
     },

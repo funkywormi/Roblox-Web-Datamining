@@ -119,6 +119,8 @@ export const ToastProvider = ({ children, closeLabel }: ToastProviderProps) => {
             onDismiss={handleClose}
             closeLabel={closeLabel}
             hasCloseAffordance
+            // Temporarily adding more padding to the toast for this incident - https://rbx.enterprise.slack.com/archives/C0CEG3QV77D
+            className="padding-top-large padding-bottom-large"
           >
             {message.title}
           </Alert>

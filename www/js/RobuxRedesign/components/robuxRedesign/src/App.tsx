@@ -1,8 +1,10 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { setItem } from "@rbx/core-lib/local-storage";
 import { getCurrentUser } from "@rbx/www-common/user";
 import { useFirstTimePurchaseConsent } from "@rbx/payments/firstTimePurchaseConsent";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { DeviceMeta } from "@rbx/www-common/device/types";
+import { useToast } from "@rbx/payments/components";
 import {
   BuyRobuxPageContext,
   BuyRobuxPageContextProps,
@@ -18,6 +20,8 @@ import { usePurchaseUrls } from "./hooks/purchase/usePurchaseUrls";
 import { BuyRobuxPage } from "./components/BuyRobuxPage";
 import useRedirect from "./hooks/useRedirect";
 import { isRedirectPlatformEligible } from "./utils/isRedirectPlatformEligible";
+import { getTriggerContext } from "./utils/getTriggerContext";
+import { trackCounter } from "./observability";
 import { withApiMetrics } from "./utils/publishMetric";
 
 const PAYMENT_SESSION_LOCAL_STORAGE_KEY_V2 =
@@ -35,6 +39,27 @@ export type AppProps = {
 
 export const App = ({ enhancedBuyRobuxPageData, urlParams, deviceMeta }: AppProps) => {
   useBonusItem();
+  const toast = useToast();
+  const isWarningShown = useRef(false);
+  const translatedErrorString =
+    enhancedBuyRobuxPageData.buyRobuxPageData.legalDisclosureTermsUrlPath;
+
+  useEffect(() => {
+    if (!deviceMeta.isIosApp || !translatedErrorString || isWarningShown.current) {
+      return;
+    }
+
+    // Temporarily message to user to restart app for this incident - https://rbx.enterprise.slack.com/archives/C0CEG3QV77D
+    isWarningShown.current = true;
+    trackCounter("IosPurchaseRestartAlertShown");
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: getTriggerContext(deviceMeta),
+      isMidPurchaseStep: true,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.IOS_PURCHASE_RESTART_ALERT,
+      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
+    });
+    toast.toastService.info(translatedErrorString);
+  }, [deviceMeta, toast.toastService, translatedErrorString]);
 
   const {
     limitedTimeBonusItem,

@@ -29,6 +29,7 @@ import { getFeatureConfig } from "../utils/subscriptionProductInfo";
 
 import type { GetRobloxPlusUserBenefitsResponse } from "@rbx/client-roblox-subscriptions-api/v1";
 import type { SubscriptionProductInfo, Subscription } from "@rbx/client-subscriptions-api/v2";
+import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
 import type { FC } from "react";
 
 // Keep the promotion implementation available for a future rerun without rendering it currently.
@@ -37,6 +38,7 @@ const SUBSCRIBER_GIFT_BANNER_CONFIG = {
 };
 
 export type SubscriberViewProps = {
+  deviceMeta: DeviceMeta;
   robloxSubscriptionProduct: SubscriptionProductInfo;
   robloxSubscriptionMembership: Subscription;
   robloxPlusUserBenefits: GetRobloxPlusUserBenefitsResponse | undefined;
@@ -46,6 +48,7 @@ export type SubscriberViewProps = {
 };
 
 const SubscriberView: FC<SubscriberViewProps> = ({
+  deviceMeta,
   robloxSubscriptionProduct,
   robloxSubscriptionMembership,
   robloxPlusUserBenefits,
@@ -60,10 +63,11 @@ const SubscriberView: FC<SubscriberViewProps> = ({
   const privateServersCreatedCount = robloxPlusUserBenefits?.privateServersCreatedForFree;
   const robuxSentToFriendsCount = robloxPlusUserBenefits?.robuxSentToFriends;
 
-  const hasFreeTrial = useMemo(
-    () => robloxSubscriptionMembership.activeOffers.some(o => o.offerType === "FreeTrial"),
+  const freeTrialOffer = useMemo(
+    () => robloxSubscriptionMembership.activeOffers.find(o => o.offerType === "FreeTrial"),
     [robloxSubscriptionMembership.activeOffers],
   );
+  const hasFreeTrial = freeTrialOffer != null;
 
   // Paid-tenure start from the backend: trial end for weekly trials, else activation. The step-up
   // countdown and period index measure from here. Nullable on endpoints that don't compute it.
@@ -179,7 +183,10 @@ const SubscriberView: FC<SubscriberViewProps> = ({
             savedRobux={savedRobux}
           />
           <SubscriptionBenefitsDisplay
+            currentDiscountPercent={currentDiscountPercent}
+            deviceMeta={deviceMeta}
             featureConfig={getFeatureConfig(robloxSubscriptionProduct)}
+            freeTrialOffer={freeTrialOffer}
           />
           <ActionPanel>
             <div className="gap-y-medium flex flex-col">

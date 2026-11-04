@@ -44,8 +44,10 @@ const DiscountTierProgressCard: FC<DiscountTierProgressCardProps> = ({
     ).getTime();
 
     const { discountPercent } = nextDiscount;
+    // The served tier comes from the backend's cycle ledger, which can trail this estimate (e.g. a
+    // renewal not yet charged), so the countdown never reaches 0 while the next tier is still locked.
     const targetDateDaysUntil = Math.max(
-      0,
+      1,
       Math.ceil((targetDateTimestampMs - nowTimestampMs) / (1000 * 60 * 60 * 24)),
     );
     const targetDateProgressPercent = Math.min(
@@ -64,8 +66,6 @@ const DiscountTierProgressCard: FC<DiscountTierProgressCardProps> = ({
       targetDateProgressPercent,
     };
   }, [nextDiscount, activationTimestampMs, trialEndTimestampMs, periodType]);
-
-  // TODO(SUBS-4070): handle case where targetDateDaysUntil is 0 (i.e., waiting for next renewal)
 
   // Don't render the card when the product has no discount tiers configured at all
   if (nextDiscountSummary === null && currentDiscountPercent === 0) {

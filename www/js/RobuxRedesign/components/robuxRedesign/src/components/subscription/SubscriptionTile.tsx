@@ -139,7 +139,7 @@ export const SubscriptionTile: FC<SubscriptionTileProps> = ({
         <h3 className="text-label-large content-emphasis text-truncate-end">{title}</h3>
         <div className="flex flex-row items-center justify-end gap-small">
           {strikethroughPrice && (
-            <span className="text-title-medium text-no-wrap content-muted strike-through">
+            <span className="text-title-medium text-no-wrap content-muted line-through">
               {strikethroughPrice}
             </span>
           )}
