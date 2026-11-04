@@ -15,6 +15,7 @@ import { SamsungPaymentMethods } from "../samsungPaymentMethods/useSamsungPaymen
 import { loginRedirectService } from "../../services/loginRedirectService";
 import { trackRedirectClickTime } from "../../utils/trackRedirectClickTime";
 import { stampRedirectStartTsOnClick } from "../../utils/stampRedirectStartTs";
+import { startNativePurchaseHandoffWatch } from "../../utils/nativePurchaseHandoff";
 
 export function usePurchase(
   {
@@ -64,7 +65,7 @@ export function usePurchase(
   }>();
 
   const purchaseProductPostPurchaseWarning = useCallback(
-    (_product: Product, _isSub: boolean, url: string) => {
+    (product: Product, isSub: boolean, url: string) => {
       if (window === undefined) {
         return;
       }
@@ -80,10 +81,11 @@ export function usePurchase(
         return;
       }
 
+      startNativePurchaseHandoffWatch(deviceMeta, isSub, product.productId);
       trackCounter("MobilePurchaseRedirect");
       window.location.href = url;
     },
-    [isNativePurchasePlatform, isWebCheckoutPlatform],
+    [deviceMeta, isNativePurchasePlatform, isWebCheckoutPlatform],
   );
 
   const purchaseProductPostVerificationUpsell = useCallback(

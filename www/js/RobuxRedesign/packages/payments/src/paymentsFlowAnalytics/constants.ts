@@ -138,6 +138,7 @@ export const VIEW_NAME = {
   REDEEM_CREDIT_FOOTER: "RedeemCreditFooter",
   REDEEM_CREDIT_GET_PLUS_MODAL: "RedeemCreditGetPlusModal",
   IOS_PURCHASE_RESTART_ALERT: "IosPurchaseRestartAlert",
+  NATIVE_PURCHASE_HANDOFF_MISSED: "NativePurchaseHandoffMissed",
 } as const;
 export type ViewName = ValueOf<typeof VIEW_NAME>;
 
