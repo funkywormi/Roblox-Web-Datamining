@@ -17,8 +17,8 @@ export type UrlOptions = {
    * The set of allowed domains. Entries starting with a `.` will allow any subdomain.
    * Otherwise, only an exact match is allowed.
    *
-   * E.g., `".roblox.com"` allows both `www.roblox.com` and `create.roblox.com`. Whereas,
-   * `"roblox.qq.com"` allows only a host matching exactly that string.
+   * E.g., `".roblox.com"` allows `www.roblox.com`, `create.roblox.com`, and `roblox.com`.
+   * Whereas, `"roblox.qq.com"` allows only a host matching exactly that string.
    */
   readonly domainAllowlist?: readonly string[];
   /**

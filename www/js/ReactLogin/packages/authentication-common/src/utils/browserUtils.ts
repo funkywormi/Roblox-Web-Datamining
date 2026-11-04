@@ -1,20 +1,14 @@
+import { UrlSearchParams } from "@rbx/core-lib/url";
 import { urlService } from "@rbx/core-scripts/legacy/core-utilities";
 import { RETURNURL } from "../constants/browserConstants";
 
 export { getBrowserTrackerId } from "@rbx/www-common/browser-tracker";
 
-// Matches case-insensitively, because that is what Roblox.UrlParser's
-// getParameterValueByName(name, false) did and callers rely on it: signupUtils reads `dataToken`
-// and `birthday` out of redirect urls whose casing is not ours to control.
-export const getUrlParam = (name: string): string | null => {
-  const target = name.toLowerCase();
-  for (const [key, value] of new URLSearchParams(window.location.search).entries()) {
-    if (key.toLowerCase() === target) {
-      return value;
-    }
-  }
-  return null;
-};
+// UrlSearchParams matches keys case-insensitively, like Roblox.UrlParser's
+// getParameterValueByName(name, false) did: signupUtils reads `dataToken` and `birthday` out of
+// redirect urls whose casing is not ours to control.
+export const getUrlParam = (name: string): string | null =>
+  UrlSearchParams.parse(window.location.search).get(name);
 
 export const getUrlParamValue = (name: string): string | null => {
   const result = getUrlParam(name);

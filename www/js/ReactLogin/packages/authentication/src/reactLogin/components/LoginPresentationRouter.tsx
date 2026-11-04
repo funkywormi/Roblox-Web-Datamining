@@ -5,8 +5,7 @@ import LoginComplianceSurface from "./LoginComplianceSurface";
 import LoginLegacyView from "./LoginLegacyView";
 import SsoCompleteHandler from "../../shared/components/SsoCompleteHandler";
 import type { LoginControllerViewModel } from "../types/loginControllerTypes";
-import { navigateToLoginReturnUrl } from "../utils/loginNavigationUtils";
-import { getRedirectUrl } from "../utils/loginUtils";
+import { getSsoRedirectUrl, navigateToSsoReturnUrl } from "../utils/loginNavigationUtils";
 
 export type LoginPresentationRouterProps = {
   viewModel: LoginControllerViewModel;
@@ -55,8 +54,8 @@ const LoginPresentationRouter = ({
     >
       {presentation}
       <SsoCompleteHandler
-        navigateToDestination={navigateToLoginReturnUrl}
-        getSignupReturnUrl={getRedirectUrl}
+        navigateToDestination={navigateToSsoReturnUrl}
+        getSignupReturnUrl={getSsoRedirectUrl}
       />
       <LoginChallengeOverlays {...challengeOverlaysProps} />
     </div>

@@ -307,7 +307,12 @@ export const parentalControlsApi = baseApi.injectEndpoints({
         postBody: manageChildFriendRequest,
       }),
       async onQueryStarted(args: TGrantConsentRequest, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          // error handling is handled in transformErrorResponse callback below.
+          return;
+        }
         if (args.details.friendManagementAction === ManagementAction.Block) {
           // Remove friend from friend cache
           dispatch(
@@ -387,7 +392,7 @@ export const parentalControlsApi = baseApi.injectEndpoints({
       transformErrorResponse: (err: unknown, _meta, arg): ParentalControlsErrorCode => {
         const errorCode = (err as TParentalControlsError).data.code;
         if (errorCode === ParentalControlsErrorCode.ParentNotVerified) {
-          window.location.href = getVerificationPageUrl(arg.childUserId);
+          window.location.href = getVerificationPageUrl(arg.childUserId, arg.consentType);
         }
         return errorCode;
       },

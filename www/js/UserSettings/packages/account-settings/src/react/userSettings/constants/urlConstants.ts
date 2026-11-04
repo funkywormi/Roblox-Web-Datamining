@@ -1,6 +1,7 @@
 import { EnvironmentUrls } from "Roblox";
 import { urlService } from "core-utilities";
 import RouterPath from "../../../enums/RouterPath";
+import { ParentConsentType } from "../../../types/parentConsentsTypes";
 
 // user-settings-api, parental-controls-api, and parental spend-control URLs used to live here.
 // They now live in @rbx/user-settings — import them from there.
@@ -139,14 +140,19 @@ export const getConsentDetailsPageUrl = (consentId: string): string =>
   )}`;
 
 export const getTrustedConnectionReviewPageUrl = (consentId: string, sessionId: string): string =>
-  `/parental-requests?requestType=AddTrustedConnection&sessionId=${sessionId}&analyticsSessionId=${sessionId}&consentId=${consentId}&redirectUrl=${encodeURIComponent(
+  `/parental-requests?requestType=AddTrustedConnection&analyticsSessionId=${sessionId}&consentId=${consentId}&redirectUrl=${encodeURIComponent(
     window.location.href,
   )}`;
 
+// requestType is the consent type that failed, so the verification plans are fetched for that consent.
 // settingName is sent as the target, so the verification plans can apply setting-specific
 // requirements (e.g. AllowIdentityVerification does not accept FAE).
-export const getVerificationPageUrl = (childUserId: number, settingName?: string): string =>
-  `/parental-requests?requestType=UpdateUserSetting&source=SettingsPage&childUserId=${childUserId}${
+export const getVerificationPageUrl = (
+  childUserId: number,
+  requestType: ParentConsentType,
+  settingName?: string,
+): string =>
+  `/parental-requests?requestType=${requestType}&source=SettingsPage&childUserId=${childUserId}${
     settingName ? `&target=${encodeURIComponent(settingName)}` : ""
   }&redirectUrl=${encodeURIComponent(window.location.href)}`;
 

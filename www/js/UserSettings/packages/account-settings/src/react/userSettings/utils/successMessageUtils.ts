@@ -9,6 +9,7 @@ import commonTranslationConstants from "../constants/contentConstants/commonTran
 import parentalControlsTranslationConstants from "../constants/contentConstants/parentalControlsTranslationConstants";
 import privacyTranslationConstants from "../constants/contentConstants/privacyTranslationConstants";
 import { getVerificationPageUrl } from "../constants/urlConstants";
+import { ParentConsentType } from "../../../types/parentConsentsTypes";
 
 export const getSuccessMessageKeyForUserSettingsUpdate = (
   request: TUpdateUserSettingValueRequest,
@@ -53,7 +54,11 @@ export const handleChildSettingsUpdateError = (
   const errorCode = err?.data?.code;
 
   if (errorCode === UpdateChildSettingsErrorCode.ParentNotVerified && childUserId) {
-    window.location.href = getVerificationPageUrl(childUserId, settingName);
+    window.location.href = getVerificationPageUrl(
+      childUserId,
+      ParentConsentType.UpdateUserSetting,
+      settingName,
+    );
     return null;
   }
 

@@ -133,6 +133,8 @@ export enum VIEW_NAME {
   ROBUX_PENDING_TRANSFERS = "RobuxPendingTransfers",
   REDEEM_CREDIT_FOOTER = "RedeemCreditFooter",
   REDEEM_CREDIT_GET_PLUS_MODAL = "RedeemCreditGetPlusModal",
+  IOS_PURCHASE_RESTART_ALERT = "IosPurchaseRestartAlert",
+  NATIVE_PURCHASE_HANDOFF_MISSED = "NativePurchaseHandoffMissed",
 }
 
 export enum PURCHASE_EVENT_TYPE {

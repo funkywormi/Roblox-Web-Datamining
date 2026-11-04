@@ -88,11 +88,12 @@ export type DeepLinkHost = {
   getPlaceIdFromUniverseId: (universeId: string) => Promise<number>;
   getUniverseIdFromPlaceId: (placeId: string) => Promise<number>;
   launchGame: (properties: PlayGameProperties, event: LaunchGameEvent) => PromiseLike<void> | void;
-  joinMultiplayerGame: (placeId: number) => void;
-  startGameWithDeepLinkUrl: (deepLinkUrl: string, placeId: number) => void;
+  // This, startGameWithDeepLinkUrl and openStudio return false when nothing can launch, so the link counts as unhandled.
+  joinMultiplayerGame: (placeId: number) => unknown;
+  startGameWithDeepLinkUrl: (deepLinkUrl: string, placeId: number) => unknown;
   // Returns false when the page cannot start the flow, so the caller falls back to a redirect.
   startDeepLinkFlow: (deepLinkUrl: string) => boolean;
-  openStudio: (data: StudioLinkData) => void;
+  openStudio: (data: StudioLinkData) => unknown;
   // Returns null when the upsell service is not on the page.
   startAccessManagementUpsell: (params: {
     featureName: string;
@@ -306,14 +307,15 @@ const deepLinkNavigate = (host: DeepLinkHost, target: DeepLink): Promise<boolean
                   }
                 }
 
-                host.openStudio({
-                  placeId: response.data.targetId,
-                  universeId,
-                  startTeamTest,
-                  instanceId: additionalParams.instanceId,
-                  annotationId: additionalParams.annotationId,
-                });
-                return true;
+                return (
+                  host.openStudio({
+                    placeId: response.data.targetId,
+                    universeId,
+                    startTeamTest,
+                    instanceId: additionalParams.instanceId,
+                    annotationId: additionalParams.annotationId,
+                  }) !== false
+                );
               })
               .catch(() => false);
           } else if (
@@ -465,8 +467,7 @@ const deepLinkNavigate = (host: DeepLinkHost, target: DeepLink): Promise<boolean
                 }${includeInstanceId ? `&gameInstanceId=${data.instanceId}` : ""}${
                   data.inviterId ? `&referredByPlayerId=${data.inviterId}` : ""
                 }`;
-                host.startGameWithDeepLinkUrl(launchLink, data.placeId);
-                return true;
+                return host.startGameWithDeepLinkUrl(launchLink, data.placeId) !== false;
               }
               return false;
             })
@@ -603,8 +604,7 @@ const deepLinkNavigate = (host: DeepLinkHost, target: DeepLink): Promise<boolean
               if (data.instanceId) {
                 launchLink += `&gameInstanceId=${data.instanceId}`;
               }
-              host.startGameWithDeepLinkUrl(launchLink, data.placeId);
-              return true;
+              return host.startGameWithDeepLinkUrl(launchLink, data.placeId) !== false;
             })
             .catch(() => {
               host.fireCounter(CounterEvents.ScreenshotInviteShareResolutionFailed);
@@ -916,8 +916,7 @@ const deepLinkNavigate = (host: DeepLinkHost, target: DeepLink): Promise<boolean
             // TODO (xueyinwang): Support redirection with a separate Status when product needs come
             let launchLink = `${UrlPart.ExperienceLauncher}placeId=${data.placeId}`;
             launchLink = buildRedirectUrlWithJoinData(launchLink, data.joinData);
-            host.startGameWithDeepLinkUrl(launchLink, data.placeId);
-            return true;
+            return host.startGameWithDeepLinkUrl(launchLink, data.placeId) !== false;
           })
           .catch(() => {
             host.fireCounter(CounterEvents.ExperienceEventResolutionFailed);
@@ -1073,19 +1072,23 @@ const deepLinkGameJoin = (host: DeepLinkHost, target: DeepLink): Promise<boolean
 
   if (params.linkCode) {
     window.location.href = `${UrlPart.Games}/${params.placeId}?privateServerLinkCode=${params.linkCode}`;
-  } else if (params.accessCode) {
+    return Promise.resolve(true);
+  }
+  if (params.accessCode) {
     window.location.href = `${UrlPart.GameStart}?placeId=${params.placeId}&accessCode=${params.accessCode}`;
-  } else if (params.launchData) {
+    return Promise.resolve(true);
+  }
+  if (params.launchData) {
     const launchLink = `${UrlPart.ExperienceLauncher}placeId=${params.placeId}${
       params.launchData ? `&launchData=${params.launchData}` : ""
     }`;
     // eslint-disable-next-line no-restricted-syntax -- NaN on a malformed placeId, as before
-    host.startGameWithDeepLinkUrl(launchLink, Number(params.placeId));
-  } else {
-    host.joinMultiplayerGame(parseFloat(params.placeId) ?? Number.NaN);
+    const placeId = Number(params.placeId);
+    return Promise.resolve(host.startGameWithDeepLinkUrl(launchLink, placeId) !== false);
   }
-
-  return Promise.resolve(true);
+  return Promise.resolve(
+    host.joinMultiplayerGame(parseFloat(params.placeId) ?? Number.NaN) !== false,
+  );
 };
 
 const deepLinkFollowUserToExperience = (target: DeepLink): Promise<boolean> => {
