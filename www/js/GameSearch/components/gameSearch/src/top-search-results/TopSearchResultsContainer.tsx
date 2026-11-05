@@ -3,6 +3,7 @@ import type { TranslateFunction } from "@rbx/core-scripts/react";
 import { usePageSession } from "@rbx/discovery-common/session";
 import { Loading } from "@rbx/sdui-common";
 import { SduiPageEntryPoint } from "@rbx/sdui-core/client";
+import { Capability } from "@rbx/sdui-core";
 
 import { getKeyword } from "@rbx/discovery-common/utils";
 import {
@@ -51,6 +52,9 @@ export const TopSearchResultsContainer = ({ translate }: TopSearchResultsContain
         sessionId,
         surfaceKey: TOP_SEARCH_RESULTS_SURFACE_KEY,
         configKey: pageKey,
+        clientCapabilities: {
+          enabledCapabilities: [Capability.SUPPORTS_SAFETY_RESOURCE_BANNER],
+        },
       }),
     [keyword, pageKey, sessionId],
   );

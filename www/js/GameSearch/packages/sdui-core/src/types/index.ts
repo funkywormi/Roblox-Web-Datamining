@@ -395,11 +395,12 @@ export interface SduiActionHandlerConfig {
   /**
    * Resolves an action param to a named telemetry handler at activation time.
    * An explicit `Action.telemetry_handler` takes precedence.
+   * An unregistered resolved name falls back to `telemetryHandler`, when supplied.
    */
   resolveTelemetryHandlerName?: SduiTelemetryHandlerNameResolver;
   /**
    * Per-`ActionType` custom telemetry hook. Suppressed when the
-   * explicit or resolved named-handler branch is selected.
+   * explicit named-handler branch or a registered resolved handler is selected.
    */
   telemetryHandler?: SduiActionTelemetryHandler;
   /**

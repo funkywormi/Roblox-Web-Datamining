@@ -30,12 +30,15 @@ const isValidSafetyResourceBannerParams = (params: TSafetyResourceBannerEventPar
   );
 };
 
-export const sendSafetyResourceBannerEvent = (params: TSafetyResourceBannerEventParams): void => {
+export const sendSafetyResourceBannerEvent = (
+  params: TSafetyResourceBannerEventParams,
+  context: string,
+): void => {
   if (!isValidSafetyResourceBannerParams(params)) {
     console.error("SafetyResourceBannerEventInvalidInterface");
     return;
   }
-  sendEvent(...eventStreamConstants.safetyResourceBanner(params));
+  sendEvent(...eventStreamConstants.safetyResourceBanner(params, context));
 };
 
 const impressedKeys = new Set<string>();
@@ -47,13 +50,17 @@ const impressedKeys = new Set<string>();
  */
 export const sendSafetyResourceBannerImpressionOnce = (
   params: Omit<TSafetyResourceBannerEventParams, "action">,
+  context: string,
 ): void => {
   const key = `${params.textFilterRequestId}:${params.surface}`;
   if (impressedKeys.has(key)) {
     return;
   }
   impressedKeys.add(key);
-  sendSafetyResourceBannerEvent({ ...params, action: SafetyResourceBannerAction.Impression });
+  sendSafetyResourceBannerEvent(
+    { ...params, action: SafetyResourceBannerAction.Impression },
+    context,
+  );
 };
 
 /** Test helper: the dedupe set is module state. */

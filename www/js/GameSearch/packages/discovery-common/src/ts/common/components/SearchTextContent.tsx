@@ -2,6 +2,8 @@ import { MouseEvent, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSanitizedHtmlLinkText } from "@rbx/game-play-button";
 import { observeVisibility } from "@rbx/core-scripts/util/element-visibility";
 import { TOmniSearchTextDataModel } from "../types/bedev2Types";
+import type { PageContext } from "../types/pageContext";
+import { getEventContext } from "../constants/eventStreamConstants";
 import {
   extractFirstLinkUrl,
   SafetyResourceBannerAction,
@@ -13,8 +15,10 @@ import {
 
 export default function SearchTextContent({
   textData,
+  page,
 }: {
   textData: TOmniSearchTextDataModel;
+  page?: PageContext;
 }): JSX.Element {
   const sanitizedText = useSanitizedHtmlLinkText(textData.name, {
     shouldOpenLinksInNewTab: true,
@@ -47,10 +51,10 @@ export default function SearchTextContent({
     }
     return observeVisibility({ element }, isVisible => {
       if (isVisible) {
-        sendSafetyResourceBannerImpressionOnce(eventFields);
+        sendSafetyResourceBannerImpressionOnce(eventFields, getEventContext(page));
       }
     });
-  }, [eventFields]);
+  }, [eventFields, page]);
 
   const onClick = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
@@ -61,13 +65,16 @@ export default function SearchTextContent({
       if (!link) {
         return;
       }
-      sendSafetyResourceBannerEvent({
-        ...eventFields,
-        action: SafetyResourceBannerAction.LinkTapped,
-        url: link.getAttribute("href") ?? eventFields.url,
-      });
+      sendSafetyResourceBannerEvent(
+        {
+          ...eventFields,
+          action: SafetyResourceBannerAction.LinkTapped,
+          url: link.getAttribute("href") ?? eventFields.url,
+        },
+        getEventContext(page),
+      );
     },
-    [eventFields],
+    [eventFields, page],
   );
 
   return (

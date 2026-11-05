@@ -39,6 +39,28 @@ export type GameLaunchConfig = {
   isOmitPlayerChannelForWinAndMacEnabled: boolean;
 };
 
+// Roblox.Hybrid.Game.LAUNCH_MODES that .NET's appHybridClientInterface uses.
+export type InAppLaunchMode =
+  | "RequestGame"
+  | "RequestFollowUser"
+  | "RequestGameJob"
+  | "RequestPrivateGame";
+
+// What appHybridClientInterface sends to Roblox.Hybrid.Game.launchGame in the apps.
+export type InAppLaunchRequest = {
+  requestType: InAppLaunchMode;
+  placeId?: string;
+  userId?: string;
+  instanceId?: ParamValue;
+  accessCode?: ParamValue;
+  linkCode?: ParamValue;
+  conversationId?: string;
+  isPlayTogetherGame?: boolean;
+  browserTrackerId: string | false;
+  joinAttemptId?: string;
+  joinAttemptOrigin?: string;
+};
+
 export type GameLaunchHost = {
   getConfig: () => GameLaunchConfig;
   getBrowserTrackerId: () => string | false;
@@ -54,6 +76,14 @@ export type GameLaunchHost = {
   // Set when the user starts the installer; the next successful launch logs successfulInstall.
   // Pass one to share the flag with install flows outside this launcher.
   installState?: { get: () => boolean; set: (isInstalling: boolean) => void };
+  // Called instead of a join for a guest, like .NET's AuthenticationChecker.restrictGuests.
+  // Private servers aren't gated, as on .NET. Without it, guests launch. .NET keeps its own copy;
+  // change both.
+  onGuestLaunch?: () => void;
+  // Joins through the app's hybrid bridge instead of the protocol URL, like .NET's
+  // appHybridClientInterface, which .NET keeps as its own copy; change both. Return null when the
+  // bridge isn't on the page to use the protocol URL.
+  launchInApp?: (request: InAppLaunchRequest) => Promise<void> | null;
 };
 
 export type MultiplayerGameParams = Params & {
@@ -220,36 +250,113 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
       params,
     );
 
+  const restrictGuests = (join: () => Promise<void>) => {
+    if (host.onGuestLaunch != null && !host.isAuthenticated()) {
+      host.onGuestLaunch();
+      return Promise.resolve();
+    }
+    return join();
+  };
+
+  // Like appHybridClientInterface, only the join attempt is passed on besides the request's own fields.
+  const joinInApp = (
+    request: Omit<InAppLaunchRequest, "browserTrackerId">,
+    params: Params,
+    joinWithProtocol: () => Promise<void>,
+  ) => {
+    const inAppLaunch = host.launchInApp?.({
+      ...request,
+      browserTrackerId: host.getBrowserTrackerId(),
+      ...(typeof params.joinAttemptId === "string" ? { joinAttemptId: params.joinAttemptId } : {}),
+      ...(typeof params.joinAttemptOrigin === "string"
+        ? { joinAttemptOrigin: params.joinAttemptOrigin }
+        : {}),
+    });
+    return inAppLaunch ?? joinWithProtocol();
+  };
+
   return {
     joinMultiplayerGame: params =>
-      startGame({
-        otherParams: { placelauncherurl: placeLauncherUrl("RequestGame", params) },
-        placeId: params.placeId,
-        isPlayTogetherGame: params.isPlayTogetherGame === true,
-        launchData: params.launchData,
-        eventId: params.eventId,
-      }),
+      restrictGuests(() =>
+        joinInApp(
+          {
+            requestType: "RequestGame",
+            placeId: String(params.placeId),
+            isPlayTogetherGame: params.isPlayTogetherGame === true,
+          },
+          params,
+          () =>
+            startGame({
+              otherParams: { placelauncherurl: placeLauncherUrl("RequestGame", params) },
+              placeId: params.placeId,
+              isPlayTogetherGame: params.isPlayTogetherGame === true,
+              launchData: params.launchData,
+              eventId: params.eventId,
+            }),
+        ),
+      ),
     followPlayerIntoGame: params =>
-      startGame({
-        otherParams: { placelauncherurl: placeLauncherUrl("RequestFollowUser", params) },
-      }),
+      restrictGuests(() =>
+        joinInApp({ requestType: "RequestFollowUser", userId: String(params.userId) }, params, () =>
+          startGame({
+            otherParams: { placelauncherurl: placeLauncherUrl("RequestFollowUser", params) },
+          }),
+        ),
+      ),
     joinGameInstance: params =>
-      startGame({
-        otherParams: { placelauncherurl: placeLauncherUrl("RequestGameJob", params) },
-        placeId: params.placeId,
-        isPlayTogetherGame: params.isPlayTogetherGame === true,
-      }),
+      restrictGuests(() =>
+        joinInApp(
+          {
+            requestType: "RequestGameJob",
+            placeId: String(params.placeId),
+            instanceId: params.gameId,
+            isPlayTogetherGame: params.isPlayTogetherGame === true,
+          },
+          params,
+          () =>
+            startGame({
+              otherParams: { placelauncherurl: placeLauncherUrl("RequestGameJob", params) },
+              placeId: params.placeId,
+              isPlayTogetherGame: params.isPlayTogetherGame === true,
+            }),
+        ),
+      ),
+    // .NET's app interface drops linkCode; it's passed here so share links can reach a private server.
     joinPrivateGame: params =>
-      startGame({
-        otherParams: { placelauncherurl: placeLauncherUrl("RequestPrivateGame", params) },
-        placeId: params.placeId,
-      }),
+      joinInApp(
+        {
+          requestType: "RequestPrivateGame",
+          placeId: String(params.placeId),
+          ...(params.accessCode == null ? {} : { accessCode: params.accessCode }),
+          ...(params.linkCode == null ? {} : { linkCode: params.linkCode }),
+        },
+        params,
+        () =>
+          startGame({
+            otherParams: { placelauncherurl: placeLauncherUrl("RequestPrivateGame", params) },
+            placeId: params.placeId,
+          }),
+      ),
+    // The apps have no play-together mode; .NET sends a simple game with the conversation.
     playTogetherGame: params =>
-      startGame({
-        otherParams: { placelauncherurl: placeLauncherUrl("RequestPlayTogetherGame", params) },
-        placeId: params.placeId,
-        conversationId: params.conversationId,
-      }),
+      restrictGuests(() =>
+        joinInApp(
+          {
+            requestType: "RequestGame",
+            placeId: String(params.placeId),
+            conversationId: String(params.conversationId),
+          },
+          params,
+          () =>
+            startGame({
+              otherParams: {
+                placelauncherurl: placeLauncherUrl("RequestPlayTogetherGame", params),
+              },
+              placeId: params.placeId,
+              conversationId: params.conversationId,
+            }),
+        ),
+      ),
     openStudio: () => startGame({ otherParams: { avatar: "avatar" } }, "edit"),
     editGameInStudio: ({ placeId, universeId, startTeamTest = false, instanceId, annotationId }) =>
       startGame(

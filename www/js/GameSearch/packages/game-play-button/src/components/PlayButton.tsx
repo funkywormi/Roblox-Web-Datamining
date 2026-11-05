@@ -20,11 +20,14 @@ import {
   TAppsFlyerReferralProperties,
   TPlayabilityStatus,
   TPlayabilityStatuses,
+  TPrivatePlaytestInfo,
   TShowAgeVerificationOverlayResponse,
   TUniversePlaceVoiceEnabledSettings,
   type TPlayButtonPageContext,
 } from "../types/playButtonTypes";
 import {
+  getJoindata,
+  isPrivatePlaytestAvailable,
   handleShareLinkEventLogging,
   launchGame,
   launchLogin,
@@ -36,7 +39,8 @@ import ExperienceApprovalActionNeededButton from "./ExperienceApprovalActionNeed
 import ParentalControlsActionNeededButton from "./ParentalControlsActionNeededButton";
 import PurchaseButton from "./PurchaseButtonContainer";
 import { DemoButton } from "./DemoButton";
-import { PlayOnWebButton } from "./PlayOnWebButton";
+import PlayOnWebButton from "./PlayOnWebButton";
+import { PlaytestButton } from "./PlaytestButton";
 import {
   getSecondaryPlayButton,
   StackedPlayButtons,
@@ -45,6 +49,7 @@ import {
 import UnplayableButton from "./UnplayableButton";
 import useLaunchGameWithPlayableUxTreatment from "../hooks/useLaunchGameWithPlayableUxTreatment";
 import usePurchaseProductData from "../hooks/usePurchaseProductData";
+import useWasmJoinId from "../hooks/useWasmJoinId";
 import { AgeCheckNeededButton } from "./AgeCheckNeededButton";
 import LoadingButton from "./LoadingButton";
 import "./playButton.css";
@@ -135,17 +140,6 @@ const getShowIdentityVerificationFlow = async (
   };
 };
 
-const getJoindata = (launchDataFromProps?: string) => {
-  // Allow launchData to be passed from props for direct joins
-  const launchData =
-    new URLSearchParams(window.location.search).get("launchData") ?? launchDataFromProps;
-  const eventId = new URLSearchParams(window.location.search).get("eventId") ?? undefined;
-  return {
-    launchData,
-    eventId,
-  };
-};
-
 const EMPTY_OBJECT = {} as const;
 
 // Primary statuses Play Demo may appear alongside.
@@ -155,6 +149,11 @@ const demoPrimaryStatuses: ReadonlySet<TPlayabilityStatus> = new Set<TPlayabilit
   PlayabilityStatus.FiatPurchaseDeviceRestricted,
   PlayabilityStatus.ContextualPlayabilityRegionalAvailability,
 ]);
+
+// Primary statuses Playtest may appear alongside.
+const playtestPrimaryStatuses: ReadonlySet<TPlayabilityStatus> = new Set<TPlayabilityStatus>(
+  Object.values(PlayabilityStatus).filter(status => status !== PlayabilityStatus.GuestProhibited),
+);
 
 // Primary statuses Play on Web may appear alongside.
 const playOnWebPrimaryStatuses: ReadonlySet<TPlayabilityStatus> = new Set<TPlayabilityStatus>([
@@ -378,6 +377,8 @@ export type TDefaultPlayButtonProps = {
   refetchPlayabilityStatus: () => void;
   playabilityStatus: TPlayabilityStatus | undefined;
   demoModeAvailable?: boolean;
+  privatePlaytestInfo?: TPrivatePlaytestInfo;
+  creatorId?: number;
   hideButtonText?: boolean;
   eventProperties?: Record<string, number | string | undefined>;
   appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
@@ -408,6 +409,8 @@ export const DefaultPlayButton = ({
   refetchPlayabilityStatus,
   playabilityStatus,
   demoModeAvailable,
+  privatePlaytestInfo,
+  creatorId,
   hideButtonText,
   eventProperties = EMPTY_OBJECT,
   appsFlyerReferralProperties = EMPTY_OBJECT,
@@ -435,9 +438,31 @@ export const DefaultPlayButton = ({
     productDetails,
   } = usePurchaseProductData(universeId, placeId, isPurchaseStatus);
 
+  const isPlaytestAvailable = isPrivatePlaytestAvailable(privatePlaytestInfo);
+  const wasmJoinId = useWasmJoinId();
+
   // Secondary CTAs that can stack under the primary button. Each case lists the primary
   // statuses it may appear alongside; the first enabled match is shown.
   const secondaryPlayButtonCases: TSecondaryPlayButtonCase[] = [
+    {
+      isEnabled: isPlaytestAvailable,
+      primaryStatuses: playtestPrimaryStatuses,
+      render: () => (
+        <PlaytestButton
+          universeId={universeId}
+          placeId={placeId}
+          rootPlaceId={rootPlaceId}
+          creatorId={creatorId}
+          // isEnabled guarantees privatePlaytestInfo is defined when this renders.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          privatePlaytestInfo={privatePlaytestInfo!}
+          refetchPlayabilityStatus={refetchPlayabilityStatus}
+          pageContext={pageContext}
+          eventProperties={eventProperties}
+          appsFlyerReferralProperties={appsFlyerReferralProperties}
+        />
+      ),
+    },
     {
       isEnabled: Boolean(demoModeAvailable),
       primaryStatuses: demoPrimaryStatuses,
@@ -456,7 +481,14 @@ export const DefaultPlayButton = ({
     {
       isEnabled: Boolean(playOnWebEnabled),
       primaryStatuses: playOnWebPrimaryStatuses,
-      render: () => <PlayOnWebButton placeId={placeId} />,
+      render: () => (
+        <PlayOnWebButton
+          placeId={placeId}
+          universeId={universeId}
+          eventProperties={eventProperties}
+          wasmJoinId={wasmJoinId}
+        />
+      ),
     },
   ];
 
@@ -641,6 +673,8 @@ export const DefaultPlayButton = ({
     case PlayabilityStatus.UniverseRootPlaceIsPrivate:
     case PlayabilityStatus.InsufficientPermissionFriendsOnly:
     case PlayabilityStatus.InsufficientPermissionGroupOnly:
+    case PlayabilityStatus.InsufficientPermissionEditorsOnly:
+    case PlayabilityStatus.InsufficientPermissionPlayTestersOnly:
     case PlayabilityStatus.DeviceRestricted:
     case PlayabilityStatus.UnderReview:
     case PlayabilityStatus.AccountRestricted:
@@ -650,6 +684,7 @@ export const DefaultPlayButton = ({
     case PlayabilityStatus.ContextualPlayabilityAgeGated:
     case PlayabilityStatus.PlaceHasNoPublishedVersion:
     case PlayabilityStatus.ContextualPlayabilityUnrated:
+    case PlayabilityStatus.ContextualPlayabilityGeneral:
     case PlayabilityStatus.ContextualPlayabilityAgeGatedByDescriptor:
     case PlayabilityStatus.ContextualPlayabilityExperienceBlockedParentalControls:
     case PlayabilityStatus.ContextualPlayabilityCoreGated:

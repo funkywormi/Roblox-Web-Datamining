@@ -1,4 +1,5 @@
 import { window as browserWindow } from "@rbx/core-lib/browser";
+import { UrlSearchParams } from "@rbx/core-lib/url";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import {
   ActionType,
@@ -20,12 +21,9 @@ function readCurrentKeyword(): string {
   if (browserWindow === undefined) {
     return "";
   }
-  for (const [name, value] of new URLSearchParams(browserWindow.location.search)) {
-    if (name.toLowerCase() === "keyword") {
-      return value;
-    }
-  }
-  return "";
+  // Unsanitized: the value only goes through encodeURIComponent, and a search for "constructor" or
+  // "prototype" must survive a tab switch since they are valid searches
+  return UrlSearchParams.parse(browserWindow.location.search, false).get("keyword") ?? "";
 }
 
 export function openSearchResultsTabResolveHref(

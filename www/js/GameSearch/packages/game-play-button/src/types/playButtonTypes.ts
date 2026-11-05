@@ -192,3 +192,5 @@ export type TFiatPreparePurchaseCheckoutUrl = {
 };
 
 export type TAppsFlyerReferralProperties = Record<string, string | number>;
+
+export type TPlayButtonActionTypes = "DemoPlayButtonClick" | "PlayOnWebButtonClick";

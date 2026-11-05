@@ -18,6 +18,7 @@ import { actionTypeName } from "../utils/protoEnum";
  *      (even on miss; an unknown name reports an error and skips later custom
  *      branches).
  *   2. Else a name resolved from the merged action params by the handler config.
+ *      If unregistered, fall back to the client default (e.g. a generic custom event).
  *   3. Else client default from `handlerConfig.telemetryHandler`.
  *   4. Else if `actionData.actionEventName` is set → fire itemAction-shaped
  *      payload under that name (from `Action.action_event_name`).
@@ -48,6 +49,8 @@ export function logActionTelemetry(
     const namedHandler = telemetryHandlerNameRegistry.getTelemetryHandler(namedHandlerName);
     if (namedHandler) {
       namedHandler(actionConfig, analyticsContext, actionContext);
+    } else if (serverNamedHandler == null && handlerConfig.telemetryHandler) {
+      handlerConfig.telemetryHandler(actionConfig, analyticsContext, actionContext);
     } else {
       errorReporter.reportSduiError(
         SduiErrorName.FailedToExecuteAction,

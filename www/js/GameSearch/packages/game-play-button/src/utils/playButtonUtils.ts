@@ -1,3 +1,4 @@
+import { UrlSearchParams } from "@rbx/core-lib/url";
 import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import "@rbx/core-scripts/global";
@@ -18,16 +19,16 @@ import {
   startVerificationFlow as startIdentityVerificationFlow,
 } from "@rbx/www-common/identity-verification";
 import { isJoinAttemptIdEnabled, launchPlayGame } from "./gameLauncher";
-import playButtonConstants from "../constants/playButtonConstants";
 import { getStartAccessManagementUpsell } from "./accessManagementUpsell";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import {
   TAppsFlyerReferralProperties,
-  TPrivatePlaytestInfo,
   TPlayabilityStatus,
   TPlayabilityStatusWithUnplayableError,
   type TPlayButtonPageContext,
+  type TPrivatePlaytestInfo,
 } from "../types/playButtonTypes";
+import playButtonConstants, { playOnWebActionType } from "../constants/playButtonConstants";
 
 export const PlaytestUnlockUpsellType = {
   AgeVerification: "AgeVerification",
@@ -79,7 +80,11 @@ function sendPlayGameClickedEvent(
   return mergedProperties;
 }
 
-function getEncodedUniversalLink(placeId: string, eventProperties: TEventProperties = {}): string {
+function getEncodedUniversalLink(
+  placeId: string,
+  eventProperties: TEventProperties = {},
+  isEarlyTesting = false,
+): string {
   let universalLink = `${environmentUrls.websiteUrl}/games/start?placeid=${placeId}`;
 
   if (isJoinAttemptIdEnabled()) {
@@ -102,6 +107,9 @@ function getEncodedUniversalLink(placeId: string, eventProperties: TEventPropert
   if (typeof eventId === "string" && eventId.length > 0) {
     universalLink += `&eventId=${eventId}`;
   }
+  if (isEarlyTesting) {
+    universalLink += "&isEarlyTesting=true";
+  }
 
   return encodeURIComponent(universalLink);
 }
@@ -115,6 +123,7 @@ export const launchGame = (
   joinData: JoinDataProperties = {},
   appsFlyerReferralProperties: TAppsFlyerReferralProperties = {},
   actionType?: string,
+  isEarlyTesting = false,
 ): void => {
   const deviceMeta = getDeviceMeta();
   if (
@@ -130,7 +139,11 @@ export const launchGame = (
       actionType,
     );
 
-    const encodedUniversalLink = getEncodedUniversalLink(placeId, playGameClickedEventProperties);
+    const encodedUniversalLink = getEncodedUniversalLink(
+      placeId,
+      playGameClickedEventProperties,
+      isEarlyTesting,
+    );
     const afDeeplinkParams = composeQueryString({
       ...defaultAfReferralProperties,
       ...appsFlyerReferralProperties,
@@ -165,6 +178,7 @@ export const launchGame = (
         privateServerLinkCode,
         referredByPlayerId,
         joinData,
+        isEarlyTesting,
       ),
       playButtonConstants.eventStreamProperties(placeId, eventProperties),
       actionType,
@@ -292,10 +306,9 @@ export const startAgeCheckAccessManagementUpsellFlow = async ({
 
 export const handleShareLinkEventLogging = (placeId: string, universeId: string): void => {
   try {
-    // The param name matches case-insensitively, like the legacy UrlParser lookup.
-    const shareLinkSourceType = [...new URLSearchParams(window.location.search)].find(
-      ([name]) => name.toLowerCase() === "sharelinksourcetype",
-    )?.[1];
+    const shareLinkSourceType = UrlSearchParams.parse(window.location.search).get(
+      "shareLinkSourceType",
+    );
     if (shareLinkSourceType?.toLowerCase() !== "experiencedetails") {
       return;
     }
@@ -395,20 +408,12 @@ export const getPlaytestUnlockUpsellType = (
   return undefined;
 };
 
-export const shouldUsePlaytestActionNeeded = (
-  playabilityStatus: TPlayabilityStatus | undefined,
-  privatePlaytestInfo: TPrivatePlaytestInfo | undefined | null,
-): privatePlaytestInfo is TPrivatePlaytestInfo => {
-  const isEligibleUnavailableStatus =
-    playabilityStatus !== undefined &&
-    playabilityStatus !== PlayabilityStatus.Playable &&
-    playabilityStatus !== PlayabilityStatus.GuestProhibited;
-  const requiresUpsell =
-    privatePlaytestInfo?.isPlayable === false &&
-    getPlaytestUnlockUpsellType(privatePlaytestInfo.playabilityStatus) !== undefined;
-
-  return isEligibleUnavailableStatus && requiresUpsell;
-};
+export const isPrivatePlaytestAvailable = (
+  privatePlaytestInfo: TPrivatePlaytestInfo | undefined,
+): privatePlaytestInfo is TPrivatePlaytestInfo =>
+  privatePlaytestInfo !== undefined &&
+  (privatePlaytestInfo.isPlayable ||
+    getPlaytestUnlockUpsellType(privatePlaytestInfo.playabilityStatus) !== undefined);
 
 export const navigateToPlaytestSettings = (): void => {
   window.location.assign(
@@ -420,6 +425,42 @@ export const navigateToUserProfile = (userId: number): void => {
   window.location.assign(getAbsoluteUrl(`/users/${userId}/profile`));
 };
 
+export const getJoindata = (launchDataFromProps?: string) => {
+  // Allow launchData to be passed from props for direct joins
+  const launchData =
+    new URLSearchParams(window.location.search).get("launchData") ?? launchDataFromProps;
+  const eventId = new URLSearchParams(window.location.search).get("eventId") ?? undefined;
+  return {
+    launchData,
+    eventId,
+  };
+};
+
+export const sendPlayOnWebClickEvents = (
+  placeId: string,
+  universeId: string,
+  eventProperties: TEventProperties = {},
+  joinData: JoinDataProperties = {},
+): TJoinAttemptProperties => {
+  handleShareLinkEventLogging(placeId, universeId);
+  const { joinAttemptId, joinAttemptOrigin } = sendPlayGameClickedEvent(
+    eventProperties,
+    placeId,
+    joinData,
+    playOnWebActionType,
+  );
+  if (!isJoinAttemptIdEnabled() || typeof joinAttemptId !== "string" || joinAttemptId === "") {
+    return {};
+  }
+  return {
+    joinAttemptId,
+    joinAttemptOrigin:
+      typeof joinAttemptOrigin === "string" && joinAttemptOrigin.length > 0
+        ? joinAttemptOrigin
+        : undefined,
+  };
+};
+
 export default {
   handleShareLinkEventLogging,
   launchGame,
@@ -428,6 +469,5 @@ export default {
   startVoiceOptInOverlayFlow,
   startAgeCheckAccessManagementUpsellFlow,
   shouldShowUnplayableButton,
-  shouldUsePlaytestActionNeeded,
   sendUnlockPlayIntentEvent,
 };

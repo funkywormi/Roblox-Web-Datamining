@@ -1,7 +1,5 @@
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import AXAnalyticsConstants from "@rbx/catalog/analytics/AXAnalyticsConstants";
-import { TItemCardSource } from "@rbx/catalog/analytics/axTrackingEvents";
-import sendAXTracking from "@rbx/catalog/analytics/sendAXTracking";
 import { AXSendTrackingActionType } from "@rbx/catalog/analytics/types";
 import {
   ActionType,
@@ -13,9 +11,12 @@ import {
   type SduiActionContext,
   type SduiActionTelemetryHandler,
 } from "@rbx/sdui-core";
+import { sendAxTracking } from "../telemetry/sendAxTracking";
 
 const ACTION_TYPE_NAME = actionTypeName(ActionType.OPEN_MARKETPLACE_TRY_ON);
 const APP_PAGE = { SearchPage: "searchPage" } as const;
+// Same value as `@rbx/catalog`'s `TItemCardSource.DiscoverySearchResults`.
+const DISCOVERY_SEARCH_RESULTS_SOURCE = "DiscoverySearchResults";
 
 const ITEM_TYPE_CONFIG = {
   Asset: {
@@ -42,13 +43,13 @@ function reportMalformedParam(ctx: SduiActionContext, message: string, propName:
 }
 
 /** Maps an SDUI app page to the marketplace AX item-click source. */
-function getMarketplaceAXSourceForAppPage(appPage: string): TItemCardSource | undefined {
+function getMarketplaceAXSourceForAppPage(appPage: string): string | undefined {
   switch (appPage) {
     case APP_PAGE.SearchPage:
       // Named after MarketplaceUnifiedSurface.DISCOVERY_SEARCH_RESULTS;
       // this is an AX metadata label, not the numeric unified-event enum.
       // https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/userjourney/enums/marketplace_unified_surface.proto
-      return TItemCardSource.DiscoverySearchResults;
+      return DISCOVERY_SEARCH_RESULTS_SOURCE;
     default:
       return undefined;
   }
@@ -140,7 +141,7 @@ export const openMarketplaceTryOnTelemetryHandler: SduiActionTelemetryHandler = 
   };
 
   try {
-    sendAXTracking({
+    sendAxTracking({
       itemName: AXAnalyticsConstants.ItemCardClick,
       actionType: AXSendTrackingActionType.Click,
       metaData: { metaData: JSON.stringify(fields) },

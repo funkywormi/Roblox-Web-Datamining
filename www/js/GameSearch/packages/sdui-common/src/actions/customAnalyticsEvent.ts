@@ -1,9 +1,10 @@
 import {
   actionTypeName,
-  readParam,
   SduiErrorName,
   type ActionConfig,
+  type AnalyticsFieldMap,
   type SduiActionHandlerConfig,
+  type SduiActionTelemetryHandler,
 } from "@rbx/sdui-core";
 
 const CUSTOM_ANALYTICS_ENVELOPE_KEYS = new Set([
@@ -59,10 +60,49 @@ export function buildCustomAnalyticsEventParams(
   };
 }
 
+function readEventName(actionParams: Record<string, unknown>): string | undefined {
+  const eventName = actionParams.eventName ?? actionParams.event_name;
+  return typeof eventName === "string" && eventName.length > 0 ? eventName : undefined;
+}
+
+function scalarFields(source: Record<string, unknown> = {}): AnalyticsFieldMap {
+  const fields: AnalyticsFieldMap = {};
+  for (const [key, value] of Object.entries(source)) {
+    if (
+      !isProtoMetadataKey(key) &&
+      (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+    ) {
+      fields[key] = value;
+    }
+  }
+  return fields;
+}
+
+/** Matches app's CustomAnalyticsEvent: merge scalar fields and send without event registration. */
+export const customAnalyticsEventTelemetryHandler: SduiActionTelemetryHandler = (
+  { actionParams },
+  analyticsContext,
+  ctx,
+) => {
+  // The name resolver reports malformed names before this fallback is invoked.
+  const eventName = readEventName(actionParams);
+  if (!eventName) return;
+
+  ctx.analyticsReporter.logEvent(
+    { name: eventName, type: eventName, context: ctx.pageContext.appPage },
+    {
+      ...scalarFields(analyticsContext?.getAncestorAnalyticsDataSnapshot()),
+      ...scalarFields(analyticsContext?.getAnalyticsDataSnapshot()),
+      ...scalarFields(copyAnalyticsFields(actionParams)),
+      ...scalarFields(readNestedEventFields(actionParams)),
+    },
+  );
+};
+
 export const resolveCustomAnalyticsTelemetryHandlerName: NonNullable<
   SduiActionHandlerConfig["resolveTelemetryHandlerName"]
 > = (actionConfig: ActionConfig, _analyticsContext, ctx) => {
-  const eventName = readParam(actionConfig.actionParams, "eventName", "event_name");
+  const eventName = readEventName(actionConfig.actionParams);
   if (eventName) {
     return eventName;
   }

@@ -3,10 +3,10 @@
  * (`NUMBER_ABBREVIATE`, `NUMBER_LOCALIZE`, `DATE_FORMAT`) to a resolved arg
  * value before placeholder substitution.
  *
- * TODO (SSR): inject an explicit locale from context (e.g. request locale)
- * into `dayjs.locale(...)` and `Intl.NumberFormat` once sdui-core has a
- * locale provider — otherwise server renders use ambient defaults and can
- * mismatch hydrated client output.
+ * Number formatters use `ctx.locale` (BCP-47). `createSduiServices` fills
+ * that from the account language on the document when the caller does not
+ * pass one. `DATE_FORMAT` stays on dayjs pattern tokens and does not take
+ * this locale.
  */
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat.js";
@@ -144,7 +144,7 @@ export function resolveFormatter(
         reportIncompatibleValue(formatterType, value, ctx);
         return undefined;
       }
-      return new Intl.NumberFormat(undefined, {
+      return new Intl.NumberFormat(ctx.locale, {
         notation: "compact",
         maximumFractionDigits: 1,
       }).format(numericValue);
@@ -155,7 +155,7 @@ export function resolveFormatter(
         reportIncompatibleValue(formatterType, value, ctx);
         return undefined;
       }
-      return new Intl.NumberFormat().format(numericValue);
+      return new Intl.NumberFormat(ctx.locale).format(numericValue);
     }
     case formatterTypeEnum.DATE_FORMAT: {
       const date = coerceDate(value);

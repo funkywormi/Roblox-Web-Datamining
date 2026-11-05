@@ -234,7 +234,7 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
   // Currently text content is only used for displaying the search hotline message, and when it is present, games data
   // is actually not returned by the API.
   if (textData && textData.length === 1 && textData[0]?.topicId === HOTLINE_SEARCH_TEXT_TOPIC_ID) {
-    return <SearchTextContent textData={textData[0]} />;
+    return <SearchTextContent textData={textData[0]} page={PageContext.SearchPage} />;
   }
 
   if (gameData.length === 0) {
