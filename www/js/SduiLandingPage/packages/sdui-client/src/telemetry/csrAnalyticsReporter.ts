@@ -1,5 +1,10 @@
 import { sendEvent } from "@rbx/core-scripts/event-stream";
-import type { SduiAnalyticsReporter, SduiEventDescriptor, SduiPageContext } from "@rbx/sdui-core";
+import type {
+  AnalyticsFieldMap,
+  SduiAnalyticsReporter,
+  SduiEventDescriptor,
+  SduiPageContext,
+} from "@rbx/sdui-core";
 
 export function createCsrAnalyticsReporter(): SduiAnalyticsReporter {
   return {
@@ -10,7 +15,7 @@ export function createCsrAnalyticsReporter(): SduiAnalyticsReporter {
       // TODO (sdui): wire feed stats event
     },
 
-    logEvent(descriptor: SduiEventDescriptor, fields: Record<string, string | number>): void {
+    logEvent(descriptor: SduiEventDescriptor, fields: AnalyticsFieldMap): void {
       sendEvent(descriptor, fields);
     },
   };

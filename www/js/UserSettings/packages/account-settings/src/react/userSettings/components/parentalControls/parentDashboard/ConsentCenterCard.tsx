@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "react-style-guide";
 import { useHistory } from "react-router-dom";
 import { LegallySensitiveContentService } from "Roblox";
@@ -67,6 +67,7 @@ const ConsentCenterCard = ({
   const [childSettings] = useGetSettingsAndOptions(consent?.childUserId);
   const [childSettingsV2] = useGetSettingsAndOptionsV2(consent?.childUserId);
   const [answerConsentRequest] = useAnswerConsentRequestMutation();
+  const [pendingAnswer, setPendingAnswer] = useState<ConsentAnswer | null>(null);
 
   const userProfileFields = [UserProfileField.Names.CombinedName];
   const consentTargetUserId =
@@ -357,6 +358,7 @@ const ConsentCenterCard = ({
   };
 
   const answerConsent = async (answer: ConsentAnswer) => {
+    setPendingAnswer(answer);
     const auditDataHeader = legallySensitiveActions?.getBase64EncodedAuditHeader?.();
     try {
       await answerConsentRequest({
@@ -369,11 +371,13 @@ const ConsentCenterCard = ({
     } catch (error) {
       const errorCode = (error as TUpdateChildSettingsError)?.data?.code;
       if (errorCode === UpdateChildSettingsErrorCode.ParentNotVerified) {
+        // Stays disabled until the browser leaves for the consent details page.
         window.location.href = getConsentDetailsPageUrl(consent.id);
-      } else {
-        snackbarService.warning(translate(commonTranslationConstants.unknownError));
+        return;
       }
+      snackbarService.warning(translate(commonTranslationConstants.unknownError));
     }
+    setPendingAnswer(null);
   };
 
   const childPages = useAppSelector(selectChildPagesForChildUserId(child.userId));
@@ -442,6 +446,8 @@ const ConsentCenterCard = ({
       <Button
         variant={Button.variants.secondary}
         size={Button.sizes.medium}
+        isDisabled={pendingAnswer !== null}
+        isLoading={pendingAnswer === ConsentAnswer.Approve}
         onClick={async () => {
           await answerConsent(ConsentAnswer.Approve);
         }}
@@ -458,6 +464,8 @@ const ConsentCenterCard = ({
         <Button
           variant={Button.variants.secondary}
           size={Button.sizes.medium}
+          isDisabled={pendingAnswer !== null}
+          isLoading={pendingAnswer === ConsentAnswer.Deny}
           onClick={async () => {
             await answerConsent(ConsentAnswer.Deny);
           }}

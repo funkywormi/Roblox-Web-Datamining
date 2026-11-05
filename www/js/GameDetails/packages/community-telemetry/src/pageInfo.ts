@@ -44,7 +44,7 @@ const PERMITTED_GROUP_HASH_ROUTE = new RegExp(
     "|/announcements/[^/]+/edit" +
     "|/announcements/[^/]+" +
     "|/announcements" +
-    "|/(?:about|store|affiliates|events)" +
+    "|/(?:about|store|affiliates|events|posts)" +
     ")$",
 );
 

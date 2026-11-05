@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { IconButton, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
 import type { SduiResolvedAction } from "@rbx/sdui-core";
 import { SduiSectionHeader, type SduiSectionHeaderProps } from "@rbx/sdui-common";
-import "../../../../css/gameCarousel/_tooltip.scss";
+import "../../../../css/gameCarousel/tooltip.css";
 
 export type DiscoverySduiSectionHeaderProps = SduiSectionHeaderProps & {
   /** Tooltip body; when set (and iconComponent is not), renders an info icon with a tooltip. */

@@ -784,11 +784,11 @@ export default {
       [EventStreamMetadata.InteractionUuid]: generateRandomUuid(),
     }),
   ],
-  [EventType.SafetyResourceBanner]: (params: TSafetyResourceBanner): TEvent => [
+  [EventType.SafetyResourceBanner]: (params: TSafetyResourceBanner, context: string): TEvent => [
     {
       name: EventType.SafetyResourceBanner,
       type: EventType.SafetyResourceBanner,
-      context: formInteraction,
+      context,
     },
     Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined)) as Record<
       string,

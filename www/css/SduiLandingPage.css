@@ -397,6 +397,45 @@ button.btn-common-play-game-unplayable-lg {
     }
 }
 
+.install-instructions-content {
+    font-size: 16px;
+    line-height: normal
+}
+
+.install-instructions-content h1,
+.install-instructions-content h3 {
+    margin: 0;
+    line-height: 1.4em
+}
+
+.install-instructions-content h1 {
+    padding: 5px 0;
+    font-size: 32px;
+    font-weight: 800
+}
+
+.install-instructions-content h3 {
+    font-size: 20px;
+    font-weight: 700
+}
+
+.install-instructions-content p {
+    color: var(--color-content-default);
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5em
+}
+
+.install-instructions:before,
+.install-instructions:after {
+    content: " ";
+    display: table
+}
+
+.install-instructions:after {
+    clear: both
+}
+
 .install-instructions {
     max-width: 1140px
 }
@@ -406,18 +445,57 @@ button.btn-common-play-game-unplayable-lg {
 }
 
 .install-instructions .col-xs-6 {
-    padding: 30px
+    float: left;
+    width: 50%;
+    min-height: 1px;
+    padding: 30px;
+    position: relative
 }
 
 .install-instructions .col-xs-6 .section-content {
+    min-height: 380px;
+    color: var(--color-content-emphasis);
     background: var(--color-surface-100);
     border-radius: 20px;
-    min-height: 380px;
+    margin: 0 0 18px;
     padding: 32px
 }
 
 .install-instructions ol {
-    text-align: left
+    text-align: left;
+    margin: 1em 0
+}
+
+.install-instructions ol:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 40px
+}
+
+.install-instructions ol:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 40px
+}
+
+.install-instructions ol:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 40px
+}
+
+.install-instructions ol:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 40px
+}
+
+.install-instructions ol:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 40px
+}
+
+.install-instructions ol:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-right: 40px
+}
+
+.install-instructions ol:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-right: 40px
+}
+
+.install-instructions ol:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-right: 40px
 }
 
 .install-instructions ol>li {
@@ -446,6 +524,42 @@ button.btn-common-play-game-unplayable-lg {
     width: calc(100% - 24px);
     height: calc(100% - 24px);
     margin: 12px
+}
+
+@media (max-width:767px) {
+    .install-instructions-content {
+        font-size: 12px
+    }
+
+    .install-instructions-content h1 {
+        font-size: 24px
+    }
+
+    .install-instructions-content h3 {
+        font-size: 16px
+    }
+
+    .install-instructions .col-xs-6 .section-content {
+        margin: 0 0 12px
+    }
+}
+
+.download-link-underline {
+    cursor: pointer;
+    text-decoration: underline
+}
+
+button.download-link-underline {
+    all: unset;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline
+}
+
+.install-dialog {
+    width: 728px;
+    max-width: unset !important
 }
 
 @keyframes sdui-skeleton-shimmer {
@@ -687,7 +801,20 @@ button.btn-common-play-game-unplayable-lg {
     margin-right: auto
 }
 
-.faq-section-container .faq-questions-container .faq-accordion>p,
+.faq-section-container .faq-questions-container .faq-accordion>p {
+    font: var(--typography-body-medium-font);
+    max-height: 0;
+    padding: 0 16px;
+    transition: max-height .3s ease-in-out, padding .3s ease-in-out;
+    overflow: hidden
+}
+
+.faq-section-container .faq-questions-container .faq-accordion>p a {
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline
+}
+
 .faq-section-container .faq-questions-container .faq-accordion>div {
     font: var(--typography-body-medium-font);
     max-height: 0;
@@ -696,7 +823,6 @@ button.btn-common-play-game-unplayable-lg {
     overflow: hidden
 }
 
-.faq-section-container .faq-questions-container .faq-accordion>p a,
 .faq-section-container .faq-questions-container .faq-accordion>div a {
     color: inherit;
     font-weight: 700;
@@ -818,48 +944,6 @@ div#react-landing-container {
     min-height: 100dvh
 }
 
-.dark-theme .sdui-icon.icon-rating-16x16,
-.dark-theme .sdui-icon.icon-current-players-16x16,
-.dark-theme .sdui-icon.icon-push-right-16x16 {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSI2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSIgdmlld0JveD0iMCAwIDMyIDY0Ij48dGl0bGU+bGlnaHRfY29tbW9uX3NtYWxsPC90aXRsZT48ZyBmaWxsPSIjZmZmIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xMi43MTMgNC4yODdBNi4wMDIgNi4wMDIgMCAwIDAgMi4zNDEgNkguMjUyYTguMDAzIDguMDAzIDAgMCAxIDEzLjg4My0zLjEzNWwxLjAxMS0xLjAxMWEuNS41IDAgMCAxIC44NTQuMzUzVjZoLTMuNzkzYS41LjUgMCAwIDEtLjM1My0uODU0em0tOS40MjYgNy40MjZBNi4wMDIgNi4wMDIgMCAwIDAgMTMuNjU5IDEwaDIuMDg5YTguMDAzIDguMDAzIDAgMCAxLTEzLjg4MyAzLjEzNUwuODU0IDE0LjE0NkEuNS41IDAgMCAxIDAgMTMuNzkzVjEwaDMuNzkzYS41LjUgMCAwIDEgLjM1My44NTR6Ii8+PHBhdGggZmlsbC1vcGFjaXR5PSIuNyIgZD0ibTEzLjIwMyAzOC44MTItMS45ODguMDA4YTEuMjkgMS4yOSAwIDAgMC0xLjExNS45NzVMOC41NjggNDYuMTRhMS4zMDUgMS4zMDUgMCAwIDAgMS4xODUgMS42MDlsMS45MzItLjAwM2MuODUzIDAgMS41ODgtLjYwMyAxLjc1Ni0xLjQ0bDEuMDg0LTUuNDA2YTEuNzkgMS43OSAwIDAgMC0xLjMyMi0yLjA4OG0tNS44OTcgNy4wOTQgMS41MzItNi4zNDVjLjA2NS0uMjcxLjE3OS0uNTIuMzI3LS43NDNsLTEuMDk4LS4wMDUuODE4LTQuNDQ0QTIgMiAwIDAgMCA2LjkxOCAzMmEuNzc1Ljc3NSAwIDAgMC0uNzUyLjU4OWwtMS4yMjUgNS4wOTNjLS4xNzkuNzA0LS41MTYgMS4xNTEtMS4xNTIgMS4xNTFBMS43OSAxLjc5IDAgMCAwIDIgNDAuNjIzdjUuMzQzYzAgLjk4OS44MDEgMS43OSAxLjc4OSAxLjc5bDMuODctLjAwNmEyLjI4IDIuMjggMCAwIDEtLjM1My0xLjg0NE0xNC44NSA2MmMwLTItMS43MS0zLjg0LTMuMTYtNWE1LjkgNS45IDAgMCAwLTEuNzQtMSAzLjA1IDMuMDUgMCAwIDAgMi4xOC0yLjkydi0yYTMgMyAwIDAgMC0zLjA1LTNIN2EzLjA1IDMuMDUgMCAwIDAtMyAzLjAzdjJhMyAzIDAgMCAwIDIuMiAyLjkyIDYuNCA2LjQgMCAwIDAtMS43MS45N0MzIDU4LjEzIDEuMjggNjAgMS4yNyA2MnYuMTRjMCAuNDggMy40MSAxLjgxIDYuNzkgMS44MXM2Ljc5LTEuMzMgNi43OS0xLjgxem0tNyAuNDJhLjY0LjY0IDAgMCAxLTEtLjUxdi0zLjYzYS42NC42NCAwIDAgMSAxLS41MUwxMSA2MC4xeiIvPjxwYXRoIGQ9Ik0xMS4zNzIgMjQuODc5IDYuNDkgMjkuNzZhLjg4OS44ODkgMCAxIDAgMS4yNTcgMS4yNTdsNi4zOTgtNi4zOThhLjg5Ljg5IDAgMCAwIDAtMS4yNTdsLTYuMzk4LTYuMzk4YS44ODkuODg5IDAgMCAwLTEuMjU3IDEuMjU3bDQuODc5IDQuODc5SC44ODlhLjg4OS44ODkgMCAxIDAgMCAxLjc3OHoiLz48L2c+PC9zdmc+)
-}
-
-.light-theme .sdui-icon.icon-rating-16x16,
-.light-theme .sdui-icon.icon-current-players-16x16,
-.light-theme .sdui-icon.icon-push-right-16x16 {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSI2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSIgdmlld0JveD0iMCAwIDMyIDY0Ij48dGl0bGU+ZGFya19jb21tb25fc21hbGw8L3RpdGxlPjxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZmlsbD0iIzM5M2IzZCIgZD0iTTEyLjcxMyA0LjI4N0E2LjAwMiA2LjAwMiAwIDAgMCAyLjM0MSA2SC4yNTJhOC4wMDMgOC4wMDMgMCAwIDEgMTMuODgzLTMuMTM1bDEuMDExLTEuMDExYS41LjUgMCAwIDEgLjg1NC4zNTNWNmgtMy43OTNhLjUuNSAwIDAgMS0uMzUzLS44NTR6bS05LjQyNiA3LjQyNkE2LjAwMiA2LjAwMiAwIDAgMCAxMy42NTkgMTBoMi4wODlhOC4wMDMgOC4wMDMgMCAwIDEtMTMuODgzIDMuMTM1TC44NTQgMTQuMTQ2QS41LjUgMCAwIDEgMCAxMy43OTNWMTBoMy43OTNhLjUuNSAwIDAgMSAuMzUzLjg1NHpNMTEuMzcyIDI0Ljg3OSA2LjQ5IDI5Ljc2YS44ODkuODg5IDAgMSAwIDEuMjU3IDEuMjU3bDYuMzk4LTYuMzk4YS44OS44OSAwIDAgMCAwLTEuMjU3bC02LjM5OC02LjM5OGEuODg5Ljg4OSAwIDAgMC0xLjI1NyAxLjI1N2w0Ljg3OSA0Ljg3OUguODg5YS44ODkuODg5IDAgMSAwIDAgMS43Nzh6Ii8+PHBhdGggZmlsbD0iIzAwMCIgZmlsbC1vcGFjaXR5PSIuNSIgZD0ibTEzLjIwMyAzOC44MTItMS45ODguMDA4YTEuMjkgMS4yOSAwIDAgMC0xLjExNS45NzVMOC41NjggNDYuMTRhMS4zMDUgMS4zMDUgMCAwIDAgMS4xODUgMS42MDlsMS45MzItLjAwM2MuODUzIDAgMS41ODgtLjYwMyAxLjc1Ni0xLjQ0bDEuMDg0LTUuNDA2YTEuNzkgMS43OSAwIDAgMC0xLjMyMi0yLjA4OG0tNS44OTcgNy4wOTQgMS41MzItNi4zNDVjLjA2NS0uMjcxLjE3OS0uNTIuMzI3LS43NDNsLTEuMDk4LS4wMDUuODE4LTQuNDQ0QTIgMiAwIDAgMCA2LjkxOCAzMmEuNzc1Ljc3NSAwIDAgMC0uNzUyLjU4OWwtMS4yMjUgNS4wOTNjLS4xNzkuNzA0LS41MTYgMS4xNTEtMS4xNTIgMS4xNTFBMS43OSAxLjc5IDAgMCAwIDIgNDAuNjIzdjUuMzQzYzAgLjk4OS44MDEgMS43OSAxLjc4OSAxLjc5bDMuODctLjAwNmEyLjI4IDIuMjggMCAwIDEtLjM1My0xLjg0NE0xNC44NSA2MmMwLTItMS43MS0zLjg0LTMuMTYtNWE1LjkgNS45IDAgMCAwLTEuNzQtMSAzLjA1IDMuMDUgMCAwIDAgMi4xOC0yLjkydi0yYTMgMyAwIDAgMC0zLjA1LTNIN2EzLjA1IDMuMDUgMCAwIDAtMyAzLjAzdjJhMyAzIDAgMCAwIDIuMiAyLjkyIDYuNCA2LjQgMCAwIDAtMS43MS45N0MzIDU4LjEzIDEuMjggNjAgMS4yNyA2MnYuMTRjMCAuNDggMy40MSAxLjgxIDYuNzkgMS44MXM2Ljc5LTEuMzMgNi43OS0xLjgxem0tNyAuNDJhLjY0LjY0IDAgMCAxLTEtLjUxdi0zLjYzYS42NC42NCAwIDAgMSAxLS41MUwxMSA2MC4xeiIvPjwvZz48L3N2Zz4=)
-}
-
-.sdui-icon.icon-rating-16x16 {
-    vertical-align: middle;
-    background-position: 0 -32px;
-    background-repeat: no-repeat;
-    background-size: 200%;
-    width: 16px;
-    height: 16px;
-    display: inline-block
-}
-
-.sdui-icon.icon-current-players-16x16 {
-    vertical-align: middle;
-    background-position: 0 -48px;
-    background-repeat: no-repeat;
-    background-size: 200%;
-    width: 16px;
-    height: 16px;
-    display: inline-block
-}
-
-.sdui-icon.icon-push-right-16x16 {
-    vertical-align: middle;
-    background-position: 0 -16px;
-    background-repeat: no-repeat;
-    background-size: 200%;
-    width: 16px;
-    height: 16px;
-    display: inline-block
-}
-
 .inset-\[0\],
 .inset-\[0px\] {
     top: 0;
@@ -934,6 +1018,10 @@ div#react-landing-container {
     min-width: 240px
 }
 
+.min-width-\[90px\] {
+    min-width: 90px
+}
+
 .min-width-\[min\(200px\,100\%\)\] {
     min-width: min(200px, 100%)
 }
@@ -958,6 +1046,10 @@ div#react-landing-container {
 
 .\!capitalize {
     text-transform: capitalize !important
+}
+
+.content-\[var\(--color-extended-white-100\)\] {
+    color: var(--color-extended-white-100)
 }
 
 .content-\[var\(--dark-mode-content-emphasis\)\] {
@@ -986,6 +1078,10 @@ div#react-landing-container {
 
 .bg-\[var\(--color-common-shimmer\)\] {
     background-color: var(--color-common-shimmer)
+}
+
+.bg-\[var\(--color-extended-gray-900\)\] {
+    background-color: var(--color-extended-gray-900)
 }
 
 .bg-\[var\(--light-mode-over-media-0\)\] {
@@ -1044,6 +1140,10 @@ div#react-landing-container {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M22.7071 16.7071C23.0976 16.3166 23.0976 15.6834 22.7071 15.2929L12.7071 5.29289C12.3166 4.90237 11.6834 4.90237 11.2929 5.29289C10.9024 5.68342 10.9024 6.31658 11.2929 6.70711L20.5858 16L11.2929 25.2929C10.9024 25.6834 10.9024 26.3166 11.2929 26.7071C11.6834 27.0976 12.3166 27.0976 12.7071 26.7071L22.7071 16.7071Z' fill='black'/%3E%3C/svg%3E")
 }
 
+.icon-regular-chevron-small-right {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M20.7071 16.7071C21.0976 16.3166 21.0976 15.6834 20.7071 15.2929L14.7071 9.29289C14.3166 8.90237 13.6834 8.90237 13.2929 9.29289C12.9024 9.68342 12.9024 10.3166 13.2929 10.7071L18.5858 16L13.2929 21.2929C12.9024 21.6834 12.9024 22.3166 13.2929 22.7071C13.6834 23.0976 14.3166 23.0976 14.7071 22.7071L20.7071 16.7071Z' fill='black'/%3E%3C/svg%3E")
+}
+
 .icon-filled-circle-check {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M16 30C23.732 30 30 23.732 30 16C30 8.26801 23.732 2 16 2C8.26801 2 2 8.26801 2 16C2 23.732 8.26801 30 16 30ZM21.7071 12.2929C22.0976 12.6834 22.0976 13.3166 21.7071 13.7071L14.7071 20.7071C14.3166 21.0976 13.6834 21.0976 13.2929 20.7071L10.2929 17.7071C9.90237 17.3166 9.90237 16.6834 10.2929 16.2929C10.6834 15.9024 11.3166 15.9024 11.7071 16.2929L14 18.5858L20.2929 12.2929C20.6834 11.9024 21.3166 11.9024 21.7071 12.2929Z' fill='black'/%3E%3C/svg%3E")
 }
@@ -1096,6 +1196,10 @@ div#react-landing-container {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M16 2.99997C16.5523 2.99997 17 3.44768 17 3.99997C17 4.55223 16.5523 4.99997 16 4.99997H5V27H27V16C27 15.4477 27.4477 15 28 15L28.1025 15.0049C28.6067 15.0562 29 15.4823 29 16V27C29 28.1045 28.1045 29 27 29H5C3.89545 29 3.00003 28.1045 3 27V4.99997C3 3.8954 3.89543 2.99997 5 2.99997H16Z' fill='black'/%3E %3Cpath d='M23.9463 2.56442C24.7152 1.80799 25.9459 1.79769 26.7275 2.54099L29.3984 5.08102C30.2056 5.84903 30.23 7.12905 29.4521 7.92673L17.4746 20.2011C16.9214 20.7138 16.1925 20.9999 15.4346 21H13C11.8957 20.9999 11.0003 20.1042 11 19V16.5576C11.0001 15.8038 11.2842 15.0795 11.792 14.5273L23.9463 2.56442ZM13.2988 15.8447C13.1079 16.0326 13.0001 16.2897 13 16.5576V19H15.4346C15.704 18.9999 15.9632 18.891 16.1514 18.6982L25.1045 9.51852L22.4385 6.85251L13.2988 15.8447ZM23.8643 5.45016L26.501 8.08688L28.0205 6.53024L25.3496 3.9902L23.8643 5.45016Z' fill='black'/%3E%3C/svg%3E")
 }
 
+.icon-filled-person-play {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M11.7142 2.56785C12.0165 1.43977 13.176 0.77031 14.3041 1.07258L20.4318 2.71451C21.5599 3.01678 22.2294 4.17631 21.9271 5.3044L20.2852 11.4321C19.9829 12.5602 18.8234 13.2297 17.6953 12.9274L11.5676 11.2855C10.4395 10.9832 9.77001 9.82369 10.0723 8.6956L11.7142 2.56785Z' fill='black'/%3E %3Cpath d='M6.83768 18.9378C7.33735 16.6394 9.37144 15 11.7236 15H20.2758C22.2895 15 24.0702 16.2016 24.8544 17.9896C22.0823 16.4893 18.9997 18.6863 18.9997 21.558V30.292C18.9997 30.4921 19.0147 30.689 19.0435 30.8816C18.1348 30.9572 17.1239 31 15.9997 31C9.18851 31 6.53782 29.4282 5.57598 28.5242C5.06195 28.0411 5.00192 27.3824 5.1067 26.9004L6.83768 18.9378Z' fill='black'/%3E %3Cpath d='M30.5172 25.0405C31.1605 25.4412 31.1605 26.4088 30.5172 26.8095L23.5048 31.1764C22.8901 31.5592 22.1202 31.1604 22.0124 30.4603C22.0041 30.4059 21.9997 30.3497 21.9997 30.292V21.558C21.9997 20.7563 22.8424 20.2611 23.5048 20.6736L30.5172 25.0405Z' fill='black'/%3E%3C/svg%3E")
+}
+
 .icon-regular-plus-large {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M16 5C16.5523 5 17 5.44772 17 6V15H26C26.5523 15 27 15.4477 27 16C27 16.5523 26.5523 17 26 17H17V26C17 26.5523 16.5523 27 16 27C15.4477 27 15 26.5523 15 26V17H6C5.44772 17 5 16.5523 5 16C5 15.4477 5.44772 15 6 15H15V6C15 5.44772 15.4477 5 16 5Z' fill='black'/%3E%3C/svg%3E")
 }
@@ -1127,6 +1231,10 @@ div#react-landing-container {
 
 .icon-regular-three-dots-horizontal {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M7.5715 14.5226C7.67226 14.1466 8.05877 13.9234 8.4348 14.0242L10.4774 14.5715C10.8534 14.6723 11.0766 15.0588 10.9758 15.4348L10.4285 17.4774C10.3277 17.8534 9.94123 18.0766 9.5652 17.9758L7.52262 17.4285C7.14659 17.3277 6.92344 16.9412 7.02419 16.5652L7.5715 14.5226ZM14.5715 14.5226C14.6723 14.1466 15.0588 13.9234 15.4348 14.0242L17.4774 14.5715C17.8534 14.6723 18.0766 15.0588 17.9758 15.4348L17.4285 17.4774C17.3277 17.8534 16.9412 18.0766 16.5652 17.9758L14.5226 17.4285C14.1466 17.3277 13.9234 16.9412 14.0242 16.5652L14.5715 14.5226ZM22.4348 14.0242C22.0588 13.9234 21.6723 14.1466 21.5715 14.5226L21.0242 16.5652C20.9234 16.9412 21.1466 17.3277 21.5226 17.4285L23.5652 17.9758C23.9412 18.0766 24.3277 17.8534 24.4285 17.4774L24.9758 15.4348C25.0766 15.0588 24.8534 14.6723 24.4774 14.5715L22.4348 14.0242Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.icon-filled-thumb-up {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M18.4286 3C17.6396 3 17 3.63959 17 4.42857V7.58579C17 7.851 16.8946 8.10536 16.7071 8.29289L12.5858 12.4142C12.2107 12.7893 12 13.298 12 13.8284L12.0001 23.2929C12.0001 23.7456 12.1799 24.1799 12.5001 24.5C14.1008 26.1007 18.2718 27 19.7856 27H25.4216C25.9521 27 26.4608 26.7893 26.8359 26.4142L26.9932 26.2569C27.4661 25.784 27.6713 25.1061 27.5402 24.4504L27.4435 23.9671C27.3216 23.3574 27.4901 22.7257 27.8995 22.2578L28.3112 21.7872C28.7427 21.2941 28.9053 20.6209 28.7464 19.9852L28.4647 18.8583C28.328 18.3117 28.4283 17.7327 28.7408 17.2639L28.9142 17.0038C29.1332 16.6753 29.2501 16.2893 29.2501 15.8944V15C29.2501 13.8954 28.3546 13 27.2501 13H20.7623C20.7546 13 20.7476 12.9961 20.7435 12.9896C20.7386 12.9817 20.7391 12.9716 20.7448 12.9643C21.5438 11.9317 22 10.6464 22 9.2918V6.57143C22 4.59898 20.401 3 18.4286 3Z' fill='black'/%3E %3Cpath d='M5.44324 27.6975L11.531 26.3139C11.3742 26.1867 11.2253 26.0535 11.086 25.9142C10.3908 25.219 10.0002 24.2761 10.0002 23.2929V18.0181L10.0001 18V13.8284C10.0001 13.1865 10.1544 12.5605 10.4425 12H5C3.89543 12 3 12.8954 3 14V25.7472C3 27.0307 4.19172 27.9819 5.44324 27.6975Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-filled-triangle-exclamation {
@@ -1277,6 +1385,10 @@ div#react-landing-container {
 
 .\[overflow-wrap\:break-word\] {
     overflow-wrap: break-word
+}
+
+.\[overflow-x\:auto\] {
+    overflow-x: auto
 }
 
 .\[overflow-x\:hidden\] {
@@ -1436,6 +1548,30 @@ div#react-landing-container {
     .dark\:hidden:where(:not(:is(.color-mode-light, .color-mode-light *))) {
         display: none
     }
+
+    .dark\:content-\[var\(--color-extended-gray-900\)\]:where(:not(:-webkit-any(.color-mode-light, .color-mode-light *))) {
+        color: var(--color-extended-gray-900)
+    }
+
+    .dark\:content-\[var\(--color-extended-gray-900\)\]:where(:not(:-moz-any(.color-mode-light, .color-mode-light *))) {
+        color: var(--color-extended-gray-900)
+    }
+
+    .dark\:content-\[var\(--color-extended-gray-900\)\]:where(:not(:is(.color-mode-light, .color-mode-light *))) {
+        color: var(--color-extended-gray-900)
+    }
+
+    .dark\:bg-\[var\(--color-extended-white-100\)\]:where(:not(:-webkit-any(.color-mode-light, .color-mode-light *))) {
+        background-color: var(--color-extended-white-100)
+    }
+
+    .dark\:bg-\[var\(--color-extended-white-100\)\]:where(:not(:-moz-any(.color-mode-light, .color-mode-light *))) {
+        background-color: var(--color-extended-white-100)
+    }
+
+    .dark\:bg-\[var\(--color-extended-white-100\)\]:where(:not(:is(.color-mode-light, .color-mode-light *))) {
+        background-color: var(--color-extended-white-100)
+    }
 }
 
 .dark\:block:where(.color-mode-dark, .color-mode-dark *) {
@@ -1444,6 +1580,14 @@ div#react-landing-container {
 
 .dark\:hidden:where(.color-mode-dark, .color-mode-dark *) {
     display: none
+}
+
+.dark\:content-\[var\(--color-extended-gray-900\)\]:where(.color-mode-dark, .color-mode-dark *) {
+    color: var(--color-extended-gray-900)
+}
+
+.dark\:bg-\[var\(--color-extended-white-100\)\]:where(.color-mode-dark, .color-mode-dark *) {
+    background-color: var(--color-extended-white-100)
 }
 
 .\[\&\:\:-webkit-scrollbar\]\:hidden::-webkit-scrollbar {
@@ -1499,10 +1643,6 @@ div#react-landing-container {
 }
 
 @media (pointer:coarse) and (not (any-pointer:fine)) {
-    .\[\@media\(pointer\:coarse\)_and_\(not_\(any-pointer\:fine\)\)\]\:\[overflow-x\:auto\] {
-        overflow-x: auto
-    }
-
     .\[\@media\(pointer\:coarse\)_and_\(not_\(any-pointer\:fine\)\)\]\:\[scroll-snap-type\:none\] {
         scroll-snap-type: none
     }

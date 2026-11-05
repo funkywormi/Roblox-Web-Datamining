@@ -54,13 +54,13 @@ function normalizeColorToCss(color: unknown, ctx: BindingContext): string {
  * Parse icon prop value.
  * On web, icon names are passed as strings (e.g. "icons/status/games/rating_small").
  * Map supported SDUI icon paths to the CSS classes -- mirrors app behavior.
- * Discovery sprites use the `sdui-icon` prefix. Robux uses the Foundation
- * `icon` mask plus `icon-filled-robux` so it does not depend on a core-ui sprite.
+ * Rating, player count, see-all and Robux use the Foundation `icon` mask plus
+ * a Foundation icon class, so they do not depend on a core-ui sprite.
  */
 export const SUPPORTED_ICON_CLASSES: Record<string, string> = {
-  "icons/status/games/rating_small": "sdui-icon icon-rating-16x16",
-  "icons/status/games/people-playing_small": "sdui-icon icon-current-players-16x16",
-  "icons/navigation/pushRight_small": "sdui-icon icon-push-right-16x16",
+  "icons/status/games/rating_small": "icon icon-filled-thumb-up",
+  "icons/status/games/people-playing_small": "icon icon-filled-person-play",
+  "icons/navigation/pushRight_small": "icon icon-regular-chevron-small-right",
   "icons/common/robux": "icon icon-filled-robux",
   "icons/actions/info_small": "icon-moreinfo-16x16",
 };

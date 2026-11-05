@@ -5,8 +5,7 @@ import {
   getSduiLandingPageContainerElement,
   SduiLandingPageContainer,
 } from "@rbx/discovery-common";
-import "@rbx/discovery-common/sduiLandingPage.scss";
-import "@rbx/discovery-common/sduiIcons.scss";
+import "@rbx/discovery-common/sduiLandingPage.css";
 import { gamePlayButtonNamespaces } from "@rbx/game-play-button";
 import type { Namespace } from "@rbx/www-common/i18n";
 import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";

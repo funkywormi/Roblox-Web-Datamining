@@ -34,6 +34,8 @@ const playButtonErrorStatusTranslationMap: Record<TPlayabilityStatusWithUnplayab
   [PlayabilityStatus.InsufficientPermissionFriendsOnly]:
     "UnplayableError.CreatorHasntMadeAvailable",
   [PlayabilityStatus.InsufficientPermissionGroupOnly]: "UnplayableError.CreatorHasntMadeAvailable",
+  [PlayabilityStatus.InsufficientPermissionEditorsOnly]: "UnplayableError.UnplayableOther",
+  [PlayabilityStatus.InsufficientPermissionPlayTestersOnly]: "UnplayableError.UnplayableOther",
   [PlayabilityStatus.DeviceRestricted]: "UnplayableError.DeviceRestrictedDefault",
   [PlayabilityStatus.FiatPurchaseDeviceRestricted]: "UnplayableError.FiatPurchaseDeviceRestricted",
   [PlayabilityStatus.UnderReview]: "UnplayableError.Moderated",
@@ -49,6 +51,7 @@ const playButtonErrorStatusTranslationMap: Record<TPlayabilityStatusWithUnplayab
     "UnplayableError.ContextualPlayabilityAgeGated",
   [PlayabilityStatus.PlaceHasNoPublishedVersion]: "UnplayableError.CreatorHasntMadeAvailable",
   [PlayabilityStatus.ContextualPlayabilityUnrated]: "UnplayableError.ContextualPlayabilityUnrated",
+  [PlayabilityStatus.ContextualPlayabilityGeneral]: "UnplayableError.UnplayableOther",
   [PlayabilityStatus.ContextualPlayabilityAgeGatedByDescriptor]:
     "UnplayableError.ContextualPlayabilityAgeGatedByDescriptor",
   [PlayabilityStatus.ContextualPlayabilityExperienceBlockedParentalControls]:
@@ -63,6 +66,7 @@ const playButtonTextTranslationMap = {
   Buy: "PlayButtonText.Buy",
   PlayDemo: "PlayButtonText.PlayDemo",
   PlayOnWeb: "PlayButtonText.PlayOnWeb",
+  Playtest: "PlayButtonText.Playtest",
 };
 
 const counterEvents = {

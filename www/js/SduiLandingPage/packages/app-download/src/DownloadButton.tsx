@@ -5,6 +5,7 @@ import { installInstructionsDelayMs } from "./constants";
 import { onAppDownloadClick, resolveAppDownload } from "./resolveAppDownload";
 import type { ResolvedAppDownload, ResolveAppDownloadOptions } from "./resolveAppDownload";
 import { useAppDownloadTranslate } from "./useAppDownloadTranslate";
+import "./InstallDialog.css";
 
 type ButtonVariant = ComponentProps<typeof Button>["variant"];
 type ButtonSize = ComponentProps<typeof Button>["size"];

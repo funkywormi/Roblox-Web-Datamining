@@ -1,5 +1,11 @@
 import type { TranslateFunction } from "@rbx/core-scripts/react";
-import { composeSduiRegistries, getOrCreatePageServices, type SduiServices } from "@rbx/sdui-core";
+import {
+  composeSduiRegistries,
+  createSduiServices,
+  getOrCreatePageServices,
+  type CreateSduiServicesOptions,
+  type SduiServices,
+} from "@rbx/sdui-core";
 import { createSduiCsrTelemetry, SduiClientModule } from "@rbx/sdui-client";
 import { SduiCommonModule } from "@rbx/sdui-common";
 import type { PageContext } from "../../common/types/pageContext";
@@ -15,6 +21,22 @@ const registries = composeSduiRegistries(
   { errorReporter: telemetry.errorReporter },
 );
 
+const servicesOptions = (
+  appPage: PageContext,
+  translate?: TranslateFunction,
+): CreateSduiServicesOptions => ({
+  componentRegistry: registries.componentRegistry,
+  actionHandlerRegistry: registries.actionHandlerRegistry,
+  telemetryHandlerNameRegistry: registries.telemetryHandlerNameRegistry,
+  impressionHandlerRegistry: registries.impressionHandlerRegistry,
+  analyticsReporter: telemetry.analyticsReporter,
+  errorReporter: telemetry.errorReporter,
+  observeWebVitals: telemetry.observeWebVitals,
+  pageLoadPlatformAdapter: telemetry.pageLoadPlatformAdapter,
+  pageContext: { pageName: appPage, appPage },
+  translate,
+});
+
 /**
  * Resolve the page-scoped SDUI service graph for a landing page surface.
  *
@@ -26,16 +48,17 @@ export function getSduiLandingPageServices(
   appPage: PageContext,
   translate?: TranslateFunction,
 ): SduiServices {
-  return getOrCreatePageServices(appPage, {
-    componentRegistry: registries.componentRegistry,
-    actionHandlerRegistry: registries.actionHandlerRegistry,
-    telemetryHandlerNameRegistry: registries.telemetryHandlerNameRegistry,
-    impressionHandlerRegistry: registries.impressionHandlerRegistry,
-    analyticsReporter: telemetry.analyticsReporter,
-    errorReporter: telemetry.errorReporter,
-    observeWebVitals: telemetry.observeWebVitals,
-    pageLoadPlatformAdapter: telemetry.pageLoadPlatformAdapter,
-    pageContext: { pageName: appPage, appPage },
-    translate,
-  });
+  return getOrCreatePageServices(appPage, servicesOptions(appPage, translate));
+}
+
+/**
+ * A new SDUI service graph for a landing page surface, not shared or kept. For Next.js, where
+ * client-side navigation keeps modules alive: the shared graph would keep the first locale's data
+ * and `translate` after a language switch.
+ */
+export function createSduiLandingPageServices(
+  appPage: PageContext,
+  translate?: TranslateFunction,
+): SduiServices {
+  return createSduiServices(servicesOptions(appPage, translate));
 }

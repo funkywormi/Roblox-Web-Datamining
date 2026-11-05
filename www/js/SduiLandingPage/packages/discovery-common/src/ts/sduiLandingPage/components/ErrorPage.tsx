@@ -1,5 +1,6 @@
 import React from "react";
 import { TranslateFunction } from "@rbx/core-scripts/react";
+import { Button } from "@rbx/foundation-ui";
 import { FeatureSduiLandingPage } from "../../common/constants/translationConstants";
 
 interface ErrorPageProps {
@@ -27,25 +28,27 @@ const ErrorPage: React.FC<ErrorPageProps> = ({ titleKey, messageKey, translate }
         />
         {/* TODO: update cdn image to local image */}
         <div className="sdui-landing-error-page-action-buttons">
-          <button
-            className="btn-primary-md btn-min-width"
+          {/* Keep the old .NET look: `btn-min-width` (90px) and `btn-primary-md` colors */}
+          <Button
+            className="min-width-[90px] bg-[var(--color-extended-gray-900)] content-[var(--color-extended-white-100)] dark:bg-[var(--color-extended-white-100)] dark:content-[var(--color-extended-gray-900)]"
+            variant="Emphasis"
+            size="Medium"
             title={translate(FeatureSduiLandingPage.ActionBack) || "Go to the Previous Page"}
-            type="button"
             onClick={() => window.history.back()}
           >
             {translate(FeatureSduiLandingPage.ActionBack) || "Back"}
-          </button>
-          <button
-            className="btn-control-md btn-min-width"
+          </Button>
+          <Button
+            as="a"
+            className="min-width-[90px]"
+            variant="Standard"
+            size="Medium"
+            href="/"
             title={translate(FeatureSduiLandingPage.ActionHome) || "Return Home"}
-            type="button"
-            onClick={() => {
-              window.location.href = "/";
-            }}
           >
             {translate(FeatureSduiLandingPage.ActionHome) || "Home"}
             {/* TODO: update Action.Home to say Login if user is not logged in */}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

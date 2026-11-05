@@ -5195,7 +5195,7 @@
         },
         {
             "name": "GameDetails",
-            "url": "https://js.rbxcdn.com/8fbab6a6bda5563f25b7b37b9b8e536b36f7985a1f8bb55a39f31fa3d40d5b42-GameDetails.js",
+            "url": "https://js.rbxcdn.com/b36aa6812ef2ec09a31f6ba1af013c70577556a2ce395b305e869e741ec96b01-GameDetails.js",
             "sources": [
                 "/games/1818"
             ]
@@ -6684,7 +6684,7 @@
         },
         {
             "name": "SduiLandingPage",
-            "url": "https://js.rbxcdn.com/bc1aca0a2b8d5ed29a7f9d052c7186d5250abddf4e33535bd0065d0bd5961e67-SduiLandingPage.js",
+            "url": "https://js.rbxcdn.com/f79f018fd146aa6bc41cb1adde1cdbb5d6a982d93e57f6107a6880153a786a2c-SduiLandingPage.js",
             "sources": [
                 "/"
             ]
@@ -7311,7 +7311,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/289553193fdc4f14185e8cacf940e8411a176348fd7089fada5b07a910506268-UserSettings.js",
+            "url": "https://js.rbxcdn.com/097d58d57c52b8ff9c270d8d88008f22ded03653e538fe49e2772cfd65a6b82c-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -9158,7 +9158,7 @@
         },
         {
             "name": "SduiLandingPage",
-            "url": "https://css.rbxcdn.com/a60476eee5ece0fe86fb336ec2097454a2b2b5683482d708f4ab817a40efc1ad-SduiLandingPage.css",
+            "url": "https://css.rbxcdn.com/851fdee45ec75313414f5bfc8dc2db6f3766cecce593b48a94c18972ef6aec86-SduiLandingPage.css",
             "sources": [
                 "/"
             ]
