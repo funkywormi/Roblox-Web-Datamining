@@ -126,18 +126,23 @@ export const getDelaySummariesByState = (
   }
 
   const now = Date.now();
-  const grouped = Object.groupBy(delays, ({ state, delayUntil }) => {
-    if (state === "LOCK_STATE_UNLOCKED" && now <= Number(delayUntil)) {
-      return resources.Label.Delay.Status.PendingLower;
-    }
-    return resources.Label.Delay.Status.CompletedLower;
-  });
+  const grouped = delays.reduce<Record<string, DelayParameters[]>>((acc, delay) => {
+    const { state, delayUntil } = delay;
+    const key =
+      state === "LOCK_STATE_UNLOCKED" && now <= Number(delayUntil)
+        ? resources.Label.Delay.Status.PendingLower
+        : resources.Label.Delay.Status.CompletedLower;
+
+    // eslint-disable-next-line no-param-reassign
+    acc[key] ??= [];
+    acc[key].push(delay);
+
+    return acc;
+  }, {});
 
   return Object.entries(grouped)
-    .filter(([_, delays]) => delays !== undefined)
     .map(([groupKey, delays]) => {
-      // Help the compiler figure out we cleaned up undefined values in the filter above.
-      return `${delays!.length} ${groupKey}`;
+      return `${delays.length} ${groupKey}`;
     })
     .join(", ");
 };

@@ -131,7 +131,6 @@ export const SecurityTabContextProvider = ({
       isSmsTwoStepVerificationAvailable: false,
       isSecurityKeyTwoStepVerificationAvailable: false,
       isAndroidSecurityKeyEnabled: false,
-      isSettingsTabRedesignEnabled: false,
       isEppUIEnabled: false,
       twoStepCopyTextEnrollmentStatus: 0,
       isUserU13: false,

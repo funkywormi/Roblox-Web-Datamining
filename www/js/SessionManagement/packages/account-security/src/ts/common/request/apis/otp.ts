@@ -1,4 +1,4 @@
-import { httpService } from "core-utilities";
+import transport from "../requestTransport";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as Otp from "../types/otp";
@@ -7,7 +7,7 @@ export const sendCodeForUser = (
   otpContactType: Otp.ContactTypes,
 ): Promise<Result<Otp.SendCodeReturnType, Otp.OtpError | null>> =>
   toResult(
-    httpService.post(Otp.SEND_CODE_CONFIG, {
+    transport.post(Otp.SEND_CODE_CONFIG, {
       contactType: otpContactType,
       origin: Otp.Origin.Reauth,
       messageVariant: Otp.MessageVariant.Default,
@@ -20,7 +20,7 @@ export const resendCode = (
   otpSessionToken: string,
 ): Promise<Result<Otp.ResendCodeReturnType, Otp.OtpError | null>> =>
   toResult(
-    httpService.post(Otp.RESEND_CODE_CONFIG, {
+    transport.post(Otp.RESEND_CODE_CONFIG, {
       contactType: otpContactType,
       origin: Otp.Origin.Reauth,
       otpSessionToken,
@@ -34,7 +34,7 @@ export const validateCode = (
   passCode: string,
 ): Promise<Result<Otp.ValidateCodeReturnType, Otp.OtpError | null>> =>
   toResult(
-    httpService.post(Otp.VALIDATE_CODE_CONFIG, {
+    transport.post(Otp.VALIDATE_CODE_CONFIG, {
       contactType: otpContactType,
       origin: Otp.Origin.Reauth,
       passCode,
@@ -47,7 +47,7 @@ export const getMetadata = (
   origin: Otp.Origin,
 ): Promise<Result<Otp.MetadataReturnType, Otp.OtpError | null>> =>
   toResult(
-    httpService.get(Otp.GET_METADATA_CONFIG, {
+    transport.get(Otp.GET_METADATA_CONFIG, {
       // The parameter name seems to be capitalized for this specific endpoint.
       Origin: origin,
     }),

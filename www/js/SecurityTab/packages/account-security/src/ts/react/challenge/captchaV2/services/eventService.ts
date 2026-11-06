@@ -1,5 +1,5 @@
 import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
-import { EVENT_CONSTANTS } from "../app.config";
+import { DEFAULT_ACTION_TYPE, EVENT_CONSTANTS } from "../app.config";
 
 /**
  * A class encapsulating the events fired by this web app.
@@ -7,8 +7,16 @@ import { EVENT_CONSTANTS } from "../app.config";
 export class EventServiceDefault {
   private readonly challengeId: string;
 
-  constructor(challengeId: string) {
+  // Canonical action that trigered the challenge.
+  private readonly actionType: string;
+
+  constructor(challengeId: string, actionType?: string) {
     this.challengeId = challengeId;
+    // `||` (not `??`) is intentional: GCS sends an empty string for an
+    // unresolved action type, which must also fall back to the default so every
+    // event carries a meaningful action type value.
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    this.actionType = actionType || DEFAULT_ACTION_TYPE;
   }
 
   private sendEvent(context: string, additionalParams: Record<string, string> = {}): void {
@@ -17,6 +25,7 @@ export class EventServiceDefault {
       context,
       {
         challengeId: this.challengeId,
+        actionType: this.actionType,
         ...additionalParams,
       },
       targetTypes.WWW,

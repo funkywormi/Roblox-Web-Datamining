@@ -3,7 +3,7 @@
  */
 
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const apiGatewayUrl = EnvironmentUrls.apiGatewayUrl ?? URL_NOT_FOUND;
@@ -27,7 +27,7 @@ export enum OtpError {
 /**
  * Request Type: `POST`.
  */
-export const SEND_CODE_CONFIG: UrlConfig = {
+export const SEND_CODE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${otpServiceUrl}/v1/sendCodeForUser`,
   timeout: 10000,
@@ -40,7 +40,7 @@ export type SendCodeReturnType = {
 /**
  * Request Type: `POST`.
  */
-export const RESEND_CODE_CONFIG: UrlConfig = {
+export const RESEND_CODE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${otpServiceUrl}/v1/resendCode`,
   timeout: 10000,
@@ -53,7 +53,7 @@ export type ResendCodeReturnType = {
 /**
  * Request Type: `POST`.
  */
-export const VALIDATE_CODE_CONFIG: UrlConfig = {
+export const VALIDATE_CODE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${otpServiceUrl}/v1/validateCode`,
   timeout: 10000,
@@ -66,7 +66,7 @@ export type ValidateCodeReturnType = {
 /**
  * Request Type: `GET`.
  */
-export const GET_METADATA_CONFIG: UrlConfig = {
+export const GET_METADATA_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${otpServiceUrl}/v1/metadata`,
   timeout: 10000,

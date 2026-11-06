@@ -1,14 +1,13 @@
-import React, { Fragment, useState } from "react";
-import { Modal } from "react-style-guide";
+import React, { useState } from "react";
+import { DialogBody, Icon, ProgressCircle } from "@rbx/foundation-ui";
 import * as Passwords from "../../../../../common/request/types/passwords";
-import InputControl, {
-  validateChained,
-  validateEquals,
-  validatePassword,
-  validateTrue,
-} from "../../../../common/inputControl";
-import { FooterButtonConfig, FragmentModalFooter } from "../../../../common/modalFooter";
-import { FragmentModalHeader, HeaderButtonType } from "../../../../common/modalHeader";
+import ChallengeInputControl from "../../../../common/challengeInputControl";
+import { validateChained, validateEquals, validateTrue } from "../../../../common/inputValidation";
+import {
+  ChallengeDialogFooter,
+  FooterButtonConfig,
+} from "../../../../common/challengeDialogFooter";
+import { ChallengeDialogHeader, HeaderButtonType } from "../../../../common/challengeDialogHeader";
 import {
   CHANGE_PASSWORD_SUGGESTED_CHARACTER_COUNT,
   FORGOT_PASSWORD_SUPPORT_URL,
@@ -19,6 +18,10 @@ import useAccountSecurityPromptContext from "../../../hooks/useAccountSecurityPr
 import { AccountSecurityPromptActionType } from "../../../store/action";
 import ModalState from "../../../store/modalState";
 import { returnToIntro } from "../../commonHandlers";
+import validatePassword from "./validatePassword";
+
+// Legacy small labels sitting close to their inputs.
+const INPUT_CLASS_NAME = "!gap-xsmall [&_label]:text-label-small";
 
 /**
  * The change password form.
@@ -97,7 +100,11 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
   const positiveButton: FooterButtonConfig = {
     // Show a spinner as the button content when a request is in flight.
     content: requestInFlight ? (
-      <span className="spinner spinner-xs spinner-no-margin" />
+      <ProgressCircle
+        variant="Indeterminate"
+        size="Small"
+        ariaLabel={resources.Action.SubmitChangePassword}
+      />
     ) : (
       resources.Action.SubmitChangePassword
     ),
@@ -109,7 +116,7 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
   const currentPasswordBottomLabel = (
     <a
       href={FORGOT_PASSWORD_SUPPORT_URL}
-      className="bottom-label-link"
+      className="bottom-label-link xsmall"
       target="_blank"
       rel="noreferrer"
     >
@@ -118,12 +125,12 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
   );
 
   const newPasswordBottomLabel = (
-    <Fragment>
-      <div className="shield-check-icon xsmall" />
-      <div className="bottom-label-text-with-start-margin text-label xsmall">
+    <span className="flex items-center">
+      <Icon name="icon-filled-shield-check" size="XSmall" />
+      <span className="bottom-label-text-with-start-margin text-label xsmall">
         {resources.Label.UseAUniquePassword}
-      </div>
-    </Fragment>
+      </span>
+    </span>
   );
 
   /*
@@ -132,15 +139,17 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
 
   return (
     <React.Fragment>
-      <FragmentModalHeader
+      <ChallengeDialogHeader
         headerText={resources.Header.CreateAStrongPassword}
         buttonType={HeaderButtonType.BACK}
         buttonAction={returnToIntro(dispatch)}
         buttonEnabled={!requestInFlight}
         headerInfo={null}
       />
-      <Modal.Body>
-        <InputControl
+      <DialogBody className="account-security-prompt-form flex flex-col gap-large max-[542px]:gap-small">
+        <ChallengeInputControl
+          showFeedback
+          className={INPUT_CLASS_NAME}
           id="inputCurrentPassword"
           label={resources.Label.CurrentPassword}
           bottomLabel={currentPasswordBottomLabel}
@@ -157,7 +166,9 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
           handleSubmit={changePassword}
           onChange={clearRequestError}
         />
-        <InputControl
+        <ChallengeInputControl
+          showFeedback
+          className={INPUT_CLASS_NAME}
           id="inputNewPassword"
           label={resources.Label.NewPassword}
           bottomLabel={newPasswordBottomLabel}
@@ -187,7 +198,9 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
           handleSubmit={changePassword}
           onChange={clearRequestError}
         />
-        <InputControl
+        <ChallengeInputControl
+          showFeedback
+          className={INPUT_CLASS_NAME}
           id="inputNewPasswordAgain"
           label={resources.Label.ConfirmNewPassword}
           inputType="password"
@@ -213,8 +226,8 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
           handleSubmit={changePassword}
           onChange={clearRequestError}
         />
-      </Modal.Body>
-      <FragmentModalFooter positiveButton={positiveButton} negativeButton={null} />
+      </DialogBody>
+      <ChallengeDialogFooter positiveButton={positiveButton} negativeButton={null} />
     </React.Fragment>
   );
 };

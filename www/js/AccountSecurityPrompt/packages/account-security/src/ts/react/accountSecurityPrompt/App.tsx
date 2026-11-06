@@ -1,9 +1,7 @@
 import React from "react";
-import { withTranslations, WithTranslationsProps } from "react-utilities";
-import { RequestService } from "../../common/request";
 import { PromptAssignment } from "../../common/request/types/promptAssignments";
-import { TRANSLATION_CONFIG } from "./app.config";
 import AccountSecurityPromptContainer from "./containers/accountSecurityPrompt";
+import { PromptRequestService } from "./requestService";
 import { EventService } from "./services/eventService";
 import { AccountSecurityPromptContextProvider } from "./store/contextProvider";
 
@@ -15,8 +13,8 @@ type Props = {
   username: string;
   isUserUnder13: boolean;
   eventService: EventService;
-  requestService: RequestService;
-} & WithTranslationsProps;
+  requestService: PromptRequestService;
+};
 
 const App: React.FC<Props> = ({
   promptAssignment,
@@ -24,7 +22,6 @@ const App: React.FC<Props> = ({
   isUserUnder13,
   eventService,
   requestService,
-  translate,
 }: Props) => {
   return (
     <AccountSecurityPromptContextProvider
@@ -33,11 +30,10 @@ const App: React.FC<Props> = ({
       isUserUnder13={isUserUnder13}
       eventService={eventService}
       requestService={requestService}
-      translate={translate}
     >
       <AccountSecurityPromptContainer />
     </AccountSecurityPromptContextProvider>
   );
 };
 
-export default withTranslations(App, TRANSLATION_CONFIG);
+export default App;

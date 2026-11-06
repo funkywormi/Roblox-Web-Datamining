@@ -2,8 +2,8 @@
  * Games
  */
 
-import { EnvironmentUrls } from "Roblox";
-import { UrlConfig } from "core-utilities";
+import EnvironmentUrls from "@rbx/environment-urls";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const gamesApiUrl = EnvironmentUrls.gamesApi ?? URL_NOT_FOUND;
@@ -24,7 +24,7 @@ export type GetDetailsForUniverseIdsReturnType = {
 /**
  * Request Type: `GET`.
  */
-export const GET_DETAILS_FOR_UNIVERSE_IDS_CONFIG: UrlConfig = {
+export const GET_DETAILS_FOR_UNIVERSE_IDS_CONFIG: RequestConfig = {
   url: `${gamesApiUrl}/v1/games`,
   timeout: 10000,
 };

@@ -1,4 +1,4 @@
-import { httpService } from "core-utilities";
+import transport from "../requestTransport";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as Thumbnails from "../types/thumbnails";
@@ -12,7 +12,7 @@ export const getIconsForUniverseIds = (
   Result<Thumbnails.GetIconsForUniverseIdsReturnType, Thumbnails.ThumbnailsError | null>
 > =>
   toResult(
-    httpService.get(Thumbnails.GET_ICONS_FOR_UNIVERSE_IDS_CONFIG, {
+    transport.get(Thumbnails.GET_ICONS_FOR_UNIVERSE_IDS_CONFIG, {
       universeIds,
       size,
       format,

@@ -3,7 +3,6 @@ import { initRobloxBadgesFrameworkAgnostic } from 'roblox-badges';
 import { Component } from '@rbx/profile-platform';
 import { GROUP_MEMBERSHIP_CHANGED_EVENT } from '../../../../ts/react/shared/constants/groupMembershipConstants';
 import groupModule from '../groupModule';
-import createTabConfiguration from '../utils/createTabConfiguration';
 
 function groupController(
   $scope,
@@ -32,36 +31,17 @@ function groupController(
 ) {
   'ngInject';
 
-  const postsTabs = createTabConfiguration(groupDetailsConstants.tabs, {
-    about: { translationKey: 'Heading.Home' },
-    forums: { translationKey: 'Heading.Posts', state: 'announcements' }
-  });
-  let hasExposedAnnouncementArchiveExperiment = false;
-  const canViewAnnouncementArchive = () => {
-    const isEligible =
-      $scope.isAnnouncementArchiveEnabled &&
-      !$scope.policies?.isGracefulDegradationEnabled &&
-      $scope.policies?.displayGroupAnnouncements &&
-      $scope.library.currentGroup.permissions?.groupPostsPermissions?.viewStatus;
-
-    if (
-      isEligible &&
-      $scope.isAnnouncementArchiveExperimentLoaded &&
-      !hasExposedAnnouncementArchiveExperiment
-    ) {
-      hasExposedAnnouncementArchiveExperiment = true;
-      groupExperimentsService.exposeAnnouncementArchiveExperiment();
-    }
-
-    return isEligible && $scope.isAnnouncementArchiveExperimentEnabled;
-  };
-  const getBaseGroupDetailsTabs = () => {
-    if (!canViewAnnouncementArchive()) {
-      return groupDetailsConstants.tabs;
-    }
-
-    return postsTabs;
-  };
+  const postsTab = { ...groupDetailsConstants.tabs.forums, state: 'posts' };
+  const canViewAnnouncementArchive = () =>
+    $scope.isAnnouncementArchiveEnabled &&
+    !$scope.policies?.isGracefulDegradationEnabled &&
+    $scope.policies?.displayGroupAnnouncements &&
+    $scope.canViewAnnouncements();
+  const canViewPosts = () => canViewAnnouncementArchive() || $scope.canViewForums();
+  const arePostsTabInputsLoaded = () =>
+    $scope.isGroupForumsLoaded &&
+    $scope.isAnnouncementArchiveConfigurationLoaded &&
+    $scope.isGroupPermissionsLoaded;
 
   function loadGroupData() {
     const whenLoadGroupData = $scope.loadGroup($scope.library.currentGroup.id);
@@ -533,8 +513,27 @@ function groupController(
         return;
       }
     }
-    $scope.layout.activeTab = getBaseGroupDetailsTabs()[tabKey];
+    $scope.layout.activeTab = groupDetailsConstants.tabs[tabKey];
     tryExposeAboutTabExperiment(toState);
+  });
+
+  const isPostsStateUnavailable = () =>
+    ($state.includes(postsTab.state) && !canViewPosts()) ||
+    ($state.includes('announcements') && !canViewAnnouncementArchive());
+  const getUnavailablePostsRedirectState = () => {
+    if (!arePostsTabInputsLoaded() || !isPostsStateUnavailable()) {
+      return undefined;
+    }
+
+    return $scope.canViewForums()
+      ? groupDetailsConstants.tabs.forums.state
+      : groupDetailsConstants.tabs.about.state;
+  };
+
+  $scope.$watch(getUnavailablePostsRedirectState, redirectState => {
+    if (redirectState) {
+      $state.go(redirectState, { success: true }, { reload: true });
+    }
   });
 
   $scope.loadGroup = groupId => {
@@ -644,6 +643,16 @@ function groupController(
           $scope.library.groupsList.isLoadingGroups = false;
         });
     }
+  };
+
+  const loadMissingGuestPermissions = groupId => {
+    if ($scope.isAuthenticatedUser || $scope.library.currentGroup.permissions) {
+      return $q.resolve();
+    }
+
+    return groupsService.getGroupRolePermissions(groupId, 'guest').then(result => {
+      $scope.library.currentGroup.permissions = result.permissions;
+    });
   };
 
   $scope.loadGroupMembership = groupId => {
@@ -876,7 +885,7 @@ function groupController(
   };
 
   $scope.canViewCommunityTabs = () => {
-    if (!$scope.isGroupForumsLoaded || !$scope.isAnnouncementArchiveConfigurationLoaded) {
+    if (!arePostsTabInputsLoaded()) {
       return false;
     }
 
@@ -887,11 +896,13 @@ function groupController(
   };
 
   $scope.groupDetailsTabs = () => {
-    const tabs = { ...getBaseGroupDetailsTabs() };
+    const tabs = { ...groupDetailsConstants.tabs };
     if (!$scope.canViewEvents()) {
       delete tabs.events;
     }
-    if (!canViewAnnouncementArchive() && !$scope.canViewForums()) {
+    if (canViewPosts()) {
+      tabs.forums = postsTab;
+    } else {
       delete tabs.forums;
     }
     if (!$scope.canViewStore()) {
@@ -1027,16 +1038,6 @@ function groupController(
     });
   };
 
-  $scope.loadAnnouncementArchiveExperiment = () => {
-    return $q
-      .when(groupExperimentsService.isAnnouncementArchiveExperimentEnabled())
-      .then(isEnabled => {
-        $scope.isAnnouncementArchiveExperimentEnabled = isEnabled === true;
-        $scope.isAnnouncementArchiveExperimentLoaded = isEnabled !== undefined;
-        $scope.isAnnouncementArchiveConfigurationLoaded = true;
-      });
-  };
-
   // Resolve the React-vs-legacy affiliates decision from product features,
   // independent of the guac policy load. Kept off the policies object since
   // the guac response replaces it wholesale.
@@ -1047,11 +1048,7 @@ function groupController(
         $scope.reactAffiliatesFlagLoaded = true;
         $scope.isAnnouncementArchiveEnabled =
           features?.AnnouncementArchive === true && features?.AnnouncementsUsingCommsPlat === true;
-        if ($scope.isAnnouncementArchiveEnabled) {
-          $scope.loadAnnouncementArchiveExperiment();
-        } else {
-          $scope.isAnnouncementArchiveConfigurationLoaded = true;
-        }
+        $scope.isAnnouncementArchiveConfigurationLoaded = true;
       },
       () => {
         $scope.isReactAffiliatesEnabled = false;
@@ -1153,14 +1150,23 @@ function groupController(
   $scope.updateGroup = groupId => {
     $scope.initGroupDetails(groupId);
 
-    $scope.loadGroupMembership(groupId).then(
-      () => {
-        $scope.getCurrencyIfNeeded();
-      },
-      () => {
-        $log.debug('--error waiting for membershipPromise and metadataPromise---');
-      }
-    );
+    $scope
+      .loadGroupMembership(groupId)
+      .then(
+        () => {
+          $scope.getCurrencyIfNeeded();
+        },
+        () => {
+          $log.debug('--error waiting for membershipPromise and metadataPromise---');
+        }
+      )
+      .then(() => loadMissingGuestPermissions(groupId))
+      .catch(() => {
+        $log.debug('--loadMissingGuestPermissions-error---');
+      })
+      .finally(() => {
+        $scope.isGroupPermissionsLoaded = true;
+      });
   };
 
   $scope.doesCurrentGroupHaveVerifiedBadge = () => {
@@ -1281,6 +1287,7 @@ function groupController(
     $scope.isReactAffiliatesEnabled = false;
     $scope.reactAffiliatesFlagLoaded = false;
     $scope.isAnnouncementArchiveConfigurationLoaded = false;
+    $scope.isGroupPermissionsLoaded = false;
     $scope.isAuthenticatedUser = CurrentUser.isAuthenticated;
 
     $scope.groupAnnouncement = {};

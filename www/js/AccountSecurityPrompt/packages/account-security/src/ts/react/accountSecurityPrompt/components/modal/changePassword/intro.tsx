@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Modal } from "react-style-guide";
+import { DialogBody, ProgressCircle } from "@rbx/foundation-ui";
 import { PromptType } from "../../../../../common/request/types/promptAssignments";
-import { FooterButtonConfig, FragmentModalFooter } from "../../../../common/modalFooter";
-import { FragmentModalHeader, HeaderButtonType } from "../../../../common/modalHeader";
+import {
+  ChallengeDialogFooter,
+  FooterButtonConfig,
+} from "../../../../common/challengeDialogFooter";
+import { ChallengeDialogHeader, HeaderButtonType } from "../../../../common/challengeDialogHeader";
 import { ModalFragmentProps } from "../../../constants/types";
 import useAccountSecurityPromptContext from "../../../hooks/useAccountSecurityPromptContext";
 import { AccountSecurityPromptActionType } from "../../../store/action";
@@ -44,25 +47,30 @@ const ModalChangePasswordIntro: React.FC<ModalFragmentProps> = ({
    * Render Properties
    */
 
-  let bodyText = "An unexpected issue occurred while displaying this text.";
+  let bodyText: React.ReactNode = "An unexpected issue occurred while displaying this text.";
   if (!promptAssignment.isGeneric) {
-    // IMPORTANT: Do not inject user input into this variable; this content is
-    // rendered as HTML.
     bodyText =
-      promptAssignment.promptType !== PromptType.CHANGE_PASSWORD__BREACHED_CREDENTIAL
-        ? `${resources.Description.UnusualActivity} ${resources.Description.ChangeYourPassword}`
-        : // PromptType.CHANGE_PASSWORD__BREACHED_CREDENTIAL
-          `${
-            resources.Description.ChangeYourPasswordImmediately
-          } ${resources.Description.NoChangeForceReset(
+      promptAssignment.promptType !== PromptType.CHANGE_PASSWORD__BREACHED_CREDENTIAL ? (
+        `${resources.Description.UnusualActivity} ${resources.Description.ChangeYourPassword}`
+      ) : (
+        // PromptType.CHANGE_PASSWORD__BREACHED_CREDENTIAL
+        <React.Fragment>
+          {resources.Description.ChangeYourPasswordImmediately}{" "}
+          {resources.Description.NoChangeForceReset(
             getDaysRemainingToForceReset(promptAssignment.metadata.forceResetTimestamp),
-          )}`;
+          )}
+        </React.Fragment>
+      );
   }
 
   const positiveButton: FooterButtonConfig = {
     // Show a spinner as the button content when a request is in flight.
     content: requestInFlight ? (
-      <span className="spinner spinner-xs spinner-no-margin" />
+      <ProgressCircle
+        variant="Indeterminate"
+        size="Small"
+        ariaLabel={resources.Action.ContinueChangePassword}
+      />
     ) : (
       resources.Action.ContinueChangePassword
     ),
@@ -77,25 +85,19 @@ const ModalChangePasswordIntro: React.FC<ModalFragmentProps> = ({
 
   return (
     <React.Fragment>
-      <FragmentModalHeader
+      <ChallengeDialogHeader
         headerText={resources.Header.ChangeYourPassword}
         buttonType={HeaderButtonType.CLOSE}
         buttonAction={closeModal}
         buttonEnabled={!requestInFlight}
         headerInfo={null}
       />
-      <Modal.Body>
+      <DialogBody>
         <div className="modal-lock-icon" />
-        <p
-          className="modal-margin-bottom"
-          // We need to do this since the translated text injects tags. There
-          // should be no vulnerability since we control the translated text.
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: bodyText }}
-        />
-        <p className="text-error xsmall">{requestError}</p>
-      </Modal.Body>
-      <FragmentModalFooter positiveButton={positiveButton} negativeButton={null} />
+        <p className="modal-margin-bottom">{bodyText}</p>
+        <p className="text-caption-small content-system-alert xsmall">{requestError}</p>
+      </DialogBody>
+      <ChallengeDialogFooter positiveButton={positiveButton} negativeButton={null} />
     </React.Fragment>
   );
 };

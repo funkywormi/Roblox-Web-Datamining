@@ -1,5 +1,6 @@
-import { fido2Util, hybridResponseService } from "core-roblox-utilities";
-import { DeviceMeta } from "Roblox";
+import * as fido2Util from "@rbx/core-scripts/auth/fido2";
+import * as hybridResponseService from "@rbx/core-scripts/auth/hybrid-response";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { Result } from "../../result";
 import { toResultCustomRequest } from "../common";
 import * as fido2 from "../types/fido2";
@@ -36,11 +37,8 @@ export const getNativeResponse = (
       }
 
       // Android does not need conversion
-      const shouldConvertToStandardBase64 = !(
-        DeviceMeta &&
-        DeviceMeta().isInApp &&
-        DeviceMeta().isAndroidApp
-      );
+      const deviceMeta = getDeviceMeta();
+      const shouldConvertToStandardBase64 = !(deviceMeta?.isInApp && deviceMeta?.isAndroidApp);
       return shouldConvertToStandardBase64
         ? fido2Util.formatCredentialAuthenticationResponseApp(credentialString)
         : credentialString;

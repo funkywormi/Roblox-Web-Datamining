@@ -511,6 +511,7 @@
             "url": "https://js.rbxcdn.com/48dba3f75eb97bd9a307468491aec7a595fce460337c472283615754b7df5d76.js",
             "sources": [
                 "/home",
+                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -643,6 +644,7 @@
             "name": "Common.Captcha",
             "url": "https://js.rbxcdn.com/5f2ee2913bf919a8576bbe4120a6d41b933e814a4779a0a3fc1d9d941c5ee368.js",
             "sources": [
+                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -835,6 +837,7 @@
                 "/bundles/591",
                 "/sponsorships/list",
                 "/login/forgot-password-or-username",
+                "/challenge/cdn/hybrid",
                 "/help-safety",
                 "/support-center",
                 "/events/6177598281426797213",
@@ -1203,7 +1206,7 @@
         },
         {
             "name": "Feature.AppealsPortal",
-            "url": "https://js.rbxcdn.com/44ccce0a0acfdc70163426a4f51b081f9e5b2644e1847d7c199b277f95ba0711.js",
+            "url": "https://js.rbxcdn.com/cc60c9883fcc4fed064fddbee4bec2da0522b9273d28503a2719a6dd7fd27e19.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -2392,6 +2395,7 @@
             "name": "Feature.Landing",
             "url": "https://js.rbxcdn.com/686bd55707be42af370b81d2f36f55b6e10c56edb105502b3f9f0a34f7412bf5.js",
             "sources": [
+                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -2676,7 +2680,6 @@
             "url": "https://js.rbxcdn.com/7774e92ccee60b92717e18209b9060b35988362a9493cadb5234c96550e27d90.js",
             "sources": [
                 "/home",
-                "/",
                 "/charts",
                 "/discover/?Keyword=roblox",
                 "/users/1/profile"
@@ -3389,13 +3392,6 @@
             "url": "https://js.rbxcdn.com/46ec7856c5aa19b2bd5e4d7b745da33086769838558970c98610e983b70fe922.js",
             "sources": [
                 "/my/account"
-            ]
-        },
-        {
-            "name": "Feature.SduiLandingPage",
-            "url": "https://js.rbxcdn.com/5e740513671abfd8b06b4e8eebe99f64123b585b131d5798a48bb8e1811de323.js",
-            "sources": [
-                "/"
             ]
         },
         {
@@ -4206,7 +4202,7 @@
         },
         {
             "name": "AccountRecovery",
-            "url": "https://js.rbxcdn.com/cb6dec594c73e7dba973a92c4344777a0e7838cde03aa1ba8d1eac9a0fc7a4a3-AccountRecovery.js",
+            "url": "https://js.rbxcdn.com/0bf254cf81d42c8bfe6456c9af2c1f51c76b4eb5c145d51120ff0d741e79f0e2-AccountRecovery.js",
             "sources": [
                 "/login/forgot-password-or-username"
             ]
@@ -4220,7 +4216,7 @@
         },
         {
             "name": "AccountSecurityPrompt",
-            "url": "https://js.rbxcdn.com/8cab61cbce3e27ab581db90f443725c268378e315e78ec169289cf353e30f04b-AccountSecurityPrompt.js",
+            "url": "https://js.rbxcdn.com/c823cd04fa7923c218e24aa138cd9b5d176ad5372b9c534e190a972d04e8b112-AccountSecurityPrompt.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -4498,6 +4494,7 @@
             "name": "Captcha",
             "url": "https://js.rbxcdn.com/b604dac29d89b56aef30844f099c5640c2f1870a97a06f4e692208d24097f9ed-Captcha.js",
             "sources": [
+                "/",
                 "/login",
                 "/CreateAccount",
                 "/support",
@@ -4569,7 +4566,7 @@
         },
         {
             "name": "Challenge",
-            "url": "https://js.rbxcdn.com/a6afd84b9b1897db81dc5cd72f5fd745df3e0d9d5ae8c1f14e088d42804cf3f4-Challenge.js",
+            "url": "https://js.rbxcdn.com/1fb0ecc3db4cf6d25bfbbc5d65ef9516575863a1a18c5330cf8273d901ca6df8-Challenge.js",
             "sources": [
                 "/home",
                 "/",
@@ -4623,14 +4620,14 @@
         },
         {
             "name": "ChallengeHybridView",
-            "url": "https://js.rbxcdn.com/6e4642a52903fe3ce98ba3c634f9e0968279070f6ee0b2219c305fb81aa4dd82-ChallengeHybridView.js",
+            "url": "https://js.rbxcdn.com/78aef9ef9288c48a446459953085fda153f808b7929cbe965e727c56482f45d1-ChallengeHybridView.js",
             "sources": [
                 "/challenge/cdn/hybrid"
             ]
         },
         {
             "name": "CommunityTelemetry",
-            "url": "https://js.rbxcdn.com/c08c71574c9206439fa24ffad3c30c3b14e16c5c111da52bb71782f2728b5027-CommunityTelemetry.js",
+            "url": "https://js.rbxcdn.com/55371e03ee74c4ba08970353821ce85d45b2882191477ad79f915c1c4c12151d-CommunityTelemetry.js",
             "sources": [
                 "/users/1/profile",
                 "/search/communities",
@@ -4894,7 +4891,7 @@
         },
         {
             "name": "EmailVerifyCodeModal",
-            "url": "https://js.rbxcdn.com/5b3170c956b0c87ade14d298bcf45d0bae3991c1b427b7e1624bf94e488792c0-EmailVerifyCodeModal.js",
+            "url": "https://js.rbxcdn.com/9924a686bd1dc1a2f4f42ea04ea587397602739b7977c06a3a43bc90df38bc9e-EmailVerifyCodeModal.js",
             "sources": [
                 "/home",
                 "/",
@@ -5084,7 +5081,7 @@
         },
         {
             "name": "Fido2CredentialRegistration",
-            "url": "https://js.rbxcdn.com/f96b140d763b7668b4ed9e79b958ea2bc4ba3d7790eee16e2a30d70f0a7d1668-Fido2CredentialRegistration.js",
+            "url": "https://js.rbxcdn.com/a8b651eb6da12324030a7d6c80177a83eedc3c83366eadd9c78615b77d4c20c9-Fido2CredentialRegistration.js",
             "sources": [
                 "/my/account"
             ]
@@ -5360,7 +5357,7 @@
         },
         {
             "name": "GroupDetails",
-            "url": "https://js.rbxcdn.com/8d35aadfd7b956ea25212eecafec4fbb6bc915676e2c1ee89d27fba7fb988dc6-GroupDetails.js",
+            "url": "https://js.rbxcdn.com/a214538fac226fa63a45b405cddb06ef6e5aa0b46b6435c45a0588a53268803d-GroupDetails.js",
             "sources": [
                 "/communities/1"
             ]
@@ -5374,7 +5371,7 @@
         },
         {
             "name": "GroupForums",
-            "url": "https://js.rbxcdn.com/16140bf98441e583e9086246c7d0dcfd27847348e159b258e7727569afdfafe5-GroupForums.js",
+            "url": "https://js.rbxcdn.com/7cd8ed065b8a8d07a4ba814cb6dbcc2b8539948231591f5f24ef2cd831b6baa5-GroupForums.js",
             "sources": [
                 "/communities/1",
                 "/communities/configure"
@@ -5397,7 +5394,7 @@
         },
         {
             "name": "GroupShouts",
-            "url": "https://js.rbxcdn.com/a698b0c25dd17ffaa94a93685a348c3725a199ed719edce4cd99fa7d06b6526d-GroupShouts.js",
+            "url": "https://js.rbxcdn.com/4cc5a65c6ba189449d7f896e557a43a1500ee72f5cc74df36bd2304a45b3a927-GroupShouts.js",
             "sources": [
                 "/communities/1",
                 "/communities/configure"
@@ -6142,6 +6139,7 @@
             "url": "https://js.rbxcdn.com/215fe9b0fe92491f665645f65f57db6668d716af72e02465db259b715f061118.js",
             "sources": [
                 "/home",
+                "/",
                 "/login",
                 "/CreateAccount",
                 "/catalog",
@@ -6381,6 +6379,7 @@
             "name": "ReactLanding",
             "url": "https://js.rbxcdn.com/d5ed442140c2fe16d5c061ae4886f43dd204d3fc8079a83120f2fce22d5847c3-ReactLanding.js",
             "sources": [
+                "/",
                 "/CreateAccount"
             ]
         },
@@ -6659,7 +6658,7 @@
         },
         {
             "name": "Routing",
-            "url": "https://js.rbxcdn.com/fba1e443708acf4d3f6795f5df9250be1ed19895e73512c5a6035cc8c8f7b486.js",
+            "url": "https://js.rbxcdn.com/83f631e96d65e1f0ed1c8c18c4731bcc2f6e2b5c70bda403b2db4c393ea4915d-Routing.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -6670,7 +6669,7 @@
         },
         {
             "name": "SafetyDashboard",
-            "url": "https://js.rbxcdn.com/03d4d230cf4468af6e702270ea6d5a631d93b9be816ff6f811afe42479d7359a-SafetyDashboard.js",
+            "url": "https://js.rbxcdn.com/a9792f3f10e6ccc838d8840dbfdb2eea9d03816cf711bafb18a45ba38cd45937-SafetyDashboard.js",
             "sources": [
                 "/safety-dashboard"
             ]
@@ -6680,13 +6679,6 @@
             "url": "https://js.rbxcdn.com/a505b3027f104d536a1ed2300358ee47d7fe6cf8c73c9afe9e4b61e72e87243c-SafetySupportPage.js",
             "sources": [
                 "/help-safety"
-            ]
-        },
-        {
-            "name": "SduiLandingPage",
-            "url": "https://js.rbxcdn.com/f79f018fd146aa6bc41cb1adde1cdbb5d6a982d93e57f6107a6880153a786a2c-SduiLandingPage.js",
-            "sources": [
-                "/"
             ]
         },
         {
@@ -6750,7 +6742,7 @@
         },
         {
             "name": "SecurityTab",
-            "url": "https://js.rbxcdn.com/98e2866b763b5fc2f33279bec2a164b0442dcc4fcd2a8be30f6b3dcf718dfcf1-SecurityTab.js",
+            "url": "https://js.rbxcdn.com/dac3765a91d1ff58ead19f0fc46df13d88e2f3d8e890a12cbd2029be3bd7c291-SecurityTab.js",
             "sources": [
                 "/my/account"
             ]
@@ -6866,7 +6858,7 @@
         },
         {
             "name": "SessionManagement",
-            "url": "https://js.rbxcdn.com/dcdb4c4b2047939b65806a85225509dcd45b7098b176f75f80b12840260bacd1-SessionManagement.js",
+            "url": "https://js.rbxcdn.com/aa5df2a9907860786bc631e9814d629181bfa12c8e3d891dfdf9158fc3283188-SessionManagement.js",
             "sources": [
                 "/my/account"
             ]
@@ -7318,7 +7310,7 @@
         },
         {
             "name": "VerificationUpsell",
-            "url": "https://js.rbxcdn.com/ea02dd03dee8d01ac1d70c79d1a67cd19f1a2cee81b5796e32ae0102917d8992-VerificationUpsell.js",
+            "url": "https://js.rbxcdn.com/19f3928bf9a30d9337452e9b282460e71a679459e774627bf76ac6fea1c8d4fb-VerificationUpsell.js",
             "sources": [
                 "/home",
                 "/",
@@ -7618,7 +7610,7 @@
         },
         {
             "name": "AccountSecurityPrompt",
-            "url": "https://css.rbxcdn.com/66428aa5f5dc6a12371d849c4351587c19578a8872aaced39277d594a2a02f38-AccountSecurityPrompt.css",
+            "url": "https://css.rbxcdn.com/317924feec9eec8774169d27e29b64c954baf531e8c759e4fe547f7b985e6b4b-AccountSecurityPrompt.css",
             "sources": [
                 "/home",
                 "/charts",
@@ -7814,6 +7806,7 @@
             "name": "Captcha",
             "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-Captcha.css",
             "sources": [
+                "/",
                 "/login",
                 "/CreateAccount",
                 "/support",
@@ -7885,7 +7878,7 @@
         },
         {
             "name": "Challenge",
-            "url": "https://css.rbxcdn.com/e74dff4ac45225e41fab2fa856ee4d3661eb346860a9b7e6ded1f6972c95e7cd-Challenge.css",
+            "url": "https://css.rbxcdn.com/a352f44e24213028a9a7ed8ad5a3e59b95375069a37d44a3cbc8aa355789a43d-Challenge.css",
             "sources": [
                 "/home",
                 "/",
@@ -8069,7 +8062,7 @@
         },
         {
             "name": "EmailVerifyCodeModal",
-            "url": "https://css.rbxcdn.com/425750fcea32cbd87363ee2d46539a13eee157b6c0b565dbe4389b416614f269-EmailVerifyCodeModal.css",
+            "url": "https://css.rbxcdn.com/a1e67690ea675055cc824a3b7d98902332cece3d52c18b7420c72e53873f641c-EmailVerifyCodeModal.css",
             "sources": [
                 "/home",
                 "/",
@@ -8415,7 +8408,7 @@
         },
         {
             "name": "GroupDetails",
-            "url": "https://css.rbxcdn.com/5386328b0d36c54974664f9a86a7f57701f4b9a04a204e7d448b61f305806032-GroupDetails.css",
+            "url": "https://css.rbxcdn.com/bfe41fac4092f0c2ab395feb7699276d8474eec2094d2736042e82b94ecc0dce-GroupDetails.css",
             "sources": [
                 "/communities/1"
             ]
@@ -8935,6 +8928,7 @@
             "name": "ReactLanding",
             "url": "https://css.rbxcdn.com/eb5dcc055e5d083a0f5cd9922d739527d0f8583b4529ac9ddf16df8cac71d71f-ReactLanding.css",
             "sources": [
+                "/",
                 "/CreateAccount"
             ]
         },
@@ -9157,13 +9151,6 @@
             ]
         },
         {
-            "name": "SduiLandingPage",
-            "url": "https://css.rbxcdn.com/851fdee45ec75313414f5bfc8dc2db6f3766cecce593b48a94c18972ef6aec86-SduiLandingPage.css",
-            "sources": [
-                "/"
-            ]
-        },
-        {
             "name": "SearchDropdown",
             "url": "https://css.rbxcdn.com/9465044f971fd06d5fb1af0ee4e1ce58cd6fe515dce4a57b3343a1ddd920a65f.css",
             "sources": [
@@ -9224,7 +9211,7 @@
         },
         {
             "name": "SecurityTab",
-            "url": "https://css.rbxcdn.com/55ae9ac198ff1817de6f2da2c61b51c4a3115726971e93e0a77251e11f1a20c5-SecurityTab.css",
+            "url": "https://css.rbxcdn.com/c46f976d56b1e3d30228a3ce84af8afbfafe2a920ef1b070ea3f064a1357a761-SecurityTab.css",
             "sources": [
                 "/my/account"
             ]
@@ -9287,7 +9274,7 @@
         },
         {
             "name": "SessionManagement",
-            "url": "https://css.rbxcdn.com/303e3fe9e6492e254f19e608d1648bb9a1952ca8864767e4d3d89b54403efdba-SessionManagement.css",
+            "url": "https://css.rbxcdn.com/b079036a1082d2d88bb3fbb07f5def87f5bc2c864edb5d586200b30050ee0df6-SessionManagement.css",
             "sources": [
                 "/my/account"
             ]
@@ -9546,7 +9533,7 @@
         },
         {
             "name": "VerificationUpsell",
-            "url": "https://css.rbxcdn.com/f77e16b9fa5823882aaa0cdabade9706b9ba2b7e050d23d2831da138a58e5f7f-VerificationUpsell.css",
+            "url": "https://css.rbxcdn.com/ed3893592f01a54a652cc3d23eac7211e82c83a159e24cdc1f708c6c9e58eab3-VerificationUpsell.css",
             "sources": [
                 "/home",
                 "/",

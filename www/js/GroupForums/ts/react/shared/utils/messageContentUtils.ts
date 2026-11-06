@@ -1,9 +1,9 @@
 import {
   DEFAULT_BLOCK_TYPE,
   Document,
-  getPlaintext,
   hasRichTextContent as hasRichTextContentRbx
 } from '@rbx/richtext';
+import { getPlaintext } from '@rbx/richtext-editor';
 import { MessageContent, MessageContentRaw } from '../types';
 
 export type MessageContentFragment = {
@@ -73,7 +73,7 @@ export const hasRichTextContent = (content: MessageContent): boolean => {
 };
 
 // Flattens a MessageContent to plain text: returns `plainText` directly when the field is plain,
-// otherwise delegates to @rbx/richtext's `getPlaintext`.
+// otherwise delegates to @rbx/richtext-editor's `getPlaintext`.
 export const getPlainText = (content: MessageContent): string => {
   if (content.plainText) {
     return content.plainText;

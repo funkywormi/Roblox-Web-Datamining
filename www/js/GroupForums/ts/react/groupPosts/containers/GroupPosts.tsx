@@ -10,7 +10,8 @@ export type GroupPostsProps = {
   channelsPermissions: GroupChannelPermissions[];
   userId: number;
   isGroupMember: boolean;
-  forumsEnabled: boolean;
+  forumsEnabled?: boolean;
+  areForumsLoaded: boolean;
   policies: GroupDetailsPolicies;
 };
 

@@ -53,6 +53,14 @@ import {
 import * as Metadata from "./interface/metadata/interface";
 import { ChallengeError } from "./challengeError";
 import { MetricsServiceDefault } from "./services/metricsService";
+import {
+  trackChallengeAbandoned,
+  trackChallengeCompleted,
+  trackChallengeInvalidated,
+  trackChallengeParseFailed,
+  trackChallengeRenderFailed,
+  trackChallengeShown,
+} from "../../observability";
 import { ChallengeMetadataValidator } from "./validators";
 
 // Export some additional enums that are declared in the shared interface (they
@@ -275,6 +283,7 @@ export const renderChallenge: RenderChallenge = async ({
       // eslint-disable-next-line no-console
       console.error(LOG_PREFIX, "Challenge headers failed to be parsed");
       metricsService.fireParseFailureEvent();
+      trackChallengeParseFailed();
       challengeBaseProperties.onChallengeInvalidated({
         challengeType: challengeSpecificProperties.challengeType,
         errorCode: Generic.ErrorCodeGeneric.UNKNOWN,
@@ -296,6 +305,7 @@ export const renderChallenge: RenderChallenge = async ({
         if (!success) {
           // Record render failure.
           metricsService.fireRenderFailureEvent(nextChallengeSpecificProperties.challengeType);
+          trackChallengeRenderFailed(nextChallengeSpecificProperties.challengeType);
           // eslint-disable-next-line no-console
           console.error(LOG_PREFIX, "Challenge component failed to initialize");
           challengeBaseProperties.onChallengeInvalidated({
@@ -307,9 +317,11 @@ export const renderChallenge: RenderChallenge = async ({
         }
         // Record successful render.
         metricsService.fireSuccessEvent(nextChallengeSpecificProperties.challengeType);
+        trackChallengeShown(nextChallengeSpecificProperties.challengeType);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         metricsService.fireRenderFailureEvent(nextChallengeSpecificProperties.challengeType);
+        trackChallengeRenderFailed(nextChallengeSpecificProperties.challengeType, error);
         // eslint-disable-next-line no-console
         console.error(LOG_PREFIX, "Exception on rendering challenge component");
         challengeBaseProperties.onChallengeInvalidated({
@@ -787,6 +799,7 @@ export const interceptChallenge: InterceptChallenge = <T>(parameters: {
       );
 
       metricsService.fireParseFailureEvent();
+      trackChallengeParseFailed();
       return;
     }
 
@@ -822,6 +835,7 @@ export const interceptChallenge: InterceptChallenge = <T>(parameters: {
         onChallengeCompleted: data => {
           // Clean up the container before proceeding
           cleanupContainer();
+          trackChallengeCompleted(challengeSpecificProperties.challengeType);
 
           // Retry the request on success.
           try {
@@ -851,6 +865,7 @@ export const interceptChallenge: InterceptChallenge = <T>(parameters: {
         onChallengeInvalidated: data => {
           // Clean up the container before proceeding
           cleanupContainer();
+          trackChallengeInvalidated(challengeSpecificProperties.challengeType);
 
           // Fail the request on an invalidated challenge.
           reject(
@@ -863,6 +878,7 @@ export const interceptChallenge: InterceptChallenge = <T>(parameters: {
         onModalChallengeAbandoned: () => {
           // Clean up the container before proceeding
           cleanupContainer();
+          trackChallengeAbandoned(challengeSpecificProperties.challengeType);
 
           // Fail the request on an abandoned challenge.
           reject(
@@ -879,17 +895,39 @@ export const interceptChallenge: InterceptChallenge = <T>(parameters: {
         newParseChallenge,
       },
       challengeSpecificProperties,
-    }).then(success => {
-      if (!success) {
-        // Clean up container on initialization failure
+    }).then(
+      success => {
+        if (!success) {
+          // Clean up container on initialization failure
+          cleanupContainer();
+
+          // Record render failure.
+          metricsService.fireRenderFailureEvent(challengeSpecificProperties.challengeType);
+          trackChallengeRenderFailed(challengeSpecificProperties.challengeType);
+
+          // Fail the request on a challenge that fails to initialize.
+          // eslint-disable-next-line no-console
+          console.error(LOG_PREFIX, "Challenge component failed to initialize");
+          reject(
+            new ChallengeError({
+              kind: ChallengeErrorKind.UNKNOWN,
+              data: {
+                challengeType: challengeSpecificProperties.challengeType,
+              },
+            }),
+          );
+        } else {
+          // Record successful render.
+          metricsService.fireSuccessEvent(challengeSpecificProperties.challengeType);
+          trackChallengeShown(challengeSpecificProperties.challengeType);
+        }
+      },
+      (error: unknown) => {
         cleanupContainer();
-
-        // Record render failure.
         metricsService.fireRenderFailureEvent(challengeSpecificProperties.challengeType);
-
-        // Fail the request on a challenge that fails to initialize.
+        trackChallengeRenderFailed(challengeSpecificProperties.challengeType, error);
         // eslint-disable-next-line no-console
-        console.error(LOG_PREFIX, "Challenge component failed to initialize");
+        console.error(LOG_PREFIX, "Exception on rendering challenge component", error);
         reject(
           new ChallengeError({
             kind: ChallengeErrorKind.UNKNOWN,
@@ -898,9 +936,6 @@ export const interceptChallenge: InterceptChallenge = <T>(parameters: {
             },
           }),
         );
-      } else {
-        // Record successful render.
-        metricsService.fireSuccessEvent(challengeSpecificProperties.challengeType);
-      }
-    });
+      },
+    );
   });

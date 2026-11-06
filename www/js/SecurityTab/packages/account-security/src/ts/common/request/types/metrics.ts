@@ -371,6 +371,9 @@ export type Metric =
         // such as iOS, Android, etc.
         // eslint-disable-next-line camelcase
         application_type: string;
+        // `action_type` is  the canonical action that trigered the challenge.
+        // eslint-disable-next-line camelcase
+        action_type: string;
       };
     }
   | {
@@ -383,6 +386,9 @@ export type Metric =
         // such as iOS, Android, etc.
         // eslint-disable-next-line camelcase
         application_type: string;
+        // `action_type` is  the canonical action that trigered the challenge.
+        // eslint-disable-next-line camelcase
+        action_type: string;
       };
     }
   | {
@@ -393,6 +399,9 @@ export type Metric =
         // such as iOS, Android, etc.
         // eslint-disable-next-line camelcase
         application_type: string;
+        // `action_type` is  the canonical action that trigered the challenge.
+        // eslint-disable-next-line camelcase
+        action_type: string;
       };
     }
   | {

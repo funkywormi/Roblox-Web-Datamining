@@ -11,6 +11,9 @@ import {
 const isOwnerDeactivateAction = (action: ProfileActionWithKey): boolean =>
   (action.key === 'LeaveCommunity' || action.key === 'Unfollow') && !!action.href;
 
+const getActionId = (action: ProfileActionWithKey): string =>
+  isOwnerDeactivateAction(action) ? 'DeactivateGroup' : action.key;
+
 const ContextualMenuActions: React.FC = () => {
   const { actionsData } = useGroupProfileHeaderContext();
   const { contextual } = actionsData ?? {};
@@ -98,13 +101,13 @@ const ContextualMenuActions: React.FC = () => {
             key={action.key}
             component={action.href ? 'a' : undefined}
             href={action.href}
+            // Labels are localized, so tests and tooling identify actions by id.
+            data-action-key={getActionId(action)}
             className={`contextual-menu-actions-menu-item ${
               action.href ? 'contextual-menu-actions-menu-item-link' : ''
             }`}
             onClick={() => {
-              sendOverflowMenuItemClickEvent(
-                isOwnerDeactivateAction(action) ? 'DeactivateGroup' : action.key
-              );
+              sendOverflowMenuItemClickEvent(getActionId(action));
               // href items navigate via the anchor; just close the menu.
               if (action.href) {
                 handleMenuClose();

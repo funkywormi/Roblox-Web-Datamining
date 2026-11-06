@@ -3,7 +3,7 @@
  */
 
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const thumbnailsApiUrl = EnvironmentUrls.thumbnailsApi ?? URL_NOT_FOUND;
@@ -49,7 +49,7 @@ export type GetIconsForUniverseIdsReturnType = {
 /**
  * Request Type: `GET`.
  */
-export const GET_ICONS_FOR_UNIVERSE_IDS_CONFIG: UrlConfig = {
+export const GET_ICONS_FOR_UNIVERSE_IDS_CONFIG: RequestConfig = {
   url: `${thumbnailsApiUrl}/v1/games/icons`,
   timeout: 10000,
 };

@@ -7,20 +7,14 @@ import { EppEnrollmentStatus } from "../../../common/request/types/userSettings"
 import { Result } from "../../../common/result";
 import { ChallengeType } from "../../challenge/generic";
 import { MediaType } from "../../challenge/twoStepVerification";
-import { HighlightableElement } from "../../common/HighlightableElement";
 import { LOG_PREFIX } from "../app.config";
 import useSecurityTabContext from "../hooks/useSecurityTabContext";
-import useRedesignFlags from "../hooks/useRedesignFlags";
 import useEppFlags from "../hooks/useEppFlags";
 import { SecurityTabActionType } from "../store/action";
 import ModalState from "../store/modalState";
 import { isGenericChallengeType, renderGenericSpendFriction } from "../utils/challengeParamData";
 import { getFilteredEnabledMediaTypes } from "../utils/helperUtils";
-import AuthenticatorToggle from "./authenticatorToggle";
-import EmailTwoStepVerificationToggle from "./emailTwoStepVerificationToggle";
 import RecoveryCodesSection from "./recoveryCodesSection";
-import SecurityKeyToggle from "./securityKeyToggle";
-import SmsTwoStepVerificationToggle from "./smsTwoStepVerificationToggle";
 import TwoStepVerificationRadioOptions from "./twoStepVerificationRadioOptions";
 
 type TwoStepVerificationProps = {
@@ -46,7 +40,6 @@ const TwoStepVerification: React.FC<TwoStepVerificationProps> = ({ shouldScrollI
     dispatch,
   } = useSecurityTabContext();
 
-  const { isRedesignEnabled, isSecurityTabRedesignEnabled } = useRedesignFlags();
   const { isEppEligibilityPending } = useEppFlags();
 
   const isEppEnrolled = userSettings?.eppEnrollmentStatus === EppEnrollmentStatus.KEY_PLAN_ENROLLED;
@@ -358,19 +351,11 @@ const TwoStepVerification: React.FC<TwoStepVerificationProps> = ({ shouldScrollI
     }
     shouldScrollIntoViewRef.current = false;
     current.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [requestInFlight, isEppEligibilityPending, isSecurityTabRedesignEnabled]);
+  }, [requestInFlight, isEppEligibilityPending]);
 
   /*
    * Component Markup
    */
-
-  const isSmsTwoStepVerificationAvailable = () => {
-    return twoStepVerificationMetadata.isSmsTwoStepVerificationAvailable;
-  };
-
-  const isSecurityKeyTwoStepVerificationAvailable = () => {
-    return twoStepVerificationMetadata.isSecurityKeyTwoStepVerificationAvailable;
-  };
 
   const shouldShowRecoveryCodesSection = () => {
     // Recovery codes should be available when any enableable 2SV method is enabled
@@ -393,34 +378,20 @@ const TwoStepVerification: React.FC<TwoStepVerificationProps> = ({ shouldScrollI
       ? resources.Label.TwoStepVerificationSingleMethodDescription
       : resources.Label.TwoStepVerificationDescription;
 
-    if (isRedesignEnabled) {
-      return (
-        <div className="description-wrapper">
-          <div id="security-page-description" className="section-content">
-            <div className="text-body-large text-new-line">{descriptionResource}</div>
-          </div>
-        </div>
-      );
-    }
-
     return (
-      <div id="security-page-description" className="section-content">
-        <div className="text-description text-new-line">{descriptionResource}</div>
-        <div className="text-description">{resources.Description.SecurityWarning("", "")}</div>
+      <div className="description-wrapper">
+        <div id="security-page-description" className="section-content">
+          <div className="text-body-large text-new-line">{descriptionResource}</div>
+        </div>
       </div>
     );
   };
-
-  // Don't render anything until experiment flag is resolved to avoid flicker
-  if (isSecurityTabRedesignEnabled === null) {
-    return null;
-  }
 
   return (
     <React.Fragment>
       <div
         ref={sectionRef}
-        className={`section two-step-verification-section ${isRedesignEnabled ? "settings-redesign-enabled" : ""}`}
+        className="section two-step-verification-section settings-redesign-enabled"
         data-testid="two-step-verification-section"
       >
         <div className="container-header margin-bottom-small">
@@ -462,26 +433,7 @@ const TwoStepVerification: React.FC<TwoStepVerificationProps> = ({ shouldScrollI
                     <span id="2sv-popup-container" />
                   </div>
                 )}
-                {isRedesignEnabled ? (
-                  <TwoStepVerificationRadioOptions isDisabled={shouldDisableForEpp} />
-                ) : (
-                  <div
-                    className="two-step-toggle-interface"
-                    data-testid="two-step-toggle-interface"
-                  >
-                    <AuthenticatorToggle unlockPinAndToggleAuthenticator={toggleAuthenticator} />
-                    <HighlightableElement
-                      isHighlighted={email2SVHasHighlight}
-                      setIsHighlighted={setEmail2SVHasHighlight}
-                    >
-                      <EmailTwoStepVerificationToggle />
-                    </HighlightableElement>
-                    {isSmsTwoStepVerificationAvailable() && <SmsTwoStepVerificationToggle />}
-                    {isSecurityKeyTwoStepVerificationAvailable() && (
-                      <SecurityKeyToggle unlockPinAndToggleAuthenticator={toggleAuthenticator} />
-                    )}
-                  </div>
-                )}
+                <TwoStepVerificationRadioOptions isDisabled={shouldDisableForEpp} />
                 {shouldShowRecoveryCodesSection() && <RecoveryCodesSection />}
               </React.Fragment>
             )}

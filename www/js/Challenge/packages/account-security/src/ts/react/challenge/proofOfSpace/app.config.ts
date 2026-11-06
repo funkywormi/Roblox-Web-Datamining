@@ -7,7 +7,7 @@ export const LOG_PREFIX = "Proof-of-Space:" as const;
  */
 export const TRANSLATION_NAMESPACES = [
   "Feature.ProofOfSpaceChallenge",
-  "CommonUI.Messages",
+  "CommonUI.Controls",
 ] as const;
 
 /**

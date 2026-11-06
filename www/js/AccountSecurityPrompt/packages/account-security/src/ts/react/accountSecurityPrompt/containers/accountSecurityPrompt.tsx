@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Modal } from "react-style-guide";
+import React from "react";
 import { PromptType } from "../../../common/request/types/promptAssignments";
+import ChallengeDialog from "../../common/challengeDialog";
 import BannerAccountSecurity from "../components/bannerAccountSecurity";
 import ModalAccountRestoresPolicyUpsell from "../components/modal/accountRestoresPolicyUpsell/upsell";
 import ModalAuthenticatorUpsellDownload from "../components/modal/authenticatorUpsell/download";
@@ -74,35 +74,14 @@ const AccountSecurityPromptContainer: React.FC = () => {
   } = useAccountSecurityPromptContext();
 
   /*
-   * Component State
-   */
-
-  const [isModalVisible, setIsModalVisible] = useState(true);
-
-  /*
    * Event Handlers
    */
 
-  const closeModal = () => setIsModalVisible(false);
-
-  /**
-   * While it is typical to trigger a modal close `onHide` (a property of every
-   * modal), we do not set the modal state to `NONE` in a handler attached to
-   * that event, since doing so would remove the modal element from the DOM
-   * immediately and prevent a close animation from running.
-   *
-   * To allow the animation to run before setting a `NONE` state, we attach
-   * this function to the modal's `onExited` event.
-   */
-  const setModalStateNone = () => {
+  const closeModal = () =>
     dispatch({
       type: AccountSecurityPromptActionType.SET_MODAL_STATE,
       modalState: ModalState.NONE,
     });
-    // Reset the modal visible state (although the component itself will not be
-    // rendered at this point).
-    setIsModalVisible(true);
-  };
 
   /*
    * Component Markup
@@ -128,15 +107,15 @@ const AccountSecurityPromptContainer: React.FC = () => {
     <React.Fragment>
       {!isFlowComplete && !showModalDirectly && <BannerAccountSecurity />}
       {modalSchema && (
-        <Modal
-          className="modal-modern modal-modern-security-prompt"
-          show={isModalVisible}
-          onHide={closeModal}
-          onExited={setModalStateNone}
-          backdrop={modalSchema.canClickBackdropToClose ? undefined : "static"}
+        <ChallengeDialog
+          open
+          onClose={closeModal}
+          isBackdropDismissible={modalSchema.canClickBackdropToClose}
+          // The text colour is set here so it doesn't follow the host page's body.
+          className="account-security-prompt-dialog content-default"
         >
           <modalSchema.innerFragment closeModal={closeModal} />
-        </Modal>
+        </ChallengeDialog>
       )}
     </React.Fragment>
   );

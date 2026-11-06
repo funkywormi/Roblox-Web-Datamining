@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Modal } from "react-style-guide";
+import { DialogBody, ProgressCircle } from "@rbx/foundation-ui";
 import * as PromptAssignments from "../../../../../common/request/types/promptAssignments";
-import { FooterButtonConfig, FragmentModalFooter } from "../../../../common/modalFooter";
-import { FragmentModalHeader, HeaderButtonType } from "../../../../common/modalHeader";
+import {
+  ChallengeDialogFooter,
+  FooterButtonConfig,
+} from "../../../../common/challengeDialogFooter";
+import { ChallengeDialogHeader, HeaderButtonType } from "../../../../common/challengeDialogHeader";
 import { LOG_PREFIX } from "../../../app.config";
 import { ModalFragmentProps } from "../../../constants/types";
 import useAccountSecurityPromptContext from "../../../hooks/useAccountSecurityPromptContext";
@@ -70,7 +73,11 @@ const ModalAuthenticatorUpsellIntro: React.FC<ModalFragmentProps> = ({
   const positiveButton: FooterButtonConfig = {
     // Show a spinner as the button content when a request is in flight.
     content: requestInFlight ? (
-      <span className="spinner spinner-xs spinner-no-margin" />
+      <ProgressCircle
+        variant="Indeterminate"
+        size="Small"
+        ariaLabel={resources.Action.AuthenticatorUpsellSetupAuthenticatorButtonMessage}
+      />
     ) : (
       resources.Action.AuthenticatorUpsellSetupAuthenticatorButtonMessage
     ),
@@ -85,14 +92,14 @@ const ModalAuthenticatorUpsellIntro: React.FC<ModalFragmentProps> = ({
 
   return (
     <React.Fragment>
-      <FragmentModalHeader
+      <ChallengeDialogHeader
         headerText={resources.Header.AuthenticatorUpsellWelcomeMessage}
         buttonType={HeaderButtonType.CLOSE}
         buttonAction={closeModalAndDismissTemporary}
         buttonEnabled={!requestInFlight}
         headerInfo={null}
       />
-      <Modal.Body>
+      <DialogBody>
         <div className="authenticator-upsell-intro-grid">
           <div className="grid-container">
             <div className="grid-item">
@@ -118,9 +125,9 @@ const ModalAuthenticatorUpsellIntro: React.FC<ModalFragmentProps> = ({
             </div>
           </div>
         </div>
-        <p className="text-error xsmall">{requestError}</p>
-      </Modal.Body>
-      <FragmentModalFooter positiveButton={positiveButton} negativeButton={null} />
+        <p className="text-caption-small content-system-alert xsmall">{requestError}</p>
+      </DialogBody>
+      <ChallengeDialogFooter positiveButton={positiveButton} negativeButton={null} />
     </React.Fragment>
   );
 };

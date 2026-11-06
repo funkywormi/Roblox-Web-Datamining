@@ -1,8 +1,8 @@
 import { create, DescMessage } from "@bufbuild/protobuf";
 import { Message, Schema } from "@rbx/event-stream-v2";
 import { WebEventBase } from "@rbx/event-stream-proto/event/web_event_base_pb";
-import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
-import { EnvironmentUrls } from "@rbx/core-scripts/legacy/Roblox";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
+import environmentUrls from "@rbx/environment-urls";
 
 import {
   CmntyAgeCheckBannerShownEventSchema,
@@ -152,11 +152,11 @@ import {
 import { EventStreamClient, webEventBase } from "./eventStreamClient";
 
 // refreshed on "app/browser" restart, or manually from code as needed very much like a session id
-let ImpressionId = uuidService.generateRandomUuid();
+let ImpressionId = generateRandomUuid();
 
 export const getImpressionId = (): string => ImpressionId;
 export const updateImpressionId = (): string => {
-  ImpressionId = uuidService.generateRandomUuid();
+  ImpressionId = generateRandomUuid();
   return ImpressionId;
 };
 
@@ -177,9 +177,12 @@ export const getMetricEvent = <T extends DescMessage>(
   };
 };
 
-const client: EventStreamClient = new EventStreamClient({
-  baseUrl: EnvironmentUrls.apiGatewayUrl,
-});
+let client: EventStreamClient | undefined;
+
+const getClient = (): EventStreamClient => {
+  client ??= new EventStreamClient({ baseUrl: environmentUrls.apiGatewayUrl });
+  return client;
+};
 
 type SafeEvent<T> = Omit<
   T,
@@ -438,7 +441,10 @@ class CommunityEventStream {
     schema: Schema<T>,
     message: Message<T>,
   ): Promise<void> =>
-    client.sendEvent(schema, CommunityEventStream.withWebBase(message) as unknown as Message<T>);
+    getClient().sendEvent(
+      schema,
+      CommunityEventStream.withWebBase(message) as unknown as Message<T>,
+    );
 
   static sendEvent = <T extends DescMessage>(event: StructuredEvent): void => {
     // eslint-disable-next-line no-void

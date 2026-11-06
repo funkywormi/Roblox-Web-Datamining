@@ -28,13 +28,13 @@ export const ChallengeDialogHeader: React.FC<Props> = ({
   headerInfo,
   buttonAriaLabel,
 }: Props) => {
-  const translateCommon = useTranslations("CommonUI.Messages");
+  const translateCommon = useTranslations("CommonUI.Controls");
 
   return (
     <React.Fragment>
       <div
         data-testid="challenge-dialog-header"
-        className="grid [grid-template-columns:minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-large padding-x-xlarge padding-top-xsmall"
+        className="grid [grid-template-columns:minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-large padding-x-small"
       >
         {buttonType === HeaderButtonType.HIDDEN ? (
           <div />
@@ -53,7 +53,7 @@ export const ChallengeDialogHeader: React.FC<Props> = ({
                   ? "icon-regular-chevron-large-left"
                   : "icon-regular-x"
               }
-              size="Medium"
+              size="XLarge"
             />
           </button>
         )}

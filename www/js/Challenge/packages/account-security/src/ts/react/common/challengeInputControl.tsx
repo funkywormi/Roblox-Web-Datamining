@@ -23,6 +23,12 @@ type Props = {
   validCharactersRegEx?: RegExp;
   concealInput?: boolean;
   autoFocus?: boolean;
+  label?: React.ReactNode;
+  /** Shown under the input, replaced by the error when there is one. */
+  bottomLabel?: React.ReactNode;
+  className?: string;
+  /** Shows a check or an X in the input once it has a value, like the legacy `InputControl`. */
+  showFeedback?: boolean;
 };
 
 /**
@@ -47,37 +53,58 @@ const ChallengeInputControl: React.FC<Props> = ({
   validCharactersRegEx,
   concealInput,
   autoFocus,
+  label,
+  bottomLabel,
+  className,
+  showFeedback = false,
 }: Props) => {
   const errorText = !disabled && value !== "" && error !== null ? error : null;
+  const feedbackIconName =
+    showFeedback && !disabled && value !== ""
+      ? error === null
+        ? "icon-regular-check"
+        : "icon-regular-x"
+      : undefined;
 
-  return (
-    <TextInput
-      id={id}
-      data-testid="challenge-input-control"
-      size="Medium"
-      type={inputType}
-      inputMode={inputMode}
-      autoComplete={autoComplete}
-      maxLength={maxLength}
-      placeholder={placeholder}
-      aria-label={placeholder}
-      value={value}
-      isDisabled={disabled}
-      hasError={errorText !== null}
-      // Reserve the hint row so showing an error doesn't shift the layout.
-      helperText={errorText ?? "\u00A0"}
-      className={concealInput && value.length > 0 ? "challenge-input-concealed" : undefined}
-      onChange={validateAndSetStateForInput(
-        value, // The value prior to change.
-        validCharactersRegEx,
-        validate,
-        setValue,
-        setError,
-        onChangeCustom,
-      )}
-      onKeyDown={handleKeyDown(handleSubmit, canSubmit)}
-      autoFocus={autoFocus}
-    />
+  const inputProps = {
+    id,
+    "data-testid": "challenge-input-control",
+    size: "Medium",
+    label,
+    type: inputType,
+    inputMode,
+    autoComplete,
+    maxLength,
+    placeholder,
+    "aria-label": label === undefined ? placeholder : undefined,
+    value,
+    isDisabled: disabled,
+    hasError: errorText !== null,
+    // Reserve the hint row so showing an error doesn't shift the layout.
+    helperText: errorText ?? bottomLabel ?? "\u00A0",
+    // 16px text: legacy size, and iOS Safari zooms on focus below it.
+    className: [
+      "[&_input::placeholder]:text-body-large [&_input]:text-body-large",
+      concealInput && value.length > 0 ? "challenge-input-concealed" : "",
+      className ?? "",
+    ].join(" "),
+    onChange: validateAndSetStateForInput(
+      value, // The value prior to change.
+      validCharactersRegEx,
+      validate,
+      setValue,
+      setError,
+      onChangeCustom,
+    ),
+    onKeyDown: handleKeyDown(handleSubmit, canSubmit),
+    autoFocus,
+  } as const;
+
+  // Two branches because `trailingIconName` can't be passed as `undefined`.
+  return feedbackIconName === undefined ? (
+    <TextInput {...inputProps} />
+  ) : (
+    <TextInput {...inputProps} trailingIconName={feedbackIconName} />
   );
 };
 

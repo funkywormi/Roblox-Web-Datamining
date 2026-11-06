@@ -9,7 +9,7 @@ export const OTP_CONTAINER_ID = "otp-challenge-container" as const;
  */
 export const TRANSLATION_NAMESPACES = [
   "Feature.EmailVerificationChallenge",
-  "CommonUI.Messages",
+  "CommonUI.Controls",
 ] as const;
 
 /**

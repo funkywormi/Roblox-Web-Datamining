@@ -26,12 +26,12 @@ const groupDetailsConstants = {
   tabs: {
     about: {
       key: 'about',
-      translationKey: 'Heading.About',
+      translationKey: 'Heading.Home',
       state: 'about'
     },
     forums: {
       key: 'forums',
-      translationKey: 'Heading.Forums',
+      translationKey: 'Heading.Posts',
       state: 'forums',
       label: 'Forums'
     },
@@ -53,6 +53,7 @@ const groupDetailsConstants = {
   },
 
   stateToTab: {
+    posts: 'forums',
     announcements: 'forums',
     'announcements.detail': 'forums',
     'announcements.detail.edit': 'forums',

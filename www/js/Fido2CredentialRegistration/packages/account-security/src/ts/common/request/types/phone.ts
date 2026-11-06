@@ -3,7 +3,7 @@
  */
 
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const accountInformationApiUrl = EnvironmentUrls.accountInformationApi ?? URL_NOT_FOUND;
@@ -21,7 +21,7 @@ export type GetPhoneConfigurationReturnType = {
 /**
  * Request Type: `GET`.
  */
-export const GET_PHONE_CONFIG: UrlConfig = {
+export const GET_PHONE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountInformationApiUrl}/v1/phone`,
   timeout: 10000,
@@ -30,7 +30,7 @@ export const GET_PHONE_CONFIG: UrlConfig = {
 /**
  * Request Type: `POST` (duplicated in case we want to separately configure the timeout).
  */
-export const POST_PHONE_CONFIG: UrlConfig = {
+export const POST_PHONE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountInformationApiUrl}/v1/phone`,
   timeout: 10000,
@@ -39,7 +39,7 @@ export const POST_PHONE_CONFIG: UrlConfig = {
 /**
  * Request Type: POST
  */
-export const VERIFY_CODE_CONFIG: UrlConfig = {
+export const VERIFY_CODE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountInformationApiUrl}/v1/phone/verify`,
   timeout: 10000,
@@ -48,7 +48,7 @@ export const VERIFY_CODE_CONFIG: UrlConfig = {
 /**
  * Request Type: POST
  */
-export const RESEND_CODE_CONFIG: UrlConfig = {
+export const RESEND_CODE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountInformationApiUrl}/v1/phone/resend`,
   timeout: 10000,
@@ -110,7 +110,7 @@ export type GetPhonePrefixesListReturnType = PhonePrefix[];
 /**
  * Request Type: `GET`.
  */
-export const GET_PHONE_PREFIXES_LIST_CONFIG: UrlConfig = {
+export const GET_PHONE_PREFIXES_LIST_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${apiGateWayUrl}/phone-number-api/v1/phone-prefix-list`,
   timeout: 10000,

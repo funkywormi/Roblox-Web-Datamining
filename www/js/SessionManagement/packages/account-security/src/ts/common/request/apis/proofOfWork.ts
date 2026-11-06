@@ -1,4 +1,4 @@
-import { httpService } from "core-utilities";
+import transport from "../requestTransport";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as ProofOfWork from "../types/proofOfWork";
@@ -7,7 +7,7 @@ export const getPuzzle = (
   sessionID: string,
 ): Promise<Result<ProofOfWork.GetPuzzleReturnType, ProofOfWork.ProofOfWorkError | null>> =>
   toResult(
-    httpService.get(ProofOfWork.GET_PUZZLE_CONFIG, { sessionID }),
+    transport.get(ProofOfWork.GET_PUZZLE_CONFIG, { sessionID }),
     ProofOfWork.ProofOfWorkError,
   );
 
@@ -16,7 +16,7 @@ export const verifyPuzzle = async (
   solution: string,
 ): Promise<Result<ProofOfWork.VerifyPuzzleReturnType, ProofOfWork.ProofOfWorkError | null>> =>
   toResult(
-    httpService.post(ProofOfWork.VERIFY_PUZZLE_CONFIG, {
+    transport.post(ProofOfWork.VERIFY_PUZZLE_CONFIG, {
       sessionID,
       solution,
     }),

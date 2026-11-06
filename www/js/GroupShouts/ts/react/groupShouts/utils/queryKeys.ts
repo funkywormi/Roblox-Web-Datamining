@@ -13,5 +13,6 @@ export default {
   ],
   getGroupMembershipKey: (groupId: number): GroupKeyTuple => ['getGroupMembership', groupId],
   getCommunityInfoKey: (groupId: number): GroupKeyTuple => ['getCommunityInfo', groupId],
-  getUserDraftsKey: (groupId: number): GroupKeyTuple => ['getUserDrafts', groupId]
+  getUserDraftsKey: (groupId: number): GroupKeyTuple => ['getUserDrafts', groupId],
+  getAnnouncementArchiveKey: (groupId: number): GroupKeyTuple => ['announcement-archive', groupId]
 };

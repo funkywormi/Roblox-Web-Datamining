@@ -2,8 +2,8 @@
  * Security Questions
  */
 
-import { EnvironmentUrls } from "Roblox";
-import { UrlConfig } from "core-utilities";
+import EnvironmentUrls from "@rbx/environment-urls";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const apiGatewayUrl = EnvironmentUrls.apiGatewayUrl ?? URL_NOT_FOUND;
@@ -46,7 +46,7 @@ export type GetQuestionReturnType = {
 /**
  * Request Type: `GET`.
  */
-export const GET_QUESTION_CONFIG: UrlConfig = {
+export const GET_QUESTION_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountSecurityServiceUrl}/v1/security-question`,
   timeout: 10000,
@@ -78,7 +78,7 @@ export type AnswerQuestionReturnType =
 /**
  * Request Type: `POST`.
  */
-export const ANSWER_QUESTION_CONFIG: UrlConfig = {
+export const ANSWER_QUESTION_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountSecurityServiceUrl}/v1/security-question`,
   timeout: 10000,

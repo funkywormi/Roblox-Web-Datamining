@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Modal } from "react-style-guide";
+import { DialogBody, ProgressCircle } from "@rbx/foundation-ui";
 import * as PromptAssignments from "../../../../common/request/types/promptAssignments";
-import { FooterButtonConfig, FragmentModalFooter } from "../../../common/modalFooter";
-import { FragmentModalHeader, HeaderButtonType } from "../../../common/modalHeader";
+import { ChallengeDialogFooter, FooterButtonConfig } from "../../../common/challengeDialogFooter";
+import { ChallengeDialogHeader, HeaderButtonType } from "../../../common/challengeDialogHeader";
 import { LOG_PREFIX } from "../../app.config";
 import { ModalFragmentProps } from "../../constants/types";
 import useAccountSecurityPromptContext from "../../hooks/useAccountSecurityPromptContext";
@@ -76,7 +76,7 @@ const ModalDismissConfirmation: React.FC<ModalFragmentProps> = ({
   const negativeButton: FooterButtonConfig = {
     // Show a spinner as the button content when a request is in flight.
     content: requestInFlight ? (
-      <span className="spinner spinner-xs spinner-no-margin" />
+      <ProgressCircle variant="Indeterminate" size="Small" ariaLabel={confirmActionText} />
     ) : (
       confirmActionText
     ),
@@ -91,18 +91,18 @@ const ModalDismissConfirmation: React.FC<ModalFragmentProps> = ({
 
   return (
     <React.Fragment>
-      <FragmentModalHeader
+      <ChallengeDialogHeader
         headerText={resources.Header.AreYouSure}
         buttonType={HeaderButtonType.HIDDEN}
         buttonAction={closeModal}
         buttonEnabled
         headerInfo={null}
       />
-      <Modal.Body>
+      <DialogBody>
         <div className="modal-lock-icon" />
         <p>{bodyMessage}</p>
-      </Modal.Body>
-      <FragmentModalFooter positiveButton={positiveButton} negativeButton={negativeButton} />
+      </DialogBody>
+      <ChallengeDialogFooter positiveButton={positiveButton} negativeButton={negativeButton} />
     </React.Fragment>
   );
 };

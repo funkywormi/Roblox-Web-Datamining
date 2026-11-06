@@ -1,4 +1,4 @@
-import { httpService } from "core-utilities";
+import transport from "../requestTransport";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as GenericChallenge from "../types/genericChallenge";
@@ -14,7 +14,7 @@ export const continueChallenge = async (
   >
 > =>
   toResult(
-    httpService.post(GenericChallenge.CONTINUE_CHALLENGE_CONFIG, {
+    transport.post(GenericChallenge.CONTINUE_CHALLENGE_CONFIG, {
       challengeId,
       challengeType,
       challengeMetadata,

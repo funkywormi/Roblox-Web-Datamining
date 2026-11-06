@@ -1,4 +1,6 @@
 import React, { Fragment, useState } from "react";
+import { Button, Icon, ProgressCircle } from "@rbx/foundation-ui";
+import { window } from "@rbx/core-lib/browser";
 import * as PromptAssignments from "../../../common/request/types/promptAssignments";
 import { DisplayType, PromptType } from "../../../common/request/types/promptAssignments";
 import {
@@ -97,14 +99,17 @@ const BannerAccountSecurity: React.FC = () => {
     ) {
       await dismissForever();
       // The `_self` target opens the redirect URL in the current page.
-      window.open(ACCOUNT_SETTINGS_SECURITY_PATH + AUTH_REDIRECT_URL_SIGNIFIER, "_self");
+      window?.open(ACCOUNT_SETTINGS_SECURITY_PATH + AUTH_REDIRECT_URL_SIGNIFIER, "_self");
     } else if (promptAssignment.promptType === PromptType.BROADER_AUTHENTICATOR_UPSELL) {
       dispatch({
         type: AccountSecurityPromptActionType.SET_MODAL_STATE,
         modalState: ModalState.AUTHENTICATOR_UPSELL_OPENING,
       });
     } else if (promptAssignment.promptType === PromptType.EMAIL_2SV_UPSELL) {
-      window.open(ACCOUNT_SETTINGS_SECURITY_PATH + EMAIL_HIGHLIGHT_REDIRECT_URL_SIGNIFIER, "_self");
+      window?.open(
+        ACCOUNT_SETTINGS_SECURITY_PATH + EMAIL_HIGHLIGHT_REDIRECT_URL_SIGNIFIER,
+        "_self",
+      );
     } else {
       dispatch({
         type: AccountSecurityPromptActionType.SET_MODAL_STATE,
@@ -212,9 +217,7 @@ const BannerAccountSecurity: React.FC = () => {
     }
   }
 
-  // IMPORTANT: Do not inject user input into this variable; this content is
-  // rendered as HTML.
-  let bannerDescription: string;
+  let bannerDescription: React.ReactNode;
 
   // Compute banner body:
   if (promptAssignment.isGeneric) {
@@ -244,9 +247,12 @@ const BannerAccountSecurity: React.FC = () => {
           undefined,
           dateOptions,
         );
-        bannerDescription = `${resources.Description.AccountRestoresPolicyWithDate(
-          accountRestoresDateDescription,
-        )} ${resources.Description.AuthenticatorSetupPrompt(TWO_STEP_SUPPORT_URL)}`;
+        bannerDescription = (
+          <React.Fragment>
+            {resources.Description.AccountRestoresPolicyWithDate(accountRestoresDateDescription)}{" "}
+            {resources.Description.AuthenticatorSetupPrompt(TWO_STEP_SUPPORT_URL)}
+          </React.Fragment>
+        );
         break;
       }
       case PromptType.ACCOUNT_RESTORES_POLICY_UPDATE_V2: {
@@ -264,11 +270,15 @@ const BannerAccountSecurity: React.FC = () => {
         break;
       }
       case PromptType.CHANGE_PASSWORD__BREACHED_CREDENTIAL: {
-        bannerDescription = `${
-          resources.Description.ChangeYourPasswordImmediately
-        } ${resources.Description.NoChangeForceReset(
-          getDaysRemainingToForceReset(promptAssignment.metadata.forceResetTimestamp),
-        )} ${resources.Description.LearnMoreHere(CHANGE_PASSWORD_BANNER_SUPPORT_URL)}`;
+        bannerDescription = (
+          <React.Fragment>
+            {resources.Description.ChangeYourPasswordImmediately}{" "}
+            {resources.Description.NoChangeForceReset(
+              getDaysRemainingToForceReset(promptAssignment.metadata.forceResetTimestamp),
+            )}{" "}
+            {resources.Description.LearnMoreHere(CHANGE_PASSWORD_BANNER_SUPPORT_URL)}
+          </React.Fragment>
+        );
         break;
       }
       case PromptType.BROADER_AUTHENTICATOR_UPSELL: {
@@ -290,7 +300,7 @@ const BannerAccountSecurity: React.FC = () => {
 
   // Now that translations are purely statically bundled this is actually possible if someone
   // tries to return a generic prompt that is missing a translation resource.
-  if (bannerHeader === "" || bannerDescription === "") {
+  if (bannerHeader === "" || bannerDescription === "" || bannerDescription == null) {
     return <React.Fragment />;
   }
 
@@ -300,75 +310,82 @@ const BannerAccountSecurity: React.FC = () => {
 
   return (
     <div className="security-banner-wrapper">
-      <div className="security-banner">
+      <div className="security-banner" data-testid="account-security-banner">
         <div className="banner-start">
           {showAlertIcon && (
             <div className="banner-icon">
-              <div className="icon-warning" />
+              <Icon name="icon-regular-triangle-exclamation" className="banner-warning-icon" />
             </div>
           )}
           {showUpsellIcon && <div className="banner-icon-lock" />}
           <div className="banner-content">
-            <h2 className="banner-header">{bannerHeader}</h2>
-            <div
-              className="banner-description"
-              // We need to do this since the translated text injects tags.
-              // There should be no vulnerability since we control the
-              // translated text.
-              // eslint-disable-next-line react/no-danger
-              dangerouslySetInnerHTML={{ __html: bannerDescription }}
-            />
+            <h2 className="banner-header padding-bottom-xsmall text-heading-small max-[767px]:text-title-large">
+              {bannerHeader}
+            </h2>
+            <div className="banner-description text-body-large max-[767px]:text-body-small">
+              {bannerDescription}
+            </div>
           </div>
           {showDismissButton && (
             <button
               type="button"
-              className="close banner-close"
+              className="banner-close flex bg-none stroke-none padding-none"
               aria-label={resources.Action.RemindMeLater}
               onClick={dismissTemporary}
             >
-              <span className="icon-close" />
+              <Icon name="icon-regular-x" size="XLarge" />
             </button>
           )}
         </div>
         <div className="banner-buttons">
           {showSecondaryButton && (
             <span className="banner-button">
-              <button
-                type="button"
-                className="btn-secondary-md"
+              <Button
+                variant="Standard"
+                size="Medium"
+                className="!text-label-large max-[991px]:!height-800 max-[767px]:!height-700"
+                data-testid="banner-secondary"
                 aria-label={resources.Action.DismissForever}
                 onClick={startDismissForever}
-                disabled={requestInFlight}
+                isDisabled={requestInFlight}
               >
                 {resources.Action.DismissForever}
-              </button>
+              </Button>
             </span>
           )}
           {showPrimaryButton && (
             <span className="banner-button banner-button-last">
-              <button
-                type="button"
-                className="btn-cta-md"
+              <Button
+                variant="Emphasis"
+                size="Medium"
+                className="!text-label-large !bg-[var(--color-content-emphasis)] !content-[var(--color-surface-0)] max-[991px]:!height-800 max-[767px]:!height-700"
+                data-testid="banner-primary"
                 aria-label={bannerButtonText}
                 onClick={handleBannerButtonClick}
-                disabled={requestInFlight}
+                isDisabled={requestInFlight}
               >
                 {bannerButtonText}
-              </button>
+              </Button>
             </span>
           )}
           {showDismissButton && (
             <Fragment>
               {requestInFlight ? (
-                <span className="banner-close icon-close spinner-circle" />
+                <ProgressCircle
+                  variant="Indeterminate"
+                  size="Small"
+                  ariaLabel={resources.Action.RemindMeLater}
+                  className="banner-close banner-close-progress"
+                />
               ) : (
                 <button
                   type="button"
-                  className="close banner-close"
+                  className="banner-close flex bg-none stroke-none padding-none"
+                  data-testid="banner-close"
                   aria-label={resources.Action.RemindMeLater}
                   onClick={dismissAccordingToPromptType}
                 >
-                  <span className="icon-close" />
+                  <Icon name="icon-regular-x" size="XLarge" />
                 </button>
               )}
             </Fragment>

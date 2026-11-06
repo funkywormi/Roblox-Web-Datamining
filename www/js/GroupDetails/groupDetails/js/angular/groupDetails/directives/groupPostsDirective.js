@@ -13,6 +13,7 @@ function groupPosts() {
       userId: '<',
       isGroupMember: '<',
       forumsEnabled: '<',
+      areForumsLoaded: '<',
       policies: '<'
     },
     link(scope, element) {
@@ -27,6 +28,7 @@ function groupPosts() {
           userId: scope.userId,
           isGroupMember: scope.isGroupMember,
           forumsEnabled: scope.forumsEnabled,
+          areForumsLoaded: scope.areForumsLoaded,
           policies: scope.policies
         });
       };
@@ -45,6 +47,7 @@ function groupPosts() {
           userId: scope.userId,
           isGroupMember: scope.isGroupMember,
           forumsEnabled: scope.forumsEnabled,
+          areForumsLoaded: scope.areForumsLoaded,
           policies: scope.policies
         }),
         (newVal, oldVal) => {
@@ -62,6 +65,7 @@ function groupPosts() {
             newVal.userId !== oldVal.userId ||
             newVal.isGroupMember !== oldVal.isGroupMember ||
             newVal.forumsEnabled !== oldVal.forumsEnabled ||
+            newVal.areForumsLoaded !== oldVal.areForumsLoaded ||
             JSON.stringify(newVal.policies) !== JSON.stringify(oldVal.policies)
           ) {
             renderPosts();

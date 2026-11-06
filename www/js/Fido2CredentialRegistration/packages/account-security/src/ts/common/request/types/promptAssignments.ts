@@ -3,7 +3,7 @@
  */
 
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const apiGatewayUrl = EnvironmentUrls.apiGatewayUrl ?? URL_NOT_FOUND;
@@ -117,7 +117,7 @@ export type GetAllForCurrentUserReturnType = PromptAssignment[];
 /**
  * Request Type: `GET`.
  */
-export const GET_ALL_FOR_CURRENT_USER_CONFIG: UrlConfig = {
+export const GET_ALL_FOR_CURRENT_USER_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountSecurityServiceUrl}/v1/prompt-assignments`,
   timeout: 10000,
@@ -133,7 +133,7 @@ export type UpdateForCurrentUserReturnType = void;
 /**
  * Request Type: `POST`.
  */
-export const UPDATE_FOR_CURRENT_USER_CONFIG: UrlConfig = {
+export const UPDATE_FOR_CURRENT_USER_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountSecurityServiceUrl}/v1/prompt-assignments`,
   timeout: 10000,

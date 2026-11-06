@@ -60,7 +60,7 @@ export const renderChallenge: ForceActionRedirect.RenderChallenge = ({
         delayParameters={delayParametersTyped}
         bodyTranslationKey={bodyTranslationKey}
       />,
-      [namespace],
+      [namespace, "CommonUI.Controls"],
     );
     return true;
   }

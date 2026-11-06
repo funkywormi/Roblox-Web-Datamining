@@ -1,4 +1,5 @@
 import { EventService } from "../services/eventService";
+import { trackPromptModalViewed } from "../../observability";
 import ModalState from "./modalState";
 
 /**
@@ -6,6 +7,7 @@ import ModalState from "./modalState";
  */
 export const runModalStateChangeEffect = (
   eventService: EventService,
+  promptType: string,
   modalState: ModalState,
   lastModalState: ModalState | null,
 ): void => {
@@ -16,4 +18,7 @@ export const runModalStateChangeEffect = (
 
   // Event: A modal state was viewed (should capture the initial `NONE` state on page load).
   eventService.sendModalStateViewedEvent(modalState);
+  if (modalState !== ModalState.NONE) {
+    trackPromptModalViewed(promptType, modalState);
+  }
 };

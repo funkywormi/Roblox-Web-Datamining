@@ -3,18 +3,16 @@ import { CommunityProductFeatures, GroupPermissions } from '../../shared/types';
 import { GroupDetailsPolicies } from '../types';
 
 export const isAnnouncementArchiveFeatureEnabled = (features: CommunityProductFeatures): boolean =>
-  features.AnnouncementArchive && features.AnnouncementsUsingCommsPlat;
+  features.AnnouncementArchive === true && features.AnnouncementsUsingCommsPlat === true;
 
 export const canViewAnnouncementArchive = (
   features: CommunityProductFeatures,
   policies: GroupDetailsPolicies,
-  permissions: GroupPermissions,
-  isExperimentEnabled: boolean | undefined
-): boolean | undefined =>
-  isExperimentEnabled &&
+  permissions: GroupPermissions
+): boolean =>
   isAnnouncementArchiveFeatureEnabled(features) &&
   !policies.isGracefulDegradationEnabled &&
-  policies.displayGroupAnnouncements &&
+  !!policies.displayGroupAnnouncements &&
   permissions.groupPostsPermissions.viewStatus;
 
 const { apiGatewayUrl, groupsApi, catalogApi } = EnvironmentUrls;

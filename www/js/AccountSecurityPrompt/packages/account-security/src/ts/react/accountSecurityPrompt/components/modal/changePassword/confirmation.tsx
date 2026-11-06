@@ -1,6 +1,6 @@
 import React from "react";
-import { Modal } from "react-style-guide";
-import { FragmentModalHeader, HeaderButtonType } from "../../../../common/modalHeader";
+import { DialogBody } from "@rbx/foundation-ui";
+import { ChallengeDialogHeader, HeaderButtonType } from "../../../../common/challengeDialogHeader";
 import { ModalFragmentProps } from "../../../constants/types";
 import useAccountSecurityPromptContext from "../../../hooks/useAccountSecurityPromptContext";
 
@@ -20,19 +20,19 @@ const ModalChangePasswordConfirmation: React.FC<ModalFragmentProps> = ({
 
   return (
     <React.Fragment>
-      <FragmentModalHeader
+      <ChallengeDialogHeader
         headerText={resources.Header.Success}
         buttonType={HeaderButtonType.CLOSE}
         buttonAction={closeModal}
         buttonEnabled
         headerInfo={null}
       />
-      <Modal.Body>
+      <DialogBody>
         <div className="modal-lock-icon" />
         <p className="modal-margin-bottom-large">
           {resources.Description.ChangeYourPasswordSuccess}
         </p>
-      </Modal.Body>
+      </DialogBody>
     </React.Fragment>
   );
 };

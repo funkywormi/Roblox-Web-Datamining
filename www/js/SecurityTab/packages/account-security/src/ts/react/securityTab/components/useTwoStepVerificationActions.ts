@@ -8,7 +8,6 @@ import { SecurityTabActionType } from "../store/action";
 import ModalState from "../store/modalState";
 import useTwoStepVerificationState from "./useTwoStepVerificationState";
 import useDeleteAllSecurityKeys from "../hooks/useDeleteAllSecurityKeys";
-import useRedesignFlags from "../hooks/useRedesignFlags";
 import useSecurityKeyWarningModal from "../hooks/useSecurityKeyWarningModal";
 import useGenericErrorModal from "../hooks/useGenericErrorModal";
 import usePlatformSupportsPasskeyAndSecurityKey from "../../common/hooks/usePlatformSupportsPasskeyAndSecurityKey";
@@ -31,8 +30,6 @@ const useTwoStepVerificationActions = (): TwoStepVerificationActionsReturn => {
     enabledMediaTypes,
     twoStepVerificationMetadata,
   } = state;
-
-  const { isRedesignEnabled } = useRedesignFlags();
 
   // Use the state hook to get computed values and helpers
   const { selectedOption, isEmailVerified } = useTwoStepVerificationState();
@@ -106,7 +103,7 @@ const useTwoStepVerificationActions = (): TwoStepVerificationActionsReturn => {
         sendDisabledEvent();
         // switching from (enabled) security key to authenticator requires us to delete all security keys
         // do not need enable event for authenticator since it is already enabled
-        if (hasSecurityKey && isRedesignEnabled) {
+        if (hasSecurityKey) {
           showWarningModal(resources.Description.SecurityKey.AuthenticatorDeletion);
         } else {
           showTwoStepDisableModal(MediaType.Authenticator);
@@ -132,7 +129,6 @@ const useTwoStepVerificationActions = (): TwoStepVerificationActionsReturn => {
       sendEnabledEvent,
       sendDisabledEvent,
       showTwoStepDisableModal,
-      isRedesignEnabled,
       dispatch,
       showEmailRequirementModal,
       showWarningModal,
@@ -149,23 +145,13 @@ const useTwoStepVerificationActions = (): TwoStepVerificationActionsReturn => {
       }
 
       if (!skipAuthenticatorCheck && !enabledMediaTypes.includes(MediaType.Authenticator)) {
-        // New redesigned flow: skip modal and go directly to authenticator setup
+        // Skip the modal and go directly to authenticator setup.
         // Pass security key registration as callback to authenticator setup
-        if (isRedesignEnabled) {
-          dispatch({
-            type: SecurityTabActionType.SET_MODAL_STATE,
-            modalState: ModalState.AUTHENTICATOR_ENABLE,
-            additionalModalProps: {
-              onAuthenticatorComplete: () => beginSecurityKeyRegistration(true), // Skip check on callback
-            },
-          });
-          return;
-        }
         dispatch({
           type: SecurityTabActionType.SET_MODAL_STATE,
-          modalState: ModalState.TURN_ON_AUTHENTICATOR,
+          modalState: ModalState.AUTHENTICATOR_ENABLE,
           additionalModalProps: {
-            enableAuthenticatorFunction: () => toggleAuthenticator(isEmailVerified()),
+            onAuthenticatorComplete: () => beginSecurityKeyRegistration(true), // Skip check on callback
           },
         });
         return;
@@ -206,10 +192,8 @@ const useTwoStepVerificationActions = (): TwoStepVerificationActionsReturn => {
       requestService,
       showGenericErrorModal,
       dispatch,
-      toggleAuthenticator,
       isEmailVerified,
       showEmailRequirementModal,
-      isRedesignEnabled,
       Generic.ChallengeError,
       checkPlatformSupport,
     ],
@@ -255,7 +239,7 @@ const useTwoStepVerificationActions = (): TwoStepVerificationActionsReturn => {
     const hasSecurityKey = enabledMediaTypes.includes(MediaType.SecurityKey);
     const hasAuthenticator = enabledMediaTypes.includes(MediaType.Authenticator);
 
-    if (isRedesignEnabled && (hasSecurityKey || hasAuthenticator)) {
+    if (hasSecurityKey || hasAuthenticator) {
       showWarningModal(resources.Description.TurnOnLowerSecurity2SVMethod, {
         skipDeletion: true,
         onConfirm: async () => {
@@ -301,7 +285,6 @@ const useTwoStepVerificationActions = (): TwoStepVerificationActionsReturn => {
     requestService,
     showGenericErrorModal,
     dispatch,
-    isRedesignEnabled,
     showWarningModal,
     deleteAllSecurityKeys,
     resources.Description.TurnOnLowerSecurity2SVMethod,

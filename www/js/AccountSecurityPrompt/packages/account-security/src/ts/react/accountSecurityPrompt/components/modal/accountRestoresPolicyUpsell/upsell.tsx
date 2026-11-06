@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { Modal } from "react-style-guide";
+import { window } from "@rbx/core-lib/browser";
+import { DialogBody, ProgressCircle } from "@rbx/foundation-ui";
 import * as PromptAssignments from "../../../../../common/request/types/promptAssignments";
-import { FooterButtonConfig, FragmentModalFooter } from "../../../../common/modalFooter";
+import {
+  ChallengeDialogFooter,
+  FooterButtonConfig,
+} from "../../../../common/challengeDialogFooter";
 
-import { FragmentModalHeader, HeaderButtonType } from "../../../../common/modalHeader";
+import { ChallengeDialogHeader, HeaderButtonType } from "../../../../common/challengeDialogHeader";
 import {
   ACCOUNT_SETTINGS_SECURITY_PATH,
   AUTH_REDIRECT_URL_SIGNIFIER,
@@ -62,7 +66,7 @@ const ModalAccountRestoresPolicyUpsell: React.FC<ModalFragmentProps> = ({
     await dismissTemporary();
 
     // The `_self` target opens the redirect URL in the current page.
-    window.open(ACCOUNT_SETTINGS_SECURITY_PATH + AUTH_REDIRECT_URL_SIGNIFIER, "_self");
+    window?.open(ACCOUNT_SETTINGS_SECURITY_PATH + AUTH_REDIRECT_URL_SIGNIFIER, "_self");
   };
 
   /*
@@ -72,7 +76,11 @@ const ModalAccountRestoresPolicyUpsell: React.FC<ModalFragmentProps> = ({
   const positiveButton: FooterButtonConfig = {
     // Show a spinner as the button content when a request is in flight.
     content: requestInFlight ? (
-      <span className="spinner spinner-xs spinner-no-margin" />
+      <ProgressCircle
+        variant="Indeterminate"
+        size="Small"
+        ariaLabel={resources.Action.SetUpAuthenticatorAccountRestoresPolicyUpsell}
+      />
     ) : (
       resources.Action.SetUpAuthenticatorAccountRestoresPolicyUpsell
     ),
@@ -87,30 +95,24 @@ const ModalAccountRestoresPolicyUpsell: React.FC<ModalFragmentProps> = ({
 
   return (
     <React.Fragment>
-      <FragmentModalHeader
+      <ChallengeDialogHeader
         headerText={resources.Header.AccountRestoresPolicyUpsell}
         buttonType={HeaderButtonType.CLOSE}
         buttonAction={closeModalAndDismissTemporary}
         buttonEnabled
         headerInfo={null}
       />
-      <Modal.Body>
+      <DialogBody>
         <div className="modal-lock-icon" />
 
-        <p
-          className="modal-margin-bottom-sm"
-          // We need to do this since the translated text injects tags. There
-          // should be no vulnerability since we control the translated text.
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{
-            __html: resources.Description.AccountRestoresPolicyUpsellMessageBody(
-              ACCOUNT_SETTINGS_SECURITY_PATH,
-            ),
-          }}
-        />
-        <p className="text-error xsmall">{requestError}</p>
-      </Modal.Body>
-      <FragmentModalFooter positiveButton={positiveButton} negativeButton={null} />
+        <p className="modal-margin-bottom-sm">
+          {resources.Description.AccountRestoresPolicyUpsellMessageBody(
+            ACCOUNT_SETTINGS_SECURITY_PATH,
+          )}
+        </p>
+        <p className="text-caption-small content-system-alert xsmall">{requestError}</p>
+      </DialogBody>
+      <ChallengeDialogFooter positiveButton={positiveButton} negativeButton={null} />
     </React.Fragment>
   );
 };

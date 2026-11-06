@@ -1,40 +1,17 @@
 import React from "react";
 import { FormControl, FormGroup } from "react-style-guide";
 import "../../../css/common/inputFieldConcealed.css";
-import { RequestService } from "../../common/request";
 import {
   handleKeyDown,
   InputValidator,
   validateAndSetStateForInput,
+  validateChained,
+  validateEquals,
   validateTrue,
 } from "./inputValidation";
-import {
-  AccountSecurityPromptResources,
-  mapPasswordValidationStatusToResource,
-} from "../accountSecurityPrompt/constants/resources";
 
 export type { InputValidator };
-export { validateTrue };
-
-/**
- * Returns null (no error) if the argument is an acceptable password (meets
- * certain requirements and does not match the user's username).
- */
-export const validatePassword =
-  (
-    requestService: RequestService,
-    resources: AccountSecurityPromptResources,
-    username: string,
-    defaultErrorMessage: string,
-  ): InputValidator =>
-  async (value: string) => {
-    const result = await requestService.password.validate(username, value);
-    if (result.isError) {
-      return defaultErrorMessage;
-    }
-
-    return mapPasswordValidationStatusToResource(resources, result.value);
-  };
+export { validateChained, validateEquals, validateTrue };
 
 /**
  * Returns true if the value looks like an email address.
@@ -52,37 +29,6 @@ export const validateEmailAddress =
     }
 
     return Promise.resolve(errorMessage);
-  };
-
-/**
- * Returns null (no error) if the argument equals some target value.
- */
-export const validateEquals =
-  (errorMessage: string, target: string): InputValidator =>
-  async (value: string) => {
-    if (value === target) {
-      return Promise.resolve(null);
-    }
-
-    return Promise.resolve(errorMessage);
-  };
-
-/**
- * Returns null (no error) if all the passed input validators return null for
- * the argument (after being applied in sequence).
- */
-export const validateChained =
-  (...inputValidators: InputValidator[]): InputValidator =>
-  async (value: string) => {
-    for (let i = 0; i < inputValidators.length; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
-      const errorMessage = await inputValidators[i]!(value);
-      if (errorMessage !== null) {
-        return errorMessage;
-      }
-    }
-
-    return null;
   };
 
 type Props = {

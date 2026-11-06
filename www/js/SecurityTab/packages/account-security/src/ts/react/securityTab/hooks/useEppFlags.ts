@@ -9,9 +9,7 @@ const useEppFlags = () => {
 
   const { isEppEnabled } = useSecurityTabExperiment();
 
-  const metadataAllowsEpp =
-    !!twoStepVerificationMetadata?.isSettingsTabRedesignEnabled &&
-    !!twoStepVerificationMetadata?.isEppUIEnabled;
+  const metadataAllowsEpp = !!twoStepVerificationMetadata?.isEppUIEnabled;
 
   const shouldShowEppCard = metadataAllowsEpp && (isEppEnabled ?? false) && !CurrentUser.isUnder13;
 

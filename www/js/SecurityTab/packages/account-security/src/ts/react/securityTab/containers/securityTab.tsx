@@ -4,7 +4,6 @@ import { Modal } from "react-style-guide";
 import { hybridResponseService } from "core-roblox-utilities";
 import TwoStepVerification from "../components/twoStepVerification";
 import useSecurityTabContext from "../hooks/useSecurityTabContext";
-import useRedesignFlags from "../hooks/useRedesignFlags";
 import useEppFlags from "../hooks/useEppFlags";
 import { SESSION_MANAGEMENT_ELEMENT_ID, STATE_PROPERTIES_ELEMENT_ID } from "../app.config";
 import { SecurityTabActionType } from "../store/action";
@@ -15,7 +14,6 @@ import ModalAuthenticatorEnable from "../components/modal/authenticatorEnable";
 import ModalTwoStepDisable from "../components/modal/twoStepDisable";
 import ModalTwoStepDisableAll from "../components/modal/twoStepDisableAll";
 import ModalTwoStepEnableWarning from "../components/modal/twoStepEnableWarning";
-import ModalTurnOnAuthenticator from "../components/modal/turnOnAuthenticator";
 import ModalSecurityKeyEnable from "../components/modal/securityKeyEnable";
 import ModalSecurityKeyError from "../components/modal/securityKeyError";
 import ModalSecurityKeyName from "../components/modal/securityKeyName";
@@ -66,7 +64,6 @@ const getModalSchema = (modalState: ModalState): ModalSchema | null => {
       ModalState.SECURITY_KEY_DELETED_WARNING,
       createModalSchema(ModalSecurityKeyDeletedWarning, true),
     ],
-    [ModalState.TURN_ON_AUTHENTICATOR, createModalSchema(ModalTurnOnAuthenticator, true)],
     [ModalState.SECURITY_KEY_ENABLE, createModalSchema(ModalSecurityKeyEnable, true)],
     [ModalState.SECURITY_KEY_ERROR, createModalSchema(ModalSecurityKeyError, true)],
     [ModalState.SECURITY_KEY_NAME, createModalSchema(ModalSecurityKeyName, true)],
@@ -101,7 +98,6 @@ const SecurityTabContainer: React.FC = () => {
     dispatch,
   } = useSecurityTabContext();
 
-  const { isRedesignEnabled, isSecurityTabRedesignEnabled } = useRedesignFlags();
   const { shouldShowEppCard, isEppEnabled, isEppEligibilityPending } = useEppFlags();
 
   /*
@@ -346,7 +342,7 @@ const SecurityTabContainer: React.FC = () => {
       ) : (
         <React.Fragment>
           <div
-            className={isRedesignEnabled ? "settings-redesign-enabled" : ""}
+            className="settings-redesign-enabled"
             style={pendingEppDisplayStyle}
             data-testid="security-tab-content"
           >

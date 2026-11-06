@@ -3,7 +3,7 @@
  */
 
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const authApiUrl = EnvironmentUrls.authApi ?? URL_NOT_FOUND;
@@ -19,7 +19,7 @@ export type getXboxConnectionReturnType = {
 /**
  * Request Type: `GET`.
  */
-export const GET_XBOX_CONNECTION_CONFIG: UrlConfig = {
+export const GET_XBOX_CONNECTION_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v1/xbox/connection`,
   timeout: 10000,
@@ -30,7 +30,7 @@ export type disconnectXboxReturnType = void;
 /**
  * Request Type: `POST`.
  */
-export const DISCONNECT_XBOX_CONFIG: UrlConfig = {
+export const DISCONNECT_XBOX_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${authApiUrl}/v1/xbox/disconnect`,
   timeout: 10000,

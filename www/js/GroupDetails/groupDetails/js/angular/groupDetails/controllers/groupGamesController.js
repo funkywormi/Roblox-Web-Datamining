@@ -101,9 +101,14 @@ function groupGamesController($scope, $log, groupGamesService, groupUtilityServi
         }
     });
 
-    $scope.loadGroupExperiencesRedesignExperiment = async () => {
-        const isEnabled = await groupExperimentsService.isGroupExperiencesRedesignExperimentEnabled();
-        $scope.isGroupExperiencesRedesignEnabled = Boolean(isEnabled);
+    // The experiment resolves outside Angular; $q.when runs a digest so the section
+    // renders instead of staying blank until some unrelated $http call finishes.
+    $scope.loadGroupExperiencesRedesignExperiment = () => {
+        return $q
+            .when(groupExperimentsService.isGroupExperiencesRedesignExperimentEnabled())
+            .then(isEnabled => {
+                $scope.isGroupExperiencesRedesignEnabled = Boolean(isEnabled);
+            });
     };
 
     const init = function () {

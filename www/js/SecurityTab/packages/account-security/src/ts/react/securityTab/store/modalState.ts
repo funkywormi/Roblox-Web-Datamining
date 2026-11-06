@@ -20,9 +20,6 @@ enum ModalState {
   // Modal to warn user they are about to delete their security keys:
   SECURITY_KEY_DELETED_WARNING = "SECURITY_KEY_DELETED_WARNING",
 
-  // Modal that tells user to turn on authenticator before enabling security keys:
-  TURN_ON_AUTHENTICATOR = "TURN_ON_AUTHENTICATOR",
-
   // Modal to enable security key:
   SECURITY_KEY_ENABLE = "SECURITY_KEY_ENABLE",
 

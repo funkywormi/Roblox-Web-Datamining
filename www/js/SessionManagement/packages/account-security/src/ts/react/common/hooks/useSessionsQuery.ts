@@ -34,16 +34,16 @@ async function getFullPageOfSessions(): Promise<GetSessionsReturnType> {
   return { sessions, hasMore, nextCursor };
 }
 
-export const useSessionsQuery = (): UseQueryResult<
-  GetSessionsReturnType,
-  SessionManagementError | null
-> =>
+export const useSessionsQuery = (
+  enabled = true,
+): UseQueryResult<GetSessionsReturnType, SessionManagementError | null> =>
   useQuery({
     queryKey: SESSIONS_QUERY_KEY,
     queryFn: getFullPageOfSessions,
+    enabled,
   });
 
-export const useTrustedSessionCount = (): number | undefined => {
-  const { data } = useSessionsQuery();
+export const useTrustedSessionCount = (enabled = true): number | undefined => {
+  const { data } = useSessionsQuery(enabled);
   return data?.sessions.filter(s => s.isTrustedSession).length;
 };

@@ -1,6 +1,5 @@
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Appeal } from "../../util/violations";
-import { useUser } from "../../../../api/useUser";
 import Timestamp from "../Timestamp";
 
 /**
@@ -10,14 +9,11 @@ import Timestamp from "../Timestamp";
 const AppealRequestedItem = ({
   appeal,
   isFromSomeoneElse,
-  submitterId,
 }: {
   appeal: Appeal;
   isFromSomeoneElse: boolean;
-  submitterId: number;
 }) => {
   const { translate } = useTranslation();
-  const { data: submitter } = useUser(submitterId, { enabled: isFromSomeoneElse });
 
   return (
     <div className="flex flex-col gap-xxsmall">
@@ -25,9 +21,9 @@ const AppealRequestedItem = ({
         {translate(isFromSomeoneElse ? "Label.AppealRequested" : "Header.AppealReceived")}
       </span>
       <Timestamp timestamp={appeal.create_time} />
-      {isFromSomeoneElse && submitter?.name && (
+      {isFromSomeoneElse && appeal.submitter_username && (
         <p className="text-body-medium content-default" style={{ wordBreak: "break-word" }}>
-          {translate("Label.AppealSentBy", { username: submitter.name })}
+          {translate("Label.AppealSentBy", { username: appeal.submitter_username })}
         </p>
       )}
 

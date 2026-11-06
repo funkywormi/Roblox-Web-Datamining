@@ -59,13 +59,7 @@ const flattenAppealsHistory = (violation: EnrichedViolation) => {
      */
     if (appeal.state !== Appeal.state.APPEAL_STATE_EDUCATIONAL_PASS) {
       flat.push({
-        content: (
-          <AppealRequestedItem
-            appeal={appeal}
-            isFromSomeoneElse={isFromSomeoneElse}
-            submitterId={submitterId}
-          />
-        ),
+        content: <AppealRequestedItem appeal={appeal} isFromSomeoneElse={isFromSomeoneElse} />,
         id: `${appeal.uid}-initial`,
       });
     }

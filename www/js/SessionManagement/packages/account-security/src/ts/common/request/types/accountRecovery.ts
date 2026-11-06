@@ -2,8 +2,8 @@
  * Account Recovery
  */
 
-import { EnvironmentUrls } from "Roblox";
-import { UrlConfig } from "core-utilities";
+import EnvironmentUrls from "@rbx/environment-urls";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const apiGatewayUrl = EnvironmentUrls.apiGatewayUrl ?? URL_NOT_FOUND;
@@ -50,7 +50,7 @@ export type RequestRecoveryReturnType = {
 /**
  * Request Type: `POST`.
  */
-export const REQUEST_RECOVERY_CONFIG: UrlConfig = {
+export const REQUEST_RECOVERY_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountRecoveryServiceUrl}/v1/request-recovery`,
   timeout: 10000,
@@ -59,6 +59,7 @@ export const REQUEST_RECOVERY_CONFIG: UrlConfig = {
 export enum ContactMethodType {
   Email = 2,
   Phone = 3,
+  RecoveryAccount = 4,
 }
 
 export function contactMethodTypeToString(value: ContactMethodType): string {
@@ -67,6 +68,8 @@ export function contactMethodTypeToString(value: ContactMethodType): string {
       return "Email";
     case ContactMethodType.Phone:
       return "Phone";
+    case ContactMethodType.RecoveryAccount:
+      return "RecoveryAccount";
     default:
       return "Unknown";
   }
@@ -77,7 +80,7 @@ export type SendCodeReturnType = {};
 /**
  * Request Type: `POST`
  */
-export const SEND_CODE_CONFIG: UrlConfig = {
+export const SEND_CODE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountRecoveryServiceUrl}/v1/send-code`,
   timeout: 10000,
@@ -88,7 +91,7 @@ export type ResendCodeReturnType = {};
 /**
  * Request Type: `POST`
  */
-export const RESEND_CODE_CONFIG: UrlConfig = {
+export const RESEND_CODE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountRecoveryServiceUrl}/v1/resend-code`,
   timeout: 10000,
@@ -99,9 +102,72 @@ export type VerifyCodeReturnType = {};
 /**
  * Request Type: `POST`
  */
-export const VERIFY_CODE_CONFIG: UrlConfig = {
+export const VERIFY_CODE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountRecoveryServiceUrl}/v1/verify-code`,
+  timeout: 10000,
+};
+
+export const RecoveryIntentStatus = {
+  Pending: "PENDING",
+  Approved: "APPROVED",
+  Denied: "DENIED",
+  Redeemed: "REDEEMED",
+  Invalid: "INVALID",
+} as const;
+
+export type RecoveryIntentStatus = (typeof RecoveryIntentStatus)[keyof typeof RecoveryIntentStatus];
+
+export type GetRecoveryIntentStatusReturnType = {
+  recoveryIntentId: string;
+  status: RecoveryIntentStatus;
+};
+
+export type RecoveryIntent = {
+  recoveryIntentId: string;
+  mainAccountUserId: number;
+  createdTime: string;
+};
+
+export type GetRecoveryIntentsResponse = {
+  pendingRecoveryIntents: RecoveryIntent[];
+};
+
+export type RecoveryIntentRequest = {
+  recoveryIntentId: string;
+};
+
+export const GET_RECOVERY_INTENT_STATUS_CONFIG: RequestConfig = {
+  withCredentials: true,
+  url: `${accountRecoveryServiceUrl}/v1/get-recovery-intent-status`,
+  timeout: 10000,
+};
+
+export const GET_RECOVERY_INTENTS_CONFIG: RequestConfig = {
+  withCredentials: true,
+  url: `${accountRecoveryServiceUrl}/v1/get-recovery-intents`,
+  timeout: 10000,
+};
+
+export const APPROVE_RECOVERY_INTENT_CONFIG: RequestConfig = {
+  withCredentials: true,
+  url: `${accountRecoveryServiceUrl}/v1/approve-recovery-intent`,
+  timeout: 10000,
+};
+
+export const DENY_RECOVERY_INTENT_CONFIG: RequestConfig = {
+  withCredentials: true,
+  url: `${accountRecoveryServiceUrl}/v1/deny-recovery-intent`,
+  timeout: 10000,
+};
+
+export type VerifyRecoveryIntentReturnType = {
+  status: typeof RecoveryIntentStatus.Pending | typeof RecoveryIntentStatus.Redeemed;
+};
+
+export const VERIFY_RECOVERY_INTENT_CONFIG: RequestConfig = {
+  withCredentials: true,
+  url: `${accountRecoveryServiceUrl}/v1/verify-recovery-intent`,
   timeout: 10000,
 };
 
@@ -110,7 +176,7 @@ export type VerifyBackupCodeReturnType = {};
 /**
  * Request Type: `POST`
  */
-export const VERIFY_BACKUP_CODE_CONFIG: UrlConfig = {
+export const VERIFY_BACKUP_CODE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountRecoveryServiceUrl}/v1/verify-backup-code`,
   timeout: 10000,
@@ -123,6 +189,7 @@ export enum RecoveryMethodType {
   HistoricalEmail = 3,
   Phone = 4,
   BackupCode = 10,
+  RecoveryAccount = 11,
 }
 
 export type ContinueRecoveryReturnType = {
@@ -135,7 +202,7 @@ export type ContinueRecoveryReturnType = {
 /**
  * Request Type: `POST`
  */
-export const CONTINUE_RECOVERY_CONFIG: UrlConfig = {
+export const CONTINUE_RECOVERY_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountRecoveryServiceUrl}/v1/continue-recovery`,
   timeout: 10000,
@@ -149,7 +216,7 @@ export type RecoverySessionMetadataReturnType = {
 /**
  * Request Type: `POST`
  */
-export const RECOVERY_SESSION_METADATA_CONFIG: UrlConfig = {
+export const RECOVERY_SESSION_METADATA_CONFIG: RequestConfig = {
   url: `${accountRecoveryServiceUrl}/v1/recovery-session-metadata`,
   timeout: 10000,
 };
@@ -159,7 +226,7 @@ export type SetEmailReturnType = {};
 /**
  * Request Type: `POST`
  */
-export const SET_EMAIL_CONFIG: UrlConfig = {
+export const SET_EMAIL_CONFIG: RequestConfig = {
   url: `${accountRecoveryServiceUrl}/v1/set-email`,
   timeout: 10000,
 };
@@ -171,7 +238,7 @@ export type GetCurrentTwoStepMethodReturnType = {
 /**
  * Request Type: `GET`
  */
-export const GET_CURRENT_TWO_STEP_METHOD_CONFIG: UrlConfig = {
+export const GET_CURRENT_TWO_STEP_METHOD_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountRecoveryServiceUrl}/v1/get-current-two-step-method`,
   timeout: 10000,
@@ -184,8 +251,52 @@ export type DisableTwoStepMethodReturnType = {
 /**
  * Request Type: `POST`
  */
-export const DISABLE_TWO_STEP_METHOD_CONFIG: UrlConfig = {
+export const DISABLE_TWO_STEP_METHOD_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountRecoveryServiceUrl}/v1/disable-two-step-method`,
+  timeout: 10000,
+};
+
+export enum CredentialCategory {
+  Email = "EMAIL",
+  TwoStepVerification = "TWO_STEP_VERIFICATION",
+  EnhancedProtectionProgram = "ENHANCED_PROTECTION_PROGRAM",
+  Passkey = "PASSKEY",
+  BackupCodes = "BACKUP_CODES",
+  BillingEmail = "BILLING_EMAIL",
+  PhoneNumber = "PHONE_NUMBER",
+}
+
+export type CredentialToInvalidate = {
+  timeAdded: number;
+  value: string;
+};
+
+export type CredentialCategoryGroup = {
+  category: CredentialCategory;
+  credentials: CredentialToInvalidate[];
+};
+
+export type GetCredentialsToInvalidateReturnType = {
+  credentialsToInvalidate: CredentialCategoryGroup[];
+};
+
+/**
+ * Request Type: `GET`
+ */
+export const GET_CREDENTIALS_TO_INVALIDATE_CONFIG: RequestConfig = {
+  withCredentials: true,
+  url: `${accountRecoveryServiceUrl}/v1/get-credentials-to-invalidate`,
+  timeout: 10000,
+};
+
+export type InvalidateCredentialsReturnType = {};
+
+/**
+ * Request Type: `POST`
+ */
+export const INVALIDATE_CREDENTIALS_CONFIG: RequestConfig = {
+  withCredentials: true,
+  url: `${accountRecoveryServiceUrl}/v1/invalidate-credentials`,
   timeout: 10000,
 };

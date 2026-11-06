@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback } from 'react';
-import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { InfiniteData, useQueryClient } from '@tanstack/react-query';
 import { useHistory } from 'react-router-dom';
 import { Loading, useSystemFeedback } from 'react-style-guide';
 import { Button } from '@rbx/foundation-ui';
@@ -15,8 +15,8 @@ import { logGroupForumsClickEvent } from '../../shared/utils/logging';
 import { useAnnouncementTracking } from '../hooks/useAnnouncementTracking';
 import NativeFooter from '../../shared/components/NativeFooter';
 import updateReaction from '../../shared/utils/reactionUtils';
-
-const ANNOUNCEMENTS_PER_PAGE = 10;
+import useAnnouncementArchiveQuery from '../hooks/useAnnouncementArchiveQuery';
+import queryKeys from '../utils/queryKeys';
 
 type AnnouncementArchiveProps = {
   groupId: number;
@@ -45,18 +45,7 @@ const AnnouncementArchive = ({
     isFetchingNextPage,
     isLoading,
     refetch
-  } = useInfiniteQuery<AnnouncementsPageResponse<AnnouncementModel>, Error>({
-    queryKey: ['announcement-archive', groupId],
-    queryFn: ({ pageParam }) => {
-      const cursor = pageParam as string | undefined;
-      return announcementsService.getAnnouncements(groupId, {
-        cursor,
-        limit: ANNOUNCEMENTS_PER_PAGE
-      });
-    },
-    getNextPageParam: (page: AnnouncementsPageResponse<AnnouncementModel>) =>
-      page.nextPageCursor || undefined
-  });
+  } = useAnnouncementArchiveQuery(groupId);
 
   const announcements = (data?.pages ?? []).reduce<AnnouncementModel[]>(
     (items, page) => items.concat(page.data),
@@ -137,7 +126,7 @@ const AnnouncementArchive = ({
           isReactionAdded: togglingOn
         });
         queryClient.setQueryData<InfiniteData<AnnouncementsPageResponse<AnnouncementModel>>>(
-          ['announcement-archive', groupId],
+          queryKeys.getAnnouncementArchiveKey(groupId),
           archiveData => {
             if (!archiveData) {
               return archiveData;

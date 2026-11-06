@@ -35,7 +35,6 @@ const CaptchaV2: FC = () => {
   const {
     state: {
       challengeId,
-      mode,
       renderInline,
       resources,
       requestService,
@@ -132,7 +131,7 @@ const CaptchaV2: FC = () => {
   const verifyRef = useRef<(isRetry: boolean) => Promise<void>>(() => Promise.resolve());
   const verify = useCallback(
     async (isRetry: boolean): Promise<void> => {
-      const result = await requestService.captchaV2.submitCaptcha(challengeId, mode);
+      const result = await requestService.captchaV2.submitCaptcha(challengeId);
 
       if (!result.isError) {
         // On a re-verify (isRetry) this is the backend's verdict on a solved
@@ -174,15 +173,7 @@ const CaptchaV2: FC = () => {
 
       invalidate(ErrorCode.UNKNOWN);
     },
-    [
-      challengeId,
-      mode,
-      complete,
-      invalidate,
-      requestService.captchaV2,
-      showChallenge,
-      eventService,
-    ],
+    [challengeId, complete, invalidate, requestService.captchaV2, showChallenge, eventService],
   );
   verifyRef.current = verify;
 

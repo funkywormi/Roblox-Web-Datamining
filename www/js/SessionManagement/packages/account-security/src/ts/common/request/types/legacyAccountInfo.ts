@@ -1,6 +1,6 @@
-import { UrlConfig } from "core-utilities";
+import type { RequestConfig } from "../requestConfig";
 
-export const LegacyAccountInfoUrlConfig: UrlConfig = {
+export const LegacyAccountInfoUrlConfig: RequestConfig = {
   url: "/my/settings/json",
   withCredentials: true,
 };

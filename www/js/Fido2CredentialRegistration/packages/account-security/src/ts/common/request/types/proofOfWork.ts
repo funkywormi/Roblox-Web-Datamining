@@ -1,5 +1,5 @@
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const apiGatewayUrl = EnvironmentUrls.apiGatewayUrl ?? URL_NOT_FOUND;
@@ -24,7 +24,7 @@ export type GetPuzzleReturnType = {
 /**
  * Request Type: `GET`.
  */
-export const GET_PUZZLE_CONFIG: UrlConfig = {
+export const GET_PUZZLE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${proofOfWorkServiceUrl}/v1/pow-puzzle`,
   timeout: 10000,
@@ -39,7 +39,7 @@ export type VerifyPuzzleReturnType = {
 /**
  * Request Type: `POST`.
  */
-export const VERIFY_PUZZLE_CONFIG: UrlConfig = {
+export const VERIFY_PUZZLE_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${proofOfWorkServiceUrl}/v1/pow-puzzle`,
   timeout: 10000,

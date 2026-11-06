@@ -1,5 +1,3 @@
-import { TranslationConfig } from "react-utilities";
-
 export const FEATURE_NAME = "AccountSecurityPrompt" as const;
 export const LOG_PREFIX = "Account Security Prompt:" as const;
 export const ROOT_ELEMENT_ID = "account-security-prompt-container" as const;
@@ -46,11 +44,4 @@ export const EVENT_CONSTANTS = {
   },
 } as const;
 
-/**
- * Translations required by this web app (remember to also edit
- * `bundle.config.js` if changing this configuration).
- */
-export const TRANSLATION_CONFIG: TranslationConfig = {
-  common: [],
-  feature: "Feature.AccountSecurityPrompt",
-};
+export { FEATURE_NAMESPACE, PROVIDER_NAMESPACES } from "./translations";

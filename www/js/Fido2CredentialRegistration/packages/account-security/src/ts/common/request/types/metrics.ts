@@ -1,5 +1,5 @@
 import EnvironmentUrls from "@rbx/environment-urls";
-import { UrlConfig } from "@rbx/core-scripts/http";
+import type { RequestConfig } from "../requestConfig";
 
 const URL_NOT_FOUND = "URL_NOT_FOUND";
 const apiGatewayUrl = EnvironmentUrls.apiGatewayUrl ?? URL_NOT_FOUND;
@@ -371,6 +371,9 @@ export type Metric =
         // such as iOS, Android, etc.
         // eslint-disable-next-line camelcase
         application_type: string;
+        // `action_type` is  the canonical action that trigered the challenge.
+        // eslint-disable-next-line camelcase
+        action_type: string;
       };
     }
   | {
@@ -383,6 +386,9 @@ export type Metric =
         // such as iOS, Android, etc.
         // eslint-disable-next-line camelcase
         application_type: string;
+        // `action_type` is  the canonical action that trigered the challenge.
+        // eslint-disable-next-line camelcase
+        action_type: string;
       };
     }
   | {
@@ -393,6 +399,9 @@ export type Metric =
         // such as iOS, Android, etc.
         // eslint-disable-next-line camelcase
         application_type: string;
+        // `action_type` is  the canonical action that trigered the challenge.
+        // eslint-disable-next-line camelcase
+        action_type: string;
       };
     }
   | {
@@ -423,7 +432,7 @@ export type Metric =
 /**
  * Request Type: `POST`.
  */
-export const RECORD_METRICS_CONFIG: UrlConfig = {
+export const RECORD_METRICS_CONFIG: RequestConfig = {
   withCredentials: true,
   url: `${accountSecurityServiceUrl}/v1/metrics/record`,
   timeout: 10000,

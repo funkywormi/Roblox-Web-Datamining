@@ -6,8 +6,10 @@ import "../../../css/common/challengeText.css";
 type Props = {
   open: boolean;
   onClose: () => unknown;
-  /** Escape closes the dialog unless disabled. The backdrop never does. */
+  /** Escape closes the dialog unless disabled. */
   isKeyboardDismissible?: boolean;
+  /** A backdrop click closes the dialog only when enabled. */
+  isBackdropDismissible?: boolean;
   /** Screen-reader title for dialogs without a `ChallengeDialogHeader`. */
   hiddenTitle?: string;
   className?: string;
@@ -18,12 +20,13 @@ const preventDefault = (event: Event) => event.preventDefault();
 
 /**
  * Foundation replacement for the react-style-guide `Modal` used by challenges, matching its
- * `backdrop="static"` behavior. Pair with `ChallengeDialogHeader` and `ChallengeDialogFooter`.
+ * `backdrop="static"` behavior unless `isBackdropDismissible` is set. Pair with `ChallengeDialogHeader` and `ChallengeDialogFooter`.
  */
 const ChallengeDialog: React.FC<Props> = ({
   open,
   onClose,
   isKeyboardDismissible = true,
+  isBackdropDismissible = false,
   hiddenTitle,
   className,
   children,
@@ -47,8 +50,8 @@ const ChallengeDialog: React.FC<Props> = ({
       data-testid="challenge-dialog"
       // Radix props forwarded through DialogContent's ...props spread (not in its types).
       {...({
-        onPointerDownOutside: preventDefault,
-        onInteractOutside: preventDefault,
+        onPointerDownOutside: isBackdropDismissible ? undefined : preventDefault,
+        onInteractOutside: isBackdropDismissible ? undefined : preventDefault,
         onEscapeKeyDown: isKeyboardDismissible ? undefined : preventDefault,
       } as Record<string, unknown>)}
     >

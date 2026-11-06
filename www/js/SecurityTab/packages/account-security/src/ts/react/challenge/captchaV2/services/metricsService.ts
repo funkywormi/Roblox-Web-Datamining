@@ -1,13 +1,16 @@
 import EventTimer from "../../../../common/eventTimer";
 import { RequestServiceDefault } from "../../../../common/request";
 import { MetricName } from "../../../../common/request/types/metrics";
-import { FEATURE_NAME, METRICS_CONSTANTS } from "../app.config";
+import { DEFAULT_ACTION_TYPE, FEATURE_NAME, METRICS_CONSTANTS } from "../app.config";
 
 /**
  * A class encapsulating the metrics fired by this web app.
  */
 export class MetricsServiceDefault {
   private readonly appType: string;
+
+  // Canonical action that trigered the challenge.
+  private readonly actionType: string;
 
   private readonly challengeSolveTimeSequenceName: string;
 
@@ -17,8 +20,17 @@ export class MetricsServiceDefault {
 
   private readonly requestServiceDefault: RequestServiceDefault;
 
-  constructor(appType: string | undefined, requestServiceDefault: RequestServiceDefault) {
+  constructor(
+    appType: string | undefined,
+    requestServiceDefault: RequestServiceDefault,
+    actionType?: string,
+  ) {
     this.appType = appType ?? "unknown";
+    // `||` (not `??`) is intentional: GCS sends an empty string for an
+    // unresolved action type, which must also fall back to the default so the
+    // metric label is always an allow-listed value.
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    this.actionType = actionType || DEFAULT_ACTION_TYPE;
     this.requestServiceDefault = requestServiceDefault;
     this.eventTimer = new EventTimer();
     this.challengeSolveTimeSequenceName = `${FEATURE_NAME}_${METRICS_CONSTANTS.sequence.challengeSolveTime}`;
@@ -63,6 +75,7 @@ export class MetricsServiceDefault {
         labelValues: {
           event_type: `${FEATURE_NAME}_${metricName}`,
           application_type: this.appType,
+          action_type: this.actionType,
         },
       })
       // Swallow errors if metrics failed to send; this should not be fatal.
@@ -80,6 +93,7 @@ export class MetricsServiceDefault {
           labelValues: {
             event_type: `${FEATURE_NAME}_${metricName}`,
             application_type: this.appType,
+            action_type: this.actionType,
           },
         })
         // Swallow errors if metrics failed to send; this should not be fatal.
@@ -99,6 +113,7 @@ export class MetricsServiceDefault {
           value: eventTime,
           labelValues: {
             application_type: this.appType,
+            action_type: this.actionType,
           },
         })
         // Swallow errors if metrics failed to send; this should not be fatal.

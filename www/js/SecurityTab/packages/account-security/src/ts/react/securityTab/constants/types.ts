@@ -54,12 +54,6 @@ export type ModalStateAndProps =
       };
     }
   | {
-      modalState: ModalState.TURN_ON_AUTHENTICATOR;
-      additionalModalProps: {
-        enableAuthenticatorFunction: (emailVerified: boolean) => void;
-      };
-    }
-  | {
       modalState: ModalState.SECURITY_KEY_ENABLE;
       additionalModalProps: {
         creationOptions: CredentialCreationOptions;

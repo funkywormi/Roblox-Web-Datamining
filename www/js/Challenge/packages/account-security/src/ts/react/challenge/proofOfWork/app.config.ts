@@ -7,7 +7,7 @@ export const LOG_PREFIX = "Proof-of-Work:" as const;
  */
 export const TRANSLATION_NAMESPACES = [
   "Feature.ProofOfWorkChallenge",
-  "CommonUI.Messages",
+  "CommonUI.Controls",
 ] as const;
 
 /**

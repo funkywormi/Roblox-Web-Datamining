@@ -50,7 +50,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
         Verify: translate("Action.Dialog.Verify"),
         VerifyCode: translate("Action.Dialog.VerifyCode") || "Verify Code",
       },
-      Clear: translate("Action.Clear") || "Clear",
       Create: translate("Action.Create") || "Create",
       Delete: translate("Action.Delete") || "Delete",
       Copy: translate("Action.Copy") || "Copy",
@@ -61,7 +60,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
       EnableEnhancedProtectionProgram:
         translate("Action.EnableEnhancedProtectionProgram") ||
         "Enroll in Enhanced Protection Program",
-      Generate: translate("Action.Generate"),
       ManagePasskey: translate("Action.ManagePasskey"),
       SocialDisconnect: translate("Action.SocialDisconnect"),
       TurnOff: translate("Action.TurnOff"),
@@ -91,9 +89,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
             ? "Description.Dialog.MissingEmailTwoStepVerificationU13"
             : "Description.Dialog.MissingEmailTwoStepVerification",
         ),
-        MissingPhoneTwoStepVerification: translate(
-          "Description.Dialog.MissingPhoneTwoStepVerification",
-        ),
         ChangeEmailWarning: translate("Description.Dialog.ChangeEmailWarning"),
         RecoveryCodesGenerated: translate("Description.Dialog.RecoveryCodesGenerated"),
         SmsInstructions:
@@ -111,7 +106,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
         ),
       },
       SecurityKey: {
-        AuthenticatorOff: translate("Description.SecurityKey.AuthenticatorOff"),
         AuthenticatorDeletion: translate("Description.SecurityKey.Delete"),
         AuthenticatorDeletionAlternate: translate("Description.SecurityKey.DeleteWarning"),
         DeleteSuccess: (deletedKeyList: string) =>
@@ -128,8 +122,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
         translate("Description.SecurityWarning", { boldStart, boldEnd }),
       SecurityWarningShort: (boldStart: string, boldEnd: string) =>
         translate("Description.SecurityWarningShort", { boldStart, boldEnd }),
-      SmsTwoStepVerificationSecondaryEnabled: (phoneNumber: string) =>
-        translate("Description.SmsTwoStepVerificationSecondaryEnabled", { phoneNumber }),
       TurnOffEnhancedProtectionProgram: translate("Description.TurnOffEnhancedProtectionProgram"),
       TurnOnLowerSecurity2SVMethod: translate("Description.TurnOnLowerSecurity2SVMethod"),
       TwoStepVerificationSecondaryEnabled: (email: string) =>
@@ -146,7 +138,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
         OneOptionAtATime: translate("Heading.Dialog.OneOptionAtATime"),
         PasswordVerification: translate("Heading.Dialog.PasswordVerification"),
         VerifiedEmailOrPhoneRequired: translate("Heading.Dialog.VerifiedEmailOrPhoneRequired"),
-        VerifiedPhoneRequired: translate("Heading.Dialog.VerifiedPhoneRequired"),
       },
       GenerateNewRecoveryCodes: translate("Heading.GenerateNewRecoveryCodes"),
       ManageYourKeys: translate("Heading.ManageYourKeys"),
@@ -163,7 +154,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
       },
       SecurityKeyRegistered: translate("Heading.SecurityKeyRegistered"),
       SomethingWentWrong: translate("Heading.SomethingWentWrong"),
-      TurnOnAuthenticator: translate("Heading.TurnOnAuthenticator"),
       TwoStepVerification: translate("Heading.TwoStepVerification"),
       Xbox: translate("Heading.Xbox"),
     },
@@ -188,8 +178,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
       },
       EmailTwoStepVerificationCodes: translate("Label.EmailTwoStepVerificationCodes"),
       EnterEmail: translate("Label.EnterEmail"),
-      GenerateNewRecoveryCodes: translate("Label.GenerateNewRecoveryCodes"),
-      GenerateRecoveryCodes: translate("Label.GenerateRecoveryCodes"),
       AddBothOfThese: translate("Label.AddBothOfThese") || "Add both of these:",
       BackupCodes: translate("Label.BackupCodes") || "Backup codes",
       BackupCodesDescription:
@@ -228,10 +216,7 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUnder13
             registeredKeysCount,
             totalKeysCount,
           }),
-        TurnOnAuthenticator: translate("Label.SecurityKey.TurnOnAuthenticator"),
       },
-      SmsTwoStepPrerequisite: translate("Label.SmsTwoStepPrerequisite"),
-      SmsTwoStepVerificationCodes: translate("Label.SmsTwoStepVerificationCodes"),
       TwoStepPrerequisite: translate("Label.TwoStepPrerequisite"),
       TwoStepVerificationDescription: translate("Label.TwoStepVerificationDescription"),
       TwoStepVerificationEmailWarningNew: translate("Label.TwoStepVerificationEmailWarningNew"),

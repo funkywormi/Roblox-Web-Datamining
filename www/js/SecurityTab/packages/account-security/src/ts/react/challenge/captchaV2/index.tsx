@@ -26,6 +26,7 @@ export const renderChallenge: RenderChallenge = ({
   challengeId,
   appType,
   mode,
+  actionType,
   renderInline,
   onChallengeDisplayed,
   onChallengeCompleted,
@@ -39,8 +40,8 @@ export const renderChallenge: RenderChallenge = ({
 
     // Instantiate services externally to the app, which will offer future
     // flexibility (e.g. for mocking).
-    const eventService = new EventServiceDefault(challengeId);
-    const metricsService = new MetricsServiceDefault(appType, requestServiceDefault);
+    const eventService = new EventServiceDefault(challengeId, actionType);
+    const metricsService = new MetricsServiceDefault(appType, requestServiceDefault, actionType);
 
     // Render the app on the selected element.
     mountChallenge(

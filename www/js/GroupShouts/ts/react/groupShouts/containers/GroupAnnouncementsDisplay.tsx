@@ -28,7 +28,6 @@ import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProd
 import announcementRoutes from '../constants/announcementRoutes';
 import { useAnnouncementTracking } from '../hooks/useAnnouncementTracking';
 import useAnnouncementSeeMoreExposure from '../hooks/useAnnouncementSeeMoreExposure';
-import useAnnouncementArchiveExperiment from '../hooks/useAnnouncementArchiveExperiment';
 
 export type GroupAnnouncementsDisplayProps = {
   group: Group;
@@ -59,13 +58,8 @@ const GroupAnnouncementsDisplay = ({
   const { SystemFeedbackComponent, systemFeedbackService } = useSystemFeedback();
   const history = useHistory();
   const { features } = useCommunityProductFeatures();
-  const isAnnouncementArchiveEnabled = isAnnouncementArchiveFeatureEnabled(features);
-  const isAnnouncementArchiveExperimentEnabled = useAnnouncementArchiveExperiment(
-    isAnnouncementArchiveEnabled
-  );
   const canUseAnnouncementArchive =
-    isAnnouncementArchiveEnabled &&
-    isAnnouncementArchiveExperimentEnabled === true &&
+    isAnnouncementArchiveFeatureEnabled(features) &&
     !policies.isGracefulDegradationEnabled &&
     canViewAnnouncements;
   const { trackAnnouncementSeeMoreButtonClick } = useAnnouncementTracking({

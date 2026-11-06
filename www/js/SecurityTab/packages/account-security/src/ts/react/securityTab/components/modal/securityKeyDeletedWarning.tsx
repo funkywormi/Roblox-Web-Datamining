@@ -3,7 +3,6 @@ import { Modal } from "react-style-guide";
 import { ModalFragmentProps } from "../../constants/types";
 import useSecurityTabContext from "../../hooks/useSecurityTabContext";
 import ModalState from "../../store/modalState";
-import useRedesignFlags from "../../hooks/useRedesignFlags";
 
 const ModalSecurityKeyDeletedWarning: React.FC<ModalFragmentProps> = ({
   closeModal,
@@ -12,13 +11,9 @@ const ModalSecurityKeyDeletedWarning: React.FC<ModalFragmentProps> = ({
     state: { resources, modalStateAndProps },
   } = useSecurityTabContext();
 
-  const { isRedesignEnabled } = useRedesignFlags();
-
   const securityKeyText =
     (modalStateAndProps.additionalModalProps as { customMessage?: string }).customMessage ||
-    (isRedesignEnabled
-      ? resources.Description.SecurityKey.AuthenticatorDeletion
-      : resources.Description.SecurityKey.AuthenticatorOff);
+    resources.Description.SecurityKey.AuthenticatorDeletion;
 
   /*
    * Component State

@@ -1,4 +1,3 @@
-import { AxiosPromise } from "axios";
 import { parse } from "query-string";
 import { Result } from "../result";
 
@@ -81,19 +80,19 @@ export const getAxiosErrorStatusCode = (error: unknown): number | null => {
 };
 
 /**
- * Converts an Axios HTTP request into a `Result`.
+ * Converts a `requestTransport` request into a `Result`.
  */
 export const toResult = async <T, M>(
-  request: AxiosPromise<T>,
+  request: Promise<T>,
   errorEnum: M,
   additionalProcessingFunction?: (unProcessedResult: T) => T,
 ): Promise<Result<T, M[keyof M] | null>> => {
   try {
-    const response = await request;
+    const data = await request;
     if (additionalProcessingFunction !== undefined) {
-      return Result.ok(additionalProcessingFunction(response.data));
+      return Result.ok(additionalProcessingFunction(data));
     }
-    return Result.ok(response.data);
+    return Result.ok(data);
   } catch (error) {
     const errorCode = parseErrorCode(error);
     const errorStatusCode = getAxiosErrorStatusCode(error);

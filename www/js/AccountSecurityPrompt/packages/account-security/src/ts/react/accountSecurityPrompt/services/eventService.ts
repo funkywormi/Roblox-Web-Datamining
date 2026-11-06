@@ -1,4 +1,4 @@
-import Roblox from "Roblox";
+import { sendEventWithTarget, targetTypes } from "@rbx/core-scripts/event-stream";
 import { EVENT_CONSTANTS } from "../app.config";
 import ModalState from "../store/modalState";
 
@@ -13,14 +13,14 @@ export class EventServiceDefault {
   }
 
   sendModalStateViewedEvent(state: ModalState): void {
-    Roblox.EventStream.SendEventWithTarget(
+    sendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.modalStateViewed,
       {
         promptType: this.promptType,
         state,
       },
-      Roblox.EventStream.TargetTypes.WWW,
+      targetTypes.WWW,
     );
   }
 }

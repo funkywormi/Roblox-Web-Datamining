@@ -1,4 +1,4 @@
-import * as http from "@rbx/core-scripts/http";
+import transport from "../requestTransport";
 import { Result } from "../../result";
 import { toResult } from "../common";
 import * as PromptAssignments from "../types/promptAssignments";
@@ -14,7 +14,7 @@ export const getAllForCurrentUser = async (): Promise<
     PromptAssignments.GetAllForCurrentUserReturnType,
     PromptAssignments.PromptAssignmentsError | null
   > = await toResult(
-    http.get(PromptAssignments.GET_ALL_FOR_CURRENT_USER_CONFIG, {
+    transport.get(PromptAssignments.GET_ALL_FOR_CURRENT_USER_CONFIG, {
       shouldReturnMetadata: true,
     }),
     PromptAssignments.PromptAssignmentsError,
@@ -50,7 +50,7 @@ export const updateForCurrentUser = (
   >
 > => {
   return toResult(
-    http.post(PromptAssignments.UPDATE_FOR_CURRENT_USER_CONFIG, {
+    transport.post(PromptAssignments.UPDATE_FOR_CURRENT_USER_CONFIG, {
       action,
       promptType,
     }),

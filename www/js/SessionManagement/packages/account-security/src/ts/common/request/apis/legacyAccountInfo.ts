@@ -1,4 +1,4 @@
-import { httpService } from "core-utilities";
+import transport from "../requestTransport";
 import { toResult } from "../common";
 import {
   LegacyAccountInfoError,
@@ -9,4 +9,4 @@ import { Result } from "../../result";
 
 export const getAccountInfo = (): Promise<
   Result<LegacyAccountInfoResponse, LegacyAccountInfoError | null>
-> => toResult(httpService.get(LegacyAccountInfoUrlConfig), LegacyAccountInfoError);
+> => toResult(transport.get(LegacyAccountInfoUrlConfig), LegacyAccountInfoError);

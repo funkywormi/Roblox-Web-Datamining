@@ -1,14 +1,15 @@
 import React, {
   createContext,
-  ReactChild,
   ReactElement,
+  ReactNode,
   useEffect,
   useReducer,
   useState,
 } from "react";
-import { TranslateFunction } from "react-utilities";
-import { RequestService } from "../../../common/request";
+import { useTranslations } from "@rbx/www-common/i18n";
+import { PromptRequestService } from "../requestService";
 import { PromptAssignment, PromptType } from "../../../common/request/types/promptAssignments";
+import { FEATURE_NAMESPACE } from "../app.config";
 import { getPersonalizedResources } from "../constants/resources";
 import { EventService } from "../services/eventService";
 import { AccountSecurityPromptAction } from "./action";
@@ -42,9 +43,8 @@ type Props = {
   username: string;
   isUserUnder13: boolean;
   eventService: EventService;
-  requestService: RequestService;
-  translate: TranslateFunction;
-  children: ReactChild;
+  requestService: PromptRequestService;
+  children: ReactNode;
 };
 
 /**
@@ -58,9 +58,9 @@ export const AccountSecurityPromptContextProvider = ({
   isUserUnder13,
   eventService,
   requestService,
-  translate,
   children,
 }: Props): ReactElement => {
+  const translate = useTranslations(FEATURE_NAMESPACE);
   let modalState = ModalState.NONE;
   // If the broader authenticator upsell has showBanner as false, go directly to the modal.
   const shouldGoDirectlyToAuthenticatorUpsell =
@@ -117,8 +117,14 @@ export const AccountSecurityPromptContextProvider = ({
    */
 
   useEffect(
-    () => runModalStateChangeEffect(eventService, state.modalState, state.lastModalState),
-    [eventService, state.modalState, state.lastModalState],
+    () =>
+      runModalStateChangeEffect(
+        eventService,
+        promptAssignment.promptType,
+        state.modalState,
+        state.lastModalState,
+      ),
+    [eventService, promptAssignment.promptType, state.modalState, state.lastModalState],
   );
 
   return (

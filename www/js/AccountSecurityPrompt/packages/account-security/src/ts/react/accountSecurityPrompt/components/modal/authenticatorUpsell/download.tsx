@@ -1,8 +1,12 @@
 import React, { useState } from "react";
-import { Modal } from "react-style-guide";
+import { window } from "@rbx/core-lib/browser";
+import { DialogBody, ProgressCircle } from "@rbx/foundation-ui";
 import * as PromptAssignments from "../../../../../common/request/types/promptAssignments";
-import { FooterButtonConfig, FragmentModalFooter } from "../../../../common/modalFooter";
-import { FragmentModalHeader, HeaderButtonType } from "../../../../common/modalHeader";
+import {
+  ChallengeDialogFooter,
+  FooterButtonConfig,
+} from "../../../../common/challengeDialogFooter";
+import { ChallengeDialogHeader, HeaderButtonType } from "../../../../common/challengeDialogHeader";
 import {
   ACCOUNT_SETTINGS_SECURITY_PATH,
   AUTH_REDIRECT_URL_SIGNIFIER,
@@ -62,7 +66,7 @@ const ModalAuthenticatorUpsellDownload: React.FC<ModalFragmentProps> = ({
     await dismissTemporary();
 
     // The `_self` target opens the redirect URL in the current page.
-    window.open(ACCOUNT_SETTINGS_SECURITY_PATH + AUTH_REDIRECT_URL_SIGNIFIER, "_self");
+    window?.open(ACCOUNT_SETTINGS_SECURITY_PATH + AUTH_REDIRECT_URL_SIGNIFIER, "_self");
   };
 
   /*
@@ -72,7 +76,11 @@ const ModalAuthenticatorUpsellDownload: React.FC<ModalFragmentProps> = ({
   const positiveButton: FooterButtonConfig = {
     // Show a spinner as the button content when a request is in flight.
     content: requestInFlight ? (
-      <span className="spinner spinner-xs spinner-no-margin" />
+      <ProgressCircle
+        variant="Indeterminate"
+        size="Small"
+        ariaLabel={resources.Action.AuthenticatorUpsellNextButtonMessage}
+      />
     ) : (
       resources.Action.AuthenticatorUpsellNextButtonMessage
     ),
@@ -87,14 +95,14 @@ const ModalAuthenticatorUpsellDownload: React.FC<ModalFragmentProps> = ({
 
   return (
     <React.Fragment>
-      <FragmentModalHeader
+      <ChallengeDialogHeader
         headerText={resources.Header.AuthenticatorUpsellDownloadAuthenticator}
         buttonType={HeaderButtonType.CLOSE}
         buttonAction={closeModalAndDismissTemporary}
         buttonEnabled={!requestInFlight}
         headerInfo={null}
       />
-      <Modal.Body>
+      <DialogBody>
         <div>
           <p>{resources.Label.AuthenticatorUpsellDownloadInstruction}</p>
         </div>
@@ -120,9 +128,9 @@ const ModalAuthenticatorUpsellDownload: React.FC<ModalFragmentProps> = ({
             </div>
           </div>
         </div>
-        <p className="text-error xsmall">{requestError}</p>
-      </Modal.Body>
-      <FragmentModalFooter positiveButton={positiveButton} negativeButton={null} />
+        <p className="text-caption-small content-system-alert xsmall">{requestError}</p>
+      </DialogBody>
+      <ChallengeDialogFooter positiveButton={positiveButton} negativeButton={null} />
     </React.Fragment>
   );
 };
