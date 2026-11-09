@@ -24,18 +24,21 @@ function LayeredClothingBodyTypeWarningDialog({
 }: LayeredClothingBodyTypeWarningDialogProps): React.ReactElement {
   const translate = useAvatarTranslate("Feature.Avatar");
   const { wearAsset } = useAssetManagerContext();
-  const { setAvatarType } = useAvatarPageContext();
+  const { avatarType, setAvatarType } = useAvatarPageContext();
 
   const confirmChange = useCallback(() => {
     if (!assetToWear) {
       return;
     }
 
+    const previousAvatarType = avatarType;
     setAvatarType("R15");
+    closeDialog();
     wearAsset(assetToWear, false).catch(() => {
-      // Error handled elsewhere
+      // wearAsset reports the error; only the avatar type needs undoing here.
+      setAvatarType(previousAvatarType);
     });
-  }, [assetToWear, setAvatarType, wearAsset]);
+  }, [assetToWear, avatarType, closeDialog, setAvatarType, wearAsset]);
 
   const modalLayout = avatarConstants.modalLayout.outfitDelete;
 

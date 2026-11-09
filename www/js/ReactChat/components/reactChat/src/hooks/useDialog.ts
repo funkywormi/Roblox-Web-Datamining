@@ -7,7 +7,7 @@ import { chatQueryKeys } from "../constants/queryKeys";
 import { updateTypingStatus } from "../services/chatService";
 import { useChatMetadataConfig } from "./useChatMetadataConfig";
 import type { TChatConversation, TChatMessage } from "../types/chat";
-import { seedPendingConversation } from "../utils/chatQueryCache";
+import { addConversationToList } from "../utils/chatQueryCache";
 import { isFriendPlaceholderConversation } from "../utils/chatTransforms";
 
 export type TUseDialogOptions = {
@@ -109,10 +109,10 @@ export const useDialog = (
           if (!newConversationId) {
             return;
           }
-          // Seed the created conversation so its dialog renders immediately — the server list is
-          // eventually consistent, so opening off it alone left the dialog with no backing
+          // Add the created conversation to the list so its dialog renders immediately — the server
+          // list is eventually consistent, so opening off it alone left the dialog with no backing
           // conversation and it closed on the first send.
-          seedPendingConversation(queryClient, result);
+          addConversationToList(queryClient, result);
           sendMessageMutation.mutate({
             conversationId: newConversationId,
             content: trimmedDraft,

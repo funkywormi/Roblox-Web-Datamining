@@ -20,6 +20,7 @@ export type UseAnnouncementTrackingResult = {
   trackCreatePageButtonClick: (input: {
     buttonClicked: AnnouncementCreateButton;
     isImageAttached: boolean;
+    hasRichText?: boolean;
   }) => void;
   trackCreatePageBannerShown: (input: { bannerMessageShown: string }) => void;
   trackDeleteBannerShown: (input: { bannerMessageShown: string }) => void;
@@ -31,9 +32,10 @@ export type UseAnnouncementTrackingResult = {
     announcementId: string;
     emoteId: string;
     isReactionAdded: boolean;
+    hasRichText?: boolean;
   }) => void;
   trackAnnouncementViewed: (input: { announcementId: string }) => void;
-  trackAnnouncementClicked: (input: { announcementId: string }) => void;
+  trackAnnouncementClicked: (input: { announcementId: string; hasRichText?: boolean }) => void;
   trackAnnouncementArchiveAnnouncementViewed: (input: { announcementId: string }) => void;
   trackAnnouncementSeeMoreButtonShown: (input: { announcementId: string }) => void;
   trackAnnouncementSeeMoreButtonClick: (input: { announcementId: string }) => void;
@@ -70,13 +72,14 @@ export const useAnnouncementTracking = ({
   const trackCreatePageButtonClick = useCallback<
     UseAnnouncementTrackingResult['trackCreatePageButtonClick']
   >(
-    ({ buttonClicked, isImageAttached }) => {
+    ({ buttonClicked, isImageAttached, hasRichText }) => {
       CommunityEventStream.sendEvent(
         CommunityMetric.AnnouncementCreatePageButtonClick({
           ...common,
           buttonClicked,
           isImageAttached: isImageAttached ? 1 : 0,
-          isFormAttached: 0
+          isFormAttached: 0,
+          ...(hasRichText && { hasRichText })
         })
       );
     },
@@ -127,13 +130,14 @@ export const useAnnouncementTracking = ({
   );
 
   const trackReactionToggled = useCallback<UseAnnouncementTrackingResult['trackReactionToggled']>(
-    ({ announcementId, emoteId, isReactionAdded }) => {
+    ({ announcementId, emoteId, isReactionAdded, hasRichText }) => {
       CommunityEventStream.sendEvent(
         CommunityMetric.AnnouncementReactionToggled({
           ...common,
           announcementId,
           reactionEmoteId: emoteId,
-          isReactionAdded: isReactionAdded ? 1 : 0
+          isReactionAdded: isReactionAdded ? 1 : 0,
+          ...(hasRichText && { hasRichText })
         })
       );
     },
@@ -157,11 +161,12 @@ export const useAnnouncementTracking = ({
   const trackAnnouncementClicked = useCallback<
     UseAnnouncementTrackingResult['trackAnnouncementClicked']
   >(
-    ({ announcementId }) => {
+    ({ announcementId, hasRichText }) => {
       CommunityEventStream.sendEvent(
         CommunityMetric.AnnouncementClicked({
           ...common,
-          announcementId
+          announcementId,
+          ...(hasRichText && { hasRichText })
         })
       );
     },

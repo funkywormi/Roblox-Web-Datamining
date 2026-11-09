@@ -102,6 +102,21 @@ const getParticipantUsers = (
 const getPreviewMessage = (conversation: TChatApiConversation): TChatApiMessage | undefined =>
   conversation.preview_message ?? conversation.messages?.find(message => message.is_previewable);
 
+// The latest of the preview, update and creation times. The server sorts by updated_at, which also
+// moves without a message (member or title changes); the preview time can be ahead of it right after
+// a send.
+const getLatestActivityTime = (conversation: TChatApiConversation): number =>
+  Math.max(
+    0,
+    ...[
+      getPreviewMessage(conversation)?.created_at,
+      conversation.updated_at,
+      conversation.created_at,
+    ]
+      .map(time => Date.parse(time ?? ""))
+      .filter(time => !Number.isNaN(time)),
+  );
+
 const getMessageContent = (message: TChatApiMessage): string =>
   message.preview_content ??
   message.content ??
@@ -276,11 +291,11 @@ export const toChatConversation = (
 };
 
 /**
- * Flattens the paginated `get-user-conversations` responses into a single ordered
- * conversation list, de-duplicating by id. Cursor pagination can surface the same
- * conversation on two pages when roster activity shifts a conversation between fetches;
- * without de-duping that yields duplicate React keys and double-rendered rows. The first
- * occurrence wins — pages arrive newest-first, so it reflects the most recent placement.
+ * Flattens the paginated `get-user-conversations` responses into a single conversation list,
+ * de-duplicating by id and ordering by latest activity, newest first. Cursor pagination can
+ * surface the same conversation on two pages when roster activity shifts a conversation between
+ * fetches; without de-duping that yields duplicate React keys and double-rendered rows. The first
+ * occurrence wins.
  */
 export const flattenConversationPages = (
   pages: TGetUserConversationsResponse[],
@@ -290,6 +305,7 @@ export const flattenConversationPages = (
 ): TChatConversation[] => {
   const seenIds = new Set<string>();
   const conversations: TChatConversation[] = [];
+  const timestamps = new Map<string, number>();
 
   for (const page of pages) {
     for (const apiConversation of page.conversations) {
@@ -304,8 +320,14 @@ export const flattenConversationPages = (
       }
       seenIds.add(conversation.id);
       conversations.push(conversation);
+      timestamps.set(conversation.id, getLatestActivityTime(apiConversation));
     }
   }
+
+  // Sort by timestamp, newest first.
+  conversations.sort(
+    (first, second) => (timestamps.get(second.id) ?? 0) - (timestamps.get(first.id) ?? 0),
+  );
 
   // Drop a friend placeholder once a real Direct conversation with that friend exists — the friend
   // list keeps returning the suggestion, so a first incoming message would otherwise show the

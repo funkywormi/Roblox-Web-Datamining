@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TranslateFn } from "../../../../utils/translate";
 import { mapItemRestrictionIcons } from "@rbx/www-common/components/itemCard";
-import { reportAXError } from "../../../../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import AvatarAccoutrementService from "../../../../utils/avatarAccoutrementService";
 import avatarConstants from "../../../../constants/avatarConstants";
 import { recommendationTypes } from "../../../../constants/recommendationsConstants";

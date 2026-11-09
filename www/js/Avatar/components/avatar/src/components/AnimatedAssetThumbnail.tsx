@@ -86,9 +86,17 @@ const getAnimatedThumbnailComponent = (): AnimatedThumbnailComponent | undefined
   return typeof external?.AnimatedThumbnail === "function" ? external.AnimatedThumbnail : undefined;
 };
 
+// Next.js aliases @rbx/thumbnails3d to a www-common stand-in and never sets the window global.
+const importAnimatedThumbnailComponent = (): Promise<AnimatedThumbnailComponent | undefined> =>
+  import("@rbx/thumbnails3d").then(
+    ({ AnimatedThumbnail }) =>
+      typeof AnimatedThumbnail === "function" ? AnimatedThumbnail : undefined,
+    () => undefined,
+  );
+
 /**
  * Preserves the normal 2D thumbnail until hover/focus, then crossfades to the
- * animated thumbnailer when its legacy runtime external is available.
+ * animated thumbnailer once it loads (legacy window external on .NET, module import on Next.js).
  */
 function AnimatedAssetThumbnail({
   children,
@@ -119,6 +127,13 @@ function AnimatedAssetThumbnail({
     if (win == null || !isPlaying || AnimatedThumbnail !== undefined) {
       return undefined;
     }
+    let cancelled = false;
+    // eslint-disable-next-line @rbx/promises/prefer-query-mutation, no-void -- one-time module load, not server state
+    void importAnimatedThumbnailComponent().then(next => {
+      if (!cancelled && next !== undefined) {
+        setAnimatedThumbnail(() => next);
+      }
+    });
     let attempts = 0;
     const interval = win.setInterval(() => {
       attempts += 1;
@@ -132,6 +147,7 @@ function AnimatedAssetThumbnail({
       }
     }, 250);
     return () => {
+      cancelled = true;
       win.clearInterval(interval);
     };
   }, [isPlaying, AnimatedThumbnail]);

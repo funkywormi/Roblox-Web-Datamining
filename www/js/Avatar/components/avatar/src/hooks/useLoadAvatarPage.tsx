@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { ThumbnailType } from "@rbx/www-common/components/thumbnail";
 import { logFinalThumbnailTime, logThumbnailTimeout } from "@rbx/www-common/components/thumbnail";
 import { ThumbnailAvatarsSize } from "../constants/thumbnailConstants";
-import { reportAXError } from "../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import AvatarAccoutrementService from "../utils/avatarAccoutrementService";
 import useAvatarTypeService, { AvatarTypeService } from "./useAvatarTypeService";
 import { AvatarConfigV2 } from "../avatarRequest";
@@ -16,7 +16,13 @@ import { useSystemFeedback } from "../contexts/SystemFeedbackContext";
 import { useAvatarTabsContext } from "../contexts/AvatarTabsContext";
 import { useCurrentlyWearingAssetsStoreContext } from "../contexts/CurrentlyWearingAssetsStoreContext";
 import parseError from "../utils/parseErrorUtil";
-import { trackEditorLoadFailed, trackError, type EditorLoadStep } from "../observability";
+import {
+  trackEditorLoaded,
+  trackEditorLoadFailed,
+  trackError,
+  type EditorLoadStep,
+} from "../observability";
+import { hasPrefetchedStartupRequest, takeStartupRequest } from "../startupRequests";
 
 export type HeadShape = AvatarInventoryItem["headShape"];
 
@@ -88,13 +94,13 @@ const useLoadAvatarPage = () => {
     useState<AvatarThumbnailDataModel>();
 
   const getCategories = useCallback(() => {
-    return AvatarAPIService.getCategories().then(result => {
+    return takeStartupRequest("categories").then(result => {
       setCategoryDict(result as Record<string, string>);
     });
   }, []);
 
   const getSubcategories = useCallback(() => {
-    return AvatarAPIService.getSubcategories().then(result => {
+    return takeStartupRequest("subcategories").then(result => {
       setSubcategoryDict(result as Record<string, string>);
     });
   }, []);
@@ -257,15 +263,13 @@ const useLoadAvatarPage = () => {
   useEffect(() => {
     const loadAvatarPage = async () => {
       try {
-        // Configure the API service before any request so the very first avatar read
-        // (below) honors the V4 read/write flags.
-        AvatarAPIService.configure(defaultSettings);
-
-        const getRulesRequest = tagStep("rules", AvatarAPIService.getAvatarRules());
-        const getAvatarRequest = tagStep("avatar", AvatarAPIService.getAvatarV2(false));
+        // Next.js may have started these while the editor chunk was loading.
+        const prefetched = hasPrefetchedStartupRequest("rules");
+        const getRulesRequest = tagStep("rules", takeStartupRequest("rules"));
+        const getAvatarRequest = tagStep("avatar", takeStartupRequest("avatar"));
         const getCatalogMetaDataRequest = tagStep(
           "catalogMetadata",
-          AvatarAPIService.getCatalogMetaData(false),
+          takeStartupRequest("catalogMetadata"),
         );
 
         setAvatarType(avatarConstants.avatarType.defaultOnPageLoad as AvatarType);
@@ -285,6 +289,7 @@ const useLoadAvatarPage = () => {
         ]);
 
         loadAvatarPageCallBackSuccess(results);
+        trackEditorLoaded(prefetched);
       } catch (caught) {
         const { step, failure: error } =
           caught instanceof EditorLoadStepError

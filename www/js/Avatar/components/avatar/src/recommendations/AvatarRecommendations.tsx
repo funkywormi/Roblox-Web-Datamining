@@ -56,7 +56,8 @@ const AvatarRecommendations: React.FC<AvatarRecommendationsProps> = ({
   pageName,
   showSeeAllButton,
 }) => {
-  const tAvatar = useAvatarTranslate("Feature.Avatar");
+  // Item card copy (Label.ByCreatorLink, status labels) lives in Feature.Catalog.
+  const tCatalog = useAvatarTranslate("Feature.Catalog");
   const tRecommendations = useAvatarTranslate("Feature.Recommendations");
   const [items, setItems] = useState<RecommendedItem[]>([]);
   // Display exactly one row sized to the editor's current column count (5/6/7),
@@ -124,38 +125,42 @@ const AvatarRecommendations: React.FC<AvatarRecommendationsProps> = ({
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getABTestEnrollment(
       experimentConstants.defaultProjectId,
       experimentConstants.layerNames.avatarShopRecommendationsAndSearchWeb,
       experimentConstants.parameterNames.complimentaryItemRecommendationsEnabled,
-    ).then((result: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (result?.complimentaryItemRecommendationsEnabled !== undefined) {
+    )
+      .then((result: any) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const enabled = result.complimentaryItemRecommendationsEnabled as boolean;
-        if (enabled) {
-          const isBundle = subject === itemTypes.bundle;
-          setComplimentaryItemRecommendations({
-            enabled,
-            targetId: initialRecommendationTargetId,
-            isBundle,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            displayPurchaseButtonLeft: result.displayPurchaseButtonLeft as boolean,
-          });
-          renderComplimentaryItems();
+        if (result?.complimentaryItemRecommendationsEnabled !== undefined) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          const enabled = result.complimentaryItemRecommendationsEnabled as boolean;
+          if (enabled) {
+            const isBundle = subject === itemTypes.bundle;
+            setComplimentaryItemRecommendations({
+              enabled,
+              targetId: initialRecommendationTargetId,
+              isBundle,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              displayPurchaseButtonLeft: result.displayPurchaseButtonLeft as boolean,
+            });
+            renderComplimentaryItems();
+          }
         }
-      }
-    });
+      })
+      .catch(() => {
+        // Leave complimentary items off.
+      });
   };
 
   const getAvatarMarketplaceRelevanceRecommendationsEnrollment = () => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getABTestEnrollment(
       experimentConstants.defaultProjectId,
       experimentConstants.layerNames.avatarMarketplaceRelevanceRecommendations,
       experimentConstants.parameterNames.avatarMarketplaceRelevanceRecommendations,
-    );
+    ).catch(() => {
+      // Enrollment is best effort.
+    });
   };
 
   const initRecommendations = () => {
@@ -209,6 +214,9 @@ const AvatarRecommendations: React.FC<AvatarRecommendationsProps> = ({
                         setRecommendationNumRows(result.recommendationNumRows);
                       }
                     })
+                    .catch(() => {
+                      // Keep the default number of rows.
+                    })
                     .finally(() => {
                       getItems(recommendationsMetadata.subject);
                     });
@@ -231,11 +239,7 @@ const AvatarRecommendations: React.FC<AvatarRecommendationsProps> = ({
     }
   };
 
-  useEffect(() => {
-    initRecommendations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  // Also runs on mount.
   useEffect(() => {
     clearItems();
     initRecommendations();
@@ -325,7 +329,7 @@ const AvatarRecommendations: React.FC<AvatarRecommendationsProps> = ({
                     // widths (avatar-non-fui.css) and the click-delegation analytics below
                     // both key off of.
                     containerClassName="item-card"
-                    translate={tAvatar}
+                    translate={tCatalog}
                     id={item.id}
                     name={item.name}
                     type={item.itemType}

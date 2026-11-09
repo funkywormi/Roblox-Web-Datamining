@@ -1,3 +1,4 @@
+import { UrlSearchParams } from "@rbx/core-lib/url";
 import environmentUrls from "@rbx/environment-urls";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import "@rbx/core-scripts/global";
@@ -18,7 +19,6 @@ import {
   startVerificationFlow as startIdentityVerificationFlow,
 } from "@rbx/www-common/identity-verification";
 import { isJoinAttemptIdEnabled, launchPlayGame } from "./gameLauncher";
-import playButtonConstants from "../constants/playButtonConstants";
 import { getStartAccessManagementUpsell } from "./accessManagementUpsell";
 import { PlayabilityStatus } from "../constants/playabilityStatus";
 import {
@@ -28,6 +28,7 @@ import {
   TPlayabilityStatusWithUnplayableError,
   type TPlayButtonPageContext,
 } from "../types/playButtonTypes";
+import playButtonConstants, { playOnWebActionType } from "../constants/playButtonConstants";
 
 export const PlaytestUnlockUpsellType = {
   AgeVerification: "AgeVerification",
@@ -292,10 +293,9 @@ export const startAgeCheckAccessManagementUpsellFlow = async ({
 
 export const handleShareLinkEventLogging = (placeId: string, universeId: string): void => {
   try {
-    // The param name matches case-insensitively, like the legacy UrlParser lookup.
-    const shareLinkSourceType = [...new URLSearchParams(window.location.search)].find(
-      ([name]) => name.toLowerCase() === "sharelinksourcetype",
-    )?.[1];
+    const shareLinkSourceType = UrlSearchParams.parse(window.location.search).get(
+      "shareLinkSourceType",
+    );
     if (shareLinkSourceType?.toLowerCase() !== "experiencedetails") {
       return;
     }
@@ -418,6 +418,42 @@ export const navigateToPlaytestSettings = (): void => {
 
 export const navigateToUserProfile = (userId: number): void => {
   window.location.assign(getAbsoluteUrl(`/users/${userId}/profile`));
+};
+
+export const getJoindata = (launchDataFromProps?: string) => {
+  // Allow launchData to be passed from props for direct joins
+  const launchData =
+    new URLSearchParams(window.location.search).get("launchData") ?? launchDataFromProps;
+  const eventId = new URLSearchParams(window.location.search).get("eventId") ?? undefined;
+  return {
+    launchData,
+    eventId,
+  };
+};
+
+export const sendPlayOnWebClickEvents = (
+  placeId: string,
+  universeId: string,
+  eventProperties: TEventProperties = {},
+  joinData: JoinDataProperties = {},
+): TJoinAttemptProperties => {
+  handleShareLinkEventLogging(placeId, universeId);
+  const { joinAttemptId, joinAttemptOrigin } = sendPlayGameClickedEvent(
+    eventProperties,
+    placeId,
+    joinData,
+    playOnWebActionType,
+  );
+  if (!isJoinAttemptIdEnabled() || typeof joinAttemptId !== "string" || joinAttemptId === "") {
+    return {};
+  }
+  return {
+    joinAttemptId,
+    joinAttemptOrigin:
+      typeof joinAttemptOrigin === "string" && joinAttemptOrigin.length > 0
+        ? joinAttemptOrigin
+        : undefined,
+  };
 };
 
 export default {

@@ -2,6 +2,7 @@ import * as httpService from '@rbx/core-scripts/http';
 import urlConstants from '../constants/urlConstants';
 import type {
   DeveloperProductPurchaseResponse,
+  DeveloperProductRequestLocationType,
   GamePassPurchaseResponse,
   SubscriptionWithRobuxPurchaseResponse,
   PrepareFiatSubscriptionPurchaseResponse,
@@ -38,9 +39,13 @@ export default {
     };
     return httpService.post<CollectibleItemPurchaseResponse>(urlConfig, params);
   },
-  purchaseDeveloperProduct: (productId: number, request: object) => {
+  purchaseDeveloperProduct: (
+    productId: number,
+    request: object,
+    requestLocationType?: DeveloperProductRequestLocationType
+  ) => {
     const urlConfig = {
-      url: postPurchaseDeveloperProductUrl(productId),
+      url: postPurchaseDeveloperProductUrl(productId, requestLocationType),
       withCredentials: true
     };
     return httpService.post<DeveloperProductPurchaseResponse>(urlConfig, request);

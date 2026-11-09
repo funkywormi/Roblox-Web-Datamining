@@ -14,7 +14,9 @@ import { useAvatarPageContext } from "../contexts/AvatarPageContext";
 import parseError from "../utils/parseErrorUtil";
 import { getSlotConfig } from "../constants/slotConfigurations";
 import { isAvatarEditingDisabledError } from "../utils/avatarEditingError.utils";
-import { sendAXTracking, reportAXError, AXAnalyticsConstants } from "../utils/axAnalyticsService";
+import sendAXTracking from "@rbx/catalog/analytics/sendAXTracking";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
+import AXAnalyticsConstants from "@rbx/catalog/analytics/AXAnalyticsConstants";
 import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../observability";
 
 const useAssetManager = () => {

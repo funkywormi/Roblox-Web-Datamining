@@ -29,10 +29,6 @@ const AvatarHeadshot = ({
       targetId={userId}
       type="AvatarHeadShot"
       includeProfileFrame
-      // The AvatarExperience.Backgrounds.Thumbnails IXP is launched at 100%, so the headshot
-      // background is the default. Legacy @rbx/thumbnails applied it via the experiment resolver;
-      // set it explicitly here (www-common has no experiment hook) to keep parity.
-      includeBackground
     />
   </span>
 );

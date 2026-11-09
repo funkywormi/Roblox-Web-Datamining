@@ -1,7 +1,6 @@
-import React, { useCallback } from "react";
+import React, { Component, type ReactNode, Suspense, lazy, useCallback } from "react";
 import classNames from "classnames";
 import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
-import { Thumbnail3d } from "@rbx/thumbnails3d";
 import { ThumbnailAvatarsSize } from "../constants/thumbnailConstants";
 import { useAvatarTranslate } from "../utils/translate";
 import { Button, Icon } from "@rbx/foundation-ui";
@@ -14,6 +13,34 @@ import { useAvatarTabsContext } from "../contexts/AvatarTabsContext";
 import { useAvatarPageContext } from "../contexts/AvatarPageContext";
 import { getSlotConfig } from "../constants/slotConfigurations";
 import { CategorySlots, SlotItem } from "./slots";
+
+// Loaded on demand: it carries Babylon.js (several MB), and 3D is off by default.
+const Thumbnail3d = lazy(() =>
+  import("@rbx/thumbnails3d").then(({ Thumbnail3d: component }) => ({ default: component })),
+);
+
+type Thumbnail3dBoundaryProps = { fallback: ReactNode; onError: () => void; children: ReactNode };
+
+// Falls back to 2D if the 3D viewer fails to load or render, instead of breaking the editor.
+class Thumbnail3dBoundary extends Component<Thumbnail3dBoundaryProps, { hasError: boolean }> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(): { hasError: boolean } {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error): void {
+    console.warn("Avatar 3D viewer failed", error);
+    const { onError } = this.props;
+    onError();
+  }
+
+  render(): ReactNode {
+    const { fallback, children } = this.props;
+    const { hasError } = this.state;
+    return hasError ? fallback : children;
+  }
+}
 
 interface AvatarBackProps {
   onHatSlotClicked: (slot: HatSlot) => void;
@@ -115,6 +142,16 @@ const AvatarBack: React.FC<AvatarBackProps> = ({
   if (!avatarThumbnailDataModel) {
     return null;
   }
+
+  const thumbnail2d = (
+    <Thumbnail2d
+      version={version.toString()}
+      targetId={getCurrentUserId()}
+      type={avatarThumbnailDataModel.thumbnailType}
+      size={ThumbnailAvatarsSize.size352}
+      includeBackground
+    />
+  );
 
   return (
     <div className="avatar-back">
@@ -313,22 +350,24 @@ const AvatarBack: React.FC<AvatarBackProps> = ({
           )}
         >
           {is3d ? (
-            <Thumbnail3d
-              version={version.toString()}
-              targetId={getCurrentUserId()}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-              onSuccess={avatarThumbnailDataModel.on3dAvatarSuccess as any}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-              onFailure={avatarThumbnailDataModel.on3dAvatarFailure as any}
-            />
+            // 2D shows while the 3D viewer loads, and if it fails.
+            <Thumbnail3dBoundary
+              fallback={thumbnail2d}
+              onError={() => avatarThumbnailDataModel.on3dAvatarFailure({ duration: 0 })}
+            >
+              <Suspense fallback={thumbnail2d}>
+                <Thumbnail3d
+                  version={version.toString()}
+                  targetId={getCurrentUserId()}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+                  onSuccess={avatarThumbnailDataModel.on3dAvatarSuccess as any}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+                  onFailure={avatarThumbnailDataModel.on3dAvatarFailure as any}
+                />
+              </Suspense>
+            </Thumbnail3dBoundary>
           ) : (
-            <Thumbnail2d
-              version={version.toString()}
-              targetId={getCurrentUserId()}
-              type={avatarThumbnailDataModel.thumbnailType}
-              size={ThumbnailAvatarsSize.size352}
-              includeBackground
-            />
+            thumbnail2d
           )}
 
           <Button

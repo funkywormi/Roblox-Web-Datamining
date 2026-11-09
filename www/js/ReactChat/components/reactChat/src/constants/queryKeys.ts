@@ -4,12 +4,11 @@ export const chatQueryKeys = {
   /** Unfriended/blocked user ids whose 1:1 is filtered from the list until the server stops returning it. */
   removedFriendUserIds: () => [...chatQueryKeys.all, "removedFriendUserIds"] as const,
   /**
-   * Client-only conversations a dialog needs before the loaded list pages contain them: one created
-   * by a first-message send, or one started from a friend's profile whose 1:1 sits on a page that has
-   * not loaded. useChatData merges them in until the list returns them. Unrelated to the server's
-   * `user_pending_status` and `participant_pending_status`.
+   * The client-owned conversation list the UI renders. Never fetched: each `conversations()` page is
+   * merged into it, and opened, patched and removed conversations are written to it directly (see
+   * chatQueryCache).
    */
-  pendingConversations: () => [...chatQueryKeys.all, "pendingConversations"] as const,
+  conversationList: () => [...chatQueryKeys.all, "conversationList"] as const,
   conversationMessages: (conversationId: string) =>
     [...chatQueryKeys.all, "conversationMessages", conversationId] as const,
   /** Prefix key matching every conversation's message cache — used to refetch open dialogs on reconnect. */

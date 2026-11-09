@@ -1,5 +1,6 @@
 import { EnvironmentUrls } from '@rbx/environment-urls';
 import { getAbsoluteUrl, getUrlWithQueries } from '@rbx/core-scripts/util/url';
+import type { DeveloperProductRequestLocationType } from '../types/purchase';
 
 const {
   economyApi,
@@ -43,8 +44,11 @@ export default {
   getVngShopFallbackUrl: () => vngGamesShopUrl,
   getSubscriptionsMetadataUrl: () => `${apiGatewayUrl}/roblox-subscriptions/v1/metadata`,
   /** @param productId NOT developer product id */
-  postPurchaseDeveloperProductUrl: (productId: string | number) =>
-    `${apiGatewayUrl}/developer-products/v1/developer-products/${productId}/purchase?requestLocationType=ExperienceDetailPage` as const,
+  postPurchaseDeveloperProductUrl: (
+    productId: string | number,
+    requestLocationType: DeveloperProductRequestLocationType = 'ExperienceDetailPage'
+  ) =>
+    `${apiGatewayUrl}/developer-products/v1/developer-products/${productId}/purchase?requestLocationType=${requestLocationType}` as const,
   /** @param productId NOT game pass id */
   postPurchaseGamePassUrl: (productId: string | number) =>
     `${apiGatewayUrl}/game-passes/v1/game-passes/${productId}/purchase` as const,

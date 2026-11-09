@@ -10,7 +10,7 @@ import { Icon } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../../../utils/translate";
 import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 import { ThumbnailTypes } from "../../../constants/thumbnailConstants";
-import { reportAXError } from "../../../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../../../observability";
 import avatarConstants from "../../../constants/avatarConstants";
 import AvatarAPIService, { InventoryEmote } from "../../../services/avatarAPIService";

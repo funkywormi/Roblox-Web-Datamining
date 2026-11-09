@@ -1,15 +1,20 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, useContext } from "react";
 import ClassNames from "classnames";
 import PropTypes from "prop-types";
 import { logMeasurement } from "../metrics";
 import * as thumbnailService from "../services/thumbnail2d";
 import { ThumbnailRequester } from "../util/thumbnailRequester";
 import { ThumbnailBatchHandler } from "../util/thumbnailHandler";
-import { ThumbnailStates } from "../constants/thumbnail2dConstant";
+import {
+  ThumbnailStates,
+  ThumbnailTypes,
+  ThumbnailAvatarHeadshotSize,
+} from "../constants/thumbnail2dConstant";
 import {
   resolveAvatarHeadshotIncludeBackground,
   useAvatarHeadshotBackgroundInTreatment,
 } from "../experimentation/avatarHeadshotBackgroundExperiment";
+import { ProfileFrameDefaultContext } from "../context/profileFrameDefaultContext";
 import Thumbnail from "../components/Thumbnail";
 
 const customThumbnailRequester = new ThumbnailRequester(
@@ -21,7 +26,7 @@ function Thumbnail2d({
   type,
   targetId,
   token,
-  size,
+  size: sizeProp,
   imgClassName,
   containerClass,
   format,
@@ -31,10 +36,21 @@ function Thumbnail2d({
   version,
   headShape,
   includeBackground,
-  includeProfileFrame,
+  includeProfileFrame: includeProfileFrameProp,
   seedFromCache,
 }) {
   const [startTime] = useState(new Date().getTime());
+  // Callers that can't pass the prop (rendered off the window global) opt in via context;
+  // an explicit prop still wins.
+  const profileFrameDefault = useContext(ProfileFrameDefaultContext);
+  const includeProfileFrame = includeProfileFrameProp || profileFrameDefault;
+  // A framed headshot packs the avatar + ring into one square, so at small tiers (48x48 → ~30px) the
+  // avatar upscales badly. Context opt-in callers can't pick a size, so bump to the largest headshot
+  // tier; callers passing the prop explicitly keep their chosen size.
+  const size =
+    profileFrameDefault && !includeProfileFrameProp && type === ThumbnailTypes.avatarHeadshot
+      ? ThumbnailAvatarHeadshotSize.size150
+      : sizeProp;
   const avatarHeadshotBackgroundInTreatment = useAvatarHeadshotBackgroundInTreatment(type);
   const resolvedIncludeBackground = resolveAvatarHeadshotIncludeBackground(
     type,

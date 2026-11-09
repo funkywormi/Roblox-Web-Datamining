@@ -43,11 +43,11 @@ type Has<N extends Namespace> = (key: string) => key is TranslationKey<N>;
 type TranslateDynamic = (key: string, values?: TranslationValues, fallback?: string) => string;
 
 /**
- * Renders a legacy `{tagStart}...{tagEnd}` string. `key` may be a catalogue key or a runtime
- * string. A missing key or malformed segment is tracked and renders nothing.
+ * Renders a legacy `{tagStart}...{tagEnd}` string for a catalogue key. A key missing from the
+ * messages loaded at runtime, or a malformed segment, is tracked and renders nothing.
  */
 type TranslateHtml<N extends Namespace> = (
-  key: TranslationKey<N> | (string & {}),
+  key: TranslationKey<N>,
   tags: readonly HtmlTag[],
   values?: Record<string, string | number | Date>,
 ) => ReactNode;

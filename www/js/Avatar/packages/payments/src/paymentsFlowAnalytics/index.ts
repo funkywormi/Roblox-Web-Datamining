@@ -96,6 +96,8 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
 
   private eventMetadata: Record<string, string> = {};
 
+  private webStack?: "dotnet" | "nextjs";
+
   /**
    * Only run when there is redirection, go back/forward might not trigger the constructor if page loaded from cache
    */
@@ -152,6 +154,16 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
     this.purchaseFlowUuid = id;
     this.publishSharedFlowUuid();
     this.writePaymentFlowContextIntoCookie();
+  }
+
+  /**
+   * Identifies the current page's implementation, not where the flow started.
+   * Set before mounting the page; intentionally not persisted across navigation.
+   */
+  public setWebStack(webStack: "dotnet" | "nextjs"): void {
+    if (isBrowser()) {
+      this.webStack = webStack;
+    }
   }
 
   /**
@@ -390,7 +402,10 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
     const referralUrl = PaymentFlowAnalyticsService.getReferralUrl();
     const previousView = PaymentFlowAnalyticsService.extractView(referralUrl);
     const currentView = PaymentFlowAnalyticsService.extractView(currentWindow.location.href);
-    const metadata = JSON.stringify(this.eventMetadata);
+    const metadata = JSON.stringify({
+      ...this.eventMetadata,
+      ...(this.webStack === undefined ? {} : { webStack: this.webStack }),
+    });
 
     eventStreamTracker.sendEventViaImg({
       target: "www",

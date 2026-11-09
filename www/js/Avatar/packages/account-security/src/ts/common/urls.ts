@@ -19,5 +19,6 @@ export const redirectToSessionManagement = (): void => {
 
 export const ACCOUNT_SECURITY_DISPLAY_QUERY = "display";
 export const ACCOUNT_SECURITY_DISPLAY_EPP = "enhanced-protection-program";
+export const ACCOUNT_SECURITY_DISPLAY_TWO_STEP_VERIFICATION = "two-step-verification";
 
 export const eppDetailsLink = `${ACCOUNT_SETTINGS_PAGE}${SHEBANG}${SECURITY}${QUERY}${ACCOUNT_SECURITY_DISPLAY_QUERY}=${ACCOUNT_SECURITY_DISPLAY_EPP}`;

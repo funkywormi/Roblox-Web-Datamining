@@ -1,7 +1,8 @@
-import type { InfiniteData, QueryClient } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import { userProfilesQueryKeys } from "@rbx/www-common/user-profiles";
 import { chatQueryKeys, FRIEND_PROFILE_FIELDS } from "../constants/queryKeys";
-import type { TChatApiConversation, TGetUserConversationsResponse } from "../types/api";
+import type { TChatApiConversation } from "../types/api";
+import { getConversationListId, getOtherParticipantIds } from "./chatQueryCache";
 
 export type TChatRealtimeCacheAction =
   | { kind: "invalidate_user_conversations" }
@@ -19,46 +20,24 @@ export type TChatRealtimeCacheAction =
   | { kind: "invalidate_chat_settings" }
   | { kind: "invalidate_all_conversation_messages" };
 
-function otherParticipantIds(
-  conversation: TChatApiConversation,
-  currentUserId: number | null,
-): number[] {
-  if (conversation.participants && conversation.participants.length > 0) {
-    return conversation.participants.map(user => user.id).filter(id => id !== currentUserId);
-  }
-  return (conversation.participant_user_ids ?? []).filter(id => id !== currentUserId);
-}
-
-// Mirrors the id derivation in toChatConversation so removed ids line up with the rendered list
-// (a friend placeholder has no server id and is keyed by its participant ids).
-function deriveConversationId(conversation: TChatApiConversation): string {
-  return (
-    conversation.id ??
-    `friends-${(conversation.participant_user_ids ?? []).toSorted((a, b) => a - b).join("-")}`
-  );
-}
-
-// Ids of each user's 1:1 (non-group) conversation — real or friend-placeholder — in the cached
-// list. Used on FriendshipDestroyed to close those dialogs; the list itself is filtered durably via
-// the removedFriendUserIds tombstone (see useChatData), since the server keeps returning the
-// conversation and a plain cache removal would reappear on the next refetch.
+// Ids of each user's 1:1 (non-group) conversation — real or friend-placeholder — in the conversation
+// list. Used on FriendshipDestroyed to close those dialogs and remove them from the list; the
+// removedFriendUserIds tombstone (see useChatData) keeps them out while the server still returns them.
 export function findDirectConversationIdsForUsers(
-  data: InfiniteData<TGetUserConversationsResponse> | undefined,
+  conversations: TChatApiConversation[] | undefined,
   userIds: number[],
   currentUserId: number | null,
 ): string[] {
-  if (!data || userIds.length === 0) {
+  if (!conversations || userIds.length === 0) {
     return [];
   }
   const targets = new Set(userIds);
   const ids: string[] = [];
-  for (const page of data.pages) {
-    for (const conversation of page.conversations) {
-      const others = otherParticipantIds(conversation, currentUserId);
-      const onlyOther = others.length === 1 ? others[0] : undefined;
-      if (conversation.type !== "group" && onlyOther !== undefined && targets.has(onlyOther)) {
-        ids.push(deriveConversationId(conversation));
-      }
+  for (const conversation of conversations) {
+    const others = getOtherParticipantIds(conversation, currentUserId);
+    const onlyOther = others.length === 1 ? others[0] : undefined;
+    if (conversation.type !== "group" && onlyOther !== undefined && targets.has(onlyOther)) {
+      ids.push(getConversationListId(conversation));
     }
   }
   return ids;

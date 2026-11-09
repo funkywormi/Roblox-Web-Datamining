@@ -1,9 +1,8 @@
-import { AxiosError } from "@rbx/core-scripts/http";
+import { AxiosError, get, patch, post } from "@rbx/core-scripts/http";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import { callBehaviour } from "@rbx/core-scripts/guac";
 import { generateAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import environmentUrls from "@rbx/environment-urls";
-import { httpService } from "@rbx/core-scripts/legacy/core-utilities";
 import { getCurrentUserId } from "../utils/currentUser";
 import {
   TSetBodyColors,
@@ -15,25 +14,15 @@ import {
 import avatarUrlConstants from "../constants/avatarUrlConstants";
 import avatarConstants from "../constants/avatarConstants";
 import { PlayerAvatarConfig } from "../avatarRules";
-import { AvatarConfig, AvatarConfigV2, AvatarScales } from "../avatarRequest";
+import { AvatarConfigV2, AvatarScales } from "../avatarRequest";
 import { CatalogSettings } from "../catalogMetadataRequest";
 import { AvatarAppPolicy } from "../avatarAppPolicy";
 import { AvatarSettings } from "../metadataRequest";
-import {
-  AvatarItemAvailabilityStatus,
-  CatalogItem,
-  CatalogOutfitItem,
-  ItemLicense,
-} from "../avatar.types";
-import { OutfitDetails, OutfitDetailsV3 } from "../types";
+import { AvatarItemAvailabilityStatus, ItemLicense } from "../avatar.types";
+import { OutfitDetailsV3 } from "../types";
 import { BodyColorsStateV2, BodyColorsV2Request } from "../types/bodyColors.types";
 import {
-  AvatarUpdateType,
-  AvatarDefinitionV4,
-  UpdateAvatarModelV4,
-  UpdateAvatarConfigV4,
   EmoteRequestModel,
-  AvatarUpdateSections,
   UpdateAvatarRequestV4,
   UpdateAvatarResponseV4,
   GetAvatarResponseV4,
@@ -53,9 +42,9 @@ import {
   mapPatchOutfitResponseV4,
 } from "./outfitV4";
 import { getAvatarV4SearchParams, mapGetAvatarV4ToConfigV2 } from "./avatarV4";
+import { buildAvatarUpdateRequest, emotesAfterEquip, emotesAfterUnequip } from "./updateAvatarV4";
 
-// httpService from legacy-core-utilities doesn't propagate its generic into .then(),
-// so we use this typed helper to unwrap .data without implicit any.
+// Unwraps the Axios response body.
 const unwrapData = <T>(r: { data: T }): T => r.data;
 
 type InventoryAsset = {
@@ -67,16 +56,6 @@ type InventoryAsset = {
 
 export type ErrorData = {
   errors: AxiosError[]; // An array of ApiError objects
-};
-
-export type OutfitsResponse = {
-  data: CatalogOutfitItem[];
-  paginationToken: string | undefined;
-};
-
-export type RecentItemsResponse = {
-  data: CatalogItem[];
-  total: number;
 };
 
 export type PostItemDetailsResponse = {
@@ -121,10 +100,10 @@ export type FeatureAccess = {
 
 export type V2Resource = {
   action: string;
-  timedOutActions: timeoutAction[];
+  timeoutActions?: TimeoutAction[];
 };
 
-export type timeoutAction = {
+export type TimeoutAction = {
   featureVector: string;
   endTime: string;
   startTime: string;
@@ -210,28 +189,6 @@ export function getInvalidAssetIds(response: AvatarResponseBase | null | undefin
 // TODO: old, migrated code
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class AvatarAPIService {
-  // When true, the legacy equip endpoints route through the consolidated
-  // `PATCH /v4/avatar` (UpdateAvatar) endpoint instead. Set once via `configure`.
-  private static isUpdateAvatarV4Enabled = false;
-
-  // When true, the avatar read path uses `GET /v4/avatar` instead of `/v2/avatar/avatar`.
-  private static isGetAvatarV4Enabled = false;
-
-  // When true, outfit create/update/details route through the `/v4/outfits/*` endpoints, which
-  // carry the outfit definition and persist the profile background.
-  private static isOutfitApiV4Enabled = false;
-
-  static configure(
-    settings: Pick<
-      AvatarSettings,
-      "isUpdateAvatarV4Enabled" | "isGetAvatarV4Enabled" | "isOutfitApiV4Enabled"
-    >,
-  ): void {
-    AvatarAPIService.isUpdateAvatarV4Enabled = settings.isUpdateAvatarV4Enabled;
-    AvatarAPIService.isGetAvatarV4Enabled = settings.isGetAvatarV4Enabled;
-    AvatarAPIService.isOutfitApiV4Enabled = settings.isOutfitApiV4Enabled;
-  }
-
   static avatarApi(url: string, pathParams: Record<string, string | number> = {}): string {
     const absoluteUrl = generateAbsoluteUrl(
       url,
@@ -277,34 +234,8 @@ export class AvatarAPIService {
     return `${environmentUrls.apiGatewayUrl}${absoluteUrl}`;
   }
 
-  static getOutfitDetails(userOutfitId: number): Promise<OutfitDetails> {
-    // Prefer V3 endpoint for hex colors, but keep V1 for backward compatibility
-    console.warn(
-      "getOutfitDetails (v1) is deprecated. Consider using getOutfitDetailsV3 for hex color support.",
-    );
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.getOutfitDetailsUrl, {
-      id: userOutfitId,
-    });
-    const config = {
-      url,
-      withCredentials: true,
-    };
-    return httpService.get<OutfitDetails>(config).then(unwrapData);
-  }
-
   static getOutfitDetailsV3(userOutfitId: number): Promise<OutfitDetailsV3> {
-    if (AvatarAPIService.isOutfitApiV4Enabled) {
-      return AvatarAPIService.getOutfitDetailsV4(userOutfitId);
-    }
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.getOutfitDetailsUrlV3, {
-      id: userOutfitId,
-    });
-    const config = {
-      url,
-      withCredentials: true,
-    };
-    return httpService.get<OutfitDetailsV3>(config).then(unwrapData);
+    return AvatarAPIService.getOutfitDetailsV4(userOutfitId);
   }
 
   /**
@@ -320,61 +251,14 @@ export class AvatarAPIService {
       url,
       withCredentials: true,
     };
-    return httpService
-      .get<GetOutfitDefinitionResponseV4>(config)
-      .then((r: { data: GetOutfitDefinitionResponseV4 }) =>
+    return get<GetOutfitDefinitionResponseV4>(config).then(
+      (r: { data: GetOutfitDefinitionResponseV4 }) =>
         AvatarAPIService.mapGetOutfitDefinitionV4ToV3(r.data),
-      );
+    );
   }
 
   static mapGetOutfitDefinitionV4ToV3(response: GetOutfitDefinitionResponseV4): OutfitDetailsV3 {
     return mapGetOutfitDefinitionV4ToV3(response);
-  }
-
-  static createOutfit(
-    name: string,
-    bodyColors: TSetBodyColors,
-    assets: AccoutrementAsset[],
-    scale: AvatarScales,
-    playerAvatarType: string,
-    backgroundAssetId?: number,
-  ): Promise<void> {
-    // Since all APIs should use hex colors now, prefer V3 endpoint
-    // Check if bodyColors exists and has hex string values
-    if (
-      bodyColors &&
-      typeof bodyColors === "object" &&
-      bodyColors !== null &&
-      "headColorId" in bodyColors &&
-      typeof (bodyColors as BodyColorsStateV2).headColorId === "string"
-    ) {
-      // Convert hex colors to v3 format and use v3 endpoint
-      return this.createOutfitV3(
-        name,
-        bodyColors as BodyColorsStateV2,
-        assets,
-        scale,
-        playerAvatarType,
-        backgroundAssetId,
-      );
-    }
-
-    // If bodyColors is undefined or has number IDs, we should still try to create the outfit
-    // but warn that hex colors should be used
-    console.warn(
-      "createOutfit: bodyColors is undefined or contains number IDs. All APIs should use hex colors.",
-      "bodyColors:",
-      bodyColors,
-    );
-
-    // Use v2 endpoint as fallback, but this should be migrated to use hex colors
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.createOutfitUrl);
-
-    const params: Record<string, unknown> = { name, bodyColors, assets, scale, playerAvatarType };
-    if (backgroundAssetId !== undefined) {
-      params.backgroundAssetId = backgroundAssetId;
-    }
-    return httpService.post<void>({ url, withCredentials: true }, params).then(unwrapData);
   }
 
   static createOutfitV3(
@@ -390,28 +274,16 @@ export class AvatarAPIService {
       throw new Error("bodyColor3s is required for createOutfitV3");
     }
 
-    if (AvatarAPIService.isOutfitApiV4Enabled) {
-      // The V4 create response carries { outfit, invalidAssets, ... };
-      // callers of createOutfitV3 don't read the body, so drop it to keep the void contract.
-      return AvatarAPIService.createOutfitV4(
-        name,
-        bodyColor3s,
-        assets,
-        scale,
-        playerAvatarType,
-        backgroundAssetId,
-      ).then(() => undefined);
-    }
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.createOutfitUrlV3);
-
-    // bodyColor3s is already in the correct Color3 format from the API. Only send
-    // backgroundAssetId when known so we never overwrite a saved background with `undefined`.
-    const params: Record<string, unknown> = { name, bodyColor3s, assets, scale, playerAvatarType };
-    if (backgroundAssetId !== undefined) {
-      params.backgroundAssetId = backgroundAssetId;
-    }
-    return httpService.post<void>({ url, withCredentials: true }, params).then(unwrapData);
+    // The V4 create response carries { outfit, invalidAssets, ... };
+    // callers of createOutfitV3 don't read the body, so drop it to keep the void contract.
+    return AvatarAPIService.createOutfitV4(
+      name,
+      bodyColor3s,
+      assets,
+      scale,
+      playerAvatarType,
+      backgroundAssetId,
+    ).then(() => undefined);
   }
 
   /**
@@ -437,37 +309,18 @@ export class AvatarAPIService {
       playerAvatarType,
       backgroundAssetId,
     );
-    return httpService
-      .post<MutateOutfitDefinitionResponseV4>({ url, withCredentials: true }, body)
-      .then(unwrapData);
-  }
-
-  static patchOutfit(
-    userOutfitId: number,
-    outfitContents: Partial<OutfitDetails>,
-  ): Promise<TPatchOutfitResponse> {
-    // Prefer using patchOutfitV3 for hex color support
-    console.warn("patchOutfit (v2) is deprecated. Use patchOutfitV3 for hex color support.");
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.patchOutfitUrl, { id: userOutfitId });
-    return httpService
-      .patch<TPatchOutfitResponse>({ url, withCredentials: true }, outfitContents)
-      .then(unwrapData);
+    return post<MutateOutfitDefinitionResponseV4>({ url, withCredentials: true }, body).then(
+      unwrapData,
+    );
   }
 
   static patchOutfitV3(
     userOutfitId: number,
     outfitContents: Partial<OutfitDetailsV3>,
   ): Promise<TPatchOutfitResponse> {
-    if (AvatarAPIService.isOutfitApiV4Enabled) {
-      return AvatarAPIService.patchOutfitV4(userOutfitId, outfitContents);
-    }
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.patchOutfitUrlV3, { id: userOutfitId });
-    return httpService
-      .patch<TPatchOutfitResponse>({ url, withCredentials: true }, outfitContents)
-      .then(unwrapData);
+    return AvatarAPIService.patchOutfitV4(userOutfitId, outfitContents);
   }
+
   /**
    * `PATCH /v4/outfits/{id}`. Translates the partial outfit contents into the outfit definition,
    * declaring only the changed sections via `updateTypes` (a name-only patch sends
@@ -478,58 +331,17 @@ export class AvatarAPIService {
     outfitContents: Partial<OutfitDetailsV3>,
   ): Promise<TPatchOutfitResponse> {
     const url = this.avatarApi(avatarUrlConstants.avatarApi.patchOutfitUrlV4, { id: userOutfitId });
-    return httpService
-      .patch<MutateOutfitDefinitionResponseV4>(
-        { url, withCredentials: true },
-        buildPatchOutfitRequestV4(outfitContents),
-      )
-      .then((r: { data: MutateOutfitDefinitionResponseV4 }) =>
-        mapPatchOutfitResponseV4(r.data, userOutfitId, outfitContents),
-      );
+    return patch<MutateOutfitDefinitionResponseV4>(
+      { url, withCredentials: true },
+      buildPatchOutfitRequestV4(outfitContents),
+    ).then((r: { data: MutateOutfitDefinitionResponseV4 }) =>
+      mapPatchOutfitResponseV4(r.data, userOutfitId, outfitContents),
+    );
   }
 
   static deleteOutfit(userOutfitId: number): Promise<void> {
     const url = this.avatarApi(avatarUrlConstants.avatarApi.deleteOutfitUrl, { id: userOutfitId });
-    return httpService.post<void>({ url, withCredentials: true }).then(unwrapData);
-  }
-
-  static getOutfits(
-    userId: string,
-    pageNumber: number,
-    itemsPerPage: number,
-    isEditable: boolean,
-    outfitType?: string,
-  ): Promise<unknown> {
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.getOutfitsUrl, { userId });
-    const config = {
-      url,
-      retryable: true,
-      withCredentials: true,
-    };
-
-    const params = { itemsPerPage, page: pageNumber, isEditable, outfitType };
-    return httpService.get<any>(config, params).then(unwrapData);
-  }
-
-  static getOutfitsV2(
-    userId: string,
-    paginationToken: string | undefined,
-    itemsPerPage: number,
-    isEditable: boolean,
-    outfitType?: string,
-  ): Promise<OutfitsResponse> {
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.getOutfitsUrlV2, { userId });
-    const config = {
-      url,
-      retryable: true,
-      withCredentials: true,
-    };
-
-    let params: Record<string, unknown> = { itemsPerPage, isEditable, outfitType };
-    if (paginationToken) {
-      params = { ...params, paginationToken };
-    }
-    return httpService.get<OutfitsResponse>(config, params).then(unwrapData);
+    return post<void>({ url, withCredentials: true }).then(unwrapData);
   }
 
   /**
@@ -543,102 +355,7 @@ export class AvatarAPIService {
       url,
       withCredentials: true,
     };
-    return httpService.patch<T>(config, request).then(unwrapData);
-  }
-
-  /**
-   * Consolidated save: send any combination of avatar sections (colors, scales, avatar type,
-   * assets, emotes, background) in a single `PATCH /v4/avatar` request.
-   */
-  static saveAvatar<T = UpdateAvatarResponseV4>(sections: AvatarUpdateSections): Promise<T> {
-    return AvatarAPIService.updateAvatar<T>(AvatarAPIService.buildAvatarUpdateRequest(sections));
-  }
-
-  /**
-   * Composes an `UpdateAvatarRequestV4` from the provided sections. Only sections that are
-   * present are declared in `updateTypes` and serialized into the payload.
-   */
-  static buildAvatarUpdateRequest(sections: AvatarUpdateSections): UpdateAvatarRequestV4 {
-    const updateTypes: AvatarUpdateType[] = [];
-    const updateAvatarModel: UpdateAvatarModelV4 = {};
-    const updateAvatarConfig: UpdateAvatarConfigV4 = {};
-
-    if (sections.bodyColors) {
-      updateTypes.push(AvatarUpdateType.UpdateBodyColors);
-      updateAvatarModel.bodyColors = {
-        headColor: sections.bodyColors.headColorId,
-        torsoColor: sections.bodyColors.torsoColorId,
-        rightArmColor: sections.bodyColors.rightArmColorId,
-        leftArmColor: sections.bodyColors.leftArmColorId,
-        rightLegColor: sections.bodyColors.rightLegColorId,
-        leftLegColor: sections.bodyColors.leftLegColorId,
-      };
-    }
-
-    if (sections.scales) {
-      updateTypes.push(AvatarUpdateType.UpdateScales);
-      updateAvatarModel.scales = sections.scales;
-    }
-
-    if (sections.avatarType) {
-      updateTypes.push(AvatarUpdateType.UpdateAvatarType);
-      updateAvatarModel.playerAvatarType = sections.avatarType;
-    }
-
-    if (sections.assets) {
-      updateTypes.push(AvatarUpdateType.UpdateAssets);
-      updateAvatarModel.assets = sections.assets.map(asset => ({
-        id: asset.id,
-        meta: asset.meta,
-      }));
-    }
-
-    if (sections.emotes) {
-      updateTypes.push(AvatarUpdateType.UpdateEmotes);
-      updateAvatarConfig.emoteRequestModels = sections.emotes;
-    }
-
-    if (sections.backgroundAssetId !== undefined) {
-      updateTypes.push(AvatarUpdateType.UpdateBackground);
-      updateAvatarConfig.backgroundRequestModel = { id: sections.backgroundAssetId };
-    }
-
-    const request: UpdateAvatarRequestV4 = { updateTypes };
-    const avatarDefinition: AvatarDefinitionV4 = {};
-    if (Object.keys(updateAvatarModel).length > 0) {
-      avatarDefinition.updateAvatarModel = updateAvatarModel;
-    }
-    if (Object.keys(updateAvatarConfig).length > 0) {
-      avatarDefinition.updateAvatarConfig = updateAvatarConfig;
-    }
-    if (Object.keys(avatarDefinition).length > 0) {
-      request.avatarDefinition = avatarDefinition;
-    }
-    return request;
-  }
-
-  static buildBodyColorsUpdateRequest(bodyColors: BodyColorsStateV2): UpdateAvatarRequestV4 {
-    return AvatarAPIService.buildAvatarUpdateRequest({ bodyColors });
-  }
-
-  static buildScalesUpdateRequest(scales: Partial<AvatarScales>): UpdateAvatarRequestV4 {
-    return AvatarAPIService.buildAvatarUpdateRequest({ scales });
-  }
-
-  static buildAvatarTypeUpdateRequest(avatarType: AvatarType): UpdateAvatarRequestV4 {
-    return AvatarAPIService.buildAvatarUpdateRequest({ avatarType });
-  }
-
-  static buildWearingAssetsUpdateRequest(assets: AccoutrementAsset[]): UpdateAvatarRequestV4 {
-    return AvatarAPIService.buildAvatarUpdateRequest({ assets });
-  }
-
-  static buildEmotesUpdateRequest(emotes: EmoteRequestModel[]): UpdateAvatarRequestV4 {
-    return AvatarAPIService.buildAvatarUpdateRequest({ emotes });
-  }
-
-  static buildBackgroundUpdateRequest(backgroundAssetId: number): UpdateAvatarRequestV4 {
-    return AvatarAPIService.buildAvatarUpdateRequest({ backgroundAssetId });
+    return patch<T>(config, request).then(unwrapData);
   }
 
   static setBodyColors(bodyColors: TSetBodyColors): Promise<SetBodyColorsResponse> {
@@ -680,64 +397,19 @@ export class AvatarAPIService {
       withCredentials: true,
     };
 
-    return httpService.post<SetBodyColorsResponse>(config, bodyColors).then(unwrapData);
+    return post<SetBodyColorsResponse>(config, bodyColors).then(unwrapData);
   }
 
   static setBodyColorsV2(bodyColors: BodyColorsStateV2): Promise<SetBodyColorsResponse> {
-    if (AvatarAPIService.isUpdateAvatarV4Enabled) {
-      return AvatarAPIService.updateAvatar<SetBodyColorsResponse>(
-        AvatarAPIService.buildBodyColorsUpdateRequest(bodyColors),
-      );
-    }
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.setBodyColorsUrlV2);
-
-    // Convert from internal format to API request format
-    const requestBody: BodyColorsV2Request = {
-      headColor3: bodyColors.headColorId,
-      torsoColor3: bodyColors.torsoColorId,
-      rightArmColor3: bodyColors.rightArmColorId,
-      leftArmColor3: bodyColors.leftArmColorId,
-      rightLegColor3: bodyColors.rightLegColorId,
-      leftLegColor3: bodyColors.leftLegColorId,
-    };
-
-    const config = {
-      url,
-      withCredentials: true,
-    };
-
-    return httpService.post<SetBodyColorsResponse>(config, requestBody).then(unwrapData);
-  }
-
-  static setWearingAssets(assetIds: number[]): Promise<void> {
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.setWearingAssetsUrl);
-
-    const config = {
-      url,
-      withCredentials: true,
-    };
-
-    const params = { assetIds };
-    return httpService.post<void>(config, params).then(unwrapData);
+    return AvatarAPIService.updateAvatar<SetBodyColorsResponse>(
+      buildAvatarUpdateRequest({ bodyColors }),
+    );
   }
 
   static setWearingAssetsV2(assets: AccoutrementAsset[]): Promise<SetWearingAssetsResponse> {
-    if (AvatarAPIService.isUpdateAvatarV4Enabled) {
-      return AvatarAPIService.updateAvatar<SetWearingAssetsResponse>(
-        AvatarAPIService.buildWearingAssetsUpdateRequest(assets),
-      );
-    }
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.setWearingAssetsUrlV2);
-
-    const config = {
-      url,
-      withCredentials: true,
-    };
-
-    const params = { assets };
-    return httpService.post<SetWearingAssetsResponse>(config, params).then(unwrapData);
+    return AvatarAPIService.updateAvatar<SetWearingAssetsResponse>(
+      buildAvatarUpdateRequest({ assets }),
+    );
   }
 
   static wearAsset(assetId: number): Promise<SetWearingAssetsResponse> {
@@ -748,7 +420,7 @@ export class AvatarAPIService {
       withCredentials: true,
     };
 
-    return httpService.post<SetWearingAssetsResponse>(config).then(unwrapData);
+    return post<SetWearingAssetsResponse>(config).then(unwrapData);
   }
 
   static removeAsset(assetId: number): Promise<SetWearingAssetsResponse> {
@@ -759,38 +431,11 @@ export class AvatarAPIService {
       withCredentials: true,
     };
 
-    return httpService.post<SetWearingAssetsResponse>(config).then(unwrapData);
-  }
-
-  static wearOutfit(userOutfitId: number): Promise<void> {
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.wearOutfitUrl, { id: userOutfitId });
-
-    const config = {
-      url,
-      withCredentials: true,
-    };
-
-    return httpService.post<void>(config).then(unwrapData);
-  }
-
-  static getAvatar(retry = true): Promise<AvatarConfig> {
-    // Prefer V2 endpoint for hex colors, but keep V1 for backward compatibility
-    console.warn("getAvatar (v1) is deprecated. Consider using getAvatarV2 for hex color support.");
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.getAvatarUrl);
-    const config = { url, withCredentials: true, retryable: retry };
-
-    return httpService.get<AvatarConfig>(config).then(unwrapData);
+    return post<SetWearingAssetsResponse>(config).then(unwrapData);
   }
 
   static getAvatarV2(retry = true): Promise<AvatarConfigV2> {
-    if (AvatarAPIService.isGetAvatarV4Enabled) {
-      return AvatarAPIService.getAvatarV4(retry);
-    }
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.getAvatarUrlV2);
-    const config = { url, withCredentials: true, retryable: retry };
-
-    return httpService.get<AvatarConfigV2>(config).then(unwrapData);
+    return AvatarAPIService.getAvatarV4(retry);
   }
 
   static getAvatarV4(retry = true): Promise<AvatarConfigV2> {
@@ -799,9 +444,9 @@ export class AvatarAPIService {
     )}?${getAvatarV4SearchParams()}`;
     const config = { url, withCredentials: true, retryable: retry };
 
-    return httpService
-      .get<GetAvatarResponseV4>(config)
-      .then((r: { data: GetAvatarResponseV4 }) => mapGetAvatarV4ToConfigV2(r.data));
+    return get<GetAvatarResponseV4>(config).then((r: { data: GetAvatarResponseV4 }) =>
+      mapGetAvatarV4ToConfigV2(r.data),
+    );
   }
 
   static getAvatarRules(): Promise<PlayerAvatarConfig> {
@@ -809,48 +454,19 @@ export class AvatarAPIService {
     const config = {
       url,
     };
-    return httpService.get<PlayerAvatarConfig>(config).then(unwrapData);
+    return get<PlayerAvatarConfig>(config).then(unwrapData);
   }
 
   static setScales(scales: any): Promise<SetBodyScalesResponse> {
-    if (AvatarAPIService.isUpdateAvatarV4Enabled) {
-      return AvatarAPIService.updateAvatar<SetBodyScalesResponse>(
-        AvatarAPIService.buildScalesUpdateRequest(scales as Partial<AvatarScales>),
-      );
-    }
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.setScalesUrl);
-    const config = {
-      url,
-      withCredentials: true,
-    };
-    return httpService.post<SetBodyScalesResponse>(config, scales).then(unwrapData);
+    return AvatarAPIService.updateAvatar<SetBodyScalesResponse>(
+      buildAvatarUpdateRequest({ scales: scales as Partial<AvatarScales> }),
+    );
   }
 
   static setAvatarType(avatarType: AvatarType): Promise<SetAvatarTypeResponse> {
-    if (AvatarAPIService.isUpdateAvatarV4Enabled) {
-      return AvatarAPIService.updateAvatar<SetAvatarTypeResponse>(
-        AvatarAPIService.buildAvatarTypeUpdateRequest(avatarType),
-      );
-    }
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.setAvatarTypeUrl);
-    const config = {
-      url,
-      withCredentials: true,
-    };
-    const params = { playerAvatarType: avatarType };
-    return httpService.post<SetAvatarTypeResponse>(config, params).then(unwrapData);
-  }
-
-  static getRecentItems(type: string): Promise<RecentItemsResponse> {
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.getRecentItemsUrl, { type });
-    const config = {
-      url,
-      withCredentials: true,
-      retryable: true,
-    };
-    return httpService.get<RecentItemsResponse>(config).then(unwrapData);
+    return AvatarAPIService.updateAvatar<SetAvatarTypeResponse>(
+      buildAvatarUpdateRequest({ avatarType }),
+    );
   }
 
   static getAvatarInventory(
@@ -880,7 +496,7 @@ export class AvatarAPIService {
         params[`itemCategories[${index}].ItemType`] = item.itemType;
       });
     }
-    return httpService.get<GetAvatarInventoryResponse>(config, params).then(unwrapData);
+    return get<GetAvatarInventoryResponse>(config, params).then(unwrapData);
   }
 
   static redrawThumbnail(): Promise<void> {
@@ -890,13 +506,13 @@ export class AvatarAPIService {
       withCredentials: true,
       retryable: false,
     };
-    return httpService.post<void>(config).then(unwrapData);
+    return post<void>(config).then(unwrapData);
   }
 
   static getMetaData(retry = true): Promise<AvatarSettings> {
     const url = this.avatarApi(avatarUrlConstants.avatarApi.getMetaData);
     const config = { url, withCredentials: true, retryable: retry };
-    return httpService.get<AvatarSettings>(config, config).then(unwrapData);
+    return get<AvatarSettings>(config, config).then(unwrapData);
   }
 
   static getCatalogMetaData(retry = true): Promise<CatalogSettings> {
@@ -906,7 +522,7 @@ export class AvatarAPIService {
       withCredentials: true,
       retryable: retry,
     };
-    return httpService.get<CatalogSettings>(config).then(unwrapData);
+    return get<CatalogSettings>(config).then(unwrapData);
   }
 
   static getCategories(): Promise<unknown> {
@@ -914,7 +530,7 @@ export class AvatarAPIService {
     const config = {
       url,
     };
-    return httpService.get<any>(config).then(unwrapData);
+    return get<any>(config).then(unwrapData);
   }
 
   static getSubcategories(): Promise<unknown> {
@@ -922,7 +538,7 @@ export class AvatarAPIService {
     const config = {
       url,
     };
-    return httpService.get<any>(config).then(unwrapData);
+    return get<any>(config).then(unwrapData);
   }
 
   static postItemDetails(
@@ -937,7 +553,7 @@ export class AvatarAPIService {
     const params = {
       items: items.map(item => ({ itemType, id: item.assetId })),
     };
-    return httpService.post<PostItemDetailsResponse>(config, params).then(unwrapData);
+    return post<PostItemDetailsResponse>(config, params).then(unwrapData);
   }
 
   static getEmotes(): Promise<GetEmotesResponse> {
@@ -946,7 +562,7 @@ export class AvatarAPIService {
       url,
       withCredentials: true,
     };
-    return httpService.get<GetEmotesResponse>(config).then(unwrapData);
+    return get<GetEmotesResponse>(config).then(unwrapData);
   }
 
   /**
@@ -954,53 +570,30 @@ export class AvatarAPIService {
    *
    * The V4 endpoint replaces the entire emote config with the array it receives, so
    * `currentEmotes` (the emotes already equipped in the other slots) must be included
-   * alongside the changed slot. The legacy endpoint ignores `currentEmotes`.
+   * alongside the changed slot.
    */
   static equipEmote(
     assetId: number,
     positionIndex: number,
-    currentEmotes: EmoteRequestModel[] = [],
+    currentEmotes: EmoteRequestModel[],
   ): Promise<void> {
-    if (AvatarAPIService.isUpdateAvatarV4Enabled) {
-      const emotes = currentEmotes.filter(emote => emote.position !== positionIndex);
-      emotes.push({ assetId, position: positionIndex });
-      return AvatarAPIService.updateAvatar<void>(AvatarAPIService.buildEmotesUpdateRequest(emotes));
-    }
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.equipEmoteUrl, {
-      assetId,
-      position: positionIndex,
-    });
-    const config = {
-      url,
-      withCredentials: true,
-    };
-    return httpService.post<void>(config).then(unwrapData);
+    return AvatarAPIService.updateAvatar<void>(
+      buildAvatarUpdateRequest({
+        emotes: emotesAfterEquip(currentEmotes, assetId, positionIndex),
+      }),
+    );
   }
 
   /**
    * Unequips the emote at `positionIndex`.
    *
    * The V4 endpoint replaces the entire emote config, so we send `currentEmotes` with the
-   * cleared slot removed. The legacy endpoint ignores `currentEmotes`.
+   * cleared slot removed.
    */
-  static unequipEmote(
-    positionIndex: number,
-    currentEmotes: EmoteRequestModel[] = [],
-  ): Promise<void> {
-    if (AvatarAPIService.isUpdateAvatarV4Enabled) {
-      const emotes = currentEmotes.filter(emote => emote.position !== positionIndex);
-      return AvatarAPIService.updateAvatar<void>(AvatarAPIService.buildEmotesUpdateRequest(emotes));
-    }
-
-    const url = this.avatarApi(avatarUrlConstants.avatarApi.unequipEmoteUrl, {
-      position: positionIndex,
-    });
-    const config = {
-      url,
-      withCredentials: true,
-    };
-    return httpService.delete<void>(config).then(unwrapData);
+  static unequipEmote(positionIndex: number, currentEmotes: EmoteRequestModel[]): Promise<void> {
+    return AvatarAPIService.updateAvatar<void>(
+      buildAvatarUpdateRequest({ emotes: emotesAfterUnequip(currentEmotes, positionIndex) }),
+    );
   }
 
   /**
@@ -1008,9 +601,7 @@ export class AvatarAPIService {
    * consolidated V4 endpoint. Backgrounds have no legacy equip endpoint, so this is V4-only.
    */
   static equipBackground(backgroundAssetId: number): Promise<UpdateAvatarResponseV4> {
-    return AvatarAPIService.updateAvatar(
-      AvatarAPIService.buildBackgroundUpdateRequest(backgroundAssetId),
-    );
+    return AvatarAPIService.updateAvatar(buildAvatarUpdateRequest({ backgroundAssetId }));
   }
 
   static getInventoryUrl(userId: string): string {
@@ -1024,7 +615,7 @@ export class AvatarAPIService {
       url,
       withCredentials: true,
     };
-    return httpService.get<GetInventoryItemsResponse>(config, params).then(unwrapData);
+    return get<GetInventoryItemsResponse>(config, params).then(unwrapData);
   }
 
   // static getInventoryItems(): Promise<InventoryAsset[]> {
@@ -1032,7 +623,7 @@ export class AvatarAPIService {
   //   const config = {
   //     url
   //   };
-  //   return httpService.get<InventoryAsset[]>(config).then(unwrapData);
+  //   return get<InventoryAsset[]>(config).then(unwrapData);
   // }
 
   static getOwnership(userId: string, itemType: string, itemId: number): Promise<boolean> {
@@ -1049,7 +640,7 @@ export class AvatarAPIService {
     const config = {
       url,
     };
-    return httpService.get<any>(config).then(unwrapData);
+    return get<any>(config).then(unwrapData);
   }
 
   static getAppPolicyBehavior(): Promise<AvatarAppPolicy> {
@@ -1059,13 +650,13 @@ export class AvatarAPIService {
   static getUserCurrency(userId: string): Promise<GetUserCurrencyResponse> {
     const url = this.economyApi(avatarUrlConstants.economyApi.getUserCurrency, { userId });
     const config = { url, withCredentials: true };
-    return httpService.get<GetUserCurrencyResponse>(config).then(unwrapData);
+    return get<GetUserCurrencyResponse>(config).then(unwrapData);
   }
 
   static getFeatureAccess(): Promise<GetFeatureAccessResponse> {
     const url = this.api(avatarUrlConstants.api.featureAccess);
     const config = { url, withCredentials: true };
-    return httpService.get<GetFeatureAccessResponse>(config).then(unwrapData);
+    return get<GetFeatureAccessResponse>(config).then(unwrapData);
   }
 }
 

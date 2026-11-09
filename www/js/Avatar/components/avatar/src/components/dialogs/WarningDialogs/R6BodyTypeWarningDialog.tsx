@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../../../utils/translate";
-import { reportAXError } from "../../../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import avatarConstants from "../../../constants/avatarConstants";
 import { AvatarType } from "../../../constants/types";
 import AvatarAPIService from "../../../services/avatarAPIService";
@@ -29,10 +29,11 @@ function R6BodyTypeWarningDialog({
   const translate = useAvatarTranslate("Feature.Avatar");
   const systemFeedback = useSystemFeedback();
   const { removeLayeredClothing } = useAssetManagerContext();
-  const { setAvatarType } = useAvatarPageContext();
+  const { avatarType, setAvatarType } = useAvatarPageContext();
 
   const confirmChange = useCallback(() => {
     const newAvatarType: AvatarType = "R6";
+    const previousAvatarType = avatarType;
     setAvatarType(newAvatarType);
     AvatarAPIService.setAvatarType(newAvatarType)
       .then(() => {
@@ -42,8 +43,9 @@ function R6BodyTypeWarningDialog({
         closeDialog();
       })
       .catch(e => {
+        setAvatarType(previousAvatarType);
         reportAXError({
-          itemName: "SetR15AvatarTypeError",
+          itemName: "SetR6AvatarTypeError",
           counterName: "AvatarEditorError",
           log: parseError(e),
         });
@@ -51,7 +53,7 @@ function R6BodyTypeWarningDialog({
         console.error(e);
         systemFeedback.error(avatarConstants.avatarType.failedToUpdate);
       });
-  }, [setAvatarType, removeLayeredClothing, closeDialog, systemFeedback]);
+  }, [avatarType, setAvatarType, removeLayeredClothing, closeDialog, systemFeedback]);
 
   const modalLayout = avatarConstants.modalLayout.outfitDelete;
 

@@ -9,7 +9,7 @@ import {
   TextInput,
 } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../../../utils/translate";
-import { reportAXError } from "../../../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import avatarConstants from "../../../constants/avatarConstants";
 import AvatarAPIService from "../../../services/avatarAPIService";
 import hasInvalidOutfitName from "../../../utils/outfitsMenu.utils";
@@ -48,9 +48,11 @@ function CreateOutfitDialog({
       // Structural type (only `.code` is read) so this dialog does not depend on
       // `@rbx/core-scripts/http` on the Next.js path.
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      const errorResponse: { code?: string } = e?.errors?.[0] || e;
+      const errorResponse: { code?: string | number } = e?.errors?.[0] || e;
+      // The API can return the code as a number or a string.
       const hasMaxOutfits =
-        errorResponse.code === avatarConstants.outfits.outfitErrorCodes.maxOutfits.toString();
+        String(errorResponse.code) ===
+        avatarConstants.outfits.outfitErrorCodes.maxOutfits.toString();
       if (hasMaxOutfits) {
         setError(translate(outfitCostumeMessage.maxNumberOfOutfits));
       } else {
@@ -61,7 +63,7 @@ function CreateOutfitDialog({
           reportAXError({
             itemName: "CreateOutfitError",
             counterName: "AvatarEditorError",
-            log: parseError(error),
+            log: parseError(e),
           });
           trackEditFailed("outfitCreate", e);
 
@@ -69,7 +71,7 @@ function CreateOutfitDialog({
         }
       }
     },
-    [error, translate],
+    [translate],
   );
 
   const handleClose = useCallback(() => {

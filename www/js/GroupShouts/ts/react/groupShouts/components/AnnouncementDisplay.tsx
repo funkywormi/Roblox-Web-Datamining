@@ -15,7 +15,7 @@ import { AnnouncementModel, GroupDetailsPolicies } from '../types';
 import { groupAnnouncementsConfig } from '../translation.config';
 import { logGroupPageClickEvent } from '../../shared/utils/logging';
 import { EventContext as SharedEventContext } from '../../shared/constants/eventConstants';
-import { getPlainText } from '../../shared/utils/messageContentUtils';
+import { getPlainText, hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import announcementsService from '../services/announcementsService';
 import Message from '../../shared/components/content/MessageContent';
 import ContentReactions from '../../shared/components/reactions/ContentReactions';
@@ -60,6 +60,7 @@ const AnnouncementDisplay = ({
   locationTab = 'home'
 }: AnnouncementDisplayProps): JSX.Element => {
   const { id, messageId, title, content, reactions, imageAssetId, formId } = announcement;
+  const hasRichText = hasRichTextContent(announcement.originalContent);
 
   const isPollsEnabled = useAnnouncementPollsEnabled();
   const { features } = useCommunityProductFeatures();
@@ -140,16 +141,22 @@ const AnnouncementDisplay = ({
           groupId,
           clickTargetType: togglingOn ? 'shoutReactionAdded' : 'shoutReactionRemoved',
           clickTargetId: id,
+          hasRichText,
           context: SharedEventContext.GroupHomepage
         });
-        trackReactionToggled({ announcementId: id, emoteId, isReactionAdded: togglingOn });
+        trackReactionToggled({
+          announcementId: id,
+          emoteId,
+          isReactionAdded: togglingOn,
+          hasRichText
+        });
         return true;
       } catch {
         systemFeedbackService.warning(translate('NetworkError'));
         return false;
       }
     },
-    [groupId, id, messageId, systemFeedbackService, translate, trackReactionToggled]
+    [groupId, id, messageId, hasRichText, systemFeedbackService, translate, trackReactionToggled]
   );
 
   // Only signed-in users can react. Anyone else sees view-only mode.

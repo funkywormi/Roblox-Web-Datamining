@@ -3,10 +3,7 @@ import useChatTranslate from "./useChatTranslate";
 import { chatQueryKeys } from "../constants/queryKeys";
 import { markConversationsAsRead, sendMessage } from "../services/chatService";
 import type { TChatMessage } from "../types/chat";
-import {
-  patchConversationInListCache,
-  setConversationMessagesCache,
-} from "../utils/chatQueryCache";
+import { patchConversationsInList, setConversationMessagesCache } from "../utils/chatQueryCache";
 import { buildModeratedMessage, isModeratedSendResponse } from "../utils/chatModeration";
 import { buildFailedMessage, classifySendFailure } from "../utils/chatSendFailure";
 import { sendConversationMessageSent } from "../utils/chatAnalytics";
@@ -79,14 +76,8 @@ export const useSendMessage = () => {
         isSending: true,
       };
 
-      patchConversationInListCache(queryClient, conversationId, {
+      patchConversationsInList(queryClient, [conversationId], {
         unread_message_count: 0,
-        preview_message: {
-          content,
-          created_at: sentAt,
-          sender_user_id: currentUserId ?? undefined,
-          is_previewable: true,
-        },
       });
 
       setConversationMessagesCache(queryClient, conversationId, current => ({
@@ -174,8 +165,18 @@ export const useSendMessage = () => {
       });
 
       markConversationsAsRead([conversationId]).catch(() => undefined);
-      patchConversationInListCache(queryClient, conversationId, {
+      patchConversationsInList(queryClient, [conversationId], {
         unread_message_count: 0,
+        // Promote only a persisted message, using the server's filtered content and timestamp.
+        // Failed and fully moderated sends must not change conversation ordering.
+        ...(sentMessage && !isModeratedSendResponse(data)
+          ? {
+              preview_message: {
+                ...sentMessage,
+                created_at: sentMessage.created_at ?? context?.sentAt,
+              },
+            }
+          : {}),
       });
 
       // A fully moderated message is not persisted server-side, so the onSettled refetch

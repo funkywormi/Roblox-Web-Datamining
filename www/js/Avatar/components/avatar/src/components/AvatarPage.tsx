@@ -14,7 +14,7 @@ import { AvatarEditorTabs, AvatarTabContentHeader, AvatarTabContent } from "./ta
 import AvatarBack from "./AvatarBack";
 import AvatarBodyTypeScale from "./AvatarScaling/AvatarBodyTypeScale";
 import AvatarScaling from "./AvatarScaling/AvatarScaling";
-import LoadingSpinner from "./LoadingSpinner";
+import { AvatarItemsSkeleton } from "./AvatarEditorSkeleton";
 import {
   useRefreshAvatarOnPageFocus,
   useAvatarScaleController,
@@ -31,7 +31,8 @@ import useOutfitHelpers from "../hooks/useOutfitHelpers";
 import useAvatarTimeoutDialog from "../hooks/useAvatarTimeoutDialog";
 import { useAvatarBodyColorsContext } from "../contexts/AvatarBodyColorsContext";
 import { trackAvatarEditorClick, AvatarEditorTrackingEvents } from "../utils/axTracking";
-import { sendAXTracking, AXAnalyticsConstants } from "../utils/axAnalyticsService";
+import sendAXTracking from "@rbx/catalog/analytics/sendAXTracking";
+import AXAnalyticsConstants from "@rbx/catalog/analytics/AXAnalyticsConstants";
 import { host, trackCounter } from "../observability";
 
 function AvatarPage(): React.ReactElement {
@@ -240,7 +241,7 @@ function AvatarPage(): React.ReactElement {
       {/* Right Panel */}
       {!pageLoaded ? (
         <div className="right-panel seven-column">
-          <LoadingSpinner />
+          <AvatarItemsSkeleton />
         </div>
       ) : (
         <div

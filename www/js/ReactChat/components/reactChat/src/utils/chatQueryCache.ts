@@ -1,10 +1,7 @@
-import type { InfiniteData, QueryClient } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import { chatQueryKeys } from "../constants/queryKeys";
-import type {
-  TChatApiConversation,
-  TGetConversationMessagesResponse,
-  TGetUserConversationsResponse,
-} from "../types/api";
+import type { TChatApiConversation, TGetConversationMessagesResponse } from "../types/api";
+import { getCurrentUserId } from "./currentUser";
 
 // Tombstones unfriended/blocked users so useChatData filters their 1:1 out of the list until the
 // server stops returning it (see removedFriendUserIds). De-duped.
@@ -22,104 +19,135 @@ export function addRemovedFriendUserIds(
   });
 }
 
-// Adds a just-created conversation to the pending-seed store so useChatData can show it immediately,
-// before the server's conversation list catches up. A no-op if it (or the server list) already has
-// it — dedup by id keeps a repeated first-message send from stacking duplicates.
-export function seedPendingConversation(
-  queryClient: Pick<QueryClient, "setQueryData">,
+export function getOtherParticipantIds(
   conversation: TChatApiConversation,
+  currentUserId: number | null,
+): number[] {
+  if (conversation.participants && conversation.participants.length > 0) {
+    return conversation.participants.map(user => user.id).filter(id => id !== currentUserId);
+  }
+  return (conversation.participant_user_ids ?? []).filter(id => id !== currentUserId);
+}
+
+// Mirrors the id derivation in toChatConversation, so list entries line up with the rendered rows.
+// A friend suggestion has no server id and is keyed by its participant ids.
+export function getConversationListId(conversation: TChatApiConversation): string {
+  return (
+    conversation.id ??
+    `friends-${(conversation.participant_user_ids ?? []).toSorted((a, b) => a - b).join("-")}`
+  );
+}
+
+function writeConversationsToList(
+  queryClient: Pick<QueryClient, "setQueryData" | "getQueryData">,
+  conversations: TChatApiConversation[],
+  { appendNew }: { appendNew: boolean },
 ): void {
-  if (conversation.id == null) {
+  const removedUserIds = new Set(
+    queryClient.getQueryData<number[]>(chatQueryKeys.removedFriendUserIds()) ?? [],
+  );
+  const currentUserId = getCurrentUserId();
+  // The server keeps returning an unfriended/blocked user's 1:1 until the removal propagates.
+  const incoming = conversations.filter(
+    conversation =>
+      conversation.type === "group" ||
+      !getOtherParticipantIds(conversation, currentUserId).some(id => removedUserIds.has(id)),
+  );
+  if (incoming.length === 0) {
     return;
   }
-  queryClient.setQueryData<TChatApiConversation[]>(
-    chatQueryKeys.pendingConversations(),
-    previous => {
-      const existing = previous ?? [];
-      if (existing.some(pending => pending.id === conversation.id)) {
-        return existing;
+  queryClient.setQueryData<TChatApiConversation[]>(chatQueryKeys.conversationList(), previous => {
+    const existing = previous ?? [];
+    const incomingById = new Map(
+      incoming.map(conversation => [getConversationListId(conversation), conversation]),
+    );
+    let hasChanged = false;
+    const next = existing.map(conversation => {
+      const id = getConversationListId(conversation);
+      const fresh = incomingById.get(id);
+      if (!fresh) {
+        return conversation;
       }
-      return [...existing, conversation];
-    },
-  );
+      incomingById.delete(id);
+      hasChanged ||= fresh !== conversation;
+      return fresh;
+    });
+    if (appendNew && incomingById.size > 0) {
+      next.push(...incomingById.values());
+      hasChanged = true;
+    }
+    return hasChanged ? next : previous;
+  });
 }
 
-// Replaces seeds with the server's current copy of the same conversation. A seed outside the loaded
-// list pages never gets the list's refreshes, so this is how a policy change (opt-in, OSA, moderation
-// type) reaches it. It only touches seeds that still exist, so a response that arrives after the list
-// returned the conversation (and the seed was pruned) cannot bring the seed back.
-export function refreshPendingConversations(
-  queryClient: Pick<QueryClient, "setQueryData">,
+// The server is authoritative for the conversations it returns: their copies replace ours. A
+// conversation it does not return stays in the list until it is removed explicitly.
+export function upsertConversationsInList(
+  queryClient: Pick<QueryClient, "setQueryData" | "getQueryData">,
   conversations: TChatApiConversation[],
 ): void {
-  const freshById = new Map(
-    conversations.flatMap(conversation =>
-      conversation.id == null ? [] : [[conversation.id, conversation] as const],
-    ),
-  );
-  queryClient.setQueryData<TChatApiConversation[]>(
-    chatQueryKeys.pendingConversations(),
-    previous => {
-      if (!previous || previous.length === 0) {
-        return previous;
-      }
-      return previous.map(seed => (seed.id == null ? seed : (freshById.get(seed.id) ?? seed)));
-    },
-  );
+  writeConversationsToList(queryClient, conversations, { appendNew: true });
 }
 
-// Drops seeded conversations once the server's list includes them, so the (fresher) server copy
-// wins and the seed store stays small.
-export function prunePendingConversations(
-  queryClient: Pick<QueryClient, "setQueryData">,
-  serverConversationIds: ReadonlySet<string>,
+// Updates only conversations still in the list, so a late response cannot bring back one that was
+// removed while it was in flight.
+export function replaceConversationsInList(
+  queryClient: Pick<QueryClient, "setQueryData" | "getQueryData">,
+  conversations: TChatApiConversation[],
 ): void {
-  queryClient.setQueryData<TChatApiConversation[]>(
-    chatQueryKeys.pendingConversations(),
-    previous => {
-      if (!previous || previous.length === 0) {
-        return previous;
-      }
-      const next = previous.filter(
-        pending => pending.id == null || !serverConversationIds.has(pending.id),
-      );
-      return next.length === previous.length ? previous : next;
-    },
-  );
+  writeConversationsToList(queryClient, conversations, { appendNew: false });
 }
 
-export function patchConversationInListCache(
+// Adds a conversation the user just opened, so its dialog can render before the server list
+// returns it: a just-created one is not in that list yet, and an older 1:1 opened from the carousel
+// may sit on a page that has not loaded. Keeps the existing copy if the list already has it.
+export function addConversationToList(
+  queryClient: Pick<QueryClient, "setQueryData" | "getQueryData">,
+  conversation: TChatApiConversation,
+): void {
+  const { id } = conversation;
+  if (id == null) {
+    return;
+  }
+  queryClient.setQueryData<TChatApiConversation[]>(chatQueryKeys.conversationList(), previous => {
+    const existing = previous ?? [];
+    return existing.some(candidate => candidate.id === id) ? previous : [...existing, conversation];
+  });
+}
+
+export function removeConversationsFromList(
   queryClient: Pick<QueryClient, "setQueryData">,
-  conversationId: string,
+  conversationIds: string[],
+): void {
+  if (conversationIds.length === 0) {
+    return;
+  }
+  const ids = new Set(conversationIds);
+  queryClient.setQueryData<TChatApiConversation[]>(chatQueryKeys.conversationList(), previous => {
+    if (!previous) {
+      return previous;
+    }
+    const next = previous.filter(conversation => !ids.has(getConversationListId(conversation)));
+    return next.length === previous.length ? previous : next;
+  });
+}
+
+export function patchConversationsInList(
+  queryClient: Pick<QueryClient, "setQueryData">,
+  conversationIds: string[],
   patch: Partial<TChatApiConversation>,
 ): void {
-  // The conversations list is an infinite query, so the cache holds InfiniteData with a `pages`
-  // array (not a flat { conversations }); patch the matching conversation within its page.
-  queryClient.setQueryData<InfiniteData<TGetUserConversationsResponse>>(
-    chatQueryKeys.conversations(),
-    previous => {
-      if (!previous) {
-        return previous;
-      }
-
-      const hasMatch = previous.pages.some(page =>
-        page.conversations.some(conversation => conversation.id === conversationId),
-      );
-      if (!hasMatch) {
-        return previous;
-      }
-
-      return {
-        ...previous,
-        pages: previous.pages.map(page => ({
-          ...page,
-          conversations: page.conversations.map(conversation =>
-            conversation.id === conversationId ? { ...conversation, ...patch } : conversation,
-          ),
-        })),
-      };
-    },
-  );
+  const ids = new Set(conversationIds);
+  queryClient.setQueryData<TChatApiConversation[]>(chatQueryKeys.conversationList(), previous => {
+    if (!previous?.some(conversation => conversation.id != null && ids.has(conversation.id))) {
+      return previous;
+    }
+    return previous.map(conversation =>
+      conversation.id != null && ids.has(conversation.id)
+        ? { ...conversation, ...patch }
+        : conversation,
+    );
+  });
 }
 
 // Writes a conversation's cached messages without moving dataUpdatedAt. useConversationMessages

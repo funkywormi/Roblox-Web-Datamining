@@ -23,9 +23,9 @@ const GENERAL_MODIFIED_BODY_KEYS: BodyKeys = {
 };
 
 const GENERAL_WARNING_BODY_KEYS: BodyKeys = {
-  kind_word: "Experiment.TextFilterEducation.General.Body.Respect.Warning",
-  no_spam: "Experiment.TextFilterEducation.General.Body.Spam.Warning",
-  no_personal_info: "Experiment.TextFilterEducation.General.Body.Pii.Warning",
+  kind_word: "TextFilterEducation.General.Body.Respect.Warning.V2",
+  no_spam: "TextFilterEducation.General.Body.Spam.Warning.V2",
+  no_personal_info: "TextFilterEducation.General.Body.Pii.Warning.V2",
   no_sexual: "Experiment.TextFilterEducation.General.Body.Romance.Warning",
 };
 

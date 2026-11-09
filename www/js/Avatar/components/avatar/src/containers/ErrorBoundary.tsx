@@ -7,7 +7,7 @@
  * The data is sent to counters + superset, under table webfrontend_userjourney_actions
  */
 import React, { ReactNode } from "react";
-import { reportAXError } from "../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 
 interface ErrorBoundaryProps {
   children: ReactNode;

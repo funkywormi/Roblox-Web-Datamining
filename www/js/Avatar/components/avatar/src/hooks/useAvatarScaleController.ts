@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { reportAXError } from "../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../observability";
 import DEFAULT_AVATAR_SCALES from "../utils/avatarScale.constants";
 import AvatarScaleUtils from "../utils/avatarScale.utils";

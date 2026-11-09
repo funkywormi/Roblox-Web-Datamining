@@ -5,7 +5,7 @@ import { useAvatarTranslate } from "../../../utils/translate";
 import { isBlackbirdUser } from "@rbx/core-scripts/meta/user";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import { mapItemRestrictionIcons } from "@rbx/www-common/components/itemCard";
-import { reportAXError } from "../../../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import {
   trackItemsLoadFailed,
   trackItemsLoadRequested,
@@ -184,6 +184,8 @@ function AvatarItemsContent({
 
   // Request sequence tracking to detect race conditions
   const requestSequenceRef = useRef(0);
+  // Bumped by first-page loads only, so detail responses for a replaced list are dropped.
+  const listGenerationRef = useRef(0);
 
   // Item details can resolve after the user equips something. Read selection through a ref so a
   // late response doesn't apply the worn assets from when the request started.
@@ -314,7 +316,8 @@ function AvatarItemsContent({
     (isLoadMore = false) => {
       const inventoryRequest = getInventoryRequest();
 
-      if (!inventoryRequest || !config.isActive || loading) {
+      // A first-page load replaces any load in flight; the sequence check drops the old response.
+      if (!inventoryRequest || !config.isActive || (isLoadMore && loading)) {
         return;
       }
 
@@ -337,7 +340,9 @@ function AvatarItemsContent({
         // Reset deduplication dictionary immediately to ensure it's clear before API call
         seenItemsDictRef.current = new Set(); // Synchronous reset
         setAutoPaginationCount(0);
+        listGenerationRef.current += 1;
       }
+      const listGeneration = listGenerationRef.current;
       setLoading(true);
 
       // Track this request to detect race conditions
@@ -354,9 +359,8 @@ function AvatarItemsContent({
       ).then(
         response => {
           trackItemsLoaded(itemsRequest);
-          // Check for race condition - ignore stale responses
+          // Ignore stale responses. The newer request clears the loading state.
           if (currentRequestId !== requestSequenceRef.current) {
-            setLoading(false); // Important: Clear loading state even for stale requests
             return;
           }
 
@@ -556,6 +560,9 @@ function AvatarItemsContent({
           if (finalAssetIds.length > 0) {
             AvatarAPIService.postItemDetails(finalAssetIds, "Asset")
               .then(detailResponse => {
+                if (listGeneration !== listGenerationRef.current) {
+                  return;
+                }
                 // Batch all asset updates into a single state update
                 setItems(prevItems => {
                   const newItems = [...prevItems];
@@ -633,6 +640,9 @@ function AvatarItemsContent({
           finalOutfits.forEach(catalogItem => {
             AvatarAPIService.getOutfitDetailsV3(catalogItem.id)
               .then(detailResponse => {
+                if (listGeneration !== listGenerationRef.current) {
+                  return;
+                }
                 const details = detailResponse;
                 const supportsHeadShapes = details.assets.some(
                   asset => asset.supportsHeadShapes === true,
@@ -686,6 +696,9 @@ function AvatarItemsContent({
           setLoading(false);
         },
         e => {
+          if (currentRequestId !== requestSequenceRef.current) {
+            return;
+          }
           reportAXError({
             itemName: "LoadAvatarInventoryError",
             counterName: "AvatarEditorError",

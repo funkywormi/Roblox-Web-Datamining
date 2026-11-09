@@ -3,12 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@rbx/foundation-ui";
 import { retryPendingThumbnail, THUMBNAIL_PENDING } from "./pendingPoll";
 import { resolveThumbnail } from "./thumbnailService";
+import { resolveIncludeBackground } from "./headshotBackground";
 import { logMeasurement } from "./thumbnailMeasurement";
 import type { ResolvedThumbnail, ThumbnailFormat, ThumbnailType } from "./types";
 import "./thumbnailContainer.css";
 import "./thumbnailStatus.css";
 
 // Status placeholder class (styled by thumbnailStatus.css); "" when the image is ready or loading.
+// An image the API returns for these states is drawn over the placeholder, as .NET does.
 const statusClass = (data: ResolvedThumbnail | undefined, isError: boolean, error: unknown) => {
   if (data?.state === "Blocked") return "icon-blocked";
   if (data?.state === "InReview") return "icon-in-review";
@@ -41,7 +43,7 @@ const Thumbnail2d = ({
   format,
   version,
   headShape,
-  includeBackground,
+  includeBackground: includeBackgroundProp,
   includeProfileFrame,
   altName = "",
   imgClassName = "",
@@ -52,6 +54,7 @@ const Thumbnail2d = ({
   const startRef = useRef(Date.now());
   const pollCountRef = useRef(0);
   const loggedRef = useRef(false);
+  const includeBackground = resolveIncludeBackground(type, includeBackgroundProp);
 
   const { data, isError, error, isPending, isLoading } = useQuery({
     queryKey: [
@@ -129,7 +132,7 @@ const Thumbnail2d = ({
     }
   }, [data, isError, error, type]);
 
-  const imageUrl = data?.state === "Completed" ? data.imageUrl : null;
+  const imageUrl = data?.imageUrl ?? null;
   const stateClass = statusClass(data, isError, error);
   // isPending is react-query v5; v4 exposes the same state as isLoading. The v5 dev types don't
   // express that isPending is undefined under a v4 host, so the nullish check reads as unnecessary.
@@ -140,6 +143,7 @@ const Thumbnail2d = ({
     "thumbnail-2d-container float-left overflow-hidden",
     containerClassName,
     stateClass,
+    showSkeleton && "thumbnail-2d-loading",
   ]
     .filter(Boolean)
     .join(" ");

@@ -4,6 +4,7 @@ import { chatQueryKeys } from "../constants/queryKeys";
 import { CHAT_MODAL_ACTION_TYPE, CHAT_MODAL_SEQUENCE } from "../constants/chatModalConstants";
 import { recordModalSequenceResponse, removeUsersFromConversation } from "../services/chatService";
 import { getModalConversationKey } from "../utils/chatModalKey";
+import { removeConversationsFromList } from "../utils/chatQueryCache";
 import { getCurrentUserId } from "../utils/currentUser";
 import {
   MODAL_ACTION_RESULT_TYPE,
@@ -139,16 +140,16 @@ export const useConsentModal = (
       return;
     }
     const currentUserId = getCurrentUserId();
-    const request =
-      expandedChatEnabled && currentUserId != null
-        ? removeUsersFromConversation(rawConversationId, [currentUserId])
-        : recordModalSequenceResponse({
-            conversationId,
-            friendId,
-            modalSequence: CHAT_MODAL_SEQUENCE.conversation_list_overlay,
-            modalVariant: variant,
-            actionType: CHAT_MODAL_ACTION_TYPE.record_dont_show_again,
-          });
+    const isLeaving = expandedChatEnabled && currentUserId != null;
+    const request = isLeaving
+      ? removeUsersFromConversation(rawConversationId, [currentUserId])
+      : recordModalSequenceResponse({
+          conversationId,
+          friendId,
+          modalSequence: CHAT_MODAL_SEQUENCE.conversation_list_overlay,
+          modalVariant: variant,
+          actionType: CHAT_MODAL_ACTION_TYPE.record_dont_show_again,
+        });
     request
       .then(() => {
         sendWebChatModalActionResult({
@@ -158,6 +159,9 @@ export const useConsentModal = (
           actionResult: MODAL_ACTION_RESULT_TYPE.success,
         });
         onClose(layoutId);
+        if (isLeaving) {
+          removeConversationsFromList(queryClient, [rawConversationId]);
+        }
         invalidateConversations();
         return undefined;
       })
@@ -180,6 +184,7 @@ export const useConsentModal = (
     onClose,
     layoutId,
     invalidateConversations,
+    queryClient,
   ]);
 
   const dismiss = useCallback(() => {

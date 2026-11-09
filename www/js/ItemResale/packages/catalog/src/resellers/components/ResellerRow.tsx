@@ -73,11 +73,11 @@ const ResellerRow = ({
   return (
     <li className="reseller-item list-item">
       <a className="list-header reseller-item-avatar" href={getProfilePageUrl(sellerId)}>
-        <Thumbnail2d
-          type={ThumbnailTypes.avatarHeadshot}
-          targetId={sellerId ?? 0}
-          containerClass="avatar-headshot-md"
-        />
+        {/* Size stays on this wrapper. icon-blocked / icon-broken set width and height to
+            100% on the thumbnail node and would drop the 60px box, stretching the row. */}
+        <span className="avatar-headshot-md">
+          <Thumbnail2d type={ThumbnailTypes.avatarHeadshot} targetId={sellerId ?? 0} />
+        </span>
       </a>
       <div className="resale-info">
         <div className="item-reseller-container">

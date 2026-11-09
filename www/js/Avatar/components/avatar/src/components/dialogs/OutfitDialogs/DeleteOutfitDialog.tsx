@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../../../utils/translate";
-import { reportAXError } from "../../../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../../../observability";
 import { CatalogOutfitItem } from "../../../avatar.types";
 import avatarConstants from "../../../constants/avatarConstants";

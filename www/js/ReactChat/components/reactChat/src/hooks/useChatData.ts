@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { InfiniteData } from "@tanstack/react-query";
 import { chatQueryKeys } from "../constants/queryKeys";
 import {
   getConversationMetadata,
@@ -19,12 +20,13 @@ import type {
   TPresenceResponse,
 } from "../types/api";
 import type { TChatConversation } from "../types/chat";
-import { prunePendingConversations, refreshPendingConversations } from "../utils/chatQueryCache";
+import { replaceConversationsInList, upsertConversationsInList } from "../utils/chatQueryCache";
 import {
   applyPresences,
   filterRemovedFriendConversations,
   flattenConversationPages,
   pruneRemovedFriendUserIds,
+  toChatConversation,
 } from "../utils/chatTransforms";
 import { conversationsRetryDelayMs, shouldRetryConversations } from "../utils/conversationsRetry";
 import {
@@ -88,7 +90,11 @@ export const useChatData = (): TUseChatDataResult => {
   // (isFetchingNextPage), which the scroll trigger fires in bursts (UBIQUITY-3100).
   const conversationsQuery = useInfiniteQuery<TGetUserConversationsResponse, Error>({
     queryKey: chatQueryKeys.conversations(),
-    queryFn: ({ pageParam }: { pageParam?: string | null }) => getUserConversations(pageParam),
+    queryFn: async ({ pageParam }: { pageParam?: string | null }) => {
+      const page = await getUserConversations(pageParam);
+      upsertConversationsInList(queryClient, page.conversations);
+      return page;
+    },
     // The API ends the list with an empty cursor, and requesting it returns the first page again.
     getNextPageParam: lastPage =>
       lastPage.next_cursor === "" ? undefined : (lastPage.next_cursor ?? undefined),
@@ -175,48 +181,42 @@ export const useChatData = (): TUseChatDataResult => {
 
   const conversationPages = conversationsQuery.data?.pages;
 
-  // Client-only seed of just-created conversations, never fetched (seeded/pruned via setQueryData)
-  // so it survives the refetch storm after create+send that would otherwise drop the new one.
-  const { data: pendingConversations } = useQuery<TChatApiConversation[]>({
-    queryKey: chatQueryKeys.pendingConversations(),
+  // The list the UI renders. The queryFn above merges every fetched page into it, so a conversation
+  // the server did not return this time (opened from the carousel, just created, or off the loaded
+  // pages) stays until it is removed explicitly. Never fetched.
+  const { data: listConversations } = useQuery<TChatApiConversation[]>({
+    queryKey: chatQueryKeys.conversationList(),
     queryFn: () => [],
     initialData: [],
     staleTime: Infinity,
   });
 
-  // Drop a seed once the server's list actually returns it, so the fresher server copy wins.
-  useEffect(() => {
-    if (pendingConversations.length === 0) {
-      return;
-    }
-    const serverConversationIds = new Set(
-      (conversationPages ?? []).flatMap(page =>
-        page.conversations
-          .map(conversation => conversation.id)
-          .filter((id): id is string => id != null),
-      ),
-    );
-    prunePendingConversations(queryClient, serverConversationIds);
-  }, [conversationPages, pendingConversations.length, queryClient]);
-
-  // A seed is a conversation outside the loaded list pages, so a list refetch never refreshes it.
-  // Realtime events that change policy (for example UserSettingsChanged for an opt-in) carry no
-  // conversation id and only invalidate the list, as do in-tab actions like accepting the consent
-  // modal. The list refetch is the one signal they share, so read the seeds back by id after each
-  // one. Declared after the prune effect so a seed the list just returned is not read.
+  // A conversation the latest pages did not return gets no fresh copy from the refetch. Realtime
+  // events that change policy (for example UserSettingsChanged for an opt-in) carry no conversation
+  // id and only invalidate the list, as do in-tab actions like accepting the consent modal. The list
+  // refetch is the one signal they share, so read those conversations back by id after each one.
   const listUpdatedAt = conversationsQuery.dataUpdatedAt;
   useEffect(() => {
-    const seeds =
-      queryClient.getQueryData<TChatApiConversation[]>(chatQueryKeys.pendingConversations()) ?? [];
-    const seedIds = seeds.flatMap(seed => (seed.id == null ? [] : [seed.id]));
-    if (seedIds.length === 0) {
+    const pages =
+      queryClient.getQueryData<InfiniteData<TGetUserConversationsResponse>>(
+        chatQueryKeys.conversations(),
+      )?.pages ?? [];
+    const serverIds = new Set(
+      pages.flatMap(page => page.conversations.map(conversation => conversation.id)),
+    );
+    const list =
+      queryClient.getQueryData<TChatApiConversation[]>(chatQueryKeys.conversationList()) ?? [];
+    const unlistedIds = list.flatMap(conversation =>
+      conversation.id != null && !serverIds.has(conversation.id) ? [conversation.id] : [],
+    );
+    if (unlistedIds.length === 0) {
       return undefined;
     }
     let isCurrent = true;
-    getConversations(seedIds)
+    getConversations(unlistedIds)
       .then(conversations => {
         if (isCurrent) {
-          refreshPendingConversations(queryClient, conversations);
+          replaceConversationsInList(queryClient, conversations);
         }
       })
       .catch((): undefined => undefined);
@@ -225,26 +225,16 @@ export const useChatData = (): TUseChatDataResult => {
     };
   }, [listUpdatedAt, queryClient]);
 
-  const baseConversations = useMemo(() => {
-    // Prepend the seeds so a newly created conversation is newest and wins de-dup over any
-    // stale server copy; flattenConversationPages de-dupes by id (first occurrence wins).
-    const pendingPage: TGetUserConversationsResponse[] =
-      pendingConversations.length > 0
-        ? [{ conversations: pendingConversations, next_cursor: null }]
-        : [];
-    return flattenConversationPages(
-      [...pendingPage, ...(conversationPages ?? [])],
-      currentUserId,
-      partyChromeDisplayTimeStampInterval,
-      chatSettingsQuery.data,
-    );
-  }, [
-    conversationPages,
-    pendingConversations,
-    currentUserId,
-    partyChromeDisplayTimeStampInterval,
-    chatSettingsQuery.data,
-  ]);
+  const baseConversations = useMemo(
+    () =>
+      flattenConversationPages(
+        [{ conversations: listConversations, next_cursor: null }],
+        currentUserId,
+        partyChromeDisplayTimeStampInterval,
+        chatSettingsQuery.data,
+      ),
+    [listConversations, currentUserId, partyChromeDisplayTimeStampInterval, chatSettingsQuery.data],
+  );
 
   // Unfriended/blocked users whose 1:1 stays in the server list until the removal propagates. Never
   // fetched — added via setQueryData in the realtime dispatcher — so it filters durably.
@@ -255,16 +245,20 @@ export const useChatData = (): TUseChatDataResult => {
     staleTime: Infinity,
   });
 
-  // Drop a tombstone once the server stops returning that user's 1:1 (removal has propagated).
+  // Drop a tombstone once the server stops returning that user's 1:1 (removal has propagated). This
+  // reads the server pages: the list never takes the 1:1 back while the tombstone exists.
   useEffect(() => {
     if (conversationPages == null || removedFriendUserIds.length === 0) {
       return;
     }
-    const pruned = pruneRemovedFriendUserIds(removedFriendUserIds, baseConversations);
+    const serverConversations = conversationPages.flatMap(page =>
+      page.conversations.map(conversation => toChatConversation(conversation, currentUserId)),
+    );
+    const pruned = pruneRemovedFriendUserIds(removedFriendUserIds, serverConversations);
     if (pruned !== removedFriendUserIds) {
       queryClient.setQueryData(chatQueryKeys.removedFriendUserIds(), pruned);
     }
-  }, [baseConversations, conversationPages, removedFriendUserIds, queryClient]);
+  }, [conversationPages, currentUserId, removedFriendUserIds, queryClient]);
 
   const removedFriendUserIdSet = useMemo(
     () => new Set(removedFriendUserIds),
@@ -302,19 +296,13 @@ export const useChatData = (): TUseChatDataResult => {
   );
   const moderationEligibleIds = useMemo(() => {
     const ids = new Set<string>();
-    // Seeds count too: one that sits outside the loaded list pages would otherwise never have its
-    // conversation-level timeout fetched.
-    const apiConversations = [
-      ...pendingConversations,
-      ...(conversationPages ?? []).flatMap(page => page.conversations),
-    ];
-    for (const conversation of apiConversations) {
+    for (const conversation of listConversations) {
       if (conversation.id != null && canFetchModerationStatusesForConversation(conversation)) {
         ids.add(conversation.id);
       }
     }
     return ids;
-  }, [conversationPages, pendingConversations]);
+  }, [listConversations]);
 
   const conversations = useMemo(
     () => applyPresences(visibleConversations, presencesByUserId),

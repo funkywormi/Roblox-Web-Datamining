@@ -87,10 +87,10 @@ const useLayeredClothingSlots = (
       const itemInCurrentlyWornList = currentlyWearingAssets?.find(
         asset => "id" in item && asset.id === item.id,
       );
-      if (!itemInCurrentlyWornList) {
+      const itemOrderCurrent = itemInCurrentlyWornList?.meta?.order;
+      if (typeof itemOrderCurrent !== "number") {
         return;
       }
-      const itemOrderCurrent = itemInCurrentlyWornList.meta?.order;
       const itemOrderToSwap = isUp ? itemOrderCurrent - 1 : itemOrderCurrent + 1;
       if (currentlyWearingAssets) {
         const reorderedAssets = currentlyWearingAssets.map(asset => {

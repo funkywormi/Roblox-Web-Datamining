@@ -33,9 +33,15 @@ const getSessionCacheKey = (): string => {
   return `${AVATAR_HEADSHOT_BACKGROUND_LAYER}_${AVATAR_HEADSHOT_BACKGROUND_EXPERIMENT_KEY}_${userId}_${new Date().toDateString()}_${CACHE_VERSION}`;
 };
 
-/** Sync read of cached treatment (false when unbucketed / cache miss). */
-export const isAvatarHeadshotBackgroundInTreatmentFromCache = (): boolean =>
-  sessionStorage.getItem(getSessionCacheKey()) === "true";
+/** Sync read of cached treatment (false when unbucketed / cache unavailable). */
+export const isAvatarHeadshotBackgroundInTreatmentFromCache = (): boolean => {
+  try {
+    return sessionStorage.getItem(getSessionCacheKey()) === "true";
+  } catch {
+    // Blocked storage must not throw from Thumbnail2d's render-time initializer.
+    return false;
+  }
+};
 
 /**
  * Single-flight promise shared by every Thumbnail2d instance and the prefetch,
@@ -70,7 +76,11 @@ const resolveTreatment = (): Promise<boolean> => {
   const pending = (async () => {
     const layerValues = await service.getAllValuesForLayer(AVATAR_HEADSHOT_BACKGROUND_LAYER);
     const inTreatment = layerValues[AVATAR_HEADSHOT_BACKGROUND_EXPERIMENT_KEY] === true;
-    sessionStorage.setItem(getSessionCacheKey(), inTreatment.toString());
+    try {
+      sessionStorage.setItem(getSessionCacheKey(), inTreatment.toString());
+    } catch {
+      // Caching is optional: keep the fetched assignment and single-flight promise.
+    }
     return inTreatment;
   })();
 

@@ -22,9 +22,15 @@ const getSessionCacheKey = (): string => {
   return `${PROFILE_FRAME_LAYER}_${PROFILE_FRAME_EXPERIMENT_KEY}_${currentUserId}_${new Date().toDateString()}_${CACHE_VERSION}`;
 };
 
-/** Sync read of cached treatment (false when unbucketed / cache miss). */
-export const isProfileFrameInTreatmentFromCache = (): boolean =>
-  sessionStorage.getItem(getSessionCacheKey()) === "true";
+/** Sync read of cached treatment (false when unbucketed / cache unavailable). */
+export const isProfileFrameInTreatmentFromCache = (): boolean => {
+  try {
+    return sessionStorage.getItem(getSessionCacheKey()) === "true";
+  } catch {
+    // Blocked storage must not throw from the friends carousel's render-time initializer.
+    return false;
+  }
+};
 
 /**
  * Single-flight promise shared by every carousel tile so a page with N friend
@@ -40,7 +46,11 @@ const resolveTreatment = (): Promise<boolean> => {
   const pending = (async () => {
     const layerValues = await ExperimentationService.getAllValuesForLayer(PROFILE_FRAME_LAYER);
     const inTreatment = layerValues[PROFILE_FRAME_EXPERIMENT_KEY] === true;
-    sessionStorage.setItem(getSessionCacheKey(), inTreatment.toString());
+    try {
+      sessionStorage.setItem(getSessionCacheKey(), inTreatment.toString());
+    } catch {
+      // Caching is optional: keep the fetched assignment and single-flight promise.
+    }
     return inTreatment;
   })();
 

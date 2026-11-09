@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
-import type { InfiniteData } from "@tanstack/react-query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { chatQueryKeys } from "../constants/queryKeys";
 import { markConversationsAsRead } from "../services/chatService";
-import type { TGetUserConversationsResponse } from "../types/api";
+import type { TChatApiConversation } from "../types/api";
+import { patchConversationsInList } from "../utils/chatQueryCache";
 
 const MARK_READ_DEBOUNCE_MS = 400;
 
@@ -32,27 +32,7 @@ export function useMarkAsRead({
   const { mutate } = useMutation({
     mutationFn: (conversationIds: string[]) => markConversationsAsRead(conversationIds),
     onMutate: conversationIds => {
-      const idSet = new Set(conversationIds);
-      queryClient.setQueryData<InfiniteData<TGetUserConversationsResponse>>(
-        chatQueryKeys.conversations(),
-        previous => {
-          if (!previous) {
-            return previous;
-          }
-
-          return {
-            ...previous,
-            pages: previous.pages.map(page => ({
-              ...page,
-              conversations: page.conversations.map(conversation =>
-                conversation.id != null && idSet.has(conversation.id)
-                  ? { ...conversation, unread_message_count: 0 }
-                  : conversation,
-              ),
-            })),
-          };
-        },
-      );
+      patchConversationsInList(queryClient, conversationIds, { unread_message_count: 0 });
     },
     onSettled: () => {
       queryClient
@@ -85,12 +65,9 @@ export function useMarkAsRead({
       // Honor shouldRespectConversationHasUnreadMessageToMarkAsRead: skip conversations that the
       // cached list already shows as fully read, avoiding a redundant mark-read call.
       if (shouldRespectUnread) {
-        const cached = queryClient.getQueryData<InfiniteData<TGetUserConversationsResponse>>(
-          chatQueryKeys.conversations(),
-        );
-        const conversation = cached?.pages
-          .flatMap(page => page.conversations)
-          .find(candidate => candidate.id === conversationId);
+        const conversation = queryClient
+          .getQueryData<TChatApiConversation[]>(chatQueryKeys.conversationList())
+          ?.find(candidate => candidate.id === conversationId);
         if (conversation && (conversation.unread_message_count ?? 0) === 0) {
           return;
         }

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { Link } from "@rbx/foundation-ui";
-import { reportAXError } from "../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import AvatarAPIService, { ErrorData } from "../services/avatarAPIService";
 import { useSystemFeedback } from "../contexts/SystemFeedbackContext";
 import avatarConstants from "../constants/avatarConstants";
@@ -35,7 +35,9 @@ function RedrawThumbnailButton({
 
         const floodchecked =
           firstError &&
-          (firstError.code === "1" || firstError.message.toLowerCase() === "too many requests");
+          // The API can return the code as a number or a string.
+          (String(firstError.code) === "1" ||
+            firstError.message?.toLowerCase() === "too many requests");
         if (floodchecked) {
           systemFeedback.error(avatarConstants.thumbnail.redrawFloodchecked);
           setRedrawFloodchecked(true);

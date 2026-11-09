@@ -101,6 +101,9 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
     !subIsPremium(subscription, isPremium) &&
     (subscription.productType === ProductType.CurrencySubscription ||
       subscription.productType === ProductType.RobuxSubscription);
+  const isRobuxSubscription =
+    !subIsPremium(subscription, isPremium) &&
+    subscription.productType === ProductType.RobuxSubscription;
 
   const navigateToExperience = useCallback(
     (e: React.MouseEvent) => {
@@ -427,16 +430,18 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
         </div>
         <div className="margin-top-[16px] height-fit justify-self-start empty:hidden [grid-column:1/3]">
           {isExpiring(subscription.renewal, subscription.expiration) ? (
-            <ResubscribeSubscription
-              subscription={subscription}
-              onResubscribe={() =>
-                onStatusChange
-                  ? onStatusChange(isPremium, false, subscription.subscriptionTargetKey)
-                  : undefined
-              }
-              isPremium={isPremium}
-              assumeEligible={justCancelled}
-            />
+            !isRobuxSubscription && (
+              <ResubscribeSubscription
+                subscription={subscription}
+                onResubscribe={() =>
+                  onStatusChange
+                    ? onStatusChange(isPremium, false, subscription.subscriptionTargetKey)
+                    : undefined
+                }
+                isPremium={isPremium}
+                assumeEligible={justCancelled}
+              />
+            )
           ) : (
             <CancelSubscription
               subscription={subscription}

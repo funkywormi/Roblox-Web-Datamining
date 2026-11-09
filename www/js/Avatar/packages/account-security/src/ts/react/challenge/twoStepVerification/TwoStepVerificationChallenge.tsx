@@ -2,25 +2,19 @@ import { useEffect, useMemo } from "react";
 import * as nextEventTracker from "@rbx/www-common/event-tracker";
 import { RequestServiceDefault } from "../../../common/request";
 import { App } from "./App";
-import { ChallengeParameters } from "./interface";
 import { EventServiceDefault } from "./services/eventService";
 import { MetricsServiceDefault } from "./services/metricsService";
+import type {
+  TwoStepVerificationChallenge as Declared,
+  TwoStepVerificationChallengeProps,
+} from "./nextInterface";
 
 // React 19 / Next.js version of renderChallenge. The host must provide an i18n provider that
-// includes `Authentication.TwoStepVerification`. Client mount only (dynamic ssr: false). Not yet
-// self-contained on Next — needs styles, a twoStepVerificationApi env-urls shim, and the App graph
-// de-globaled; see the PR for follow-ups.
+// includes `Authentication.TwoStepVerification`. Client mount only (dynamic ssr: false).
 
-// Distributive Omit so ChallengeParameters' renderInline/onModalChallengeAbandoned union survives;
-// a plain Omit collapses it and would allow modal mode with a null handler.
-type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+export type { TwoStepVerificationChallengeProps };
 
-export type TwoStepVerificationChallengeProps = DistributiveOmit<
-  ChallengeParameters,
-  "containerId"
->;
-
-export const TwoStepVerificationChallenge = ({
+export const TwoStepVerificationChallenge: typeof Declared = ({
   userId,
   challengeId,
   appType,

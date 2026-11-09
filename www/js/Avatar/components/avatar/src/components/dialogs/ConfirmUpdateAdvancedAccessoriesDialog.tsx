@@ -9,7 +9,7 @@ import {
 } from "@rbx/foundation-ui";
 import { useAvatarTranslate } from "../../utils/translate";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
-import { reportAXError } from "../../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import AvatarAccoutrementService from "../../utils/avatarAccoutrementService";
 import { assetTypeLabels } from "../../constants/avatarAssetTypeNames";
 import avatarConstants from "../../constants/avatarConstants";
@@ -154,6 +154,7 @@ function ConfirmUpdateAdvancedAccessoriesDialog({
                   selectedSubcategory?.assetType,
                   false,
                 );
+              } else {
                 success = true;
                 systemFeedback.success(avatarConstants.assets.savedAdvancedAccessories);
                 sendAdvancedEditSaveEvent(
@@ -166,7 +167,7 @@ function ConfirmUpdateAdvancedAccessoriesDialog({
             },
             response => {
               reportAXError({
-                itemName: "SaveAdvancedAccessoriesPostItemDetailsError",
+                itemName: "SaveAdvancedAccessoriesSetWearingIdsError",
                 counterName: "AvatarEditorError",
                 log: parseError(response),
               });
@@ -186,7 +187,7 @@ function ConfirmUpdateAdvancedAccessoriesDialog({
       },
       response => {
         reportAXError({
-          itemName: "SaveAdvancedAccessoriesSetWearingIdsError",
+          itemName: "SaveAdvancedAccessoriesPostItemDetailsError",
           counterName: "AvatarEditorError",
           log: parseError(response),
         });

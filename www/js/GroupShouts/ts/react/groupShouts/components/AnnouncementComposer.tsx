@@ -17,6 +17,7 @@ import { isDraftModerationPending, parseDraftModerationState } from '../utils/dr
 import { isModerationErrorKey, ASSET_MODERATION_REJECTED_KEY } from '../utils/composerErrors';
 import { isSaveDisabled, isPublishDisabled, canPublishNow } from '../utils/composerSelectors';
 import { MessageContent } from '../../shared/types';
+import { hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
 import AnnouncementFooterControls from './AnnouncementFooterControls';
 import {
@@ -336,7 +337,8 @@ const AnnouncementComposer: React.FC<AnnouncementComposerProps> = ({
   const commitPublishIntent = useCallback(async (): Promise<void> => {
     tracking.trackCreatePageButtonClick({
       buttonClicked: 'post',
-      isImageAttached: asset.assetId != null
+      isImageAttached: asset.assetId != null,
+      hasRichText: hasRichTextContent(currentContent)
     });
 
     // A Publish click is an explicit retry; drop any stale transient error so the
@@ -425,7 +427,8 @@ const AnnouncementComposer: React.FC<AnnouncementComposerProps> = ({
     (payload: { title: string; content: MessageContent }) => {
       tracking.trackCreatePageButtonClick({
         buttonClicked: 'save',
-        isImageAttached: asset.assetId != null
+        isImageAttached: asset.assetId != null,
+        hasRichText: hasRichTextContent(payload.content)
       });
       return actions.onSave(payload);
     },

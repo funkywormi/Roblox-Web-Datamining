@@ -21,9 +21,15 @@ const useAvatarTimeoutDialog = () => {
     hasTimeoutAction,
     formattedBlockEndTime,
     isLoading: isAccessLoading,
+    refetchAccess,
   } = useAvatarEditingAccessContext();
   const { showFeatureRestriction } = useUniversalFeatureRestrictions();
   const isTimedOut = !isAccessLoading && isAvatarEditingBlocked && hasTimeoutAction;
+
+  // Acknowledging changes the server state, so refetch to check if we can unlock the page.
+  const handleAcknowledgmentSuccess = useCallback(() => {
+    refetchAccess().catch((): undefined => undefined);
+  }, [refetchAccess]);
 
   const {
     data: isUfrTimeoutDialogFlagEnabled,
@@ -47,6 +53,7 @@ const useAvatarTimeoutDialog = () => {
       showFeatureRestriction({
         abuseVector: AVATAR_CHANGE_ABUSE_VECTOR,
         onAppeal: handleAvatarChangeAppeal,
+        onAcknowledgmentSuccess: handleAcknowledgmentSuccess,
       });
     } else if (formattedBlockEndTime) {
       setIsEditingBlockedDialogOpen(true);
@@ -58,6 +65,7 @@ const useAvatarTimeoutDialog = () => {
     isUfrTimeoutDialogFlagEnabled,
     formattedBlockEndTime,
     showFeatureRestriction,
+    handleAcknowledgmentSuccess,
   ]);
 
   const closeEditingBlockedDialog = useCallback(() => {

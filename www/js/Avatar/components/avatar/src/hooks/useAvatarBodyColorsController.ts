@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { reportAXError } from "../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../observability";
 
 import { BodyColorsStateV2 } from "../types";

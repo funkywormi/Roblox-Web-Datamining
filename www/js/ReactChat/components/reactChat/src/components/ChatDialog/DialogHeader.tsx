@@ -67,6 +67,14 @@ const DialogHeader = ({
         "aria-expanded": conversation.isCollapsed !== true,
       }
     : { role: "group", "aria-label": headerLabel };
+  // Mouse shortcut to Chat details from the avatar and the title text, only in a static header. A
+  // collapsible header stays one collapse button. These targets stay hidden and unfocusable;
+  // keyboard and screen reader users open details with the gear.
+  const openDetailsFromHeader = onToggleCollapsed
+    ? undefined
+    : () => {
+        onOpenDetails(conversation.layoutId);
+      };
 
   return (
     <div
@@ -92,9 +100,16 @@ const DialogHeader = ({
       <div
         className="react-chat-dialog-header-main flex min-width-0 grow-1 items-center gap-small overflow-hidden"
         aria-hidden="true"
+        data-testid="react-chat-dialog-header-main"
       >
         {primaryParticipant && (
-          <span className="react-chat-dialog-avatar-wrap relative shrink-0">
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- see openDetailsFromHeader
+          <span
+            className={classNames("react-chat-dialog-avatar-wrap relative shrink-0", {
+              "cursor-pointer": openDetailsFromHeader,
+            })}
+            onClick={openDetailsFromHeader}
+          >
             <AvatarHeadshot
               userId={primaryParticipant.id}
               displayName={primaryParticipant.displayName}
@@ -112,8 +127,17 @@ const DialogHeader = ({
         )}
         <span className="flex min-width-0 grow-1 flex-col">
           <span className="flex min-width-0 items-center gap-xsmall">
-            <span className="react-chat-dialog-title min-width-0 grow-1 text-title-medium content-emphasis text-truncate-end">
-              {conversation.title}
+            <span
+              className="react-chat-dialog-title min-width-0 grow-1 text-title-medium content-emphasis text-truncate-end"
+              data-testid="react-chat-dialog-title"
+            >
+              {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- see openDetailsFromHeader */}
+              <span
+                className={classNames({ "cursor-pointer": openDetailsFromHeader })}
+                onClick={openDetailsFromHeader}
+              >
+                {conversation.title}
+              </span>
             </span>
             {showPlusBadge && (
               <span className="shrink-0">

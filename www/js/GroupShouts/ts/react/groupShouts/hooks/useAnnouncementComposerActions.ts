@@ -6,7 +6,10 @@ import { refreshInlinePrompt } from '@rbx/prompts-orchestrator';
 import announcementsService from '../services/announcementsService';
 import { AnnouncementDraftModel, AnnouncementErrorResponseV2 } from '../types';
 import { MessageContent } from '../../shared/types';
-import { createMessageContentFragment } from '../../shared/utils/messageContentUtils';
+import {
+  createMessageContentFragment,
+  hasRichTextContent
+} from '../../shared/utils/messageContentUtils';
 import { logGroupPageClickEvent } from '../../shared/utils/logging';
 import { EventContext as SharedEventContext } from '../../shared/constants/eventConstants';
 import queryKeys from '../utils/queryKeys';
@@ -116,6 +119,7 @@ export const useAnnouncementComposerActions = ({
       logGroupPageClickEvent({
         groupId,
         clickTargetType: 'submitEditAnnouncement',
+        hasRichText: hasRichTextContent(content),
         context: SharedEventContext.GroupHomepage
       });
 
@@ -146,6 +150,7 @@ export const useAnnouncementComposerActions = ({
       logGroupPageClickEvent({
         groupId,
         clickTargetType: 'saveDraftAnnouncement',
+        hasRichText: hasRichTextContent(content),
         context: SharedEventContext.GroupHomepage
       });
 
@@ -179,10 +184,11 @@ export const useAnnouncementComposerActions = ({
   });
 
   const publishDraft = useMutation({
-    mutationFn: async ({ draftId }: { draftId: string }) => {
+    mutationFn: async ({ draftId, content }: { draftId: string; content: MessageContent }) => {
       logGroupPageClickEvent({
         groupId,
         clickTargetType: 'publishAnnouncement',
+        hasRichText: hasRichTextContent(content),
         context: SharedEventContext.GroupHomepage
       });
 
@@ -252,12 +258,15 @@ export const useAnnouncementComposerActions = ({
     [mode, assetId, formId, saveEdit, saveDraft, queryClient, groupId, history, onDraftSaved]
   );
 
-  const draftIdForPublish = mode.kind === 'editDraft' ? mode.draft.id : null;
+  const draftForPublish = mode.kind === 'editDraft' ? mode.draft : null;
 
   const onPublish = useCallback(async (): Promise<void> => {
-    if (!draftIdForPublish) return;
+    if (!draftForPublish) return;
     try {
-      const published = await publishDraft.mutateAsync({ draftId: draftIdForPublish });
+      const published = await publishDraft.mutateAsync({
+        draftId: draftForPublish.id,
+        content: draftForPublish.content
+      });
       // Hand the new announcement's id back to the section container so the display's
       // `announcementsData.id`-derived queryKey changes and it refetches for the new one.
       onPublished?.(published.id);
@@ -269,7 +278,7 @@ export const useAnnouncementComposerActions = ({
     } catch (error: unknown) {
       setErrorKey(getErrorKey(error as AnnouncementErrorResponseV2));
     }
-  }, [draftIdForPublish, publishDraft, queryClient, groupId, history, onPublished]);
+  }, [draftForPublish, publishDraft, queryClient, groupId, history, onPublished]);
 
   return {
     onSave,

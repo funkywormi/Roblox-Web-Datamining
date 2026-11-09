@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { Icon, Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
-import { reportAXError } from "../../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../../observability";
 import AvatarScalingScale from "./AvatarScalingScale";
 import avatarConstants from "../../constants/avatarConstants";

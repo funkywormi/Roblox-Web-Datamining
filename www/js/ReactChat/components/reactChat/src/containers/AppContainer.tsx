@@ -54,7 +54,7 @@ import {
 import { CHAT_UPDATE_STATUS } from "../constants/chatPolicyConstants";
 import type { TChatConversation, TChatFeedback, TRenameResult } from "../types/chat";
 import { applyModerationTimeouts } from "../utils/chatTransforms";
-import { seedPendingConversation } from "../utils/chatQueryCache";
+import { addConversationToList, removeConversationsFromList } from "../utils/chatQueryCache";
 import { clearAllPersistedChatLayouts, readPersistedChatLayout } from "../utils/chatLayoutStorage";
 import { getCurrentUserId } from "../utils/currentUser";
 import { getStatusCode } from "../utils/getStatusCode";
@@ -295,7 +295,7 @@ const AppContainer = () => {
   const conversationsLoadedSentRef = useRef(false);
 
   // Opens the 1:1 with `userId`, creating it if needed. A dialog only renders for a conversation that
-  // is in the list, and this one may sit on a list page that has not loaded yet — so seed it first
+  // is in the list, and this one may sit on a list page that has not loaded yet — so add it first
   // (legacy chat likewise put the started conversation at the front of its list).
   const startConversationWithUser = useCallback(
     async (userId: number) => {
@@ -311,7 +311,7 @@ const AppContainer = () => {
       // for one), so read the conversation back before it opens. If that fails, the create response
       // still opens the chat.
       const [conversation = created] = await getConversations([conversationId]).catch(() => []);
-      seedPendingConversation(queryClient, conversation);
+      addConversationToList(queryClient, conversation);
       openConversation(`conv_${conversationId}`);
       queryClient
         .invalidateQueries({ queryKey: chatQueryKeys.conversations() })
@@ -854,6 +854,7 @@ const AppContainer = () => {
       try {
         await removeUsersFromConversation(match.id, [currentUserId]);
         closeConversation(layoutId);
+        removeConversationsFromList(queryClient, [match.id]);
         await queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations() });
       } catch (error) {
         trackGroupActionFailed("leave", error);

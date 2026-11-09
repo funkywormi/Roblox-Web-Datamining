@@ -1,29 +1,23 @@
 import { AXSendTrackingActionType } from "@rbx/catalog/analytics/types";
-import { sendAXTracking } from "./axAnalyticsService";
+import sendAXTracking from "@rbx/catalog/analytics/sendAXTracking";
+import AXAnalyticsConstants from "@rbx/catalog/analytics/AXAnalyticsConstants";
 
-/**
- * Avatar editor (Customize page) tracking event names.
- *
- * These mirror the AvatarEditorInteractionTrackingConstants defined in
- * `@rbx/catalog`'s AXAnalyticsConstants. We keep a local copy of the string
- * values here so that emitting these events does not depend on the
- * `axAnalyticsService` external being redeployed with the new constants.
- */
+// Short names for the avatar editor events in `@rbx/catalog`'s AXAnalyticsConstants.
 export const AvatarEditorTrackingEvents = {
-  FirstEdit: "AvatarEditorFirstEditClick",
-  Edit: "AvatarEditorEditClick",
-  Equip: "AvatarEditorEquipClick",
-  Unequip: "AvatarEditorUnequipClick",
-  BodyColorChange: "AvatarEditorBodyColorChangeClick",
-  ScaleChange: "AvatarEditorScaleChangeClick",
-  TypeChange: "AvatarEditorTypeChangeClick",
-  AdvancedEditor: "AvatarEditorAdvancedEditorClick",
-  EmoteChange: "AvatarEditorEmoteChangeClick",
-  RecommendationClick: "AvatarEditorRecommendationClick",
-  GetMoreClick: "AvatarEditorGetMoreClick",
-  OutfitCreated: "AvatarEditorOutfitCreatedClick",
-  OutfitDeleted: "AvatarEditorOutfitDeletedClick",
-  OutfitEdited: "AvatarEditorOutfitEditedClick",
+  FirstEdit: AXAnalyticsConstants.AvatarEditorFirstEditClick,
+  Edit: AXAnalyticsConstants.AvatarEditorEditClick,
+  Equip: AXAnalyticsConstants.AvatarEditorEquipClick,
+  Unequip: AXAnalyticsConstants.AvatarEditorUnequipClick,
+  BodyColorChange: AXAnalyticsConstants.AvatarEditorBodyColorChangeClick,
+  ScaleChange: AXAnalyticsConstants.AvatarEditorScaleChangeClick,
+  TypeChange: AXAnalyticsConstants.AvatarEditorTypeChangeClick,
+  AdvancedEditor: AXAnalyticsConstants.AvatarEditorAdvancedEditorClick,
+  EmoteChange: AXAnalyticsConstants.AvatarEditorEmoteChangeClick,
+  RecommendationClick: AXAnalyticsConstants.AvatarEditorRecommendationClick,
+  GetMoreClick: AXAnalyticsConstants.AvatarEditorGetMoreClick,
+  OutfitCreated: AXAnalyticsConstants.AvatarEditorOutfitCreatedClick,
+  OutfitDeleted: AXAnalyticsConstants.AvatarEditorOutfitDeletedClick,
+  OutfitEdited: AXAnalyticsConstants.AvatarEditorOutfitEditedClick,
 } as const;
 
 export type AXTrackingMetaData = Record<string, string | number | boolean | undefined | null>;

@@ -2,6 +2,7 @@ import type { RegistryInput } from "@rbx/observability-framework/schema";
 import type { MakeObservabilityTypes } from "@rbx/observability-framework/types";
 import { createTrackers, type PublishFn } from "@rbx/observability-framework/trackers";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
+import { createFireTelemetryHistogram } from "@rbx/web-telemetry/v2/histogram";
 import { getStatusCode } from "../utils/getStatusCode";
 
 export const observabilityRegistry = {
@@ -139,6 +140,30 @@ export const trackItemsLoaded = (request: ItemsRequest): void => {
 
 export const trackItemsLoadFailed = (request: ItemsRequest, error: unknown): void => {
   trackError("ItemsLoadFailed", { request, statusCode: getStatusCode(error) }, error);
+};
+
+const fireTelemetryHistogram = createFireTelemetryHistogram(observabilityRegistry.featureName, {});
+
+// False after a client-side navigation.
+const isInitialPageLoad = (): boolean => {
+  const [navigation] = performance.getEntriesByType("navigation");
+  return navigation !== undefined && new URL(navigation.name).pathname === window.location.pathname;
+};
+
+let editorLoadReported = false;
+
+/** Navigation start to editor data loaded, on the first editor load of an initial page load. */
+export const trackEditorLoaded = (prefetched: boolean): void => {
+  // A later remount (client-side nav back to the editor) would measure from the original load.
+  if (editorLoadReported || !isInitialPageLoad()) {
+    return;
+  }
+  editorLoadReported = true;
+  fireTelemetryHistogram(
+    "EditorLoadedMs",
+    { host, prefetched: String(prefetched) },
+    performance.now(),
+  );
 };
 
 export const trackEditorLoadFailed = (step: EditorLoadStep, error: unknown): void => {

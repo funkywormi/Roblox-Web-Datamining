@@ -1,4 +1,5 @@
 import { Button } from "@rbx/foundation-ui";
+import { assetUrl } from "@rbx/www-common/asset";
 
 import giftAugust2026Image from "../../images/gift-august-2026.png";
 
@@ -49,7 +50,7 @@ const RobloxPlusGiftItemUpsellBanner: FC<RobloxPlusGiftItemUpsellBannerProps> = 
       onKeyDown={isItemDetailsClickable ? onBannerKeyDown : undefined}
     >
       <div className="radius-medium size-[50px] shrink-0 overflow-hidden">
-        <img alt={title} className="size-full object-cover" src={giftAugust2026Image} />
+        <img alt={title} className="size-full object-cover" src={assetUrl(giftAugust2026Image)} />
       </div>
       <div className="min-width-0 grow-1 shrink-1 flex basis-0 flex-col justify-center">
         <span className="text-title-medium content-emphasis">{title}</span>

@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormatter } from "@rbx/www-common/intl";
 import AvatarAPIService from "../services/avatarAPIService";
-import { getAvatarAccessStatus, AvatarAccessStatus } from "../utils/featureAccess.utils";
+import { takeStartupRequest } from "../startupRequests";
+import { getAvatarAccessStatus, NOT_BLOCKED } from "../utils/featureAccess.utils";
 
 interface AvatarEditingAccessContextType {
   isAvatarEditingBlocked: boolean;
@@ -9,7 +11,22 @@ interface AvatarEditingAccessContextType {
   blockEndTime: Date | null;
   formattedBlockEndTime: string | null;
   isLoading: boolean;
+  /**
+   * Fetches feature access again, ignoring any request already in flight. On failure it keeps the
+   * last known state, so editing stays blocked.
+   */
+  refetchAccess: () => Promise<void>;
 }
+
+const REFETCH_RETRIES = 3;
+
+// One query per mount, so a remount on a reused QueryClient loads fresh instead of showing cached
+// result.
+let providerInstances = 0;
+
+// The first fetch uses the startup prefetch. Refetches always go to the API.
+const takeFeatureAccess = () => takeStartupRequest("featureAccess");
+const fetchFeatureAccess = () => AvatarAPIService.getFeatureAccess();
 
 const AvatarEditingAccessContext = createContext<AvatarEditingAccessContextType | undefined>(
   undefined,
@@ -32,41 +49,52 @@ interface AvatarEditingAccessProviderProps {
 export const AvatarEditingAccessProvider: React.FC<AvatarEditingAccessProviderProps> = ({
   children,
 }) => {
-  const [accessStatus, setAccessStatus] = useState<AvatarAccessStatus>({
-    isBlocked: false,
-    hasTimeoutAction: false,
-    endTime: null,
-    durationSeconds: null,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [formattedBlockEndTime, setFormattedBlockEndTime] = useState<string | null>(null);
   const formatter = useFormatter();
+  const queryClient = useQueryClient();
+  const [queryKey] = useState(() => {
+    providerInstances += 1;
+    return ["avatar/featureAccess", providerInstances];
+  });
 
-  useEffect(() => {
-    AvatarAPIService.getFeatureAccess()
-      .then(response => {
-        const status = getAvatarAccessStatus(response);
-        setAccessStatus(status);
+  // Error fetching feature access defaults to not blocked. Fetch once per mount.
+  const { data: accessStatus = NOT_BLOCKED, isLoading } = useQuery({
+    queryKey,
+    queryFn: takeFeatureAccess,
+    select: getAvatarAccessStatus,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
+  });
 
-        if (status.isBlocked && status.endTime) {
-          const formatted = formatter.dateTime(status.endTime, {
+  const formattedBlockEndTime = useMemo(
+    () =>
+      accessStatus.isBlocked && accessStatus.endTime
+        ? formatter.dateTime(accessStatus.endTime, {
             weekday: "short",
             year: "numeric",
             month: "short",
             day: "numeric",
             hour: "numeric",
             minute: "2-digit",
-          });
-          setFormattedBlockEndTime(formatted);
-        }
-      })
-      .catch(() => {
-        // Error fetching feature access - default to not blocked
-      })
-      .finally(() => {
-        setIsLoading(false);
+          })
+        : null,
+    [accessStatus.isBlocked, accessStatus.endTime, formatter],
+  );
+
+  const refetchAccess = useCallback(async () => {
+    await queryClient.cancelQueries({ queryKey });
+    try {
+      await queryClient.fetchQuery({
+        queryKey,
+        queryFn: fetchFeatureAccess,
+        staleTime: 0,
+        retry: REFETCH_RETRIES,
       });
-  }, [formatter]);
+    } catch {
+      // react-query keeps the previous data, so editing stays blocked.
+    }
+  }, [queryClient, queryKey]);
 
   const contextValue = useMemo(
     () => ({
@@ -75,6 +103,7 @@ export const AvatarEditingAccessProvider: React.FC<AvatarEditingAccessProviderPr
       blockEndTime: accessStatus.endTime,
       formattedBlockEndTime,
       isLoading,
+      refetchAccess,
     }),
     [
       accessStatus.isBlocked,
@@ -82,6 +111,7 @@ export const AvatarEditingAccessProvider: React.FC<AvatarEditingAccessProviderPr
       accessStatus.endTime,
       formattedBlockEndTime,
       isLoading,
+      refetchAccess,
     ],
   );
 

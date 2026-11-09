@@ -268,5 +268,6 @@
     "Label.DeveloperID": "Developer ID",
     "Label.VideoID": "Video ID",
     "Response.InvalidDeveloperID": "Please enter a valid Developer ID.",
-    "Response.InvalidVideoID": "Please enter a valid Video ID."
+    "Response.InvalidVideoID": "Please enter a valid Video ID.",
+    "Response.AppealRequiresLogin": "Log in to submit an appeal in this category."
 }

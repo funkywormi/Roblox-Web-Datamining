@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { reportAXError } from "../../../../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import AvatarAPIService from "../../../../services/avatarAPIService";
 import parseError from "../../../../utils/parseErrorUtil";
 import { getCurrentUserId } from "../../../../utils/currentUser";

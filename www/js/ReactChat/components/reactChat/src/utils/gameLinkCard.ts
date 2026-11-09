@@ -18,15 +18,7 @@ const GAME_SHARE_LINK_TYPES = new Set([
 ]);
 
 /** Only Roblox website URLs can become cards; lookalike domains stay as text. */
-const parseRobloxUrl = (url: string): Url | undefined => {
-  try {
-    return Url.parseWithOptions(url, {
-      domainAllowlist: ["roblox.com", ".roblox.com", "robloxlabs.com", ".robloxlabs.com"],
-    }).getOrThrow();
-  } catch {
-    return undefined;
-  }
-};
+const parseRobloxUrl = (url: string): Url | null => Url.parse(url).getOrNull();
 
 export const parseGameShareLink = (url: string): TGameShareLink | undefined => {
   const parsed = parseRobloxUrl(url);

@@ -25,6 +25,7 @@ import {
   type TPlayButtonPageContext,
 } from "../types/playButtonTypes";
 import {
+  getJoindata,
   handleShareLinkEventLogging,
   launchGame,
   launchLogin,
@@ -36,7 +37,7 @@ import ExperienceApprovalActionNeededButton from "./ExperienceApprovalActionNeed
 import ParentalControlsActionNeededButton from "./ParentalControlsActionNeededButton";
 import PurchaseButton from "./PurchaseButtonContainer";
 import { DemoButton } from "./DemoButton";
-import { PlayOnWebButton } from "./PlayOnWebButton";
+import PlayOnWebButton from "./PlayOnWebButton";
 import {
   getSecondaryPlayButton,
   StackedPlayButtons,
@@ -45,6 +46,7 @@ import {
 import UnplayableButton from "./UnplayableButton";
 import useLaunchGameWithPlayableUxTreatment from "../hooks/useLaunchGameWithPlayableUxTreatment";
 import usePurchaseProductData from "../hooks/usePurchaseProductData";
+import useWasmJoinId from "../hooks/useWasmJoinId";
 import { AgeCheckNeededButton } from "./AgeCheckNeededButton";
 import LoadingButton from "./LoadingButton";
 import "./playButton.css";
@@ -132,17 +134,6 @@ const getShowIdentityVerificationFlow = async (
     requireExplicitVoiceConsent,
     useCameraU13Design,
     useVoiceUpsellV2Design,
-  };
-};
-
-const getJoindata = (launchDataFromProps?: string) => {
-  // Allow launchData to be passed from props for direct joins
-  const launchData =
-    new URLSearchParams(window.location.search).get("launchData") ?? launchDataFromProps;
-  const eventId = new URLSearchParams(window.location.search).get("eventId") ?? undefined;
-  return {
-    launchData,
-    eventId,
   };
 };
 
@@ -435,6 +426,8 @@ export const DefaultPlayButton = ({
     productDetails,
   } = usePurchaseProductData(universeId, placeId, isPurchaseStatus);
 
+  const wasmJoinId = useWasmJoinId();
+
   // Secondary CTAs that can stack under the primary button. Each case lists the primary
   // statuses it may appear alongside; the first enabled match is shown.
   const secondaryPlayButtonCases: TSecondaryPlayButtonCase[] = [
@@ -456,7 +449,14 @@ export const DefaultPlayButton = ({
     {
       isEnabled: Boolean(playOnWebEnabled),
       primaryStatuses: playOnWebPrimaryStatuses,
-      render: () => <PlayOnWebButton placeId={placeId} />,
+      render: () => (
+        <PlayOnWebButton
+          placeId={placeId}
+          universeId={universeId}
+          eventProperties={eventProperties}
+          wasmJoinId={wasmJoinId}
+        />
+      ),
     },
   ];
 

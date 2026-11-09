@@ -44,6 +44,8 @@ export type ThumbnailRequest = {
   includeProfileFrame?: boolean;
 };
 
+// Non-Completed states can still carry an image (a Blocked thumbnail's moderation image, for
+// example); .NET's @rbx/thumbnails draws it over the status placeholder, so keep it.
 export type ResolvedThumbnail =
   | { state: "Completed"; imageUrl: string }
-  | { state: "Pending" | "Blocked" | "Error" | "InReview" };
+  | { state: "Pending" | "Blocked" | "Error" | "InReview"; imageUrl?: string };

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { AccoutrementAsset } from "@rbx/avatar-common";
 import type { TranslateFn } from "../utils/translate";
-import { reportAXError } from "../utils/axAnalyticsService";
+import reportAXError from "@rbx/catalog/analytics/reportAXError";
 import AvatarAccoutrementService from "../utils/avatarAccoutrementService";
 import AvatarAPIService, {
   AvatarResponseBase,
@@ -31,6 +31,7 @@ import {
 import parseError from "../utils/parseErrorUtil";
 import { isAvatarEditingDisabledError } from "../utils/avatarEditingError.utils";
 import { useAvatarTabsContext } from "../contexts/AvatarTabsContext";
+import { isEmptySlot } from "../types";
 import { trackEditAttempted, trackEditFailed, trackEditSucceeded } from "../observability";
 import {
   trackAvatarEdit,
@@ -489,13 +490,16 @@ const useOutfitHelpers = (
           assetToRemove,
           filteredAssets,
         );
-        layeredClothingSlots.splice(layeredClothingSlots.indexOf(assetToRemove as any), 1);
       });
+      const removedIds = new Set(assetsToRemove.map(asset => asset.id));
+      const remainingSlots = layeredClothingSlots.filter(
+        slot => isEmptySlot(slot) || !removedIds.has(slot.id),
+      );
 
       const filteredAssetsWithMeta = AvatarAccoutrementService.buildMetaForAssets(
         filteredAssets,
         false,
-        layeredClothingSlots as unknown as AccoutrementAsset[],
+        remainingSlots as unknown as AccoutrementAsset[],
       );
 
       return setWearingAssets(filteredAssetsWithMeta);
