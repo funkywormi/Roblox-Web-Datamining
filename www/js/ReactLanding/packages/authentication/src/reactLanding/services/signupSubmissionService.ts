@@ -32,6 +32,8 @@ export type SubmitSignupOptions = {
   isConditionalCreateSupported: boolean;
   silentPasskeyUpgradeBrowserCheck: SilentPasskeyUpgradeVariant;
   telemetry?: AuthFlowTelemetry;
+  /** Overrides the `ctx` of the sign up success event. */
+  eventContext?: string;
 };
 
 export type SignupRequestResult = {
@@ -187,6 +189,7 @@ const isExpiredSignupTokenError = (error: unknown): boolean => {
 export const submitSignup = async ({
   params,
   telemetry,
+  eventContext,
   ...completionOptions
 }: SubmitSignupOptions): Promise<void> => {
   const isPasskeySignup = Boolean(params.passkeySessionId);
@@ -224,7 +227,7 @@ export const submitSignup = async ({
   }
   telemetry?.requestSucceeded(method);
   telemetry?.flowCompleted(method);
-  sendSignupSucceededEvent(method);
+  sendSignupSucceededEvent(method, eventContext);
 
   await completeSignupSuccess({
     ...completionOptions,

@@ -1979,5 +1979,9 @@
     "Description.AskForParentPermission": "Ask for parent permission",
     "Action.AskParent": "Ask parent",
     "Label.SendRobuxToTrustedFriendsSetting": "Send Robux to Trusted Friends setting",
-    "Heading.SendRobuxToTrustedFriends": "Send Robux to Trusted Friends"
+    "Heading.SendRobuxToTrustedFriends": "Send Robux to Trusted Friends",
+    "ScopeType.Marketplace": "your Marketplace content",
+    "ScopeType.MarketplaceItem": "your Marketplace items",
+    "ScopeType.MarketplaceItemAppeal": "your Marketplace item appeals",
+    "ScopeType.MarketplaceItemUploadFee": "your Marketplace upload fees and Robux balance"
 }

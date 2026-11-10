@@ -284,7 +284,6 @@ export const USER_AGREEMENTS = {
 export const PARENTALCONSENT = "ParentalConsent";
 export const OPTIONAL_PERSONAL_INFORMATION_POLICY = "OptionalPersonalInformationPolicy";
 export const requestTypeParam = "requestType";
-export const sessionIdParam = "sessionId";
 export const analyticsSessionIdParam = "analyticsSessionId";
 export const settingNameParam = "target";
 export const defaultLandingBackgroundClass = "default-background";

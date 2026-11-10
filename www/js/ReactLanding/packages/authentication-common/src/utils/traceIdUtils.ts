@@ -1,15 +1,16 @@
+import { UrlSearchParams } from "@rbx/core-lib/url";
+
 let cachedTraceId: string | undefined;
 
 export const STUDIO_TRACE_ID_PARAM = "studio_trace_id";
 
 export const getTraceIdFromUrl = (): string | undefined => {
   if (cachedTraceId === undefined) {
-    const params = new URLSearchParams(window.location.search);
+    const params = UrlSearchParams.parse(window.location.search);
     let traceId = params.get(STUDIO_TRACE_ID_PARAM);
 
     if (!traceId) {
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- deliberate case-insensitive fallback; `??` would stop an empty `returnUrl=` falling through to `ReturnUrl`.
-      const returnUrl = params.get("returnUrl") || params.get("ReturnUrl");
+      const returnUrl = params.get("returnUrl");
       if (returnUrl) {
         try {
           const returnUrlObj = new URL(returnUrl);

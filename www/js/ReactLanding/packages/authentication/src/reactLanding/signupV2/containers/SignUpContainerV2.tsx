@@ -59,6 +59,8 @@ export type SignUpContainerV2FormProps = Omit<
 export type SignUpContainerV2Props = {
   treatment: SignUpV2Treatment;
   telemetry: AuthFlowTelemetry;
+  /** Overrides the `ctx` of the submit button click event. */
+  eventContext?: string;
   formProps: SignUpContainerV2FormProps;
   addAuthMethodLabels: AddAuthMethodPageLabels;
   passwordRequirements?: PasswordRequirementItem[];
@@ -102,6 +104,7 @@ const getAddAuthMethodEntryReason = (outcome: PasskeyAttemptOutcome): string => 
 const SignUpContainerV2 = ({
   treatment,
   telemetry,
+  eventContext,
   formProps,
   addAuthMethodLabels,
   passwordRequirements,
@@ -317,7 +320,7 @@ const SignUpContainerV2 = ({
             onPasswordBlur={onPasswordBlur}
             onSubmit={() => {
               telemetry.primaryActionClicked(authMethod.password);
-              sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.password);
+              sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.password, eventContext);
               createPasswordAfterCompliance();
             }}
           />
@@ -352,7 +355,7 @@ const SignUpContainerV2 = ({
               telemetry.primaryActionClicked(authMethod.unspecified);
               const interruption = beginComplianceInterruption?.();
               if (interruption) {
-                sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.complianceInterruption);
+                sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.complianceInterruption, eventContext);
                 // The parent OTP or consent step consumes the click's user activation, so the
                 // passkey prompt can't open automatically afterwards.
                 // eslint-disable-next-line no-void
@@ -368,14 +371,14 @@ const SignUpContainerV2 = ({
                 return;
               }
               if (shouldSkipAutomaticPasskey) {
-                sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.autoPromptSuppressed);
+                sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.autoPromptSuppressed, eventContext);
                 sendAddAuthMethodPageReachedEvent(
                   EVENT_CONSTANTS.state.signUpV2.addAuthMethodEntry.autoPromptSuppressed,
                 );
                 telemetry.stepReached(authStage.addAuthMethod);
                 showAddAuthMethod();
               } else {
-                sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.passkeyCeremony);
+                sendSignUpV2SubmitEvent(EVENT_CONSTANTS.ctype.passkeyCeremony, eventContext);
                 // eslint-disable-next-line no-void
                 void handleCreatePasskey();
               }

@@ -15,7 +15,7 @@ export type UseSignupAuditContentOptions = {
  * Encapsulates the pattern of creating a full translation key, memoizing audit content,
  * and registering it with the audit content store
  *
- * @param translationKey - The field-specific translation key (e.g., signupFormStrings.Password)
+ * @param translationKey - The field-specific translation key (e.g., signupFormStrings.Password), or null to register nothing
  * @param translate - Translation function from withTranslations
  * @param options - Optional configuration object
  * @param options.translationParameters - Parameters for translation placeholders (e.g., links, spans)
@@ -23,11 +23,13 @@ export type UseSignupAuditContentOptions = {
  * @param options.additionalAuditValue - Value for additional audit content
  */
 const useSignupAuditContent = (
-  translationKey: string,
+  translationKey: string | null,
   translate: WithTranslationsProps["translate"],
   options?: UseSignupAuditContentOptions,
 ): void => {
-  const fullTranslationKey = `${signupTranslationConfig.feature}.${translationKey}`;
+  const fullTranslationKey = translationKey
+    ? `${signupTranslationConfig.feature}.${translationKey}`
+    : null;
 
   const auditContent = useMemo(
     () =>

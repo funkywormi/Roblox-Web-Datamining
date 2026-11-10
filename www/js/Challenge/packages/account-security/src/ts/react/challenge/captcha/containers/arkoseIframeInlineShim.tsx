@@ -87,6 +87,7 @@ const ArkoseIframeInlineShim: React.FC<Props> = ({
     script.setAttribute("data-callback", setupEnforcementName);
     script.async = true;
     script.defer = true;
+    script.crossOrigin = "anonymous";
     if (nonce) {
       script.setAttribute("data-nonce", nonce);
     }

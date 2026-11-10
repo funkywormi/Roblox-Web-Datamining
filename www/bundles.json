@@ -170,7 +170,7 @@
         },
         {
             "name": "Authentication.AccountSwitch",
-            "url": "https://js.rbxcdn.com/7abdf6938bc2b534cc11aeb1857a475e73f08f2e95a04b8846257dc113f6fa6e.js",
+            "url": "https://js.rbxcdn.com/cc8d5562b127dd2ee85a41b82efd3c6f9355bf9f5ed15de3f5038c02ca2404b9.js",
             "sources": [
                 "/home",
                 "/",
@@ -1083,7 +1083,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/ff9f87e3a64e560f83bb6e8eb5238579b3f59ed834a184c253ea04702094faf5.js",
+            "url": "https://js.rbxcdn.com/91468f57cedc66b2697a11272886256dfba9138d5bd82744a1428de93fc4bc0c.js",
             "sources": [
                 "/home",
                 "/",
@@ -1746,7 +1746,7 @@
         },
         {
             "name": "Feature.ExperienceDetails",
-            "url": "https://js.rbxcdn.com/fcdaacf1314e6a7ad298d4b506c5b610d10a839ccdb469e32e502e0b4b1f7b33.js",
+            "url": "https://js.rbxcdn.com/55863622ade93d112df014d57d9b928a3edf7b1fa4cd02f812c10ee0eeccc3c4.js",
             "sources": [
                 "/home",
                 "/",
@@ -2531,7 +2531,7 @@
         },
         {
             "name": "Feature.Parents",
-            "url": "https://js.rbxcdn.com/9a021c6f5ad417a1915c54331f0ce605561030ed20ad977544e6912ee9231d75.js",
+            "url": "https://js.rbxcdn.com/8805b7ff7acd4ccee0c6439323d671e7ee4657a614eea77c7ecdca7d3b474a8f.js",
             "sources": [
                 "/home",
                 "/",
@@ -4570,7 +4570,7 @@
         },
         {
             "name": "Challenge",
-            "url": "https://js.rbxcdn.com/1fb0ecc3db4cf6d25bfbbc5d65ef9516575863a1a18c5330cf8273d901ca6df8-Challenge.js",
+            "url": "https://js.rbxcdn.com/eea8de1ac382f0f9c757f8a274118b3680e3ffb9abb28402b8e8d273fe15d181-Challenge.js",
             "sources": [
                 "/home",
                 "/",
@@ -6380,7 +6380,7 @@
         },
         {
             "name": "ReactLanding",
-            "url": "https://js.rbxcdn.com/d5ed442140c2fe16d5c061ae4886f43dd204d3fc8079a83120f2fce22d5847c3-ReactLanding.js",
+            "url": "https://js.rbxcdn.com/49ec9fea0f677edf6e58566773754cb02e8084ba6e3f8510b222c80573fe6b4f-ReactLanding.js",
             "sources": [
                 "/CreateAccount"
             ]
@@ -6685,7 +6685,7 @@
         },
         {
             "name": "SduiLandingPage",
-            "url": "https://js.rbxcdn.com/f79f018fd146aa6bc41cb1adde1cdbb5d6a982d93e57f6107a6880153a786a2c-SduiLandingPage.js",
+            "url": "https://js.rbxcdn.com/df6c9e8c99818fb01fd105cf7daac9052ed118da698f810386dc90a9be0cd450-SduiLandingPage.js",
             "sources": [
                 "/"
             ]
@@ -7065,7 +7065,7 @@
         },
         {
             "name": "Thumbnails",
-            "url": "https://js.rbxcdn.com/b8fe9f3ee244f722afa917ea0083591e3d50a351c326d08b99b062d34fb21fae-Thumbnails.js",
+            "url": "https://js.rbxcdn.com/664879d899c5ae28f6b44ecd005e7995148312180c152c6884a96fc2ac2a1f25-Thumbnails.js",
             "sources": [
                 "/home",
                 "/",

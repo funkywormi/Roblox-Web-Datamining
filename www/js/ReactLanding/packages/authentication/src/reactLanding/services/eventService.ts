@@ -803,9 +803,10 @@ const signUpV2RefreshArmOrigin: Record<SignUpV2RefreshVariant, string> = {
 export const sendSignUpV2FormPageLoadEvent = (
   treatment: SignUpV2Treatment,
   authUiVariant?: SignUpV2RefreshVariant,
+  ctx: string = EVENT_CONSTANTS.context.signupForm,
 ): void => {
   sendAuthPageLoadEvent(
-    EVENT_CONSTANTS.context.signupForm,
+    ctx,
     undefined,
     authUiVariant ? signUpV2RefreshArmOrigin[authUiVariant] : signUpV2ArmOrigin[treatment],
   );
@@ -815,13 +816,11 @@ export const sendSignUpV2FormPageLoadEvent = (
  * Matches Control's `sendSignupButtonClickEvent` shape so the arms are directly
  * comparable, which is why the mode is in `ctype` rather than `state`.
  */
-export const sendSignUpV2SubmitEvent = (ctype: string): void => {
-  sendAuthButtonClickEvent(
-    EVENT_CONSTANTS.btn.signupSubmit,
-    "",
-    EVENT_CONSTANTS.context.schematizedSignupForm,
-    ctype,
-  );
+export const sendSignUpV2SubmitEvent = (
+  ctype: string,
+  ctx: string = EVENT_CONSTANTS.context.schematizedSignupForm,
+): void => {
+  sendAuthButtonClickEvent(EVENT_CONSTANTS.btn.signupSubmit, "", ctx, ctype);
 };
 
 const ssoProviderButtons: Readonly<Record<SsoProvider, string>> = {
@@ -860,15 +859,14 @@ export const sendSignupSsoButtonClickEvent = (provider: SsoProvider): void => {
  * here, so this is the client-side count to reconcile against server account creation.
  * `authFormInteraction` has no `ctype` column, so the method is in `entered`.
  */
-export const sendSignupSucceededEvent = (method: string): void => {
-  sendEventWithTraceId(
-    EVENT_CONSTANTS.schematizedEventTypes.authFormInteraction,
-    EVENT_CONSTANTS.context.schematizedSignupForm,
-    {
-      field: EVENT_CONSTANTS.field.signupSuccess,
-      entered: method,
-    },
-  );
+export const sendSignupSucceededEvent = (
+  method: string,
+  ctx: string = EVENT_CONSTANTS.context.schematizedSignupForm,
+): void => {
+  sendEventWithTraceId(EVENT_CONSTANTS.schematizedEventTypes.authFormInteraction, ctx, {
+    field: EVENT_CONSTANTS.field.signupSuccess,
+    entered: method,
+  });
 };
 
 // `origin` is the only thing distinguishing this from the in-card sign-in click, which

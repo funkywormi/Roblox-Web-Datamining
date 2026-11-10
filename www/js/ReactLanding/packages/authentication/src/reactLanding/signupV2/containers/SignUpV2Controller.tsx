@@ -95,6 +95,7 @@ import useSignUpV2Compliance from "../hooks/useSignUpV2Compliance";
 import useUsernameSuggestions from "@rbx/authentication-common/hooks/useUsernameSuggestions";
 import { SignUpFormV2BirthdayFieldName } from "../components/SignUpFormV2";
 import SignInPrompt from "../components/SignInPrompt";
+import SignUpV2AuditContent from "../components/SignUpV2AuditContent";
 import {
   getPasswordRequirements,
   PasswordRequirement,
@@ -121,6 +122,8 @@ import SignUpContainerV2, {
 type SignUpV2ControllerProps = {
   treatment: SignUpV2Treatment;
   authUiVariant?: SignUpV2RefreshVariant;
+  /** Overrides the `ctx` of the page load and the button click events, for forms embedded outside /CreateAccount. */
+  eventContext?: string;
 };
 
 // Field-level interaction telemetry, matching the shape `revamp/SignUpForm` emits
@@ -152,7 +155,12 @@ const signupVariantByAuthUiVariant: Record<SignUpV2RefreshVariant, AuthVariant> 
   refreshSsoInline: authVariant.refreshSsoInline,
 };
 
-const SignUpV2Controller = ({ treatment, authUiVariant }: SignUpV2ControllerProps): JSX.Element => {
+const SignUpV2Controller = ({
+  treatment,
+  authUiVariant,
+  eventContext,
+}: SignUpV2ControllerProps): JSX.Element => {
+  const signupCtx = eventContext ?? EVENT_CONSTANTS.context.schematizedSignupForm;
   const { translate } = useTranslation();
   // Account-switcher restriction: mirrors the legacy form so a browser at or over the
   // max-logged-in-accounts limit cannot create yet another session, over either submit path.
@@ -352,7 +360,7 @@ const SignUpV2Controller = ({ treatment, authUiVariant }: SignUpV2ControllerProp
   };
 
   useEffect(() => {
-    sendSignUpV2FormPageLoadEvent(treatment, authUiVariant);
+    sendSignUpV2FormPageLoadEvent(treatment, authUiVariant, eventContext);
     telemetry.pageMounted();
     telemetry.formReady();
 
@@ -389,7 +397,7 @@ const SignUpV2Controller = ({ treatment, authUiVariant }: SignUpV2ControllerProp
     // eslint-disable-next-line no-void
     void probeConditionalCreate();
     // The arm never changes after first render, so this still runs once.
-  }, [authUiVariant, telemetry, treatment]);
+  }, [authUiVariant, eventContext, telemetry, treatment]);
 
   useEffect(() => {
     ssoProviders.forEach(provider => sendSignupSsoButtonShownEvent(provider));
@@ -646,7 +654,7 @@ const SignUpV2Controller = ({ treatment, authUiVariant }: SignUpV2ControllerProp
               href={urlConstants.login}
               isDisabled={isDisabled || isAccountLimitReached}
               onClick={() => {
-                sendAuthButtonClickEvent(signIn, "", EVENT_CONSTANTS.context.schematizedSignupForm);
+                sendAuthButtonClickEvent(signIn, "", signupCtx);
               }}
             />
           ),
@@ -697,11 +705,7 @@ const SignUpV2Controller = ({ treatment, authUiVariant }: SignUpV2ControllerProp
     },
     onUsernameChange: handleUsernameChange,
     onUsernameSuggestionSelect: suggestion => {
-      sendAuthButtonClickEvent(
-        usernameSuggestion,
-        suggestion,
-        EVENT_CONSTANTS.context.schematizedSignupForm,
-      );
+      sendAuthButtonClickEvent(usernameSuggestion, suggestion, signupCtx);
       setUsernameError("");
       handleUsernameChange(suggestion);
     },
@@ -727,11 +731,7 @@ const SignUpV2Controller = ({ treatment, authUiVariant }: SignUpV2ControllerProp
       // The form reports a deselect as Gender.unknown, so the button is read off current state.
       const isDeselect = nextGender === Gender.unknown;
       const button = (isDeselect ? gender : nextGender) === Gender.male ? genderMale : genderFemale;
-      sendAuthButtonClickEvent(
-        button,
-        isDeselect ? unselected : selected,
-        EVENT_CONSTANTS.context.schematizedSignupForm,
-      );
+      sendAuthButtonClickEvent(button, isDeselect ? unselected : selected, signupCtx);
       setGender(nextGender);
     },
   };
@@ -744,6 +744,7 @@ const SignUpV2Controller = ({ treatment, authUiVariant }: SignUpV2ControllerProp
 
   return (
     <React.Fragment>
+      <SignUpV2AuditContent treatment={treatment} translate={translate} />
       {compliance.interstitial}
       {/* Stays mounted under the consent page so the pending Continue can resume. */}
       <div hidden={Boolean(compliance.interstitial)}>
@@ -778,8 +779,10 @@ const SignUpV2Controller = ({ treatment, authUiVariant }: SignUpV2ControllerProp
             isConditionalCreateSupported,
             silentPasskeyUpgradeBrowserCheck: signupSilentUpgradeBrowserCheck,
             telemetry,
+            eventContext,
           }}
           telemetry={telemetry}
+          eventContext={eventContext}
           submitSignupRequest={submitSignupRequest}
           onSignupError={onSignupError}
           onPasskeyRegistrationRejected={compliance.clearParentOtp}

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { WithTranslationsProps } from "@rbx/core-scripts/react";
 import { Loading } from "@rbx/sdui-common";
 import {
@@ -14,6 +14,12 @@ import { usePageSession } from "../../common/utils/PageSessionContext";
 import { parseQueryString } from "../../common/utils/parsingUtils";
 import { getSessionInfoKey, toV1PageContext } from "../../sdui/v2/utils/pageReferralUtils";
 import { logSduiError, SduiErrorNames } from "../../sdui/utils/logSduiError";
+import {
+  trackDataLoaded,
+  trackDataLoadFailed,
+  trackPageView,
+  type DataSource,
+} from "../observability";
 import type { ISduiLandingPageConfiguration } from "../types/sduiLandingPageTypes";
 import { buildSduiLandingPageEntryPointMessages } from "../utils/sduiEntryPointMessages";
 import { getSubPageAnalyticsData } from "../utils/sduiLandingPageHelpers";
@@ -98,6 +104,13 @@ export const SduiLandingPageContainerV2 = ({
     () => services.apiStore.getCacheSignal(configKey).peek()?.error,
   );
 
+  // Count one load per mount; the effect below re-runs when the session id rotates.
+  const dataLoadedTrackedRef = useRef(false);
+
+  useEffect(() => {
+    trackPageView(appPage, pageSlug);
+  }, [appPage, pageSlug]);
+
   const [queryParams] = useState(() =>
     parseQueryString(typeof window === "undefined" ? "" : window.location.search),
   );
@@ -127,11 +140,19 @@ export const SduiLandingPageContainerV2 = ({
   ]);
 
   useEffect(() => {
+    const reportDataLoaded = (source: DataSource) => {
+      if (!dataLoadedTrackedRef.current) {
+        dataLoadedTrackedRef.current = true;
+        trackDataLoaded(appPage, source);
+      }
+    };
+
     const seed = readSeedFromHtml(htmlPayloadId, protoSchema, appPage);
     if (seed) {
       services.apiStore.seedFromResponse(seed, requestConfig);
       setStatus(services.apiStore.getCacheSignal(configKey).peek()?.status ?? "loaded");
       setCacheError(undefined);
+      reportDataLoaded("ssr");
       return;
     }
 
@@ -147,6 +168,10 @@ export const SduiLandingPageContainerV2 = ({
           }`,
           toV1PageContext(pageContext),
         );
+        trackDataLoadFailed(appPage, entry?.error);
+      }
+      if (nextStatus === "loaded") {
+        reportDataLoaded("client");
       }
       setCacheError(entry?.error);
       setStatus(nextStatus);
