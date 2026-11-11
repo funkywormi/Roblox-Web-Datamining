@@ -40,7 +40,6 @@ const defaultValues = {
     IsGameStorePreviewEnabled: false,
     HasUpdatedRecommendedSortTitle: true,
     IsGamePreviewVideoEnabled: false,
-    HasTopSongsEnabled: false,
     IsPlayOnWebEnabled: false,
   },
   gameDetailsBtid: {

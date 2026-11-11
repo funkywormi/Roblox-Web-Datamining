@@ -6,6 +6,7 @@ import { chatService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import { Button } from "@rbx/core-ui";
 import { Thumbnail2d, ThumbnailTypes, ThumbnailGameIconSize } from "@rbx/thumbnails";
+import { getGameLauncher } from "@rbx/www-common/game-launch";
 import { TFriend } from "../types/friendsCarousel";
 import IARCInGameCard from "./IARCInGameCard";
 
@@ -50,11 +51,15 @@ const FriendTileDropdown = ({
     } else if (meta?.isIosDevice) {
       window.location.href = `robloxmobile://userId=${friend.id}&joinAttemptId=${joinAttemptId}&joinAttemptOrigin=JoinUser`;
     } else {
-      await window.Roblox.ProtocolHandlerClientInterface?.followPlayerIntoGame({
-        userId: friend.id,
-        joinAttemptId,
-        joinAttemptOrigin: "JoinUser",
-      });
+      const params = { userId: friend.id, joinAttemptId, joinAttemptOrigin: "JoinUser" };
+      // The Next.js host registers the shared launcher; .NET pages keep their protocol handler.
+      const launcher = getGameLauncher();
+      if (launcher != null) {
+        await launcher.followPlayerIntoGame(params);
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- .NET fallback, getGameLauncher() is null there
+        await window.Roblox.ProtocolHandlerClientInterface?.followPlayerIntoGame(params);
+      }
     }
   };
 

@@ -1,9 +1,11 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { AccessManagementUpsellV2Service } from "Roblox";
-import { UserProfileField, useUserProfiles } from "@rbx/user-profile-api-client";
 import { useTranslation } from "@rbx/core-scripts/react";
+import {
+  useTrustedFriendsModalHost,
+  type TrustedFriendsModalHost,
+} from "../components/trustedFriendsModalHost";
 import {
   TrustedFriendPrimaryHandler,
   triggerTrustedFriendVPCRecourseAmpFeatureName,
@@ -42,9 +44,12 @@ function getTrustedFriendActionButtons(
   };
 }
 
-async function startTrustedFriendVpcUpsell(targetUserId: number): Promise<void> {
+async function startTrustedFriendVpcUpsell(
+  startAccessManagementUpsell: TrustedFriendsModalHost["startAccessManagementUpsell"],
+  targetUserId: number,
+): Promise<void> {
   try {
-    await AccessManagementUpsellV2Service.startAccessManagementUpsell({
+    await startAccessManagementUpsell({
       featureName: triggerTrustedFriendVPCRecourseAmpFeatureName,
       ampFeatureCheckData: [{ name: "targetUser", type: "UserId", value: String(targetUserId) }],
       isAsyncCall: false,
@@ -83,13 +88,8 @@ export function useGetTrustedFriendsModalButtons({
 } {
   const { translate } = useTranslation();
   const queryClient = useQueryClient();
-
-  const profileFields = useMemo(
-    () => [UserProfileField.Names.CombinedName, UserProfileField.Names.Username],
-    [],
-  );
-  const { data: userProfiles } = useUserProfiles([userId], profileFields);
-  const targetProfile = userProfiles?.[userId];
+  const { startAccessManagementUpsell, useUserNames } = useTrustedFriendsModalHost();
+  const targetNames = useUserNames(userId);
 
   const buttonConfig = useMemo(
     () => getTrustedFriendActionButtons(trustedFriendAction),
@@ -102,7 +102,7 @@ export function useGetTrustedFriendsModalButtons({
     }
 
     const { handler } = buttonConfig;
-    const userName = targetProfile?.names.username ?? "";
+    const userName = targetNames?.username ?? "";
 
     const invalidateTrustedQueries = async (): Promise<void> => {
       await queryClient.invalidateQueries({ queryKey: trustedFriendStatusQueryKey(userId) });
@@ -165,13 +165,13 @@ export function useGetTrustedFriendsModalButtons({
           break;
         case TrustedFriendPrimaryHandler.vpcUpsell:
           onClose(false);
-          await startTrustedFriendVpcUpsell(userId);
+          await startTrustedFriendVpcUpsell(startAccessManagementUpsell, userId);
           await onComplete?.();
           break;
         case TrustedFriendPrimaryHandler.vpcLinkRecipientUpsell:
           onClose(false);
           await addTrustedFriendViaLink();
-          await startTrustedFriendVpcUpsell(userId);
+          await startTrustedFriendVpcUpsell(startAccessManagementUpsell, userId);
           await onComplete?.();
           break;
         case TrustedFriendPrimaryHandler.addViaLinkEmpty:
@@ -193,11 +193,12 @@ export function useGetTrustedFriendsModalButtons({
     linkTokens,
     translate,
     onClose,
-    targetProfile,
+    targetNames,
     setToastMessage,
     queryClient,
     onComplete,
     buttonConfig,
+    startAccessManagementUpsell,
   ]);
 
   return { buttonConfig, performPrimaryAction };

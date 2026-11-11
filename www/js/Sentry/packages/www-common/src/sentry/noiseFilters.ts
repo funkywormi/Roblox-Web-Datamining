@@ -21,6 +21,10 @@ export const NOISE_DENY_URLS: RegExp[] = [
   /^moz-extension:\/\//i,
   /^safari(-web)?-extension:\/\//i,
   /^blob:/i,
+  // Arkose (FunCaptcha) scripts, loaded with `crossorigin="anonymous"`, so their errors are no longer redacted
+  // to "Script error."  Errors thrown in our own Arkose callbacks have a Roblox frame on top and still report.
+  /^https?:\/\/arkoselabs\.(roblox\.com|sitetest\d\.robloxlabs\.com)\//i,
+  /^https?:\/\/([a-z0-9-]+\.)*(arkoselabs|funcaptcha)\.com\//i,
   ...THIRD_PARTY_NOISE_PATTERNS,
 ];
 

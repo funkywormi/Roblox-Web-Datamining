@@ -2,7 +2,7 @@ import React, { Ref, forwardRef, useCallback, useEffect, useMemo, useState } fro
 import { QueryClientProvider } from "@tanstack/react-query";
 import { TranslateFunction, queryClient } from "@rbx/core-scripts/react";
 import "../../../css/common/_gameTiles.scss";
-import "../../../css/gameCarousel/_tooltip.scss";
+import "../../../css/gameCarousel/tooltip.css";
 import useFocused from "../hooks/useFocused";
 import useGetGameLayoutData from "../hooks/useGetGameLayoutData";
 import useGameTileOverflowMenu from "../hooks/useGameTileOverflowMenu";

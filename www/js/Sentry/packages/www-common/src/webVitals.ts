@@ -2,6 +2,7 @@ import { onCLS, onFCP, onINP, onLCP, onTTFB } from "web-vitals";
 import { bigIntFromNumber, parseBigInt } from "@rbx/core-lib/bigint";
 import { WebVitalsSchema } from "@rbx/event-stream-proto/eventstream/web/web_vitals_pb";
 import { EventStreamClient } from "@rbx/event-stream-v2";
+import { publishPagePerformance } from "./pagePerformance";
 
 /**
  * Web-vital measurements keyed by metric (`lcp`, `fcp`, `ttfb`, `cls`, `inp`),
@@ -40,6 +41,9 @@ function getClient(baseUrl: string): EventStreamClient {
  * Sentry init; each passes its own event-stream base URL (apiGatewayUrl), the
  * user id, and the internal page name.
  *
+ * Also publishes a sampled share of loads as PagePerf histograms (see
+ * pagePerformance.ts) so every page gets Grafana latency metrics.
+ *
  * LCP/FCP/TTFB/INP are in milliseconds; CLS is a unitless score. No-ops when the
  * transaction carries none of the tracked vitals (e.g. navigations).
  */
@@ -48,6 +52,11 @@ export function sendWebVitals(
   measurements: WebVitalMeasurements,
   userId: string | number | bigint | null | undefined,
   pageName: string | undefined,
+  // The page the vitals were measured on. Differs from pageName after in-app
+  // navigation; PagePerf histograms file samples under the page that loaded.
+  // Required, not defaulted: an unnamed load page must stay undefined (reported
+  // as Unknown) instead of picking up the current page's name.
+  loadPageName: string | undefined,
 ): void {
   if (!measurements) {
     return;
@@ -84,6 +93,7 @@ export function sendWebVitals(
       .catch(() => {
         // Best-effort telemetry; the client already logs its own failures.
       });
+    publishPagePerformance(measurements, loadPageName);
   } catch (error) {
     console.error("[PERF] Failed to send web vitals:", error);
   }
@@ -133,7 +143,10 @@ export function reportWebVitals(
   }
 
   const measurements: Record<string, { value: number }> = {};
+  // Read on the first vital report, before any in-app route change rewrites page-meta.
+  let loadPageName: string | undefined;
   const record = (key: string) => (metric: { value: number }) => {
+    loadPageName ??= getPageName();
     measurements[key] = { value: metric.value };
   };
 
@@ -155,7 +168,8 @@ export function reportWebVitals(
     if (ttfb) {
       measurements.ttfb = ttfb;
     }
-    sendWebVitals(baseUrl, measurements, getUserId(), getPageName());
+    const pageName = getPageName();
+    sendWebVitals(baseUrl, measurements, getUserId(), pageName, loadPageName ?? pageName);
   };
 
   // Flush once when the page is hidden/unloaded — after web-vitals has finalized

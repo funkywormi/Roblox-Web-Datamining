@@ -134,7 +134,7 @@ export enum VIEW_NAME {
   REDEEM_CREDIT_FOOTER = "RedeemCreditFooter",
   REDEEM_CREDIT_GET_PLUS_MODAL = "RedeemCreditGetPlusModal",
   IOS_PURCHASE_RESTART_ALERT = "IosPurchaseRestartAlert",
-  NATIVE_PURCHASE_HANDOFF_MISSED = "NativePurchaseHandoffMissed",
+  NATIVE_PURCHASE_UI_SHOWN_TIME = "NativePurchaseUiShownTime",
 }
 
 export enum PURCHASE_EVENT_TYPE {

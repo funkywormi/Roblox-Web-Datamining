@@ -275,7 +275,7 @@
         },
         {
             "name": "Authentication.CrossDevice",
-            "url": "https://js.rbxcdn.com/ce98f84e59607325a8d59044a9301a4cdbeabb09ba316542995b2cc0c17e485e.js",
+            "url": "https://js.rbxcdn.com/e5e14cbd41c2b7c07435d59d336c538511e7332d18b6551befbed681b06c86ed.js",
             "sources": [
                 "/login",
                 "/crossdevicelogin/ConfirmCode"
@@ -283,7 +283,7 @@
         },
         {
             "name": "Authentication.Login",
-            "url": "https://js.rbxcdn.com/05ffa7e020754dd6a4f5ca84f68a66b0bac77262dd21a68e3e5b543b05c3af8e.js",
+            "url": "https://js.rbxcdn.com/b3b0f28b337feaf4beb8b4c105034c61203eadb19b2094679893a375e04325b9.js",
             "sources": [
                 "/home",
                 "/",
@@ -511,6 +511,7 @@
             "url": "https://js.rbxcdn.com/48dba3f75eb97bd9a307468491aec7a595fce460337c472283615754b7df5d76.js",
             "sources": [
                 "/home",
+                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -643,6 +644,7 @@
             "name": "Common.Captcha",
             "url": "https://js.rbxcdn.com/5f2ee2913bf919a8576bbe4120a6d41b933e814a4779a0a3fc1d9d941c5ee368.js",
             "sources": [
+                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -846,7 +848,7 @@
         },
         {
             "name": "CommonUI.Features",
-            "url": "https://js.rbxcdn.com/e983e18532310b80e1e8f3fcf3677b64ab19f00bf78919bdd2bd307827099a82.js",
+            "url": "https://js.rbxcdn.com/bb2781b20d80e0042b7bb26edc61b24ad95895f12ba4c41a5cac1f9334da7ef4.js",
             "sources": [
                 "/home",
                 "/",
@@ -1083,7 +1085,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/91468f57cedc66b2697a11272886256dfba9138d5bd82744a1428de93fc4bc0c.js",
+            "url": "https://js.rbxcdn.com/426d28f3d80c8ab63282563f08bb17359ebba381851cb2f45dbb3b5645b57dd3.js",
             "sources": [
                 "/home",
                 "/",
@@ -1746,7 +1748,7 @@
         },
         {
             "name": "Feature.ExperienceDetails",
-            "url": "https://js.rbxcdn.com/55863622ade93d112df014d57d9b928a3edf7b1fa4cd02f812c10ee0eeccc3c4.js",
+            "url": "https://js.rbxcdn.com/9cbf97139001ca2d0a7eca6a2f2114a9d668819e82adbd0be63a0575a483829b.js",
             "sources": [
                 "/home",
                 "/",
@@ -1799,7 +1801,7 @@
         },
         {
             "name": "Feature.Favorites",
-            "url": "https://js.rbxcdn.com/69c3f641759f1d3f8d23f837f2011c1bd85ad258641401e27f6562ddf2e84d2e.js",
+            "url": "https://js.rbxcdn.com/f84a470c2f7af6a76ca3b01b28d8045b39443c56301c70e07c9deefe58102ce4.js",
             "sources": [
                 "/users/1/favorites",
                 "/catalog/3360689775",
@@ -1987,7 +1989,7 @@
         },
         {
             "name": "Feature.Friends",
-            "url": "https://js.rbxcdn.com/0a2591b2953d92349b2bea2cb26b0c4e6afe46327d2710b1f5cc4dce89fb31c9.js",
+            "url": "https://js.rbxcdn.com/5c67bcb7d01d2378af5d650bf60e4b43b92d4ddde69e27706849d4ae8d1bf7e1.js",
             "sources": [
                 "/home",
                 "/",
@@ -2393,6 +2395,7 @@
             "name": "Feature.Landing",
             "url": "https://js.rbxcdn.com/686bd55707be42af370b81d2f36f55b6e10c56edb105502b3f9f0a34f7412bf5.js",
             "sources": [
+                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -2677,7 +2680,6 @@
             "url": "https://js.rbxcdn.com/7774e92ccee60b92717e18209b9060b35988362a9493cadb5234c96550e27d90.js",
             "sources": [
                 "/home",
-                "/",
                 "/charts",
                 "/discover/?Keyword=roblox",
                 "/users/1/profile"
@@ -2685,7 +2687,7 @@
         },
         {
             "name": "Feature.PlayerSearchResults",
-            "url": "https://js.rbxcdn.com/7fa1ab56dbe8f9e5e5f277401acb4ef2631d9bbf40f42338a54fb690dd3cf6ce.js",
+            "url": "https://js.rbxcdn.com/8ca31f37e8d61b172913e3d5614fad3e8039f693148aa41ab550a1d394e63f5c.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -3390,13 +3392,6 @@
             "url": "https://js.rbxcdn.com/46ec7856c5aa19b2bd5e4d7b745da33086769838558970c98610e983b70fe922.js",
             "sources": [
                 "/my/account"
-            ]
-        },
-        {
-            "name": "Feature.SduiLandingPage",
-            "url": "https://js.rbxcdn.com/5e740513671abfd8b06b4e8eebe99f64123b585b131d5798a48bb8e1811de323.js",
-            "sources": [
-                "/"
             ]
         },
         {
@@ -4499,6 +4494,7 @@
             "name": "Captcha",
             "url": "https://js.rbxcdn.com/b604dac29d89b56aef30844f099c5640c2f1870a97a06f4e692208d24097f9ed-Captcha.js",
             "sources": [
+                "/",
                 "/login",
                 "/CreateAccount",
                 "/support",
@@ -4712,7 +4708,7 @@
         },
         {
             "name": "CoreUtilities",
-            "url": "https://js.rbxcdn.com/2fdef63668705a2aa45e93b457a701862bef9b6e3e7d8292483e9f2176538272-CoreUtilities.js",
+            "url": "https://js.rbxcdn.com/69a4eaa670f7286ee8fdbaec86359306bae21413af388593d0b2525f42424647-CoreUtilities.js",
             "sources": [
                 "/home",
                 "/",
@@ -6143,6 +6139,7 @@
             "url": "https://js.rbxcdn.com/215fe9b0fe92491f665645f65f57db6668d716af72e02465db259b715f061118.js",
             "sources": [
                 "/home",
+                "/",
                 "/login",
                 "/CreateAccount",
                 "/catalog",
@@ -6252,7 +6249,7 @@
         },
         {
             "name": "ProfilePlatform",
-            "url": "https://js.rbxcdn.com/81612b76081d6f9ce5e07f6ff85e9527d0ab380a4081ac0c5e37f330b3a0e43c-ProfilePlatform.js",
+            "url": "https://js.rbxcdn.com/8541332b57f14547a7eb996d3fcb11fe95683d75ff8c87f32b751d669ef1c7b8-ProfilePlatform.js",
             "sources": [
                 "/users/1/profile"
             ]
@@ -6382,6 +6379,7 @@
             "name": "ReactLanding",
             "url": "https://js.rbxcdn.com/49ec9fea0f677edf6e58566773754cb02e8084ba6e3f8510b222c80573fe6b4f-ReactLanding.js",
             "sources": [
+                "/",
                 "/CreateAccount"
             ]
         },
@@ -6394,7 +6392,7 @@
         },
         {
             "name": "ReactPlayerSearch",
-            "url": "https://js.rbxcdn.com/77c16fd5b8a2b496627a73ceea6d37ce5a745a78eefaf25f9e7523b42e65fea5-ReactPlayerSearch.js",
+            "url": "https://js.rbxcdn.com/80c22815474f1bdeb4bb1ff700d2ac3cad543173502de012750fd6dd610342d2-ReactPlayerSearch.js",
             "sources": [
                 "/search/users"
             ]
@@ -6684,13 +6682,6 @@
             ]
         },
         {
-            "name": "SduiLandingPage",
-            "url": "https://js.rbxcdn.com/df6c9e8c99818fb01fd105cf7daac9052ed118da698f810386dc90a9be0cd450-SduiLandingPage.js",
-            "sources": [
-                "/"
-            ]
-        },
-        {
             "name": "SearchDropdown",
             "url": "https://js.rbxcdn.com/d7b66604b6aed7454c982f0c5e055cb0a91bf6bf02ce81a9069db7578a9c7119.js",
             "sources": [
@@ -6807,7 +6798,7 @@
         },
         {
             "name": "Sentry",
-            "url": "https://js.rbxcdn.com/12b630149830d1df94cddc2165f9e0d7bfb1328b7d2b6a46ac59fa121db0342d-Sentry.js",
+            "url": "https://js.rbxcdn.com/377f5c634c2ce044a02f51ee14c3ba184e0e93b65e644781ae8a0a9a8e4ad39d-Sentry.js",
             "sources": [
                 "/home",
                 "/",
@@ -7312,7 +7303,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/097d58d57c52b8ff9c270d8d88008f22ded03653e538fe49e2772cfd65a6b82c-UserSettings.js",
+            "url": "https://js.rbxcdn.com/c167022af0fc93a766fceac46f6857cb37531e39786a30ca3ae6b6b353b88eb4-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -7815,6 +7806,7 @@
             "name": "Captcha",
             "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-Captcha.css",
             "sources": [
+                "/",
                 "/login",
                 "/CreateAccount",
                 "/support",
@@ -8863,7 +8855,7 @@
         },
         {
             "name": "ProfilePlatform",
-            "url": "https://css.rbxcdn.com/cce4871cae050976c2b04c9d51e49df8db80044364c9b788edd6956125ff6173-ProfilePlatform.css",
+            "url": "https://css.rbxcdn.com/0889bc0cf1b689c1634f841765dd93513397177c0832b5604fa579378161dd34-ProfilePlatform.css",
             "sources": [
                 "/users/1/profile"
             ]
@@ -8936,6 +8928,7 @@
             "name": "ReactLanding",
             "url": "https://css.rbxcdn.com/eb5dcc055e5d083a0f5cd9922d739527d0f8583b4529ac9ddf16df8cac71d71f-ReactLanding.css",
             "sources": [
+                "/",
                 "/CreateAccount"
             ]
         },
@@ -8948,7 +8941,7 @@
         },
         {
             "name": "ReactPlayerSearch",
-            "url": "https://css.rbxcdn.com/7761daf088ac54cd1dc5f4af84409896a43adea621739f5b7b399668383e1cfa-ReactPlayerSearch.css",
+            "url": "https://css.rbxcdn.com/7c6bb73e69383fdb64d9bd1398032c4d2a60a959d3661dbdefa7f04e83415dda-ReactPlayerSearch.css",
             "sources": [
                 "/search/users"
             ]
@@ -9155,13 +9148,6 @@
             "url": "https://css.rbxcdn.com/4f18adca1119c32d0bc94f5d0dd663a22313b32342a77271cd9caa09d25f8083-SafetySupportPage.css",
             "sources": [
                 "/help-safety"
-            ]
-        },
-        {
-            "name": "SduiLandingPage",
-            "url": "https://css.rbxcdn.com/851fdee45ec75313414f5bfc8dc2db6f3766cecce593b48a94c18972ef6aec86-SduiLandingPage.css",
-            "sources": [
-                "/"
             ]
         },
         {

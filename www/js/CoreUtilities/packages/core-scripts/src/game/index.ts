@@ -1,6 +1,7 @@
 import "../global";
 import { uuidService } from "@rbx/core-legacy";
 import { sendEventWithTarget, sendGamePlayEvent } from "../event-stream";
+import { getDeviceMeta } from "../meta/device";
 
 // TODO: this should not be part of core-scripts
 
@@ -169,14 +170,15 @@ const joinGame = (
 };
 
 // Share links wait for the returned launch before redirecting to the game page, because the
-// redirect cancels a launch that hasn't opened the client yet. Only the shared launcher
-// (is-www-common-game-launcher-enabled) returns it. With the switch off this returns nothing, so
-// the redirect happens right away, as before.
+// redirect cancels a launch that hasn't opened the client yet. The UWP and Universal apps join
+// through the app (gameLaunch's appHybridClientInterface), so the redirect can't cancel it and
+// happens right away, as before.
 export const launchGame = (
   playGameProperties: PlayGameProperties,
   eventStreamProperties: EventStreamProperties,
   actionType?: string,
 ): PromiseLike<void> | void => {
   const launch = joinGame(playGameProperties, eventStreamProperties, actionType);
-  return window.Roblox.GameLauncher?.isSharedGameLauncherEnabled?.() ? launch : undefined;
+  const device = getDeviceMeta();
+  return device?.isUWPApp || device?.isUniversalApp ? undefined : launch;
 };

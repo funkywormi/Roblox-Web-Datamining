@@ -94,3 +94,16 @@ export const linkifyHtml = (html: string, isPhone: boolean): string => {
   }
   return out + html.slice(index);
 };
+
+// String.prototype.escapeHTML on .NET (website wwwroot/js/extensions/string.js); core-scripts escapeHtml also escapes "/", which stops URLs matching.
+const escapeHtml = (text: string) =>
+  text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+/** Escapes plain text and links it, as `Linkify.String(text.escapeHTML())` does on .NET. */
+export const linkifyText = (text: string, isPhone: boolean): string =>
+  linkifyHtml(escapeHtml(text), isPhone);

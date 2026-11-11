@@ -3,33 +3,29 @@ import { callBehaviour } from "@rbx/core-scripts/guac";
 import { Action } from "@rbx/profile-platform";
 
 export type TrustedFriendsOnWebEnabledResponse = {
-  acceptTrustedFriendRequestOnWeb: boolean;
-  sendTrustedFriendRequestOnWeb: boolean;
+  enableTrustedFriendsManagementOnWeb: boolean;
 };
 
 const disabledResponse: TrustedFriendsOnWebEnabledResponse = {
-  acceptTrustedFriendRequestOnWeb: false,
-  sendTrustedFriendRequestOnWeb: false,
+  enableTrustedFriendsManagementOnWeb: false,
 };
+
+const trustedFriendRequestActions = new Set<Action>([
+  Action.AddTrustedConnection,
+  Action.AddTrustedConnectionViaLink,
+  Action.PendingTrustedConnection,
+  Action.AddIncomingTrustedConnection,
+  Action.PendingIncomingTrustedConnection,
+]);
 
 // The backend can place trusted friend actions in either the button row or the contextual menu, so
 // every surface that renders an action must consult this before rendering its button or menu item.
 export const isTrustedFriendActionHidden = (
   action: Action,
   trustedFriendsOnWebEnabled: TrustedFriendsOnWebEnabledResponse,
-): boolean => {
-  const isAcceptTrustedFriendAction =
-    action === Action.AddIncomingTrustedConnection ||
-    action === Action.PendingIncomingTrustedConnection;
-  const isSendTrustedFriendAction =
-    action === Action.AddTrustedConnection ||
-    action === Action.AddTrustedConnectionViaLink ||
-    action === Action.PendingTrustedConnection;
-  return (
-    (isAcceptTrustedFriendAction && !trustedFriendsOnWebEnabled.acceptTrustedFriendRequestOnWeb) ||
-    (isSendTrustedFriendAction && !trustedFriendsOnWebEnabled.sendTrustedFriendRequestOnWeb)
-  );
-};
+): boolean =>
+  trustedFriendRequestActions.has(action) &&
+  !trustedFriendsOnWebEnabled.enableTrustedFriendsManagementOnWeb;
 
 const trustedFriendsOnWebQuery = {
   queryKey: ["web-trusted-friends"],
@@ -47,7 +43,7 @@ const useIsTrustedFriendsOnWebEnabled = (): TrustedFriendsOnWebEnabledResponse =
 
 /**
  * Whether the trusted friends rollout check has settled (succeeded or failed). Until then,
- * trusted friend actions are hidden, so surfaces rendering actions can wait on this to avoid
+ * trusted friend request actions are hidden, so surfaces rendering actions can wait on this to avoid
  * buttons popping in.
  */
 export const useIsTrustedFriendsOnWebLoaded = (): boolean => {

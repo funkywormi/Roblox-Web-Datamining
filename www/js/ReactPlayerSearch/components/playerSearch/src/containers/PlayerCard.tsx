@@ -47,7 +47,7 @@ const getRelationshipIcon = (user: SearchResultUser): string | null => {
     return null;
   }
 
-  if (user.matchingPreviousName) {
+  if (user.hasPreviousUsernameMatch) {
     return relationshipIcon.aka;
   }
 
@@ -64,7 +64,7 @@ const getRelationshipText = (
   }
 
   // Label.NewUsername resolves from Roblox.LangDynamic, not Roblox.Lang.
-  if (user.matchingPreviousName) {
+  if (user.hasPreviousUsernameMatch) {
     return translate("Label.NewUsername", undefined, "New Username");
   }
 
@@ -87,7 +87,7 @@ const shouldShowPresenceStatus = (user: SearchResultUser, isUserGuest: boolean):
   return (
     !isUserGuest &&
     !user.isCurrentUser &&
-    !user.matchingPreviousName &&
+    !user.hasPreviousUsernameMatch &&
     user.friendshipStatus !== friendshipStatuses.friends &&
     !user.isFollowing
   );

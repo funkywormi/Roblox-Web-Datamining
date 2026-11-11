@@ -57,5 +57,8 @@
     "Heading.WaitingForConfirmation": "Waiting for confirmation",
     "Description.QuickSignInInstructionsModal": "On your signed-in device, scan the QR code or go to <b>More > Quick sign in</b> and enter the code below.",
     "Description.ConfirmOnSignedInDevice": "Confirm on your signed-in device to continue.",
-    "Description.SigningInAs": "Signing in as {identifier}"
+    "Description.SigningInAs": "Signing in as {identifier}",
+    "Label.TroubleSigningIn": "Trouble signing in?",
+    "Action.Close": "Close",
+    "Action.Back": "Back"
 }

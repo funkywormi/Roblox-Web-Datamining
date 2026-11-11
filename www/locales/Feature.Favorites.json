@@ -11,5 +11,6 @@
     "Heading.MyFavorites": "My Favorites",
     "Heading.UserFavorites": "{username}'s Favorites",
     "Label.Favorite": "Favorite",
-    "Label.Favorited": "Favorited"
+    "Label.Favorited": "Favorited",
+    "Heading.MyLibrary": "My Library"
 }

@@ -1,5 +1,6 @@
 import { RefObject, useCallback } from "react";
 import { sendEvent } from "@rbx/core-scripts/event-stream";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import "@rbx/core-scripts/global";
 import {
   useCollectionItemsIntersectionTracker,
@@ -73,6 +74,8 @@ const useFriendsCarouselImpressionTracker = (
           [UserImpressionsMetadata.SourceCarousel]: carouselName,
 
           [SessionInfo.HomePageSessionInfo]: homePageSessionInfo,
+
+          [SharedEventMetadata.InteractionUuid]: generateRandomUuid(),
         };
       }
 

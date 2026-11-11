@@ -184,6 +184,7 @@ export enum EventType {
   QueryImpressions = "queryImpressions",
   ExpandableTextImpression = "expandableTextImpression",
   GameDetailUnavailable = "gameDetailUnavailable",
+  SafetyResourceBanner = "safetyResourceBanner",
 }
 
 export enum SessionInfoType {
@@ -570,6 +571,19 @@ export type TQueryImpressions = {
   [SessionInfoType.SearchLandingPageSessionInfo]?: string;
 };
 
+/**
+ * Field names match the JSON names of the proto-schemas `SafetyResourceBannerEvent`.
+ * They are sent as-is instead of going through `parseEventParams`, which URL-encodes
+ * values and would mangle `url`.
+ */
+export type TSafetyResourceBanner = {
+  action: string;
+  moderationCategory: string;
+  url: string;
+  surface: string;
+  textFilterRequestId: string;
+};
+
 export type TGameDetailUnavailable = {
   [EventStreamMetadata.UniverseId]?: string;
   [EventStreamMetadata.PlaceId]?: string;
@@ -769,6 +783,17 @@ export default {
       [EventStreamMetadata.PageContext]: getEventContext(pageContext),
       [EventStreamMetadata.InteractionUuid]: generateRandomUuid(),
     }),
+  ],
+  [EventType.SafetyResourceBanner]: (params: TSafetyResourceBanner, context: string): TEvent => [
+    {
+      name: EventType.SafetyResourceBanner,
+      type: EventType.SafetyResourceBanner,
+      context,
+    },
+    Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined)) as Record<
+      string,
+      string
+    >,
   ],
   [EventType.GameDetailUnavailable]: (params: TGameDetailUnavailable = {}): TEvent => [
     {

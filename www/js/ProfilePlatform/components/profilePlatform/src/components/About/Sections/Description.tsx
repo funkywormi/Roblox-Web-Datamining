@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import Linkify from "@rbx/linkify";
+import React, { useState } from "react";
+import { useLinkifiedText } from "@rbx/linkify/react";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { About, Component } from "@rbx/profile-platform";
 import EditUserBioModal from "@rbx/profile-common/EditUserBioModal";
@@ -8,8 +8,6 @@ import SectionHeader from "./SectionHeader";
 import useProfileJsonComponent from "../../../hooks/useProfileJsonComponent";
 import { SectionKeys } from "../../../constants/enums";
 import { useProfilePlatformContext } from "../../../context/ProfilePlatformContext";
-
-type StringWithEscapeHTML = string & { escapeHTML: () => string };
 
 const Description: React.FC<About> = ({ description }) => {
   const { translate } = useTranslation();
@@ -21,16 +19,8 @@ const Description: React.FC<About> = ({ description }) => {
   const nameWithAt = `@${aboutData?.name}`;
 
   // Be cautious editing below code. this can easily create a XSS vulnerability if not handled properly.
-  const linkifiedDescription = useMemo(() => {
-    if (!description) {
-      return translate("Label.NoBioYet");
-    }
-
-    // We need to cast content to new type because typescript is unaware of the escapeHTML added to the string prototype
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const escapedContent = (description as StringWithEscapeHTML).escapeHTML();
-    return Linkify.String(escapedContent);
-  }, [translate, description]);
+  const linkifiedText = useLinkifiedText(description);
+  const linkifiedDescription = description ? linkifiedText : translate("Label.NoBioYet");
 
   return (
     <div key={SectionKeys.Description} className="gap-large flex flex-col">

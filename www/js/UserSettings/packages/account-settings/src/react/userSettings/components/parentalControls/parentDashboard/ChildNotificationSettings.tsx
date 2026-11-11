@@ -10,7 +10,6 @@ import SettingsSection from "../../../../common/components/SettingsSection";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import { TChildSettingsInfo } from "../../../../../types/childrenInfoTypes";
 import privacyTranslationConstants from "../../../constants/contentConstants/privacyTranslationConstants";
-import { useGetSettingsUiPolicyQuery } from "../../../../apis/universalAppConfigurationApi";
 import { TSettingUpdateProps } from "../../../../../types/settingUpdateTypes";
 
 export const ChildNotificationSettings = ({
@@ -21,7 +20,6 @@ export const ChildNotificationSettings = ({
 } & TSettingUpdateProps): JSX.Element => {
   const { userId: childUserId } = child;
   const { translate } = useTranslation();
-  const { data: settingsUiPolicy } = useGetSettingsUiPolicyQuery();
   const { notifications } = parentalControlsTranslationConstants;
   const [childSettings] = useGetSettingsAndOptions(childUserId);
   const [childSettingsV2] = useGetSettingsAndOptionsV2(childUserId);
@@ -43,17 +41,16 @@ export const ChildNotificationSettings = ({
           />
         )}
         {/* Desktop notifications */}
-        {settingsUiPolicy?.displayDesktopNotificationSettings &&
-          childSettingsV2?.[UserSetting.aggregatedDesktopNotifications] && (
-            <ToggleWithParentalConsentV2
-              onUpdateSetting={onUpdateSetting}
-              label={translate(notifications.desktopNotifications)}
-              description={translate(notifications.desktopNotificationsParentSideDescription)}
-              inputId="desktop-notifications"
-              settingName={UserSetting.aggregatedDesktopNotifications}
-              childUserId={childUserId}
-            />
-          )}
+        {childSettingsV2?.[UserSetting.aggregatedDesktopNotifications] && (
+          <ToggleWithParentalConsentV2
+            onUpdateSetting={onUpdateSetting}
+            label={translate(notifications.desktopNotifications)}
+            description={translate(notifications.desktopNotificationsParentSideDescription)}
+            inputId="desktop-notifications"
+            settingName={UserSetting.aggregatedDesktopNotifications}
+            childUserId={childUserId}
+          />
+        )}
         {/* Push notifications */}
         {childSettings?.[UserSetting.allowEnablePushNotifications] && (
           <ToggleWithParentalConsent

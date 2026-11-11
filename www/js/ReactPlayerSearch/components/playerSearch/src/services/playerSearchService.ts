@@ -42,27 +42,6 @@ export type CombinedSearchResults = {
 
 const sessionId = uuidService.generateRandomUuid();
 
-const getMatchingPreviousName = (user: SearchResultUser, keyword: string): string | null => {
-  const lowerKeyword = keyword.trim().toLowerCase();
-
-  if (!lowerKeyword || user.previousUsernames.length === 0) {
-    return null;
-  }
-
-  return (
-    user.previousUsernames
-      .map(previousName => previousName.trim())
-      .find(previousName => {
-        const lowerPreviousName = previousName.toLowerCase();
-
-        return (
-          lowerPreviousName.startsWith(lowerKeyword) &&
-          lowerPreviousName !== user.name.toLowerCase()
-        );
-      }) ?? null
-  );
-};
-
 export const searchUsers = async (
   keyword: string,
   cursor: string,
@@ -103,7 +82,7 @@ export const searchUsers = async (
         id: result.contentId,
         name: result.username,
         displayName: result.displayName,
-        previousUsernames: result.previousUsernames ?? [],
+        isPreviousUsernameMatch: result.isPreviousUsernameMatch,
         hasVerifiedBadge: result.hasVerifiedBadge,
         isCurrentUser: Number(currentUser.userId) === result.contentId,
         profileUrl: urlService.getUrlWithQueries(profileUrl, {
@@ -122,7 +101,6 @@ export const searchUsers = async (
 
 export const combineResults = async (
   users: SearchedUser[],
-  keyword: string,
   startIndex = 0,
 ): Promise<SearchResultUser[]> => {
   const currentUser = getCurrentUser();
@@ -162,7 +140,7 @@ export const combineResults = async (
       // Parity with Angular's processUserProfiles, which drops the search endpoint's names so the
       // card shimmers until the authoritative ones arrive from the user-profiles service.
       areNamesLoading: true,
-      matchingPreviousName: null,
+      hasPreviousUsernameMatch: user.isPreviousUsernameMatch,
       gameId: presence?.gameId,
       placeId: presence?.placeId,
       universeId: presence?.universeId,
@@ -172,8 +150,6 @@ export const combineResults = async (
       lastLocation: presence?.lastLocation ?? "",
       absPos: startIndex + index,
     };
-
-    combinedUser.matchingPreviousName = getMatchingPreviousName(combinedUser, keyword);
 
     return combinedUser;
   });
@@ -185,7 +161,7 @@ export const getSearchResults = async (
   startIndex = 0,
 ): Promise<CombinedSearchResults> => {
   const searchResponse = await searchUsers(keyword, cursor);
-  const results = await combineResults(searchResponse.data, keyword, startIndex);
+  const results = await combineResults(searchResponse.data, startIndex);
 
   return {
     nextPageCursor: searchResponse.nextPageCursor,

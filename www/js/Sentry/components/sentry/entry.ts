@@ -13,7 +13,8 @@ import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { requestCountryCode as getRequestCountryCode } from "@rbx/core-scripts/meta/requestContext";
 import { isTestSite } from "@rbx/core-scripts/meta/environment";
 import { sendToOtel } from "@rbx/www-common/sentry/sentryToOtel";
-import { browserFromUserAgent, type DeviceInfo } from "@rbx/www-common/device";
+import { DeviceMeta } from "@rbx/www-common/device/types";
+import { browserFromUserAgent } from "@rbx/www-common/device/utils";
 import { parseCountryCode } from "@rbx/www-common/country";
 import type { TracingResources } from "@rbx/www-common/sentry/tracingResources";
 import { getOtelCollectorTracesEndpoint } from "@rbx/www-common/sentry/otelEndpoint";
@@ -84,8 +85,8 @@ const user = authenticatedUser as typeof authenticatedUser | undefined;
 const getPageMetaTag = () => document.querySelector<HTMLMetaElement>('meta[name="page-meta"]');
 
 const deviceMeta = getDeviceMeta();
-const deviceInfo: DeviceInfo = {
-  deviceType: deviceMeta?.deviceType,
+const deviceInfo: TracingResources["deviceInfo"] = {
+  deviceType: DeviceMeta.shape.deviceType.parse(deviceMeta?.deviceType),
   browser: browserFromUserAgent(navigator.userAgent),
 };
 const tracingResources: TracingResources = {

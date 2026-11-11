@@ -59,6 +59,14 @@
     min-width: min(100% - max(2*var(--margin-small), env(safe-area-inset-left) + env(safe-area-inset-right)), 393px)
 }
 
+.content-\[var\(--color-action-standard-background\)\] {
+    color: var(--color-action-standard-background)
+}
+
+.content-\[var\(--color-extended-orange-600\)\] {
+    color: var(--color-extended-orange-600)
+}
+
 .content-\[var\(--dark-mode-content-emphasis\)\] {
     color: var(--dark-mode-content-emphasis)
 }
@@ -109,6 +117,10 @@
 
 .\[--icon-size-small\:1em\] {
     --icon-size-small: 1em
+}
+
+.\[outline\:solid_3px\] {
+    outline: 3px solid
 }
 
 .player-search-action-parity {

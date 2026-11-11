@@ -1,12 +1,10 @@
-import React, { useCallback, useMemo, useState } from "react";
-import Linkify from "@rbx/linkify";
+import React, { useCallback, useState } from "react";
+import { useLinkifiedText } from "@rbx/linkify/react";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Component } from "@rbx/profile-platform";
 import useProfileJsonComponent from "../../hooks/useProfileJsonComponent";
 import AboutDialog from "./AboutDialog";
 import useAboutSectionsFromData from "../../hooks/useAboutSectionsFromData";
-
-type StringWithEscapeHTML = string & { escapeHTML: () => string };
 
 const AboutContainer: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -25,16 +23,8 @@ const AboutContainer: React.FC = () => {
   const description = aboutData?.description;
 
   // Be cautious editing below code. this can easily create a XSS vulnerability if not handled properly.
-  const linkifiedDescription = useMemo(() => {
-    if (!description) {
-      return translate("Label.NoBioYet");
-    }
-
-    // We need to cast content to new type because typescript is unaware of the escapeHTML added to the string prototype
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const escapedContent = (description as StringWithEscapeHTML).escapeHTML();
-    return Linkify.String(escapedContent);
-  }, [translate, description]);
+  const linkifiedText = useLinkifiedText(description ?? "");
+  const linkifiedDescription = description ? linkifiedText : translate("Label.NoBioYet");
 
   if (!aboutData) {
     return null;

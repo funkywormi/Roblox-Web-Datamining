@@ -263,11 +263,7 @@ export const getOdpSettingsPages = (
       [
         [UserSetting.allowEnableEmailNotifications, true],
         [UserSetting.allowEnablePushNotifications, true],
-        [
-          UserSetting.aggregatedDesktopNotifications,
-          policy?.displayDesktopNotificationSettings,
-          true,
-        ],
+        [UserSetting.aggregatedDesktopNotifications, true, true],
         [UserSetting.doNotDisturb, context.canParentManageChildsDoNotDisturb],
       ],
       true,
