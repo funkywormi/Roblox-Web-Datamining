@@ -7,6 +7,9 @@ import {
   CurrentUser,
 } from "@rbx/core-scripts/legacy/Roblox";
 
+// Duplicated for Next.js by the shared launcher's onGuestLaunch hook
+// (www-nextjs/src/game-launch/GuestLaunchDialog.tsx). Keep the events and pages in sync until
+// .NET pages stop loading this component.
 let translationProvider;
 let langMap;
 

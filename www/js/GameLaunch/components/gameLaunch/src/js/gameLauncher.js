@@ -1,3 +1,4 @@
+// Deprecated: new launch code goes in @rbx/www-common/game-launch. See ../../AGENTS.md.
 import $ from "jquery";
 import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
 import AuthenticationChecker from "./authenticationChecker";
@@ -24,10 +25,6 @@ const gameLauncher = {
 
 function isJoinAttemptIdEnabled() {
   return gameLauncher.gameLaunchInterface?.isJoinAttemptIdEnabled;
-}
-
-function isSharedGameLauncherEnabled() {
-  return Boolean(gameLauncher.gameLaunchInterface?.isSharedGameLauncherEnabled);
 }
 
 function generateGameLaunchParams(originalParams, joinAttemptId, joinAttemptOrigin) {
@@ -239,7 +236,6 @@ Object.assign(gameLauncher, {
   setGameLaunchLogger,
   tryAssetInStudio,
   isJoinAttemptIdEnabled,
-  isSharedGameLauncherEnabled,
 
   // EventNames
   startClientAttemptedEvent,

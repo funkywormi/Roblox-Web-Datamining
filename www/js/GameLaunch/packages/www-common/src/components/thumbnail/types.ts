@@ -8,6 +8,7 @@ export const thumbnailTypes = [
   "GameThumbnail",
   "GamePass",
   "Look",
+  "GroupIcon",
 ] as const;
 
 export type ThumbnailType = (typeof thumbnailTypes)[number];

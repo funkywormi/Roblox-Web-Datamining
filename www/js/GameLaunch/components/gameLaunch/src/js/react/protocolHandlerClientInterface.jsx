@@ -1,44 +1,24 @@
-// Please note: This file depends on RobloxCookies.js being already loaded.
+// Deprecated: new launch code goes in @rbx/www-common/game-launch. See ../../../AGENTS.md.
 import ReactDOM from "react-dom";
 import $ from "jquery";
 import { QueryClientProvider } from "@tanstack/react-query";
-import {
-  Cookies,
-  CurrentUser,
-  Dialog,
-  Endpoints,
-  EnvironmentUrls,
-  TranslationResourceProvider,
-} from "@rbx/core-scripts/legacy/Roblox";
-import { getCurrentBrowser } from "@rbx/core-scripts/legacy/core-utilities";
-import { isMac, isWindows } from "@rbx/core-scripts/meta/device";
-import { queryClient, renderWithErrorBoundary, TranslationProvider } from "@rbx/core-scripts/react";
+import { Endpoints } from "@rbx/core-scripts/legacy/Roblox";
+import { queryClient, renderWithErrorBoundary } from "@rbx/core-scripts/react";
 import { createGameLauncher } from "@rbx/www-common/game-launch";
-import SharedDownloadDialog from "@rbx/app-download/DownloadDialog";
+import DownloadDialog from "@rbx/app-download/DownloadDialog";
 import LaunchFailureDialog from "@rbx/app-download/LaunchFailureDialog";
 import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { translations } from "../../../component.json";
 import GameLauncher from "../gameLauncher";
 import { getDeferredDeeplinkQueryParams } from "../../ts/deferredDeeplinks/deferredDeeplinkUtilities";
 import resolveLaunchContext from "../../ts/deferredDeeplinks/gameJoinDeeplink";
-import DownloadDialog from "../../ts/DownloadDialog";
-import { resetClientStatus, getAuthTicket } from "../../ts/api";
 import { createSharedGameLauncherHost } from "../../ts/sharedGameLauncherHost";
 
+// Launches go through the launcher Next.js uses. This keeps the .NET page state and dialogs.
 const ProtocolHandlerClientInterface = {
   isInstalling: false,
   robloxLocale: "",
   gameLocale: "",
-  protocolUrlSeparator: "+",
-  protocolDetectionEnabled: false,
-  isSharedGameLauncherEnabled: false,
-  avatarParamEnabled: true,
-  separateScriptParamsEnabled: false,
-  waitTimeBeforeFailure: 300,
-  protocolNameForStudio: "roblox-studio",
-  protocolNameForClient: "roblox-client",
-  logger: null,
-  channel: "",
   studioChannel: "",
   playerChannel: "",
   isDuarAutoOptInEnabled: false,
@@ -47,26 +27,7 @@ const ProtocolHandlerClientInterface = {
   isOmitPlayerChannelForWinAndMacEnabled: false,
 };
 
-const distributorTypes = {
-  Global: "Global",
-};
-
-const launchModes = {
-  edit: "edit",
-  plugin: "plugin",
-  play: "play",
-  build: "build",
-  app: "app",
-  asset: "asset",
-};
-
-function isStudioMode(launchMode) {
-  return (
-    launchMode === launchModes.edit ||
-    launchMode === launchModes.plugin ||
-    launchMode === launchModes.asset
-  );
-}
+const studioLaunchModes = ["edit", "plugin", "asset"];
 
 function getDialogContainer(id = "react-dialog-container") {
   let container = document.getElementById(id);
@@ -81,24 +42,9 @@ function getDialogContainer(id = "react-dialog-container") {
   return container;
 }
 
+// The same dialog Next.js shows. Like Roblox.Dialog it gets its own node, so the install dialog
+// stays underneath and that dialog's unmount can't close this one.
 function showLaunchFailureDialog() {
-  $.modal.close();
-
-  const translationProvider = new TranslationResourceProvider();
-  const visitGameResources = translationProvider.getTranslationResource("Common.VisitGame");
-  const controlsResources = translationProvider.getTranslationResource("CommonUI.Controls");
-  Dialog.open({
-    titleText: visitGameResources.get("Heading.ErrorStartingGame"),
-    bodyContent: visitGameResources.get("Response.Dialog.ErrorLaunching"),
-    acceptText: controlsResources.get("Action.OK") || "OK",
-    showDecline: false,
-  });
-}
-
-// The shared launcher (behind is-www-common-game-launcher-enabled) shows the same dialog Next.js does.
-// Like Roblox.Dialog it gets its own node, so the install dialog stays underneath and that dialog's
-// unmount can't close this one.
-function showSharedLaunchFailureDialog() {
   $.modal.close();
 
   const container = getDialogContainer("react-launch-failure-dialog-container");
@@ -109,22 +55,6 @@ function showSharedLaunchFailureDialog() {
     </TranslationProviderSCC>,
     container,
   );
-}
-
-function cleanUpAndLogSuccess(gameLaunchParams) {
-  // hide dialog
-  $.modal.close();
-
-  // Log success!
-  const logParams = {
-    launchMethod: "Protocol",
-    params: gameLaunchParams,
-  };
-  $(GameLauncher).trigger(GameLauncher.startClientSucceededEvent, logParams);
-  if (ProtocolHandlerClientInterface.isInstalling) {
-    $(GameLauncher).trigger(GameLauncher.successfulInstallEvent, logParams);
-    ProtocolHandlerClientInterface.isInstalling = false;
-  }
 }
 
 function setLocationHref(href) {
@@ -140,189 +70,6 @@ function setLocationHref(href) {
   window.dispatchEvent(seleniumEvent);
 }
 
-function launchProtocolUrl(gameLaunchParams, authTicket) {
-  const studio = isStudioMode(gameLaunchParams?.launchMode);
-  const urlSeparator = ProtocolHandlerClientInterface.protocolUrlSeparator;
-  let gameLaunchUrl = `${gameLaunchParams.protocolName}:`;
-  const urlComponents = [];
-
-  urlComponents.push(1); // protocol version parameter - used if we wish to significantly change the structure of the protocol url
-  urlComponents.push(`launchmode:${gameLaunchParams.launchMode}`);
-
-  // Studio will freeze at log-in if passed a guest ticket
-  if (
-    authTicket &&
-    (gameLaunchParams.protocolName !== ProtocolHandlerClientInterface.protocolNameForStudio ||
-      authTicket.indexOf("Guest:") !== 0)
-  ) {
-    urlComponents.push(`gameinfo:${encodeURIComponent(authTicket)}`);
-  }
-
-  urlComponents.push(`launchtime:${gameLaunchParams.launchTime}`);
-
-  if (studio && CurrentUser.isAuthenticated) {
-    urlComponents.push(`distributorType:${distributorTypes.Global}`);
-    urlComponents.push(`userId:${CurrentUser.userId}`);
-  }
-
-  if (studio) {
-    urlComponents.push(`browser:${getCurrentBrowser()}`);
-  }
-
-  $.each(gameLaunchParams.otherParams, (name, value) => {
-    if (name === value) {
-      // assume if name === value, just add name
-      urlComponents.push(name);
-    } else {
-      urlComponents.push(`${name}:${encodeURIComponent(value)}`);
-    }
-  });
-
-  gameLaunchUrl += urlComponents.join(urlSeparator);
-  GameLauncher.gameLaunchLogger?.logToConsole?.(
-    `launchProtocolUrl: ${JSON.stringify({
-      url: gameLaunchUrl,
-      params: gameLaunchParams,
-    })}`,
-  );
-
-  // setLocationHref is used so that automated tests can intercept the protocol handler URL for verification.  Do not refactor without checking the tests.
-  setLocationHref(gameLaunchUrl);
-}
-
-async function startGameFlow(gameLaunchParams) {
-  try {
-    const studio = isStudioMode(gameLaunchParams?.launchMode);
-    const reset = resetClientStatus();
-    let ticket;
-    if (CurrentUser.isAuthenticated && !studio) {
-      [ticket] = await Promise.all([getAuthTicket(), reset]);
-    } else {
-      await reset;
-    }
-    launchProtocolUrl(gameLaunchParams, ticket);
-    cleanUpAndLogSuccess(gameLaunchParams);
-  } catch (e) {
-    console.error(e);
-    showLaunchFailureDialog();
-  }
-}
-
-function startGame(gameLaunchDefaultParams) {
-  const gameLaunchParams = { ...gameLaunchDefaultParams };
-  gameLaunchParams.launchTime = Date.now();
-  gameLaunchParams.otherParams.browsertrackerid = Cookies.getBrowserTrackerId();
-
-  gameLaunchParams.otherParams.robloxLocale = ProtocolHandlerClientInterface.robloxLocale;
-  gameLaunchParams.otherParams.gameLocale = ProtocolHandlerClientInterface.gameLocale;
-  if (gameLaunchParams.protocolName === ProtocolHandlerClientInterface.protocolNameForStudio) {
-    gameLaunchParams.otherParams.channel = ProtocolHandlerClientInterface.studioChannel;
-  } else if (
-    !ProtocolHandlerClientInterface.isOmitPlayerChannelForWinAndMacEnabled ||
-    (!isWindows() && !isMac())
-  ) {
-    gameLaunchParams.otherParams.channel = ProtocolHandlerClientInterface.playerChannel;
-  }
-
-  if (
-    ProtocolHandlerClientInterface.isDuarAutoOptInEnabled &&
-    gameLaunchParams.protocolName === ProtocolHandlerClientInterface.protocolNameForClient &&
-    !gameLaunchParams.otherParams.LaunchExp
-  ) {
-    if (ProtocolHandlerClientInterface.isDuarOptOutDisabled) {
-      gameLaunchParams.otherParams.LaunchExp = "InApp";
-    } else {
-      gameLaunchParams.otherParams.LaunchExp = "PreferInApp";
-    }
-  }
-
-  // fire startClientAttempted
-  $(GameLauncher).trigger(GameLauncher.startClientAttemptedEvent, {
-    launchMethod: "Protocol",
-    params: gameLaunchParams,
-  });
-  const ret = startGameFlow(gameLaunchParams);
-  ProtocolHandlerClientInterface.showDialog(gameLaunchParams);
-  // return the deferred object so we can continue chaining, if desired.
-  return ret;
-}
-
-function startGameWithDeepLinkUrl(deepLinkUrl, placeId) {
-  const gameLaunchParams = {
-    launchMode: "play",
-    protocolName: ProtocolHandlerClientInterface.protocolNameForClient,
-    placeId,
-  };
-  ProtocolHandlerClientInterface.showDialog(gameLaunchParams);
-  setLocationHref(deepLinkUrl);
-}
-
-// The install dialog: `@rbx/app-download`'s on the shared launcher, the legacy one otherwise.
-function renderDownloadDialog(props) {
-  if (ProtocolHandlerClientInterface.isSharedGameLauncherEnabled) {
-    return (
-      <TranslationProviderSCC namespaces={translations}>
-        <QueryClientProvider client={queryClient}>
-          <SharedDownloadDialog {...props} />
-        </QueryClientProvider>
-      </TranslationProviderSCC>
-    );
-  }
-  return (
-    <TranslationProvider config={translations}>
-      <QueryClientProvider client={queryClient}>
-        <DownloadDialog {...props} />
-      </QueryClientProvider>
-    </TranslationProvider>
-  );
-}
-
-function startDeepLinkFlow(deepLinkUrl) {
-  const container = getDialogContainer();
-  const unmount = () => ReactDOM.unmountComponentAtNode(container);
-  renderWithErrorBoundary(
-    renderDownloadDialog({
-      download: async () => {
-        $(GameLauncher).trigger(GameLauncher.beginInstallEvent, {
-          launchMethod: "Protocol",
-          params: {},
-        });
-        ProtocolHandlerClientInterface.isInstalling = true;
-        await startDownload();
-      },
-      launchGame: async () => {
-        setLocationHref(deepLinkUrl);
-      },
-      unmount,
-    }),
-    container,
-  );
-  setLocationHref(deepLinkUrl);
-}
-
-function openDesktopUniversalApp() {
-  const DUALaunchParams = {};
-  const protocol = ProtocolHandlerClientInterface.protocolNameForClient;
-  DUALaunchParams.protocolName = protocol;
-  DUALaunchParams.launchTime = Date.now();
-  DUALaunchParams.launchMode = launchModes.app;
-  DUALaunchParams.otherParams = {};
-  DUALaunchParams.otherParams.browsertrackerid = Cookies.getBrowserTrackerId();
-  DUALaunchParams.otherParams.robloxLocale = ProtocolHandlerClientInterface.robloxLocale;
-  DUALaunchParams.otherParams.gameLocale = ProtocolHandlerClientInterface.gameLocale;
-  DUALaunchParams.otherParams.LaunchExp = "InApp";
-
-  // fire startClientAttempted
-  $(GameLauncher).trigger(GameLauncher.startClientAttemptedEvent, {
-    launchMethod: "Protocol",
-    params: DUALaunchParams,
-  });
-  const ret = startGameFlow(DUALaunchParams);
-  ProtocolHandlerClientInterface.showDialog(DUALaunchParams);
-  // return the deferred object so we can continue chaining, if desired.
-  return ret;
-}
-
 function getPlaceLauncherBaseUrl() {
   let absoluteUrl = " ";
   if (Endpoints && Endpoints.Urls) {
@@ -334,231 +81,6 @@ function getPlaceLauncherBaseUrl() {
     absoluteUrl = `http://${window.location.host}/Game/PlaceLauncher.ashx`;
   }
   return absoluteUrl.replace("placelauncher", "PlaceLauncher");
-}
-
-function getPlaceLauncherUrl(requestType, otherParams) {
-  const args = {
-    request: requestType,
-    browserTrackerId: Cookies.getBrowserTrackerId(),
-  };
-  $.extend(args, otherParams);
-  return `${getPlaceLauncherBaseUrl()}?${$.param(args)}`;
-}
-
-function getStudioScriptUrl(scriptHandlerName, placeId, universeId, allowUpload) {
-  let absoluteUrl = " ";
-  if (Endpoints && Endpoints.Urls) {
-    absoluteUrl = `${Endpoints.getAbsoluteUrl(`/Game/${scriptHandlerName}`)}?`;
-  }
-
-  // if endpoints are turned off, or if the absolute url resolver returns a relative path, fallback on the old method
-  if (absoluteUrl[0] !== "h") {
-    const domainUrl = `http://${window.location.host}`;
-    const domainPath = `/Game/${scriptHandlerName}?`;
-    absoluteUrl = domainUrl + domainPath;
-  }
-
-  const args = {
-    placeId,
-    upload: allowUpload ? placeId : "",
-    universeId,
-    testMode: false,
-  };
-  return absoluteUrl + $.param(args);
-}
-
-function getEditScriptUrl(placeId, universeId, allowUpload) {
-  return getStudioScriptUrl("Edit.ashx", placeId, universeId, allowUpload);
-}
-
-function openStudio() {
-  const otherParams = {};
-
-  if (ProtocolHandlerClientInterface.avatarParamEnabled) {
-    otherParams.avatar = "avatar";
-  }
-
-  return startGame({
-    protocolName: ProtocolHandlerClientInterface.protocolNameForStudio,
-    launchMode: "edit",
-    otherParams,
-  });
-}
-
-function tryAssetInStudio(assetId) {
-  const otherParams = {
-    assetid: assetId,
-  };
-
-  if (ProtocolHandlerClientInterface.avatarParamEnabled) {
-    otherParams.avatar = "avatar";
-  }
-
-  return startGame({
-    protocolName: ProtocolHandlerClientInterface.protocolNameForStudio,
-    launchMode: "asset",
-    otherParams,
-  });
-}
-
-function openPluginInStudio(pluginId) {
-  const otherParams = {
-    pluginid: pluginId,
-  };
-
-  if (ProtocolHandlerClientInterface.avatarParamEnabled) {
-    otherParams.avatar = "avatar";
-  }
-
-  startGame({
-    protocolName: ProtocolHandlerClientInterface.protocolNameForStudio,
-    launchMode: "plugin",
-    otherParams,
-  });
-}
-
-function editGameInStudio(
-  placeId,
-  universeId,
-  allowUpload,
-  startTeamTest = false,
-  instanceId = "",
-  annotationId = "",
-) {
-  let otherParams;
-  if (ProtocolHandlerClientInterface.separateScriptParamsEnabled) {
-    otherParams = {
-      task: startTeamTest ? "StartTeamTest" : "EditPlace",
-      placeId,
-      universeId,
-    };
-    if (!startTeamTest) {
-      if (instanceId) {
-        otherParams.targetInstanceId = instanceId;
-      }
-      if (annotationId) {
-        otherParams.annotationId = annotationId;
-      }
-    }
-  } else {
-    const scriptUrl = getEditScriptUrl(placeId, universeId, allowUpload);
-    otherParams = {
-      script: scriptUrl,
-    };
-  }
-
-  if (ProtocolHandlerClientInterface.avatarParamEnabled) {
-    otherParams.avatar = "avatar";
-  }
-
-  // we currently always pass "avatar" to studio, but in the future it may need to be optional
-  startGame({
-    protocolName: ProtocolHandlerClientInterface.protocolNameForStudio,
-    launchMode: "edit",
-    otherParams,
-    placeId,
-  });
-}
-
-// placeLauncherParams has placeId, isPlayTogetherGame, joinAttemptId, joinAttemptOrigin, launchData, eventId
-function joinMultiplayerGame(placeLauncherParams) {
-  const protocol = ProtocolHandlerClientInterface.protocolNameForClient;
-
-  const launchMode = "play";
-  const placeLauncherUrl = getPlaceLauncherUrl("RequestGame", placeLauncherParams);
-  const isPlayTogetherGame = placeLauncherParams.isPlayTogetherGame === true;
-  const otherParams = {
-    placelauncherurl: placeLauncherUrl,
-  };
-  const startGameParams = {
-    protocolName: protocol,
-    launchMode,
-    otherParams,
-    placeId: placeLauncherParams.placeId,
-    isPlayTogetherGame,
-    launchData: placeLauncherParams.launchData,
-    eventId: placeLauncherParams.eventId,
-  };
-
-  return startGame(startGameParams);
-}
-
-// placeLauncherParams has userId, joinAttemptId, joinAttemptOrigin
-function followPlayerIntoGame(placeLauncherParams) {
-  const protocol = ProtocolHandlerClientInterface.protocolNameForClient;
-
-  const launchMode = "play";
-  const placeLauncherUrl = getPlaceLauncherUrl("RequestFollowUser", placeLauncherParams);
-  const params = {
-    placelauncherurl: placeLauncherUrl,
-  };
-  const startGameParams = {
-    protocolName: protocol,
-    launchMode,
-    otherParams: params,
-  };
-
-  return startGame(startGameParams);
-}
-
-// placeLauncherParams has placeId, gameId, isPlayTogetherGame, joinAttemptId, joinAttemptOrigin
-function joinGameInstance(placeLauncherParams) {
-  const protocol = ProtocolHandlerClientInterface.protocolNameForClient;
-
-  const launchMode = "play";
-  const placeLauncherUrl = getPlaceLauncherUrl("RequestGameJob", placeLauncherParams);
-  const isPlayTogetherGame = placeLauncherParams.isPlayTogetherGame === true;
-  const params = {
-    placelauncherurl: placeLauncherUrl,
-  };
-  const startGameParams = {
-    protocolName: protocol,
-    launchMode,
-    otherParams: params,
-    placeId: placeLauncherParams.placeId,
-    isPlayTogetherGame,
-  };
-
-  return startGame(startGameParams);
-}
-
-// placeLauncherParams has placeId, accessCode, joinAttemptId, joinAttemptOrigin
-function joinPrivateGame(placeLauncherParams) {
-  const protocol = ProtocolHandlerClientInterface.protocolNameForClient;
-
-  const launchMode = "play";
-  const placeLauncherUrl = getPlaceLauncherUrl("RequestPrivateGame", placeLauncherParams);
-  const params = {
-    placelauncherurl: placeLauncherUrl,
-  };
-  const startGameParams = {
-    protocolName: protocol,
-    launchMode,
-    otherParams: params,
-    placeId: placeLauncherParams.placeId,
-  };
-
-  return startGame(startGameParams);
-}
-
-// placeLauncherParams has placeId, conversationId, joinAttemptId, joinAttemptOrigin
-function playTogetherGame(placeLauncherParams) {
-  const protocol = ProtocolHandlerClientInterface.protocolNameForClient;
-
-  const launchMode = "play";
-  const placeLauncherUrl = getPlaceLauncherUrl("RequestPlayTogetherGame", placeLauncherParams);
-  const otherParams = {
-    placelauncherurl: placeLauncherUrl,
-  };
-  const startGameParams = {
-    protocolName: protocol,
-    launchMode,
-    otherParams,
-    placeId: placeLauncherParams.placeId,
-    conversationId: placeLauncherParams.conversationId,
-  };
-
-  return startGame(startGameParams);
 }
 
 async function startDownload(launchContext) {
@@ -580,94 +102,57 @@ function startStudioDownload() {
   iframe.src = "/download/studio";
 }
 
-function showDialog(gameLaunchParams, launchGame = () => startGameFlow(gameLaunchParams)) {
+function showDialog(gameLaunchParams, launchGame) {
   const container = getDialogContainer();
   const unmount = () => ReactDOM.unmountComponentAtNode(container);
-  const studio = isStudioMode(gameLaunchParams?.launchMode);
+  const studio = studioLaunchModes.includes(gameLaunchParams?.launchMode);
   renderWithErrorBoundary(
-    renderDownloadDialog({
-      download: async () => {
-        if (gameLaunchParams.placeId) {
-          const refInfoRaw = window.localStorage.getItem("ref_info");
-          if (refInfoRaw != null) {
-            window.localStorage.removeItem("ref_info");
-            let refInfo = {};
-            try {
-              refInfo = JSON.parse(atob(refInfoRaw));
-            } catch {
-              // do nothing
+    <TranslationProviderSCC namespaces={translations}>
+      <QueryClientProvider client={queryClient}>
+        <DownloadDialog
+          download={async () => {
+            if (gameLaunchParams.placeId) {
+              const refInfoRaw = window.localStorage.getItem("ref_info");
+              if (refInfoRaw != null) {
+                window.localStorage.removeItem("ref_info");
+                let refInfo = {};
+                try {
+                  refInfo = JSON.parse(atob(refInfoRaw));
+                } catch {
+                  // do nothing
+                }
+                // eslint-disable-next-line no-param-reassign
+                gameLaunchParams.referredByPlayerId = refInfo[gameLaunchParams.placeId];
+              }
             }
-            // eslint-disable-next-line no-param-reassign
-            gameLaunchParams.referredByPlayerId = refInfo[gameLaunchParams.placeId];
-          }
-        }
 
-        // fire begin install event
-        $(GameLauncher).trigger(GameLauncher.beginInstallEvent, {
-          launchMethod: "Protocol",
-          params: gameLaunchParams,
-        });
-        ProtocolHandlerClientInterface.isInstalling = true;
-        if (studio) {
-          startStudioDownload();
-          unmount();
-        } else {
-          // Play -> Download: carry the game-join intent so the client can rebuild the join
-          // after install. Falls back to a plain LinkId deep link when there is no join URL.
-          const launchContext = await resolveLaunchContext(
-            gameLaunchParams?.otherParams?.placelauncherurl,
-            gameLaunchParams?.otherParams?.LaunchExp,
-            gameLaunchParams?.referredByPlayerId,
-          );
-          await startDownload(launchContext);
-        }
-      },
-      launchGame: async () => await launchGame(),
-      unmount,
-    }),
+            // fire begin install event
+            $(GameLauncher).trigger(GameLauncher.beginInstallEvent, {
+              launchMethod: "Protocol",
+              params: gameLaunchParams,
+            });
+            ProtocolHandlerClientInterface.isInstalling = true;
+            if (studio) {
+              startStudioDownload();
+              unmount();
+            } else {
+              // Play -> Download: carry the game-join intent so the client can rebuild the join
+              // after install. Falls back to a plain LinkId deep link when there is no join URL.
+              const launchContext = await resolveLaunchContext(
+                gameLaunchParams?.otherParams?.placelauncherurl,
+                gameLaunchParams?.otherParams?.LaunchExp,
+                gameLaunchParams?.referredByPlayerId,
+              );
+              await startDownload(launchContext);
+            }
+          }}
+          launchGame={async () => await launchGame()}
+          unmount={unmount}
+        />
+      </QueryClientProvider>
+    </TranslationProviderSCC>,
     container,
   );
-}
-
-// Play joins and Studio launches via the launcher Next.js uses; events re-fire on GameLauncher for gameLaunchLogger.
-function enableSharedGameLauncher() {
-  ProtocolHandlerClientInterface.isSharedGameLauncherEnabled = true;
-  const launcher = createGameLauncher(
-    createSharedGameLauncherHost({
-      state: ProtocolHandlerClientInterface,
-      getPlaceLauncherBaseUrl,
-      triggerEvent: (name, event) => $(GameLauncher).trigger(GameLauncher[`${name}Event`], event),
-      logToConsole: message => GameLauncher.gameLaunchLogger?.logToConsole?.(message),
-      showDialog: (gameLaunchParams, launch) =>
-        ProtocolHandlerClientInterface.showDialog(gameLaunchParams, launch),
-      closeDialog: () => $.modal.close(),
-      showLaunchFailureDialog: showSharedLaunchFailureDialog,
-      openProtocolUrl: setLocationHref,
-    }),
-  );
-
-  Object.assign(ProtocolHandlerClientInterface, {
-    joinMultiplayerGame: launcher.joinMultiplayerGame,
-    followPlayerIntoGame: launcher.followPlayerIntoGame,
-    joinGameInstance: launcher.joinGameInstance,
-    joinPrivateGame: launcher.joinPrivateGame,
-    playTogetherGame: launcher.playTogetherGame,
-    openStudio: launcher.openStudio,
-    tryAssetInStudio: assetId => launcher.tryAssetInStudio({ assetId }),
-    openPluginInStudio: pluginId => launcher.openPluginInStudio({ pluginId }),
-    // allowUpload only fed the Edit.ashx script URL, which separateScriptParamsEnabled replaced.
-    editGameInStudio: (
-      placeId,
-      universeId,
-      _allowUpload,
-      startTeamTest,
-      instanceId,
-      annotationId,
-    ) =>
-      launcher.editGameInStudio({ placeId, universeId, startTeamTest, instanceId, annotationId }),
-    startDeepLinkFlow: launcher.startDeepLinkFlow,
-    startGameWithDeepLinkUrl: launcher.startGameWithDeepLinkUrl,
-  });
 }
 
 async function manualDownload() {
@@ -687,62 +172,53 @@ async function attachManualDownloadToLink() {
   });
 }
 
+// Events re-fire on GameLauncher for gameLaunchLogger. The host reads the state above on each
+// launch, so the $(document).ready settings below apply.
+const launcher = createGameLauncher(
+  createSharedGameLauncherHost({
+    state: ProtocolHandlerClientInterface,
+    getPlaceLauncherBaseUrl,
+    triggerEvent: (name, event) => $(GameLauncher).trigger(GameLauncher[`${name}Event`], event),
+    logToConsole: message => GameLauncher.gameLaunchLogger?.logToConsole?.(message),
+    showDialog: (gameLaunchParams, launch) =>
+      ProtocolHandlerClientInterface.showDialog(gameLaunchParams, launch),
+    closeDialog: () => $.modal.close(),
+    showLaunchFailureDialog,
+    openProtocolUrl: setLocationHref,
+  }),
+);
+
 // attach the functions
 Object.assign(ProtocolHandlerClientInterface, {
   // functions
-  joinMultiplayerGame,
-  openStudio,
-  tryAssetInStudio,
-  openPluginInStudio,
-  editGameInStudio,
-  followPlayerIntoGame,
-  joinGameInstance,
-  joinPrivateGame,
-  playTogetherGame,
+  joinMultiplayerGame: launcher.joinMultiplayerGame,
+  followPlayerIntoGame: launcher.followPlayerIntoGame,
+  joinGameInstance: launcher.joinGameInstance,
+  joinPrivateGame: launcher.joinPrivateGame,
+  playTogetherGame: launcher.playTogetherGame,
+  openStudio: launcher.openStudio,
+  tryAssetInStudio: assetId => launcher.tryAssetInStudio({ assetId }),
+  openPluginInStudio: pluginId => launcher.openPluginInStudio({ pluginId }),
+  // allowUpload only fed the old Edit.ashx script URL.
+  editGameInStudio: (placeId, universeId, _allowUpload, startTeamTest, instanceId, annotationId) =>
+    launcher.editGameInStudio({ placeId, universeId, startTeamTest, instanceId, annotationId }),
+  startDeepLinkFlow: launcher.startDeepLinkFlow,
+  startGameWithDeepLinkUrl: launcher.startGameWithDeepLinkUrl,
   manualDownload,
   attachManualDownloadToLink,
   startDownload,
   setLocationHref, // this is used by automated tests to intercept the protocol handler URL for verification.  Do not remove.
-  openDesktopUniversalApp,
-  startDeepLinkFlow,
   // test overrides
   showDialog,
   showLaunchFailureDialog,
-  cleanUpAndLogSuccess,
-  startGameWithDeepLinkUrl,
-  enableSharedGameLauncher,
 });
-
-function getProtocolNameForEnvironment(protocolName) {
-  switch (EnvironmentUrls.domain) {
-    case "sitetest1.robloxlabs.com":
-      return `${protocolName}-sitetest1`;
-    case "sitetest2.robloxlabs.com":
-      return `${protocolName}-sitetest2`;
-    case "sitetest3.robloxlabs.com":
-      return `${protocolName}-sitetest3`;
-    default:
-      return protocolName;
-  }
-}
 
 $(document).ready(() => {
   GameLauncher.setGameLaunchInterface(ProtocolHandlerClientInterface);
   const placeLauncherPanel = $("#PlaceLauncherStatusPanel");
-  ProtocolHandlerClientInterface.protocolNameForClient =
-    getProtocolNameForEnvironment("roblox-player");
-  ProtocolHandlerClientInterface.protocolNameForStudio =
-    getProtocolNameForEnvironment("roblox-studio");
-  ProtocolHandlerClientInterface.protocolDetectionEnabled = true;
-  ProtocolHandlerClientInterface.separateScriptParamsEnabled = true;
-  ProtocolHandlerClientInterface.avatarParamEnabled = true;
   ProtocolHandlerClientInterface.isJoinAttemptIdEnabled = true;
   ProtocolHandlerClientInterface.robloxLocale = placeLauncherPanel.data("protocol-roblox-locale");
   ProtocolHandlerClientInterface.gameLocale = placeLauncherPanel.data("protocol-game-locale");
-  const channel = placeLauncherPanel.data("protocol-channel-name");
-  if (typeof channel === "string" && channel.toUpperCase() !== "LIVE") {
-    ProtocolHandlerClientInterface.channel = channel;
-  }
 
   const studioChannel = placeLauncherPanel.data("protocol-studio-channel-name");
   if (typeof studioChannel === "string" && studioChannel.toUpperCase() !== "LIVE") {
@@ -752,13 +228,6 @@ $(document).ready(() => {
   const playerChannel = placeLauncherPanel.data("protocol-player-channel-name");
   if (typeof playerChannel === "string" && playerChannel.toUpperCase() !== "LIVE") {
     ProtocolHandlerClientInterface.playerChannel = playerChannel;
-  }
-
-  if (
-    !ProtocolHandlerClientInterface.logger &&
-    typeof window.Roblox.ProtocolHandlerLogger !== "undefined"
-  ) {
-    ProtocolHandlerClientInterface.logger = window.Roblox.ProtocolHandlerLogger;
   }
 
   ProtocolHandlerClientInterface.isDuarAutoOptInEnabled = placeLauncherPanel.data(
@@ -771,10 +240,6 @@ $(document).ready(() => {
   ProtocolHandlerClientInterface.isOmitPlayerChannelForWinAndMacEnabled = placeLauncherPanel.data(
     "is-omit-player-channel-for-win-and-mac-enabled",
   );
-
-  if (placeLauncherPanel.data("is-www-common-game-launcher-enabled") === true) {
-    enableSharedGameLauncher();
-  }
 });
 
 // todo: set Roblox.ProtocolHandlerClientInterface to be this.

@@ -1,6 +1,10 @@
 import $ from "jquery";
 import { Cookies, Hybrid } from "@rbx/core-scripts/legacy/Roblox";
 
+// Duplicated for Next.js by the shared launcher's launchInApp hook
+// (www-common/src/gameLaunch/launcher.ts, www-nextjs/src/game-launch/inApp.ts). Keep the requests
+// in sync until .NET pages stop loading this component.
+
 function startGame(gameLaunchParams) {
   const deferred = new $.Deferred();
   Hybrid.Game.launchGame(gameLaunchParams, () => {
