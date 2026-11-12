@@ -66,7 +66,6 @@ export type GetMetadataReturnType = {
   // wrapper in 2SV service around isSecurityKeyEnabled (check admin prod for this)
   isSecurityKeyTwoStepVerificationAvailable: boolean;
   isAndroidSecurityKeyEnabled: boolean;
-  isSettingsTabRedesignEnabled: boolean;
   isEppUIEnabled: boolean;
   twoStepCopyTextEnrollmentStatus: number;
   isUserU13: boolean;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, ProgressCircle } from '@rbx/foundation-ui';
 import { Thumbnail2d } from '@rbx/www-common/components/thumbnail';
-import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
+import { paymentFlowAnalyticsService } from '@rbx/payments/payments-flow-analytics';
 import createItemPurchase from '../factories/createItemPurchase';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
 import urlConstants from '../constants/urlConstants';
@@ -69,13 +69,13 @@ function BuyItem({
           id='upgrade-button'
           className='btn-fixed-width-lg btn-primary-lg'
           onClick={() => {
-            paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-              paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_PREMIUM_PURCHASE,
-              false,
-              paymentFlowAnalyticsService.ENUM_VIEW_NAME.PREMIUM_UPSELL,
-              paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-              paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.GET_PREMIUM
-            );
+            paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+              triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_PREMIUM_PURCHASE,
+              isMidPurchaseStep: false,
+              viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.PREMIUM_UPSELL,
+              purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+              viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.GET_PREMIUM
+            });
             window.open(getPremiumConversionUrl(itemDetailItemId, itemType));
           }}>
           {translate(resources.getPremiumAction)}

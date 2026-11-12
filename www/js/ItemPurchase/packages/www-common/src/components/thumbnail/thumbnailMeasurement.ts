@@ -19,7 +19,9 @@ export type ThumbnailMeasurementData = {
 
 type Measure = { metricName: string; jsonData: string };
 
-const measurementsUrl = Url.parse(`${environmentUrls.beaconApi}/v1/measurements`).getOrThrow();
+// Getters, not module-scope consts: parsing at import throws for importers that never fetch (e.g. under jest).
+const measurementsUrl = () =>
+  Url.parse(`${environmentUrls.beaconApi}/v1/measurements`).getOrThrow();
 
 const DEFAULT_BATCH_SIZE = 100;
 const DEFAULT_BATCH_WAIT_MS = 1000;
@@ -53,7 +55,7 @@ const flush = (): void => {
   }
   const measures = queue;
   queue = [];
-  http.postUntyped(measurementsUrl, measures, {
+  http.postUntyped(measurementsUrl(), measures, {
     credentials: "include",
     keepalive: true,
     signal: AbortSignal.timeout(3_000),

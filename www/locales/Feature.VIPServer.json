@@ -95,7 +95,7 @@
     "Message.InvalidUserInWhitelistError": "You may only add or remove valid users to your private server's invite list.",
     "Message.CannotChangeWhitelistInactiveServer": "You may only add or remove users when your private server is active.",
     "Message.InvalidServerNameError": "The name of the private server is either empty or too long.",
-    "Message.TooManyFreeServersOnGame": "You can not have more free private servers on this experience.",
+    "Message.TooManyFreeServersOnGame": "You can not have more free private servers on this game.",
     "Message.TooManyTotalActiveFreeServers": "You cannot have more active free private servers. Please deactivate some other servers first.",
     "Message.CreatorDisabledPrivateServersError": "The creator of this experience has disabled private servers for this experience.",
     "Message.FriendOnlyGameError": "The experience must not be Friends Only to allow private servers.",

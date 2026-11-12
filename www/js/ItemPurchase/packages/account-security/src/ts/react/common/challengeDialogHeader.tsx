@@ -1,5 +1,6 @@
 import React from "react";
 import { DialogTitle, Divider, Icon } from "@rbx/foundation-ui";
+import { useTranslations } from "@rbx/www-common/i18n";
 
 export enum HeaderButtonType {
   BACK = "BACK",
@@ -26,38 +27,42 @@ export const ChallengeDialogHeader: React.FC<Props> = ({
   buttonEnabled,
   headerInfo,
   buttonAriaLabel,
-}: Props) => (
-  <React.Fragment>
-    <div
-      data-testid="challenge-dialog-header"
-      className="grid [grid-template-columns:minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-large padding-x-xlarge padding-top-xsmall"
-    >
-      {buttonType === HeaderButtonType.HIDDEN ? (
-        <div />
-      ) : (
-        <button
-          type="button"
-          className="justify-self-start bg-none stroke-none padding-none"
-          onClick={buttonAction}
-          disabled={!buttonEnabled}
-          aria-label={buttonAriaLabel}
-          data-testid="challenge-dialog-header-button"
-        >
-          <Icon
-            name={
-              buttonType === HeaderButtonType.BACK
-                ? "icon-regular-chevron-large-left"
-                : "icon-regular-x"
-            }
-            size="Medium"
-          />
-        </button>
-      )}
-      <DialogTitle className="challenge-dialog-title text-heading-small text-align-x-center text-truncate-end text-no-wrap min-width-0">
-        {headerText}
-      </DialogTitle>
-      <div className="justify-self-end">{headerInfo}</div>
-    </div>
-    <Divider className="challenge-dialog-divider" />
-  </React.Fragment>
-);
+}: Props) => {
+  const translateCommon = useTranslations("CommonUI.Controls");
+
+  return (
+    <React.Fragment>
+      <div
+        data-testid="challenge-dialog-header"
+        className="grid [grid-template-columns:minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-large padding-x-small"
+      >
+        {buttonType === HeaderButtonType.HIDDEN ? (
+          <div />
+        ) : (
+          <button
+            type="button"
+            className="justify-self-start bg-none stroke-none padding-none"
+            onClick={buttonAction}
+            disabled={!buttonEnabled}
+            aria-label={buttonAriaLabel ?? translateCommon("Action.Close")}
+            data-testid="challenge-dialog-header-button"
+          >
+            <Icon
+              name={
+                buttonType === HeaderButtonType.BACK
+                  ? "icon-regular-chevron-large-left"
+                  : "icon-regular-x"
+              }
+              size="XLarge"
+            />
+          </button>
+        )}
+        <DialogTitle className="challenge-dialog-title text-heading-small text-align-x-center text-truncate-end text-no-wrap min-width-0">
+          {headerText}
+        </DialogTitle>
+        <div className="justify-self-end">{headerInfo}</div>
+      </div>
+      <Divider className="challenge-dialog-divider" />
+    </React.Fragment>
+  );
+};

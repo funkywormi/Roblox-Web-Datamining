@@ -1,5 +1,5 @@
 import React from 'react';
-import { isAuthenticated, isPremiumUser } from '@rbx/core-scripts/meta/user';
+import { isAuthenticated, isPremiumUser } from '../../utils/currentUser';
 import loadItemDetails from '../factories/loadItemDetails';
 import itemDetailsService from '../services/itemDetailsService';
 import itemDetailData from '../util/itemDetailData';

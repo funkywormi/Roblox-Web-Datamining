@@ -30,7 +30,13 @@ export default function createTransactionFailureModal(): [React.ComponentType<Tr
         open={open}
         title={title}
         body={body}
-        thumbnail={<span className='icon-warning-orange-150x150' />}
+        // A Foundation glyph: the legacy icon-warning-orange sprite isn't loaded on Next.js.
+        thumbnail={
+          <span
+            className='icon icon-filled-triangle-exclamation size-1600 content-system-warning'
+            aria-hidden='true'
+          />
+        }
         neutralButtonText={translate(resources.okAction)}
         onNeutral={() => {
           setOpen(false);

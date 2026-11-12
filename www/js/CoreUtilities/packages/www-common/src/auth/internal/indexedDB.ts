@@ -200,11 +200,12 @@ export const deleteCryptoKeyPair = async (
 };
 
 /**
+ * @param {string} dbName
  * @returns {Promise<void>} Nothing.
  */
-export const deleteCryptoDB = async (): Promise<void> => {
+export const deleteCryptoDB = async (dbName: string = databaseName): Promise<void> => {
   try {
-    const databaseDeleteRequest = indexedDB.deleteDatabase(databaseName);
+    const databaseDeleteRequest = indexedDB.deleteDatabase(dbName);
     // TODO: old, migrated code
     // eslint-disable-next-line @typescript-eslint/return-await
     return new Promise((resolve, reject) => {
@@ -212,6 +213,9 @@ export const deleteCryptoDB = async (): Promise<void> => {
         // TODO: old, migrated code
         // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
         reject(databaseDeleteRequest.error);
+      };
+      databaseDeleteRequest.onblocked = () => {
+        reject(new Error("IndexedDB delete blocked by an open connection"));
       };
       databaseDeleteRequest.onsuccess = () => {
         resolve();

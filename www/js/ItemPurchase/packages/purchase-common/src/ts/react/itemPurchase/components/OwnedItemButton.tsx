@@ -1,6 +1,6 @@
 import React from 'react';
-import { userId } from '@rbx/core-scripts/meta/user';
 import * as DeviceMeta from '@rbx/core-scripts/meta/device';
+import { userId } from '../../utils/currentUser';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
 import urlConstants from '../constants/urlConstants';
 import { SelfProvidedTranslate } from '../SelfProvidedTranslate';

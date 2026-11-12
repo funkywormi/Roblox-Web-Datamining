@@ -2,7 +2,7 @@ import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 
 // We need to declare a bunch of types manually since we're on older ES versions
-// and be careful not to break anything on older browsers
+// and be careful not to break anything on older browsers.
 
 // https://developer.mozilla.org/en-US/docs/Web/API/COEPViolationReport#body
 interface COEPReportBody {
@@ -52,9 +52,17 @@ const ignoredReportOnlyUrlMatchFuncs: ((url: URL) => boolean)[] = [
 ];
 // patterns to ignore regardless of disposition
 // these come from web proxies or third parties, not our own pages
-const ignoredDocumentUrlPatterns = ["/service/uv/", "/uv/service/", "/scramjet/"];
+const ignoredDocumentUrlPatterns = ["/service/uv/", "/uv/service/", "/scramjet/", "/__frame__/"];
 const ignoredBlockedUrlMatchFuncs: ((url: URL) => boolean)[] = [
   ({ hostname }) => hostname.includes("opiumbull"),
+  // web proxy worker loaders rewrite URLs as .../~/<blob>?$dest=worker&$io=<origin>
+  ({ searchParams }) => searchParams.has("$io"),
+  // or as .../~/blob:<origin>/<uuid>
+  ({ pathname }) => pathname.includes("/~/blob:"),
+  // web proxy navigations, e.g. https://noahstutoring.academy/study/browse/<blob>
+  ({ pathname }) => pathname.startsWith("/study/browse/"),
+  // GoGuardian school filter extension
+  ({ hostname }) => hostname === "internal.goguardian",
   ({ hostname }) => hostname === "commonsensehealthcare.org",
 ];
 const fireTelemetry = createFireTelemetryCounter("Web_ReportingObserver");

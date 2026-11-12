@@ -283,7 +283,7 @@
         },
         {
             "name": "Authentication.Login",
-            "url": "https://js.rbxcdn.com/b3b0f28b337feaf4beb8b4c105034c61203eadb19b2094679893a375e04325b9.js",
+            "url": "https://js.rbxcdn.com/134c78134813d4740e622ada273bbaebcbe6968b30c1e11b41bb82bd1c3cdbd9.js",
             "sources": [
                 "/home",
                 "/",
@@ -1085,7 +1085,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/39331133ca4c3fda2f368bfdb8a426321c2ccfa71c98cbc788dc20029a765b00.js",
+            "url": "https://js.rbxcdn.com/5670ea1c7aefd744dd2f6b4d874114a33c9fa624d2ad4c5c62093385264406ec.js",
             "sources": [
                 "/home",
                 "/",
@@ -1336,7 +1336,7 @@
         },
         {
             "name": "Feature.BuyRobux",
-            "url": "https://js.rbxcdn.com/cb65703ff47760730ad9e879c1bc9e04225b6bdc70d50171c5b58de01621efb1.js",
+            "url": "https://js.rbxcdn.com/d65405feda66d89d240036432c8dab40b071f1347ebfe6ba63a9f26e7c5c5850.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -1612,7 +1612,7 @@
         },
         {
             "name": "Feature.DownloadLanding",
-            "url": "https://js.rbxcdn.com/4114bfd33653786b4811ebde7c20957ca9f69c13091cfe49ae6c824006549b83.js",
+            "url": "https://js.rbxcdn.com/4729d5c3797f0e6e5f957cacbd77fb7946993adae3b12ddaf7ebf9d06cfa5917.js",
             "sources": [
                 "/home",
                 "/",
@@ -1686,7 +1686,7 @@
         },
         {
             "name": "Feature.EditUserBio",
-            "url": "https://js.rbxcdn.com/ac5fefa1a754781d3c1c02704fe6ac81c3a146a71ee09c796e35a77a2d42b1bb.js",
+            "url": "https://js.rbxcdn.com/1452a74537229961a3f7c79165701ce2e76c9eef08da3acdde9756f4053671ef.js",
             "sources": [
                 "/users/1/profile",
                 "/users/profile/edit"
@@ -1748,7 +1748,7 @@
         },
         {
             "name": "Feature.ExperienceDetails",
-            "url": "https://js.rbxcdn.com/9cbf97139001ca2d0a7eca6a2f2114a9d668819e82adbd0be63a0575a483829b.js",
+            "url": "https://js.rbxcdn.com/4d89a7e918b0b911cf53c9bba910574f70c242cf71408c13d83ad8b97f5d6127.js",
             "sources": [
                 "/home",
                 "/",
@@ -2149,7 +2149,7 @@
         },
         {
             "name": "Feature.Groups",
-            "url": "https://js.rbxcdn.com/02cd9fdb79b577e27d0ba18d9cf4a0b4b55d54569c2b5b8aedd67ad962ad29ee.js",
+            "url": "https://js.rbxcdn.com/0f548b03c737563c2f269fc90a171bfe02cae29c3704059909609fba95ca004d.js",
             "sources": [
                 "/transactions",
                 "/users/1/profile",
@@ -2279,7 +2279,7 @@
         },
         {
             "name": "Feature.Item",
-            "url": "https://js.rbxcdn.com/0f75a173261ace474005809f5a4f985eb1f6974dd0a74683bb734a4f837f768d.js",
+            "url": "https://js.rbxcdn.com/d805b8de033852d60b01cfb46de41d562996103b84a0f892378c2ea19c1fa8e9.js",
             "sources": [
                 "/home",
                 "/",
@@ -2534,7 +2534,7 @@
         },
         {
             "name": "Feature.Parents",
-            "url": "https://js.rbxcdn.com/8805b7ff7acd4ccee0c6439323d671e7ee4657a614eea77c7ecdca7d3b474a8f.js",
+            "url": "https://js.rbxcdn.com/414d6c95a7b54107623924fe09be9a937de1f73313629e7330679025bccd6eda.js",
             "sources": [
                 "/home",
                 "/",
@@ -2916,7 +2916,7 @@
         },
         {
             "name": "Feature.Profile",
-            "url": "https://js.rbxcdn.com/01caf301cdfba5b783b252cb5d9a6396fd7d8e6701a2f50478f8d720a2059703.js",
+            "url": "https://js.rbxcdn.com/c4ff21fceb682ae6cfaa6361cc65146fac0548bdb0d47d9c3050b4d4cde37100.js",
             "sources": [
                 "/home",
                 "/users/inventory",
@@ -3773,7 +3773,7 @@
         },
         {
             "name": "Feature.VIPServer",
-            "url": "https://js.rbxcdn.com/329cece6d50d421d7deab3d2e7b397d887bd71d19ff72298bc2d6b1a97468c94.js",
+            "url": "https://js.rbxcdn.com/7135019f19b3ec9de80ce3bacd039523cd9ae3cfe82ac7a371471febbd1a70ba.js",
             "sources": [
                 "/games/1818",
                 "/private-server/configure/527154577"
@@ -4708,7 +4708,7 @@
         },
         {
             "name": "CoreUtilities",
-            "url": "https://js.rbxcdn.com/69a4eaa670f7286ee8fdbaec86359306bae21413af388593d0b2525f42424647-CoreUtilities.js",
+            "url": "https://js.rbxcdn.com/ec5153a41ecaa15cb42ec912ba6c83e318a605203fffc3f957e15b6087bf22ef-CoreUtilities.js",
             "sources": [
                 "/home",
                 "/",
@@ -5741,7 +5741,7 @@
         },
         {
             "name": "ItemPurchase",
-            "url": "https://js.rbxcdn.com/10896dcc8b0f892dd5eda0d963f67234be7013fab2b30f56520148dc6fee15dc-ItemPurchase.js",
+            "url": "https://js.rbxcdn.com/1e1060c5f4e61665df836daf4aea67ba2ff2c1523e07279ec9ddc96f8a94afa6-ItemPurchase.js",
             "sources": [
                 "/home",
                 "/",
@@ -8571,7 +8571,7 @@
         },
         {
             "name": "ItemPurchase",
-            "url": "https://css.rbxcdn.com/a6bf444758ea015e7f3e81a5f18e631c040211878604d93f68662b55cb56f509-ItemPurchase.css",
+            "url": "https://css.rbxcdn.com/44ccc643b6d65e35d6aa6342e9aa844d00d27e33a47fd04be37fe5a7c72b7991-ItemPurchase.css",
             "sources": [
                 "/home",
                 "/",

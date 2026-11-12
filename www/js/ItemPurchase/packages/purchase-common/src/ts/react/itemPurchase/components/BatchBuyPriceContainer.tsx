@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { isAuthenticated, userId } from "@rbx/core-scripts/meta/user";
+import { isAuthenticated, userId } from "../../utils/currentUser";
 import batchLoadItemDetails from "../factories/batchLoadItemDetails";
 import itemDetailsService from "../services/itemDetailsService";
 import { BatchBuyItemsButton } from "./BatchBuyItems";

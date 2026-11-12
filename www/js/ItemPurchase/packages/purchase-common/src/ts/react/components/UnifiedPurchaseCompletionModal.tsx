@@ -27,7 +27,7 @@ const UnifiedPurchaseCompletionModalInner = ({
   itemName,
   currentRobuxBalance,
   translate
-}: UnifiedPurchaseCompletionModalProps & { translate: PurchaseTranslate }): JSX.Element => {
+}: UnifiedPurchaseCompletionModalProps & { translate: PurchaseTranslate }): React.ReactElement => {
   const completeTitle = translate(resources.purchaseCompleteHeading);
   const buttonLabel = translate(resources.okAction);
   const renderBold = (text: React.ReactNode) => <b>{text}</b>;
@@ -89,7 +89,7 @@ const UnifiedPurchaseCompletionModalInner = ({
 const UnifiedPurchaseCompletionModal = ({
   translate,
   ...props
-}: UnifiedPurchaseCompletionModalProps): JSX.Element => (
+}: UnifiedPurchaseCompletionModalProps): React.ReactElement => (
   <SelfProvidedTranslate
     translate={translate}
     namespaces={purchasingNamespaces}

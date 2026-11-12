@@ -8,6 +8,37 @@ export type InputValidator = (value: string) => Promise<string | null>;
 export const validateTrue: InputValidator = () => Promise.resolve(null);
 
 /**
+ * Returns null (no error) if the argument equals some target value.
+ */
+export const validateEquals =
+  (errorMessage: string, target: string): InputValidator =>
+  async (value: string) => {
+    if (value === target) {
+      return Promise.resolve(null);
+    }
+
+    return Promise.resolve(errorMessage);
+  };
+
+/**
+ * Returns null (no error) if all the passed input validators return null for
+ * the argument (after being applied in sequence).
+ */
+export const validateChained =
+  (...inputValidators: InputValidator[]): InputValidator =>
+  async (value: string) => {
+    for (let i = 0; i < inputValidators.length; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      const errorMessage = await inputValidators[i]!(value);
+      if (errorMessage !== null) {
+        return errorMessage;
+      }
+    }
+
+    return null;
+  };
+
+/**
  * A helper function that captures [Enter] presses within input elements
  * (especially those that are not bound to forms with submit behavior).
  */

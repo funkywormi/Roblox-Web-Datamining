@@ -2,7 +2,7 @@ import React from 'react';
 import { ProgressCircle } from '@rbx/foundation-ui';
 import { renderToString } from 'react-dom/server';
 import { formatNumber } from '@rbx/core-scripts/format/number';
-import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
+import { paymentFlowAnalyticsService } from '@rbx/payments/payments-flow-analytics';
 import itemPurchaseConstants from '../constants/itemPurchaseConstants';
 import PriceLabel from './PriceLabel';
 import PriceLabelText from './PriceLabelText';
@@ -55,13 +55,13 @@ function PriceContainerText({
   let firstLineText = '';
 
   const sendPaymentFlowEvent = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_PREMIUM_PURCHASE,
-      false,
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.PREMIUM_UPSELL,
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-      (event.target as HTMLElement).innerText
-    );
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_PREMIUM_PURCHASE,
+      isMidPurchaseStep: false,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.PREMIUM_UPSELL,
+      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+      viewMessage: (event.target as HTMLElement).innerText
+    });
   };
   const renderPremiumPrice = () => {
     if (premiumPriceInRobux == null || isOwned) {
