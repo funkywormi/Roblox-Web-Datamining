@@ -5,6 +5,7 @@ import {
   C3ChatMessage,
   C3ChatMessageType,
   C3ChatMetadataPayload,
+  C3ContentResponse,
   C3Interaction,
 } from "../core/types/c3Chat";
 import { useGetChatMessage, usePostChatMessage } from "./c3ChatServices";
@@ -51,7 +52,8 @@ const useChat = (
   chatConfig: C3ChatMetadataPayload,
 ): {
   messages: C3ChatMessage[];
-  handleSendMessage: (message: string) => void;
+  /** `response` answers a control on the latest bot message; `message` is its label. */
+  handleSendMessage: (message: string, response?: C3ContentResponse) => void;
   isChatEnded: boolean;
   waitingForResponse: boolean;
 } => {
@@ -128,12 +130,13 @@ const useChat = (
     [lastMessageId],
   );
 
-  const handleSendMessage = (message: string, ordinal: number) => {
+  const handleSendMessage = (message: string, ordinal: number, response?: C3ContentResponse) => {
     const newC3Interaction: C3Interaction = {
       message,
       ordinal,
       id: uuidService.generateRandomUuid(),
       type: C3ChatMessageType.Message,
+      ...(response && { response }),
     };
     const newMessage: C3ChatMessage = {
       ...newC3Interaction,
@@ -173,8 +176,8 @@ const useChat = (
 
   return {
     messages,
-    handleSendMessage: message => {
-      handleSendMessage(message, lastMessageOrdinal);
+    handleSendMessage: (message, response) => {
+      handleSendMessage(message, lastMessageOrdinal, response);
     },
     isChatEnded,
     waitingForResponse,

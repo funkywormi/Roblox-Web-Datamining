@@ -1,13 +1,13 @@
-import { parseEventParams } from '../utils/parsingUtils';
+import { parseEventParams } from "../utils/parsingUtils";
 
 export const eventType = {
-  favoriteButtonClicked: 'favoriteButtonClicked',
-  favoriteButtonClickedType: 'buttonClicked'
+  favoriteButtonClicked: "favoriteButtonClicked",
+  favoriteButtonClickedType: "buttonClicked",
 } as const;
 
 export type TEvent = [
   { name: string; type: string; context: string },
-  Record<string, string | number>
+  Record<string, string | number>,
 ];
 export type TEventType = keyof typeof eventType;
 
@@ -20,10 +20,10 @@ export default {
     {
       name: eventType.favoriteButtonClicked,
       type: eventType.favoriteButtonClickedType,
-      context
+      context,
     },
     parseEventParams({
-      ...params
-    })
-  ]
+      ...params,
+    }),
+  ],
 };

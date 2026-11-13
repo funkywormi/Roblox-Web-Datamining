@@ -2,11 +2,17 @@ export enum C3ChatMessageType {
   Message = "message",
   EndConversation = "end_conversation",
 }
+/** The answer to a control on a bot message, sent with the user message that shows it. */
+export type C3ContentResponse = { id: string; value: string };
+
 export type C3Interaction = {
   message: string;
   ordinal: number;
   id: string;
   type: C3ChatMessageType;
+  /** Items to show instead of `message` on a bot message. Unchecked, as the server sent them. */
+  content?: readonly unknown[];
+  response?: C3ContentResponse;
 };
 
 export type C3ChatMessage = C3Interaction & {

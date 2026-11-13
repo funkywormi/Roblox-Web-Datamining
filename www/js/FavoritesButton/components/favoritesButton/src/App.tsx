@@ -1,12 +1,12 @@
-import React from 'react';
-import { WithTranslationsProps, withTranslations } from '@rbx/core-scripts/legacy/react-utilities';
-import { translationConfig } from './translation.config';
-import FavoritesButtonContainer from './containers/FavoritesButtonContainer';
+import React from "react";
+import { WithTranslationsProps, withTranslations } from "@rbx/core-scripts/legacy/react-utilities";
+import { translationConfig } from "./translation.config";
+import FavoritesButtonContainer from "./containers/FavoritesButtonContainer";
 
 export function App({
   assetId,
   itemType,
-  translate
+  translate,
 }: {
   assetId: number | string;
   itemType: string;

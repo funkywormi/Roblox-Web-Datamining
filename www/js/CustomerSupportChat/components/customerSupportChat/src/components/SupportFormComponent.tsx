@@ -54,7 +54,7 @@ import useScrollToTop from "../hooks/useScrollTop";
 import { MessageModalConfig, useConfirmDialog } from "./modal/MessageModal";
 import RedirectToPortalMessage from "./RedirectToPortalMessage";
 import ArticleSuggestions from "./article-suggestions/ArticleSuggestions";
-import { SubCategory } from "../core/types/serviceMetadataResponse";
+import { MainCategoryName, SubCategory } from "../core/types/serviceMetadataResponse";
 import DevModeComponent from "./DevModeComponent";
 import useAppealsPortalGuacConfiguration from "../hooks/useAppealsPortalGuacConfiguration";
 import { useEmailVerification } from "../hooks/useEmailVerification";
@@ -125,6 +125,9 @@ export const UnwrappedSupportFormComponent: React.FC<
   const [supportFormData, setSupportFormData] = useState<SupportFormState>(defaultTicketFormFields);
   // Applied once; cleared after the categories are matched so later edits are not overwritten.
   const [askPrefill, setAskPrefill] = useState(prefill);
+  // Cleared with the form, so a later ticket in this same mount is not tagged.
+  const [fromSupportAsk, setFromSupportAsk] = useState(prefill?.fromSupportAsk === true);
+  const [messageWasShortened] = useState(prefill?.messageWasShortened === true);
 
   const userViewedHelpArticleRef = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -243,9 +246,27 @@ export const UnwrappedSupportFormComponent: React.FC<
     return (
       authenticatedUser.isAuthenticated &&
       guacConfig?.EnableOptOutCommunication &&
-      selectedItems[SupportTicketStateKey.HelpCategoryType]?.val === "AppealDecision"
+      selectedItems[SupportTicketStateKey.HelpCategoryType]?.val === MainCategoryName.AppealDecision
     );
   }, [selectedItems, guacConfig, authenticatedUser]);
+
+  /**
+   * Logged-out users outside the EU/AU/UK must log in before submitting an appeal.
+   * Per product, scoped to the "Appeal a Decision" category and every sub-category within
+   * it except the parental appeal (AppealForChild). Other categories are untouched.
+   * Drives both the inline message and the disabled submit button.
+   */
+  const requiresLoginForAppeal = useMemo(() => {
+    const subCategory = selectedItems[SupportTicketStateKey.HelpSubCategoryType];
+    return (
+      !authenticatedUser.isAuthenticated &&
+      metadata?.isInEuAuUk === false &&
+      selectedItems[SupportTicketStateKey.HelpCategoryType]?.val ===
+        MainCategoryName.AppealDecision &&
+      !!subCategory &&
+      subCategory.id !== SubCategory.AppealForChild
+    );
+  }, [selectedItems, metadata, authenticatedUser]);
 
   // Memoize all dropdown selectable configs from metadata response
   const selector: SupportTicketSelectableItems = useMemo(
@@ -447,6 +468,7 @@ export const UnwrappedSupportFormComponent: React.FC<
     updateSupportInquiryContext({ [SupportTicketStateKey.SubmittedSupportFormData]: undefined });
     setSupportFormData(defaultTicketFormFields());
     setSelectedItems(defaultTicketFormSelectables());
+    setFromSupportAsk(false);
     resetSubmitRequest();
     resetVerification(); // Clear OTP session token and verification state
   }, [updateSupportInquiryContext, resetSubmitRequest, resetVerification]);
@@ -653,6 +675,7 @@ export const UnwrappedSupportFormComponent: React.FC<
             helpCenterArticleLang,
             ageCategory,
             otpSessionToken || undefined,
+            fromSupportAsk,
           ),
         });
 
@@ -752,6 +775,7 @@ export const UnwrappedSupportFormComponent: React.FC<
       helpCenterArticleId,
       helpCenterArticleLang,
       ageCategory,
+      fromSupportAsk,
       showSuccessDialog,
       pushSegment,
       showErrorDialog,
@@ -984,6 +1008,13 @@ export const UnwrappedSupportFormComponent: React.FC<
               setSelectedItem={updateSupportTicketFormSelectable}
             />
           )}
+
+          {/* Logged-out, out-of-region appeal: prompt login (submit is also disabled). */}
+          {requiresLoginForAppeal && (
+            <span className="text-red-500 text-sm" data-testid="appeal-login-required-error">
+              {t("Response.AppealRequiresLogin")}
+            </span>
+          )}
         </div>
 
         {/* Help articles suggestions */}
@@ -1140,6 +1171,11 @@ export const UnwrappedSupportFormComponent: React.FC<
           >
             {formErrors[SupportTicketStateKey.Message]}
           </span>
+          {messageWasShortened && (
+            <p className="text-red-500 text-sm" role="status">
+              Your message was shortened to fit this form. Check it before you send.
+            </p>
+          )}
         </div>
 
         {/* Opt-Out Communication Checkbox */}
@@ -1166,6 +1202,7 @@ export const UnwrappedSupportFormComponent: React.FC<
             isSubmissionLoading ||
             isSendingCode ||
             !isFormDataValidToSubmit ||
+            requiresLoginForAppeal ||
             (supportFormData.username !== "" &&
               !!dirty[SupportTicketStateKey.Username] &&
               isUsernameValid === false)

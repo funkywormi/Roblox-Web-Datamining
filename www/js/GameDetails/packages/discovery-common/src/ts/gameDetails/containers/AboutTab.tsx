@@ -6,7 +6,7 @@ import { aboutTabTranslationConfig } from "../translation.config";
 import metadataConstants from "../constants/metadataConstants";
 import GameDescriptionSection from "../components/GameDescriptionSection";
 import RecommendedGamesCarousel from "../../recommendedGames/RecommendedGamesCarousel";
-import TopSongsInGame from "../components/TopSongsInGame";
+import TopSongsInGameCarousel from "../components/TopSongsInGameCarousel";
 import GameDetailsVirtualEventsSection from "../../gameDetailsVirtualEvents/GameDetailsVirtualEventsSection";
 import useGameDetailsForUniverseId from "../hooks/useGameDetailsForUniverseId";
 import useGetAppPolicyData from "../../common/hooks/useGetAppPolicyData";
@@ -80,7 +80,7 @@ export const AboutTab = ({
           <GameBadgesList universeId={universeId} />
           <div className="container-list games-detail">
             <RecommendedGamesCarousel translate={translate} />
-            <TopSongsInGame translate={translate} universeId={universeId} />
+            <TopSongsInGameCarousel translate={translate} universeId={universeId} />
           </div>
           {gameDetails?.refundPolicy && (
             <ExperienceRefund gameDetails={gameDetails} translate={translate} />

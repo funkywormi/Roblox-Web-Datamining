@@ -19,7 +19,7 @@ const fetchHeadshotUrl = async (userId: number): Promise<string | null> => {
     undefined, // token
     undefined, // version
     undefined, // headShape
-    undefined, // includeBackground (leave to the background experiment)
+    undefined, // includeBackground (headshots default it on)
     true, // includeProfileFrame — ungated on this surface
   );
   return isThumbnailDataItem(data) ? (data.thumbnail?.imageUrl ?? null) : null;

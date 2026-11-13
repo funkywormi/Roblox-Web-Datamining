@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { eventStreamService } from '@rbx/core-scripts/legacy/core-roblox-utilities';
-import { httpResponseCodes } from '@rbx/core-scripts/legacy/core-utilities';
-import { TranslateFunction } from '@rbx/core-scripts/legacy/react-utilities';
-import { createSystemFeedback } from '@rbx/core-ui/legacy/react-style-guide';
-import { authenticatedUser } from '@rbx/core-scripts/legacy/header-scripts';
-import FavoritesButton from '../components/FavoritesButton';
-import FavoritesButtonService from '../services/FavoritesButtonService';
-import FavoritesLoggedInModal from '../components/FavoritesLoggedInModal';
-import eventStreamConstants, { eventType } from '../constants/eventStreamConstants';
+import React, { useState, useEffect } from "react";
+import { eventStreamService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
+import { httpResponseCodes } from "@rbx/core-scripts/legacy/core-utilities";
+import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import { createSystemFeedback } from "@rbx/core-ui/legacy/react-style-guide";
+import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
+import FavoritesButton from "../components/FavoritesButton";
+import FavoritesButtonService from "../services/FavoritesButtonService";
+import FavoritesLoggedInModal from "../components/FavoritesLoggedInModal";
+import eventStreamConstants, { eventType } from "../constants/eventStreamConstants";
 
 const [SystemFeedback, systemFeedbackService] = createSystemFeedback();
 
 export const FavoritesButtonContainer = ({
   assetId,
   itemType,
-  translate
+  translate,
 }: {
   assetId: number | string;
   itemType: string;
@@ -59,7 +59,6 @@ export const FavoritesButtonContainer = ({
     setIsFavorited(result);
 
     if (!isCountLoaded) {
-       
       getCurrentFavoriteCount().catch(() => {
         setFavoriteCount(undefined);
       });
@@ -84,7 +83,6 @@ export const FavoritesButtonContainer = ({
     isSendingFavoritesCall = false;
   };
 
-   
   const handleFavoriteResponse = (status: number, isFavorited: boolean) => {
     if (status !== null) {
       switch (status) {
@@ -100,11 +98,11 @@ export const FavoritesButtonContainer = ({
           break;
         }
         case httpResponseCodes.unauthorized: {
-          systemFeedbackService.warning(translate('DescriptionLoginRequired'));
+          systemFeedbackService.warning(translate("DescriptionLoginRequired"));
           break;
         }
         case httpResponseCodes.forbidden: {
-          systemFeedbackService.warning(translate('DescriptionLoginRequired'));
+          systemFeedbackService.warning(translate("DescriptionLoginRequired"));
           break;
         }
         case httpResponseCodes.conflict: {
@@ -112,7 +110,7 @@ export const FavoritesButtonContainer = ({
           break;
         }
         default: {
-          systemFeedbackService.warning(translate('MessageAssetNotFoundError'));
+          systemFeedbackService.warning(translate("MessageAssetNotFoundError"));
           break;
         }
       }
@@ -138,9 +136,9 @@ export const FavoritesButtonContainer = ({
 
     const tryOnParams = eventStreamConstants.favoriteButtonClicked(
       {
-        url: window.location.href
+        url: window.location.href,
       },
-      itemType
+      itemType,
     );
     eventStreamService.sendEvent(...tryOnParams);
   };
@@ -152,7 +150,6 @@ export const FavoritesButtonContainer = ({
   useEffect(() => {
     getShowFavoriteCount();
     if (authenticatedUser.isAuthenticated) {
-       
       getCurrentFavoriteStatus().catch(() => {
         setIsFavorited(false);
       });
@@ -164,7 +161,7 @@ export const FavoritesButtonContainer = ({
   }, []);
 
   return (
-    <div className='favorites-button-container'>
+    <div className="favorites-button-container">
       <SystemFeedback />
       <FavoritesLoggedInModal
         translate={translate}

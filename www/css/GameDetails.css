@@ -1,3 +1,42 @@
+.install-instructions-content {
+    font-size: 16px;
+    line-height: normal
+}
+
+.install-instructions-content h1,
+.install-instructions-content h3 {
+    margin: 0;
+    line-height: 1.4em
+}
+
+.install-instructions-content h1 {
+    padding: 5px 0;
+    font-size: 32px;
+    font-weight: 800
+}
+
+.install-instructions-content h3 {
+    font-size: 20px;
+    font-weight: 700
+}
+
+.install-instructions-content p {
+    color: var(--color-content-default);
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5em
+}
+
+.install-instructions:before,
+.install-instructions:after {
+    content: " ";
+    display: table
+}
+
+.install-instructions:after {
+    clear: both
+}
+
 .install-instructions {
     max-width: 1140px
 }
@@ -7,18 +46,57 @@
 }
 
 .install-instructions .col-xs-6 {
-    padding: 30px
+    float: left;
+    width: 50%;
+    min-height: 1px;
+    padding: 30px;
+    position: relative
 }
 
 .install-instructions .col-xs-6 .section-content {
+    min-height: 380px;
+    color: var(--color-content-emphasis);
     background: var(--color-surface-100);
     border-radius: 20px;
-    min-height: 380px;
+    margin: 0 0 18px;
     padding: 32px
 }
 
 .install-instructions ol {
-    text-align: left
+    text-align: left;
+    margin: 1em 0
+}
+
+.install-instructions ol:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 40px
+}
+
+.install-instructions ol:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 40px
+}
+
+.install-instructions ol:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 40px
+}
+
+.install-instructions ol:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 40px
+}
+
+.install-instructions ol:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 40px
+}
+
+.install-instructions ol:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-right: 40px
+}
+
+.install-instructions ol:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-right: 40px
+}
+
+.install-instructions ol:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-right: 40px
 }
 
 .install-instructions ol>li {
@@ -47,6 +125,42 @@
     width: calc(100% - 24px);
     height: calc(100% - 24px);
     margin: 12px
+}
+
+@media (max-width:767px) {
+    .install-instructions-content {
+        font-size: 12px
+    }
+
+    .install-instructions-content h1 {
+        font-size: 24px
+    }
+
+    .install-instructions-content h3 {
+        font-size: 16px
+    }
+
+    .install-instructions .col-xs-6 .section-content {
+        margin: 0 0 12px
+    }
+}
+
+.download-link-underline {
+    cursor: pointer;
+    text-decoration: underline
+}
+
+button.download-link-underline {
+    all: unset;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline
+}
+
+.install-dialog {
+    width: 728px;
+    max-width: unset !important
 }
 
 .thumbnail-2d-container {
@@ -141,10 +255,29 @@
 }
 
 button.btn-common-play-game-lg,
+button.game-play-button-lg,
 button.btn-economy-robux-white-lg,
+button.game-play-button-purchase-lg,
 button.btn-common-play-game-action-needed-lg,
-button.btn-common-play-game-unplayable-lg {
+button.game-play-button-action-needed-lg,
+button.btn-common-play-game-unplayable-lg,
+button.game-play-button-unplayable-lg {
     height: auto
+}
+
+.play-on-web-button-container {
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.play-on-web-beta-notice {
+    text-align: center
 }
 
 game-badges-list .badge-row .badge-image,
@@ -544,6 +677,7 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 
 .featured-grid-item-container.wide-featured-tile>a .game-card-name-info .game-card-name,
 .featured-grid-item-container.wide-featured-tile>a .game-card-name-info .btn-common-play-game-lg.btn-primary-md.btn-full-width,
+.featured-grid-item-container.wide-featured-tile>a .game-card-name-info .game-play-button-lg.btn-primary-md.btn-full-width,
 .featured-grid-item-container.wide-featured-tile>a .game-card-name-info .stacked-play-buttons-container {
     margin-top: 8px
 }
@@ -604,9 +738,13 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-lg,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-lg,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-economy-robux-white-lg,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-purchase-lg,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-action-needed-lg,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-unplayable-lg,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-unplayable-lg,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .play-button {
     width: -webkit-fit-content;
@@ -631,34 +769,52 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-lg.purchase-button,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-lg.purchase-button,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-lg.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-lg.game-play-button-action-needed-lg,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-economy-robux-white-lg.purchase-button,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-purchase-lg.purchase-button,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-economy-robux-white-lg.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-purchase-lg.game-play-button-action-needed-lg,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-action-needed-lg.purchase-button,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-action-needed-lg.purchase-button,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-action-needed-lg.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-action-needed-lg.game-play-button-action-needed-lg,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-unplayable-lg.purchase-button,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-unplayable-lg.purchase-button,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-unplayable-lg.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-unplayable-lg.game-play-button-action-needed-lg,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg.purchase-button,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg.game-play-button-action-needed-lg,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .play-button.purchase-button,
-.game-card-link .game-card-name-info .stacked-play-buttons-container .play-button.btn-common-play-game-action-needed-lg {
+.game-card-link .game-card-name-info .stacked-play-buttons-container .play-button.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .play-button.game-play-button-action-needed-lg {
     padding-left: 8px;
     padding-right: 8px
 }
 
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-lg .btn-text,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-lg .btn-text,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-economy-robux-white-lg .btn-text,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-purchase-lg .btn-text,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-action-needed-lg .btn-text,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-action-needed-lg .btn-text,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-unplayable-lg .btn-text,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-unplayable-lg .btn-text,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg .btn-text,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .play-button .btn-text {
     white-space: nowrap
 }
 
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-lg .icon-robux-white,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-lg .icon-robux-white,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-economy-robux-white-lg .icon-robux-white,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-purchase-lg .icon-robux-white,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-action-needed-lg .icon-robux-white,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-action-needed-lg .icon-robux-white,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-unplayable-lg .icon-robux-white,
+.game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-unplayable-lg .icon-robux-white,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg .icon-robux-white,
 .game-card-link .game-card-name-info .stacked-play-buttons-container .play-button .icon-robux-white {
     background-position: 0 -56px;
@@ -668,9 +824,13 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg,
 .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg,
 .game-card-link .game-card-name-info .play-button {
     border-radius: 8px;
     -ms-flex: none;
@@ -691,15 +851,24 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg.purchase-button,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg.purchase-button,
 .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg.purchase-button,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg.purchase-button,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg.purchase-button,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg.purchase-button,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg.purchase-button,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg.purchase-button,
 .game-card-link .game-card-name-info .play-button.purchase-button,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg.game-play-button-action-needed-lg,
 .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg.game-play-button-action-needed-lg,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg.game-play-button-action-needed-lg,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg.btn-common-play-game-action-needed-lg,
-.game-card-link .game-card-name-info .play-button.btn-common-play-game-action-needed-lg {
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg.game-play-button-action-needed-lg,
+.game-card-link .game-card-name-info .play-button.btn-common-play-game-action-needed-lg,
+.game-card-link .game-card-name-info .play-button.game-play-button-action-needed-lg {
     width: -webkit-fit-content;
     width: -moz-fit-content;
     width: fit-content;
@@ -708,9 +877,13 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-common-play,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-common-play,
 .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-common-play,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-common-play,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-common-play,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-common-play,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-common-play,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-common-play,
 .game-card-link .game-card-name-info .play-button .icon-common-play {
     background-position: 0 0;
     background-size: 200%;
@@ -719,9 +892,13 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-robux-white,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-robux-white,
 .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-robux-white,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-robux-white,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-robux-white,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-robux-white,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-robux-white,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-robux-white,
 .game-card-link .game-card-name-info .play-button .icon-robux-white {
     background-position: 0 -56px;
     background-size: 200%;
@@ -730,14 +907,22 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-status-private,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-status-private,
 .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-status-private,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-status-private,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-status-private,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-status-private,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-status-private,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-status-private,
 .game-card-link .game-card-name-info .play-button .icon-status-private,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-status-private-primary,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-status-private-primary,
 .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-status-private-primary,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-status-private-primary,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-status-private-primary,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-status-private-primary,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-status-private-primary,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-status-private-primary,
 .game-card-link .game-card-name-info .play-button .icon-status-private-primary {
     background-position: 0 -72px;
     background-size: 200%;
@@ -746,14 +931,22 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-status-unavailable,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-status-unavailable,
 .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-status-unavailable,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-status-unavailable,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-status-unavailable,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-status-unavailable,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-status-unavailable,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-status-unavailable,
 .game-card-link .game-card-name-info .play-button .icon-status-unavailable,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-status-unavailable-secondary,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-status-unavailable-secondary,
 .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-status-unavailable-secondary,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-status-unavailable-secondary,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-status-unavailable-secondary,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-status-unavailable-secondary,
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-status-unavailable-secondary,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-status-unavailable-secondary,
 .game-card-link .game-card-name-info .play-button .icon-status-unavailable-secondary {
     background-position: 0 -180px;
     background-size: 200%;
@@ -847,9 +1040,13 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     }
 
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-lg,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-lg,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-economy-robux-white-lg,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-purchase-lg,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-action-needed-lg,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-unplayable-lg,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-unplayable-lg,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .play-button {
         width: -webkit-fit-content;
@@ -863,25 +1060,39 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     }
 
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-lg.purchase-button,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-lg.purchase-button,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-lg.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-lg.game-play-button-action-needed-lg,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-economy-robux-white-lg.purchase-button,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-purchase-lg.purchase-button,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-economy-robux-white-lg.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-purchase-lg.game-play-button-action-needed-lg,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-action-needed-lg.purchase-button,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-action-needed-lg.purchase-button,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-action-needed-lg.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-action-needed-lg.game-play-button-action-needed-lg,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-unplayable-lg.purchase-button,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-unplayable-lg.purchase-button,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-unplayable-lg.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-unplayable-lg.game-play-button-action-needed-lg,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg.purchase-button,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg.game-play-button-action-needed-lg,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .play-button.purchase-button,
-    .game-card-link .game-card-name-info .stacked-play-buttons-container .play-button.btn-common-play-game-action-needed-lg {
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .play-button.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .play-button.game-play-button-action-needed-lg {
         padding-left: 8px;
         padding-right: 8px
     }
 
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-lg .icon-robux-white,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-lg .icon-robux-white,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-economy-robux-white-lg .icon-robux-white,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-purchase-lg .icon-robux-white,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-action-needed-lg .icon-robux-white,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-action-needed-lg .icon-robux-white,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-common-play-game-unplayable-lg .icon-robux-white,
+    .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.game-play-button-unplayable-lg .icon-robux-white,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .btn-full-width.btn-control-lg .icon-robux-white,
     .game-card-link .game-card-name-info .stacked-play-buttons-container .play-button .icon-robux-white {
         background-position: 0 -36px;
@@ -891,9 +1102,13 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     }
 
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg,
     .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg,
     .game-card-link .game-card-name-info .play-button {
         border-radius: 4px;
         width: 27px;
@@ -902,10 +1117,15 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     }
 
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg.game-play-button-action-needed-lg,
     .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg.game-play-button-action-needed-lg,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg.game-play-button-action-needed-lg,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg.btn-common-play-game-action-needed-lg,
-    .game-card-link .game-card-name-info .play-button.btn-common-play-game-action-needed-lg {
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg.game-play-button-action-needed-lg,
+    .game-card-link .game-card-name-info .play-button.btn-common-play-game-action-needed-lg,
+    .game-card-link .game-card-name-info .play-button.game-play-button-action-needed-lg {
         width: -webkit-fit-content;
         width: -moz-fit-content;
         width: fit-content;
@@ -914,9 +1134,13 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     }
 
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-common-play,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-common-play,
     .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-common-play,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-common-play,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-common-play,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-common-play,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-common-play,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-common-play,
     .game-card-link .game-card-name-info .play-button .icon-common-play {
         background-position: 0 0;
         background-size: 200%;
@@ -925,19 +1149,31 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     }
 
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-robux-white,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-robux-white,
     .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-robux-white,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-robux-white,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-robux-white,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-robux-white,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-robux-white,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-robux-white,
     .game-card-link .game-card-name-info .play-button .icon-robux-white,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-status-private,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-status-private,
     .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-status-private,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-status-private,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-status-private,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-status-private,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-status-private,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-status-private,
     .game-card-link .game-card-name-info .play-button .icon-status-private,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-status-private-primary,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-status-private-primary,
     .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-status-private-primary,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-status-private-primary,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-status-private-primary,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-status-private-primary,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-status-private-primary,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-status-private-primary,
     .game-card-link .game-card-name-info .play-button .icon-status-private-primary {
         background-position: 0 -36px;
         background-size: 200%;
@@ -946,14 +1182,22 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     }
 
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-status-unavailable,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-status-unavailable,
     .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-status-unavailable,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-status-unavailable,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-status-unavailable,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-status-unavailable,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-status-unavailable,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-status-unavailable,
     .game-card-link .game-card-name-info .play-button .icon-status-unavailable,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-status-unavailable-secondary,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-status-unavailable-secondary,
     .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-status-unavailable-secondary,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-status-unavailable-secondary,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-action-needed-lg .icon-status-unavailable-secondary,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-status-unavailable-secondary,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-status-unavailable-secondary,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-status-unavailable-secondary,
     .game-card-link .game-card-name-info .play-button .icon-status-unavailable-secondary {
         background-position: 0 -90px;
         background-size: 200%;
@@ -1035,6 +1279,283 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     align-items: center;
     display: -ms-flexbox;
     display: flex
+}
+
+[role=dialog].player-interaction-dialog {
+    color: var(--color-content-emphasis);
+    font-size: 16px;
+    font-weight: var(--font-weight-400);
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 0;
+    line-height: normal
+}
+
+.player-interaction-dialog .foundation-web-dialog-close-container {
+    top: 12px;
+    right: auto
+}
+
+.player-interaction-dialog .foundation-web-dialog-close-container:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    right: 12px
+}
+
+.player-interaction-dialog .foundation-web-dialog-close-container:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    right: 12px
+}
+
+.player-interaction-dialog .foundation-web-dialog-close-container:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    right: 12px
+}
+
+.player-interaction-dialog .foundation-web-dialog-close-container:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    right: 12px
+}
+
+.player-interaction-dialog .foundation-web-dialog-close-container:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    right: 12px
+}
+
+.player-interaction-dialog .foundation-web-dialog-close-container:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    left: 12px
+}
+
+.player-interaction-dialog .foundation-web-dialog-close-container:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    left: 12px
+}
+
+.player-interaction-dialog .foundation-web-dialog-close-container:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    left: 12px
+}
+
+.player-interaction-dialog .foundation-web-close-affordance {
+    background-color: transparent;
+    border-radius: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0
+}
+
+.player-interaction-dialog .foundation-web-close-affordance>div {
+    display: none
+}
+
+.player-interaction-dialog .foundation-web-close-affordance .icon {
+    width: 28px;
+    height: 28px
+}
+
+.player-interaction-dialog .player-interaction-body {
+    padding: 0
+}
+
+.player-interaction-dialog .player-interaction-title {
+    border-bottom: 1px solid var(--color-extended-gray-500);
+    font-size: 20px;
+    font-weight: var(--font-weight-400);
+    margin: 0;
+    padding: 17px 12px;
+    line-height: 24px
+}
+
+.player-interaction-dialog .player-interaction-game {
+    border-bottom: 1px solid var(--color-extended-gray-500);
+    gap: 12px;
+    padding: 12px 15px
+}
+
+.player-interaction-dialog .player-interaction-game-icon {
+    width: 90px;
+    height: 90px
+}
+
+.player-interaction-dialog .player-interaction-game-name {
+    font-size: 16px
+}
+
+.player-interaction-dialog .player-interaction-row {
+    color: var(--color-content-default)
+}
+
+.player-interaction-dialog .player-interaction-row-content {
+    gap: 12px
+}
+
+.player-interaction-dialog .player-interaction-row-content:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 15px
+}
+
+.player-interaction-dialog .player-interaction-row-content:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 15px
+}
+
+.player-interaction-dialog .player-interaction-row-content:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 15px
+}
+
+.player-interaction-dialog .player-interaction-row-content:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 15px
+}
+
+.player-interaction-dialog .player-interaction-row-content:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 15px
+}
+
+.player-interaction-dialog .player-interaction-row-content:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-right: 15px
+}
+
+.player-interaction-dialog .player-interaction-row-content:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-right: 15px
+}
+
+.player-interaction-dialog .player-interaction-row-content:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-right: 15px
+}
+
+.player-interaction-dialog .player-interaction-avatar {
+    width: 44px;
+    height: 44px;
+    margin-top: 14px
+}
+
+.player-interaction-dialog .player-interaction-info {
+    border-bottom: 1px solid var(--color-extended-gray-500);
+    padding-top: 12px;
+    padding-bottom: 12px
+}
+
+.player-interaction-dialog .player-interaction-info:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 0;
+    padding-right: 15px
+}
+
+.player-interaction-dialog .player-interaction-info:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 0;
+    padding-right: 15px
+}
+
+.player-interaction-dialog .player-interaction-info:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 0;
+    padding-right: 15px
+}
+
+.player-interaction-dialog .player-interaction-info:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 0;
+    padding-right: 15px
+}
+
+.player-interaction-dialog .player-interaction-info:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+    padding-left: 0;
+    padding-right: 15px
+}
+
+.player-interaction-dialog .player-interaction-info:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-left: 15px;
+    padding-right: 0
+}
+
+.player-interaction-dialog .player-interaction-info:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-left: 15px;
+    padding-right: 0
+}
+
+.player-interaction-dialog .player-interaction-info:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+    padding-left: 15px;
+    padding-right: 0
+}
+
+.player-interaction-dialog .player-interaction-name {
+    margin: 12px 0;
+    font-size: 16px;
+    line-height: 24px
+}
+
+.player-interaction-dialog .player-interaction-join {
+    border: 1px solid var(--color-extended-gray-900);
+    background-color: var(--color-extended-gray-900);
+    min-width: 60px;
+    height: 32px;
+    color: var(--color-extended-white-100);
+    font-size: 16px;
+    font-weight: var(--font-weight-500);
+    border-radius: 8px;
+    padding: 7px;
+    line-height: 16px
+}
+
+:-webkit-any(.dark-theme, .color-mode-dark) [role=dialog].player-interaction-dialog {
+    background-color: var(--color-surface-300)
+}
+
+:-moz-any(.dark-theme, .color-mode-dark) [role=dialog].player-interaction-dialog {
+    background-color: var(--color-surface-300)
+}
+
+:is(.dark-theme, .color-mode-dark) [role=dialog].player-interaction-dialog {
+    background-color: var(--color-surface-300)
+}
+
+:-webkit-any(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-title {
+    border-color: var(--color-extended-gray-700)
+}
+
+:-moz-any(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-title {
+    border-color: var(--color-extended-gray-700)
+}
+
+:is(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-title {
+    border-color: var(--color-extended-gray-700)
+}
+
+:-webkit-any(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-game {
+    border-color: var(--color-extended-gray-700)
+}
+
+:-moz-any(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-game {
+    border-color: var(--color-extended-gray-700)
+}
+
+:is(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-game {
+    border-color: var(--color-extended-gray-700)
+}
+
+:-webkit-any(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-info {
+    border-color: var(--color-extended-gray-700)
+}
+
+:-moz-any(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-info {
+    border-color: var(--color-extended-gray-700)
+}
+
+:is(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-info {
+    border-color: var(--color-extended-gray-700)
+}
+
+:-webkit-any(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-join {
+    border-color: var(--color-extended-white-100);
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-900)
+}
+
+:-moz-any(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-join {
+    border-color: var(--color-extended-white-100);
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-900)
+}
+
+:is(.dark-theme, .color-mode-dark) .player-interaction-dialog .player-interaction-join {
+    border-color: var(--color-extended-white-100);
+    background-color: var(--color-extended-white-100);
+    color: var(--color-extended-gray-900)
+}
+
+@media (max-width:767px) {
+
+    [role=dialog].player-interaction-dialog,
+    .player-interaction-dialog .player-interaction-game-name,
+    .player-interaction-dialog .player-interaction-name {
+        font-size: 12px
+    }
 }
 
 @keyframes fadein-delay {
@@ -1211,6 +1732,16 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     .hover-game-tile.experience-events-tile.focused.old-hover .featured-game-container .info-metadata-container .wide-game-tile-metadata .base-metadata .game-card-info .info-avatar .avatar-card .avatar-count-container .avatar-count {
         transition: none
     }
+}
+
+.light-theme .hover-game-tile.contained-tile .featured-game-container .game-card-link .info-container,
+.dark-theme .hover-game-tile.contained-tile .featured-game-container .game-card-link .info-container {
+    background: var(--color-surface-300)
+}
+
+.game-sort-mural-loaded .container-header,
+.game-sort-mural-loaded .font-sort-subtitle {
+    color: var(--color-extended-white-100)
 }
 
 .game-sort-header-container {
@@ -5397,6 +5928,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 #game-details-play-button-container .btn-economy-robux-white-lg,
 #game-details-play-button-container .btn-common-play-game-action-needed-lg,
 #game-details-play-button-container .btn-common-play-game-unplayable-lg,
+#game-details-play-button-container .game-play-button-lg,
+#game-details-play-button-container .game-play-button-purchase-lg,
+#game-details-play-button-container .game-play-button-action-needed-lg,
+#game-details-play-button-container .game-play-button-unplayable-lg,
 #game-details-play-button-container .game-details-download-button {
     min-height: 60px;
     margin: 0 auto;
@@ -5410,6 +5945,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     #game-details-play-button-container .btn-economy-robux-white-lg,
     #game-details-play-button-container .btn-common-play-game-action-needed-lg,
     #game-details-play-button-container .btn-common-play-game-unplayable-lg,
+    #game-details-play-button-container .game-play-button-lg,
+    #game-details-play-button-container .game-play-button-purchase-lg,
+    #game-details-play-button-container .game-play-button-action-needed-lg,
+    #game-details-play-button-container .game-play-button-unplayable-lg,
     #game-details-play-button-container .game-details-download-button {
         width: 60%
     }
@@ -5419,6 +5958,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 #game-details-play-button-container .btn-economy-robux-white-lg .btn-text,
 #game-details-play-button-container .btn-common-play-game-action-needed-lg .btn-text,
 #game-details-play-button-container .btn-common-play-game-unplayable-lg .btn-text,
+#game-details-play-button-container .game-play-button-lg .btn-text,
+#game-details-play-button-container .game-play-button-purchase-lg .btn-text,
+#game-details-play-button-container .game-play-button-action-needed-lg .btn-text,
+#game-details-play-button-container .game-play-button-unplayable-lg .btn-text,
 #game-details-play-button-container .game-details-download-button .btn-text {
     padding-left: 5px
 }
@@ -5449,6 +5992,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 #game-details-play-button-container .stacked-play-buttons-container .btn-economy-robux-white-lg,
 #game-details-play-button-container .stacked-play-buttons-container .btn-common-play-game-action-needed-lg,
 #game-details-play-button-container .stacked-play-buttons-container .btn-common-play-game-unplayable-lg,
+#game-details-play-button-container .stacked-play-buttons-container .game-play-button-lg,
+#game-details-play-button-container .stacked-play-buttons-container .game-play-button-purchase-lg,
+#game-details-play-button-container .stacked-play-buttons-container .game-play-button-action-needed-lg,
+#game-details-play-button-container .stacked-play-buttons-container .game-play-button-unplayable-lg,
 #game-details-play-button-container .stacked-play-buttons-container .btn-control-lg {
     width: 100%;
     min-height: 60px;
@@ -5897,6 +6444,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     opacity: .9
 }
 
+.\[overflow-x\:auto\] {
+    overflow-x: auto
+}
+
 .\[overflow-x\:hidden\] {
     overflow-x: hidden
 }
@@ -6180,10 +6731,4 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 
 .\[\&_a\]\:\[font-weight\:700\] a {
     font-weight: 700
-}
-
-@media (pointer:coarse) and (not (any-pointer:fine)) {
-    .\[\@media\(pointer\:coarse\)_and_\(not_\(any-pointer\:fine\)\)\]\:\[overflow-x\:auto\] {
-        overflow-x: auto
-    }
 }

@@ -4,7 +4,7 @@ import { truncNumber } from "@rbx/core-scripts/format/number";
 import { getAbsoluteUrl } from "@rbx/core-scripts/util/url";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { TGetGameDetails, TGetUniverseVoiceStatus } from "../../common/types/bedev1Types";
-import { getNumberFormat, dateTimeFormatter } from "../../common/utils/parsingUtils";
+import { getNumberFormat, getDateTimeFormatter } from "../../common/utils/parsingUtils";
 import { gameDetailsPage } from "../../common/constants/configConstants";
 import { FeatureGameDetails } from "../../common/constants/translationConstants";
 import useSortIdMapping from "../hooks/useSortIdMapping";
@@ -138,7 +138,7 @@ const GameDescriptionTable = ({
             label: translate(FeatureGameDetails.LabelCreated),
             value: (
               <GameDescriptionTableValueText
-                valueText={dateTimeFormatter.getShortDate(gameDetails.created)}
+                valueText={getDateTimeFormatter().getShortDate(gameDetails.created)}
               />
             ),
           },
@@ -148,7 +148,7 @@ const GameDescriptionTable = ({
       label: translate(FeatureGameDetails.LabelUpdated),
       value: (
         <GameDescriptionTableValueText
-          valueText={dateTimeFormatter.getShortDate(gameDetails.updated)}
+          valueText={getDateTimeFormatter().getShortDate(gameDetails.updated)}
         />
       ),
     },

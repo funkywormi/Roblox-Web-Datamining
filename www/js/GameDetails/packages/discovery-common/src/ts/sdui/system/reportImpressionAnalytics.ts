@@ -5,6 +5,7 @@ import {
   SharedEventMetadata,
 } from "@rbx/unified-logging";
 import { sendEvent } from "@rbx/core-scripts/event-stream";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import {
   TAnalyticsData,
   TCollectionAnalyticsData,
@@ -183,6 +184,11 @@ export const reportImpressionAnalytics = (
     ...collectionAnalyticsData,
     ...itemFields,
     ...baseParams,
+    // Preserve a caller-provided interactionUuid, otherwise generate a new one per event
+    [SharedEventMetadata.InteractionUuid]:
+      typeof collectionAnalyticsData[SharedEventMetadata.InteractionUuid] === "string"
+        ? collectionAnalyticsData[SharedEventMetadata.InteractionUuid]
+        : generateRandomUuid(),
   };
 
   sendEvent(

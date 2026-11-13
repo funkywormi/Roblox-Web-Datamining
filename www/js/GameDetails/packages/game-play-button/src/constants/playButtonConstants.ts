@@ -66,6 +66,7 @@ const playButtonTextTranslationMap = {
   Buy: "PlayButtonText.Buy",
   PlayDemo: "PlayButtonText.PlayDemo",
   PlayOnWeb: "PlayButtonText.PlayOnWeb",
+  PlayOnWebBetaNotice: "PlayButtonText.PlayOnWebBetaNotice",
   Playtest: "PlayButtonText.Playtest",
 };
 

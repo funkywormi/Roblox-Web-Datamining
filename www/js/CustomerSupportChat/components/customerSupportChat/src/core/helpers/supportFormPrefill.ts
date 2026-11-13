@@ -7,6 +7,9 @@ export type SupportFormPrefill = {
   message: string;
   category?: string;
   subcategory?: string;
+  fromSupportAsk?: boolean;
+  /** The landing fallback had to shorten the text to fit the description field. */
+  messageWasShortened?: boolean;
 };
 
 export type SupportFormCategorySelection = {
@@ -57,3 +60,34 @@ export const supportFormSelectionFromPrefill = (
 
 export const clipSupportFormMessage = (message: string): string =>
   message.slice(0, defaultMaxIssueDescriptionFieldLength);
+
+const FALLBACK_SEPARATOR = "\n\n";
+
+/**
+ * Fits a landing fallback into the classic form's description field. The follow-up was typed
+ * while the create was pending and never sent, so it is kept whole and the first message is
+ * what gets shortened. A follow-up that is itself over the limit keeps its newest characters.
+ */
+export const fitSupportFormFallbackMessage = (
+  firstMessage: string,
+  followUp: string,
+): { message: string; wasShortened: boolean } => {
+  const limit = defaultMaxIssueDescriptionFieldLength;
+  const extra = followUp.trim();
+  const combined = extra ? `${firstMessage}${FALLBACK_SEPARATOR}${extra}` : firstMessage;
+  if (combined.length <= limit) {
+    return { message: combined, wasShortened: false };
+  }
+  if (!extra) {
+    return { message: firstMessage.slice(0, limit), wasShortened: true };
+  }
+  if (extra.length >= limit) {
+    return { message: extra.slice(extra.length - limit), wasShortened: true };
+  }
+  const room = limit - FALLBACK_SEPARATOR.length - extra.length;
+  const head = firstMessage.slice(0, Math.max(room, 0)).trimEnd();
+  return {
+    message: head ? `${head}${FALLBACK_SEPARATOR}${extra}` : extra,
+    wasShortened: true,
+  };
+};

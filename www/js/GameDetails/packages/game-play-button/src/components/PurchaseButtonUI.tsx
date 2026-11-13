@@ -70,7 +70,7 @@ const PurchaseButtonUI = ({
 PurchaseButtonUI.defaultProps = {
   hideButtonText: false,
   buttonWidth: buttonWidths.full,
-  buttonClassName: "btn-economy-robux-white-lg",
+  buttonClassName: "btn-economy-robux-white-lg game-play-button-purchase-lg",
   iconClassName: "icon-robux-white",
   hideButtonIcon: false,
   isPurchasing: false,

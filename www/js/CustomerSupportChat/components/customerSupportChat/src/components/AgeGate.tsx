@@ -144,6 +144,7 @@ const AgeGate: React.FC<WithTranslationsProps> = ({ translate, intl }) => {
       <div className="flex items-center justify-center my-6">
         <span>
           {translate("Action.LogInOr")}{" "}
+          {/* TODO: /login and returnurl=/support drop a locale prefix such as /fr. */}
           <a href="/login?returnurl=%2Fsupport">
             <span className="text-blue-600 hover:text-blue-300 visited:text-purple-600">
               {translate("Action.LogIn")}

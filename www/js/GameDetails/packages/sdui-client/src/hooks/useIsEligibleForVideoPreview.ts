@@ -114,7 +114,11 @@ export const useIsEligibleForVideoPreview = (
       };
     }
 
-    if (isFetchingPlayability) {
+    // Only the first fetch, which has no status yet, should
+    // hide the preview. Dropping eligibility on a refetch unregisters a playing tile.
+    const isInitialPlayabilityFetch =
+      isFetchingPlayability && playabilityStatus === undefined && isPlayable === undefined;
+    if (isInitialPlayabilityFetch) {
       return {
         isEligibleForVideoPreview: false,
         isLoadingEligibility: true,

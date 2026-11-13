@@ -43,6 +43,7 @@ export interface CreateSupportTicketRequestModel {
   videoId?: string;
   otpSessionToken?: string;
   optOutCommunication?: boolean;
+  fromSupportAsk?: boolean;
 }
 
 // TODO(mhowell): Refactor www backend to return error/status codes instead of messages that may be more dynamic and user facing in the future now these are limited by the downstream services we are inheriting

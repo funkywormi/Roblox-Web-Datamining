@@ -29,6 +29,25 @@ const getCssClasses = (
   });
 };
 
+const NewTabLink = ({
+  children,
+  ...props
+}: React.AnchorHTMLAttributes<HTMLAnchorElement>): React.ReactElement => (
+  <a {...props} target="_blank" rel="noopener noreferrer">
+    {children}
+  </a>
+);
+
+const MARKDOWN_OPTIONS = {
+  wrapper: React.Fragment,
+  overrides: { a: { component: NewTabLink } },
+};
+
+/** Renders a chat message's markdown, opening links in a new tab. */
+export const ChatMarkdown = ({ content }: { content: string }): React.ReactElement => (
+  <Markdown options={MARKDOWN_OPTIONS}>{content}</Markdown>
+);
+
 const ChatMessage = ({
   id,
   isUser,
@@ -54,23 +73,7 @@ const ChatMessage = ({
         ) : (
           content && (
             <div className="c3-chat-message-markdown-styling">
-              <Markdown
-                options={{
-                  wrapper: React.Fragment,
-                  overrides: {
-                    a: {
-                      // We want to open links in a new tab
-                      component: ({ children, ...props }) => (
-                        <a {...props} target="_blank" rel="noopener noreferrer">
-                          {children}
-                        </a>
-                      ),
-                    },
-                  },
-                }}
-              >
-                {content}
-              </Markdown>
+              <ChatMarkdown content={content} />
             </div>
           )
         )}

@@ -190,6 +190,8 @@ export enum EventType {
 export enum SessionInfoType {
   HomePageSessionInfo = "homePageSessionInfo",
   GameSearchSessionInfo = "gameSearchSessionInfo",
+  OmniSearchSessionInfo = "omniSearchSessionInfo",
+  SearchUuid = "searchUuid",
   DiscoverPageSessionInfo = "discoverPageSessionInfo",
   SearchLandingPageSessionInfo = "searchLandingPageSessionInfo",
   SpotlightPageSessionInfo = "spotlightPageSessionInfo",

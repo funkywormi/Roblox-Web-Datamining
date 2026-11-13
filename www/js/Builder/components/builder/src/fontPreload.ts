@@ -1,11 +1,12 @@
 import "./main.scss";
-import builderSansRegular from "@rbx/webfont/fonts/BuilderSans-Regular.woff2";
-import builderSansMedium from "@rbx/webfont/fonts/BuilderSans-Medium.woff2"; // Used for matching legacy font weights usage, such as top nav
-import builderSansSemiBold from "@rbx/webfont/fonts/BuilderSans-SemiBold.woff2";
-import builderSansBold from "@rbx/webfont/fonts/BuilderSans-Bold.woff2";
 
 import { buildFontPreloadHtml } from "./fontPreloadUtils.js";
 
-const fonts = [builderSansRegular, builderSansMedium, builderSansSemiBold, builderSansBold];
+const fonts = [
+  "https://cdn.foundation.roblox.com/current/fonts/builder-sans/BuilderSans-Regular.woff2",
+  "https://cdn.foundation.roblox.com/current/fonts/builder-sans/BuilderSans-Medium.woff2",
+  "https://cdn.foundation.roblox.com/current/fonts/builder-sans/BuilderSans-SemiBold.woff2",
+  "https://cdn.foundation.roblox.com/current/fonts/builder-sans/BuilderSans-Bold.woff2",
+];
 
 export default buildFontPreloadHtml(fonts);

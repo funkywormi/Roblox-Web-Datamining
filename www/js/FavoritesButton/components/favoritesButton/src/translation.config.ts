@@ -5,7 +5,7 @@ type TConfig = {
 
 export const translationConfig: TConfig = {
   common: [],
-  feature: 'Feature.Favorites'
+  feature: "Feature.Favorites",
 };
 
 export default translationConfig;

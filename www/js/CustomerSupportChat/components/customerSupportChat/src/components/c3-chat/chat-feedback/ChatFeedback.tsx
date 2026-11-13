@@ -3,32 +3,23 @@ import { Icon } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/legacy/react-utilities";
 import { C3FeedbackRating } from "../../../core/types/c3Chat";
 import { usePatchConversation } from "../../../hooks/c3ChatServices";
-import useGetIXPResult from "../../../hooks/useGetIXPResult";
 import ChatParticipantIcon from "../chat-participant-icon/ChatParticipantIcon";
 
 const STAR_VALUES: C3FeedbackRating[] = [1, 2, 3, 4, 5];
 const FEEDBACK_DEBOUNCE_MS = 300;
-const IXP_EXPERIMENT_LAYER = "CustomerCare.C3.ChatFeedback.V2";
-const IXP_EXPERIMENT_PARAMETER = "show_chat_feedback";
 
 type ChatFeedbackProps = {
   conversationId: string;
   conversationAuthToken: string;
-  isRobloxEmployee?: boolean;
   removeRbxLogo?: boolean;
 };
 
 const ChatFeedback: React.FC<ChatFeedbackProps> = ({
   conversationId,
   conversationAuthToken,
-  isRobloxEmployee,
   removeRbxLogo,
 }) => {
   const { translate: t } = useTranslation();
-  const { data: isFeedbackEnabled } = useGetIXPResult(
-    IXP_EXPERIMENT_LAYER,
-    IXP_EXPERIMENT_PARAMETER,
-  );
   const [rating, setRating] = useState<C3FeedbackRating>();
   const [hoveredRating, setHoveredRating] = useState<C3FeedbackRating>();
   const { mutate: updateConversation, isPending } = usePatchConversation(
@@ -88,10 +79,6 @@ const ChatFeedback: React.FC<ChatFeedbackProps> = ({
     },
     [],
   );
-
-  if (!isRobloxEmployee && isFeedbackEnabled !== true) {
-    return null;
-  }
 
   return (
     <div className="c3-chat-message-container is-agent">
