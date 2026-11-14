@@ -1,10 +1,12 @@
+import { document } from "@rbx/core-lib/browser";
+
 /**
  * Check if the account experience revamp is enabled for the current browser and
  * page. This is meant for authentication related pages only.
  * @returns {boolean}
  */
 export const isAccountExperienceRevampEnabled = (): boolean => {
-  const metaTag = document.querySelector<HTMLElement>(
+  const metaTag = document?.querySelector<HTMLElement>(
     'meta[name="account-experience-revamp-data"]',
   );
   const keyMap = metaTag?.dataset ?? {};

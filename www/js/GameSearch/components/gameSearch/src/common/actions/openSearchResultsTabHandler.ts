@@ -1,6 +1,7 @@
 import { window as browserWindow } from "@rbx/core-lib/browser";
 import { UrlSearchParams } from "@rbx/core-lib/url";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
+import { SessionInfoType } from "@rbx/discovery-common/telemetry";
 import {
   ActionType,
   SduiErrorName,
@@ -11,8 +12,10 @@ import {
 
 const OPEN_SEARCH_RESULTS_TAB_ACTION_TYPE = actionTypeName(ActionType.OPEN_SEARCH_RESULTS_TAB);
 
+const GAMES_SEARCH_TYPE = "Games";
+
 const SEARCH_RESULTS_TAB_PATHS: Record<string, string> = {
-  Games: "/discover/",
+  [GAMES_SEARCH_TYPE]: "/discover/",
   Marketplace: "/catalog/",
   Players: "/search/users",
 };
@@ -32,6 +35,7 @@ export function openSearchResultsTabResolveHref(
   _analyticsContext?: AnalyticsContext,
 ): string | undefined {
   const { searchType } = actionParams;
+  const { sessionStore } = ctx;
   const path = typeof searchType === "string" ? SEARCH_RESULTS_TAB_PATHS[searchType] : undefined;
   if (path === undefined) {
     ctx.errorReporter.reportSduiError(
@@ -43,5 +47,17 @@ export function openSearchResultsTabResolveHref(
     return undefined;
   }
 
-  return getAbsoluteUrl(`${path}?keyword=${encodeURIComponent(readCurrentKeyword())}`);
+  const keyword = encodeURIComponent(readCurrentKeyword());
+  // Carry the Top Results search session so impressions and plays on that page
+  // stay in the same search session even when opening in a new tab/window.
+  const omniSearchSessionId =
+    searchType === GAMES_SEARCH_TYPE
+      ? sessionStore.get(SessionInfoType.OmniSearchSessionInfo)
+      : undefined;
+  const sessionQuery =
+    omniSearchSessionId === undefined
+      ? ""
+      : `&${SessionInfoType.OmniSearchSessionInfo}=${encodeURIComponent(omniSearchSessionId)}`;
+
+  return getAbsoluteUrl(`${path}?keyword=${keyword}${sessionQuery}`);
 }

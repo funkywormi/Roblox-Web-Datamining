@@ -4,7 +4,8 @@ import { Menu, MenuItem, MenuSection } from "@rbx/foundation-ui";
 
 import links from "../constants/linkConstants";
 import layoutConstants from "../constants/layoutConstants";
-import { getNavCapability } from "../util/navCapabilities";
+import { getNavCapability, useNavCapability } from "../util/navCapabilities";
+import { useNavHref } from "../util/navHref";
 
 const { settingsUrl, quickLoginUrl } = links;
 const { quickLogin, settings, logout, switchAccountKey } = layoutConstants.menuKeys;
@@ -22,6 +23,7 @@ export default function SettingsMenu({
 }: Props) {
   const tFeatures = useTranslations("CommonUI.Features");
   const tAlerts = useTranslations("Common.AlertsAndOptions");
+  const toNavHref = useNavHref();
   const translateSetting = (
     namespace: "CommonUI.Features" | "Common.AlertsAndOptions",
     label: string,
@@ -32,7 +34,7 @@ export default function SettingsMenu({
     return tAlerts.has(label) ? tAlerts(label) : "";
   };
   const useIsAccountSwitcherAvailableForBrowser =
-    getNavCapability("useIsAccountSwitcherAvailableForBrowser") ?? useNoAccountSwitcher;
+    useNavCapability("useIsAccountSwitcherAvailableForBrowser") ?? useNoAccountSwitcher;
   const [isAccountSwitchingEnabledForBrowser] = useIsAccountSwitcherAvailableForBrowser();
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -81,7 +83,7 @@ export default function SettingsMenu({
               key={urlKey}
               value={urlKey}
               as="a"
-              href={urlKey === quickLogin ? quickLoginUrl : url}
+              href={toNavHref(urlKey === quickLogin ? quickLoginUrl : url)}
               title={title}
               trailing={trailing}
             />

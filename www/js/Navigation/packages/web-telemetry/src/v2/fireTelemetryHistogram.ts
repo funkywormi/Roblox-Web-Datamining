@@ -41,14 +41,25 @@ type Accumulator = {
   bucketCounts: Map<number, number>;
 };
 
-const flushCallbacks: (() => void)[] = [];
+const flushCallbacks: ((forceSync: boolean) => void)[] = [];
 let listenersInstalled = false;
 let isTearingDown = false;
 
-function flushAll(): void {
+function flushAll(forceSync = false): void {
   for (const cb of flushCallbacks) {
-    cb();
+    cb(forceSync);
   }
+}
+
+/**
+ * Sends every histogram's pending observations now, over the unload-safe sync
+ * path. Call after recording values from a page-hide handler: the built-in
+ * visibilitychange flush may have already run, the interval timer won't fire
+ * once the page unloads, and `pagehide` can fire while the page still reports
+ * visible.
+ */
+export function flushTelemetryHistograms(): void {
+  flushAll(true);
 }
 
 function installLifecycleListeners(): void {
@@ -133,7 +144,7 @@ export function createFireTelemetryHistogram(
     return { bucketIndices, countsInBuckets };
   }
 
-  function flush(): void {
+  function flush(forceSync = false): void {
     if (accumulators.size === 0) {
       return;
     }
@@ -158,7 +169,9 @@ export function createFireTelemetryHistogram(
     const version = BigInt(1);
     const uuid = newBatchUuid();
     const useSync =
-      isTearingDown || (typeof document !== "undefined" && document.visibilityState === "hidden");
+      forceSync ||
+      isTearingDown ||
+      (typeof document !== "undefined" && document.visibilityState === "hidden");
     if (useSync) {
       sendHistogramBatchSync(histograms, nowMs, version, uuid);
     } else {

@@ -38,7 +38,7 @@
     "Description.EnterEmail": "Enter your email to recover your Roblox account",
     "Description.EnterPhoneNumber": "Enter your phone number to recover your Roblox account",
     "Description.EmailCodeSent": "If a Roblox account exists for this email, you'll receive a verification code. Check all your folders, including spam.",
-    "Heading.RobloxAccountRecovery": "Roblox Account Recovery",
+    "Heading.RobloxAccountRecovery": "Roblox account recovery",
     "Label.UsernameEmailPhone": "Username/Email/Phone",
     "Label.EnterYourUsernameEmailPhone": "Enter your username, email, or phone number",
     "Message.Error.AccountNotFound": "Account not found.",
@@ -59,7 +59,7 @@
     "Label.AddEmail": "Add an email",
     "Action.UpdatePassword": "Update password",
     "Message.Error.TooManyRequests": "Too many requests made. Try again later.",
-    "Description.EnterContactMethodAssociatedWithYourAccount": "Enter an email or phone number that may be associated with your account. If you made a purchase before, you can try your billing email.",
+    "Description.EnterContactMethodAssociatedWithYourAccount": "Enter any email or phone number associated with your account. Try your billing email if you've made a purchase.",
     "Action.Ok": "Ok",
     "Description.CreateNewPasswordAddEmail": "Create a new password and add an email to help protect your account in the future.",
     "Description.ChooseAccount": "Choose the account you want to recover.",
@@ -164,5 +164,6 @@
     "Description.NoChangesMadeWeb": "Keep your account secure by adding an extra layer of protection.",
     "Action.AddProtection": "Add protection",
     "Response.PasswordLowComplexity": "Password must contain at least one letter and at least one number or symbol.",
-    "Response.PasswordTooSimilarToUsername": "Password shouldn't be too similar to your username."
+    "Response.PasswordTooSimilarToUsername": "Password shouldn't be too similar to your username.",
+    "Label.ContactMethodHint": "Hint: {hint}"
 }

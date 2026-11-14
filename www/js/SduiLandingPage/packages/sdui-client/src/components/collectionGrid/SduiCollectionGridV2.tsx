@@ -3,17 +3,19 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { window as browserWindow } from "@rbx/core-lib/browser";
 import {
+  capCollectionItemConfigs,
+  gridMeasurementChanged,
   resolveCollectionColumnCount,
   resolveCollectionColumnGap,
+  resolveGridRowHeightFromItemWidth,
+  toPositiveGridMeasurement,
   type PoolItemPlacementMetadata,
-  type PoolSectionLayoutMetadata,
   type SduiComponentConfig,
   type SduiDim,
   type SduiManagedChildList,
 } from "@rbx/sdui-core";
+import { useIsomorphicLayoutEffect, useMeasuredGridWidth } from "@rbx/sdui-core/client";
 
-const MEASUREMENT_EPSILON_PX = 0.5;
-const MAX_IGNORED_GRID_WIDTH_CHANGE_PX = 20;
 const STANDARD_COLLECTION_ITEM_SIZE = "Small";
 
 export interface SduiCollectionGridV2Props {
@@ -33,78 +35,9 @@ export interface SduiCollectionGridV2Props {
   onItemsPerRowChange: (itemsPerRow: number) => void;
 }
 
-function positiveFiniteMeasurement(value: number): number | undefined {
-  return Number.isFinite(value) && value > 0 ? value : undefined;
-}
-
-function measurementChanged(previous: number | undefined, next: number | undefined): boolean {
-  if (previous === undefined || next === undefined) return previous !== next;
-  return Math.abs(previous - next) > MEASUREMENT_EPSILON_PX;
-}
-
 export interface GridItemHeight {
   naturalHeight: number;
   rowSpan: number;
-}
-
-export function nextGridHeightBasisWidth(
-  previousWidth: number | undefined,
-  nextWidth: number | undefined,
-): number | undefined {
-  if (nextWidth === undefined) return previousWidth;
-  if (
-    previousWidth === undefined ||
-    Math.abs(previousWidth - nextWidth) > MAX_IGNORED_GRID_WIDTH_CHANGE_PX
-  ) {
-    return nextWidth;
-  }
-  return previousWidth;
-}
-
-export function resolveGridRowHeightFromItemWidth(
-  basisWidth: number,
-  columnCount: number,
-  gap: number,
-  itemHeightFromWidth: SduiDim,
-): number | undefined {
-  if (
-    !Number.isFinite(basisWidth) ||
-    basisWidth <= 0 ||
-    !Number.isFinite(columnCount) ||
-    columnCount <= 0 ||
-    !Number.isFinite(gap) ||
-    !Number.isFinite(itemHeightFromWidth.scale) ||
-    !Number.isFinite(itemHeightFromWidth.offset)
-  ) {
-    return undefined;
-  }
-
-  const cellWidth = (basisWidth - gap * (columnCount - 1)) / columnCount;
-  const rowHeight = cellWidth * itemHeightFromWidth.scale + itemHeightFromWidth.offset;
-  if (!Number.isFinite(rowHeight) || rowHeight <= 0) return undefined;
-  return rowHeight;
-}
-
-export function capCollectionItemConfigs(
-  configs: SduiComponentConfig[],
-  columnCount: number,
-  maxNumRows: number | undefined,
-  poolLayout?: PoolSectionLayoutMetadata,
-): SduiComponentConfig[] {
-  if (maxNumRows === undefined || maxNumRows <= 0 || columnCount <= 0) {
-    return configs;
-  }
-
-  if (!poolLayout) {
-    const maximumItems = columnCount * maxNumRows;
-    return configs.length <= maximumItems ? configs : configs.slice(0, maximumItems);
-  }
-
-  const visibleConfigs = configs.filter(config => {
-    const cellIndex = config.poolPlacement?.cellIndex;
-    return cellIndex !== undefined && Math.floor(cellIndex / columnCount) < maxNumRows;
-  });
-  return visibleConfigs.length === configs.length ? configs : visibleConfigs;
 }
 
 export function resolveGridRowHeight(
@@ -183,12 +116,10 @@ export function SduiCollectionGridV2({
 }: SduiCollectionGridV2Props): React.JSX.Element {
   const poolLayout = items?.poolLayout;
   const isPooled = poolLayout !== undefined;
-  const [containerWidth, setContainerWidth] = useState<number | undefined>(undefined);
-  const [heightBasisWidth, setHeightBasisWidth] = useState<number | undefined>(undefined);
+  const { gridWidth: containerWidth, heightBasisWidth } = useMeasuredGridWidth(itemsContainerRef);
   const [measurementVersion, setMeasurementVersion] = useState(0);
   const [rowHeight, setRowHeight] = useState<number | undefined>(undefined);
   const itemMeasurementElements = useRef(new Map<number, HTMLDivElement>());
-  const lastPositiveGridWidth = useRef<number | undefined>(undefined);
   const lastMeasuredItemHeights = useRef(new Map<number, number>());
   const columnCount =
     poolLayout?.columnCount ?? resolveCollectionColumnCount(collectionItemSize, containerWidth);
@@ -207,42 +138,22 @@ export function SduiCollectionGridV2({
     ? resolveGridRowHeightFromItemWidth(heightBasisWidth, columnCount, gap, itemHeightFromWidth)
     : undefined;
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     onItemsPerRowChange(columnCount);
   }, [columnCount, onItemsPerRowChange]);
 
   useEffect(() => {
-    const gridElement = itemsContainerRef.current;
-    if (!gridElement) return undefined;
-
-    const updateGridWidth = (width: number): boolean => {
-      const nextWidth = positiveFiniteMeasurement(width);
-      if (!measurementChanged(lastPositiveGridWidth.current, nextWidth)) return false;
-      lastPositiveGridWidth.current = nextWidth;
-      setContainerWidth(nextWidth);
-      setHeightBasisWidth(previousWidth => nextGridHeightBasisWidth(previousWidth, nextWidth));
-      if (!isItemHeightFromWidthApplied) setRowHeight(undefined);
-      return true;
-    };
-    updateGridWidth(gridElement.getBoundingClientRect().width);
-
     const ResizeObserverConstructor = browserWindow?.ResizeObserver;
-    if (!ResizeObserverConstructor) return undefined;
+    if (!isPooled || isItemHeightFromWidthApplied || !ResizeObserverConstructor) return undefined;
 
     const resizeObserver = new ResizeObserverConstructor(entries => {
       let itemHeightChanged = false;
       for (const entry of entries) {
-        if (entry.target === gridElement) {
-          updateGridWidth(entry.contentRect.width);
-          continue;
-        }
-        if (!isPooled || isItemHeightFromWidthApplied) continue;
-
         for (const [index, measurementElement] of itemMeasurementElements.current) {
           if (entry.target !== measurementElement) continue;
-          const nextHeight = positiveFiniteMeasurement(entry.contentRect.height);
+          const nextHeight = toPositiveGridMeasurement(entry.contentRect.height);
           const previousHeight = lastMeasuredItemHeights.current.get(index);
-          if (measurementChanged(previousHeight, nextHeight)) {
+          if (gridMeasurementChanged(previousHeight, nextHeight)) {
             if (nextHeight === undefined) {
               lastMeasuredItemHeights.current.delete(index);
             } else {
@@ -255,16 +166,13 @@ export function SduiCollectionGridV2({
       }
       if (itemHeightChanged) setMeasurementVersion(version => version + 1);
     });
-    resizeObserver.observe(gridElement);
-    if (isPooled && !isItemHeightFromWidthApplied) {
-      for (const measurementElement of itemMeasurementElements.current.values()) {
-        resizeObserver.observe(measurementElement);
-      }
+    for (const measurementElement of itemMeasurementElements.current.values()) {
+      resizeObserver.observe(measurementElement);
     }
     return () => {
       resizeObserver.disconnect();
     };
-  }, [isItemHeightFromWidthApplied, isPooled, itemsContainerRef, visibleItemConfigs]);
+  }, [isItemHeightFromWidthApplied, isPooled, visibleItemConfigs]);
 
   useEffect(() => {
     if (!isPooled || isItemHeightFromWidthApplied) {

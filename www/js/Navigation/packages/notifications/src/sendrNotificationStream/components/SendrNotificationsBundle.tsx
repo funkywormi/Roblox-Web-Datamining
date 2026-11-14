@@ -8,6 +8,7 @@ import SendrNotification from "./SendrNotification";
 import { useNotificationLocalization } from "../context/NotificationsLocalization";
 import { sendEventStreamEvent } from "../services/NotificationStreamService";
 import eventConstants from "../constants/eventConstants";
+import type { JSX } from "react";
 
 export const SendrNotificationsBundle = ({
   notificationsBundle,

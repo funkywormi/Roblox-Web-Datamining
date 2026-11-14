@@ -21,7 +21,7 @@ export type BenefitItemProps = {
 };
 
 export const BenefitItem: FC<BenefitItemProps> = ({ iconName, label }) => (
-  <div className="gap-x-medium align-items-center flex flex-row">
+  <div className="gap-x-medium items-center flex flex-row">
     <Icon name={iconName} size="Large" />
     <span className="[font-size:var(--font-size-350)]">{label}</span>
   </div>

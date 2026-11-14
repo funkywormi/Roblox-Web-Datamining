@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { httpService } from "core-utilities";
 import {
   StreamNotification,
   StreamNotificationPage,
   getRecentUrlConfig,
   PAGE_SIZE,
 } from "./notificationStreamApi";
-import { reportNotificationStreamError } from "./notificationStreamObservability";
+import { useReportQueryError } from "./useReportQueryError";
+import { streamGet } from "./streamTransport";
 import { sendBundleCreated, sendNotificationRetrieved } from "./notificationStreamEvents";
+import { hashStringWithSha256 } from "@rbx/core-scripts/auth/crypto";
 
 export const GET_RECENT_QUERY_KEY = ["notification-stream-get-recent"];
 
@@ -19,7 +20,10 @@ const byEventDateDesc = (a: StreamNotification, b: StreamNotification): number =
 // (the React port of the Angular controller's buildNotificationsList/createSendrBundle).
 // The bundle takes the position/id of its newest member; the card router renders a
 // collapsible SendrNotificationsBundle when it holds more than one notification.
-export const groupSendrBundles = (items: StreamNotification[]): StreamNotification[] => {
+export const groupSendrBundles = (
+  items: StreamNotification[],
+  bundleIds: Record<string, string> = {},
+): StreamNotification[] => {
   const bundleByKey = new Map<string, StreamNotification>();
   const rows: StreamNotification[] = [];
   items.forEach(notification => {
@@ -36,7 +40,7 @@ export const groupSendrBundles = (items: StreamNotification[]): StreamNotificati
         notificationSourceType: "SendrBundle",
         eventDate: notification.eventDate,
         bundleKey,
-        bundleId: notification.id,
+        bundleId: bundleIds[bundleKey] ?? notification.id,
         notifications: [],
       };
       bundleByKey.set(bundleKey, bundle);
@@ -50,19 +54,33 @@ export const groupSendrBundles = (items: StreamNotification[]): StreamNotificati
 const isGameUpdate = (notification: StreamNotification): boolean =>
   notification.notificationSourceType === "GameUpdate";
 
-const sendPageBundles = (notifications: StreamNotification[]): void => {
-  groupSendrBundles(notifications.filter(n => !isGameUpdate(n))).forEach(row => {
-    if (row.notificationSourceType !== "SendrBundle") {
-      return;
-    }
-    const members = row.notifications ?? [];
-    sendBundleCreated(
-      row.bundleKey ?? "",
-      row.bundleId ?? row.id,
-      members.map(member => member.id),
-      members[0]?.content?.clientEventsPayload as Record<string, string> | undefined,
-    );
-  });
+const sendPageBundles = async (
+  notifications: StreamNotification[],
+): Promise<Record<string, string>> => {
+  const bundleIds: Record<string, string> = {};
+  await Promise.all(
+    groupSendrBundles(notifications.filter(n => !isGameUpdate(n))).map(async row => {
+      if (row.notificationSourceType !== "SendrBundle" || row.bundleKey == null) {
+        return;
+      }
+      const members = row.notifications ?? [];
+      const memberIds = members.map(member => member.id);
+      const bundleId = await hashStringWithSha256(
+        `${JSON.stringify(memberIds)}${Date.now()}`,
+      ).catch(() => null);
+      if (bundleId == null) {
+        return;
+      }
+      bundleIds[row.bundleKey] = bundleId;
+      sendBundleCreated(
+        row.bundleKey,
+        bundleId,
+        memberIds,
+        members[0]?.content?.clientEventsPayload as Record<string, string> | undefined,
+      );
+    }),
+  );
+  return bundleIds;
 };
 
 const registerRetrieved = (notifications: StreamNotification[]): StreamNotification[] => {
@@ -82,10 +100,10 @@ const rowCountPage = (
 };
 
 const fetchPage = (startIndex: number): Promise<StreamNotificationPage> =>
-  httpService.get<StreamNotification[]>(getRecentUrlConfig(startIndex)).then(({ data }) => {
+  streamGet<StreamNotification[]>(getRecentUrlConfig(startIndex)).then(async data => {
     const notifications = registerRetrieved(data ?? []);
-    sendPageBundles(notifications);
-    return rowCountPage(startIndex, notifications);
+    const bundleIds = await sendPageBundles(notifications);
+    return { ...rowCountPage(startIndex, notifications), bundleIds };
   });
 
 export const useGetRecentNotifications = (): ReturnType<
@@ -101,8 +119,8 @@ export const useGetRecentNotifications = (): ReturnType<
     queryFn: ({ pageParam = 0 }) => fetchPage(pageParam as number),
     getNextPageParam: lastPage => lastPage.nextStartIndex ?? undefined,
     staleTime: Infinity,
-    onError: error => reportNotificationStreamError("getRecent", error),
   });
+  useReportQueryError("getRecent", query.error, query.errorUpdatedAt);
 
   const { hasNextPage, fetchNextPage } = query;
   const pageCount = query.data?.pages.length ?? 0;
@@ -117,14 +135,14 @@ export const useGetRecentNotifications = (): ReturnType<
   // The shell unmounts on close, so each open starts again from window 0.
   useEffect(
     () => () => {
-      queryClient.removeQueries(GET_RECENT_QUERY_KEY);
+      queryClient.removeQueries({ queryKey: GET_RECENT_QUERY_KEY });
     },
     [queryClient],
   );
 
   const reload = useCallback(() => {
     prefetchedRef.current = false;
-    return queryClient.resetQueries(GET_RECENT_QUERY_KEY);
+    return queryClient.resetQueries({ queryKey: GET_RECENT_QUERY_KEY });
   }, [queryClient]);
 
   const pages = query.data?.pages ?? [];
@@ -135,7 +153,10 @@ export const useGetRecentNotifications = (): ReturnType<
   // notificationStreamController.js buildNotificationsList bundles each fetched page on its own.
   const notifications = pages
     .flatMap(page =>
-      groupSendrBundles(page.notifications.filter(n => !isGameUpdate(n)).sort(byEventDateDesc)),
+      groupSendrBundles(
+        page.notifications.filter(n => !isGameUpdate(n)).sort(byEventDateDesc),
+        page.bundleIds,
+      ),
     )
     .sort(byEventDateDesc);
 

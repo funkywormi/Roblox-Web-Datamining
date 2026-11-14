@@ -16,6 +16,7 @@ import isVisualItemAbuseReport from "../../utils/isVisualItemAbuseReport";
 import { formatText } from "../../utils/labelUtils";
 import { openNotificationStreamAbuseReport } from "../../utils/notificationStreamWindowHost";
 import eventConstants from "../../constants/eventConstants";
+import type { JSX } from "react";
 
 const buttonStyleClass: Record<ButtonStyle, string> = {
   [ButtonStyle.Primary]: "sendr-notification-button--primary",
@@ -29,6 +30,7 @@ export const FoundationNotificationTemplate = ({
   eventTime,
   handleActions,
   handleEventStreamClickEvent,
+  toggleMetaActions,
   isReadOnly,
   notificationData,
 }: NotificationTemplateProps): JSX.Element => {
@@ -52,11 +54,20 @@ export const FoundationNotificationTemplate = ({
         eventConstants.ReportNotificationOpen,
         action.visualItemType,
         action.clientEventsPayload,
-        action.visualItemName,
+        undefined,
         notificationData.bundleIndex,
         notificationData.bundleId,
       );
-      openNotificationStreamAbuseReport(notificationData);
+      openNotificationStreamAbuseReport({
+        displayState: {
+          currentState,
+          eventTime,
+          handleActions,
+          handleEventStreamClickEvent,
+          toggleMetaActions,
+        },
+        notificationData,
+      });
     } else if (handleActions) {
       handleActions(action);
     }
@@ -66,6 +77,25 @@ export const FoundationNotificationTemplate = ({
     <FoundationSendrKebab
       actions={metaActions}
       onSelect={onMetaSelect}
+      onOpen={() =>
+        handleEventStreamClickEvent(
+          eventConstants.OpenMetaActionsEvent,
+          VisualItemType.MetaActionsButton,
+          undefined,
+          undefined,
+          notificationData?.bundleIndex,
+        )
+      }
+      onDismiss={() =>
+        handleEventStreamClickEvent(
+          eventConstants.CloseMetaActionsEvent,
+          VisualItemType.MetaActionsButton,
+          undefined,
+          undefined,
+          notificationData?.bundleIndex,
+          notificationData?.bundleId,
+        )
+      }
       ariaLabel="Notification options"
     />
   ) : null;
@@ -90,7 +120,7 @@ export const FoundationNotificationTemplate = ({
   return (
     <Notification
       className="notification-card-tight"
-      style={{ textAlign: "left", cursor: cardClickable ? "pointer" : undefined }}
+      style={{ textAlign: "start", cursor: cardClickable ? "pointer" : undefined }}
       media={thumbnailItem ? <FoundationSendrMedia thumbnailItem={thumbnailItem} /> : undefined}
       title={
         textBody?.title ? <React.Fragment>{formatText(textBody.title)}</React.Fragment> : undefined

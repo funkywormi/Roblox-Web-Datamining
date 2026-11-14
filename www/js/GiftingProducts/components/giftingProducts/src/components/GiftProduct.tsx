@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/react";
 import { PriceTag } from "@rbx/payments/priceTag";
-import { formatIntlNumber } from "@rbx/payments/utils";
+import { formatIntlNumber } from "../utils/format";
 import { translationConfig } from "../translation.config";
 import { Price } from "../constants/TypeDefinitions";
 import { translations } from "../constants/Constants";

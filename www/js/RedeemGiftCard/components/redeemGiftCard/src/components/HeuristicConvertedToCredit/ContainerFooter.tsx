@@ -10,7 +10,7 @@ import {
   getCreditBucket,
   redeemFunnelMetadata,
 } from "@rbx/payments/creditCheckout";
-import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import GetPlusModal from "./GetPlusModal";
 
 type TContainerFooterProps = {
@@ -71,17 +71,17 @@ function ContainerFooter({
   const handleGetPlusClick = useCallback(() => {
     const creditBucket = getCreditBucket(creditBalance);
     trackCounter("GetPlus_EntryClicked", { creditBucket, currencyCode });
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-      true,
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_FOOTER,
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-      paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.GET_PLUS_CLICKED,
-      redeemFunnelMetadata({
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+      isMidPurchaseStep: true,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_FOOTER,
+      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+      viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.GET_PLUS_CLICKED,
+      eventMetadata: redeemFunnelMetadata({
         availableCreditBalance: String(creditBalance),
         currencyCode,
       }),
-    );
+    });
     setIsGetPlusModalOpen(true);
   }, [creditBalance, currencyCode]);
 
@@ -97,18 +97,18 @@ function ContainerFooter({
     }
     const creditBucket = getCreditBucket(creditBalance);
     trackCounter("GetPlus_AutoOpened", { creditBucket, currencyCode });
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-      true,
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_GET_PLUS_MODAL,
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
-      undefined,
-      redeemFunnelMetadata({
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+      isMidPurchaseStep: true,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_GET_PLUS_MODAL,
+      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
+      viewMessage: undefined,
+      eventMetadata: redeemFunnelMetadata({
         availableCreditBalance: String(creditBalance),
         currencyCode,
         source: "giftCard",
       }),
-    );
+    });
     setIsGetPlusModalOpen(true);
     onGetPlusModalAutoOpened?.();
   }, [
@@ -130,18 +130,18 @@ function ContainerFooter({
       creditBucket,
       currencyCode,
     });
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-      true,
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_FOOTER,
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-      paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.GET_ROBUX_CLICKED,
-      redeemFunnelMetadata({
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+      isMidPurchaseStep: true,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_FOOTER,
+      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+      viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.GET_ROBUX_CLICKED,
+      eventMetadata: redeemFunnelMetadata({
         availableCreditBalance: String(creditBalance),
         currencyCode,
         buttonType,
       }),
-    );
+    });
     if (isConvertAllFlowEnabled) {
       creditConvertAllModalService.open();
     } else {
@@ -179,20 +179,20 @@ function ContainerFooter({
     }
     paymentFlowImpressionTrackedRef.current = true;
     const convertVisible = convertedRobuxAmount > 0;
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-      true,
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_FOOTER,
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
-      undefined,
-      redeemFunnelMetadata({
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+      isMidPurchaseStep: true,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_FOOTER,
+      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
+      viewMessage: undefined,
+      eventMetadata: redeemFunnelMetadata({
         availableCreditBalance: String(creditBalance),
         currencyCode,
         getPlusVisible: String(!convertVisible && showGetPlus),
         getRobuxVisible: String(!convertVisible),
         convertVisible: String(convertVisible),
       }),
-    );
+    });
   }, [isLoadingPlusProducts, convertedRobuxAmount, showGetPlus, creditBalance, currencyCode]);
 
   // If credit balance > 0 => we render footer
@@ -202,7 +202,7 @@ function ContainerFooter({
   const showConvertCreditToRobuxButtonOnly = convertedRobuxAmount > 0;
 
   return (
-    <div className="hcc-container-footer convert-text d-flex justify-content-between">
+    <div className="hcc-container-footer convert-text flex justify-between">
       {showConvertCreditToRobuxButtonOnly ? (
         <Button
           {...buttonInitProps}

@@ -1,6 +1,6 @@
-import { EnvironmentUrls } from "Roblox";
+import environmentUrls from "@rbx/environment-urls";
 
-const apiGwUrl = EnvironmentUrls.apiGatewayUrl || "https://apis.roblox.com";
+const apiGwUrl = environmentUrls.apiGatewayUrl || "https://apis.roblox.com";
 
 export default {
   safetyEvent: {

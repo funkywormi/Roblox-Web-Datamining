@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ValueOf } from "@rbx/core-lib";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { getCurrentUser, userIdToNumber } from "@rbx/www-common/user";
@@ -6,6 +6,7 @@ import layoutConstants from "../constants/layoutConstants";
 import RobuxBadgeType from "../constants/robuxBadgeConstants";
 import { getNavCapability } from "../util/navCapabilities";
 import { shouldShowRobuxUpdateBadge } from "../util/robuxBadgeUtil";
+import { useNavServerHints } from "../util/navServerHints";
 
 const isForbidden = (error: unknown) => {
   if (error == null || typeof error !== "object") {
@@ -19,6 +20,7 @@ export default function useRobuxBalance() {
   const tMessages = useTranslations("CommonUI.Messages");
   const user = getCurrentUser();
   const userId = user == null ? undefined : userIdToNumber(user.id);
+  const { robuxStream } = useNavServerHints();
   const [isGetCurrencyCallDone, setGetCurrencyCallDone] = useState(false);
   const [robuxAmount, setRobuxAmount] = useState(0);
   const [robuxBadgeType, setRobuxBadgeType] = useState<ValueOf<typeof RobuxBadgeType> | null>(null);
@@ -31,11 +33,15 @@ export default function useRobuxBalance() {
   const [creditError, setCreditError] = useState("");
   // wait for experiment to load before loading Robux wallet icons
   const [isExperimentCallDone, setIsExperimentCallDone] = useState(false);
+  const hasFetchedCurrencyRef = useRef(false);
 
   const getUserCurrencyLocal = () => {
     const getUserCurrency = getNavCapability("getUserCurrency");
     if (userId != null && getUserCurrency != null) {
-      setGetCurrencyCallDone(false);
+      hasFetchedCurrencyRef.current = true;
+      if (robuxStream == null) {
+        setGetCurrencyCallDone(false);
+      }
       getUserCurrency(userId)
         .then(
           usercurrencyData => {
@@ -124,7 +130,28 @@ export default function useRobuxBalance() {
 
   useEffect(() => {
     if (user != null) {
-      getUserCurrencyLocal();
+      if (robuxStream == null) {
+        getUserCurrencyLocal();
+      } else {
+        robuxStream.then(
+          serverRobux => {
+            if (hasFetchedCurrencyRef.current) {
+              return;
+            }
+            if (serverRobux == null) {
+              getUserCurrencyLocal();
+            } else {
+              setRobuxAmount(serverRobux);
+              setGetCurrencyCallDone(true);
+            }
+          },
+          () => {
+            if (!hasFetchedCurrencyRef.current) {
+              getUserCurrencyLocal();
+            }
+          },
+        );
+      }
       getRobuxBadgeLocal();
       getCreditBalanceLocal();
     }

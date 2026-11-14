@@ -345,10 +345,7 @@ const createCreditConvertAllModal = (): [
               </div>
             </span>
           </div>,
-          <div
-            key="available-credit"
-            className="available-credit d-flex justify-content-between row-pad"
-          >
+          <div key="available-credit" className="available-credit flex justify-between row-pad">
             <span className="bold">{translate("Label.AvailableCredit") || "Available Credit"}</span>
             <PriceTag amount={creditBalance} currencyCode={currencyCode} />
           </div>,
@@ -365,7 +362,7 @@ const createCreditConvertAllModal = (): [
               />
               <div
                 key="convertible-credit"
-                className="convertible-credit d-flex justify-content-between row-pad"
+                className="convertible-credit flex justify-between row-pad"
               >
                 <span className="bold">
                   {translate(TRANSLATION_KEYS.ConvertibleCredit) || "Convertible Credit"}
@@ -378,10 +375,7 @@ const createCreditConvertAllModal = (): [
             </React.Fragment>
           ),
           <div key="divider" className="rbx-divider" />,
-          <div
-            key="remaining-balance"
-            className="remaining-balance d-flex justify-content-between row-pad"
-          >
+          <div key="remaining-balance" className="remaining-balance flex justify-between row-pad">
             <span className="bold">
               {translate(TRANSLATION_KEYS.RemainingBalance) || "Remaining balance"}
             </span>
@@ -402,7 +396,7 @@ const createCreditConvertAllModal = (): [
           ),
           <div
             key="modal-footer-buttons"
-            className="modal-footer-buttons d-flex justify-content-between mt-4"
+            className="modal-footer-buttons flex justify-between mt-4"
           >
             {isPurchaseLoading ? (
               <button

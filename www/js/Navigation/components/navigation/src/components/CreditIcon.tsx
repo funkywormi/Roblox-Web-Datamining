@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { PriceTag } from "@rbx/payments/priceTag";
-import "@rbx/payments/src/priceTag/priceTag.css";
+// Keep legacy payment pages styled while they still rely on Navigation's CSS.
+import "@rbx/price-tag/legacy.css";
 import layoutConstants from "../constants/layoutConstants";
 import NavIcon from "./NavIcon";
 

@@ -1,13 +1,15 @@
 import { RefObject, useCallback, useEffect, useRef } from "react";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
+import { authenticatedUser } from "@rbx/core-scripts/meta/user";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { Popover as FoundationPopover, PopoverContent, PopoverTrigger } from "@rbx/foundation-ui";
-import { useUnreadNotificationCount } from "../hooks/useUnreadNotificationCount";
+import { useUnreadNotificationCountState } from "../hooks/useUnreadNotificationCount";
 import { useClearUnreadOnOpen } from "../hooks/useClearUnreadOnOpen";
 import ReactNotificationBell from "./ReactNotificationBell";
 import events from "../constants/notificationsEventStreamConstants";
-import { getNavCapability } from "../util/navCapabilities";
+import { useNavCapability } from "../util/navCapabilities";
 import { popoverDismissGuard } from "../util/popoverDismissGuard";
 import { trackOpenToVisible } from "../topNav/observability";
 
@@ -18,25 +20,15 @@ export default function NotificationStreamPopover({
 }) {
   const t = useTranslations("CommonUI.Features");
 
-  const unreadCount = useUnreadNotificationCount();
-  const isReactBell = getNavCapability("getIsReactNotificationBellEnabled")?.() ?? true;
-  const isReactStream = getNavCapability("getIsReactNotificationStreamEnabled")?.() ?? true;
-  const AngularBell = getNavCapability("NotificationStreamIcon");
-  const StreamContent = getNavCapability(
-    isReactStream ? "NotificationStreamShell" : "NotificationStreamBase",
-  );
+  const { unreadCount, ctaFetchedAt } = useUnreadNotificationCountState();
+  const StreamContent = useNavCapability("NotificationStreamShell");
 
-  // Flag-on only: React owns clear-unread-on-open, since the Angular indicator
-  // directive that used to do it isn't bootstrapped when the React bell renders.
-  const handleReactBellStreamOpen = useClearUnreadOnOpen(unreadCount);
+  const clearUnreadOnOpen = useClearUnreadOnOpen(unreadCount);
 
-  // The stream fires this on a reload, as notificationStreamIndicatorDirective.js expects.
-  const clearUnreadRef = useRef(handleReactBellStreamOpen);
-  clearUnreadRef.current = handleReactBellStreamOpen;
+  // The stream shell fires this when its new-notifications banner reloads the list.
+  const clearUnreadRef = useRef(clearUnreadOnOpen);
+  clearUnreadRef.current = clearUnreadOnOpen;
   useEffect(() => {
-    if (!isReactBell) {
-      return undefined;
-    }
     const onClearUnread = () => clearUnreadRef.current();
     document.addEventListener("Roblox.NotificationStream.ClearUnreadNotifications", onClearUnread);
     return () =>
@@ -44,19 +36,20 @@ export default function NotificationStreamPopover({
         "Roblox.NotificationStream.ClearUnreadNotifications",
         onClearUnread,
       );
-  }, [isReactBell]);
+  }, []);
 
   const handleStreamOpen = useCallback(() => {
     trackOpenToVisible("Notifications");
-    getNavCapability("logNotificationStreamExposure")?.();
     sendEventWithTarget(events.openContent.name, events.openContent.context, {
+      userId: authenticatedUser()?.id,
+      inApp: getDeviceMeta()?.isInApp ?? false,
       countOfUnreadNotification: unreadCount,
       sendrVersion: 0,
     });
-    if (isReactBell && StreamContent != null) {
-      handleReactBellStreamOpen();
+    if (StreamContent != null) {
+      clearUnreadOnOpen();
     }
-  }, [isReactBell, StreamContent, handleReactBellStreamOpen, unreadCount]);
+  }, [StreamContent, clearUnreadOnOpen, unreadCount]);
 
   const formattedCount = formatNumber(unreadCount);
   const ariaLabel =
@@ -84,11 +77,7 @@ export default function NotificationStreamPopover({
       aria-label={ariaLabel}
       aria-haspopup="true"
     >
-      {isReactBell ? (
-        <ReactNotificationBell unreadCount={unreadCount} />
-      ) : (
-        AngularBell && <AngularBell />
-      )}
+      <ReactNotificationBell unreadCount={unreadCount} countFetchedAt={ctaFetchedAt} />
     </button>
   );
 

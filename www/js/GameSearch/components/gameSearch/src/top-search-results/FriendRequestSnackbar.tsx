@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { TranslateFunction } from "@rbx/core-scripts/react";
 import {
-  type FriendRequestResult,
+  type FriendRequestFeedback,
   subscribeToFriendRequestResults,
 } from "@rbx/discovery-common/sdui";
 import { Snackbar } from "@rbx/foundation-ui";
@@ -10,9 +10,20 @@ type FriendRequestSnackbarProps = {
   translate: TranslateFunction;
 };
 
-type Feedback = {
+type Feedback = FriendRequestFeedback & {
   id: number;
-  result: FriendRequestResult;
+};
+
+const getFeedbackTitle = (translate: TranslateFunction, feedback: Feedback): string => {
+  if (feedback.type === "friend-request-accepted") {
+    return feedback.result === "success"
+      ? translate("Action.FriendAdded") || "Friend added."
+      : translate("NetworkingError.SomethingIsWrong") || "Unable to accept friend request.";
+  }
+  if (feedback.result === "success") {
+    return translate("Action.FriendRequestSent") || "Friend request sent.";
+  }
+  return translate("NetworkingError.SomethingIsWrong") || "Unable to send friend request.";
 };
 
 export const FriendRequestSnackbar = ({ translate }: FriendRequestSnackbarProps) => {
@@ -20,10 +31,10 @@ export const FriendRequestSnackbar = ({ translate }: FriendRequestSnackbarProps)
 
   useEffect(
     () =>
-      subscribeToFriendRequestResults(result => {
+      subscribeToFriendRequestResults(friendRequestFeedback => {
         setFeedback(previousFeedback => ({
+          ...friendRequestFeedback,
           id: (previousFeedback?.id ?? 0) + 1,
-          result,
         }));
       }),
     [],
@@ -34,9 +45,7 @@ export const FriendRequestSnackbar = ({ translate }: FriendRequestSnackbarProps)
   }
 
   const isSuccess = feedback.result === "success";
-  const title = isSuccess
-    ? translate("Action.FriendRequestSent") || "Friend request sent."
-    : translate("NetworkingError.SomethingIsWrong") || "Unable to send friend request.";
+  const title = getFeedbackTitle(translate, feedback);
   const closeIconAriaLabel = translate("Action.Close") || "Close";
 
   return (

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { observeIntersection } from "@rbx/core-lib/element-visibility";
+import { prefersReducedMotion, subscribeToReducedMotion } from "@rbx/sdui-common";
 import { VIEWPORT_AUTOPLAY_VISIBLE_RATIO } from "../consts/videoAutoplay";
-import { prefersReducedMotion, subscribeToReducedMotion } from "../utils/prefersReducedMotion";
 import {
   getViewportVideoAutoplayCoordinator,
   type ViewportAutoplayHandle,

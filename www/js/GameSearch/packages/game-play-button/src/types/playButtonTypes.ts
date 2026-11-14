@@ -194,3 +194,18 @@ export type TFiatPreparePurchaseCheckoutUrl = {
 export type TAppsFlyerReferralProperties = Record<string, string | number>;
 
 export type TPlayButtonActionTypes = "DemoPlayButtonClick" | "PlayOnWebButtonClick";
+
+/**
+ * Which Play on Web treatment to show.
+ *
+ * - `None` - Play on Web is not shown.
+ * - `OneButton` - Play on Web replaces the Play button.
+ * - `TwoButton` - Play on Web is stacked under the Play button.
+ */
+export const PlayOnWebVariant = {
+  None: "None",
+  OneButton: "OneButton",
+  TwoButton: "TwoButton",
+} as const;
+
+export type TPlayOnWebVariant = (typeof PlayOnWebVariant)[keyof typeof PlayOnWebVariant];

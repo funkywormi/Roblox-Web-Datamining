@@ -117,5 +117,6 @@
     "Label.By2": "By",
     "Label.DeleteItemUndercase": "Delete item",
     "Label.DeleteThisItem": "Delete this item?",
-    "Label.DeleteFromInventoryPermanently": "We'll remove it from your inventory permanently."
+    "Label.DeleteFromInventoryPermanently": "We'll remove it from your inventory permanently.",
+    "Message.ItemNotDeleted": "Item wasn't deleted"
 }

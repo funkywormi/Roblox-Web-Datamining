@@ -1,19 +1,21 @@
+// ObsErrorBoundary (not renderWithErrorBoundary) handles crashes, so render directly.
+import { render } from "react-dom";
 import ready from "@rbx/core-scripts/util/ready";
-import { renderWithErrorBoundary } from "@rbx/core-scripts/react";
 import { PaymentsTranslationProvider } from "@rbx/payments";
 import { translations } from "./component.json";
 import App from "./src/App";
-import { trackCounter, trackCriticalError } from "./src/observability";
+import {
+  reportPageLoad,
+  reportPageView,
+  ObsErrorBoundary,
+  reportNoRoot,
+} from "./src/observability";
 import "./src/css/giftingProducts.scss";
 
 const ROOT_ELEMENT_ID = "gifting-products-web-app";
 
-function trackCrash(error: unknown) {
-  trackCriticalError("Error_ReactCrash", null, error);
-}
-
 ready(() => {
-  trackCounter("PageView");
+  reportPageLoad();
 
   const contentElement = document.getElementById("content");
   if (contentElement) {
@@ -22,17 +24,17 @@ ready(() => {
 
   const rootElement = document.getElementById(ROOT_ELEMENT_ID);
   if (!rootElement) {
-    trackCriticalError("NoRoot", null);
+    reportNoRoot();
     return;
   }
 
-  renderWithErrorBoundary(
-    <PaymentsTranslationProvider config={translations} context="RobuxGifting">
-      <App />
-    </PaymentsTranslationProvider>,
+  reportPageView();
+  render(
+    <ObsErrorBoundary>
+      <PaymentsTranslationProvider config={translations} context="RobuxGifting">
+        <App />
+      </PaymentsTranslationProvider>
+    </ObsErrorBoundary>,
     rootElement,
-    undefined,
-    undefined,
-    trackCrash,
   );
 });

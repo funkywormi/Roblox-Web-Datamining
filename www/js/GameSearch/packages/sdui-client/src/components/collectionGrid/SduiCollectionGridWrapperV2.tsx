@@ -2,6 +2,7 @@
 
 import React, { Children, useMemo, useState } from "react";
 import {
+  capCollectionItemConfigs,
   expandManagedList,
   parseCollectionItemSize,
   resolveCollectionColumnCount,
@@ -10,7 +11,7 @@ import {
   type SduiRendererInjectedProps,
 } from "@rbx/sdui-core";
 import { useSduiCollectionItems } from "../useSduiCollectionItems";
-import { capCollectionItemConfigs, SduiCollectionGridV2 } from "./SduiCollectionGridV2";
+import { SduiCollectionGridV2 } from "./SduiCollectionGridV2";
 
 const COLLECTION_COMPONENT_TYPE = "COLLECTION_GRID";
 const STANDARD_COLLECTION_ITEM_SIZE = "Small";

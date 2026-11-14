@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
-import { DeepLinkService } from "Roblox";
 import {
   sendEventStreamEvent,
   updateNotificationAction,
 } from "../services/NotificationStreamService";
 import { executeClientTrigger } from "../clientTriggers/executeClientTrigger";
+import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
 import {
   Action,
   ActionType,
@@ -23,6 +23,7 @@ import {
 
 import NotificationView from "./NotificationView";
 import { reportNotificationStreamError } from "../../notificationStreamData/notificationStreamObservability";
+import type { JSX } from "react";
 
 export const handleUpdateNotificationAction = async (
   streamId: string,
@@ -43,7 +44,7 @@ const getFirstDeepLinkNavigationPath = (path: string | undefined): string | unde
   if (!path) {
     return undefined;
   }
-  const parsedPath = DeepLinkService.parseDeeplink(path);
+  const parsedPath = getNotificationStreamHost().parseDeepLink(path);
   if (parsedPath.path[0] === deepLinkNavigationPathPart) {
     return parsedPath.path[1];
   }
@@ -123,31 +124,35 @@ export const SendrNotification = ({
           break;
         case ActionType.Deeplink:
           if (action!.path) {
-            DeepLinkService.navigateToDeepLink(action!.path).then(
-              success => {
-                if (!success && shouldRetryDeeplink(action!)) {
-                  // Possibly a network failure on game join, retry once after a
-                  // short delay
-                  setTimeout(() => {
-                    if (action!.path) {
-                      DeepLinkService.navigateToDeepLink(action!.path).then(
-                        retrySuccess => {
-                          if (!retrySuccess) {
-                            setShowDeeplinkFailureModal(true);
-                          }
-                        },
-                        () => setShowDeeplinkFailureModal(true),
-                      );
-                    }
-                  }, 2000);
-                }
-              },
-              () => {
-                if (shouldDeeplinkFailShowModal(action!)) {
-                  setShowDeeplinkFailureModal(true);
-                }
-              },
-            );
+            getNotificationStreamHost()
+              .navigateToDeepLink(action!.path)
+              .then(
+                success => {
+                  if (!success && shouldRetryDeeplink(action!)) {
+                    // Possibly a network failure on game join, retry once after a
+                    // short delay
+                    setTimeout(() => {
+                      if (action!.path) {
+                        getNotificationStreamHost()
+                          .navigateToDeepLink(action!.path)
+                          .then(
+                            retrySuccess => {
+                              if (!retrySuccess) {
+                                setShowDeeplinkFailureModal(true);
+                              }
+                            },
+                            () => setShowDeeplinkFailureModal(true),
+                          );
+                      }
+                    }, 2000);
+                  }
+                },
+                () => {
+                  if (shouldDeeplinkFailShowModal(action!)) {
+                    setShowDeeplinkFailureModal(true);
+                  }
+                },
+              );
           }
           break;
         case ActionType.NotificationAPI:

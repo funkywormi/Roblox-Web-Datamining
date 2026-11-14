@@ -17,7 +17,7 @@ function InstallInstructions({ translate, downloadLink, showQrCode = true }: Pro
   const installInstructions = getInstallInstructions();
 
   return (
-    <div>
+    <div className="install-instructions-content">
       <h1>{translate(downloadPageStrings.downloadConfirmationHeader)}</h1>
       <div className="instructions-description">
         <div>{translate(downloadPageStrings.followInstallStepsLabel)}</div>

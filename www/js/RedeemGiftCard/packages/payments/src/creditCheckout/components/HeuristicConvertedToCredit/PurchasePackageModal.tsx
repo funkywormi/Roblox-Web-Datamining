@@ -99,7 +99,7 @@ const PurchasePackageModal: React.FC<PurchasePackageModalProps> = ({ translate }
       title={translate(TRANSLATION_KEYS.BuyRobuxWithCreditModalHeading)}
       onNeutral={closePurchaseModal}
       body={
-        <div className="d-flex flex-direction-column">
+        <div className="flex flex-direction-column">
           {isTaxFlowEnabled && (
             <React.Fragment key="purchase-banner-sections">
               <div className="order-summary bold">
@@ -134,12 +134,12 @@ const PurchasePackageModal: React.FC<PurchasePackageModalProps> = ({ translate }
               </div>
             </React.Fragment>
           )}
-          <div className="available-credit d-flex justify-content-between row-pad">
+          <div className="available-credit flex justify-between row-pad">
             <span className="bold">{translate("Label.AvailableCredit") || "Available Credit"}</span>
             <PriceTag amount={creditBalance} currencyCode={currencyCode} />
           </div>
 
-          <div className="balance-due d-flex justify-content-between row-pad">
+          <div className="balance-due flex justify-between row-pad">
             <span className="bold">
               {/* TODO: Add Label.BalanceDueWithoutColon translation key instead of string replacement */}
               {/* https://roblox.atlassian.net/browse/PAY-12066 */}
@@ -161,7 +161,7 @@ const PurchasePackageModal: React.FC<PurchasePackageModalProps> = ({ translate }
           <div className="rbx-divider" />
 
           {/* Credit After Transaction */}
-          <div className="remaining-balance d-flex justify-content-between row-pad">
+          <div className="remaining-balance flex justify-between row-pad">
             <span className="bold">
               {translate(TRANSLATION_KEYS.RemainingBalance) || "Remaining Balance"}
             </span>
@@ -207,7 +207,7 @@ const PurchasePackageModal: React.FC<PurchasePackageModalProps> = ({ translate }
             </React.Fragment>
           )}
 
-          <div className="modal-footer-buttons d-flex justify-content-between mt-4">
+          <div className="modal-footer-buttons flex justify-between mt-4">
             {isLoading ? (
               <button
                 type="button"

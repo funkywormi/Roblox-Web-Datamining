@@ -1,8 +1,9 @@
 import React, { ReactNode } from "react";
-import { EnvironmentUrls } from "Roblox";
+import environmentUrls from "@rbx/environment-urls";
 import { GroupMembershipMetadata, GroupMembershipNotificationData } from "./types";
+import type { JSX } from "react";
 
-const { websiteUrl } = EnvironmentUrls;
+const { websiteUrl } = environmentUrls;
 
 // Matches the Angular `groupLink` template (layoutLibraryI18nService.js: '/communities/{id}').
 export const groupHref = (groupId: number): string => `${websiteUrl}/communities/${groupId}`;

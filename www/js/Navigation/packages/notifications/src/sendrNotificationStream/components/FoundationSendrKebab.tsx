@@ -9,6 +9,7 @@ import {
   PopoverTrigger,
 } from "@rbx/foundation-ui";
 import { VisualItemMetaAction } from "../types/NotificationTemplateTypes";
+import type { JSX } from "react";
 
 const metaActionIconMap = {
   report: "icon-regular-triangle-exclamation",
@@ -24,12 +25,16 @@ const isMetaActionIcon = (icon: string | undefined): icon is MetaActionIcon =>
 export type FoundationSendrKebabProps = {
   actions: Array<VisualItemMetaAction>;
   onSelect: (action: VisualItemMetaAction) => void;
+  onOpen?: () => void;
+  onDismiss?: () => void;
   ariaLabel: string;
 };
 
 export const FoundationSendrKebab = ({
   actions,
   onSelect,
+  onOpen,
+  onDismiss,
   ariaLabel,
 }: FoundationSendrKebabProps): JSX.Element => {
   const [open, setOpen] = useState(false);
@@ -48,6 +53,11 @@ export const FoundationSendrKebab = ({
           }
           lastChangeRef.current = { open: next, ts: now };
           setOpen(next);
+          if (next) {
+            onOpen?.();
+          } else {
+            onDismiss?.();
+          }
         }}
       >
         <PopoverTrigger asChild>

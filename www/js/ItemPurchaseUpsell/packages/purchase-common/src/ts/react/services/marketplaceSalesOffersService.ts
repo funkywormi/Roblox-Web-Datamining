@@ -1,5 +1,6 @@
 import { EnvironmentUrls } from '@rbx/environment-urls';
 import * as httpService from '@rbx/core-scripts/http';
+import { descriptionWithoutInlineExpiration } from '@rbx/www-common/offer-expiration';
 import type { DiscountInformation } from '../components/discountInformation';
 
 export type CartPricingItemRequest = {
@@ -18,6 +19,8 @@ export type CartPricingAvailableOffer = {
   offerId: string;
   localizedDescription?: string;
   selected?: boolean;
+  /** ISO-8601 UTC timestamp; when present, offer UI shows an "Ends …" badge. */
+  expirationTimeUtc?: string;
 };
 
 export type CartPricingItemResponse = {
@@ -38,6 +41,8 @@ export type MarketplaceOfferSelection = {
   offerId: string;
   localizedText: string;
   selected: boolean;
+  /** ISO-8601 UTC timestamp from cart-pricing; drives the optional "Ends …" badge. */
+  expirationTimeUtc?: string;
 };
 
 /** Feature key for marketplace-sales `/cart-pricing` on single-item purchase.
@@ -63,10 +68,13 @@ export function mapAvailableOffersToSelections(
     availableOffers?.reduce<MarketplaceOfferSelection[]>((selections, offer) => {
       const localizedText = offer.localizedDescription?.trim();
       if (offer.offerId && localizedText) {
+        const expirationTimeUtc = offer.expirationTimeUtc?.trim() || undefined;
         selections.push({
           offerId: offer.offerId,
-          localizedText,
-          selected: offer.selected ?? false
+          // Drop the inline date only when the clock badge will actually render.
+          localizedText: descriptionWithoutInlineExpiration(localizedText, expirationTimeUtc),
+          selected: offer.selected ?? false,
+          ...(expirationTimeUtc ? { expirationTimeUtc } : {})
         });
       }
       return selections;

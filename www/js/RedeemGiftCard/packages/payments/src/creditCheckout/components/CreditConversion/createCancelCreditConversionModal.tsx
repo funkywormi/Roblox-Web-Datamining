@@ -20,7 +20,7 @@ export default function createCancelCreditConversionModal(): [
     translate,
   }: TCancelCreditConversionModalProps): JSX.Element {
     const body = (
-      <div className="d-flex text-center text-description">
+      <div className="flex text-center text-description">
         {translate(TRANSLATION_KEYS.CodeNotYetRedeemedMessage)}
       </div>
     );

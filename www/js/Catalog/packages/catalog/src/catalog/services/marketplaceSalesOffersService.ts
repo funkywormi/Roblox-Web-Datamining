@@ -40,6 +40,8 @@ export type CartPricingAvailableOffer = {
   offerId: string;
   localizedDescription?: string;
   selected?: boolean;
+  /** ISO-8601 UTC timestamp; when present, offer UI shows an "Ends …" badge. */
+  expirationTimeUtc?: string;
 };
 
 /** `discountType` value cart-pricing uses to attribute a line to a marketplace offer. */

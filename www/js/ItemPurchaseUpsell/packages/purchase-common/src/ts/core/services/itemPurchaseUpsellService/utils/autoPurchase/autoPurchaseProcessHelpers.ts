@@ -1,6 +1,6 @@
 import { escapeHtml } from '@rbx/core-scripts/format/string';
 import * as upsellUtil from '@rbx/core-scripts/util/upsell';
-import { MetaDataValues } from '@rbx/legacy-webapp-types/Roblox';
+import { PageNameProvider } from '@rbx/core-scripts/util/page-name';
 import { redirectToCatalogShop, redirectToItemPath } from '../common/redirectionHelpers';
 import {
   ItemDetailElementDataset,
@@ -186,7 +186,7 @@ export async function preProcessData(
     itemDetailDataElementMap
   ); // Get data from elements
   const expPromoId = itemDetail.placeproductpromotionId;
-  const context = (MetaDataValues?.getPageName()) || '';
+  const context = PageNameProvider.getInternalPageName() || '';
   const isLibrary = context === 'LibraryItem';
   const userBalance = parseInt(itemPurchaseAjaxData.userBalanceRobux, 10);
   const expCurrency = parseInt(itemDetail.expectedCurrency, 10);

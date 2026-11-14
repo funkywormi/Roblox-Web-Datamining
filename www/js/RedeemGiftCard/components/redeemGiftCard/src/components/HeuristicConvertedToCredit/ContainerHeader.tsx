@@ -19,7 +19,7 @@ function ContainerHeader({
 }: TContainerHeaderProps) {
   const productPurchasable = convertedRobuxAmount === 0 && creditBalance > 0;
   return (
-    <div className="hcc-container-header available-credit-label font-header-1 d-flex justify-content-start align-items-center">
+    <div className="hcc-container-header available-credit-label font-header-1 flex justify-start items-center">
       <span className="available-credit-label">
         {translate(TRANSLATION_KEYS.AvailableCreditLabel) || "Available Credit:"}
       </span>

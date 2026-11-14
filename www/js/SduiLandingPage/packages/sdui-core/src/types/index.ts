@@ -15,6 +15,7 @@ import {
 } from "./binding";
 import { SduiErrorReporter } from "./error";
 import { DataStatus } from "./hydration";
+import type { SduiSessionStore } from "../analytics/SduiSessionStore";
 
 // ─── Proto Enum Re-exports ───
 
@@ -357,6 +358,7 @@ export interface SduiActionContext {
   analyticsReporter: SduiAnalyticsReporter;
   errorReporter: SduiErrorReporter;
   pageContext: SduiPageContext;
+  sessionStore: SduiSessionStore;
   translate?: TranslateFunction;
 }
 

@@ -5,13 +5,8 @@ import { NOTIFICATION_STREAM_UNREAD_COUNT_QUERY_KEY } from "./useUnreadNotificat
 
 /**
  * Returns a handler for the notification stream's open event that clears unread
- * server-side. The AngularJS indicator directive used to own this (via its jqLite
- * `Roblox.NotificationStream.ClearUnreadNotifications` listener), but that directive
- * isn't bootstrapped once the React bell renders, so React owns the clear.
- *
- * Optimistically zeroes the shared count query, POSTs clear-unread, then reconciles.
- * No-op when the count is already 0 (mirrors the Angular guard). Only wire this on the
- * flag-on path; the Angular flag-off path keeps its own clear-on-open.
+ * server-side: optimistically zeroes the shared count query, POSTs clear-unread, then
+ * reconciles. No-op when the count is already 0.
  */
 export const useClearUnreadOnOpen = (unreadCount: number) => {
   const queryClient = useQueryClient();

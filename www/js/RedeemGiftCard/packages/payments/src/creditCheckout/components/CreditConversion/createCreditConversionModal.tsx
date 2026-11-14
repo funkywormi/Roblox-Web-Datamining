@@ -94,7 +94,7 @@ export default function createCreditConversionModal(): [
             </span>
           </div>
         </div>
-        <div className="modal-footer-buttons d-flex justify-content-between mt-4">
+        <div className="modal-footer-buttons flex justify-between mt-4">
           <Button
             variant={Button.variants.growth}
             size={Button.sizes.medium}

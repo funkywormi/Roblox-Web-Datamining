@@ -1,7 +1,7 @@
-import { EnvironmentUrls } from "Roblox";
+import environmentUrls from "@rbx/environment-urls";
 
-const apiGwUrl = EnvironmentUrls.apiGatewayUrl || "https://apis.roblox.com";
-const { notificationApi, websiteUrl } = EnvironmentUrls;
+const apiGwUrl = environmentUrls.apiGatewayUrl || "https://apis.roblox.com";
+const { notificationApi, websiteUrl } = environmentUrls;
 
 export default {
   notificationActionUrl: (streamId: string, actionId: string): string =>

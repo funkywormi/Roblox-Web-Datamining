@@ -1,23 +1,12 @@
 import { useEffect, useState } from "react";
-import realTime from "@rbx/core-scripts/realtime";
 import { reportNotificationStreamError } from "./notificationStreamObservability";
+import { type ConnectionEventHandler, getNotificationStreamTransport } from "./streamTransport";
 
 const NAMESPACE = "NotificationStream";
 // Angular's signalRDisconnectionResponseInMilliseconds default (notifications-api MetadataSettings).
 const NO_CONNECTION_DELAY_MS = 3000;
 
-type ConnectionEventHandler = (dataReloadRequired: boolean) => void;
-
-// SubscribeToConnectionEvents exists on the runtime client but is absent from its published types.
-type RealtimeConnectionClient = {
-  SubscribeToConnectionEvents: (
-    onConnected: ConnectionEventHandler,
-    onReconnected: ConnectionEventHandler,
-    onDisconnected: () => void,
-    namespace: string,
-  ) => void;
-};
-
+let disconnectionDelayMs = NO_CONNECTION_DELAY_MS;
 let connectionLost = false;
 let registered = false;
 let timer: ReturnType<typeof setTimeout> | null = null;
@@ -35,6 +24,11 @@ const clearTimer = (): void => {
   }
 };
 
+const onRegisterFailed = (error: unknown): void => {
+  registered = false;
+  reportNotificationStreamError("realtimeConnection", error);
+};
+
 // The client has no unsubscribe for connection events and the shell remounts on every popover open,
 // so registration is anchored at module scope and runs once per page.
 const ensureRegistered = (): void => {
@@ -43,8 +37,6 @@ const ensureRegistered = (): void => {
   }
   registered = true;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- connection API exists at runtime, missing from published types
-    const client = realTime.GetClient() as unknown as RealtimeConnectionClient;
     const onRestored: ConnectionEventHandler = () => {
       clearTimer();
       emit(false);
@@ -54,16 +46,26 @@ const ensureRegistered = (): void => {
       timer = setTimeout(() => {
         timer = null;
         emit(true);
-      }, NO_CONNECTION_DELAY_MS);
+      }, disconnectionDelayMs);
     };
-    client.SubscribeToConnectionEvents(onRestored, onRestored, onDisconnected, NAMESPACE);
+    const subscribed = getNotificationStreamTransport().subscribeToConnectionEvents(
+      onRestored,
+      onRestored,
+      onDisconnected,
+      NAMESPACE,
+    );
+    subscribed?.catch(onRegisterFailed);
   } catch (error) {
-    registered = false;
-    reportNotificationStreamError("realtimeConnection", error);
+    onRegisterFailed(error);
   }
 };
 
-export const useNotificationStreamConnection = (): { isConnectionLost: boolean } => {
+export const useNotificationStreamConnection = (
+  delayMs?: number,
+): { isConnectionLost: boolean } => {
+  if (delayMs != null && delayMs > 0) {
+    disconnectionDelayMs = delayMs;
+  }
   const [isConnectionLost, setIsConnectionLost] = useState(connectionLost);
   useEffect(() => {
     ensureRegistered();

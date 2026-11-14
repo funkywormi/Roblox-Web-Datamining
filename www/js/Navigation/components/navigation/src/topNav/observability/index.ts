@@ -7,7 +7,9 @@ import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { isAuthenticated } from "@rbx/core-scripts/meta/user";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import { createFireTelemetryHistogram } from "@rbx/web-telemetry/v2/histogram";
+import type { AppShellHost } from "@rbx/www-common/observability/app-shell/host";
 import { createWithApiMetrics } from "../../util/apiMetrics";
+import { getWasHidden, logTimingDebug, watchHiddenFromNow } from "../../util/pageVisibility";
 
 export const observabilityRegistry = {
   featureName: "TopNav",
@@ -15,7 +17,7 @@ export const observabilityRegistry = {
   defaultTimeCompare: { mode: "offset", offset: "7d" },
   features: {
     health: {
-      counters: [{ name: "Rendered", dimensions: ["variant", "authState", "deviceType"] }],
+      counters: [{ name: "Rendered", dimensions: ["variant", "authState", "deviceType", "host"] }],
       criticalErrors: ["RightHeaderCrash", "RobuxCrash", "MenuIconCrash", "AgeBadgeCrash"],
     },
     header: {
@@ -60,29 +62,45 @@ export const { trackCounter } = createTrackers(observabilityRegistry, {
   featureName: observabilityRegistry.featureName,
 });
 
-export const TopNavErrorBoundary = createObsErrorBoundary({
+export const TopNavErrorBoundary = createObsErrorBoundary(observabilityRegistry, {
   publish: publishMetric,
   captureException,
   featureName: observabilityRegistry.featureName,
 });
 
+// The side that rendered the page, so TopNav metrics can compare Next.js with .NET. The .NET bundle
+// keeps the default; the Next.js entry sets it.
+let host: AppShellHost = "dotnet";
+
+export const setTopNavHost = (value: AppShellHost): void => {
+  host = value;
+};
+
 export const getDimensions = () => ({
   variant: "FOUNDATION",
   authState: isAuthenticated() ? "LOGGED_IN" : "LOGGED_OUT",
   deviceType: getDeviceMeta()?.deviceType || "unknown",
+  host,
 });
 
 export const trackRendered = (): void => {
   const dimensions = getDimensions();
   trackCounter("Rendered", dimensions);
-  publishHistogram("RenderedMs", dimensions, performance.now());
+  const renderedMs = performance.now();
+  const timingDimensions = { ...dimensions, wasHidden: getWasHidden() };
+  publishHistogram("RenderedMs", timingDimensions, renderedMs);
+  logTimingDebug("TopNav_RenderedMs", renderedMs, timingDimensions);
 };
 
 export const trackOpenToVisible = (menu: "Settings" | "Notifications"): void => {
   const start = performance.now();
+  const wasHiddenSinceStart = watchHiddenFromNow();
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      publishHistogram(`${menu}OpenToVisibleMs`, getDimensions(), performance.now() - start);
+      const ms = performance.now() - start;
+      const dimensions = { ...getDimensions(), wasHidden: wasHiddenSinceStart() };
+      publishHistogram(`${menu}OpenToVisibleMs`, dimensions, ms);
+      logTimingDebug(`TopNav_${menu}OpenToVisibleMs`, ms, dimensions);
     });
   });
 };

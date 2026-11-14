@@ -1,6 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { document } from '@rbx/core-lib/browser';
+import { createUpsellModalSlot } from './upsellModalHost';
 import PurchaseDialog from '../../../../react/components/PurchaseDialog';
 
 /** The subset of the legacy `Roblox.Dialog.open` options the upsell modals use. */
@@ -38,20 +37,15 @@ export function closeDialog(): void {
  */
 export default function openDialog(options: OpenDialogOptions): void {
   closeDialog();
-  if (!document) {
-    return;
-  }
 
-  const container = document.createElement('div');
-  document.body.appendChild(container);
+  const slot = createUpsellModalSlot();
 
   const close = () => {
     if (closeCurrent !== close) {
       return;
     }
     closeCurrent = undefined;
-    ReactDOM.unmountComponentAtNode(container);
-    container.remove();
+    slot.remove();
   };
   closeCurrent = close;
 
@@ -76,7 +70,7 @@ export default function openDialog(options: OpenDialogOptions): void {
     options.onCancel?.();
   };
 
-  ReactDOM.render(
+  slot.render(
     React.createElement(PurchaseDialog, {
       titleText: options.titleText,
       bodyContent: options.bodyContent,
@@ -92,7 +86,6 @@ export default function openDialog(options: OpenDialogOptions): void {
       onAccept,
       onDecline,
       onCancel
-    }),
-    container
+    })
   );
 }

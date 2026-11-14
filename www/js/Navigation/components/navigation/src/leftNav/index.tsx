@@ -6,6 +6,7 @@ import {
   publishHistogram,
   trackCounter,
 } from "./observability";
+import { getWasHidden, logTimingDebug } from "../util/pageVisibility";
 import LeftNavigationContent from "./LeftNavigation";
 
 function LeftNavigationWithMetrics({ user }: { user: AuthenticatedUser }) {
@@ -17,7 +18,10 @@ function LeftNavigationWithMetrics({ user }: { user: AuthenticatedUser }) {
     hasTrackedRender.current = true;
     const deviceType = getDeviceType();
     trackCounter("Rendered", { variant: "NEW", deviceType });
-    publishHistogram("RenderedMs", { variant: "NEW", deviceType }, performance.now());
+    const renderedMs = performance.now();
+    const timingDimensions = { variant: "NEW", deviceType, wasHidden: getWasHidden() };
+    publishHistogram("RenderedMs", timingDimensions, renderedMs);
+    logTimingDebug("LeftNav_RenderedMs", renderedMs, timingDimensions);
   }, []);
 
   return <LeftNavigationContent user={user} />;

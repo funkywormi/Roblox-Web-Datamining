@@ -23,9 +23,8 @@ const AvatarEditorTrackingConstants = {
   AvatarEditorReactMigrationControlGroup: "AvatarEditorReactMigrationControlGroup",
 } satisfies AXAnalyticsConstantsType;
 
-// Avatar editor (Customize page) user interaction events. These are emitted by
-// the avatar component, which keeps a local copy of the string values so it does
-// not depend on this external being redeployed. Keep both in sync.
+// Avatar editor (Customize page) user interaction events, emitted by the avatar
+// component.
 const AvatarEditorInteractionTrackingConstants = {
   // Fired once per session, the first time the user edits their avatar.
   AvatarEditorFirstEditClick: "AvatarEditorFirstEditClick",

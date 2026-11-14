@@ -1,4 +1,4 @@
-import { Fragment, useState, type ReactNode } from "react";
+import { Fragment, Suspense, useEffect, useState, type ReactNode } from "react";
 import classNames from "classnames";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { useFormatter, useTranslations } from "@rbx/www-common/i18n";
@@ -16,9 +16,24 @@ import {
   type ReferralNavEntry,
 } from "../util/plusReferralBadgeUtil";
 import type { PlusNavEntries } from "../util/navCapabilities";
+import { useIsNavServerRendered } from "../util/navServerHints";
 import { StateLayer, blackbirdPathRegex, interactable } from "./navItemStyles";
+import { useNavHref } from "../util/navHref";
 
 export const useRewardAmount = (): string => useFormatter().number(REFERRAL_REWARD_ROBUX);
+
+// Click counts live in local storage, so a server-rendered nav starts at `serverValue` and reads them after mount.
+const useStoredAfterHydration = (read: () => boolean, serverValue: boolean): boolean => {
+  const isServerRendered = useIsNavServerRendered();
+  const [value, setValue] = useState(() => (isServerRendered ? serverValue : read()));
+  useEffect(() => {
+    if (isServerRendered) {
+      setValue(read());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isServerRendered]);
+  return value;
+};
 
 /** Card layout shared by the referral entries, pinned above the nav links. */
 export const ReferralNavItem = ({
@@ -36,7 +51,13 @@ export const ReferralNavItem = ({
   onExpose?: () => void;
 }) => {
   const t = useTranslations("Feature.RobloxSubscription");
-  const [showNewBadge, setShowNewBadge] = useState(() => shouldShowReferralNewBadge(entry));
+  const storedShowNewBadge = useStoredAfterHydration(
+    () => shouldShowReferralNewBadge(entry),
+    false,
+  );
+  const [isBadgeDismissed, setIsBadgeDismissed] = useState(false);
+  const showNewBadge = storedShowNewBadge && !isBadgeDismissed;
+  const toNavHref = useNavHref();
 
   const cardClassName = classNames(
     interactable,
@@ -47,7 +68,7 @@ export const ReferralNavItem = ({
 
   const onClick = () => {
     recordReferralNavClick(entry);
-    setShowNewBadge(false);
+    setIsBadgeDismissed(true);
     onSelect?.();
   };
 
@@ -68,7 +89,7 @@ export const ReferralNavItem = ({
         {cardContent}
       </button>
     ) : (
-      <a className={cardClassName} href={href} onClick={onClick}>
+      <a className={cardClassName} href={toNavHref(href)} onClick={onClick}>
         {cardContent}
       </a>
     );
@@ -87,6 +108,11 @@ export const ReferralNavItem = ({
 const BlackbirdReferralNavItem = () => {
   const t = useTranslations("Feature.RobloxSubscription");
   const rewardAmount = useRewardAmount();
+  const isEntryShown = useStoredAfterHydration(() => shouldShowReferralEntry("share"), true);
+
+  if (!isEntryShown) {
+    return null;
+  }
 
   return (
     <ReferralNavItem
@@ -147,29 +173,61 @@ const BlackbirdUpsellNavItem = ({ currentPath }: { currentPath: string }) => {
   );
 };
 
+const StreamedBlackbirdReferralNavItem = ({
+  senderEligibility,
+  senderEligibilityStream,
+  useStreamedValue,
+}: {
+  senderEligibility: string | undefined;
+  senderEligibilityStream: Promise<string | null>;
+  useStreamedValue: <T>(promise: Promise<T>) => T;
+}) => {
+  const streamed = useStreamedValue(senderEligibilityStream);
+  return (senderEligibility ?? streamed) === "Eligible" ? <BlackbirdReferralNavItem /> : null;
+};
+
+const senderReferralEntry = (
+  senderEligibility: string | undefined,
+  senderEligibilityStream: Promise<string | null> | null | undefined,
+  useStreamedValue: (<T>(promise: Promise<T>) => T) | undefined,
+): ReactNode => {
+  if (senderEligibilityStream != null && useStreamedValue) {
+    return (
+      <Suspense fallback={null}>
+        <StreamedBlackbirdReferralNavItem
+          senderEligibility={senderEligibility}
+          senderEligibilityStream={senderEligibilityStream}
+          useStreamedValue={useStreamedValue}
+        />
+      </Suspense>
+    );
+  }
+  return senderEligibility === "Eligible" ? <BlackbirdReferralNavItem /> : null;
+};
+
 export const plusNavEntries = ({
   currentPath,
   isPlusSubscriber,
   isReferralRolloutEnabled,
   senderEligibility,
+  senderEligibilityStream,
+  useStreamedValue,
   joinEntry,
 }: {
   currentPath: string;
   isPlusSubscriber: boolean;
   isReferralRolloutEnabled: boolean;
   senderEligibility: string | undefined;
+  senderEligibilityStream?: Promise<string | null> | null;
+  useStreamedValue?: <T>(promise: Promise<T>) => T;
   joinEntry: ReactNode;
 }): PlusNavEntries => ({
   isPlusSubscriber,
   topEntries: (
     <Fragment>
-      {isReferralRolloutEnabled &&
-      isPlusSubscriber &&
-      senderEligibility === "Eligible" &&
-      !blackbirdPathRegex.test(currentPath) &&
-      shouldShowReferralEntry("share") ? (
-        <BlackbirdReferralNavItem />
-      ) : null}
+      {isReferralRolloutEnabled && isPlusSubscriber && !blackbirdPathRegex.test(currentPath)
+        ? senderReferralEntry(senderEligibility, senderEligibilityStream, useStreamedValue)
+        : null}
       {joinEntry}
     </Fragment>
   ),

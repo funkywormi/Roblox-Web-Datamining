@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { Intl } from "Roblox";
 
 import {
   NotificationTemplateProps,
@@ -10,6 +9,7 @@ import {
 } from "../../types/NotificationTemplateTypes";
 import ButtonRow from "../ButtonRow";
 import NotificationThumbnail from "../NotificationThumbnail";
+import { getNotificationStreamHost } from "../../../notificationStreamData/streamHost";
 
 import { formatText } from "../../utils/labelUtils";
 
@@ -37,8 +37,7 @@ export const LegacyNotificationTemplate = ({
   }, [baseRef, isMetaActionsOverlay]);
 
   if (eventTime) {
-    const dateTimeFormatter = new Intl().getDateTimeFormatter();
-    eventTimeString = dateTimeFormatter.getFullDate(new Date(eventTime));
+    eventTimeString = getNotificationStreamHost().formatFullDate(new Date(eventTime));
   }
 
   const handleBaseInteraction = (e: React.MouseEvent<HTMLButtonElement>) => {

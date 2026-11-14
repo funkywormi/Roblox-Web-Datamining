@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { fireEvent } from "roblox-event-tracker";
-import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { DeviceMeta } from "@rbx/core-scripts/legacy/Roblox";
 import { COUNTER_METRICS } from "../constants/Constants";
 
@@ -75,18 +75,18 @@ const useGiftingAnalytics = (): UseGiftingAnalyticsResponse => {
 
       setMessage(sanitizedMessage);
 
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        WEB_ROBUX_GIFT_PURCHASE,
-        false,
-        ROBUX_GIFT_MESSAGE_SELECTION,
-        USER_INPUT,
-        sanitizedMessage,
-        {
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: WEB_ROBUX_GIFT_PURCHASE,
+        isMidPurchaseStep: false,
+        viewName: ROBUX_GIFT_MESSAGE_SELECTION,
+        purchaseEventType: USER_INPUT,
+        viewMessage: sanitizedMessage,
+        eventMetadata: {
           requestorId,
           productId,
           message: sanitizedMessage,
         },
-      );
+      });
     },
     [WEB_ROBUX_GIFT_PURCHASE, ROBUX_GIFT_MESSAGE_SELECTION, USER_INPUT, requestorId, productId],
   );
@@ -97,18 +97,17 @@ const useGiftingAnalytics = (): UseGiftingAnalyticsResponse => {
 
       setProductId(sanitizedProductId);
 
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        WEB_ROBUX_GIFT_PURCHASE,
-        false,
-        ROBUX_GIFT_PRODUCT_SELECTION,
-        USER_INPUT,
-        undefined,
-        {
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: WEB_ROBUX_GIFT_PURCHASE,
+        isMidPurchaseStep: false,
+        viewName: ROBUX_GIFT_PRODUCT_SELECTION,
+        purchaseEventType: USER_INPUT,
+        eventMetadata: {
           requestorId,
           productId: sanitizedProductId,
           message,
         },
-      );
+      });
     },
     [WEB_ROBUX_GIFT_PURCHASE, ROBUX_GIFT_PRODUCT_SELECTION, USER_INPUT, requestorId, message],
   );
@@ -120,46 +119,45 @@ const useGiftingAnalytics = (): UseGiftingAnalyticsResponse => {
       setRequestorId(sanitizedRequestorId);
 
       fireEvent(COUNTER_METRICS.ROBUX_GIFTING_LANDING_PAGE_HIT);
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        WEB_ROBUX_GIFT_PURCHASE,
-        false,
-        ROBUX_GIFT_LANDING_PAGE,
-        VIEW_SHOWN,
-        undefined,
-        {
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: WEB_ROBUX_GIFT_PURCHASE,
+        isMidPurchaseStep: false,
+        viewName: ROBUX_GIFT_LANDING_PAGE,
+        purchaseEventType: VIEW_SHOWN,
+        eventMetadata: {
           requestorId: sanitizedRequestorId,
         },
-      );
+      });
     },
     [WEB_ROBUX_GIFT_PURCHASE, ROBUX_GIFT_LANDING_PAGE, VIEW_SHOWN],
   );
 
   const trackStartBundleMessageSelection = useCallback(() => {
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      WEB_ROBUX_GIFT_PURCHASE,
-      false,
-      ROBUX_GIFT_LANDING_PAGE,
-      USER_INPUT,
-      GIFT_NOW,
-      {
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: WEB_ROBUX_GIFT_PURCHASE,
+      isMidPurchaseStep: false,
+      viewName: ROBUX_GIFT_LANDING_PAGE,
+      purchaseEventType: USER_INPUT,
+      viewMessage: GIFT_NOW,
+      eventMetadata: {
         requestorId,
       },
-    );
+    });
   }, [WEB_ROBUX_GIFT_PURCHASE, ROBUX_GIFT_LANDING_PAGE, USER_INPUT, GIFT_NOW, requestorId]);
 
   const trackStartPhoneVerification = useCallback(() => {
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      WEB_ROBUX_GIFT_PURCHASE,
-      false,
-      ROBUX_GIFT_BUNDLE_MESSAGE_PAGE,
-      USER_INPUT,
-      CHECKOUT,
-      {
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: WEB_ROBUX_GIFT_PURCHASE,
+      isMidPurchaseStep: false,
+      viewName: ROBUX_GIFT_BUNDLE_MESSAGE_PAGE,
+      purchaseEventType: USER_INPUT,
+      viewMessage: CHECKOUT,
+      eventMetadata: {
         requestorId,
         productId,
         message,
       },
-    );
+    });
   }, [
     WEB_ROBUX_GIFT_PURCHASE,
     ROBUX_GIFT_BUNDLE_MESSAGE_PAGE,
@@ -171,18 +169,18 @@ const useGiftingAnalytics = (): UseGiftingAnalyticsResponse => {
   ]);
 
   const trackSubmitPhoneNumber = useCallback(() => {
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      WEB_ROBUX_GIFT_PURCHASE,
-      false,
-      ROBUX_GIFT_PHONE_SUBMISSION,
-      USER_INPUT,
-      CONTINUE,
-      {
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: WEB_ROBUX_GIFT_PURCHASE,
+      isMidPurchaseStep: false,
+      viewName: ROBUX_GIFT_PHONE_SUBMISSION,
+      purchaseEventType: USER_INPUT,
+      viewMessage: CONTINUE,
+      eventMetadata: {
         requestorId,
         productId,
         message,
       },
-    );
+    });
   }, [
     WEB_ROBUX_GIFT_PURCHASE,
     ROBUX_GIFT_PHONE_SUBMISSION,
@@ -194,18 +192,18 @@ const useGiftingAnalytics = (): UseGiftingAnalyticsResponse => {
   ]);
 
   const trackAuthenticatePhoneNumber = useCallback(() => {
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      WEB_ROBUX_GIFT_PURCHASE,
-      false,
-      ROBUX_GIFT_PHONE_AUTHENTICATION,
-      USER_INPUT,
-      VERIFY,
-      {
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: WEB_ROBUX_GIFT_PURCHASE,
+      isMidPurchaseStep: false,
+      viewName: ROBUX_GIFT_PHONE_AUTHENTICATION,
+      purchaseEventType: USER_INPUT,
+      viewMessage: VERIFY,
+      eventMetadata: {
         requestorId,
         productId,
         message,
       },
-    );
+    });
   }, [
     WEB_ROBUX_GIFT_PURCHASE,
     ROBUX_GIFT_PHONE_AUTHENTICATION,
@@ -217,13 +215,13 @@ const useGiftingAnalytics = (): UseGiftingAnalyticsResponse => {
   ]);
 
   const trackRequestRobux = useCallback(() => {
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      isInApp ? WEBVIEW_ROBUX_PURCHASE : WEB_ROBUX_PURCHASE,
-      false,
-      ROBUX_GIFT_REQUEST_BANNER,
-      USER_INPUT,
-      REQUEST_ROBUX,
-    );
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: isInApp ? WEBVIEW_ROBUX_PURCHASE : WEB_ROBUX_PURCHASE,
+      isMidPurchaseStep: false,
+      viewName: ROBUX_GIFT_REQUEST_BANNER,
+      purchaseEventType: USER_INPUT,
+      viewMessage: REQUEST_ROBUX,
+    });
   }, [
     isInApp,
     WEBVIEW_ROBUX_PURCHASE,

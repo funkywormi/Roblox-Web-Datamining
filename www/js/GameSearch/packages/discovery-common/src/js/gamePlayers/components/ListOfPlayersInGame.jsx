@@ -9,16 +9,18 @@ function ListOfPlayersInGame({ friendsData, friendsInGame, dismissModal, isPlaya
     friendsObj[friend.id] = friend;
   });
   return (
-    <div className="interaction-container">
-      <ul className="interaction-list">
-        {friendsInGame.map((friendId, idx) => {
-          const keyValue = friendId + idx;
-          const friend = friendsObj[friendId];
-          const { id, nameForDisplay } = friend;
-          return (
-            // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-            <li key={keyValue} className="interaction-item" aria-hidden="true">
-              <span className="avatar avatar-headshot avatar-headshot-sm player-avatar">
+    <ul className="flex flex-col" style={{ maxHeight: 450, overflowY: "auto" }}>
+      {friendsInGame.map((friendId, idx) => {
+        const keyValue = friendId + idx;
+        const friend = friendsObj[friendId];
+        const { id, nameForDisplay } = friend;
+        return (
+          <li key={keyValue} className="player-interaction-row">
+            <div className="player-interaction-row-content flex items-start">
+              <span
+                className="player-interaction-avatar shrink-0 radius-circle"
+                style={{ overflow: "hidden" }}
+              >
                 <PlayerAvatar playerId={id} altName={nameForDisplay} />
               </span>
               <PlayerAction
@@ -27,11 +29,11 @@ function ListOfPlayersInGame({ friendsData, friendsInGame, dismissModal, isPlaya
                 isPlayable={isPlayable}
                 translate={translate}
               />
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

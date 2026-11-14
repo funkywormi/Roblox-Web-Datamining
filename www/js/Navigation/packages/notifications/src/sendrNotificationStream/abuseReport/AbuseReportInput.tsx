@@ -1,11 +1,10 @@
 import React, { FC } from "react";
 import { Controller } from "react-hook-form";
 import { TextArea } from "@rbx/foundation-ui";
-import { TextField } from "../../styledMuiComponents/index";
 import { useNotificationLocalization } from "../context/NotificationsLocalization";
 import { AbuseReportInputProps } from "./abuseReportFormType";
 import { REPORTER_COMMENT_LIMIT } from "./constants/abuseReportConstants";
-import { getIsFoundationModalEnabled } from "../utils/getIsFoundationModalEnabled";
+import { getFlaggedMuiModalArms } from "../mui/muiModalArms";
 
 const AbuseReportInput: FC<AbuseReportInputProps> = ({
   control,
@@ -32,23 +31,26 @@ const AbuseReportInput: FC<AbuseReportInputProps> = ({
   };
 
   if (config.type === "textfield") {
+    const MuiTextField = getFlaggedMuiModalArms()?.AbuseReportTextField;
     return (
       <Controller
         name={config.name as never}
         control={control}
         rules={config.validation}
-        render={({
-          onChange,
-          onBlur,
-          value,
-          ref,
-        }: {
-          onChange: (e: unknown) => void;
-          onBlur: () => void;
-          value: unknown;
-          ref: React.Ref<unknown>;
-        }) =>
-          getIsFoundationModalEnabled() ? (
+        render={({ field: { onChange, onBlur, value, ref } }) =>
+          MuiTextField ? (
+            <MuiTextField
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              id={config.name}
+              inputRef={ref}
+              placeholder={config.placeHolder}
+              hasError={!!errors[config.name]}
+              helperText={getHelperText(errors[config.name])}
+              disabled={disabled}
+            />
+          ) : (
             <TextArea
               value={value as string}
               onChange={onChange as React.ChangeEventHandler<HTMLTextAreaElement>}
@@ -62,24 +64,6 @@ const AbuseReportInput: FC<AbuseReportInputProps> = ({
               helperText={getHelperText(errors[config.name])}
               isDisabled={disabled}
               className="width-full"
-            />
-          ) : (
-            <TextField
-              value={value}
-              onChange={
-                onChange as React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>
-              }
-              onBlur={onBlur as React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>}
-              id={config.name}
-              inputRef={ref}
-              placeholder={config.placeHolder}
-              error={!!errors[config.name]}
-              multiline
-              minRows={6}
-              fullWidth
-              required
-              helperText={getHelperText(errors[config.name])}
-              disabled={disabled}
             />
           )
         }
@@ -95,8 +79,7 @@ const AbuseReportInput: FC<AbuseReportInputProps> = ({
         </label>
         <div className="rbx-select-group select-group">
           <select
-            name={config.name}
-            ref={register(config.validation)}
+            {...register(config.name, config.validation)}
             className="input-field rbx-select select-option select-label"
             id={config.name}
             disabled={disabled}

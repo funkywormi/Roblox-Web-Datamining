@@ -1,19 +1,15 @@
 import React, { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { GameLauncher } from "Roblox";
+import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
-import { httpService } from "core-utilities";
 import GameUpdateNotification from "../../notificationStreamCards/gameUpdate/GameUpdateNotification";
 import { GameUpdateViewModel } from "../../notificationStreamCards/gameUpdate/types";
 import {
   GAME_UPDATES_QUERY_KEY,
   GameUpdateModel,
-  markGameUpdateInteracted,
 } from "../../notificationStreamData/useGameUpdates";
 import {
   GameUpdateMetadata,
   GameUpdateNsPage,
-  GAME_UPDATE_INTERACTIONS,
   GAME_UPDATE_NOTIF_TYPE,
   GAME_UPDATE_NS_PAGES,
   abuseReportHref,
@@ -27,6 +23,9 @@ import {
   type GameUpdateEventParams,
 } from "../../notificationStreamData/notificationStreamEvents";
 import { reportNotificationStreamError } from "../../notificationStreamData/notificationStreamObservability";
+import { streamDelete, streamPost } from "../../notificationStreamData/streamTransport";
+import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
+import type { JSX } from "react";
 
 export type GameUpdateShellCardProps = {
   universes: GameUpdateMetadata[];
@@ -64,6 +63,7 @@ export const GameUpdateShellCard = ({
 }: GameUpdateShellCardProps): JSX.Element => {
   const [unfollowed, setUnfollowed] = useState(false);
   const queryClient = useQueryClient();
+  const { joinMultiplayerGame } = getNotificationStreamHost();
   const resolved = universes
     .map(meta => models.get(meta?.UniverseId ?? 0))
     .filter((model): model is GameUpdateModel => Boolean(model));
@@ -89,7 +89,7 @@ export const GameUpdateShellCard = ({
     // keeps only a lossy sample so its eventDate can be older than the update being shown.
     eventDate: primary.createdOn != null ? new Date(primary.createdOn).toISOString() : eventDate,
     isInteracted,
-    canLaunch,
+    canLaunch: canLaunch && joinMultiplayerGame != null,
     isPlayable: primary.isPlayable,
     isResolved,
     aggregation: isAggregated
@@ -112,29 +112,29 @@ export const GameUpdateShellCard = ({
 
   const sendEvent = (eventName: string): void => sendGameUpdateEvent(eventName, eventParams());
 
+  const followMutationKey = ["gameUpdateFollow", primary.universeId, nsPage];
   const followMutation = useMutation<unknown, unknown, boolean>({
+    mutationKey: followMutationKey,
     mutationFn: (following: boolean) => {
       const userId = authenticatedUser()?.id;
       if (!userId || !primary.universeId) {
         return Promise.resolve(null);
       }
       const config = followUniverseUrlConfig(userId, primary.universeId);
-      return following ? httpService.post(config, {}) : httpService.delete(config, {});
+      return following ? streamPost(config, {}) : streamDelete(config, {});
     },
     onSuccess: (_data, following) => {
       setUnfollowed(!following);
-      if (!following) {
-        markGameUpdateInteracted(primary, GAME_UPDATE_INTERACTIONS.unfollowed);
-        return;
-      }
-      if (!primary.updateMessage) {
+      if (following && !primary.updateMessage) {
         queryClient
-          .invalidateQueries([GAME_UPDATES_QUERY_KEY])
+          .invalidateQueries({ queryKey: [GAME_UPDATES_QUERY_KEY] })
           .catch((error: unknown) => reportNotificationStreamError("gameUpdateRefetch", error));
       }
     },
     onError: (error: unknown) => reportNotificationStreamError("gameUpdateFollow", error),
   });
+
+  const isFollowPending = useIsMutating({ mutationKey: followMutationKey }) > 0;
 
   const setFollowing = (following: boolean): void => {
     sendEvent(following ? streamEvents.follow : streamEvents.unfollow);
@@ -155,15 +155,14 @@ export const GameUpdateShellCard = ({
       handlers={{
         onPlay: () => {
           onInteract();
-          markGameUpdateInteracted(primary, GAME_UPDATE_INTERACTIONS.played);
           if (primary.rootPlaceId) {
-            GameLauncher?.joinMultiplayerGame(primary.rootPlaceId, true, false);
+            joinMultiplayerGame?.(primary.rootPlaceId);
           }
           sendEvent(streamEvents.launchExperience);
         },
         onUnfollow: () => setFollowing(false),
         onUndo: () => setFollowing(true),
-        isFollowPending: followMutation.isLoading,
+        isFollowPending,
         onReport: () => {
           sendEvent(streamEvents.report);
           openAbuseReport(abuseReportHref(primary.universeId, window.location.href));

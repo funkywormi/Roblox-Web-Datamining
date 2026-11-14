@@ -1,4 +1,5 @@
 import environmentUrls from "@rbx/environment-urls";
+import { forViewer } from "../util/searchLinks";
 import linkConstants from "./linkConstants";
 
 export const getNavigationContainer = () => document.getElementById("navigation-container");
@@ -28,8 +29,8 @@ export default {
   englishLanguageCode: "en",
   avatarAutocompleteUrlLocations: ["Catalog", "Trades", "Inventory", "Avatar", "CatalogItem"],
   avatarAutocompleteSuggestionLimit: 5,
-  isSpecialTreatmentAutocompleteRestricted: (): boolean =>
-    linkConstants.miscSearchLink
+  isSpecialTreatmentAutocompleteRestricted: (pathname: string, isAuthenticated: boolean): boolean =>
+    forViewer(linkConstants.miscSearchLink, isAuthenticated)
       .flatMap(link => link.pageSort)
-      .some(keyword => window.location.pathname.includes(keyword)),
+      .some(keyword => pathname.includes(keyword)),
 } as const;

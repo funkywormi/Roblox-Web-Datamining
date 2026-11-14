@@ -15,6 +15,8 @@ import type { SduiTelemetryHandlerNameRegistry } from "../registry/SduiTelemetry
 import { createSduiApiStore } from "../store/SduiApiStore";
 import { createSduiTemplateStore } from "../store/SduiTemplateStore";
 import { createDeduplicatingErrorReporter } from "../errors/DeduplicatingSduiErrorReporter";
+import { createSessionAttributingAnalyticsReporter } from "../analytics/SessionAttributingAnalyticsReporter";
+import { SduiSessionStore, type SduiSessionData } from "../analytics/SduiSessionStore";
 import { readAccountLocaleTag } from "../utils/readAccountLocaleTag";
 import type {
   HydrationContent,
@@ -46,6 +48,8 @@ export interface SduiServices {
   analyticsReporter: SduiAnalyticsReporter;
   errorReporter: SduiErrorReporter;
   loadTimerRegistry: SduiLoadTimerRegistry;
+  /** Session values appended to every `analyticsReporter` event. */
+  sessionStore: SduiSessionStore;
   pageContext: SduiPageContext;
   translate?: TranslateFunction;
 }
@@ -68,6 +72,8 @@ export interface CreateSduiServicesOptions {
   pageContext: SduiPageContext;
   /** Seed entity hydration data at creation time. */
   initialHydrationData?: HydrationContent;
+  /** Seed the session store at creation time. */
+  initialSessionData?: SduiSessionData;
 
   /** Locale-aware translate function. */
   translate?: TranslateFunction;
@@ -95,12 +101,16 @@ export function createSduiServicesWithStores(
     actionHandlerRegistry,
     telemetryHandlerNameRegistry,
     impressionHandlerRegistry,
-    analyticsReporter,
     observeWebVitals,
     pageLoadPlatformAdapter,
     pageContext,
   } = options;
   const errorReporter = createDeduplicatingErrorReporter(options.errorReporter);
+  const sessionStore = new SduiSessionStore(options.initialSessionData);
+  const analyticsReporter = createSessionAttributingAnalyticsReporter(
+    options.analyticsReporter,
+    sessionStore,
+  );
   const loadTimerRegistry = createSduiLoadTimerRegistry(errorReporter, {
     analyticsReporter,
     observeWebVitals,
@@ -165,6 +175,7 @@ export function createSduiServicesWithStores(
     analyticsReporter,
     errorReporter,
     loadTimerRegistry,
+    sessionStore,
     pageContext,
     translate: options.translate,
   };
@@ -249,6 +260,7 @@ export function disposePageServices(pageKey: string): void {
   services.poolRegistry.clear();
   services.dataBinder.clear();
   services.templateStore.clear();
+  services.sessionStore.clear();
   pageServicesByKey.delete(pageKey);
 }
 

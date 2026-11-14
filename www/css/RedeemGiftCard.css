@@ -1170,11 +1170,13 @@
     display: inline-block
 }
 
-#credit-conversion-modal .modal-footer-buttons.d-flex.justify-content-between {
+#credit-conversion-modal .modal-footer-buttons.d-flex.justify-content-between,
+#credit-conversion-modal .modal-footer-buttons.flex.justify-between {
     margin-top: 0
 }
 
-#credit-conversion-modal .modal-footer-buttons.d-flex.justify-content-between .btn {
+#credit-conversion-modal .modal-footer-buttons.d-flex.justify-content-between .btn,
+#credit-conversion-modal .modal-footer-buttons.flex.justify-between .btn {
     margin: 0
 }
 

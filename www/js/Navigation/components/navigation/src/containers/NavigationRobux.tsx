@@ -1,34 +1,36 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ValueOf } from "@rbx/core-lib";
-
-import analytics from "@rbx/core-scripts/payments-flow";
+import {
+  PURCHASE_EVENT_TYPE,
+  TRIGGERING_CONTEXT,
+  VIEW_MESSAGE,
+  VIEW_NAME,
+  type ViewMessage,
+} from "@rbx/payments/payments-flow-analytics";
+import { sendUserPurchaseFlowEvent } from "../util/purchaseFlowUtil";
 import { useTranslations } from "@rbx/www-common/i18n";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import links from "../constants/linkConstants";
 import LeaveRobloxPopupDisclaimer from "../components/robux-popover/LeaveRobloxPopupDisclaimer";
 import Link from "../components/NavLink";
 import { getNavCapability } from "../util/navCapabilities";
+import { useNavUser } from "../util/navUser";
 
 export default function NavigationRobux() {
   const t = useTranslations("CommonUI.Features");
   const { buyRobuxUrl } = links;
   const { buyRobux, buyRobuxOnVng } = buyRobuxUrl;
-  const user = authenticatedUser();
-  const { ENUM_TRIGGERING_CONTEXT, ENUM_VIEW_NAME, ENUM_VIEW_MESSAGE, ENUM_PURCHASE_EVENT_TYPE } =
-    analytics;
-
+  const user = useNavUser();
   const [isEligibleForVng, setIsEligibleForVng] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const cacheRef = useRef(new Map());
 
-  const sendAnalyticsEvent = (viewMessage: ValueOf<typeof ENUM_VIEW_MESSAGE>) => {
-    analytics.sendUserPurchaseFlowEvent(
-      ENUM_TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
-      false,
-      ENUM_VIEW_NAME.NAVIGATION_ROBUX_TEXT,
-      ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+  const sendAnalyticsEvent = (viewMessage: ViewMessage) => {
+    sendUserPurchaseFlowEvent({
+      triggerContext: TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
+      isMidPurchaseStep: false,
+      viewName: VIEW_NAME.NAVIGATION_ROBUX_TEXT,
+      purchaseEventType: PURCHASE_EVENT_TYPE.USER_INPUT,
       viewMessage,
-    );
+    });
   };
 
   useEffect(() => {
@@ -51,11 +53,11 @@ export default function NavigationRobux() {
   }, [buyRobuxOnVng, buyRobuxOnVng.cacheKey, user?.id]);
 
   const onBuyRobuxClick = () => {
-    sendAnalyticsEvent(ENUM_VIEW_MESSAGE.BUY_ROBUX);
+    sendAnalyticsEvent(VIEW_MESSAGE.BUY_ROBUX);
   };
 
   const onBuyRobuxExternalClick = () => {
-    sendAnalyticsEvent(ENUM_VIEW_MESSAGE.EXTERNAL_LINK_MODAL);
+    sendAnalyticsEvent(VIEW_MESSAGE.EXTERNAL_LINK_MODAL);
 
     setIsPopupOpen(true);
   };
@@ -65,7 +67,7 @@ export default function NavigationRobux() {
   };
 
   const onBuyRobuxExternalContinue = () => {
-    sendAnalyticsEvent(ENUM_VIEW_MESSAGE.CONTINUE_TO_VNG);
+    sendAnalyticsEvent(VIEW_MESSAGE.CONTINUE_TO_VNG);
 
     const getVngShopUrl =
       getNavCapability("getVngShopSignedRedirectionUrl") ??

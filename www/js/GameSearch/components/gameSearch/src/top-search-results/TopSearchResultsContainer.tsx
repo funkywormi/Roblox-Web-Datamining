@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { TranslateFunction } from "@rbx/core-scripts/react";
 import { usePageSession } from "@rbx/discovery-common/session";
 import { Loading } from "@rbx/sdui-common";
@@ -12,6 +12,7 @@ import {
   EventStreamMetadata,
   SessionInfoType,
 } from "@rbx/discovery-common/telemetry";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { buildSearchApiRequestConfig } from "../common/services/searchService";
 import { getSduiServices } from "../common/services/sduiServices";
 import { useIsSearchResultsFeedEmpty } from "../common/hooks/useIsSearchResultsFeedEmpty";
@@ -23,7 +24,8 @@ const TOP_SEARCH_RESULTS_SURFACE_KEY = PageContext.SearchPage;
 const TOP_SEARCH_RESULTS_FEED_IDENTIFIER = "search_results_feed";
 const NO_SEARCH_RESULTS_KEY = "LabelNoSearchResults";
 
-const getTopSearchResultsPageKey = (sessionId: string) => `${PageContext.SearchPage}-${sessionId}`;
+const getTopSearchResultsPageKey = (omniSearchSessionId: string) =>
+  `${PageContext.SearchPage}-${omniSearchSessionId}`;
 
 const SDUI_PAGE_ENTRY_POINT_IDENTIFIERS = { rootIdentifier: TOP_SEARCH_RESULTS_FEED_IDENTIFIER };
 
@@ -36,35 +38,40 @@ type TopSearchResultsContainerProps = {
 export const TopSearchResultsContainer = ({ translate }: TopSearchResultsContainerProps) => {
   const keyword = normalizeKeyword(getKeyword());
 
-  const sessionId = usePageSession();
-  const pageKey = getTopSearchResultsPageKey(sessionId);
+  const omniSearchSessionId = usePageSession();
+  // The session is part of the page key so its reporter and API cache stay scoped together.
+  const pageKey = getTopSearchResultsPageKey(omniSearchSessionId);
+  const [topTabSessionId] = useState(generateRandomUuid());
 
   const services = getSduiServices({
     translate,
     pageKey,
     appPage: TOP_SEARCH_RESULTS_APP_PAGE,
+    omniSearchSessionId,
   });
 
   const requestConfig = useMemo(
     () =>
       buildSearchApiRequestConfig({
         keyword,
-        sessionId,
+        omniSearchSessionId,
+        tabSpecificSessionId: topTabSessionId,
         surfaceKey: TOP_SEARCH_RESULTS_SURFACE_KEY,
         configKey: pageKey,
         clientCapabilities: {
           enabledCapabilities: [Capability.SUPPORTS_SAFETY_RESOURCE_BANNER],
         },
       }),
-    [keyword, pageKey, sessionId],
+    [keyword, pageKey, omniSearchSessionId, topTabSessionId],
   );
 
   const additionalAnalyticsData = useMemo(
     () => ({
-      [SessionInfoType.GameSearchSessionInfo]: sessionId,
+      [SessionInfoType.GameSearchSessionInfo]: omniSearchSessionId,
       [EventStreamMetadata.OmniSearchType]: OmniSearchType.TopResults,
+      searchKeyword: keyword,
     }),
-    [sessionId],
+    [omniSearchSessionId, keyword],
   );
 
   const isEmpty = useIsSearchResultsFeedEmpty(

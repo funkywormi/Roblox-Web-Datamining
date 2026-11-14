@@ -6,6 +6,7 @@ import { SystemFeedbackProvider } from "@rbx/core-ui";
 import { ProfileType } from "@rbx/profile-platform";
 import { ExperimentsProvider } from "@rbx/profile-common/ExperimentsContext";
 import { ExperimentationLayer } from "@rbx/profile-common/experimentationUtils";
+import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";
 import { translations } from "./component.json";
 import ProfilePlatformContainer from "./src/ProfilePlatformContainer";
 import { ProfilePlatformContextProvider } from "./src/context/ProfilePlatformContext";
@@ -37,9 +38,11 @@ ready(() => {
         <SystemFeedbackProvider>
           <ExperimentsProvider layer={ExperimentationLayer.SocialProfile}>
             <ProfilePlatformContextProvider profileId={profileId} profileType={profileType}>
-              <TranslationProvider config={translations}>
-                <ProfilePlatformContainer />
-              </TranslationProvider>
+              <TranslationProviderSCC namespaces={["Feature.Profile"]}>
+                <TranslationProvider config={translations}>
+                  <ProfilePlatformContainer />
+                </TranslationProvider>
+              </TranslationProviderSCC>
             </ProfilePlatformContextProvider>
           </ExperimentsProvider>
         </SystemFeedbackProvider>

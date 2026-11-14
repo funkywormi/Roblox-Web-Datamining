@@ -1,11 +1,11 @@
-import type { RobloxTranslationResource } from '@rbx/legacy-webapp-types/Roblox';
+import type { UpsellTranslationResource } from '../constants/serviceTypeDefinitions';
 import { LANG_KEYS } from '../constants/upsellConstants';
 import openDialog from './openDialog';
 import { ItemPurchaseObject } from '../constants/serviceTypeDefinitions';
 
 export default function openTryAgainLaterErrorModal(
   itemPurchaseObj: ItemPurchaseObject,
-  translationResource: RobloxTranslationResource
+  translationResource: UpsellTranslationResource
 ) {
   openDialog({
     titleText: translationResource.get(LANG_KEYS.errorOccuredHeading, {}),

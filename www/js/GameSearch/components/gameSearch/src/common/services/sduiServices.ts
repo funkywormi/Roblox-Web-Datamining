@@ -1,5 +1,6 @@
 import type { TranslateFunction } from "@rbx/core-scripts/react";
 import { DiscoverySduiModule } from "@rbx/discovery-common/sdui";
+import { SessionInfoType } from "@rbx/discovery-common/telemetry";
 import {
   composeSduiRegistries,
   getOrCreatePageServices,
@@ -39,12 +40,17 @@ type GetSduiServicesParams = {
   translate: TranslateFunction;
   pageKey: string;
   appPage: string;
+  /**
+   * The "global" session ID which should stay the same across all tabs
+   */
+  omniSearchSessionId?: string;
 };
 
 export function getSduiServices({
   translate,
   pageKey,
   appPage,
+  omniSearchSessionId,
 }: GetSduiServicesParams): SduiServices {
   const { gameSearchRegistries, telemetry } = getRegistriesAndTelemetry();
 
@@ -61,6 +67,7 @@ export function getSduiServices({
       pageName: appPage,
       appPage,
     },
+    initialSessionData: { [SessionInfoType.OmniSearchSessionInfo]: omniSearchSessionId },
     translate,
   });
 }

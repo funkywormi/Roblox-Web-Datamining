@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import realTime from "@rbx/core-scripts/realtime";
+import { getNotificationStreamTransport } from "./streamTransport";
 import { reportNotificationStreamError } from "./notificationStreamObservability";
 
 type RealtimeMessage = { Type?: string };
@@ -17,7 +17,6 @@ export const useNotificationStreamRealtime = (
   handlersRef.current = handlers;
 
   useEffect(() => {
-    const client = realTime.GetClient();
     const callback = (detail: unknown): void => {
       try {
         const data = detail as RealtimeMessage;
@@ -38,8 +37,14 @@ export const useNotificationStreamRealtime = (
         reportNotificationStreamError("realtime", error);
       }
     };
-    client.Subscribe("NotificationStream", callback);
-    return () => client.Unsubscribe("NotificationStream", callback);
+    try {
+      return getNotificationStreamTransport().subscribe("NotificationStream", callback, error =>
+        reportNotificationStreamError("realtime", error),
+      );
+    } catch (error) {
+      reportNotificationStreamError("realtime", error);
+      return undefined;
+    }
   }, []);
 };
 

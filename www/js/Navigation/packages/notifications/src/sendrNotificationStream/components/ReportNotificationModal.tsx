@@ -1,24 +1,15 @@
-import React, { FC, useCallback, useState } from "react";
-import { DeviceMeta } from "Roblox";
+import React, { FC, useCallback } from "react";
 import { Dialog as FoundationDialog, DialogContent } from "@rbx/foundation-ui";
-import { Dialog } from "../../styledMuiComponents";
 import { useSelectedNotification } from "../context/SelectedNotification";
 import isVisualItemAbuseReport from "../utils/isVisualItemAbuseReport";
 import ReportNotificationModalContent from "./ReportNotificationModalContent";
-import { getIsFoundationModalEnabled } from "../utils/getIsFoundationModalEnabled";
+import { getFlaggedMuiModalArms } from "../mui/muiModalArms";
 
 const ReportNotificationModal: FC<{
   isOpen: boolean;
   closeModal: () => void;
 }> = ({ isOpen, closeModal }) => {
   const selectedNotification = useSelectedNotification();
-  const [isOnPhone] = useState(() => {
-    if (DeviceMeta) {
-      const { isPhone } = DeviceMeta();
-      return isPhone;
-    }
-    return false;
-  });
   const handleCloseAbuseReport = useCallback(
     (reported: boolean) => {
       if (reported) {
@@ -47,60 +38,51 @@ const ReportNotificationModal: FC<{
     }
   }, []);
 
-  const onReportNotificationModalClose = useCallback(
-    (event, reason: "backdropClick" | "escapeKeyDown") => {
-      if (reason === "escapeKeyDown") {
-        handleCloseAbuseReport(false);
-      }
-    },
-    [handleCloseAbuseReport],
-  );
+  const closeOnEscape = useCallback(() => handleCloseAbuseReport(false), [handleCloseAbuseReport]);
 
-  if (getIsFoundationModalEnabled()) {
+  const MuiReportNotificationDialog = getFlaggedMuiModalArms()?.ReportNotificationDialog;
+  if (MuiReportNotificationDialog) {
     return (
-      <FoundationDialog
-        open={isOpen}
-        onOpenChange={open => {
-          // Foundation exposes no close reason; Escape (and any programmatic close)
-          // fires open=false. Backdrop click is suppressed below so it never fires here.
-          if (!open) {
-            handleCloseAbuseReport(false);
-          }
-        }}
-        type="Default"
-        size="Large"
-        isModal
-        hasCloseAffordance={false}
+      <MuiReportNotificationDialog
+        isOpen={isOpen}
+        onEscape={closeOnEscape}
+        onClick={stopPropagation}
       >
-        <DialogContent
-          className="report-notification-modal"
-          // Radix close-control props forwarded through DialogContent's ...props spread
-          // to preserve MUI parity: backdrop click does not dismiss (Escape still does),
-          // and clicks do not propagate to underlying modals. See PHASE_0_4 doc for the
-          // foundation-web follow-up to type these natively.
-          {...({
-            onClick: stopPropagation,
-            onPointerDownOutside: (event: Event) => event.preventDefault(),
-            onInteractOutside: (event: Event) => event.preventDefault(),
-          } as Record<string, unknown>)}
-        >
-          <ReportNotificationModalContent handleClose={handleCloseAbuseReport} />
-        </DialogContent>
-      </FoundationDialog>
+        <ReportNotificationModalContent handleClose={handleCloseAbuseReport} />
+      </MuiReportNotificationDialog>
     );
   }
 
   return (
-    <Dialog
-      maxWidth="md"
-      onClose={onReportNotificationModalClose}
+    <FoundationDialog
       open={isOpen}
-      isPhone={isOnPhone}
-      onClick={stopPropagation}
-      className="report-notification-modal"
+      onOpenChange={open => {
+        // Foundation exposes no close reason; Escape (and any programmatic close)
+        // fires open=false. Backdrop click is suppressed below so it never fires here.
+        if (!open) {
+          handleCloseAbuseReport(false);
+        }
+      }}
+      type="Default"
+      size="Large"
+      isModal
+      hasCloseAffordance={false}
     >
-      <ReportNotificationModalContent handleClose={handleCloseAbuseReport} />
-    </Dialog>
+      <DialogContent
+        className="report-notification-modal"
+        // Radix close-control props forwarded through DialogContent's ...props spread
+        // to preserve MUI parity: backdrop click does not dismiss (Escape still does),
+        // and clicks do not propagate to underlying modals. See PHASE_0_4 doc for the
+        // foundation-web follow-up to type these natively.
+        {...({
+          onClick: stopPropagation,
+          onPointerDownOutside: (event: Event) => event.preventDefault(),
+          onInteractOutside: (event: Event) => event.preventDefault(),
+        } as Record<string, unknown>)}
+      >
+        <ReportNotificationModalContent handleClose={handleCloseAbuseReport} />
+      </DialogContent>
+    </FoundationDialog>
   );
 };
 

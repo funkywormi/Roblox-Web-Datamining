@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { descriptionWithoutInlineExpiration } from "@rbx/www-common/offer-expiration";
 import {
   MARKETPLACE_OFFER_DISCOUNT_TYPE,
   MARKETPLACE_OFFERS_FEATURE_KEY,
@@ -15,6 +16,8 @@ export type MarketplaceOfferSelection = {
   offerId: string;
   localizedText: string;
   selected: boolean;
+  /** ISO-8601 UTC timestamp from cart-pricing; drives the optional "Ends …" badge. */
+  expirationTimeUtc?: string;
 };
 
 export type CartPricedDiscountLine = {
@@ -58,10 +61,13 @@ export function mapAvailableOffersToSelections(
     availableOffers?.reduce<MarketplaceOfferSelection[]>((offers, offer) => {
       const localizedText = offer.localizedDescription?.trim();
       if (offer.offerId && localizedText) {
+        const expirationTimeUtc = offer.expirationTimeUtc?.trim() || undefined;
         offers.push({
           offerId: offer.offerId,
-          localizedText,
+          // Drop the inline date only when the clock badge will actually render.
+          localizedText: descriptionWithoutInlineExpiration(localizedText, expirationTimeUtc),
           selected: offer.selected ?? false,
+          ...(expirationTimeUtc ? { expirationTimeUtc } : {}),
         });
       }
       return offers;

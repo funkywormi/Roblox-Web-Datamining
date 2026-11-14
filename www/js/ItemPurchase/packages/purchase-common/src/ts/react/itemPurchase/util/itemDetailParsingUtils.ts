@@ -46,7 +46,9 @@ const parseItemDetails = (originalItem: Partial<ParsedItemDetail>, data: Catalog
     item.resellerAvailable = data.hasResellers;
     item.isPurchasable = data.lowestPrice !== undefined;
     item.isMarketPlaceEnabled =
-      data.saleLocationType === 'ShopAndAllExperiences' || data.saleLocationType === 'ShopOnly';
+      data.saleLocationType === 'ShopAndAllExperiences' ||
+      data.saleLocationType === 'ShopAndExperiencesById' ||
+      data.saleLocationType === 'ShopOnly';
   }
 
   return item;

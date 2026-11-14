@@ -98,7 +98,6 @@ export const PURCHASE_WARNING_ACTION_TYPES = {
   ParentalConsentWarningPaymentModal13To17: 'ParentalConsentWarningPaymentModal13To17',
   ParentalAuthorization13To17: 'ParentalAuthorization13To17',
   U13MonthlyThreshold1Modal: 'U13MonthlyThreshold1Modal',
-  RequireEmailVerification: 'RequireEmailVerification',
   U13MonthlyThreshold2Modal: 'U13MonthlyThreshold2Modal',
   NoAction: 'NoAction'
 };
@@ -174,7 +173,6 @@ export const UPSELL_COUNTER_NAMES = {
   ConfirmU13MonthlyThreshold2Modal: 'ConfirmU13MonthlyThreshold2Modal',
   ConfirmParentalConsentWarningPaymentModal13To17Modal:
     'ConfirmParentalConsentWarningPaymentModal13To17Modal',
-  U13PaymentModalEmailVerificationTriggered: 'U13PaymentModalEmailVerificationTriggered',
   U13PaymentModalFailedToShow: 'U13PaymentModalFailedToShow',
   U13PaymentModalNoAction: 'U13PaymentModalNoAction'
 };

@@ -33,7 +33,7 @@ import {
   getSubscriptionPeriodTranslationKey,
 } from "@rbx/payments/services/subscriptions";
 import { usePaymentSession } from "@rbx/payments/services/paymentSession";
-import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { PriceTag } from "@rbx/payments/priceTag";
 
 type TGetPlusModalProps = {
@@ -113,13 +113,13 @@ const GetPlusModal = ({
     }
     if (selectedProduct && !autoSelectPaymentFlowTrackedRef.current) {
       autoSelectPaymentFlowTrackedRef.current = true;
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-        true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_GET_PLUS_MODAL,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.TIER_SELECTED,
-        redeemFunnelMetadata({
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+        isMidPurchaseStep: true,
+        viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_GET_PLUS_MODAL,
+        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+        viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.TIER_SELECTED,
+        eventMetadata: redeemFunnelMetadata({
           paymentSessionId: paymentSessionId ?? "",
           tier: getTier(selectedProduct),
           source: "auto",
@@ -127,7 +127,7 @@ const GetPlusModal = ({
           currencyCode,
           subscriptionProductId: selectedProduct.productKey.id,
         }),
-      );
+      });
     }
   }, [open, sortedProducts, creditBalance, currencyCode, preferredPackageId, paymentSessionId]);
 
@@ -184,20 +184,20 @@ const GetPlusModal = ({
     trackCounter("GetPlus_SubscribeClicked", {
       tier: selectedProduct ? getTier(selectedProduct) : "unknown",
     });
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-      true,
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_GET_PLUS_MODAL,
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-      paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.SUBSCRIBE_CLICKED,
-      redeemFunnelMetadata({
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+      isMidPurchaseStep: true,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_GET_PLUS_MODAL,
+      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+      viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.SUBSCRIBE_CLICKED,
+      eventMetadata: redeemFunnelMetadata({
         paymentSessionId: paymentSessionId ?? "",
         tier: selectedProduct ? getTier(selectedProduct) : "unknown",
         availableCreditBalance: String(creditBalance),
         currencyCode,
         subscriptionProductId: selectedPackageId,
       }),
-    );
+    });
     preparePurchaseMutation.mutate(selectedPackageId);
   };
 
@@ -209,13 +209,13 @@ const GetPlusModal = ({
       creditBucket: getCreditBucket(creditBalance),
       currencyCode,
     });
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-      true,
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_GET_PLUS_MODAL,
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-      paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.TIER_SELECTED,
-      redeemFunnelMetadata({
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+      isMidPurchaseStep: true,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.REDEEM_CREDIT_GET_PLUS_MODAL,
+      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+      viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.TIER_SELECTED,
+      eventMetadata: redeemFunnelMetadata({
         paymentSessionId: paymentSessionId ?? "",
         tier,
         source: "manual",
@@ -223,7 +223,7 @@ const GetPlusModal = ({
         currencyCode,
         subscriptionProductId: packageId,
       }),
-    );
+    });
   };
 
   const toPlusPackage = (product: SubscriptionProductInfo): TPlusPackage => ({

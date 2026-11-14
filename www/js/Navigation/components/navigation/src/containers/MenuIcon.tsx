@@ -1,13 +1,14 @@
 import { Fragment } from "react";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import layoutConstants from "../constants/layoutConstants";
 import NavIcon from "../components/NavIcon";
 import SkipToMainContent from "../components/SkipToMainContent";
 import { isAccountExperienceRevampEnabled } from "../util/accountExperienceUtils";
+import { useNavUser } from "../util/navUser";
 
 const { headerMenuIconClickEvent } = layoutConstants;
 
 export default function MenuIcon() {
+  const user = useNavUser();
   const onClickMenuIcon = () => {
     document.dispatchEvent(new CustomEvent(headerMenuIconClickEvent.name));
   };
@@ -20,7 +21,7 @@ export default function MenuIcon() {
   return (
     <Fragment>
       <SkipToMainContent />
-      {authenticatedUser() != null && (
+      {user != null && (
         // Foundation's IconButton paints a background on every variant; the header hamburger is
         // transparent, so .menu-button keeps its responsive rules.
         <button

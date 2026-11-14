@@ -2,6 +2,7 @@ import { onCLS, onFCP, onINP, onLCP, onTTFB } from "web-vitals";
 import { bigIntFromNumber, parseBigInt } from "@rbx/core-lib/bigint";
 import { WebVitalsSchema } from "@rbx/event-stream-proto/eventstream/web/web_vitals_pb";
 import { EventStreamClient } from "@rbx/event-stream-v2";
+import type { AppShellHost } from "./appShell/observability/host";
 import { publishPagePerformance } from "./pagePerformance";
 
 /**
@@ -39,7 +40,7 @@ function getClient(baseUrl: string): EventStreamClient {
  * single WebVitals event (one row per page load; each vital is an optional typed
  * column). Shared by the legacy .NET sentry component and the Next.js client
  * Sentry init; each passes its own event-stream base URL (apiGatewayUrl), the
- * user id, and the internal page name.
+ * user id, the internal page name, and which side rendered the page.
  *
  * Also publishes a sampled share of loads as PagePerf histograms (see
  * pagePerformance.ts) so every page gets Grafana latency metrics.
@@ -57,6 +58,7 @@ export function sendWebVitals(
   // Required, not defaulted: an unnamed load page must stay undefined (reported
   // as Unknown) instead of picking up the current page's name.
   loadPageName: string | undefined,
+  host: AppShellHost,
 ): void {
   if (!measurements) {
     return;
@@ -89,11 +91,12 @@ export function sendWebVitals(
         ttfbMs,
         cls,
         inpMs,
+        renderPlatform: host,
       })
       .catch(() => {
         // Best-effort telemetry; the client already logs its own failures.
       });
-    publishPagePerformance(measurements, loadPageName);
+    publishPagePerformance(measurements, loadPageName, host);
   } catch (error) {
     console.error("[PERF] Failed to send web vitals:", error);
   }
@@ -137,6 +140,7 @@ export function reportWebVitals(
   baseUrl: string,
   getUserId: () => string | number | bigint | null | undefined,
   getPageName: () => string | undefined,
+  host: AppShellHost,
 ): void {
   if (typeof window === "undefined") {
     return;
@@ -169,7 +173,7 @@ export function reportWebVitals(
       measurements.ttfb = ttfb;
     }
     const pageName = getPageName();
-    sendWebVitals(baseUrl, measurements, getUserId(), pageName, loadPageName ?? pageName);
+    sendWebVitals(baseUrl, measurements, getUserId(), pageName, loadPageName ?? pageName, host);
   };
 
   // Flush once when the page is hidden/unloaded — after web-vitals has finalized

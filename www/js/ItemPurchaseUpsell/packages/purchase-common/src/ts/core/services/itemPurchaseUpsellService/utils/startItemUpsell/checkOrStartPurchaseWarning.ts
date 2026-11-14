@@ -1,31 +1,32 @@
-import { EmailVerificationService } from '@rbx/legacy-webapp-types/Roblox';
-import type { RobloxTranslationResourceProviderInstance } from '@rbx/legacy-webapp-types/Roblox';
-import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
+import { paymentFlowAnalyticsService } from '@rbx/payments/payments-flow-analytics';
 import getPurchaseWarningAction from '../../api/getPurchaseWarningAction';
-import { ItemDetailElementDataset, UpsellProduct } from '../../constants/serviceTypeDefinitions';
+import type {
+  ItemDetailElementDataset,
+  UpsellProduct,
+  UpsellTranslationProvider
+} from '../../constants/serviceTypeDefinitions';
 import {
   PURCHASE_WARNING_ACTION_TYPES,
   UPSELL_COUNTER_NAMES
 } from '../../constants/upsellConstants';
 import openPurchaseWarningModal from '../../modals/openPurchaseWarningModal';
-import { closeDialog } from '../../modals/openDialog';
 import reportCounter from '../common/reportCounter';
 
 function sendUserPurchaseFlowEvent(viewMessage: string) {
-  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-    true,
-    paymentFlowAnalyticsService.ENUM_VIEW_NAME.PURCHASE_WARNING,
-    paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
+  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+    isMidPurchaseStep: true,
+    viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.PURCHASE_WARNING,
+    purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
     viewMessage
-  );
+  });
 }
 
 export default async function checkOrStartPurchaseWarning(
   upsellProduct: UpsellProduct,
   isPurchaseWarningModalEnabled: boolean,
   onAcknowledgedOrFailedCallback: () => void,
-  intlProvider: RobloxTranslationResourceProviderInstance,
+  intlProvider: UpsellTranslationProvider,
   itemPurchaseObj?: ItemDetailElementDataset
 ) {
   if (!isPurchaseWarningModalEnabled) {
@@ -81,24 +82,6 @@ export default async function checkOrStartPurchaseWarning(
         onAcknowledgedOrFailedCallback,
         intlProvider,
         itemPurchaseObj
-      );
-    } else if (purchaseWarningAction === PURCHASE_WARNING_ACTION_TYPES.RequireEmailVerification) {
-      reportCounter(
-        UPSELL_COUNTER_NAMES.U13PaymentModalEmailVerificationTriggered,
-        itemPurchaseObj?.assetType
-      );
-      // A Radix modal blocks pointer events outside it, so close ours (without firing its cancel
-      // callbacks) before the verification modal opens.
-      closeDialog();
-      EmailVerificationService.handleUserEmailVerificationRequiredByPurchaseWarning()?.then(
-        data => {
-          sendUserPurchaseFlowEvent(
-            paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.REQUIRE_EMAIL_VERIFICATION
-          );
-          if (data?.emailAddress && data?.verified) {
-            onAcknowledgedOrFailedCallback();
-          }
-        }
       );
     } else {
       reportCounter(UPSELL_COUNTER_NAMES.U13PaymentModalNoAction, itemPurchaseObj?.assetType);

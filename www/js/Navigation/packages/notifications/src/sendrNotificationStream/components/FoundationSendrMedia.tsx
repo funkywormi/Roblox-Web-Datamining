@@ -1,8 +1,9 @@
 import React from "react";
 import { Avatar } from "@rbx/foundation-ui";
-import { Thumbnail2d, ThumbnailFormat, DefaultThumbnailSize } from "roblox-thumbnails";
 import { ThumbnailType, VisualItemThumbnail } from "../types/NotificationTemplateTypes";
 import { ThumbnailData, iconClassMap } from "./NotificationThumbnail";
+import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
+import type { JSX } from "react";
 
 const MEDIA_SIZE = 48;
 
@@ -25,6 +26,7 @@ export const FoundationSendrMedia = ({
     return null;
   }
 
+  const { Thumbnail } = getNotificationStreamHost();
   const isRound = thumbnailItem.idType === ThumbnailType.User;
   return (
     <span
@@ -41,10 +43,8 @@ export const FoundationSendrMedia = ({
         flexShrink: 0,
       }}
     >
-      <Thumbnail2d
+      <Thumbnail
         type={thumbnailSettings.type}
-        size={DefaultThumbnailSize}
-        format={ThumbnailFormat.webp}
         targetId={parseFloat(thumbnailItem.id)}
         containerClass="notification-icon"
         includeProfileFrame={isRound}

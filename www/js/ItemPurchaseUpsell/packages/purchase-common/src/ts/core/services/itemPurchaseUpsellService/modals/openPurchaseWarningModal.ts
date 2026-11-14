@@ -1,4 +1,4 @@
-import type { RobloxTranslationResourceProviderInstance } from '@rbx/legacy-webapp-types/Roblox';
+import type { UpsellTranslationProvider } from '../constants/serviceTypeDefinitions';
 import {
   COMMON_UI_CONTROLS_NAMESPACE,
   FEATURE_PREMIUM_NAMESPACE,
@@ -16,7 +16,7 @@ export default function openPurchaseWarningModal(
   upsellProduct: UpsellProduct,
   purchaseWarningAction: string,
   onAcknowledgedCallback: () => void,
-  intlProvider: RobloxTranslationResourceProviderInstance,
+  intlProvider: UpsellTranslationProvider,
   itemPurchaseObj?: ItemDetailElementDataset
 ) {
   const featurePremiumTranslationResource = intlProvider.getTranslationResource(

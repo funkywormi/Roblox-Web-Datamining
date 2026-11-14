@@ -3,14 +3,23 @@ import { ValueOf } from "@rbx/core-lib";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { Icon, Menu, MenuItem, MenuLabel, MenuSection, MenuSeparator } from "@rbx/foundation-ui";
-import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
+import {
+  PURCHASE_EVENT_TYPE,
+  TRIGGERING_CONTEXT,
+  VIEW_MESSAGE,
+  VIEW_NAME,
+  type ViewMessage,
+} from "@rbx/payments/payments-flow-analytics";
+import { sendUserPurchaseFlowEvent } from "../../util/purchaseFlowUtil";
 import { PriceTag } from "@rbx/payments/priceTag";
-import "@rbx/payments/src/priceTag/priceTag.css";
+// Keep legacy payment pages styled while they still rely on Navigation's CSS.
+import "@rbx/price-tag/legacy.css";
 
 import links from "../../constants/linkConstants";
 import layoutConstants from "../../constants/layoutConstants";
 import RobuxBadgeType from "../../constants/robuxBadgeConstants";
 import { mapRobuxBadgeTypeToStr, setRobuxBadgeLocalStorage } from "../../util/robuxBadgeUtil";
+import { useNavHref } from "../../util/navHref";
 
 const { buyRobuxUrl, redeemUrl } = links;
 
@@ -35,6 +44,7 @@ export default function RobuxMenu({
   creditDisplayConfig: ValueOf<typeof layoutConstants.creditDisplayConfigVariants>;
   onBuyRobuxExternalClick: () => void;
 }) {
+  const toNavHref = useNavHref();
   const tAlerts = useTranslations("Common.AlertsAndOptions");
   const tFeatures = useTranslations("CommonUI.Features");
   const tRedeem = useTranslations("Purchasing.RedeemGameCard");
@@ -44,20 +54,18 @@ export default function RobuxMenu({
     ? layoutConstants.robuxOnEconomySystemOutage
     : formatNumber(robuxAmount);
 
-  const sendViewMessageEvent = (
-    viewMessage: ValueOf<typeof paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE>,
-  ) => {
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
-      false,
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.NAVIGATION_DROPDOWN_MENU,
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+  const sendViewMessageEvent = (viewMessage: ViewMessage) => {
+    sendUserPurchaseFlowEvent({
+      triggerContext: TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
+      isMidPurchaseStep: false,
+      viewName: VIEW_NAME.NAVIGATION_DROPDOWN_MENU,
+      purchaseEventType: PURCHASE_EVENT_TYPE.USER_INPUT,
       viewMessage,
-    );
+    });
   };
 
   const onBuyRobuxClicked = () => {
-    sendViewMessageEvent(paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.BUY_ROBUX);
+    sendViewMessageEvent(VIEW_MESSAGE.BUY_ROBUX);
     if (robuxBadgeType != null) {
       setRobuxBadgeLocalStorage(robuxBadgeType);
     }
@@ -120,7 +128,7 @@ export default function RobuxMenu({
           <MenuItem
             value="buyRobux"
             as="a"
-            href={buyRobuxUrl.buyRobux.url}
+            href={toNavHref(buyRobuxUrl.buyRobux.url)}
             title={tAlerts(buyRobuxUrl.buyRobux.label)}
             trailing={tAlerts.has(robuxBadgeStr) ? tAlerts(robuxBadgeStr) : undefined}
             onSelect={onBuyRobuxClicked}
@@ -129,10 +137,15 @@ export default function RobuxMenu({
         <MenuItem
           value="myTransactions"
           as="a"
-          href={buyRobuxUrl.myTransactions.url}
+          href={toNavHref(buyRobuxUrl.myTransactions.url)}
           title={tFeatures(buyRobuxUrl.myTransactions.label)}
         />
-        <MenuItem value="redeem" as="a" href={redeemUrl.url} title={tRedeem(redeemUrl.label)} />
+        <MenuItem
+          value="redeem"
+          as="a"
+          href={toNavHref(redeemUrl.url)}
+          title={tRedeem(redeemUrl.label)}
+        />
       </MenuSection>
     </Menu>
   );

@@ -1,6 +1,11 @@
 import { window as browserWindow } from "@rbx/core-lib/browser";
 
 export type FriendRequestResult = "success" | "failure";
+export type FriendRequestType = "friend-request-sent" | "friend-request-accepted";
+export type FriendRequestFeedback = {
+  result: FriendRequestResult;
+  type: FriendRequestType;
+};
 
 const FRIEND_REQUEST_RESULT_EVENT = "sdui:friend-request-result";
 
@@ -8,18 +13,22 @@ function isFriendRequestResult(value: unknown): value is FriendRequestResult {
   return value === "success" || value === "failure";
 }
 
+function isFriendRequestType(value: unknown): value is FriendRequestType {
+  return value === "friend-request-sent" || value === "friend-request-accepted";
+}
+
 /**
  * Note: This is a temporary function to unblock Top SRP. Later, snackbar will
  * be managed by prompt orchestrator and this method will be removed
  */
-export function publishFriendRequestResult(result: FriendRequestResult) {
+export function publishFriendRequestResult(feedback: FriendRequestFeedback) {
   const eventTarget = browserWindow;
   if (eventTarget == null) {
     return;
   }
 
   const event = new eventTarget.CustomEvent(FRIEND_REQUEST_RESULT_EVENT, {
-    detail: { result },
+    detail: feedback,
   });
   eventTarget.dispatchEvent(event);
 }
@@ -29,7 +38,7 @@ export function publishFriendRequestResult(result: FriendRequestResult) {
  * be managed by prompt orchestrator and this method will be removed
  */
 export function subscribeToFriendRequestResults(
-  listener: (result: FriendRequestResult) => void,
+  listener: (feedback: FriendRequestFeedback) => void,
 ): () => void {
   const eventTarget = browserWindow;
   if (eventTarget == null) {
@@ -41,8 +50,13 @@ export function subscribeToFriendRequestResults(
       return;
     }
 
-    if ("result" in event.detail && isFriendRequestResult(event.detail.result)) {
-      listener(event.detail.result);
+    if (
+      "result" in event.detail &&
+      isFriendRequestResult(event.detail.result) &&
+      "type" in event.detail &&
+      isFriendRequestType(event.detail.type)
+    ) {
+      listener({ result: event.detail.result, type: event.detail.type });
     }
   };
 

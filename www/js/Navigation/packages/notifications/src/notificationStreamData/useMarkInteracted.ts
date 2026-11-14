@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient, InfiniteData } from "@tanstack/react-query";
-import { httpService } from "core-utilities";
+import { streamPost } from "./streamTransport";
 import { StreamNotificationPage, markInteractedUrlConfig } from "./notificationStreamApi";
 import { GET_RECENT_QUERY_KEY } from "./useGetRecentNotifications";
 import { reportNotificationStreamError } from "./notificationStreamObservability";
@@ -8,7 +8,7 @@ export const useMarkInteracted = (): ReturnType<typeof useMutation<unknown, unkn
   const queryClient = useQueryClient();
 
   return useMutation<unknown, unknown, string>({
-    mutationFn: (eventId: string) => httpService.post(markInteractedUrlConfig, { eventId }),
+    mutationFn: (eventId: string) => streamPost(markInteractedUrlConfig, { eventId }),
     onMutate: (eventId: string) => {
       queryClient.setQueryData<InfiniteData<StreamNotificationPage>>(GET_RECENT_QUERY_KEY, prev =>
         prev

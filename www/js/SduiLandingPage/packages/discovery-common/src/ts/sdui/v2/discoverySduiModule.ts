@@ -1,3 +1,5 @@
+import { SduiClientModule } from "@rbx/sdui-client";
+import { SduiCommonModule } from "@rbx/sdui-common";
 import type { SduiRegistryModule } from "@rbx/sdui-core";
 import { EventType } from "../../common/constants/eventStreamConstants";
 import { DISCOVERY_ACTION_HANDLERS } from "./actions/discoveryActionHandlers";
@@ -14,3 +16,6 @@ export const DiscoverySduiModule = {
     [EventType.GamesFilterClick]: gamesFilterClickTelemetryHandler,
   },
 } satisfies SduiRegistryModule;
+
+/** Modules for discovery surfaces, in precedence order. */
+export const DISCOVERY_SDUI_MODULES = [DiscoverySduiModule, SduiClientModule, SduiCommonModule];

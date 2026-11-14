@@ -1,5 +1,6 @@
 import { MouseEventHandler, ReactNode } from "react";
 import { Link as FoundationLink } from "@rbx/foundation-ui";
+import { useNavHref } from "../util/navHref";
 
 type Props = {
   url?: string;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export default function NavLink({ url, cssClasses, className, id, onClick, children }: Props) {
+  const toNavHref = useNavHref();
   const classes = [className, cssClasses].filter(Boolean).join(" ") || undefined;
 
   // isExternal defaults true for any anchor without a _self/_parent/_top target. underline is off
@@ -18,7 +20,7 @@ export default function NavLink({ url, cssClasses, className, id, onClick, child
   // until that shell moves into React.
   return (
     <FoundationLink
-      href={url}
+      href={url == null ? undefined : toNavHref(url)}
       id={id}
       onClick={onClick}
       className={classes}

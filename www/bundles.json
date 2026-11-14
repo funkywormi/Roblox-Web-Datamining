@@ -163,7 +163,7 @@
         },
         {
             "name": "Authentication.AccountRecovery",
-            "url": "https://js.rbxcdn.com/e6b6693c18ed2828f1af29dab3e2bebefdccdad0e27984c59485e4e159b42099.js",
+            "url": "https://js.rbxcdn.com/b4af3f41f6bd6a8d99dc3996b3a6da57069507911601d6ff96cc8419c976f5c7.js",
             "sources": [
                 "/login/forgot-password-or-username"
             ]
@@ -1083,7 +1083,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/5670ea1c7aefd744dd2f6b4d874114a33c9fa624d2ad4c5c62093385264406ec.js",
+            "url": "https://js.rbxcdn.com/4f35c304b58fd3d5df0521d86d35fa8dbffaff88e37a4dcfb94c64f1793357b2.js",
             "sources": [
                 "/home",
                 "/",
@@ -1398,13 +1398,52 @@
             "url": "https://js.rbxcdn.com/84c4e2586c1f29cb9da8c73e69f86c06beda46cb663eb8829824186a1621219e.js",
             "sources": [
                 "/home",
+                "/",
+                "/login",
+                "/CreateAccount",
+                "/charts",
+                "/sitemap",
+                "/gift-robux",
+                "/shopgiftcards",
                 "/catalog",
+                "/support",
+                "/trades",
+                "/transactions",
+                "/request-error",
+                "/report-abuse",
+                "/supported-browsers",
+                "/discover/?Keyword=roblox",
+                "/users/friends",
                 "/users/inventory",
+                "/users/1/profile",
+                "/users/1/inventory",
                 "/users/1/favorites",
+                "/users/1/friends",
+                "/users/profile/edit",
+                "/my/messages",
                 "/my/avatar",
+                "/my/account",
+                "/search/communities",
+                "/search/users",
+                "/communities/1",
+                "/communities/configure",
+                "/games/1818",
+                "/info/roblox-badges",
+                "/crossdevicelogin/ConfirmCode",
+                "/communities/create",
+                "/illegal-content-reporting",
+                "/game-pass/58000",
                 "/badges/176685910",
                 "/catalog/3360689775",
-                "/bundles/591"
+                "/bundles/591",
+                "/sponsorships/list",
+                "/login/forgot-password-or-username",
+                "/help-safety",
+                "/support-center",
+                "/events/6177598281426797213",
+                "/developer-product/47545/product/45124061",
+                "/private-server/configure/527154577",
+                "/safety-dashboard"
             ]
         },
         {
@@ -1610,7 +1649,7 @@
         },
         {
             "name": "Feature.DownloadLanding",
-            "url": "https://js.rbxcdn.com/4729d5c3797f0e6e5f957cacbd77fb7946993adae3b12ddaf7ebf9d06cfa5917.js",
+            "url": "https://js.rbxcdn.com/6c59c8907af0ea4f4768d5cd04c47b8463cf5e41bd0c5f6536d0009ee986f0fd.js",
             "sources": [
                 "/home",
                 "/",
@@ -1987,7 +2026,7 @@
         },
         {
             "name": "Feature.Friends",
-            "url": "https://js.rbxcdn.com/2cc56cce0773f0560bae3d738cea71cc0600610fc08bb4c58df7f8b154b2d5f0.js",
+            "url": "https://js.rbxcdn.com/3d423f986b67a9e73f7a87a0f8ce848128ad8e15e1244809780a08040be216f7.js",
             "sources": [
                 "/home",
                 "/",
@@ -2277,7 +2316,7 @@
         },
         {
             "name": "Feature.Item",
-            "url": "https://js.rbxcdn.com/d805b8de033852d60b01cfb46de41d562996103b84a0f892378c2ea19c1fa8e9.js",
+            "url": "https://js.rbxcdn.com/bee092a4711a5ae90b2dccbe77d12938146882b09cae35355123ba10ee398097.js",
             "sources": [
                 "/home",
                 "/",
@@ -2531,7 +2570,7 @@
         },
         {
             "name": "Feature.Parents",
-            "url": "https://js.rbxcdn.com/49fd82688671b1487f1ad38d757a83bf687e94db20c5b9b11deddfc4f5d7b9db.js",
+            "url": "https://js.rbxcdn.com/dd2db3db7bd926f3e6a243004f799d740fa919c8307a112b3e22805fa5dd40b8.js",
             "sources": [
                 "/home",
                 "/",
@@ -2685,7 +2724,7 @@
         },
         {
             "name": "Feature.PlayerSearchResults",
-            "url": "https://js.rbxcdn.com/8ca31f37e8d61b172913e3d5614fad3e8039f693148aa41ab550a1d394e63f5c.js",
+            "url": "https://js.rbxcdn.com/3e1e02a3df4a3fb4e3744e5669a6cf02c696e7dbd957c809ab11270db27e604c.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -2907,7 +2946,7 @@
         },
         {
             "name": "Feature.PrivateServers",
-            "url": "https://js.rbxcdn.com/68bb2f7ce96dd95cf97e0460a2317a24ca90b018c54334d3ea7e3d4106d2c4c8.js",
+            "url": "https://js.rbxcdn.com/b72eac95610726d1ae645df95aa729128c1dab5fb04c23f96d574fd1eeba13a1.js",
             "sources": [
                 "/games/1818"
             ]
@@ -3383,6 +3422,13 @@
             "sources": [
                 "/help-safety",
                 "/safety-dashboard"
+            ]
+        },
+        {
+            "name": "Feature.Schools",
+            "url": "https://js.rbxcdn.com/015448a1574f6f259d7f5d63ee0e4b7a056e91142ee0f7af93fec9f45ab2774d.js",
+            "sources": [
+                "/discover/?Keyword=roblox"
             ]
         },
         {
@@ -4563,7 +4609,7 @@
         },
         {
             "name": "Catalog",
-            "url": "https://js.rbxcdn.com/00f2eaae7c880b3bc4e97893068383ca86913cefc2a94005b42e5c1802ca704c-Catalog.js",
+            "url": "https://js.rbxcdn.com/348fccafe3e87f2807b9603809dc923b46cfc91ab44f27a2a8475cb01d99bfd0-Catalog.js",
             "sources": [
                 "/catalog"
             ]
@@ -5270,7 +5316,7 @@
         },
         {
             "name": "GameSearch",
-            "url": "https://js.rbxcdn.com/c54fa368fa5c8b5c1c52e6cb2f34f9e9bd97ee59f03647752aebaffd11f1e62a-GameSearch.js",
+            "url": "https://js.rbxcdn.com/4c6ea67e474beadbf3704c61cf33b70433d0d1be3fc096edb3aa2238325c2c15-GameSearch.js",
             "sources": [
                 "/discover/?Keyword=roblox"
             ]
@@ -5291,7 +5337,7 @@
         },
         {
             "name": "GiftingProducts",
-            "url": "https://js.rbxcdn.com/01d5037616b18d5f8d2dbffa8ad056b66021524932402bb18e459c39498871b7-GiftingProducts.js",
+            "url": "https://js.rbxcdn.com/de468732ee2f41e1e0f741ad04c9f9531c84c99fbc5093690159218dc60a717a-GiftingProducts.js",
             "sources": [
                 "/gift-robux"
             ]
@@ -5709,7 +5755,7 @@
         },
         {
             "name": "ItemDetailsInfo",
-            "url": "https://js.rbxcdn.com/84a2d6a538e25c2dbbc873dd01a432d0476224f8b9a8bdaf3aac747e6d0dae00-ItemDetailsInfo.js",
+            "url": "https://js.rbxcdn.com/e7522abc28aba995cb8077ac5fe1e071c545f3e9998469ed9e1a6c8d2af5b87a-ItemDetailsInfo.js",
             "sources": [
                 "/catalog/3360689775",
                 "/bundles/591"
@@ -5745,7 +5791,7 @@
         },
         {
             "name": "ItemPurchase",
-            "url": "https://js.rbxcdn.com/1e1060c5f4e61665df836daf4aea67ba2ff2c1523e07279ec9ddc96f8a94afa6-ItemPurchase.js",
+            "url": "https://js.rbxcdn.com/56980e29cdd5845de46d0de24e65345d43e88aa982084a5140e5c0b076d16eed-ItemPurchase.js",
             "sources": [
                 "/home",
                 "/",
@@ -5798,7 +5844,7 @@
         },
         {
             "name": "ItemPurchaseUpsell",
-            "url": "https://js.rbxcdn.com/7021250035f3df369d004a0ee2d846b4e586dac9f12cd8f157b68a7fdaf0e60f-ItemPurchaseUpsell.js",
+            "url": "https://js.rbxcdn.com/0c8d6c1249e99152a8b4794cacfe05bea452880a20c7c605c09236ee0f7888f0-ItemPurchaseUpsell.js",
             "sources": [
                 "/home",
                 "/",
@@ -5851,7 +5897,7 @@
         },
         {
             "name": "ItemResale",
-            "url": "https://js.rbxcdn.com/46cb2e9fe5c90c0f821083548f22a7e94e801fba26e9f010246acb4a1c1f0379-ItemResale.js",
+            "url": "https://js.rbxcdn.com/e2337bd9308b19d2970d5f910b8a02b2a0c8eac6f9541bae6d5803905bffc6fe-ItemResale.js",
             "sources": [
                 "/users/inventory",
                 "/users/1/favorites",
@@ -5938,7 +5984,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/ac074606f5ac22fea18df92ab378f3566782c5c602e801122c951a80c5666137-Navigation.js",
+            "url": "https://js.rbxcdn.com/1bd83aa4a3fffb12781f36ca112ee7f1a7be585460104a5757beaffe590752de-Navigation.js",
             "sources": [
                 "/home",
                 "/",
@@ -6252,7 +6298,7 @@
         },
         {
             "name": "ProfilePlatform",
-            "url": "https://js.rbxcdn.com/8541332b57f14547a7eb996d3fcb11fe95683d75ff8c87f32b751d669ef1c7b8-ProfilePlatform.js",
+            "url": "https://js.rbxcdn.com/26a128d156a68ae8dfb66b533fbaad414772bbbacfe4a33d105681b4f1759617-ProfilePlatform.js",
             "sources": [
                 "/users/1/profile"
             ]
@@ -6579,7 +6625,7 @@
         },
         {
             "name": "RedeemGiftCard",
-            "url": "https://js.rbxcdn.com/5b1617c080afc6f21c4376f5e03d27f487344585339acc206d5935e15af115e2-RedeemGiftCard.js",
+            "url": "https://js.rbxcdn.com/e3239ebd9611598c4e69b3996940249d4f07bcf8c71cf40e820e272283627311-RedeemGiftCard.js",
             "sources": [
                 "/redeem"
             ]
@@ -6685,7 +6731,7 @@
         },
         {
             "name": "SduiLandingPage",
-            "url": "https://js.rbxcdn.com/df6c9e8c99818fb01fd105cf7daac9052ed118da698f810386dc90a9be0cd450-SduiLandingPage.js",
+            "url": "https://js.rbxcdn.com/b9c6eaf77969f155875533ebb820118b44d94a5a6d35ff3f3df81200990ee148-SduiLandingPage.js",
             "sources": [
                 "/"
             ]
@@ -6807,7 +6853,7 @@
         },
         {
             "name": "Sentry",
-            "url": "https://js.rbxcdn.com/377f5c634c2ce044a02f51ee14c3ba184e0e93b65e644781ae8a0a9a8e4ad39d-Sentry.js",
+            "url": "https://js.rbxcdn.com/4a852a00887fba4111ace530165b849dbf020ab8a943a976a9e919fb500eb311-Sentry.js",
             "sources": [
                 "/home",
                 "/",
@@ -7879,7 +7925,7 @@
         },
         {
             "name": "Catalog",
-            "url": "https://css.rbxcdn.com/337e8085bde51d06386e5bcf959b73d45d80073847f0f5d427dac175342c40d5-Catalog.css",
+            "url": "https://css.rbxcdn.com/25c25a71d5ac05e2459a5c5b965493ba969d45e7e318afa3469ab20fd9048ffd-Catalog.css",
             "sources": [
                 "/catalog"
             ]
@@ -8381,7 +8427,7 @@
         },
         {
             "name": "GameSearch",
-            "url": "https://css.rbxcdn.com/6dace5ce2f6b71bb5fcd7cee4c42ca4e7408dab1378d9c8a9a87ba5fa874edf9-GameSearch.css",
+            "url": "https://css.rbxcdn.com/459d65d5607e851e02c7b2758d192f4c3a1c45125dd0d6bd9561323df4d1695a-GameSearch.css",
             "sources": [
                 "/discover/?Keyword=roblox"
             ]
@@ -8543,7 +8589,7 @@
         },
         {
             "name": "ItemDetailsInfo",
-            "url": "https://css.rbxcdn.com/17589d0fb3d2a373b0f58e040f3245c8e14abf13278205575fbbd932daa76964-ItemDetailsInfo.css",
+            "url": "https://css.rbxcdn.com/c5d3f8831f574b3d70bf7ce03cd02ef603a4b77f97e4063d31e434f75673bb55-ItemDetailsInfo.css",
             "sources": [
                 "/catalog/3360689775",
                 "/bundles/591"
@@ -8632,7 +8678,7 @@
         },
         {
             "name": "ItemPurchaseUpsell",
-            "url": "https://css.rbxcdn.com/68a80c7490553a8d5f7521e4f606b49d22fbc8e19dbbae9ec6b3ca5996550a11-ItemPurchaseUpsell.css",
+            "url": "https://css.rbxcdn.com/e6a5bb1d3ca43a00fa97058f00fe64b3f335fd9367fa02f50be79e619d85a4a8-ItemPurchaseUpsell.css",
             "sources": [
                 "/home",
                 "/",
@@ -8704,7 +8750,7 @@
         },
         {
             "name": "Navigation",
-            "url": "https://css.rbxcdn.com/669be5251755c697d9f27aa37be7703479ebe791cc07638a2d6f219987a0d302-Navigation.css",
+            "url": "https://css.rbxcdn.com/713fb359872482701dfcc244c14703338b5f5b642c9fca5101a20b050ea1c9fb-Navigation.css",
             "sources": [
                 "/home",
                 "/",
@@ -8863,7 +8909,7 @@
         },
         {
             "name": "ProfilePlatform",
-            "url": "https://css.rbxcdn.com/0889bc0cf1b689c1634f841765dd93513397177c0832b5604fa579378161dd34-ProfilePlatform.css",
+            "url": "https://css.rbxcdn.com/3c64a4957c998e7359954451d5ab2e244567f3896f396403e5d249d80022567d-ProfilePlatform.css",
             "sources": [
                 "/users/1/profile"
             ]
@@ -9018,7 +9064,7 @@
         },
         {
             "name": "RedeemGiftCard",
-            "url": "https://css.rbxcdn.com/cb3cf54238524393d022fb53f75dfd2e5fe4415e29d745bafacb17fcc9fa1ca7-RedeemGiftCard.css",
+            "url": "https://css.rbxcdn.com/2eb1a05db0c155c96819685c450c6d3a1e802c59c0f4e58fa98568662f755ccf-RedeemGiftCard.css",
             "sources": [
                 "/redeem"
             ]
@@ -9159,7 +9205,7 @@
         },
         {
             "name": "SduiLandingPage",
-            "url": "https://css.rbxcdn.com/851fdee45ec75313414f5bfc8dc2db6f3766cecce593b48a94c18972ef6aec86-SduiLandingPage.css",
+            "url": "https://css.rbxcdn.com/e2b7d8317a08fd3b2ee896ead370863581724dc646dce87a171d85c520189843-SduiLandingPage.css",
             "sources": [
                 "/"
             ]

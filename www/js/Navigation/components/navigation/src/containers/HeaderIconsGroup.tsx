@@ -1,8 +1,4 @@
-// Since the notification stream is angularjs code, the notification-stream-indicator below is for
-// notification stream code to engage with navigation component
 import { MouseEventHandler, useState, useEffect, useRef } from "react";
-// @ts-expect-error TODO: remove this once React notification stream is ready
-import angular from "angular";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { getGuacBehavior } from "../services/navigationService";
@@ -57,34 +53,13 @@ export default function HeaderIconsGroup({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  let hasStreamModules = false;
-  try {
-    angular.module("notificationStreamIcon");
-    angular.module("notificationStream");
-    hasStreamModules = true;
-  } catch (err) {
-    console.error(err);
-  }
-
-  // Keep this <li> mounted when the modules load late: BTRoblox detaches its sibling, so a remount throws NotFoundError.
   const notificationStream = (
     <li
       id="navbar-stream"
       ref={streamItemRef}
-      className={
-        hasStreamModules
-          ? "navbar-icon-item navbar-stream notification-margins"
-          : "navbar-icon-item navbar-stream"
-      }
+      className="navbar-icon-item navbar-stream notification-margins"
     >
-      {hasStreamModules ? (
-        <NotificationStreamPopover containerRef={streamItemRef} />
-      ) : (
-        <span className="nav-robux-icon rbx-menu-item">
-          {/* eslint-disable-next-line react/no-unknown-property */}
-          <span id="notification-stream-icon-container" notification-stream-indicator="true" />
-        </span>
-      )}
+      <NotificationStreamPopover containerRef={streamItemRef} />
     </li>
   );
 

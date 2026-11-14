@@ -155,6 +155,14 @@ export const catalogTranslations = {
   labelOfferApplied: (): string => {
     return translationResources.featureCatalog().get("Label.OfferApplied", {});
   },
+  /**
+   * e.g. "Ends Dec 9" for marketplace offer expiration badges.
+   * `Label.EndsDate` lives in Feature.Catalog (`{date}` = localized month/day).
+   * English fallback until the key is filled in localization.
+   */
+  labelEndsDate: (date: string): string => {
+    return translationResources.featureCatalog().get("Label.EndsDate", { date }) || `Ends ${date}`;
+  },
   labelItemOwned: (): string => {
     return translationResources.featureCatalog().get("Label.ItemOwned", {});
   },

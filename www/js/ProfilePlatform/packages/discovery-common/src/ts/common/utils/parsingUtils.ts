@@ -24,7 +24,12 @@ import { getGameLayoutData } from "../hooks/useGetGameLayoutData";
 
 export const GAME_STATS_PLACEHOLDER_STRING = "--";
 
-export const dateTimeFormatter = new Intl().getDateTimeFormatter();
+let dateTimeFormatter: ReturnType<Intl["getDateTimeFormatter"]> | undefined;
+
+export const getDateTimeFormatter = (): ReturnType<Intl["getDateTimeFormatter"]> => {
+  dateTimeFormatter ??= new Intl().getDateTimeFormatter();
+  return dateTimeFormatter;
+};
 
 /**
  * Type guard function to check whether a component type is a wide tile component type.
@@ -572,7 +577,7 @@ export default {
   getVotePercentage,
   getPlayerCount,
   getNumberFormat,
-  dateTimeFormatter,
+  getDateTimeFormatter,
   parseQueryString,
   composeQueryString,
   getSponsoredAdImpressionsData,

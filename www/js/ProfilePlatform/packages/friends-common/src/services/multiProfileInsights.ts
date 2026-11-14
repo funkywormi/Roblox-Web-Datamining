@@ -10,8 +10,14 @@ export type MultiProfileInsightsResponse = {
   }[];
 };
 
+export type MultiProfileInsightsOptions = {
+  count?: number;
+  rankingStrategy?: "profile_info_boost" | "tc_info_boost";
+};
+
 export async function fetchMultiProfileInsights(
   userIds: number | number[],
+  { rankingStrategy = "tc_info_boost", count = 8 }: MultiProfileInsightsOptions = {},
 ): Promise<MultiProfileInsightsResponse> {
   const ids = Array.isArray(userIds) ? userIds : [userIds];
   if (ids.length === 0) {
@@ -25,8 +31,8 @@ export async function fetchMultiProfileInsights(
   };
   const { data } = await http.post<MultiProfileInsightsResponse>(urlConfig, {
     userIds: ids,
-    rankingStrategy: "tc_info_boost",
-    count: 8,
+    rankingStrategy,
+    count,
   });
   return data;
 }

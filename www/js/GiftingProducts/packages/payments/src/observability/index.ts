@@ -81,7 +81,7 @@ export const { trackCounter, trackError, trackCriticalError } = createTrackers(
  */
 export const withApiEventsV2 = createWithApiMetricsV2<ApiCall>(publishMetric, captureException);
 
-export const ObsErrorBoundary = createObsErrorBoundary({
+export const ObsErrorBoundary = createObsErrorBoundary(observabilityRegistry, {
   publish: publishMetric,
   captureException,
   featureName: observabilityRegistry.featureName,

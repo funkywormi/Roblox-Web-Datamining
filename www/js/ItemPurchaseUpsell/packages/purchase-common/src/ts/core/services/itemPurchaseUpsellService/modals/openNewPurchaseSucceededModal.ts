@@ -1,6 +1,6 @@
 import { removeUrlLocale, supportLocalizedUrls } from '@rbx/core-scripts/endpoints';
-import type { RobloxTranslationResource } from '@rbx/legacy-webapp-types/Roblox';
-import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
+import { paymentFlowAnalyticsService } from '@rbx/payments/payments-flow-analytics';
+import type { UpsellTranslationResource } from '../constants/serviceTypeDefinitions';
 import {
   ASSET_TYPE_ENUM,
   GAMES_PAGE_PREFIX,
@@ -17,7 +17,7 @@ import reportCounter from '../utils/common/reportCounter';
 export default function openNewPurchaseSucceededModal(
   itemPurchaseObj: ItemPurchaseObject,
   robuxLeft: number,
-  translationResource: RobloxTranslationResource,
+  translationResource: UpsellTranslationResource,
   loadingOverlay: LoadingOverlay
 ) {
   const bodyUserBalanceNow = `<span>${translationResource.get(
@@ -50,15 +50,15 @@ export default function openNewPurchaseSucceededModal(
     declineText: translationResource.get(LANG_KEYS.backToShopAction, {}),
     acceptText,
     onAccept: () => {
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-        true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.SUCCESS,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.OK,
-        { item_type: itemPurchaseObj.assetType, item_id: itemPurchaseObj.productId },
-        true
-      );
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+        isMidPurchaseStep: true,
+        viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.SUCCESS,
+        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+        viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.OK,
+        eventMetadata: { item_type: itemPurchaseObj.assetType, item_id: itemPurchaseObj.productId },
+        isTerminalView: true
+      });
       reportCounter(
         UPSELL_COUNTER_NAMES.AutoPurchaseSucceedEquipMyAvatar,
         itemPurchaseObj.assetType
@@ -79,30 +79,30 @@ export default function openNewPurchaseSucceededModal(
     onDecline: () => {
       // Show the overlay to avoid go back to the page with the Buy Button still showing ups
       loadingOverlay.show();
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-        true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.SUCCESS,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL,
-        { item_type: itemPurchaseObj.assetType, item_id: itemPurchaseObj.productId },
-        true
-      );
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+        isMidPurchaseStep: true,
+        viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.SUCCESS,
+        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+        viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL,
+        eventMetadata: { item_type: itemPurchaseObj.assetType, item_id: itemPurchaseObj.productId },
+        isTerminalView: true
+      });
       reportCounter(UPSELL_COUNTER_NAMES.AutoPurchaseSucceedBackToShop, itemPurchaseObj.assetType);
       redirectToItemPath(itemPurchaseObj.itemPath);
       return false;
     },
     onCancel: () => {
       loadingOverlay.show();
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-        true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.SUCCESS,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL,
-        { item_type: itemPurchaseObj.assetType, item_id: itemPurchaseObj.productId },
-        true
-      );
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+        isMidPurchaseStep: true,
+        viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.SUCCESS,
+        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+        viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL,
+        eventMetadata: { item_type: itemPurchaseObj.assetType, item_id: itemPurchaseObj.productId },
+        isTerminalView: true
+      });
       reportCounter(UPSELL_COUNTER_NAMES.AutoPurchaseSucceedClose, itemPurchaseObj.assetType);
       redirectToItemPath(itemPurchaseObj.itemPath);
       return false;

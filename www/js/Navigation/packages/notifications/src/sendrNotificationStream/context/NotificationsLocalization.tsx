@@ -1,32 +1,17 @@
-import React, { createContext, FC, useContext } from "react";
-import { withTranslations, WithTranslationsProps } from "react-utilities";
-import translationConfig from "../translation.config";
+import { createContext, useContext } from "react";
 
-type TranslateFunction = WithTranslationsProps["translate"];
+export type TranslateFunction = (
+  resourceId: string,
+  parameters?: Record<string, unknown>,
+  fallbackString?: string,
+) => string;
 
 const NotificationLocalizationContext = createContext<TranslateFunction>(
   (resourceId, params) => resourceId,
 );
 
-const NotificationLocalizationComponent: FC<WithTranslationsProps> = ({ children, translate }) => {
-  return (
-    <NotificationLocalizationContext.Provider value={translate}>
-      {children}
-    </NotificationLocalizationContext.Provider>
-  );
-};
-
 const useNotificationLocalization = (): TranslateFunction => {
   return useContext(NotificationLocalizationContext);
 };
 
-const NotificationLocalizationProvider = withTranslations(
-  NotificationLocalizationComponent,
-  translationConfig,
-);
-
-export {
-  NotificationLocalizationContext,
-  useNotificationLocalization,
-  NotificationLocalizationProvider,
-};
+export { NotificationLocalizationContext, useNotificationLocalization };

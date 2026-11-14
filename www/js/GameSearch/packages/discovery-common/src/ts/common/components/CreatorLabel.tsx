@@ -6,7 +6,7 @@ import VerifiedBadgeIcon, {
   VERIFIED_BADGE_ARIA_LABEL_KEY,
 } from "@rbx/www-common/components/verified-badge";
 import { FeatureGamePage } from "../constants/translationConstants";
-import "../../../css/common/_gameTiles.scss";
+import "../../../css/common/gameTiles.css";
 
 export type TCreatorLabelProps = {
   universeId: string;

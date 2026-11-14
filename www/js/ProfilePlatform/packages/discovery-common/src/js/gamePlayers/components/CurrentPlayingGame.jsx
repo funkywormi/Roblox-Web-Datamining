@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "@rbx/core-ui";
+import { Button } from "@rbx/foundation-ui";
 import {
   Thumbnail2d,
   ThumbnailTypes,
@@ -22,22 +22,23 @@ function CurrentPlayingGame({ game, translate }) {
     />
   );
   return (
-    <div className="border-bottom player-interaction-container">
-      <span className="cursor-pointer game-icon">
-        <Link url={referralUrl} className="game-card-link">
-          {thumbnail}
-        </Link>
-      </span>
-      <span className="game-info-container">
-        <Link url={referralUrl} className="game-name">
+    <div className="player-interaction-game flex items-start">
+      <a href={referralUrl} className="game-card-link player-interaction-game-icon shrink-0">
+        {thumbnail}
+      </a>
+      <div className="flex flex-col items-start gap-small grow min-width-0">
+        <a
+          href={referralUrl}
+          className="player-interaction-game-name content-emphasis text-truncate-end"
+        >
           {name}
-        </Link>
+        </a>
         {!isPlayable && (
-          <Link url={referralUrl} className="btn-control-sm game-link">
+          <Button as="a" href={referralUrl} variant="Standard" size="Small">
             {translate(playerConstants.viewGameDetails)}
-          </Link>
+          </Button>
         )}
-      </span>
+      </div>
     </div>
   );
 }

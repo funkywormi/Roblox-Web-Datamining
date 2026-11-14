@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { getItem, removeItem } from "@rbx/core-lib/local-storage";
 import "../constants/localStorageRegistry";
 import { Snackbar } from "@rbx/foundation-ui";
 import layoutConstants from "../constants/layoutConstants";
+import { useNavUser } from "../util/navUser";
 
 const { accountSwitchedFlag, accountSwitchedMessage } =
   layoutConstants.accountSwitchConfirmationKeys;
@@ -12,7 +12,7 @@ const { accountSwitchedFlag, accountSwitchedMessage } =
 export default function AccountSwitchedSnackbar() {
   const tAlerts = useTranslations("Common.AlertsAndOptions");
   const tFeatures = useTranslations("CommonUI.Features");
-  const user = authenticatedUser();
+  const user = useNavUser();
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
 
   useEffect(() => {

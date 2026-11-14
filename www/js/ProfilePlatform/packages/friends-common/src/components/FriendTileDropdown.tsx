@@ -1,13 +1,11 @@
 import { JSX } from "react";
-import { GameLauncher } from "@rbx/core-scripts/legacy/Roblox";
-import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import "@rbx/core-scripts/global";
 import { chatService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import { Button } from "@rbx/core-ui";
 import { Thumbnail2d, ThumbnailTypes, ThumbnailGameIconSize } from "@rbx/thumbnails";
-import { getGameLauncher } from "@rbx/www-common/game-launch";
 import { TFriend } from "../types/friendsCarousel";
+import { followFriendIntoGame } from "../utils/followFriendIntoGame";
 import IARCInGameCard from "./IARCInGameCard";
 
 const FriendTileDropdown = ({
@@ -38,29 +36,10 @@ const FriendTileDropdown = ({
   sendGameRowClickEvent: () => void;
 }): JSX.Element => {
   const launchGame = async () => {
-    const joinAttemptId = friend.presence.gameId ?? "";
-    const meta = getDeviceMeta();
-    if (meta?.isInApp) {
-      if (meta.isDesktop) {
-        GameLauncher?.followPlayerIntoGame(friend.id, joinAttemptId, "JoinUser");
-      } else {
-        window.location.href = `/games/start?userID=${friend.id}&joinAttemptId=${joinAttemptId}&joinAttemptOrigin=JoinUser`;
-      }
-    } else if (meta?.isAndroidDevice || meta?.isChromeOs) {
-      window.location.href = `intent://userId=${friend.id}&joinAttemptId=${joinAttemptId}&joinAttemptOrigin=JoinUser#Intent;scheme=robloxmobile;package=com.roblox.client;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.roblox.client;end`;
-    } else if (meta?.isIosDevice) {
-      window.location.href = `robloxmobile://userId=${friend.id}&joinAttemptId=${joinAttemptId}&joinAttemptOrigin=JoinUser`;
-    } else {
-      const params = { userId: friend.id, joinAttemptId, joinAttemptOrigin: "JoinUser" };
-      // The Next.js host registers the shared launcher; .NET pages keep their protocol handler.
-      const launcher = getGameLauncher();
-      if (launcher != null) {
-        await launcher.followPlayerIntoGame(params);
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-deprecated -- .NET fallback, getGameLauncher() is null there
-        await window.Roblox.ProtocolHandlerClientInterface?.followPlayerIntoGame(params);
-      }
-    }
+    await followFriendIntoGame({
+      friendUserId: friend.id,
+      joinAttemptId: friend.presence.gameId ?? "",
+    });
   };
 
   const startChat = () => {

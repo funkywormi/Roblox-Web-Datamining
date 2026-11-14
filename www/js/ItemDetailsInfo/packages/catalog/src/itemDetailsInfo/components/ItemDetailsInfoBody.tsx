@@ -1,8 +1,8 @@
 /* eslint-disable react/no-danger */
 /* eslint-disable react/jsx-no-literals */
-import React, { useMemo, useCallback, useState, ReactChildren } from "react";
+import React, { useMemo, ReactChildren } from "react";
 import { Tooltip } from "react-style-guide";
-import { Linkify, AvatarAccoutrementService } from "@rbx/legacy-webapp-types/Roblox";
+import { AvatarAccoutrementService } from "@rbx/legacy-webapp-types/Roblox";
 import International from "@rbx/core-scripts/intl";
 import { EnvironmentUrls } from "@rbx/environment-urls";
 import {
@@ -33,6 +33,7 @@ import {
   l2ResaleHoldingPolicyDays,
 } from "../constants/holdingPolicyConstants";
 import ExperienceLinks from "./ExperienceLinks";
+import ItemDescription from "./ItemDescription";
 import {
   bundleSlotTranslations,
   groupBundleSlotTranslations,
@@ -86,74 +87,7 @@ const DescriptionLink = ({ attributes, content }: TRenderDescLinkProps) => {
   );
 };
 
-type TDescriptionTextProps = {
-  description: string;
-};
-
-type StringWithEscapeHTML = string & { escapeHTML: () => string };
 const intl = new International();
-
-function ItemDescription({ description }: TDescriptionTextProps): JSX.Element {
-  const [descriptionHasReadMore, setDescriptionHasReadMore] = useState(false);
-  const [descriptionTruncationExpanded, setDescriptionTruncationExpanded] = useState(false);
-
-  const descriptionRef = useCallback((elm: HTMLParagraphElement) => {
-    if (!elm) return;
-    if (elm.offsetHeight > 98) {
-      setDescriptionHasReadMore(true);
-    }
-  }, []);
-
-  const descriptionClass = useMemo(() => {
-    const classes = [
-      "font-body text description-content wait-for-i18n-format-render content-overflow-toggle",
-    ];
-    if (descriptionHasReadMore) {
-      if (descriptionTruncationExpanded) {
-        classes.push("content-overflow-toggle-off");
-      } else {
-        classes.push("content-height");
-      }
-    }
-    return classes.join(" ");
-  }, [descriptionHasReadMore, descriptionTruncationExpanded]);
-
-  const getDescription = () => {
-    if (Linkify !== undefined) {
-      return Linkify.String((description as StringWithEscapeHTML).escapeHTML());
-    }
-    return "";
-  };
-
-  return (
-    <div className="clearfix toggle-target item-info-row-container">
-      <div className="font-header-1 text-subheader text-label text-overflow row-label">
-        {catalogTranslations.labelDescription()}
-      </div>
-      <div className="row-content">
-        <p id="item-details-description" className={descriptionClass} ref={descriptionRef}>
-          <div dangerouslySetInnerHTML={{ __html: getDescription() }} />
-        </p>
-        {!!descriptionHasReadMore && (
-          <button
-            className="row-content toggle-description text-link cursor-pointer"
-            data-container-id="item-details-description"
-            data-show-label="Read More"
-            data-hide-label="Show Less"
-            type="button"
-            onClick={() => {
-              setDescriptionTruncationExpanded(!descriptionTruncationExpanded);
-            }}
-          >
-            {descriptionTruncationExpanded
-              ? itemTranslations.labelShowLess()
-              : itemTranslations.labelReadMore()}
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
 
 export const ItemDetailsInfoBody = (
   props: TItemDetailsInfoBodyProps & { purchaseButtonLoaded: boolean },

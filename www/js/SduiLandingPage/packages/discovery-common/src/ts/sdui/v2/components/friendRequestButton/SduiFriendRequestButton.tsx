@@ -1,18 +1,25 @@
 "use client";
 
 import { useCallback, type MouseEvent } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IconButton, type TIconButtonSize } from "@rbx/foundation-ui";
 import type { SduiRendererInjectedProps } from "@rbx/sdui-core";
 import { useSduiServices } from "@rbx/sdui-core/client";
+import type { UserId } from "@rbx/www-common/user";
 import { publishFriendRequestResult } from "./friendRequestResultEvents";
-import { startFriendRequest } from "./friendshipService";
+import {
+  startAcceptFriendRequest,
+  startFriendRequest,
+  type FriendRequestResult,
+} from "./friendshipService";
 import { friendshipStatuses, type FriendshipStatus } from "./friendshipStatus";
 import { friendshipStatusQueryKey, useFriendshipStatus } from "./useFriendshipStatus";
-import { reportPlayerFriendAdd } from "./reportPlayerFriendAdd";
+import { reportPlayerFriendAccept, reportPlayerFriendAdd } from "./reportPlayerFriendAdd";
 
 const ADD_FRIEND_TRANSLATION_KEY = "Action.AddFriend";
 const ADD_FRIEND_FALLBACK_TEXT = "Add friend";
+const ACCEPT_FRIEND_TRANSLATION_KEY = "Action.AcceptRequest";
+const ACCEPT_FRIEND_FALLBACK_TEXT = "Accept friend request";
 const DEFAULT_BUTTON_SIZE: TIconButtonSize = "Small";
 
 function normalizeButtonSize(size: string | undefined): TIconButtonSize {
@@ -25,6 +32,12 @@ export interface SduiFriendRequestButtonProps extends SduiRendererInjectedProps 
   userId?: string;
 }
 
+type FriendRequestAcceptanceMutation = {
+  requestCompletion: Promise<FriendRequestResult>;
+  targetUserId: UserId;
+  viewerUserId: UserId;
+};
+
 export function SduiFriendRequestButton({
   analyticsContext,
   size,
@@ -33,23 +46,66 @@ export function SduiFriendRequestButton({
 }: SduiFriendRequestButtonProps) {
   const services = useSduiServices();
   const queryClient = useQueryClient();
+  const { mutate: trackFriendRequestAcceptance } = useMutation({
+    mutationFn: ({ requestCompletion }: FriendRequestAcceptanceMutation) => requestCompletion,
+    onSuccess: () => {
+      publishFriendRequestResult({
+        result: "success",
+        type: "friend-request-accepted",
+      });
+    },
+    onError: (_error, { targetUserId, viewerUserId }: FriendRequestAcceptanceMutation) => {
+      const friendshipStatusCacheKey = friendshipStatusQueryKey(viewerUserId, targetUserId);
+      queryClient.setQueryData<FriendshipStatus | undefined>(
+        friendshipStatusCacheKey,
+        currentFriendshipStatus =>
+          currentFriendshipStatus === friendshipStatuses.friends
+            ? friendshipStatuses.requestReceived
+            : currentFriendshipStatus,
+      );
+      publishFriendRequestResult({
+        result: "failure",
+        type: "friend-request-accepted",
+      });
+      return queryClient.invalidateQueries({ queryKey: friendshipStatusCacheKey });
+    },
+  });
   const { friendshipStatus, isFriendshipStatusLoading, isSelf, targetUserId, viewerUserId } =
     useFriendshipStatus(userId);
 
-  const isPendingFriendship =
-    friendshipStatus === friendshipStatuses.requestSent ||
-    friendshipStatus === friendshipStatuses.requestReceived;
-  const isButtonDisabled = isPendingFriendship;
+  const isFriendRequestReceived = friendshipStatus === friendshipStatuses.requestReceived;
+  const isButtonDisabled = friendshipStatus === friendshipStatuses.requestSent;
   const handleFriendRequest = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
       event.stopPropagation();
-      if (
-        targetUserId == null ||
-        viewerUserId == null ||
-        friendshipStatus !== friendshipStatuses.notFriends ||
-        isButtonDisabled
-      ) {
+      if (targetUserId == null || viewerUserId == null || isButtonDisabled) {
+        return;
+      }
+
+      const friendshipStatusCacheKey = friendshipStatusQueryKey(viewerUserId, targetUserId);
+      if (friendshipStatus === friendshipStatuses.requestReceived) {
+        const friendRequestAcceptance = startAcceptFriendRequest(targetUserId);
+        if (!friendRequestAcceptance.didStart) {
+          return;
+        }
+
+        queryClient.setQueryData(friendshipStatusCacheKey, friendshipStatuses.friends);
+        reportPlayerFriendAccept({
+          analyticsContext,
+          analyticsReporter: services.analyticsReporter,
+          pageContext: services.pageContext,
+          targetUserId,
+        });
+        trackFriendRequestAcceptance({
+          requestCompletion: friendRequestAcceptance.requestCompletion,
+          targetUserId,
+          viewerUserId,
+        });
+        return;
+      }
+
+      if (friendshipStatus !== friendshipStatuses.notFriends) {
         return;
       }
 
@@ -58,8 +114,7 @@ export function SduiFriendRequestButton({
         return;
       }
 
-      const requestFriendshipStatusQueryKey = friendshipStatusQueryKey(viewerUserId, targetUserId);
-      queryClient.setQueryData(requestFriendshipStatusQueryKey, friendshipStatuses.requestSent);
+      queryClient.setQueryData(friendshipStatusCacheKey, friendshipStatuses.requestSent);
       reportPlayerFriendAdd({
         analyticsContext,
         analyticsReporter: services.analyticsReporter,
@@ -72,20 +127,26 @@ export function SduiFriendRequestButton({
       void friendRequestStart.requestCompletion.then(
         status => {
           if (status === "already-friends") {
-            queryClient.setQueryData(requestFriendshipStatusQueryKey, friendshipStatuses.friends);
+            queryClient.setQueryData(friendshipStatusCacheKey, friendshipStatuses.friends);
             return;
           }
-          publishFriendRequestResult("success");
+          publishFriendRequestResult({
+            result: "success",
+            type: "friend-request-sent",
+          });
         },
         () => {
           queryClient.setQueryData<FriendshipStatus | undefined>(
-            requestFriendshipStatusQueryKey,
+            friendshipStatusCacheKey,
             currentFriendshipStatus =>
               currentFriendshipStatus === friendshipStatuses.requestSent
                 ? friendshipStatus
                 : currentFriendshipStatus,
           );
-          publishFriendRequestResult("failure");
+          publishFriendRequestResult({
+            result: "failure",
+            type: "friend-request-sent",
+          });
         },
       );
     },
@@ -98,6 +159,7 @@ export function SduiFriendRequestButton({
       services.pageContext,
       source,
       targetUserId,
+      trackFriendRequestAcceptance,
       viewerUserId,
     ],
   );
@@ -116,11 +178,15 @@ export function SduiFriendRequestButton({
     return null;
   }
 
-  const translatedLabel = services.translate?.(ADD_FRIEND_TRANSLATION_KEY);
+  const translationKey = isFriendRequestReceived
+    ? ACCEPT_FRIEND_TRANSLATION_KEY
+    : ADD_FRIEND_TRANSLATION_KEY;
+  const fallbackText = isFriendRequestReceived
+    ? ACCEPT_FRIEND_FALLBACK_TEXT
+    : ADD_FRIEND_FALLBACK_TEXT;
+  const translatedLabel = services.translate?.(translationKey);
   const accessibleLabel =
-    translatedLabel == null || translatedLabel.length === 0
-      ? ADD_FRIEND_FALLBACK_TEXT
-      : translatedLabel;
+    translatedLabel == null || translatedLabel.length === 0 ? fallbackText : translatedLabel;
 
   return (
     <div

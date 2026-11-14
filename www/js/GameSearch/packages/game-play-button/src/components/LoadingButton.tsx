@@ -15,7 +15,7 @@ type TLoadingButtonProps = {
 // Loading state as an Emphasis button with FUI's built-in spinner (isLoading), matching the app —
 // not a bare spinner. Same width/size classes as the resolved button so the box doesn't jump.
 const LoadingButton = ({
-  buttonClassName = "btn-common-play-game-lg",
+  buttonClassName = "btn-common-play-game-lg game-play-button-lg",
   buttonWidth = buttonWidths.full,
 }: TLoadingButtonProps) => (
   <Button

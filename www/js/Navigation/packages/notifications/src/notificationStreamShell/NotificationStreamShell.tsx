@@ -1,12 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import environmentUrls from "@rbx/environment-urls";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@rbx/core-scripts/react";
 import NotificationStreamBanner from "./NotificationStreamBanner";
-import {
-  NotificationLocalizationProvider,
-  useNotificationLocalization,
-} from "../sendrNotificationStream/context/NotificationsLocalization";
+import { useNotificationLocalization } from "../sendrNotificationStream/context/NotificationsLocalization";
 import { NotificationStreamList } from "../notificationStreamList";
 import {
   useGetRecentNotifications,
@@ -26,15 +22,19 @@ import {
   GameUpdateMetadata,
   GameUpdateNsPage,
 } from "../notificationStreamData/gameUpdatesApi";
-import { useGameUpdates, markGameUpdateSeenOnce } from "../notificationStreamData/useGameUpdates";
+import { useGameUpdates } from "../notificationStreamData/useGameUpdates";
 import { aggregateGameUpdates } from "../notificationStreamData/aggregateGameUpdates";
 import { useStreamMetadata } from "../notificationStreamData/useStreamMetadata";
+import { streamGet } from "../notificationStreamData/streamTransport";
+import { unreadCountUrlConfig } from "../notificationStreamData/notificationStreamApi";
+import { getNotificationStreamHost } from "../notificationStreamData/streamHost";
 import GameUpdatesPanel from "./GameUpdatesPanel";
 import { NotificationStreamCardRouter } from "./NotificationStreamCardRouter";
 import { reportNotificationStreamError } from "../notificationStreamData/notificationStreamObservability";
 import NotificationStreamModalContainer from "../sendrNotificationStream/containers/NotificationStreamModalContainer";
 import { SendrTemplateContext } from "../sendrNotificationStream/context/SendrTemplateContext";
-import "./notificationStreamShell.scss";
+import "./notificationStreamShell.css";
+import type { JSX } from "react";
 
 const { websiteUrl } = environmentUrls;
 const SETTINGS_LINK = `${websiteUrl}/my/account#!/notifications`;
@@ -43,6 +43,15 @@ const RECENT_GAME_UPDATE_WINDOW_MS = 86400 * 14 * 1000;
 
 const NotificationStreamShellInner = (): JSX.Element => {
   const translate = useNotificationLocalization();
+  const { callGuacBehaviour, getDeviceMeta } = getNotificationStreamHost();
+  const isPhone = getDeviceMeta()?.isPhone ?? false;
+  const { data: accountSettingsPolicy } = useQuery({
+    queryKey: ["notification-stream-account-settings-ui"],
+    queryFn: () =>
+      callGuacBehaviour<{ displayReactNotificationsTab?: boolean }>("account-settings-ui"),
+    staleTime: Infinity,
+  });
+  const showSettingsLink = Boolean(accountSettingsPolicy?.displayReactNotificationsTab);
   const {
     notifications,
     gameUpdates,
@@ -54,7 +63,7 @@ const NotificationStreamShellInner = (): JSX.Element => {
   } = useGetRecentNotifications();
   const { models: gameUpdateModels, isLoading: isResolvingGameUpdates } =
     useGameUpdates(gameUpdates);
-  const { canLaunchGameFromGameUpdate } = useStreamMetadata();
+  const { canLaunchGameFromGameUpdate, disconnectionDelayMs } = useStreamMetadata();
   const [showGameUpdates, setShowGameUpdates] = useState(false);
 
   const selectContentView = useCallback(
@@ -106,20 +115,12 @@ const NotificationStreamShellInner = (): JSX.Element => {
       model => (model.createdOn ?? 0) >= cutoff,
     ).length;
     sendRecentGameUpdateRetrieved(aggregatedGameUpdate.id, recentGroupedNotificationCount);
-
-    const onlyUniverseId = universeIds.length === 1 ? universeIds[0] : undefined;
-    if (onlyUniverseId != null) {
-      const model = gameUpdateModels.get(onlyUniverseId);
-      if (model) {
-        markGameUpdateSeenOnce(model);
-      }
-    }
   }, [aggregatedGameUpdate, gameUpdateModels, isResolvingGameUpdates]);
-  const { isConnectionLost } = useNotificationStreamConnection();
+  const { isConnectionLost } = useNotificationStreamConnection(disconnectionDelayMs);
   const markInteracted = useMarkInteracted();
   const removeNotification = useRemoveNotification();
   const [bannerVisible, setBannerVisible] = useState(false);
-  const [newCount, setNewCount] = useState(0);
+  const [newCount, setNewCount] = useState<number | null>(null);
   const [errorDismissed, setErrorDismissed] = useState(false);
 
   const fireAndReport = useCallback((run: () => Promise<unknown>, scope: string) => {
@@ -132,14 +133,15 @@ const NotificationStreamShellInner = (): JSX.Element => {
 
   const dismissBanner = useCallback(() => {
     setBannerVisible(false);
-    setNewCount(0);
+    setNewCount(null);
   }, []);
 
   const reload = useCallback(() => {
-    dismissBanner();
+    setBannerVisible(false);
+    setNewCount(null);
     document.dispatchEvent(new CustomEvent("Roblox.NotificationStream.ClearUnreadNotifications"));
     fireAndReport(resetStream, "streamBannerReload");
-  }, [dismissBanner, resetStream, fireAndReport]);
+  }, [resetStream, fireAndReport]);
 
   // notificationStreamBodyDirective.js: true while the last click or touch landed in the stream body,
   // which excludes the header.
@@ -148,10 +150,13 @@ const NotificationStreamShellInner = (): JSX.Element => {
   useEffect(() => {
     const onPointer = (event: Event) => {
       const { target } = event;
-      bodyInteractedRef.current =
-        target instanceof Element &&
-        Boolean(bodyRef.current?.contains(target)) &&
-        !target.closest(".notification-stream-header");
+      // .NET's React 17 has already removed a target its own click handler unmounts; React 19 commits in a microtask
+      queueMicrotask(() => {
+        bodyInteractedRef.current =
+          target instanceof Element &&
+          Boolean(bodyRef.current?.contains(target)) &&
+          !target.closest(".notification-stream-header");
+      });
     };
     document.addEventListener("click", onPointer);
     document.addEventListener("touchstart", onPointer);
@@ -161,16 +166,28 @@ const NotificationStreamShellInner = (): JSX.Element => {
     };
   }, []);
 
+  const refreshUnreadCount = useCallback(() => {
+    streamGet<{ unreadNotifications?: number }>(unreadCountUrlConfig)
+      .then(data => {
+        const count = data?.unreadNotifications;
+        if (typeof count !== "number") {
+          return;
+        }
+        setNewCount(count);
+        if (count > 0) {
+          sendUnreadCta(count, true);
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
   useNotificationStreamRealtime({
     onNewNotification: () => {
-      setNewCount(count => {
-        const next = count + 1;
-        sendUnreadCta(next, true);
-        return next;
-      });
+      refreshUnreadCount();
       setBannerVisible(true);
     },
     onNotificationRevoked: () => {
+      refreshUnreadCount();
       if (!bodyInteractedRef.current) {
         reload();
       }
@@ -219,29 +236,37 @@ const NotificationStreamShellInner = (): JSX.Element => {
             />
           ) : (
             <React.Fragment>
-              <div className="notification-stream-header">
-                <span className="text-label font-caption-header">
-                  {translate("Label.Notifications")}
-                </span>
-                <a
-                  className="text-link font-caption-header"
-                  href={SETTINGS_LINK}
-                  onClick={() =>
-                    sendStreamEvent(streamEvents.goToSettingPage, streamContexts.click, {
-                      sendrVersion: 0,
-                    })
-                  }
-                >
-                  {translate("Label.Settings")}
-                </a>
-              </div>
+              {!isPhone && (
+                <div className="notification-stream-header">
+                  <span className="text-label font-caption-header">
+                    {translate("Label.Notifications")}
+                  </span>
+                  {showSettingsLink && (
+                    <a
+                      className="text-link font-caption-header"
+                      href={SETTINGS_LINK}
+                      onClick={() =>
+                        sendStreamEvent(streamEvents.goToSettingPage, streamContexts.click, {
+                          sendrVersion: 0,
+                        })
+                      }
+                    >
+                      {translate("Label.Settings")}
+                    </a>
+                  )}
+                </div>
+              )}
 
               {bannerVisible && (
                 <NotificationStreamBanner
                   variant="new"
-                  message={translate("Message.NumberofNewNotifications", {
-                    notificationCount: newCount,
-                  })}
+                  message={
+                    newCount == null
+                      ? ""
+                      : translate("Message.NumberofNewNotifications", {
+                          notificationCount: newCount,
+                        })
+                  }
                   onClick={reload}
                   onDismiss={dismissBanner}
                 />
@@ -284,12 +309,6 @@ const NotificationStreamShellInner = (): JSX.Element => {
   );
 };
 
-export const NotificationStreamShell = (): JSX.Element => (
-  <QueryClientProvider client={queryClient}>
-    <NotificationLocalizationProvider>
-      <NotificationStreamShellInner />
-    </NotificationLocalizationProvider>
-  </QueryClientProvider>
-);
+export const NotificationStreamShell = (): JSX.Element => <NotificationStreamShellInner />;
 
 export default NotificationStreamShell;

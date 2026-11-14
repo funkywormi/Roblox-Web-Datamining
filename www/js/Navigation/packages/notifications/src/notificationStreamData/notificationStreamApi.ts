@@ -33,6 +33,12 @@ export const getRecentUrlConfig = (
 export type StreamNotificationPage = {
   notifications: StreamNotification[];
   nextStartIndex: number | null;
+  bundleIds?: Record<string, string>;
+};
+
+export const unreadCountUrlConfig: { url: string; withCredentials: boolean } = {
+  url: `${notificationApi}/v2/stream-notifications/unread-count`,
+  withCredentials: true,
 };
 
 export const markInteractedUrlConfig: { url: string; withCredentials: boolean } = {

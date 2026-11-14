@@ -1,20 +1,24 @@
 import type { RegistryInput } from "@rbx/observability-framework/schema";
 import type { MakeObservabilityTypes } from "@rbx/observability-framework/types";
 import { createTrackers } from "@rbx/observability-framework/trackers";
+import { createPageLifecycle } from "@rbx/observability-framework/page-lifecycle";
+import { createObsErrorBoundary } from "@rbx/observability-framework/react";
+import { captureObservabilityException as captureException } from "@rbx/core-scripts/sentry/observability";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import { createFireTelemetryHistogram } from "@rbx/web-telemetry/v2/histogram";
-import { captureException } from "../../error";
 import { createWithApiMetrics, createWithApiMetricsV2 } from "../../withApiMetrics";
 
 export const observabilityRegistry = {
   featureName: "RedeemGiftCard",
   team: "Economy > Payments & Fraud",
+  internalPageName: "RedeemGiftCard",
   features: {
     health: {
       apiCalls: ["GetRedemptionStatus"],
-      criticalErrors: ["Error_ReactCrash", "Error_NoRootContainer"],
+      criticalErrors: ["Error_ReactCrash", "NoRoot"],
       counters: [
-        "Page_Viewed",
+        "PageLoad",
+        "PageView",
         { name: "GiftCard_RedeemPollStarted", dimensions: ["source"] },
         { name: "GiftCard_RedeemPollResolved", dimensions: ["state", "polls", "source"] },
         { name: "GiftCard_RedeemPollExhausted", dimensions: ["source"] },
@@ -159,6 +163,17 @@ export const trackSyncRedemptionDuration = (
 ): void => {
   publishDuration("GiftCard_SyncRedemptionDurationMs", { outcome }, durationMs);
 };
+
+export const { reportPageLoad, reportPageView, reportNoRoot } = createPageLifecycle(
+  observabilityRegistry,
+  { publishCounter: publishMetric },
+);
+
+export const ObsErrorBoundary = createObsErrorBoundary(observabilityRegistry, {
+  publish: publishMetric,
+  captureException,
+  featureName: observabilityRegistry.featureName,
+});
 
 export const { trackCounter, trackError, trackCriticalError } = createTrackers(
   observabilityRegistry,

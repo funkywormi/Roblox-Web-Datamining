@@ -138,6 +138,7 @@ reportWebVitals(
   environmentUrls.apiGatewayUrl,
   () => user?.id,
   () => getPageMetaTag()?.dataset.internalPageName,
+  "dotnet",
 );
 
 const initPageMetaTracking = () => {

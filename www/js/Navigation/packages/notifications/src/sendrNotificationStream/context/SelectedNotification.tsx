@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, FC, useCallback } from "react";
+import React, { createContext, useContext, useState, FC, useCallback, type ReactNode } from "react";
 import { NotificationTemplateProps, NotificationData } from "../types/NotificationTemplateTypes";
 
 export type SelectedNotificationState = {
@@ -16,7 +16,7 @@ export const useSelectedNotification = (): SelectedNotificationState => {
 };
 
 export const useSelectedNotificationProvider = (): {
-  SelectedNotificationProvider: FC;
+  SelectedNotificationProvider: FC<{ children?: ReactNode }>;
   selectedNotification: SelectedNotificationState;
   setSelectedNotification: (newState: SelectedNotificationState) => void;
 } => {
@@ -26,7 +26,7 @@ export const useSelectedNotificationProvider = (): {
   });
 
   const providerComponent = useCallback(
-    ({ children }) => (
+    ({ children }: { children?: ReactNode }) => (
       <SelectedNotificationContext.Provider value={selectedNotification}>
         {children}
       </SelectedNotificationContext.Provider>

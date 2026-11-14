@@ -24,7 +24,13 @@ export const userIdToBigInt = (userId: UserId): bigint => {
   return big;
 };
 
-export const userIdToNumber = (userId: UserId): number => {
+/** `undefined` stays `undefined`, so `userIdToNumber(getCurrentUser()?.id)` is the id or `undefined` when signed out. */
+export function userIdToNumber(userId: UserId): number;
+export function userIdToNumber(userId: UserId | undefined): number | undefined;
+export function userIdToNumber(userId: UserId | undefined): number | undefined {
+  if (userId === undefined) {
+    return undefined;
+  }
   const num = parseInt(userId);
   if (num == null) {
     // Should be enforced by type system. A truly exceptional error.
@@ -32,7 +38,7 @@ export const userIdToNumber = (userId: UserId): number => {
     throw new Error(`UserId ${userId} was not parsable as an integer.`);
   }
   return num;
-};
+}
 
 /** Convert a `bigint` into a {@link UserId}. Returns `null` if the bigint is not a positive integer in the safe integer range. */
 export const userIdFromBigInt = (big: bigint): UserId | null => {

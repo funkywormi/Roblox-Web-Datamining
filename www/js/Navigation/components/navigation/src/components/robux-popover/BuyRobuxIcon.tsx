@@ -2,10 +2,13 @@ import classNames from "classnames";
 import { Fragment, ReactNode } from "react";
 import { ValueOf } from "@rbx/core-lib";
 import { Tooltip as FoundationTooltip, TooltipTrigger } from "@rbx/foundation-ui";
-import { truncNumber } from "@rbx/core-scripts/format/number";
+import { formatNumber, truncNumber } from "@rbx/core-scripts/format/number";
 import layoutConstant from "../../constants/layoutConstants";
 import RobuxBadgeType from "../../constants/robuxBadgeConstants";
 import NavIcon from "../NavIcon";
+import useNumberLocale from "../../hooks/useNumberLocale";
+
+const robuxTruncThreshold = 10000;
 
 const renderErrorTooltip = (robuxError: string, icon: ReactNode) => (
   <FoundationTooltip position="bottom-center" title={robuxError}>
@@ -28,9 +31,12 @@ export default function BuyRobuxIcon({
   creditDisplayConfig: string;
   robuxBadgeType?: ValueOf<typeof RobuxBadgeType>;
 }) {
+  const locale = useNumberLocale();
   const robuxAmountValue = robuxError
     ? layoutConstant.robuxOnEconomySystemOutage
-    : truncNumber(robuxAmount);
+    : robuxAmount < robuxTruncThreshold
+      ? formatNumber(robuxAmount, locale)
+      : truncNumber(robuxAmount, robuxTruncThreshold);
 
   // Robux value not shown for experiment variant hideRobuxAndCredit
   const robuxBadgeClass = classNames("notification-red robux-badge", {

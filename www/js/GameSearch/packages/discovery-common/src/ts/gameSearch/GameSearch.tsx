@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { WithTranslationsProps } from "@rbx/core-scripts/react";
 import { Button, Loading } from "@rbx/core-ui";
 import { fireEvent } from "@rbx/www-common/event-tracker";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { TGameData, TMetaData, TPaginationMethod } from "../common/types/bedev1Types";
 import bedev2Services from "../common/services/bedev2Services";
 import { gameSearchPage } from "../common/constants/configConstants";
@@ -54,7 +55,8 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
   const gridRef = useRef<HTMLDivElement>(null);
   const tileRef = useRef<HTMLDivElement>(null);
   const keyword = searchHelper.getKeyword() as string;
-  const gameSearchSessionInfo = usePageSession();
+  const omniSearchSessionId = usePageSession();
+  const [gamesTabSessionId] = useState(generateRandomUuid());
   const [gameData, setGameData] = useState<TGameData[] | undefined>(undefined);
   const [textData, setTextData] = useState<TOmniSearchTextDataModel[] | undefined>(undefined);
   const [metaData, setMetaData] = useState<TMetaData | undefined>(undefined);
@@ -107,7 +109,8 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
           suggestionCorrectedKwd: metaData?.correctedKeyword || "",
           suggestionAlgorithm: metaData?.suggestionAlgorithm || "",
           algorithm: metaData?.algorithmQueryType || "",
-          gameSearchSessionInfo,
+          gameSearchSessionInfo: omniSearchSessionId,
+          searchUuid: gamesTabSessionId,
           emphasisFlag: metaData?.emphasis || false,
           page: PageContext.SearchPage,
         };
@@ -115,7 +118,7 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
 
       return undefined;
     },
-    [gameData, metaData, gameSearchSessionInfo, keyword, componentType, topicId],
+    [gameData, metaData, omniSearchSessionId, keyword, componentType, topicId, gamesTabSessionId],
   );
 
   useGameImpressionsIntersectionTracker(
@@ -132,8 +135,9 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
       const data = await bedev2Services.getOmniSearch(
         keyword,
         nextPageToken,
-        gameSearchSessionInfo,
+        gamesTabSessionId,
         TOmniSearchPageType.All,
+        omniSearchSessionId,
       );
 
       const gamesList = getSearchResultsGamesList(data.gamesList);
@@ -177,7 +181,7 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
     gameData,
     metaData,
     nextPageToken,
-    gameSearchSessionInfo,
+    omniSearchSessionId,
     setMetaData,
     setNextPageToken,
   ]);
@@ -196,7 +200,8 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
     [EventStreamMetadata.NativeAdData]: data.nativeAdData,
     [EventStreamMetadata.Position]: id,
     [EventStreamMetadata.NumberOfLoadedTiles]: (gameData || []).length,
-    [SessionInfoType.GameSearchSessionInfo]: gameSearchSessionInfo,
+    [SessionInfoType.GameSearchSessionInfo]: omniSearchSessionId,
+    [SessionInfoType.SearchUuid]: gamesTabSessionId,
     [EventStreamMetadata.Page]: PageContext.SearchPage,
     [EventStreamMetadata.LaunchData]: data.launchDataOverride,
   });

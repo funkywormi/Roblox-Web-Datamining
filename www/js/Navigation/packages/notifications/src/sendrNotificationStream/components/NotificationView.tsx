@@ -4,15 +4,17 @@ import {
   NotificationLayoutType,
 } from "../types/NotificationTemplateTypes";
 import { SendrTemplateContext } from "../context/SendrTemplateContext";
+import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
 
-import LegacyNotificationTemplate from "./templates/LegacyNotificationTemplate";
 import FoundationNotificationTemplate from "./templates/FoundationNotificationTemplate";
+import type { JSX } from "react";
 
 export const NotificationView = (notificationProps: NotificationTemplateProps): JSX.Element => {
   const useFoundationTemplate = useContext(SendrTemplateContext);
 
+  const { LegacyNotificationTemplate } = getNotificationStreamHost();
   let currentTemplate;
-  if (useFoundationTemplate) {
+  if (useFoundationTemplate || !LegacyNotificationTemplate) {
     currentTemplate = FoundationNotificationTemplate;
   } else {
     switch (notificationProps.currentState.layoutKey) {

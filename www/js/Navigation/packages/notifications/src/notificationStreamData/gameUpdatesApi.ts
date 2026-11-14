@@ -63,7 +63,10 @@ export const streamMetadataUrlConfig: UrlConfig = {
   retryable: true,
 };
 
-export type StreamMetadata = { canLaunchGameFromGameUpdate?: boolean };
+export type StreamMetadata = {
+  canLaunchGameFromGameUpdate?: boolean;
+  signalRDisconnectionResponseInMilliseconds?: number;
+};
 
 export const GAME_UPDATE_NOTIF_TYPE = "gameUpdate";
 
@@ -73,20 +76,6 @@ export const GAME_UPDATE_NS_PAGES = {
 } as const;
 
 export type GameUpdateNsPage = (typeof GAME_UPDATE_NS_PAGES)[keyof typeof GAME_UPDATE_NS_PAGES];
-
-export const GAME_UPDATE_INTERACTIONS = {
-  seen: "Seen",
-  played: "Played",
-  unfollowed: "Unfollowed",
-} as const;
-
-export type GameUpdateInteraction =
-  (typeof GAME_UPDATE_INTERACTIONS)[keyof typeof GAME_UPDATE_INTERACTIONS];
-
-export const gameUpdateInteractedUrlConfig: { url: string; withCredentials: boolean } = {
-  url: `${notificationApi}/v2/stream-notifications/game-update-notification-interacted`,
-  withCredentials: true,
-};
 
 export const followUniverseUrlConfig = (userId: number, universeId: number): UrlConfig => ({
   url: `${followingsApi}/v1/users/${userId}/universes/${universeId}`,
@@ -108,7 +97,8 @@ export const openAbuseReport = (url: string): void => {
     globals.AbuseReportDispatcher.triggerUrlAction(url);
     return;
   }
-  window.location.href = url;
+  // website's AbuseReportDispatcher.triggerUrlAction lowercases the URL before its desktop redirect
+  window.location.href = url.toLowerCase();
 };
 
 export const abuseReportHref = (universeId: number, redirectUrl: string): string =>

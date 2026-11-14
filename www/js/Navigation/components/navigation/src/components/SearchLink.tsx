@@ -6,7 +6,7 @@ import {
   TAvatarAutocompleteSuggestionEntry,
   TGamesAutocompleteSuggestionEntry,
 } from "../services/searchTypes";
-import { getNavCapability } from "../util/navCapabilities";
+import { useNavCapability } from "../util/navCapabilities";
 import links, { UniversalSearchLink } from "../constants/linkConstants";
 import Link from "./NavLink";
 import NavIcon from "./NavIcon";
@@ -29,7 +29,7 @@ export function AutocompleteSearchLink({
   });
   const { type, universeId, searchQuery } = suggestion;
   const [isThumbnailVisible, setIsThumbnailVisible] = useState(false);
-  const GameIconThumbnail = getNavCapability("GameIconThumbnail");
+  const GameIconThumbnail = useNavCapability("GameIconThumbnail");
 
   if (type === GamesAutocompleteSuggestionEntryType.GameSuggestion) {
     return (

@@ -9,20 +9,24 @@ const abbreviateUnreadCount = (count: number): string =>
 
 type ReactNotificationBellProps = {
   unreadCount?: number;
+  countFetchedAt?: number;
 };
 
-export default function ReactNotificationBell({ unreadCount = 0 }: ReactNotificationBellProps) {
-  const previousCountRef = useRef(0);
+export default function ReactNotificationBell({
+  unreadCount = 0,
+  countFetchedAt = 0,
+}: ReactNotificationBellProps) {
+  const unreadCountRef = useRef(unreadCount);
+  unreadCountRef.current = unreadCount;
 
   useEffect(() => {
-    if (unreadCount > 0 && previousCountRef.current === 0) {
+    if (countFetchedAt > 0 && unreadCountRef.current > 0) {
       sendEventWithTarget(events.openCTA.name, events.openCTA.context, {
-        count: unreadCount,
+        count: unreadCountRef.current,
         sendrVersion: 0,
       });
     }
-    previousCountRef.current = unreadCount;
-  }, [unreadCount]);
+  }, [countFetchedAt]);
 
   useEffect(() => {
     // TODO: remove; one-time unregister of the retired desktop push SW, 2024 cleanup window passed.

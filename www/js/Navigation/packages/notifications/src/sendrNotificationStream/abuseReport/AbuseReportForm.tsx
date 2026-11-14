@@ -1,10 +1,9 @@
-import { CircularProgress, Divider, Grid, Typography } from "@mui/material";
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form/dist/index.ie11";
-import { DeviceMeta } from "Roblox";
+import { useForm } from "react-hook-form";
 import { ProgressCircle } from "@rbx/foundation-ui";
 import { useNotificationLocalization } from "../context/NotificationsLocalization";
-import { getIsFoundationModalEnabled } from "../utils/getIsFoundationModalEnabled";
+import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
+import { getFlaggedMuiModalArms, getMuiModalArms } from "../mui/muiModalArms";
 import {
   AbuseReportFormData,
   AbuseReportFormProps,
@@ -16,15 +15,12 @@ import { getReportConfiguration, sendEventStreamEvent, sendReport } from "./abus
 import ABUSE_REPORT_EVENTS from "./constants/eventConstants";
 
 const AbuseReportForm: FC<AbuseReportFormProps> = ({
-  children,
   customRender,
   onSubmit,
   defaultFormValues,
   formActions,
   reportedEntity,
-  reportedEntityContext,
   reporterId,
-  title,
 }) => {
   // TODO: Add loading state, when fetching configuration
 
@@ -48,8 +44,9 @@ const AbuseReportForm: FC<AbuseReportFormProps> = ({
 
   const getEntryPoint = (): EntryPoint => {
     // TODO: remove this dependency to be outside this form??
-    if (DeviceMeta) {
-      const { isInApp, isPhone } = DeviceMeta();
+    const deviceMeta = getNotificationStreamHost().getDeviceMeta();
+    if (deviceMeta) {
+      const { isInApp, isPhone } = deviceMeta;
       if (isPhone) {
         return "mobile";
       }
@@ -60,7 +57,7 @@ const AbuseReportForm: FC<AbuseReportFormProps> = ({
     return "website";
   };
 
-  const { control, formState, handleSubmit, register } = useForm({
+  const { control, formState, handleSubmit, register } = useForm<AbuseReportFormData>({
     defaultValues,
     mode: "onChange",
     reValidateMode: "onChange",
@@ -174,21 +171,22 @@ const AbuseReportForm: FC<AbuseReportFormProps> = ({
     });
   }, []);
 
-  const AbuseReportBody = useMemo(
-    () =>
-      abuseReportsInputsConfiguration.map(config => (
-        <Grid item xs={12} key={config.name}>
-          <AbuseReportInput
-            control={control}
-            config={config}
-            register={register}
-            errors={errors}
-            disabled={isSubmitting}
-          />
-        </Grid>
-      )),
-    [abuseReportsInputsConfiguration, control, errors, isSubmitting, register],
-  );
+  const AbuseReportBody = useMemo(() => {
+    const InputItem = getMuiModalArms()?.AbuseReportInputItem ?? "div";
+    return abuseReportsInputsConfiguration.map(config => (
+      <InputItem key={config.name}>
+        <AbuseReportInput
+          control={control}
+          config={config}
+          register={register}
+          errors={errors}
+          disabled={isSubmitting}
+        />
+      </InputItem>
+    ));
+  }, [abuseReportsInputsConfiguration, control, errors, isSubmitting, register]);
+
+  const SubmitSpinner = getFlaggedMuiModalArms()?.SubmitSpinner;
 
   const AbuseReportActionButtons = useMemo(() => {
     const actionsList =
@@ -214,14 +212,14 @@ const AbuseReportForm: FC<AbuseReportFormProps> = ({
         onClick={handleSubmit(onReportSubmit)}
       >
         {isSubmitting ? (
-          getIsFoundationModalEnabled() ? (
+          SubmitSpinner ? (
+            <SubmitSpinner />
+          ) : (
             <ProgressCircle
               size="Small"
               variant="Indeterminate"
               ariaLabel={translate("Action.Report")}
             />
-          ) : (
-            <CircularProgress size={16} />
           )
         ) : (
           translate("Action.Report")
@@ -229,48 +227,18 @@ const AbuseReportForm: FC<AbuseReportFormProps> = ({
       </button>,
     );
     return actionsList;
-  }, [formActions, handleSubmit, onReportSubmit, onSubmit, isSubmitting, translate, isValid]);
+  }, [
+    formActions,
+    handleSubmit,
+    onReportSubmit,
+    onSubmit,
+    isSubmitting,
+    translate,
+    isValid,
+    SubmitSpinner,
+  ]);
 
-  const AbuseReportActions = useMemo(() => {
-    const buttonWidth = 12 / ((formActions?.length ?? 0) + 1);
-
-    return (
-      <Grid item xs={12}>
-        <Grid container direction="row" spacing={1}>
-          {AbuseReportActionButtons?.map(action => (
-            <Grid item xs={buttonWidth} key={action.key}>
-              {action}
-            </Grid>
-          ))}
-        </Grid>
-      </Grid>
-    );
-  }, [formActions, AbuseReportActionButtons]);
-
-  return customRender ? (
-    customRender(AbuseReportBody, AbuseReportActionButtons)
-  ) : (
-    <Grid container direction="column">
-      <Grid item xs={12}>
-        <Typography variant="h1">{title}</Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Divider />
-      </Grid>
-      <React.Fragment>
-        <Grid item xs={12}>
-          {reportedEntityContext}
-        </Grid>
-        {AbuseReportBody}
-        {children}
-      </React.Fragment>
-      <Grid item xs={12}>
-        <Grid container direction="row" spacing={1}>
-          {AbuseReportActions}
-        </Grid>
-      </Grid>
-    </Grid>
-  );
+  return customRender ? customRender(AbuseReportBody, AbuseReportActionButtons) : null;
 };
 
 export default AbuseReportForm;

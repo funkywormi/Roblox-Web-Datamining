@@ -16,37 +16,58 @@ import {
   NotificationsBundle,
 } from "../sendrNotificationStream/types/NotificationTemplateTypes";
 import { StreamNotification, sendCardClick, streamEvents } from "../notificationStreamData";
+import type { JSX } from "react";
 
 const { websiteUrl } = environmentUrls;
 
-const isStacked = (n: StreamNotification): boolean => {
-  const meta = n.metadataCollection ?? [];
-  return (n.eventCount ?? meta.length) > 1 || meta.length === 0;
-};
+type CardMetadata = Array<Record<string, unknown>>;
 
-const getCardClickEvent = (n: StreamNotification): string | null => {
+const INBOX_PATH = "/my/messages/#!/inbox";
+
+const getCardPath = (n: StreamNotification): string | null => {
+  const meta = (n.metadataCollection ?? []) as CardMetadata;
   switch (n.notificationSourceType) {
     case "GroupJoinRequestAccepted":
-      return streamEvents.goToGroupPage;
+      return meta.length === 0
+        ? "/my/communities"
+        : `/communities/${String(meta[0]?.AccepterGroupId ?? "")}`;
     case "PrivateMessageReceived":
-      return streamEvents.goToMessages;
+      return (n.eventCount ?? 0) > 1 || meta.length === 0
+        ? INBOX_PATH
+        : `${INBOX_PATH}?conversationId=${String(meta[0]?.MessageId ?? "")}`;
     default:
       return null;
+  }
+};
+
+// notificationsController.js clickCard: the source type is the event context, plus a per-type key.
+const sendCardClickEvent = (n: StreamNotification, path: string | null): void => {
+  const meta = (n.metadataCollection ?? []) as CardMetadata;
+  switch (n.notificationSourceType) {
+    case "GroupJoinRequestAccepted":
+      sendCardClick(
+        streamEvents.goToGroupPage,
+        n,
+        { groupId: meta.length === 0 ? 0 : (meta[0]?.AccepterGroupId as number) },
+        n.notificationSourceType,
+      );
+      break;
+    case "PrivateMessageReceived":
+      sendCardClick(
+        streamEvents.goToMessages,
+        n,
+        { targetUrl: path ?? undefined },
+        n.notificationSourceType,
+      );
+      break;
+    default:
+      break;
   }
 };
 
 export const getNotificationHref = (n: StreamNotification): string | null => {
-  const meta = (n.metadataCollection ?? []) as Array<Record<string, unknown>>;
-  switch (n.notificationSourceType) {
-    case "GroupJoinRequestAccepted":
-      return isStacked(n)
-        ? `${websiteUrl}/my/communities`
-        : `${websiteUrl}/communities/${String(meta[0]?.AccepterGroupId ?? "")}`;
-    case "PrivateMessageReceived":
-      return `${websiteUrl}/my/messages/#!/inbox`;
-    default:
-      return null;
-  }
+  const path = getCardPath(n);
+  return path == null ? null : `${websiteUrl}${path}`;
 };
 
 export type NotificationStreamCardRouterProps = {
@@ -72,13 +93,11 @@ export const NotificationStreamCardRouter = ({
   onViewGameUpdates,
   canLaunchGameFromGameUpdate,
 }: NotificationStreamCardRouterProps): JSX.Element | null => {
-  const href = getNotificationHref(notification);
+  const path = getCardPath(notification);
+  const href = path == null ? null : `${websiteUrl}${path}`;
 
   const handleClick = (): void => {
-    const clickEvent = getCardClickEvent(notification);
-    if (clickEvent) {
-      sendCardClick(clickEvent, notification);
-    }
+    sendCardClickEvent(notification, path);
     if (!notification.isInteracted) {
       onInteract(notification.id);
     }

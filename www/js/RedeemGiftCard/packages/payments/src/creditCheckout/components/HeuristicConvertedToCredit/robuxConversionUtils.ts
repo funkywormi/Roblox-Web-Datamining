@@ -26,7 +26,7 @@ const generateRobuxConversionMessage = (
         boldEnd: "</b>",
       })
     : `${translate(TRANSLATION_KEYS.ConvertToRobuxStep3Message, {
-        remainingCreditBalance: `<span class='fiat-price-tag ml-1' data-amount=${remainingCreditBalance} data-currency-code=${currencyCode}></span>`,
+        remainingCreditBalance: `<span class='fiat-price-tag' style='margin-left: 0.25rem' data-amount=${remainingCreditBalance} data-currency-code=${currencyCode}></span>`,
         lineBreaker: "<br /><br />",
         robuxConversionAmount: `<span class="icon-robux-16x16" style="transform: translateY(-2px)"></span><b>${robuxConversionAmount}</b>`,
       })} ${translate(

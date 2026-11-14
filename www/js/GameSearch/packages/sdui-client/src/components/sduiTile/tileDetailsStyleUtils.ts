@@ -67,6 +67,7 @@ export const getTileDetailsStyles = ({
     },
     titleStyles: {
       className: clsx(
+        "sdui-tile-title",
         "content-emphasis",
         titleFontClass,
         titleLines === 1 && "text-truncate-end text-no-wrap [overflow-wrap:break-word]",

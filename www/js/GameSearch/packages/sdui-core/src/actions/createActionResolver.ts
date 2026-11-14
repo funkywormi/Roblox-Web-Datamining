@@ -29,7 +29,7 @@ export function createActionResolver(
   configKey?: string,
   pageEntryIdentifier?: string,
 ): SduiActionResolver {
-  const { actionHandlerRegistry, telemetryHandlerNameRegistry, translate } = services;
+  const { actionHandlerRegistry, telemetryHandlerNameRegistry, translate, sessionStore } = services;
 
   const createActionContext = (): SduiActionContext => ({
     apiStore: services.apiStore,
@@ -39,6 +39,7 @@ export function createActionResolver(
     analyticsReporter: services.analyticsReporter,
     errorReporter: services.errorReporter,
     pageContext: services.pageContext,
+    sessionStore,
     translate,
   });
 

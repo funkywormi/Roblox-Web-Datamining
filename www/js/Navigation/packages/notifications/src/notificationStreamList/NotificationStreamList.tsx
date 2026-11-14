@@ -1,6 +1,7 @@
 import React, { ReactNode, useRef } from "react";
 import { List } from "@rbx/foundation-ui";
 import { useInfiniteScroll } from "./useInfiniteScroll";
+import type { JSX } from "react";
 
 export type NotificationStreamListProps<T> = {
   /** The rows to render. */

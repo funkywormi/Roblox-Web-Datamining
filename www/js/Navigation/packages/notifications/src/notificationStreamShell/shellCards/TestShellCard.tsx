@@ -2,6 +2,7 @@ import React from "react";
 import { getRelativeTimeMaxDays } from "../../utils/relativeTime";
 import { Notification } from "@rbx/foundation-ui";
 import { TestNotificationData } from "../../notificationStreamCards/test/types";
+import type { JSX } from "react";
 
 export type TestShellCardProps = {
   notificationData: TestNotificationData;
@@ -16,7 +17,7 @@ export const TestShellCard = ({ notificationData }: TestShellCardProps): JSX.Ele
   return (
     <Notification
       // Override the navbar <li>'s inherited text-align:center (Navigation.css).
-      style={{ textAlign: "left" }}
+      style={{ textAlign: "start" }}
       // No headline on this card type; foundation collapses the title row only when the prop is falsy,
       // and it is not optional, so absence has to be stated.
       title={undefined}

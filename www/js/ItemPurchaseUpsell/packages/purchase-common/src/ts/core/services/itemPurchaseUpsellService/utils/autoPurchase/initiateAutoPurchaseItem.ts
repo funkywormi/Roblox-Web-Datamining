@@ -3,14 +3,14 @@
  * This method was implemented in the WebSites: https://github.rbx.com/Roblox/web-platform/blob/186bc2798a9b636ef94f884de652d9554e4518ad/Web/RobloxWebSite/js/ItemPurchaseForDialog/ItemPurchaseForDialog.js#L99
  * In order to control the auto purchase flow, we have to rewrite part of the method.
  */
-import { ItemPurchase } from '@rbx/legacy-webapp-types/Roblox';
-import type { RobloxTranslationResource } from '@rbx/legacy-webapp-types/Roblox';
 import { EnvironmentUrls } from '@rbx/environment-urls';
 import { sendEventWithTarget, targetTypes } from '@rbx/core-scripts/event-stream';
 import { UrlSearchParams } from '@rbx/core-lib/url';
 import { getCurrentUser } from '@rbx/www-common/user';
 import { generateRandomUuid } from '@rbx/core-lib/uuid';
 import * as httpService from '@rbx/core-scripts/http';
+import type { UpsellTranslationResource } from '../../constants/serviceTypeDefinitions';
+import getLegacyServices from '../common/legacyServices';
 import {
   ItemPurchaseObject,
   PurchaseResponse,
@@ -30,6 +30,20 @@ import {
 import { invalidateCurrentAutoPurchaseFlow } from '../common/invalidationHelpers';
 import openTryAgainLaterErrorModal from '../../modals/openTryAgainLaterErrorModal';
 import reportCounter from '../common/reportCounter';
+
+// Uses the .NET ItemPurchase error view when that bundle is loaded, otherwise the try-again modal.
+function openErrorView(
+  error: Record<string, unknown>,
+  itemPurchaseObj: ItemPurchaseObject,
+  translationResource: UpsellTranslationResource
+) {
+  const itemPurchase = getLegacyServices().ItemPurchase;
+  if (itemPurchase) {
+    itemPurchase().openErrorView(error);
+  } else {
+    openTryAgainLaterErrorModal(itemPurchaseObj, translationResource);
+  }
+}
 
 function getAssetAcquiredAnalyticsVariables(itemId: string | undefined) {
   const searchParams = UrlSearchParams.parse(window.location.search, false);
@@ -54,7 +68,7 @@ async function purchaseWithUrl(
   urlString: string,
   itemPurchaseObj: ItemPurchaseObject,
   loadingOverlay: LoadingOverlay,
-  translationResource: RobloxTranslationResource
+  translationResource: UpsellTranslationResource
 ): Promise<void> {
   const urlConfig = {
     url: urlString,
@@ -95,7 +109,7 @@ async function purchaseWithUrl(
         purchaseResult.AssetID = purchaseResult.assetId;
       }
       loadingOverlay.hide();
-      ItemPurchase().openErrorView(purchaseResult);
+      openErrorView(purchaseResult, itemPurchaseObj, translationResource);
       invalidateCurrentAutoPurchaseFlow();
       return Promise.resolve(); // let the original error flow handle the error, reject will handle twice by catch
     }
@@ -127,7 +141,7 @@ async function purchaseWithUrl(
     } else {
       try {
         const errObj = JSON.parse(purchaseError.responseText || '') as { [key: string]: unknown };
-        ItemPurchase().openErrorView(errObj);
+        openErrorView(errObj, itemPurchaseObj, translationResource);
         invalidateCurrentAutoPurchaseFlow();
       } catch (parseErr) {
         return Promise.reject(parseErr);
@@ -141,7 +155,7 @@ async function purchaseSubscriptionWithRobux(
   urlString: string,
   itemPurchaseObj: ItemPurchaseObject,
   loadingOverlay: LoadingOverlay,
-  translationResource: RobloxTranslationResource
+  translationResource: UpsellTranslationResource
 ): Promise<void> {
   const urlConfig = {
     url: urlString,
@@ -180,7 +194,7 @@ export default async function initiateAutoPurchaseItem(
     | null
     | undefined = undefined,
   loadingOverlay: LoadingOverlay,
-  translationResource: RobloxTranslationResource
+  translationResource: UpsellTranslationResource
 ): Promise<void> {
   if (itemPurchaseObj.itemContainerElemClassList?.contains('btn-disabled-primary')) {
     return Promise.resolve();

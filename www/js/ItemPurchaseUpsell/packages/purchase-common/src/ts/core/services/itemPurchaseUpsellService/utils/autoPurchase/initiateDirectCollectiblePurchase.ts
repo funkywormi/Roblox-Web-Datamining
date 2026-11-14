@@ -1,5 +1,5 @@
 import { escapeHtml } from '@rbx/core-scripts/format/string';
-import type { RobloxTranslationResource } from '@rbx/legacy-webapp-types/Roblox';
+import type { UpsellTranslationResource } from '../../constants/serviceTypeDefinitions';
 import {
   ItemDetailObject,
   ItemPurchaseAjaxDataObject,
@@ -17,7 +17,7 @@ export type DirectCollectiblePurchaseParams = {
   purchasePrice: number;
   offerIds: string[];
   userBalance: number;
-  translationResource: RobloxTranslationResource;
+  translationResource: UpsellTranslationResource;
 };
 
 /**

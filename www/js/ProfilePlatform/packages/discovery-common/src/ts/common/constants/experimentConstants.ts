@@ -1,4 +1,5 @@
 import environmentUrls from "@rbx/environment-urls";
+import type { TPlayOnWebVariant } from "@rbx/game-play-button";
 
 const { apiGatewayUrl } = environmentUrls;
 
@@ -28,6 +29,17 @@ const layerNames = {
   tileLayer: "Website.TileLayer",
   playButton: "Website.PlayButton",
   searchLandingPage: "Website.SearchLandingPage",
+  playInBrowserDesktop: "Website.PlayInBrowser.Desktop",
+  playInBrowserMobile: "Website.PlayInBrowser.Mobile",
+};
+
+// ForcePlayOnWeb skips the browser and device checks.
+const playInBrowserDefaultValues: {
+  PlayOnWebVariant: TPlayOnWebVariant;
+  ForcePlayOnWeb: boolean;
+} = {
+  PlayOnWebVariant: "None",
+  ForcePlayOnWeb: false,
 };
 
 const defaultValues = {
@@ -40,7 +52,6 @@ const defaultValues = {
     IsGameStorePreviewEnabled: false,
     HasUpdatedRecommendedSortTitle: true,
     IsGamePreviewVideoEnabled: false,
-    IsPlayOnWebEnabled: false,
   },
   gameDetailsBtid: {
     isDownloadButtonOverrideEnabled: false,
@@ -56,6 +67,8 @@ const defaultValues = {
   tileLayer: {},
   playButton: {},
   searchLandingPage: {},
+  playInBrowserDesktop: playInBrowserDefaultValues,
+  playInBrowserMobile: playInBrowserDefaultValues,
 };
 
 export default {

@@ -1,14 +1,17 @@
-import { StyledEngineProvider } from "@mui/material";
-import { useCallback, useEffect, useRef, useState, type JSX } from "react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { CurrentUser } from "Roblox";
-import { TrustedFriendsModal } from "@rbx/friends-common";
-import { TranslationProvider, queryClient } from "@rbx/core-scripts/react";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type JSX,
+  type ReactNode,
+} from "react";
 import MetaActionsList from "../components/MetaActionsList";
 import ReportNotificationModal from "../components/ReportNotificationModal";
-import { translations } from "../components/component.json";
+import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
+import { getMuiModalArms } from "../mui/muiModalArms";
 import type { TrustedFriendsAcceptModalRequestDetail } from "../clientTriggers/clientTriggerModalBridge";
-import { NotificationLocalizationProvider } from "../context/NotificationsLocalization";
 import {
   SelectedNotificationState,
   useSelectedNotificationProvider,
@@ -23,6 +26,10 @@ import {
   setNotificationStreamMetaActionsHost,
   setNotificationStreamTrustedFriendsHost,
 } from "../utils/notificationStreamWindowHost";
+
+const PassThrough = ({ children }: { children?: ReactNode }) => (
+  <React.Fragment>{children}</React.Fragment>
+);
 
 const NotificationStreamModalContainer = (): JSX.Element => {
   const { SelectedNotificationProvider, setSelectedNotification } =
@@ -48,6 +55,10 @@ const NotificationStreamModalContainer = (): JSX.Element => {
 
   const openTrustedFriendsFromBridge = useCallback(
     (detail: TrustedFriendsAcceptModalRequestDetail): void => {
+      if (!getNotificationStreamHost().TrustedFriendsModal) {
+        detail.resolve(false);
+        return;
+      }
       trustedFriendsResolveRef.current = detail.resolve;
       setTrustedFriendsModalPayload({
         userId: detail.userId,
@@ -78,7 +89,7 @@ const NotificationStreamModalContainer = (): JSX.Element => {
       if (config.EnableNotification) {
         const url = getAbuseReportRevampUrl({
           targetId: notificationData.id,
-          submitterId: CurrentUser.userId,
+          submitterId: getNotificationStreamHost().getCurrentUserId(),
           abuseVector: "notifications",
         });
         window.location.href = url;
@@ -94,14 +105,29 @@ const NotificationStreamModalContainer = (): JSX.Element => {
     [setShowReportNotification],
   );
 
+  const showAbuseReportFor = useCallback(
+    (selection: SelectedNotificationState) => {
+      setSelectedNotification(selection);
+      if (selection.notificationData) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        showAbuseReport(selection.notificationData);
+      }
+    },
+    [setSelectedNotification, showAbuseReport],
+  );
+
   useEffect(() => {
-    setNotificationStreamAbuseReportHost(showAbuseReport);
+    setNotificationStreamAbuseReportHost(showAbuseReportFor);
     return () => setNotificationStreamAbuseReportHost(null);
-  }, [showAbuseReport]);
+  }, [showAbuseReportFor]);
+
+  const StyleProvider: ComponentType<{ children?: ReactNode }> =
+    getMuiModalArms()?.StyleProvider ?? PassThrough;
+  const { TrustedFriendsModal, TranslationBoundary } = getNotificationStreamHost();
 
   return (
-    <StyledEngineProvider injectFirst>
-      <NotificationLocalizationProvider>
+    <StyleProvider>
+      <TranslationBoundary>
         <SelectedNotificationProvider>
           <MetaActionsList
             show={metaActionsVisible}
@@ -109,21 +135,16 @@ const NotificationStreamModalContainer = (): JSX.Element => {
             showAbuseReport={showAbuseReport}
           />
           <ReportNotificationModal isOpen={showReportNotification} closeModal={closeAbuseReport} />
-          <TranslationProvider config={translations}>
-            <QueryClientProvider client={queryClient}>
-              {trustedFriendsModalPayload ? (
-                <TrustedFriendsModal
-                  open
-                  userId={trustedFriendsModalPayload.userId}
-                  linkTokens={trustedFriendsModalPayload.linkTokens}
-                  onClose={handleTrustedFriendsModalClose}
-                />
-              ) : null}
-            </QueryClientProvider>
-          </TranslationProvider>
+          {trustedFriendsModalPayload && TrustedFriendsModal ? (
+            <TrustedFriendsModal
+              userId={trustedFriendsModalPayload.userId}
+              linkTokens={trustedFriendsModalPayload.linkTokens}
+              onClose={handleTrustedFriendsModalClose}
+            />
+          ) : null}
         </SelectedNotificationProvider>
-      </NotificationLocalizationProvider>
-    </StyledEngineProvider>
+      </TranslationBoundary>
+    </StyleProvider>
   );
 };
 

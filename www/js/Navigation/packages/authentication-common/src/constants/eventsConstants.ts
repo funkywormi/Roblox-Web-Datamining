@@ -35,6 +35,7 @@ const EVENT_CONSTANTS = {
     landingPage: "Multiverse",
     signupForm: "MultiverseSignupForm",
     schematizedSignupForm: "signupForm",
+    preAuthLandingSignupForm: "preAuthLandingSignupForm",
     sendOTP: "sendOTP",
     schematizedSendOTP: "sendOtp",
     enterOTP: "enterOTP",

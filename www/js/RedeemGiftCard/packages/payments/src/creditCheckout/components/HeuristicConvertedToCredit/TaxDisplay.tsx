@@ -70,7 +70,7 @@ export const TaxDisplay = ({
   }
 
   return (
-    <div className="tax-line d-flex justify-content-between row-pad">
+    <div className="tax-line flex justify-between row-pad">
       <span className="flex items-center gap-xsmall bold">
         {baseTaxLabel}
         {taxRateDisplayString && ` (${taxRateDisplayString}%)`}

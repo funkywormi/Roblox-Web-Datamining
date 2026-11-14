@@ -2,12 +2,8 @@ import { escapeHtml } from '@rbx/core-scripts/format/string';
 import { getAbsoluteUrl } from '@rbx/core-scripts/endpoints';
 import { getUrlWithLocale } from '@rbx/core-scripts/util/url';
 import { getCurrentUser } from '@rbx/www-common/user';
-import type {
-  RobloxIntlInstance,
-  RobloxTranslationResource,
-  RobloxTranslationResourceProviderInstance
-} from '@rbx/legacy-webapp-types/Roblox';
-import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
+import { paymentFlowAnalyticsService } from '@rbx/payments/payments-flow-analytics';
+import type { UpsellIntl, UpsellTranslationProvider, UpsellTranslationResource } from '../constants/serviceTypeDefinitions';
 import {
   InsufficientFundsErrorObject,
   ItemDetailElementDataset,
@@ -55,13 +51,13 @@ function prepareAndStartAutoPurchaseFlow(
   );
 
   reportCounter(UPSELL_COUNTER_NAMES.UpsellContinued, itemPurchaseObj?.assetType);
-  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-    true,
-    paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBUX_UPSELL,
-    paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-    paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.GO_TO_ROBUX_PURCHASE_PAGE
-  );
+  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+    isMidPurchaseStep: true,
+    viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBUX_UPSELL,
+    purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+    viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.GO_TO_ROBUX_PURCHASE_PAGE
+  });
 
   window.location.href = getAbsoluteUrl(
     `${UPGRADES_PAYMENT_METHODS_URL}?ap=${upsellProduct.roblox_product_id}&UpsellUuid=${upsellUuid}`
@@ -75,20 +71,20 @@ function insufficientRobuxModalSendPurchaseFlowEvent(
 ) {
   const modalEndTime = Date.now();
   const elapsedTime = modalEndTime - modalStartTime;
-  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-    true,
-    paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBUX_UPSELL,
-    paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+    isMidPurchaseStep: true,
+    viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBUX_UPSELL,
+    purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
     viewMessage,
-    {
+    eventMetadata: {
       userBalance: itemPurchaseAjaxData.userBalanceRobux.toString(),
       itemCost: itemDetail.expectedItemPrice.toString(),
       modalImpressionTimeInMs: elapsedTime.toString(),
       modalStartTimeInMs: modalStartTime.toString(),
       modalEndTimeInMs: modalEndTime.toString()
     }
-  );
+  });
 }
 
 function autoPurchaseFlow(
@@ -97,9 +93,9 @@ function autoPurchaseFlow(
   itemDetail: ItemDetailObject,
   itemPurchaseAjaxData: ItemPurchaseAjaxDataObject,
   upsellProduct: UpsellProduct,
-  intl: RobloxIntlInstance,
-  translationResource: RobloxTranslationResource,
-  intlProvider: RobloxTranslationResourceProviderInstance,
+  intl: UpsellIntl,
+  translationResource: UpsellTranslationResource,
+  intlProvider: UpsellTranslationProvider,
   shouldShowUnifiedPurchaseModal = false
 ) {
   const modalStartTime = Date.now();
@@ -336,9 +332,9 @@ export default function openNewInsufficientRobuxModal(
   itemDetail: ItemDetailObject,
   itemPurchaseAjaxData: ItemPurchaseAjaxDataObject,
   upsellProduct: UpsellProduct,
-  intl: RobloxIntlInstance,
-  translationResource: RobloxTranslationResource,
-  intlProvider: RobloxTranslationResourceProviderInstance,
+  intl: UpsellIntl,
+  translationResource: UpsellTranslationResource,
+  intlProvider: UpsellTranslationProvider,
   shouldShowUnifiedPurchaseModal = false
 ): void {
   const robuxItemPrice = formattingRobux(itemDetail.expectedItemPrice);
@@ -352,12 +348,12 @@ export default function openNewInsufficientRobuxModal(
         </div>
       </div>`;
   reportCounter(UPSELL_COUNTER_NAMES.UpsellShown, itemDetail.buyButtonElementDataset?.assetType);
-  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-    true,
-    paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBUX_UPSELL,
-    paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN
-  );
+  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+    isMidPurchaseStep: true,
+    viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBUX_UPSELL,
+    purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN
+  });
 
   autoPurchaseFlow(
     avatarPreview,

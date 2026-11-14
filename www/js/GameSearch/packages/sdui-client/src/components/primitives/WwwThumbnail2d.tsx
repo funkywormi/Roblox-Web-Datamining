@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { clsx } from "clsx";
 import { isThumbnailType, Thumbnail2d } from "@rbx/www-common/components/thumbnail";
-import { getCurrentUser } from "@rbx/www-common/user";
 import type { RbxThumbParams } from "@rbx/sdui-core";
 
 type WwwThumbnail2dProps = {
@@ -30,12 +29,7 @@ function WwwThumbnail2dInner({
       targetId={targetId}
       size={size}
       format="webp"
-      // Headshot background is rolled out to 100% of signed-in users (IXP rollout 1715 on
-      // Avatar.AvatarExperience2, keyed on user id), so default it on for them instead of reading IXP
-      // like @rbx/thumbnails does. Signed-out users get no value from IXP, so they stay without it.
-      includeBackground={
-        includeBackground ?? (type === "AvatarHeadShot" && getCurrentUser() !== undefined)
-      }
+      includeBackground={includeBackground}
       includeProfileFrame={includeProfileFrame}
       containerClassName={containerClassName}
       imgClassName={clsx(imgClassName, !isLoaded && "sdui-thumbnail-loading")}

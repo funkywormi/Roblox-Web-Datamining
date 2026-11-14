@@ -415,12 +415,12 @@ function buildPooledComponentList({
   const startRow = poolStore.getSectionStartRow(sectionId);
   const columnCount = poolStore.getSectionColumnCount(sectionId);
   const realCells = computed(() => sectionCells.value.filter(isPoolItemCell));
-  const itemByPoolIndex = computed(
-    () => new Map(realCells.value.map(cell => [cell.poolIndex, cell.item])),
-  );
   const inputSlicer = createInputSlicer(childRequest, undefined, entry => {
     const poolIndex = entry.poolPlacement?.poolIndex;
-    return poolIndex === undefined ? undefined : itemByPoolIndex.value.get(poolIndex);
+    const poolId = poolStore.getSectionPoolId(sectionId);
+    return poolIndex === undefined || poolId === undefined
+      ? undefined
+      : poolStore.getPoolItem(poolId, poolIndex).value;
   });
 
   let previousCache: EntryConfigCache | undefined;

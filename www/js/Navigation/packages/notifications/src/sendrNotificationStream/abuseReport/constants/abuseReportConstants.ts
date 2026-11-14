@@ -3,7 +3,7 @@
  * Multiple copies of this file exists in the codebase, give that there currently is not a way to share code across WebApps.
  * If updating this file, please report all the copies in the codebase.
  */
-import { Guac } from "Roblox";
+import { getNotificationStreamHost } from "../../../notificationStreamData/streamHost";
 
 const REPORTER_COMMENT_LIMIT = 1000;
 const ABUSE_REASONS = {
@@ -58,7 +58,8 @@ export function getAbuseReportRevampUrl({
  */
 export async function loadGuacConfigNonThrowing(): Promise<GuacConfig> {
   try {
-    const data = await Guac.callBehaviour<GuacResponse>("abuse-reporting-revamp");
+    const data =
+      await getNotificationStreamHost().callGuacBehaviour<GuacResponse>("abuse-reporting-revamp");
 
     if (!data) {
       return {

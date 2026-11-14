@@ -47,7 +47,9 @@ const PURCHASING_NAMESPACES: readonly Namespace[] = [
   'Authentication.TwoStepVerification',
   'Feature.RobloxSubscription',
   'Feature.NotApproved',
-  'IAPExperience.PurchaseError'
+  'IAPExperience.PurchaseError',
+  // Offer expiration badge (`Label.EndsDate`); last so it does not steal other keys.
+  'Feature.Catalog'
 ].map(asNamespace);
 
 const ITEM_NAMESPACES: readonly Namespace[] = ['Feature.Item', 'CommonUI.Messages'].map(asNamespace);
@@ -83,7 +85,8 @@ export const usePurchasingTranslate = (): PurchaseTranslate =>
     useTranslations(asNamespace('Authentication.TwoStepVerification')),
     useTranslations(asNamespace('Feature.RobloxSubscription')),
     useTranslations(asNamespace('Feature.NotApproved')),
-    useTranslations(asNamespace('IAPExperience.PurchaseError'))
+    useTranslations(asNamespace('IAPExperience.PurchaseError')),
+    useTranslations(asNamespace('Feature.Catalog'))
   ]);
 
 /** `.NET`-path `translate` for `translation.config.itemResources`. Requires a provider ancestor. */

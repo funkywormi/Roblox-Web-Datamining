@@ -17,6 +17,7 @@ import {
 } from "../constants/buttonWidths";
 import playButtonService from "../services/playButtonService";
 import {
+  PlayOnWebVariant,
   TAppsFlyerReferralProperties,
   TPlayabilityStatus,
   TPlayabilityStatuses,
@@ -24,6 +25,7 @@ import {
   TShowAgeVerificationOverlayResponse,
   TUniversePlaceVoiceEnabledSettings,
   type TPlayButtonPageContext,
+  type TPlayOnWebVariant,
 } from "../types/playButtonTypes";
 import {
   getJoindata,
@@ -191,7 +193,7 @@ export const PlayButton = ({
   appsFlyerReferralProperties = EMPTY_OBJECT,
   iconClassName = "icon-common-play",
   buttonWidth = buttonWidths.full,
-  buttonClassName = "btn-common-play-game-lg",
+  buttonClassName = "btn-common-play-game-lg game-play-button-lg",
   disableLoadingState = false,
   buttonText = undefined,
   hideIcon = false,
@@ -397,7 +399,7 @@ export type TDefaultPlayButtonProps = {
     >
   >;
   pageContext: TPlayButtonPageContext;
-  playOnWebEnabled?: boolean;
+  playOnWebVariant?: TPlayOnWebVariant;
 };
 
 export const DefaultPlayButton = ({
@@ -424,7 +426,7 @@ export const DefaultPlayButton = ({
   shouldShowVpcPlayButtonUpsells,
   playabilityStatusCtaOverrides,
   pageContext,
-  playOnWebEnabled,
+  playOnWebVariant = PlayOnWebVariant.None,
 }: TDefaultPlayButtonProps): React.JSX.Element => {
   // Share the purchase button's product-data loading (react-query dedupes the
   // fetch) so the secondary button is withheld until the purchase button is ready,
@@ -439,7 +441,7 @@ export const DefaultPlayButton = ({
   } = usePurchaseProductData(universeId, placeId, isPurchaseStatus);
 
   const isPlaytestAvailable = isPrivatePlaytestAvailable(privatePlaytestInfo);
-  const wasmJoinId = useWasmJoinId();
+  const { wasmJoinId, isLoading: isWasmJoinIdLoading } = useWasmJoinId();
 
   // Secondary CTAs that can stack under the primary button. Each case lists the primary
   // statuses it may appear alongside; the first enabled match is shown.
@@ -479,14 +481,18 @@ export const DefaultPlayButton = ({
       ),
     },
     {
-      isEnabled: Boolean(playOnWebEnabled),
+      isEnabled: playOnWebVariant === PlayOnWebVariant.TwoButton,
       primaryStatuses: playOnWebPrimaryStatuses,
       render: () => (
         <PlayOnWebButton
           placeId={placeId}
+          rootPlaceId={rootPlaceId}
           universeId={universeId}
+          privateServerLinkCode={privateServerLinkCode}
+          gameInstanceId={gameInstanceId}
           eventProperties={eventProperties}
           wasmJoinId={wasmJoinId}
+          playOnWebVariant={PlayOnWebVariant.TwoButton}
         />
       ),
     },
@@ -529,6 +535,34 @@ export const DefaultPlayButton = ({
       if (ctaOverride !== undefined) {
         primaryButton = ctaOverride;
         break;
+      }
+
+      // Play on Web replaces the Play button
+      if (
+        playabilityStatus === PlayabilityStatus.Playable &&
+        playOnWebVariant === PlayOnWebVariant.OneButton
+      ) {
+        if (isWasmJoinIdLoading && !disableLoadingState) {
+          primaryButton = <LoadingButton buttonClassName={buttonClassName} />;
+          isPrimaryButtonLoading = true;
+          break;
+        }
+
+        if (wasmJoinId) {
+          primaryButton = (
+            <PlayOnWebButton
+              placeId={placeId}
+              rootPlaceId={rootPlaceId}
+              universeId={universeId}
+              privateServerLinkCode={privateServerLinkCode}
+              gameInstanceId={gameInstanceId}
+              eventProperties={eventProperties}
+              wasmJoinId={wasmJoinId}
+              playOnWebVariant={PlayOnWebVariant.OneButton}
+            />
+          );
+          break;
+        }
       }
 
       primaryButton = (

@@ -7,6 +7,7 @@ import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
 import { createFireTelemetryHistogram } from "@rbx/web-telemetry/v2/histogram";
 import { createWithApiMetrics } from "../util/apiMetrics";
+import { logTimingDebug, watchHiddenFromNow } from "../util/pageVisibility";
 
 export const observabilityRegistry = {
   featureName: "LeftNav",
@@ -55,7 +56,7 @@ export const { trackCounter, trackError } = createTrackers(observabilityRegistry
   featureName: observabilityRegistry.featureName,
 });
 
-export const LeftNavErrorBoundary = createObsErrorBoundary({
+export const LeftNavErrorBoundary = createObsErrorBoundary(observabilityRegistry, {
   publish: publishMetric,
   captureException,
   featureName: observabilityRegistry.featureName,
@@ -65,13 +66,13 @@ export const getDeviceType = (): string => getDeviceMeta()?.deviceType || "unkno
 
 export const trackOpenToVisible = (variant: Variant): void => {
   const start = performance.now();
+  const wasHiddenSinceStart = watchHiddenFromNow();
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      publishHistogram(
-        "OpenToVisibleMs",
-        { variant, deviceType: getDeviceType() },
-        performance.now() - start,
-      );
+      const ms = performance.now() - start;
+      const dimensions = { variant, deviceType: getDeviceType(), wasHidden: wasHiddenSinceStart() };
+      publishHistogram("OpenToVisibleMs", dimensions, ms);
+      logTimingDebug("LeftNav_OpenToVisibleMs", ms, dimensions);
     });
   });
 };

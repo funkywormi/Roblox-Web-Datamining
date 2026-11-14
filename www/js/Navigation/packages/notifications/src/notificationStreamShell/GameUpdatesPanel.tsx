@@ -1,9 +1,10 @@
 import React from "react";
 import { useNotificationLocalization } from "../sendrNotificationStream/context/NotificationsLocalization";
 import GameUpdateShellCard from "./shellCards/GameUpdateShellCard";
-import { GameUpdateModel, markGameUpdateSeenOnce } from "../notificationStreamData/useGameUpdates";
+import { GameUpdateModel } from "../notificationStreamData/useGameUpdates";
 import { GAME_UPDATE_NS_PAGES } from "../notificationStreamData/gameUpdatesApi";
 import "./gameUpdatesPanel.css";
+import type { JSX } from "react";
 
 export type GameUpdatesPanelProps = {
   models: Map<number, GameUpdateModel>;
@@ -20,11 +21,6 @@ export const GameUpdatesPanel = ({
 }: GameUpdatesPanelProps): JSX.Element => {
   const translate = useNotificationLocalization();
   const sorted = [...models.values()].sort((a, b) => (b.createdOn ?? 0) - (a.createdOn ?? 0));
-
-  React.useEffect(() => {
-    sorted.forEach(markGameUpdateSeenOnce);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div className="game-updates-panel">

@@ -44,7 +44,7 @@ const playersSearchLink = {
 } satisfies UniversalSearchLink;
 
 const miscSearchLink: UniversalSearchLink[] = [
-  ...(authenticatedUser() != null ? [playersSearchLink] : []),
+  playersSearchLink,
   avatarSearchLink,
   {
     url: getAbsoluteUrl("/search/communities?keyword="),
@@ -148,6 +148,7 @@ export default {
   gameSearchLink,
   topSearchLink,
   avatarSearchLink,
+  playersSearchLink,
   miscSearchLink,
   newUniversalSearchUrls: [gameSearchLink, ...miscSearchLink] satisfies UniversalSearchLink[],
   settingsUrl: {

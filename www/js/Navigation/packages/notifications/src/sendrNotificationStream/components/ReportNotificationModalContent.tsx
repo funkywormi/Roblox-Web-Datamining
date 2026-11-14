@@ -1,11 +1,8 @@
-import { cryptoUtil } from "core-roblox-utilities";
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
-import { CurrentUser } from "Roblox";
-import { Grid } from "@mui/material";
 import { DialogBody, DialogFooter, DialogTitle as FoundationDialogTitle } from "@rbx/foundation-ui";
-import { DialogActions, DialogContent, DialogTitle } from "../../styledMuiComponents";
 import AbuseReportForm from "../abuseReport/AbuseReportForm";
-import { getIsFoundationModalEnabled } from "../utils/getIsFoundationModalEnabled";
+import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
+import { getFlaggedMuiModalArms } from "../mui/muiModalArms";
 import {
   AbuseReportCustomRenderFn,
   AbuseReportFormAction,
@@ -54,7 +51,7 @@ const ReportNotificationModalContent: FC<ReportNotificationModalProps> = ({ hand
   const generateIdempotenceKey = useCallback(async () => {
     const key = getIdempotenceKeyFromState(notificationProps?.currentState);
     const keyWithDate = `${key}${new Date().toDateString()}`.split(" ").join("");
-    const hashedKey = await cryptoUtil.hashStringWithSha256(keyWithDate);
+    const hashedKey = await getNotificationStreamHost().hashStringWithSha256(keyWithDate);
     setIdempotenceKey(hashedKey);
   }, [notificationProps]);
 
@@ -148,62 +145,43 @@ const ReportNotificationModalContent: FC<ReportNotificationModalProps> = ({ hand
 
   const renderProp: AbuseReportCustomRenderFn = useCallback(
     (body, actionsButtons) => {
-      if (getIsFoundationModalEnabled()) {
+      const euDsaLink = showEuDsa ? (
+        <a
+          href={urlConstants.illegalContentReportingUrl}
+          className="text-link"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {translate("DSAIllegal.ReportLink")}
+        </a>
+      ) : null;
+      const MuiReportNotificationLayout = getFlaggedMuiModalArms()?.ReportNotificationLayout;
+      if (MuiReportNotificationLayout) {
         return (
-          <React.Fragment>
-            <DialogBody className="flex flex-col gap-y-small">
-              <FoundationDialogTitle className="text-heading-medium margin-none">
-                {translate("Title.ReportNotification")}
-              </FoundationDialogTitle>
-              <div className="reported-notification">{reportedNotification}</div>
-              {body}
-            </DialogBody>
-            {apiErrorMsg ? (
-              <div className="text-error notification-api-error">{translate(apiErrorMsg)}</div>
-            ) : null}
-            <DialogFooter className="flex gap-x-small">{actionsButtons}</DialogFooter>
-            {showEuDsa ? (
-              <div className="report-eu-dsa-text">
-                <a
-                  href={urlConstants.illegalContentReportingUrl}
-                  className="text-link"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {translate("DSAIllegal.ReportLink")}
-                </a>
-              </div>
-            ) : null}
-          </React.Fragment>
+          <MuiReportNotificationLayout
+            title={translate("Title.ReportNotification")}
+            reportedNotification={reportedNotification}
+            body={body}
+            apiError={apiErrorMsg ? translate(apiErrorMsg) : null}
+            actions={actionsButtons}
+            euDsa={euDsaLink}
+          />
         );
       }
       return (
         <React.Fragment>
-          <DialogTitle>{translate("Title.ReportNotification")}</DialogTitle>
-          <DialogContent>
-            <Grid item xs={12} classes={{ root: "reported-notification" }}>
-              {reportedNotification}
-            </Grid>
+          <DialogBody className="flex flex-col gap-y-small">
+            <FoundationDialogTitle className="text-heading-medium margin-none">
+              {translate("Title.ReportNotification")}
+            </FoundationDialogTitle>
+            <div className="reported-notification">{reportedNotification}</div>
             {body}
-          </DialogContent>
+          </DialogBody>
           {apiErrorMsg ? (
-            <Grid item xs={12} classes={{ root: "text-error notification-api-error" }}>
-              {translate(apiErrorMsg)}
-            </Grid>
+            <div className="text-error notification-api-error">{translate(apiErrorMsg)}</div>
           ) : null}
-          <DialogActions>{actionsButtons}</DialogActions>
-          {showEuDsa ? (
-            <Grid item xs={12} classes={{ root: "report-eu-dsa-text" }}>
-              <a
-                href={urlConstants.illegalContentReportingUrl}
-                className="text-link"
-                target="_blank"
-                rel="noreferrer"
-              >
-                {translate("DSAIllegal.ReportLink")}
-              </a>
-            </Grid>
-          ) : null}
+          <DialogFooter className="flex gap-x-small">{actionsButtons}</DialogFooter>
+          {euDsaLink ? <div className="report-eu-dsa-text">{euDsaLink}</div> : null}
         </React.Fragment>
       );
     },
@@ -213,7 +191,7 @@ const ReportNotificationModalContent: FC<ReportNotificationModalProps> = ({ hand
   return (
     <AbuseReportForm
       reportedEntity={reportedData}
-      reporterId={CurrentUser.userId}
+      reporterId={getNotificationStreamHost().getCurrentUserId()}
       formActions={formActions}
       onSubmit={reportAction}
       customRender={renderProp}

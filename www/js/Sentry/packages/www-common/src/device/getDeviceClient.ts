@@ -30,3 +30,11 @@ export const getDeviceClient = (): DeviceMeta => {
 
 /** Drop-in name for `@rbx/core-scripts/meta/device`'s `getDeviceMeta`. */
 export const getDeviceMeta = getDeviceClient;
+
+/**
+ * An iPad on iPadOS 13+ reports itself as a Mac; touch points tell them apart.
+ * Always returns false on the Next.js server, where a browser navigator is unavailable.
+ */
+export const isIos13Ipad = (): boolean =>
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- preserve the legacy iPad detection heuristic
+  navigator?.platform === "MacIntel" && navigator.maxTouchPoints > 1;

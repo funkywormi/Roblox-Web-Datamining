@@ -3,17 +3,19 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useTranslations } from "@rbx/www-common/i18n";
 import { getSignupUrl, getIsVNGLandingRedirectEnabled } from "../util/authLinkUtil";
+import { useNavLocation } from "../util/navLocation";
 import { isAccountExperienceRevampEnabled } from "../util/accountExperienceUtils";
-import { getNavCapability } from "../util/navCapabilities";
+import { getNavCapability, useNavCapability } from "../util/navCapabilities";
 import Link from "./NavLink";
 
 const useNoAccountSwitcher = (): [boolean, boolean] => [false, false];
 
 export default function HeaderSignupLink() {
   const t = useTranslations("CommonUI.Features");
+  const location = useNavLocation();
 
   const useIsAccountSwitcherAvailableForBrowser =
-    getNavCapability("useIsAccountSwitcherAvailableForBrowser") ?? useNoAccountSwitcher;
+    useNavCapability("useIsAccountSwitcherAvailableForBrowser") ?? useNoAccountSwitcher;
   const [isAccountSwitchingEnabledForBrowser] = useIsAccountSwitcherAvailableForBrowser();
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export default function HeaderSignupLink() {
   return hideSignupButton ? null : (
     <li className="signup-button-container">
       <Link
-        url={getSignupUrl(isAccountSwitchingEnabledForBrowser)}
+        url={getSignupUrl(isAccountSwitchingEnabledForBrowser, location)}
         id="sign-up-button"
         className="rbx-navbar-signup btn-growth-sm nav-menu-title signup-button"
       >

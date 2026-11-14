@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { useTranslations, type Namespace, type Translator } from '@rbx/www-common/i18n';
+import type { UpsellTranslationProvider } from '../../core/services/itemPurchaseUpsellService/constants/serviceTypeDefinitions';
 
 /**
  * The `translate` shim itemPurchase components consume. Signature-compatible with the legacy
@@ -45,7 +47,9 @@ const PURCHASING_NAMESPACES: readonly Namespace[] = [
   'Authentication.TwoStepVerification',
   'Feature.RobloxSubscription',
   'Feature.NotApproved',
-  'IAPExperience.PurchaseError'
+  'IAPExperience.PurchaseError',
+  // Offer expiration badge (`Label.EndsDate`); last so it does not steal other keys.
+  'Feature.Catalog'
 ].map(asNamespace);
 
 const ITEM_NAMESPACES: readonly Namespace[] = ['Feature.Item', 'CommonUI.Messages'].map(asNamespace);
@@ -81,7 +85,8 @@ export const usePurchasingTranslate = (): PurchaseTranslate =>
     useTranslations(asNamespace('Authentication.TwoStepVerification')),
     useTranslations(asNamespace('Feature.RobloxSubscription')),
     useTranslations(asNamespace('Feature.NotApproved')),
-    useTranslations(asNamespace('IAPExperience.PurchaseError'))
+    useTranslations(asNamespace('IAPExperience.PurchaseError')),
+    useTranslations(asNamespace('Feature.Catalog'))
   ]);
 
 /** `.NET`-path `translate` for `translation.config.itemResources`. Requires a provider ancestor. */
@@ -91,3 +96,25 @@ export const useItemTranslate = (): PurchaseTranslate =>
 /** `.NET`-path `translate` for `translation.config.itemModelResources`. Requires a provider ancestor. */
 export const useItemModelTranslate = (): PurchaseTranslate =>
   compose([useTranslations(asNamespace('Feature.ItemModel'))]);
+
+/** The namespaces the itemPurchaseUpsell service reads, keyed the way it asks for them. */
+const UPSELL_NAMESPACES = ['Purchasing.PurchaseDialog', 'Feature.Premium', 'CommonUI.Controls'] as const;
+
+/** The page's messages for the itemPurchaseUpsell service. The page must load `UPSELL_NAMESPACES`. */
+export const useUpsellTranslationProvider = (): UpsellTranslationProvider => {
+  const purchaseDialog = useTranslations(asNamespace(UPSELL_NAMESPACES[0]));
+  const premium = useTranslations(asNamespace(UPSELL_NAMESPACES[1]));
+  const controls = useTranslations(asNamespace(UPSELL_NAMESPACES[2]));
+  return useMemo(() => {
+    const byNamespace: Record<string, PurchaseTranslate> = {
+      [UPSELL_NAMESPACES[0]]: compose([purchaseDialog]),
+      [UPSELL_NAMESPACES[1]]: compose([premium]),
+      [UPSELL_NAMESPACES[2]]: compose([controls])
+    };
+    return {
+      getTranslationResource: namespace => ({
+        get: (key, params) => byNamespace[namespace]?.(key, params) ?? ''
+      })
+    };
+  }, [purchaseDialog, premium, controls]);
+};

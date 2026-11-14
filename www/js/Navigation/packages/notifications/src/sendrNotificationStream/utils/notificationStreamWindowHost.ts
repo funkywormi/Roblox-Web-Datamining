@@ -1,9 +1,8 @@
 import type { SelectedNotificationState } from "../context/SelectedNotification";
 import { CLIENT_TRIGGER_TRUSTED_FRIENDS_MODAL_EVENT } from "../constants/clientTriggerConstants";
 import type { TrustedFriendsAcceptModalRequestDetail } from "../clientTriggers/clientTriggerModalBridge";
-import type { NotificationData } from "../types/NotificationTemplateTypes";
 
-export type NotificationStreamAbuseReportHost = (notificationData: NotificationData) => void;
+export type NotificationStreamAbuseReportHost = (selection: SelectedNotificationState) => void;
 
 export type NotificationStreamMetaActionsHost = (
   event: CustomEvent<SelectedNotificationState>,
@@ -76,6 +75,6 @@ export function setNotificationStreamAbuseReportHost(
   notificationStreamAbuseReportHost = handler;
 }
 
-export function openNotificationStreamAbuseReport(notificationData: NotificationData): void {
-  notificationStreamAbuseReportHost?.(notificationData);
+export function openNotificationStreamAbuseReport(selection: SelectedNotificationState): void {
+  notificationStreamAbuseReportHost?.(selection);
 }

@@ -1,5 +1,5 @@
-import type { RobloxTranslationResourceProviderInstance } from '@rbx/legacy-webapp-types/Roblox';
-import paymentFlowAnalyticsService from '@rbx/core-scripts/payments-flow';
+import { paymentFlowAnalyticsService } from '@rbx/payments/payments-flow-analytics';
+import type { UpsellTranslationProvider } from '../constants/serviceTypeDefinitions';
 import {
   COMMON_UI_CONTROLS_NAMESPACE,
   FEATURE_PREMIUM_NAMESPACE,
@@ -12,7 +12,7 @@ import reportCounter from '../utils/common/reportCounter';
 
 export default function openLeaveRobloxWarningModal(
   onContinueToPayment: () => void,
-  intlProvider: RobloxTranslationResourceProviderInstance,
+  intlProvider: UpsellTranslationProvider,
   itemPurchaseObj?: ItemDetailElementDataset
 ) {
   const featurePremiumTranslationResource = intlProvider.getTranslationResource(
@@ -40,34 +40,34 @@ export default function openLeaveRobloxWarningModal(
       commonUiControlsTranslationResource.get(LANG_KEYS.commonUiContinueToPaymentAction, {}) ||
       'Continue to Payment',
     onAccept: () => {
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-        true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.LEAVE_ROBLOX_WARNING,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CONTINUE_TO_VNG
-      );
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+        isMidPurchaseStep: true,
+        viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.LEAVE_ROBLOX_WARNING,
+        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+        viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CONTINUE_TO_VNG
+      });
       reportCounter(UPSELL_COUNTER_NAMES.ConfirmLeaveRobloxModal, itemPurchaseObj?.assetType);
       onContinueToPayment();
     },
     onDecline: () => {
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-        true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.LEAVE_ROBLOX_WARNING,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL
-      );
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+        isMidPurchaseStep: true,
+        viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.LEAVE_ROBLOX_WARNING,
+        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+        viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL
+      });
       reportCounter(UPSELL_COUNTER_NAMES.CancelledFromLeaveRobloxModal, itemPurchaseObj?.assetType);
     },
     onCancel: () => {
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-        true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.LEAVE_ROBLOX_WARNING,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL
-      );
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+        isMidPurchaseStep: true,
+        viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.LEAVE_ROBLOX_WARNING,
+        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+        viewMessage: paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL
+      });
       reportCounter(UPSELL_COUNTER_NAMES.CancelledFromLeaveRobloxModal, itemPurchaseObj?.assetType);
     },
     allowHtmlContentInBody: true,

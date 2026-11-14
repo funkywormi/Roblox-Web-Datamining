@@ -1,4 +1,4 @@
-import { Intl as RobloxIntl } from "Roblox";
+import { getNotificationStreamHost } from "../notificationStreamData/streamHost";
 
 // Bare duration, no direction word: NumberFormat rather than RelativeTimeFormat, because the latter
 // always appends "ago" and would change every card's copy.
@@ -21,7 +21,7 @@ const formatters = new Map<string, Intl.NumberFormat>();
 // formatted duration, not to a card with no timestamp.
 const currentLocale = (): string | undefined => {
   try {
-    return new RobloxIntl().getLocale() || undefined;
+    return getNotificationStreamHost().getLocale();
   } catch {
     return undefined;
   }

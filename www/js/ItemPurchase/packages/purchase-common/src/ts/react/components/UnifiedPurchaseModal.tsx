@@ -34,6 +34,7 @@ import useMarketplaceOffers from '../hooks/useMarketplaceOffers';
 // this replaces the old cross-WebApp relative import into its source.)
 import { usePaymentSession } from '@rbx/payments/services/paymentSession';
 import EmbeddableText from './EmbeddableText';
+import OfferExpirationBadge from './OfferExpirationBadge';
 
 export type UnifiedPurchaseActionParams = {
   purchasePrice?: number;
@@ -271,6 +272,7 @@ export const UnifiedPurchaseModalComponent: React.FC<
             />
             {offerSelections.map(offer => {
               const offerLabelId = `purchase-offer-label-${offer.offerId}`;
+              const offerExpirationId = `purchase-offer-expiration-${offer.offerId}`;
 
               return (
                 // eslint-disable-next-line jsx-a11y/label-has-associated-control -- Checkbox is a custom control associated via htmlFor + aria-labelledby
@@ -280,7 +282,7 @@ export const UnifiedPurchaseModalComponent: React.FC<
                   className='flex flex-row items-start gap-x-small self-start cursor-pointer'>
                   <Checkbox
                     id={`purchase-offer-checkbox-${offer.offerId}`}
-                    aria-labelledby={offerLabelId}
+                    aria-labelledby={`${offerLabelId} ${offerExpirationId}`}
                     placement='Start'
                     size='Small'
                     isChecked={offer.selected}
@@ -290,11 +292,18 @@ export const UnifiedPurchaseModalComponent: React.FC<
                     isDisabled={isPricingLoading}
                     data-testid={`purchase-promo-checkbox-${offer.offerId}`}
                   />
-                  <EmbeddableText
-                    id={offerLabelId}
-                    text={offer.localizedText}
-                    className='text-body-medium content-default'
-                  />
+                  <span className='flex flex-row items-center wrap gap-x-small gap-y-xsmall'>
+                    <EmbeddableText
+                      id={offerLabelId}
+                      text={offer.localizedText}
+                      className='text-body-medium content-default'
+                    />
+                    <OfferExpirationBadge
+                      id={offerExpirationId}
+                      expirationTimeUtc={offer.expirationTimeUtc}
+                      translate={translate}
+                    />
+                  </span>
                 </label>
               );
             })}

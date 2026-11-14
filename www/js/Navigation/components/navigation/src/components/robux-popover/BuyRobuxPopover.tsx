@@ -2,7 +2,14 @@ import { useRef, useState } from "react";
 import classNames from "classnames";
 import { ValueOf } from "@rbx/core-lib";
 import { useTranslations } from "@rbx/www-common/i18n";
-import analytics from "@rbx/core-scripts/payments-flow";
+import {
+  PURCHASE_EVENT_TYPE,
+  TRIGGERING_CONTEXT,
+  VIEW_MESSAGE,
+  VIEW_NAME,
+  type ViewMessage,
+} from "@rbx/payments/payments-flow-analytics";
+import { sendUserPurchaseFlowEvent } from "../../util/purchaseFlowUtil";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { Popover as FoundationPopover, PopoverContent, PopoverTrigger } from "@rbx/foundation-ui";
 import BuyRobuxIcon from "./BuyRobuxIcon";
@@ -14,6 +21,7 @@ import LeaveRobloxPopupDisclaimer from "./LeaveRobloxPopupDisclaimer";
 import { getNavCapability } from "../../util/navCapabilities";
 import RobuxBadgeType from "../../constants/robuxBadgeConstants";
 import { popoverDismissGuard } from "../../util/popoverDismissGuard";
+import useNumberLocale from "../../hooks/useNumberLocale";
 
 export default function BuyRobuxPopover({
   creditAmount,
@@ -42,25 +50,23 @@ export default function BuyRobuxPopover({
 
   const { buyRobuxUrl } = links;
   const { buyRobuxOnVng } = buyRobuxUrl;
-  const { ENUM_TRIGGERING_CONTEXT, ENUM_VIEW_NAME, ENUM_VIEW_MESSAGE, ENUM_PURCHASE_EVENT_TYPE } =
-    analytics;
   const containerRef = useRef<HTMLLIElement>(null);
 
   // vng buy robux pop up a disclaimer before redirecting
   const [isLeaveRobloxDisclaimerModalOpen, setIsLeaveRobloxDisclaimerModalOpen] = useState(false);
 
-  const sendAnalyticsEvent = (viewMessage: ValueOf<typeof ENUM_VIEW_MESSAGE>) => {
-    analytics.sendUserPurchaseFlowEvent(
-      ENUM_TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
-      false,
-      ENUM_VIEW_NAME.NAVIGATION_DROPDOWN_MENU,
-      ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+  const sendAnalyticsEvent = (viewMessage: ViewMessage) => {
+    sendUserPurchaseFlowEvent({
+      triggerContext: TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
+      isMidPurchaseStep: false,
+      viewName: VIEW_NAME.NAVIGATION_DROPDOWN_MENU,
+      purchaseEventType: PURCHASE_EVENT_TYPE.USER_INPUT,
       viewMessage,
-    );
+    });
   };
 
   const onBuyRobuxExternalClick = () => {
-    sendAnalyticsEvent(ENUM_VIEW_MESSAGE.EXTERNAL_LINK_MODAL);
+    sendAnalyticsEvent(VIEW_MESSAGE.EXTERNAL_LINK_MODAL);
 
     setIsLeaveRobloxDisclaimerModalOpen(true);
   };
@@ -70,7 +76,7 @@ export default function BuyRobuxPopover({
   };
 
   const onBuyRobuxExternalContinue = () => {
-    sendAnalyticsEvent(ENUM_VIEW_MESSAGE.CONTINUE_TO_VNG);
+    sendAnalyticsEvent(VIEW_MESSAGE.CONTINUE_TO_VNG);
 
     const getVngShopUrl =
       getNavCapability("getVngShopSignedRedirectionUrl") ??
@@ -87,12 +93,13 @@ export default function BuyRobuxPopover({
     setIsLeaveRobloxDisclaimerModalOpen(false);
   };
 
+  const locale = useNumberLocale();
   // Wallet credit balance only shown on showCreditAndRobux variant
   const triggerLabel =
     robuxAmount > 0
       ? t.has("Label.sRobuxBalance")
-        ? t("Label.sRobuxBalance", { robuxAmount: formatNumber(robuxAmount) })
-        : `Robux: ${formatNumber(robuxAmount)}`
+        ? t("Label.sRobuxBalance", { robuxAmount: formatNumber(robuxAmount, locale) })
+        : `Robux: ${formatNumber(robuxAmount, locale)}`
       : t("Label.sRobux");
 
   const trigger = (

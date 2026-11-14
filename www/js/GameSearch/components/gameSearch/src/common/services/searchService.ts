@@ -24,7 +24,8 @@ const SEARCH_API_RESPONSE_FORMAT = "protobuf" as const;
 
 export type SearchApiRequestParams = {
   keyword: string;
-  sessionId: string;
+  omniSearchSessionId: string;
+  tabSpecificSessionId: string;
 };
 
 export const buildSearchApiRequestUrl = (): Url => {
@@ -53,14 +54,16 @@ export type SearchApiRequestConfigParams = SearchApiRequestParams & {
 
 export function buildSearchApiRequestConfig({
   keyword,
-  sessionId,
+  omniSearchSessionId,
+  tabSpecificSessionId,
   surfaceKey,
   configKey,
   clientCapabilities,
 }: SearchApiRequestConfigParams): ApiRequestConfig {
   const body = JSON.stringify({
     searchQuery: keyword,
-    globalSessionId: sessionId,
+    globalSessionId: omniSearchSessionId,
+    sessionId: tabSpecificSessionId,
     verticalType: SearchApiVerticalType.BLENDED,
     clientCapabilities: toJson(
       ClientCapabilitiesSchema,

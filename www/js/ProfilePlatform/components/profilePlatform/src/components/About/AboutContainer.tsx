@@ -46,7 +46,12 @@ const AboutContainer: React.FC = () => {
       >
         {translate("Label.More")}
       </button>
-      <AboutDialog open={modalOpen} onClose={closeModal} sections={sections} />
+      <AboutDialog
+        open={modalOpen}
+        onClose={closeModal}
+        sections={sections}
+        profileName={aboutData.name ? `@${aboutData.name}` : ""}
+      />
     </div>
   );
 };

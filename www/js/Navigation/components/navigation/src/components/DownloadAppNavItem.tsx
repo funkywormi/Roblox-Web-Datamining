@@ -14,31 +14,44 @@ import { DialogTitle } from "@rbx/foundation-ui";
 import { useTranslations } from "@rbx/www-common/i18n";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { useAppDownloadTranslate } from "@rbx/app-download/useAppDownloadTranslate";
+import useMountedValue from "../hooks/useMountedValue";
 import { useTopNavDownloadButton } from "../util/topNavDownloadButtonIxp";
 import { getNavCapability } from "../util/navCapabilities";
+import { useNavHref } from "../util/navHref";
 
-export default function DownloadAppNavItem() {
+export default function DownloadAppNavItem({
+  downloadType = null,
+}: {
+  downloadType?: string | null;
+}) {
   const t = useTranslations("Feature.DownloadLanding");
   const translate = useAppDownloadTranslate();
-  const isEnabled = useTopNavDownloadButton();
-  const download = resolveAppDownload({ translate });
-  const deviceMeta = getDeviceMeta();
-  const isEligible = !deviceMeta?.isPhone && !deviceMeta?.isTablet && download != null;
+  const isEnabled = useTopNavDownloadButton(downloadType != null);
+  const download = useMountedValue(
+    () => resolveAppDownload({ translate }),
+    downloadType == null
+      ? null
+      : resolveAppDownload({ translate, downloadTypeOverride: downloadType }),
+  );
+  const deviceMeta = useMountedValue(getDeviceMeta, null);
+  const toNavHref = useNavHref();
 
   // The layer allocates on exposure, so log both arms wherever the button could appear.
   useEffect(() => {
-    if (isEligible) {
+    const meta = getDeviceMeta();
+    if (!meta?.isPhone && !meta?.isTablet && resolveAppDownload({ translate }) != null) {
       // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation -- exposure logging, not a data fetch
       void getNavCapability("logTopNavDownloadExposure")?.();
     }
-  }, [isEligible]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  if (!isEnabled || !isEligible) {
+  if (!isEnabled || deviceMeta?.isPhone || deviceMeta?.isTablet || download == null) {
     return null;
   }
 
   const handleClick = async (click: ResolvedAppDownload, event: MouseEvent<HTMLElement>) => {
-    sendPrimaryAppDownloadClickEvent(click.link.name);
+    sendPrimaryAppDownloadClickEvent(click.link.name, "topNav");
     if (!click.isDirectDownload) {
       return;
     }
@@ -93,6 +106,7 @@ export default function DownloadAppNavItem() {
         variant="Emphasis"
         size="Small"
         download={download}
+        href={toNavHref(download.href.toString())}
         renderInstallInstructions={() => installInstructions}
         onClick={handleClick}
       />

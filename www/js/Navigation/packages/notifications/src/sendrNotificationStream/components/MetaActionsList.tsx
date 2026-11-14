@@ -12,6 +12,7 @@ import isVisualItemAbuseReport from "../utils/isVisualItemAbuseReport";
 import { formatText } from "../utils/labelUtils";
 
 import NotificationView from "./NotificationView";
+import type { JSX } from "react";
 
 export type MetaActionsListProps = {
   show: boolean;

@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import type { RobloxIntlInstance } from '@rbx/legacy-webapp-types/Roblox';
 import UnifiedRobuxUpsellModal, {
   UnifiedRobuxUpsellModalProps
@@ -8,6 +7,7 @@ import UnifiedRobuxUpsellTooExpensiveModal, {
   UnifiedRobuxUpsellTooExpensiveModalProps
 } from '../../../../react/components/UnifiedRobuxUpsellTooExpensiveModal';
 import { UpsellProduct } from '../constants/serviceTypeDefinitions';
+import { createUpsellModalSlot } from './upsellModalHost';
 import type { DiscountInformation } from '../../../../react/components/discountInformation';
 
 export type UnifiedRobuxUpsellVariant = 'standard' | 'tooExpensive';
@@ -56,13 +56,8 @@ export type UnifiedRobuxUpsellModalHandle = {
 export function openUnifiedRobuxUpsellModal(
   props: OpenUnifiedRobuxUpsellProps
 ): UnifiedRobuxUpsellModalHandle {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-
-  const unmount = () => {
-    ReactDOM.unmountComponentAtNode(container);
-    container.remove();
-  };
+  const slot = createUpsellModalSlot();
+  const unmount = slot.remove;
 
   const close = () => {
     unmount();
@@ -77,8 +72,8 @@ export function openUnifiedRobuxUpsellModal(
   };
 
   if (props.variant === 'tooExpensive') {
-    // The modal is a dual-path translation boundary: it self-wraps in TranslationProviderSCC on
-    // the .NET path (this detached root has no ancestor provider to inherit).
+    // The modal is a dual-path translation boundary: on .NET it self-wraps in
+    // TranslationProviderSCC; on Next.js it inherits the host's translations through the portal.
     const element = React.createElement(UnifiedRobuxUpsellTooExpensiveModal, {
       expectedPrice: props.expectedPrice,
       thumbnail: props.thumbnail,
@@ -90,7 +85,7 @@ export function openUnifiedRobuxUpsellModal(
       currentRobuxBalance: props.currentRobuxBalance
     } as UnifiedRobuxUpsellTooExpensiveModalProps);
 
-    ReactDOM.render(element, container);
+    slot.render(element);
     return { close, updatePackage: () => undefined, setPackageLoading: () => undefined };
   }
 
@@ -147,7 +142,7 @@ export function openUnifiedRobuxUpsellModal(
       onDirectPurchase: handleDirectPurchase
     } as UnifiedRobuxUpsellModalProps);
 
-    ReactDOM.render(element, container);
+    slot.render(element);
   };
 
   renderStandard();

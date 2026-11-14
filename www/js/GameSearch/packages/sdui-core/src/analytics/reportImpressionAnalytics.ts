@@ -4,6 +4,7 @@ import {
   SharedEventMetadata,
   parseEventParams,
 } from "@rbx/unified-logging";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { reportError, SduiErrorName } from "../errors";
 import type {
   CollectionAnalyticsData,
@@ -121,6 +122,11 @@ export function reportImpressionAnalytics(options: ReportImpressionAnalyticsOpti
     [ItemImpressionsMetadata.ItemPositions]: itemPositions,
     [ItemImpressionsMetadata.RowNumbers]: rowNumbers,
     [ItemImpressionsMetadata.PositionsInTopic]: itemPositions,
+    // Preserve a caller-provided interactionUuid, otherwise generate a new one per event
+    [SharedEventMetadata.InteractionUuid]:
+      typeof collectionAnalyticsData[SharedEventMetadata.InteractionUuid] === "string"
+        ? collectionAnalyticsData[SharedEventMetadata.InteractionUuid]
+        : generateRandomUuid(),
   };
 
   const eventName = eventNameOverride ?? EventNames.ItemImpressions;
