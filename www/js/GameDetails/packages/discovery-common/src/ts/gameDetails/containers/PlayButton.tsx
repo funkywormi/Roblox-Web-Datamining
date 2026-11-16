@@ -31,6 +31,7 @@ import { ExperienceNoticeType } from "../constants/experienceNoticeConstants";
 import { usePlayOnWebVariant } from "../hooks/usePlayOnWebVariant";
 import usePlayButtonDownloadCtaExperiment from "../hooks/usePlayButtonDownloadCtaExperiment";
 import useGameDetailsForUniverseId from "../hooks/useGameDetailsForUniverseId";
+import isUnauthenticatedSupportedCrawler from "../utils/isUnauthenticatedSupportedCrawler";
 
 type TPlayButtonProps = {
   attributionId: string;
@@ -48,14 +49,24 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
     privateServerLinkCode = "",
     gameInstanceId = "",
   } = metadataConstants.metadataData() || {};
-  const playOnWebVariant = usePlayOnWebVariant(universeId);
+  const isCrawler = isUnauthenticatedSupportedCrawler();
+  const fetchedPlayability = usePlayabilityStatus(universeId, !isCrawler);
   const {
     playabilityStatus,
     refetchPlayabilityData,
     unplayableDisplayText,
     demoModeAvailable,
     privatePlaytestInfo,
-  } = usePlayabilityStatus(universeId);
+  } = isCrawler
+    ? {
+        ...fetchedPlayability,
+        playabilityStatus: PlayabilityStatus.Playable,
+        unplayableDisplayText: undefined,
+        demoModeAvailable: undefined,
+        privatePlaytestInfo: undefined,
+      }
+    : fetchedPlayability;
+  const playOnWebVariant = usePlayOnWebVariant(universeId, !isCrawler);
   const { gameDetails } = useGameDetailsForUniverseId(universeId);
   const { experienceDetailsNoticeType, shouldShowVpcPlayButtonUpsells, isFetchingPolicy } =
     useGetAppPolicyData();
@@ -204,12 +215,13 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
         privateServerLinkCode={privateServerLinkCode}
         gameInstanceId={gameInstanceId}
         refetchPlayabilityStatus={refetchPlayabilityData}
+        skipPlayabilityFetch={isCrawler}
         playabilityStatus={playabilityStatus}
         demoModeAvailable={demoModeAvailable}
         privatePlaytestInfo={privatePlaytestInfo}
         creatorId={creatorId}
         hideButtonText={false}
-        disableLoadingState={false}
+        disableLoadingState={isCrawler}
         eventProperties={playButtonEventProperties}
         appsFlyerReferralProperties={appsFlyerReferralParams}
         shouldShowVpcPlayButtonUpsells={shouldShowVpcPlayButtonUpsells}

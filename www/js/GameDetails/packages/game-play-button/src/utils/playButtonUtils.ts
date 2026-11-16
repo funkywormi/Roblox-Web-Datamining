@@ -67,11 +67,12 @@ function sendPlayGameClickedEvent(
   joinDataProperties: JoinDataProperties,
   actionType?: string,
 ): TEventProperties {
+  const { getPlayOnWeb: _getPlayOnWeb, ...joinDataEventProperties } = joinDataProperties;
   const mergedProperties: TEventProperties = {
     placeId,
     ...eventProperties,
     ...getJoinAttemptProperties(eventProperties),
-    ...joinDataProperties,
+    ...joinDataEventProperties,
     ...(actionType == null ? {} : { actionType }),
   };
 
@@ -80,21 +81,17 @@ function sendPlayGameClickedEvent(
   return mergedProperties;
 }
 
-function getEncodedUniversalLink(
-  placeId: string,
-  eventProperties: TEventProperties = {},
-  isEarlyTesting = false,
-): string {
-  let universalLink = `${environmentUrls.websiteUrl}/games/start?placeid=${placeId}`;
+function getJoinQueryString(eventProperties: TEventProperties, isEarlyTesting = false): string {
+  let joinQueryString = "";
 
   if (isJoinAttemptIdEnabled()) {
     const { joinAttemptId, joinAttemptOrigin } = getJoinAttemptProperties(eventProperties);
 
     if (typeof joinAttemptId === "string" && joinAttemptId.length > 0) {
-      universalLink += `&joinAttemptId=${joinAttemptId}`;
+      joinQueryString += `&joinAttemptId=${joinAttemptId}`;
 
       if (typeof joinAttemptOrigin === "string" && joinAttemptOrigin.length > 0) {
-        universalLink += `&joinAttemptOrigin=${joinAttemptOrigin}`;
+        joinQueryString += `&joinAttemptOrigin=${joinAttemptOrigin}`;
       }
     }
   }
@@ -102,16 +99,38 @@ function getEncodedUniversalLink(
   // append join data
   const { launchData, eventId } = eventProperties;
   if (typeof launchData === "string" && launchData.length > 0) {
-    universalLink += `&launchData=${launchData}`;
+    joinQueryString += `&launchData=${launchData}`;
   }
   if (typeof eventId === "string" && eventId.length > 0) {
-    universalLink += `&eventId=${eventId}`;
+    joinQueryString += `&eventId=${eventId}`;
   }
   if (isEarlyTesting) {
-    universalLink += "&isEarlyTesting=true";
+    joinQueryString += "&isEarlyTesting=true";
   }
 
-  return encodeURIComponent(universalLink);
+  return joinQueryString;
+}
+
+function getEncodedUniversalLink(
+  placeId: string,
+  eventProperties: TEventProperties = {},
+  isEarlyTesting = false,
+): string {
+  return encodeURIComponent(
+    `${environmentUrls.websiteUrl}/games/start?placeid=${placeId}${getJoinQueryString(eventProperties, isEarlyTesting)}`,
+  );
+}
+
+// af_dp must be a custom scheme: browsers without Universal Link support (e.g. iOS Chrome) load an
+// https af_dp as a web page instead of falling back to the app store when the app is not installed.
+function getEncodedAppLaunchLink(
+  placeId: string,
+  eventProperties: TEventProperties = {},
+  isEarlyTesting = false,
+): string {
+  return encodeURIComponent(
+    `roblox://experiences/start?placeId=${placeId}${getJoinQueryString(eventProperties, isEarlyTesting)}`,
+  );
 }
 
 export const launchGame = (
@@ -144,12 +163,17 @@ export const launchGame = (
       playGameClickedEventProperties,
       isEarlyTesting,
     );
+    const encodedAppLaunchLink = getEncodedAppLaunchLink(
+      placeId,
+      playGameClickedEventProperties,
+      isEarlyTesting,
+    );
     const afDeeplinkParams = composeQueryString({
       ...defaultAfReferralProperties,
       ...appsFlyerReferralProperties,
     });
     window.open(
-      `https://ro.blox.com/Ebh5?${afDeeplinkParams}&af_dp=${encodedUniversalLink}&af_web_dp=${encodedUniversalLink}&deep_link_value=${encodedUniversalLink}`,
+      `https://ro.blox.com/Ebh5?${afDeeplinkParams}&af_dp=${encodedAppLaunchLink}&af_web_dp=${encodedUniversalLink}&deep_link_value=${encodedUniversalLink}`,
       "_self",
     );
   } else {
@@ -202,12 +226,13 @@ export const launchLogin = (
   ) {
     const playGameClickedEventProperties = sendPlayGameClickedEvent({}, placeId, {});
     const encodedUniversalLink = getEncodedUniversalLink(placeId, playGameClickedEventProperties);
+    const encodedAppLaunchLink = getEncodedAppLaunchLink(placeId, playGameClickedEventProperties);
     const afDeeplinkParams = composeQueryString({
       ...defaultAfReferralProperties,
       ...appsFlyerReferralProperties,
     });
     window.open(
-      `https://ro.blox.com/Ebh5?${afDeeplinkParams}&af_dp=${encodedUniversalLink}&af_web_dp=${encodedUniversalLink}&deep_link_value=${encodedUniversalLink}`,
+      `https://ro.blox.com/Ebh5?${afDeeplinkParams}&af_dp=${encodedAppLaunchLink}&af_web_dp=${encodedUniversalLink}&deep_link_value=${encodedUniversalLink}`,
       "_self",
     );
   } else {

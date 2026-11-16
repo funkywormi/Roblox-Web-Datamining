@@ -2186,7 +2186,7 @@
         },
         {
             "name": "Feature.Groups",
-            "url": "https://js.rbxcdn.com/0f548b03c737563c2f269fc90a171bfe02cae29c3704059909609fba95ca004d.js",
+            "url": "https://js.rbxcdn.com/c9dcc68ab8d158924d2b7957ca29a4acf3ca176cc5baa1cad7312f07739e2b67.js",
             "sources": [
                 "/transactions",
                 "/users/1/profile",
@@ -4913,7 +4913,7 @@
         },
         {
             "name": "CustomerSupportChat",
-            "url": "https://js.rbxcdn.com/a0d9e687e6f20c58d94c14d5a9f37ebb2877a6028790ac16e0e2588352b75c9a-CustomerSupportChat.js",
+            "url": "https://js.rbxcdn.com/83d04cb71fb300ae6a77fc3e957ecde8bc560effaf51d0dc54cc9bb8ed49c7a2-CustomerSupportChat.js",
             "sources": [
                 "/support"
             ]
@@ -5242,7 +5242,7 @@
         },
         {
             "name": "GameDetails",
-            "url": "https://js.rbxcdn.com/9c573d3d58b2f2bbe797ad5a35f9e2c02d21a0ec609baae07022b47a3d328587-GameDetails.js",
+            "url": "https://js.rbxcdn.com/cf2cca849eebbdc7e50275555a44fd363428c05ef60b116802355fe538bb450b-GameDetails.js",
             "sources": [
                 "/games/1818"
             ]
@@ -6044,49 +6044,35 @@
             "name": "NotificationStream",
             "url": "https://js.rbxcdn.com/79c0fb9ab4edd2972e8a5f2fc28ffad0d6345ea228a4737bdc786ab086d7704a-NotificationStream.js",
             "sources": [
-                "/home",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
                 "/catalog",
                 "/support",
                 "/trades",
-                "/transactions",
-                "/request-error",
                 "/report-abuse",
                 "/supported-browsers",
                 "/discover/?Keyword=roblox",
                 "/users/friends",
                 "/users/inventory",
                 "/users/1/profile",
-                "/users/1/inventory",
                 "/users/1/favorites",
-                "/users/1/friends",
                 "/users/profile/edit",
                 "/my/messages",
                 "/my/avatar",
                 "/my/account",
                 "/search/communities",
-                "/search/users",
                 "/communities/1",
-                "/communities/configure",
                 "/games/1818",
                 "/info/roblox-badges",
-                "/crossdevicelogin/ConfirmCode",
-                "/communities/create",
                 "/illegal-content-reporting",
                 "/game-pass/58000",
                 "/badges/176685910",
-                "/catalog/3360689775",
                 "/bundles/591",
                 "/sponsorships/list",
-                "/login/forgot-password-or-username",
                 "/help-safety",
                 "/support-center",
-                "/events/6177598281426797213",
-                "/developer-product/47545/product/45124061",
-                "/private-server/configure/527154577",
-                "/safety-dashboard"
+                "/events/6177598281426797213"
             ]
         },
         {
@@ -8360,7 +8346,7 @@
         },
         {
             "name": "GameDetails",
-            "url": "https://css.rbxcdn.com/6f183ff9e967342e16486eb4a5f214b42c016f77ad11804845851ab152f8b32c-GameDetails.css",
+            "url": "https://css.rbxcdn.com/4b8289eda859334b8fcfd41c376fb4d31465a310bd9ec6b68e171ad730ebd07a-GameDetails.css",
             "sources": [
                 "/games/1818"
             ]
@@ -8810,49 +8796,35 @@
             "name": "NotificationStream",
             "url": "https://css.rbxcdn.com/935fb7331d9761008e6d48890a8f03c8124d73dd41b4f19f93a1844577186103-NotificationStream.css",
             "sources": [
-                "/home",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
                 "/catalog",
                 "/support",
                 "/trades",
-                "/transactions",
-                "/request-error",
                 "/report-abuse",
                 "/supported-browsers",
                 "/discover/?Keyword=roblox",
                 "/users/friends",
                 "/users/inventory",
                 "/users/1/profile",
-                "/users/1/inventory",
                 "/users/1/favorites",
-                "/users/1/friends",
                 "/users/profile/edit",
                 "/my/messages",
                 "/my/avatar",
                 "/my/account",
                 "/search/communities",
-                "/search/users",
                 "/communities/1",
-                "/communities/configure",
                 "/games/1818",
                 "/info/roblox-badges",
-                "/crossdevicelogin/ConfirmCode",
-                "/communities/create",
                 "/illegal-content-reporting",
                 "/game-pass/58000",
                 "/badges/176685910",
-                "/catalog/3360689775",
                 "/bundles/591",
                 "/sponsorships/list",
-                "/login/forgot-password-or-username",
                 "/help-safety",
                 "/support-center",
-                "/events/6177598281426797213",
-                "/developer-product/47545/product/45124061",
-                "/private-server/configure/527154577",
-                "/safety-dashboard"
+                "/events/6177598281426797213"
             ]
         },
         {

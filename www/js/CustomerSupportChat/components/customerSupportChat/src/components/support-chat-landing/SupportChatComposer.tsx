@@ -40,11 +40,6 @@ type SupportChatComposerProps = {
   focusOnMount?: boolean;
   /** Text to start with, such as what was typed on the landing while the chat was starting. */
   initialDraft?: string;
-  /**
-   * Text that may arrive after the box is shown, such as an article title being looked up. It
-   * fills the box once, and only while the box is empty and the visitor has not typed in it.
-   */
-  prefill?: string;
   onDraftChange?: (draft: string) => void;
   /** The landing's box is taller and raised, and has no privacy reminder below it. */
   variant?: "chat" | "landing";
@@ -57,13 +52,11 @@ const SupportChatComposer = ({
   maxLength,
   focusOnMount = false,
   initialDraft = "",
-  prefill,
   onDraftChange,
   variant = "chat",
 }: SupportChatComposerProps): React.ReactElement => {
   const [draft, setDraft] = useState(initialDraft);
   const isMounted = useRef(true);
-  const hasTyped = useRef(false);
   const isTooLong = draft.length > maxLength;
 
   useEffect(
@@ -72,12 +65,6 @@ const SupportChatComposer = ({
     },
     [],
   );
-
-  useEffect(() => {
-    if (prefill && !hasTyped.current) {
-      setDraft(current => current || prefill);
-    }
-  }, [prefill]);
 
   useEffect(() => {
     onDraftChange?.(draft);
@@ -118,7 +105,6 @@ const SupportChatComposer = ({
           textareaClassName="support-chat-composer-field"
           value={draft}
           onChange={event => {
-            hasTyped.current = true;
             setDraft(event.target.value);
           }}
           onKeyDown={submitsOnEnter(submit)}

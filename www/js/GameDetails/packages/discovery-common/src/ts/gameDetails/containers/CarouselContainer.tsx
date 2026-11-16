@@ -7,6 +7,7 @@ import { TCarouselItem, TAssetType } from "../types/carouselTypes";
 import useIsEligibleForVideoPreview from "../hooks/useIsEligibleForVideoPreview";
 import Carousel from "../components/Carousel";
 import carouselService from "../services/carouselService";
+import isUnauthenticatedSupportedCrawler from "../utils/isUnauthenticatedSupportedCrawler";
 
 const cache = createCache();
 
@@ -29,7 +30,11 @@ const CarouselContainer = ({
 
   const [failedItemIds, setFailedItemIds] = useState<Set<string>>(new Set());
 
-  const { isPlayable, playabilityStatus, isFetchingPlayability } = usePlayabilityStatus(universeId);
+  const isCrawler = isUnauthenticatedSupportedCrawler();
+  const { isPlayable, playabilityStatus, isFetchingPlayability } = usePlayabilityStatus(
+    universeId,
+    !isCrawler,
+  );
 
   const { isEligibleForVideoPreview, isLoadingEligibility } =
     useIsEligibleForVideoPreview(universeId);
@@ -90,7 +95,7 @@ const CarouselContainer = ({
     return nonFailedAssets;
   }, [assets, isEligibleForVideoPreview, failedItemIds]);
 
-  if (isLoadingAssets || isLoadingEligibility || isFetchingPlayability) {
+  if (isLoadingAssets || isLoadingEligibility || (!isCrawler && isFetchingPlayability)) {
     return <div className="shimmer" data-testid="loading" />;
   }
 
@@ -103,7 +108,7 @@ const CarouselContainer = ({
   if (filteredAssets.length === 0) {
     // Do not show the default media thumbnails if the experience is not playable,
     // but still show them for purchase-gated experiences
-    if (isPlayable !== true && !isPurchaseGated) {
+    if (!isCrawler && isPlayable !== true && !isPurchaseGated) {
       return (
         <div
           aria-hidden

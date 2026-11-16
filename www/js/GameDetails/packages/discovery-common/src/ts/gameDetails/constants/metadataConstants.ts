@@ -13,6 +13,7 @@ export type TMetadata = {
   canCreateServer?: boolean;
   experienceInviteLinkId?: string;
   experienceInviteStatus?: string;
+  isWasmRedirect?: boolean;
 };
 
 const gameDetailsMetadataContainerId = "game-detail-meta-data";

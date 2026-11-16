@@ -31,17 +31,11 @@ import {
   createNewSupportConversation,
   isCaptchaAbandoned,
 } from "../core/services/newSupportConversationService";
-import { getAndValidateQueryParam } from "../core/helpers/supportFormHelpers";
 import { useFetchMetadata } from "../hooks/supportFormServices";
-import useArticleSuggestions from "../hooks/useArticleSuggestions";
-import { DEFAULT_LOCALE } from "../hooks/useGetUserLocale";
 import EmployeeOnly from "./employee-only/EmployeeOnly";
 
 const SWITCH_TO_CLASSIC = "Switch to classic support experience";
 const SWITCH_TO_NEW = "Switch to new support experience";
-const ARTICLE_ID = /^\d{1,20}$/;
-/** A Help Center locale, such as `fr` or `fr-ca`. Anything else is ignored. */
-const ARTICLE_LANG = /^[a-z]{2}(?:[-_][a-z0-9]{2,3})?$/i;
 
 const SupportLanding: React.FC<WithTranslationsProps> = props => {
   const { pathname, search } = useLocation();
@@ -60,63 +54,12 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
   const [hasFallenBackToForm, setHasFallenBackToForm] = useState(false);
   const [hasDeclinedSignIn, setHasDeclinedSignIn] = useState(hasDeclinedSupportSignIn);
   const [supportFormPrefill, setSupportFormPrefill] = useState<SupportFormPrefill>();
-  // Set once the visitor edits the prefilled article title, so a remounted landing leaves it out.
-  const [articlePrefillDismissed, setArticlePrefillDismissed] = useState(false);
   // Only the latest landing create may change the page.
   const landingRequestId = useRef(0);
 
   // Only employees can pick their experience; everyone else gets what the backend decided.
   const isEmployee = metadata?.isRobloxEmployee === true;
   const urlChoice = isEmployee ? getSupportUiChoiceFromUrl(search) : undefined;
-
-  const isSignedIn = authenticatedUser.isAuthenticated;
-  // The preview itself is limited to sitetest. Signed-out visitors there get the gate first.
-  // Declining sign-in stays on the form for this browser tab, including after a trip to chat.
-  // The failure redirect's form URL is limited the same way, so it can't skip the backend's
-  // choice of experience in production.
-  const showRegularForm = !isProd && isSupportRegularFormUrl(search);
-  const isLandingPreview =
-    toggledChoice === undefined &&
-    !isProd &&
-    !showRegularForm &&
-    isSupportLandingPreviewUrl(search);
-  const showSignInGate = isLandingPreview && !isSignedIn && !hasDeclinedSignIn;
-  const getShowNewExperience = (): boolean => {
-    if (hasFallenBackToForm || hasDeclinedSignIn) {
-      return false;
-    }
-    if (!isEmployee) {
-      return metadata?.isNewSupportExperienceEnabled === true;
-    }
-    // Employees always pass the backend gate, so they start on the classic form and opt in: the
-    // switch this visit, then the URL, then their stored choice.
-    return (toggledChoice ?? urlChoice ?? getStoredSupportUiChoice()) === "prototype";
-  };
-  const showNewExperience = getShowNewExperience();
-  const showLandingPreview = isLandingPreview && isSignedIn;
-  const metadataReady = metadata !== undefined || isMetadataError;
-  // The title is only used on the landing, so the Zendesk request waits until that is what's shown.
-  const showLanding =
-    metadataReady &&
-    chatConfig === null &&
-    !showSignInGate &&
-    !showRegularForm &&
-    ((showLandingPreview && !hasFallenBackToForm) || showNewExperience);
-
-  // The Help Center's contact links open /support?articleId=...&articleLang=.... The landing
-  // starts its message box with that article's title. The id is not sent with the conversation.
-  const queryParams = new URLSearchParams(search);
-  const rawArticleId = getAndValidateQueryParam(queryParams, "articleId");
-  const articleId = rawArticleId && ARTICLE_ID.test(rawArticleId) ? rawArticleId : undefined;
-  const rawArticleLang = getAndValidateQueryParam(queryParams, "articleLang");
-  const articleLang =
-    rawArticleLang && ARTICLE_LANG.test(rawArticleLang) ? rawArticleLang : DEFAULT_LOCALE;
-  const { data: articles } = useArticleSuggestions(
-    articleId && showLanding ? [articleId] : [],
-    !showLanding || articleId === undefined,
-    articleLang,
-  );
-  const articleTitle = articles[0]?.title;
 
   useEffect(() => {
     if (urlChoice) {
@@ -137,6 +80,19 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
       <span role="progressbar" aria-label="Loading content" className="spinner spinner-default" />
     );
   }
+
+  const isSignedIn = authenticatedUser.isAuthenticated;
+  // The preview itself is limited to sitetest. Signed-out visitors there get the gate first.
+  // Declining sign-in stays on the form for this browser tab, including after a trip to chat.
+  // The failure redirect's form URL is limited the same way, so it can't skip the backend's
+  // choice of experience in production.
+  const showRegularForm = !isProd && isSupportRegularFormUrl(search);
+  const isLandingPreview =
+    toggledChoice === undefined &&
+    !isProd &&
+    !showRegularForm &&
+    isSupportLandingPreviewUrl(search);
+  const showSignInGate = isLandingPreview && !isSignedIn && !hasDeclinedSignIn;
 
   const sendLandingMessage = async (firstMessage: string) => {
     landingRequestId.current += 1;
@@ -164,6 +120,20 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
       }
     }
   };
+
+  const getShowNewExperience = (): boolean => {
+    if (hasFallenBackToForm || hasDeclinedSignIn) {
+      return false;
+    }
+    if (!isEmployee) {
+      return metadata?.isNewSupportExperienceEnabled === true;
+    }
+    // Employees always pass the backend gate, so they start on the classic form and opt in: the
+    // switch this visit, then the URL, then their stored choice.
+    return (toggledChoice ?? urlChoice ?? getStoredSupportUiChoice()) === "prototype";
+  };
+  const showNewExperience = getShowNewExperience();
+  const showLandingPreview = isLandingPreview && isSignedIn;
 
   const switchTo = (choice: SupportUiChoice) => {
     // A create still pending from the landing must not replace the experience picked here.
@@ -206,10 +176,6 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
           // Switching experience drops a first message that is still sending, so start over.
           key={toggledChoice}
           onSend={sendLandingMessage}
-          articlePrefill={articlePrefillDismissed ? undefined : articleTitle}
-          onPrefillDismiss={() => {
-            setArticlePrefillDismissed(true);
-          }}
           onDraftChange={draft => {
             landingDraft.current = draft;
           }}

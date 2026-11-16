@@ -175,6 +175,7 @@ export type TPlayButtonProps = {
   appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
   status: TPlayabilityStatuses["Playable"] | TPlayabilityStatuses["GuestProhibited"];
   disableLoadingState?: boolean;
+  skipPlayabilityFetch?: boolean;
   buttonText?: string | undefined;
   hideIcon?: boolean;
   analyticsCallback?: () => void;
@@ -195,6 +196,7 @@ export const PlayButton = ({
   buttonWidth = buttonWidths.full,
   buttonClassName = "btn-common-play-game-lg game-play-button-lg",
   disableLoadingState = false,
+  skipPlayabilityFetch = false,
   buttonText = undefined,
   hideIcon = false,
   analyticsCallback = undefined,
@@ -286,7 +288,12 @@ export const PlayButton = ({
   ]);
 
   const { doGameLaunchWithPlayableUxTreatment, playableUxTreatmentModal } =
-    useLaunchGameWithPlayableUxTreatment(universeId, doGameLaunch, pageContext);
+    useLaunchGameWithPlayableUxTreatment(
+      universeId,
+      doGameLaunch,
+      pageContext,
+      skipPlayabilityFetch,
+    );
 
   if (showVerification === undefined && !disableLoadingState) {
     return <LoadingButton buttonClassName={buttonClassName} buttonWidth={buttonWidth} />;
@@ -385,6 +392,7 @@ export type TDefaultPlayButtonProps = {
   eventProperties?: Record<string, number | string | undefined>;
   appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
   disableLoadingState?: boolean;
+  skipPlayabilityFetch?: boolean;
   buttonClassName?: string;
   iconClassName?: string;
   purchaseIconClassName?: string;
@@ -417,6 +425,7 @@ export const DefaultPlayButton = ({
   eventProperties = EMPTY_OBJECT,
   appsFlyerReferralProperties = EMPTY_OBJECT,
   disableLoadingState,
+  skipPlayabilityFetch,
   buttonClassName,
   iconClassName,
   purchaseIconClassName,
@@ -486,7 +495,10 @@ export const DefaultPlayButton = ({
       render: () => (
         <PlayOnWebButton
           placeId={placeId}
+          rootPlaceId={rootPlaceId}
           universeId={universeId}
+          privateServerLinkCode={privateServerLinkCode}
+          gameInstanceId={gameInstanceId}
           eventProperties={eventProperties}
           wasmJoinId={wasmJoinId}
           playOnWebVariant={PlayOnWebVariant.TwoButton}
@@ -518,6 +530,7 @@ export const DefaultPlayButton = ({
           eventProperties={eventProperties}
           appsFlyerReferralProperties={appsFlyerReferralProperties}
           disableLoadingState={disableLoadingState}
+          skipPlayabilityFetch={skipPlayabilityFetch}
           buttonClassName={buttonClassName}
           iconClassName={iconClassName}
           pageContext={pageContext}
@@ -549,7 +562,10 @@ export const DefaultPlayButton = ({
           primaryButton = (
             <PlayOnWebButton
               placeId={placeId}
+              rootPlaceId={rootPlaceId}
               universeId={universeId}
+              privateServerLinkCode={privateServerLinkCode}
+              gameInstanceId={gameInstanceId}
               eventProperties={eventProperties}
               wasmJoinId={wasmJoinId}
               playOnWebVariant={PlayOnWebVariant.OneButton}
@@ -570,6 +586,7 @@ export const DefaultPlayButton = ({
           eventProperties={eventProperties}
           appsFlyerReferralProperties={appsFlyerReferralProperties}
           disableLoadingState={disableLoadingState}
+          skipPlayabilityFetch={skipPlayabilityFetch}
           buttonClassName={buttonClassName}
           iconClassName={iconClassName}
           pageContext={pageContext}

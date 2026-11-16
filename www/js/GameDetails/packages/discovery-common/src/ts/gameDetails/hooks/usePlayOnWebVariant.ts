@@ -26,13 +26,14 @@ const playOnWebVariants = new Set<string>(Object.values(PlayOnWebVariant));
 const isPlayOnWebVariant = (value: string): value is TPlayOnWebVariant =>
   playOnWebVariants.has(value);
 
-export const usePlayOnWebVariant = (universeId: string): TPlayOnWebVariant => {
-  const { playabilityStatus } = usePlayabilityStatus(universeId);
+export const usePlayOnWebVariant = (universeId: string, enabled = true): TPlayOnWebVariant => {
+  const { playabilityStatus } = usePlayabilityStatus(universeId, enabled);
   const { ixpData, isLoading } = useExperimentValues(
     layerNames[playInBrowserLayer],
     defaultValues[playInBrowserLayer],
   );
   const eligibleForPlayOnWeb =
+    enabled &&
     !isLoading &&
     (ixpData.ForcePlayOnWeb || (onSupportedBrowser && onSupportedDevice)) &&
     playabilityStatus === "Playable";

@@ -9,6 +9,7 @@ import { gameDetailsPage } from "../common/constants/configConstants";
 import InviteLinkInvalidModal from "./components/InviteLinkInvalidModal";
 import CarouselContainer from "./containers/CarouselContainer";
 import PlayButton from "./containers/PlayButton";
+import WasmRedirect from "./components/WasmRedirect";
 import AboutTab from "./containers/AboutTab";
 import metadataConstants from "./constants/metadataConstants";
 import carouselConstants from "./constants/carouselConstants";
@@ -28,6 +29,9 @@ import { ReviewCategoryType } from "./services/playerFeedbackService";
 import playerFeedbackConstants from "./constants/playerFeedbackConstants";
 import PlayerFeedbackContainer from "./components/PlayerFeedbackContainer";
 import instrumentCreatorByline from "./utils/instrumentCreatorByline";
+import isUnauthenticatedSupportedCrawler from "./utils/isUnauthenticatedSupportedCrawler";
+import { gameDetailsQueryOptions } from "./hooks/useGameDetailsForUniverseId";
+import carouselService from "./services/carouselService";
 
 const playButtonNamespaces = [...appDownloadNamespaces, ...gamePlayButtonNamespaces];
 
@@ -71,25 +75,42 @@ export default (): void => {
     }
   }
 
+  const isCrawler = isUnauthenticatedSupportedCrawler();
+
   if (carouselConstants.gameDetailsCarouselContainer()) {
     const { placeName = "", universeId = "", placeId = "" } = metadataConstants.metadataData();
-    renderWithErrorBoundary(
-      <QueryClientProvider client={queryClient}>
-        <CarouselContainer
-          placeName={placeName}
-          universeId={universeId}
-          placeId={placeId}
-          delay={carouselConstants.carouselConfigs.delay}
-        />
-      </QueryClientProvider>,
-      carouselConstants.gameDetailsCarouselContainer(),
-    );
+    const container = carouselConstants.gameDetailsCarouselContainer();
+    const renderCarousel = () => {
+      renderWithErrorBoundary(
+        <QueryClientProvider client={queryClient}>
+          <CarouselContainer
+            placeName={placeName}
+            universeId={universeId}
+            placeId={placeId}
+            delay={carouselConstants.carouselConfigs.delay}
+          />
+        </QueryClientProvider>,
+        container,
+      );
+    };
+    if (isCrawler) {
+      // Keep the server-rendered carousel in place until its replacement is available.
+      carouselService
+        .getUniverseAssetIds(universeId)
+        .then(renderCarousel)
+        .catch(() => {
+          // Preserve the server-rendered content when the request fails.
+        });
+    } else {
+      renderCarousel();
+    }
   }
 
   if (playButtonConstants.gameDetailsPlayButtonContainer()) {
     renderWithErrorBoundary(
       <QueryClientProvider client={queryClient}>
         <TranslationProviderSCC namespaces={playButtonNamespaces}>
+          <WasmRedirect />
           <PlayButton attributionId={attributionId} />
         </TranslationProviderSCC>
       </QueryClientProvider>,
@@ -98,16 +119,31 @@ export default (): void => {
   }
 
   if (aboutTabConstants.gameDetailsAboutTabContainer()) {
-    renderWithErrorBoundary(
-      <QueryClientProvider client={queryClient}>
-        <AboutTab
-          attributionId={attributionId}
-          referralSessionInfo={referralSessionInfo}
-          referralPage={referralPage}
-        />
-      </QueryClientProvider>,
-      aboutTabConstants.gameDetailsAboutTabContainer(),
-    );
+    const container = aboutTabConstants.gameDetailsAboutTabContainer();
+    const renderAboutTab = () => {
+      renderWithErrorBoundary(
+        <QueryClientProvider client={queryClient}>
+          <AboutTab
+            attributionId={attributionId}
+            referralSessionInfo={referralSessionInfo}
+            referralPage={referralPage}
+          />
+        </QueryClientProvider>,
+        container,
+      );
+    };
+    if (isCrawler) {
+      const { universeId = "" } = metadataConstants.metadataData();
+      // Share the query with the play button and leave the original HTML on failure.
+      queryClient
+        .fetchQuery(gameDetailsQueryOptions(universeId))
+        .then(renderAboutTab)
+        .catch(() => {
+          // Preserve the server-rendered content when the request fails.
+        });
+    } else {
+      renderAboutTab();
+    }
   }
 
   if (edpUpsellConstants.gameDetailsEdpUpsellContainer()) {

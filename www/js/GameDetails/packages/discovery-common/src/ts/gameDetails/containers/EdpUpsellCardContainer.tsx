@@ -21,6 +21,7 @@ import {
   edpUpsellCounterEvents,
 } from "../constants/edpUpsellConstants";
 import { edpUpsellTranslationConfig } from "../translation.config";
+import isUnauthenticatedSupportedCrawler from "../utils/isUnauthenticatedSupportedCrawler";
 
 const isValidUpsellUxTreatmentData = (
   data?: Record<string, string>,
@@ -41,7 +42,8 @@ const EdpUpsellCardContainer = ({
   translate,
 }: TEdpUpsellCardContainerProps): JSX.Element | null => {
   const [dismissed, setDismissed] = useState(false);
-  const { upsellUxTreatment, isFetchingPlayability } = usePlayabilityStatus(universeId);
+  const isCrawler = isUnauthenticatedSupportedCrawler();
+  const { upsellUxTreatment, isFetchingPlayability } = usePlayabilityStatus(universeId, !isCrawler);
 
   const handleUpsellClick = () => {
     if (!window.Roblox.AccessManagementUpsellV2Service) {
@@ -70,7 +72,7 @@ const EdpUpsellCardContainer = ({
       });
   };
 
-  if (dismissed || isFetchingPlayability || !upsellUxTreatment) {
+  if (isCrawler || dismissed || isFetchingPlayability || !upsellUxTreatment) {
     return null;
   }
 

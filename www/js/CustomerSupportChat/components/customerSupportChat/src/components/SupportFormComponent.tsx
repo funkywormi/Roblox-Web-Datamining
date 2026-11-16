@@ -54,7 +54,7 @@ import useScrollToTop from "../hooks/useScrollTop";
 import { MessageModalConfig, useConfirmDialog } from "./modal/MessageModal";
 import RedirectToPortalMessage from "./RedirectToPortalMessage";
 import ArticleSuggestions from "./article-suggestions/ArticleSuggestions";
-import { MainCategoryName, SubCategory } from "../core/types/serviceMetadataResponse";
+import { SubCategory } from "../core/types/serviceMetadataResponse";
 import DevModeComponent from "./DevModeComponent";
 import useAppealsPortalGuacConfiguration from "../hooks/useAppealsPortalGuacConfiguration";
 import { useEmailVerification } from "../hooks/useEmailVerification";
@@ -246,27 +246,9 @@ export const UnwrappedSupportFormComponent: React.FC<
     return (
       authenticatedUser.isAuthenticated &&
       guacConfig?.EnableOptOutCommunication &&
-      selectedItems[SupportTicketStateKey.HelpCategoryType]?.val === MainCategoryName.AppealDecision
+      selectedItems[SupportTicketStateKey.HelpCategoryType]?.val === "AppealDecision"
     );
   }, [selectedItems, guacConfig, authenticatedUser]);
-
-  /**
-   * Logged-out users outside the EU/AU/UK must log in before submitting an appeal.
-   * Per product, scoped to the "Appeal a Decision" category and every sub-category within
-   * it except the parental appeal (AppealForChild). Other categories are untouched.
-   * Drives both the inline message and the disabled submit button.
-   */
-  const requiresLoginForAppeal = useMemo(() => {
-    const subCategory = selectedItems[SupportTicketStateKey.HelpSubCategoryType];
-    return (
-      !authenticatedUser.isAuthenticated &&
-      metadata?.isInEuAuUk === false &&
-      selectedItems[SupportTicketStateKey.HelpCategoryType]?.val ===
-        MainCategoryName.AppealDecision &&
-      !!subCategory &&
-      subCategory.id !== SubCategory.AppealForChild
-    );
-  }, [selectedItems, metadata, authenticatedUser]);
 
   // Memoize all dropdown selectable configs from metadata response
   const selector: SupportTicketSelectableItems = useMemo(
@@ -1008,13 +990,6 @@ export const UnwrappedSupportFormComponent: React.FC<
               setSelectedItem={updateSupportTicketFormSelectable}
             />
           )}
-
-          {/* Logged-out, out-of-region appeal: prompt login (submit is also disabled). */}
-          {requiresLoginForAppeal && (
-            <span className="text-red-500 text-sm" data-testid="appeal-login-required-error">
-              {t("Response.AppealRequiresLogin")}
-            </span>
-          )}
         </div>
 
         {/* Help articles suggestions */}
@@ -1202,7 +1177,6 @@ export const UnwrappedSupportFormComponent: React.FC<
             isSubmissionLoading ||
             isSendingCode ||
             !isFormDataValidToSubmit ||
-            requiresLoginForAppeal ||
             (supportFormData.username !== "" &&
               !!dirty[SupportTicketStateKey.Username] &&
               isUsernameValid === false)
