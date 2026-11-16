@@ -17,7 +17,6 @@ const group = angular
     'groupList',
     'systemFeedback',
     'infiniteScroll',
-    'presence',
     'searchDropdown'
   ])
   .config([

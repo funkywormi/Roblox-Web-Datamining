@@ -173,7 +173,6 @@
             "url": "https://js.rbxcdn.com/cc8d5562b127dd2ee85a41b82efd3c6f9355bf9f5ed15de3f5038c02ca2404b9.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -340,7 +339,6 @@
             "url": "https://js.rbxcdn.com/537d3ec6e2cbc418604174fc9628078ed3fd4adc40e41637bc716c735a60677a.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -445,7 +443,6 @@
             "url": "https://js.rbxcdn.com/1f5c50ba918a5773a2e4a0308683747225b446c67f5089282954865c0e0f76a6.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -902,7 +899,7 @@
         },
         {
             "name": "CommonUI.Messages",
-            "url": "https://js.rbxcdn.com/d69011c70820c037f8de5d5035367bc7e3daa0e014a014e9342c2fba567701d7.js",
+            "url": "https://js.rbxcdn.com/30f0fa1431843fcc647e0407091e22efb370a26038b8fedfe41fb07d3d46ed83.js",
             "sources": [
                 "/home",
                 "/",
@@ -1083,7 +1080,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/4f35c304b58fd3d5df0521d86d35fa8dbffaff88e37a4dcfb94c64f1793357b2.js",
+            "url": "https://js.rbxcdn.com/311f51a66f28d66f8cfd73d7e6ef209f2a1070913671510c8fb6b2e4dcae5d4b.js",
             "sources": [
                 "/home",
                 "/",
@@ -1448,7 +1445,7 @@
         },
         {
             "name": "Feature.Chat",
-            "url": "https://js.rbxcdn.com/967844d95373be96cff62d111f7dafbe945a1c5d9e2a03edb4b09c2f99dfdfb4.js",
+            "url": "https://js.rbxcdn.com/cb0684e75b3c1cd07dc4c5fd7cd58e40d79d2588bb29d55c02d36127e47327df.js",
             "sources": [
                 "/home",
                 "/charts",
@@ -2570,7 +2567,7 @@
         },
         {
             "name": "Feature.Parents",
-            "url": "https://js.rbxcdn.com/dd2db3db7bd926f3e6a243004f799d740fa919c8307a112b3e22805fa5dd40b8.js",
+            "url": "https://js.rbxcdn.com/b432328ffc2165f3d222ab4320b93b81587f5380eef6444c0d80231ceec87421.js",
             "sources": [
                 "/home",
                 "/",
@@ -3196,7 +3193,6 @@
             "url": "https://js.rbxcdn.com/7cae8592d1cd45c8d5935159d37363a6951926fa0532dcdd627b057c76ce268e.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -3527,7 +3523,6 @@
             "url": "https://js.rbxcdn.com/13b3b0cf97cfb5da4538eb0c59f252188b4f724f9328c264a58d24a714e41fe5.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -4022,7 +4017,6 @@
             "url": "https://js.rbxcdn.com/78fa168d8370a5d68981080c0a4bd8462d1cf176710385ecf945ec6a71467be7.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -4330,7 +4324,6 @@
             "url": "https://js.rbxcdn.com/9101b07ce0b1dc4a02f76a1306b7d23ab9ddc0fb9c5f68bf12b1a2ae2a3bb5d4-AccountSwitcher.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -5407,7 +5400,7 @@
         },
         {
             "name": "GroupDetails",
-            "url": "https://js.rbxcdn.com/a214538fac226fa63a45b405cddb06ef6e5aa0b46b6435c45a0588a53268803d-GroupDetails.js",
+            "url": "https://js.rbxcdn.com/8572bd95fd1c3e96b8ed7e644153460692e84098198b183a1c201a0f1e390bef-GroupDetails.js",
             "sources": [
                 "/communities/1"
             ]
@@ -5987,7 +5980,6 @@
             "url": "https://js.rbxcdn.com/1bd83aa4a3fffb12781f36ca112ee7f1a7be585460104a5757beaffe590752de-Navigation.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -6044,35 +6036,16 @@
             "name": "NotificationStream",
             "url": "https://js.rbxcdn.com/79c0fb9ab4edd2972e8a5f2fc28ffad0d6345ea228a4737bdc786ab086d7704a-NotificationStream.js",
             "sources": [
-                "/charts",
-                "/sitemap",
                 "/gift-robux",
-                "/catalog",
                 "/support",
-                "/trades",
-                "/report-abuse",
-                "/supported-browsers",
-                "/discover/?Keyword=roblox",
-                "/users/friends",
-                "/users/inventory",
                 "/users/1/profile",
-                "/users/1/favorites",
-                "/users/profile/edit",
-                "/my/messages",
-                "/my/avatar",
                 "/my/account",
-                "/search/communities",
-                "/communities/1",
                 "/games/1818",
                 "/info/roblox-badges",
                 "/illegal-content-reporting",
                 "/game-pass/58000",
                 "/badges/176685910",
-                "/bundles/591",
-                "/sponsorships/list",
-                "/help-safety",
-                "/support-center",
-                "/events/6177598281426797213"
+                "/help-safety"
             ]
         },
         {
@@ -6735,7 +6708,6 @@
             "url": "https://js.rbxcdn.com/24a1c1b49140b8e5c860d8aafcc93b47060955d2a61218cf181dd5f24d7c2ec8-SearchLandingPage.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -7296,7 +7268,6 @@
             "url": "https://js.rbxcdn.com/05355f4f42e31d8469852179b730ec7f252467eb07a3139c9f3c2551f378bb9c.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -7344,7 +7315,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/c167022af0fc93a766fceac46f6857cb37531e39786a30ca3ae6b6b353b88eb4-UserSettings.js",
+            "url": "https://js.rbxcdn.com/1bb9493f58641828e99eb0334b3e2a903fbe7936ce110f63f50ed309a6eeb9a0-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -7711,7 +7682,6 @@
             "url": "https://css.rbxcdn.com/7a9e67ec503d2a15aac8cb8cbfe95ca99a08f78df56f5961d9e10a325c19ddf6-AccountSwitcher.css",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -8448,7 +8418,7 @@
         },
         {
             "name": "GroupDetails",
-            "url": "https://css.rbxcdn.com/bfe41fac4092f0c2ab395feb7699276d8474eec2094d2736042e82b94ecc0dce-GroupDetails.css",
+            "url": "https://css.rbxcdn.com/67f75478fadff2e9ac3a9396ded54670944dc96f1dc50965ebc2f16c39e835e0-GroupDetails.css",
             "sources": [
                 "/communities/1"
             ]
@@ -8739,7 +8709,6 @@
             "url": "https://css.rbxcdn.com/713fb359872482701dfcc244c14703338b5f5b642c9fca5101a20b050ea1c9fb-Navigation.css",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -8796,35 +8765,16 @@
             "name": "NotificationStream",
             "url": "https://css.rbxcdn.com/935fb7331d9761008e6d48890a8f03c8124d73dd41b4f19f93a1844577186103-NotificationStream.css",
             "sources": [
-                "/charts",
-                "/sitemap",
                 "/gift-robux",
-                "/catalog",
                 "/support",
-                "/trades",
-                "/report-abuse",
-                "/supported-browsers",
-                "/discover/?Keyword=roblox",
-                "/users/friends",
-                "/users/inventory",
                 "/users/1/profile",
-                "/users/1/favorites",
-                "/users/profile/edit",
-                "/my/messages",
-                "/my/avatar",
                 "/my/account",
-                "/search/communities",
-                "/communities/1",
                 "/games/1818",
                 "/info/roblox-badges",
                 "/illegal-content-reporting",
                 "/game-pass/58000",
                 "/badges/176685910",
-                "/bundles/591",
-                "/sponsorships/list",
-                "/help-safety",
-                "/support-center",
-                "/events/6177598281426797213"
+                "/help-safety"
             ]
         },
         {
@@ -9195,7 +9145,6 @@
             "url": "https://css.rbxcdn.com/195c901a616ae1e8baea44d97a0f478d58bfbbf20898d834488d6b5e68d2b405-SearchLandingPage.css",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
@@ -9558,7 +9507,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://css.rbxcdn.com/9f56e766dc8d001443520ee10bf183fd2900d89cbd37ec35f0997af07bf3a18e-UserSettings.css",
+            "url": "https://css.rbxcdn.com/e4f4d254bcaf67983a7236131eddab8f51ed55f3243dcddb3e7e9930c98be771-UserSettings.css",
             "sources": [
                 "/my/account"
             ]

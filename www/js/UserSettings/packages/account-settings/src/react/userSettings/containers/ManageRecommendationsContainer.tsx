@@ -1,33 +1,43 @@
-import React from "react";
+import { useEffect } from "react";
+import { getCurrentUser } from "@rbx/www-common/user";
 import { useGetSettingsUiPolicyQuery } from "../../apis/universalAppConfigurationApi";
-
-const MANAGE_RECOMMENDATIONS_PLACEHOLDER =
-  "This will be the content preferences page once the API is stood up.";
+import ManageRecommendationsLoader from "../components/manageRecommendations/ManageRecommendationsLoader";
+import { manageRecommendationsSurfaceKey } from "../components/manageRecommendations/ManageRecommendationsPage";
+import { SettingsSurfaceError } from "../../settingsSurface/SettingsSurfaceError";
+import reloadUtils from "../utils/reloadUtils";
+import { fireSettingsSurfaceIssueCounter } from "../components/manageRecommendations/manageRecommendationsCounters";
 
 /**
  * Manage Recommendations page (ANC-99), at `/my/account#!/personalized-recommendations`.
  *
  * The tab is removed when `displayManageRecommendationsTab` is off, but tabs mount before the
- * policy loads, so this also waits for the policy before rendering anything.
+ * policy loads, so this also waits for the policy before loading anything.
  */
-const ManageRecommendationsContainer = (): JSX.Element | null => {
+const ManageRecommendationsContainer = (): React.JSX.Element | null => {
   const { data: settingsUiPolicy } = useGetSettingsUiPolicyQuery();
+  const isEnabled = Boolean(settingsUiPolicy?.displayManageRecommendationsTab);
+  const userId = getCurrentUser()?.id;
 
-  if (!settingsUiPolicy?.displayManageRecommendationsTab) {
+  useEffect(() => {
+    if (isEnabled && !userId) {
+      fireSettingsSurfaceIssueCounter(manageRecommendationsSurfaceKey, "LoadFailed", "NoUser");
+    }
+  }, [isEnabled, userId]);
+
+  if (!isEnabled) {
     return null;
   }
+  if (!userId) {
+    return (
+      <SettingsSurfaceError
+        className="settings-container-v2 padding-bottom-large"
+        onRetry={reloadUtils.reloadPage}
+      />
+    );
+  }
 
-  // Temporary placeholder until the settings surface API is up (ANC-102/104). ANC-118 replaces it
-  // with the surface returned by SettingsSurfaceQuery, so the copy is intentionally untranslated.
   return (
-    <section className="settings-container-v2" data-testid="manage-recommendations-page">
-      <p
-        className="stroke-standard stroke-default radius-large padding-large margin-[0] text-body-medium content-default"
-        data-testid="manage-recommendations-placeholder"
-      >
-        {MANAGE_RECOMMENDATIONS_PLACEHOLDER}
-      </p>
-    </section>
+    <ManageRecommendationsLoader surfaceKey={manageRecommendationsSurfaceKey} userId={userId} />
   );
 };
 

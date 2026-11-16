@@ -14,10 +14,11 @@ export const OdpRobuxSection = (): React.JSX.Element | null => {
   const { data: odpChildContext } = useGetOdpChildContextQuery();
 
   const { robuxBalance } = odpChildContext ?? {};
-  const robuxSettingsPath =
-    odpChildContext?.canParentManageChildRobuxTransferLimits === true
-      ? parentZonePages.robuxPage.path
-      : undefined;
+  // Either Robux permission opens the settings page. Each row on that page checks its own.
+  const canOpenRobuxSettings =
+    odpChildContext?.canParentManageChildRobuxTransferLimits === true ||
+    odpChildContext?.canParentManageChildRobuxTransferSettings === true;
+  const robuxSettingsPath = canOpenRobuxSettings ? parentZonePages.robuxPage.path : undefined;
 
   if (robuxBalance === undefined && robuxSettingsPath === undefined) {
     return null;

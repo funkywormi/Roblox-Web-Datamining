@@ -74,6 +74,7 @@ const PageTitle: Record<string, string> = {
   TopGameDetails: "Game details",
   Robux: "Robux",
   TransferLimits: "Transfer limits",
+  Approvals: "Approvals",
   ContentMaturity: "Content maturity",
   BlockedExperiences: "Blocked experiences",
   SensitiveIssues: "Sensitive issues",

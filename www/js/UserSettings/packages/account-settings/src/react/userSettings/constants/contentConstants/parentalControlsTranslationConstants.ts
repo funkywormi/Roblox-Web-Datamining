@@ -33,6 +33,7 @@ export default {
     // Robux
     [SettingCategoryPageName.Robux]: "Heading.Robux",
     [RobuxSettingName.TransferLimits]: "Heading.TransferLimits",
+    [RobuxSettingName.Approvals]: "Heading.Approvals",
   },
 
   heading: "Heading.ParentalControls",
@@ -116,6 +117,13 @@ export default {
     // {limit} only — the row places an icon between the two, so they cannot be one string.
     dailyLimitValue: "Label.DailyRobuxTransferLimitValue",
     monthlyLimitValue: "Label.MonthlyRobuxTransferLimitValue",
+  },
+  robuxTransferApprovals: {
+    parentSideDescription: "Description.ParentSide.RobuxTransferApprovals",
+    alwaysAsk: "Label.AlwaysAsk",
+    alwaysAskDescription: "Description.RobuxTransferApproval.AlwaysAsk",
+    alwaysAllowForTrustedFriends: "Label.AlwaysAllowForTrustedFriends",
+    alwaysAllowForTrustedFriendsDescription: "Description.RobuxTransferApproval.TrustedFriends",
   },
   friendManagement: {
     viewProfile: "Action.ViewProfile",

@@ -1,5 +1,6 @@
 import { Intl } from "@rbx/core-scripts/legacy/Roblox";
 import { TUserBirthdate } from "../types/birthdateTypes";
+import { ageOfMajority, minimumValidAge } from "../constants/birthdateConstants";
 
 /* 
 new Date(YYYY, MM, DD) is NOT equivalent to new Date(YYYY-MM-DD) in JavaScript.
@@ -132,6 +133,14 @@ const birthdayUtils = {
   birthdateSeletionCompleted: (birthdate: TUserBirthdate): boolean => {
     const { birthDay, birthMonth, birthYear } = birthdate;
     return birthDay > 0 && birthMonth > 0 && birthYear > 0;
+  },
+  /** Whether a parent can set this birthdate for their child (5 to 17 years old) */
+  isValidChildBirthdate: (birthdate: TUserBirthdate): boolean => {
+    if (!birthdayUtils.birthdateSeletionCompleted(birthdate)) {
+      return false;
+    }
+    const age = birthdayUtils.calculateAge(birthdate);
+    return age >= minimumValidAge && age < ageOfMajority;
   },
   isSelectingTheSameDate: (
     selectedBirthdate: TUserBirthdate,

@@ -11,6 +11,7 @@ import {
   UserPrivacyLevel,
   PartySettingsValue,
   PrivatePlaytestValue,
+  RobuxTransferApprovalMode,
   UserSetting,
 } from "@rbx/user-settings";
 import ContentMaturityLevel from "../../../../enums/parentalControls/ContentMaturityLevel";
@@ -27,6 +28,7 @@ export const requestSettingLabels = {
   [UserSetting.monthlySpendLimit]: "Label.MonthlySpendingLimit",
   [UserSetting.dailyScreenTimeLimit]: "Label.DailyScreenTimeLimit",
   [UserSetting.robuxTransferLimits]: "Label.RobuxTransferLimits",
+  [UserSetting.robuxTransferApprovalMode]: "Label.SendRobuxToTrustedFriendsSetting",
   [UserSetting.updateFriendsAboutMyActivity]: "Label.ShareActivityUpdatesSetting",
   [UserSetting.phoneNumberDiscoverability]: "Label.ConnectionDiscoverySetting",
   [UserSetting.whoCanChatWithMeInApp]: "Label.RobloxChatDirectChatSetting",
@@ -80,6 +82,7 @@ export const requestSettingHeadings = {
   [UserSetting.monthlySpendLimit]: "Heading.MonthlySpendingLimit",
   [UserSetting.dailyScreenTimeLimit]: "Heading.DailyScreenTimeLimit",
   [UserSetting.robuxTransferLimits]: "Heading.RobuxTransferLimits",
+  [UserSetting.robuxTransferApprovalMode]: "Heading.SendRobuxToTrustedFriends",
   [UserSetting.updateFriendsAboutMyActivity]: "Heading.ShareActivityUpdatesSetting",
   [UserSetting.phoneNumberDiscoverability]: "Heading.ConnectionDiscoverySetting",
   [UserSetting.whoCanChatWithMeInApp]: "Label.RobloxChatDirectChatSetting",
@@ -160,7 +163,8 @@ export const getRequestSettingHeading = (
   return requestSettingHeadings[settingName];
 };
 
-const { contentMaturity, spendControls } = parentalControlsTranslationConstants;
+const { contentMaturity, spendControls, robuxTransferApprovals } =
+  parentalControlsTranslationConstants;
 
 export const requestOptionLabels = {
   // Content maturity
@@ -202,6 +206,11 @@ export const requestOptionLabels = {
   // Allowed status
   [AllowedStatusValue.Allowed]: "Label.On",
   [AllowedStatusValue.Disallowed]: "Label.Off",
+
+  // Robux transfer approval
+  [RobuxTransferApprovalMode.AlwaysAsk]: robuxTransferApprovals.alwaysAsk,
+  [RobuxTransferApprovalMode.TrustedFriendsAutoApproved]:
+    robuxTransferApprovals.alwaysAllowForTrustedFriends,
 
   // Cross age group collaboration
   [CrossAgeGroupCollaborationValue.OlderAgeGroupsAllowed]: "Label.OlderAgeGroupsAllowed",

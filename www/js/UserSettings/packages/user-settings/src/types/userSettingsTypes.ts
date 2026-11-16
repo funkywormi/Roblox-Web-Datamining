@@ -20,6 +20,7 @@ import {
   PrivatePlaytestValue,
   PartySettingsValue,
   AcbAgeRating,
+  RobuxTransferApprovalMode,
 } from "../enums/userSettingsEnums";
 
 export type TDoNotDisturbTimeWindow = {
@@ -96,6 +97,8 @@ export type TUserSettingsBody = {
    * produce rather than as a patch of it.
    */
   [UserSetting.robuxTransferLimits]?: string;
+  /** Absent means Always ask. */
+  [UserSetting.robuxTransferApprovalMode]?: RobuxTransferApprovalMode;
   [UserSetting.iarcAgeRating]?: IarcAgeRating;
   [UserSetting.allowThirdPartyFriendAccess]?: EnabledStatusValue;
   [UserSetting.whoCanSeeMyFriendsList]?: UserPrivacyLevel;
@@ -106,6 +109,7 @@ export type TUserSettingsBody = {
 export type TOptionValue =
   | ContentControls
   | AcbAgeRating
+  | RobuxTransferApprovalMode
   | PhoneNumberDiscoverability
   | Theme
   | AccountTheme
@@ -231,6 +235,11 @@ export type TUserSettingsAndOptionsV2Body = {
    * The setting carries no value at all until a cap has been saved.
    */
   [UserSetting.robuxTransferLimits]?: TUserSettingsAndOptionsV2<TRobuxTransferLimitsInput>;
+  /**
+   * No key means the child is not eligible, so Approvals stays hidden.
+   * A key with no currentValue means Always ask.
+   */
+  [UserSetting.robuxTransferApprovalMode]?: TUserSettingsAndOptionsV2<RobuxTransferApprovalMode>;
   [UserSetting.iarcAgeRating]?: TUserSettingsAndOptionsV2<IarcAgeRating>;
   [UserSetting.allowThirdPartyFriendAccess]?: TUserSettingsAndOptionsV2<EnabledStatusValue>;
   [UserSetting.whoCanSeeMyFriendsList]?: TUserSettingsAndOptionsV2<UserPrivacyLevel>;

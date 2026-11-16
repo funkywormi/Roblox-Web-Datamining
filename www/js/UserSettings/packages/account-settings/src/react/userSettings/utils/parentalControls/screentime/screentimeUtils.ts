@@ -33,13 +33,13 @@ const getAverageTimeLabel = (daysArray: number[], translate: TranslateFunction):
 // Localized whole-hour label for the screentime chart's y-axis (e.g. "2h")
 const getChartHourLabel = (hours: number): string => {
   if (hours === 0) {
-    return new globalThis.Intl.NumberFormat().format(0);
+    return intl.n(0);
   }
-  return new globalThis.Intl.NumberFormat(undefined, {
+  return intl.n(hours, {
     style: "unit",
     unit: "hour",
     unitDisplay: "narrow",
-  }).format(hours);
+  });
 };
 
 const getChartDayLabels = (currentDay: number): string[] => {
@@ -119,7 +119,7 @@ const getPastWeekDateRangeLabel = (now: Date = new Date()): string => {
   const end = new Date(now);
   const start = new Date(now);
   start.setDate(end.getDate() - 6);
-  return new globalThis.Intl.DateTimeFormat(undefined, {
+  return new globalThis.Intl.DateTimeFormat(intl.getLocale(), {
     month: "short",
     day: "numeric",
   }).formatRange(start, end);

@@ -77,7 +77,9 @@ export const ChildRoutes = ({
     );
   }, [child, childSettings]);
 
-  const showRobuxSettings = child.canParentManageChildRobuxTransferLimits;
+  const showRobuxSettings =
+    child.canParentManageChildRobuxTransferLimits ||
+    child.canParentManageChildRobuxTransferSettings;
 
   const showFae = useMemo(() => {
     const childHasFaeSetting = childSettings?.[UserSetting.allowFacialAgeEstimation];
@@ -125,7 +127,7 @@ export const ChildRoutes = ({
 
     // The Robux card on the dashboard is the only entry point to this page, so
     // listing it here as well would be a second route to the same place. The
-    // route itself stays mounted below, gated on the same permission the card's
+    // route itself stays mounted below, gated on the same permissions the card's
     // link is gated on.
     delete subpages[SettingCategoryPageName.Robux];
 

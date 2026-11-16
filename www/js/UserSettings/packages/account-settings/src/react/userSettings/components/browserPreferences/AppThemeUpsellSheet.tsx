@@ -1,5 +1,5 @@
 import { SheetRoot } from "@rbx/foundation-ui";
-import paymentFlowAnalyticsService from "@rbx/core-scripts/payments-flow";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { RobloxSubscriptionSheet } from "@rbx/subscriptions-common";
 import { useGetPlusSubscriptionProductQuery } from "../../../apis/subscriptionsApi";

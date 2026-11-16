@@ -42,7 +42,10 @@ const RobuxBalanceSection = ({ child }: { child: TChildInfo }): React.JSX.Elemen
   const canAddRobux = child.canParentGiftChildRobux === true && child.robuxBalance !== undefined;
 
   const childPages = useAppSelector(selectChildPagesForChildUserId(child.userId));
-  const robuxSettingsPath = child.canParentManageChildRobuxTransferLimits
+  const canOpenRobuxSettings =
+    child.canParentManageChildRobuxTransferLimits ||
+    child.canParentManageChildRobuxTransferSettings;
+  const robuxSettingsPath = canOpenRobuxSettings
     ? childPages?.childSettingCategoryPages[SettingCategoryPageName.Robux]?.path
     : undefined;
 

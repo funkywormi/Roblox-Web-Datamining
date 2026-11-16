@@ -3,11 +3,13 @@ import { useTranslation } from "react-utilities";
 import { formatNumber } from "@rbx/core-scripts/format/number";
 import { Icon } from "@rbx/foundation-ui";
 import {
+  RobuxTransferApprovalMode,
   toEffectiveRobuxTransferLimits,
   toRobuxTransferLimitsInputFromSetting,
   TSettingsPage,
 } from "@rbx/user-settings";
 import RobuxSettingName from "../../../../../enums/RobuxSettingName";
+import { useGetOdpChildContextQuery } from "../../../../apis/parentalControlsApi";
 import { useGetCurrentUserTransferLimitCeilingsQuery } from "../../../../apis/transferLimitsApi";
 import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAndOptionsV2";
 import SettingsList from "../../../../common/components/routing/SettingsList";
@@ -17,58 +19,87 @@ import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageNam
 import { trackCounter } from "./observability";
 import { ParentZoneCounter } from "./observability/eventConstants";
 
-// Robux settings viewed by an on-device parent
+const { robuxTransferApprovals } = parentalControlsTranslationConstants;
+
+const approvalModeLabels: Record<RobuxTransferApprovalMode, string> = {
+  [RobuxTransferApprovalMode.AlwaysAsk]: robuxTransferApprovals.alwaysAsk,
+  [RobuxTransferApprovalMode.TrustedFriendsAutoApproved]:
+    robuxTransferApprovals.alwaysAllowForTrustedFriends,
+};
+
+// Robux settings viewed by an on-device parent. Either permission opens this page, so each row
+// checks its own. Approvals also needs that setting.
 export const OdpRobuxPage = (): React.JSX.Element => {
   const { translate } = useTranslation();
   const { robuxTransferLimits } = parentalControlsTranslationConstants;
-  const { robuxTransferLimitsPage } = parentZonePages;
+  const { robuxApprovalsPage, robuxTransferLimitsPage } = parentZonePages;
 
   useEffect(() => {
     trackCounter(ParentZoneCounter.PageShown, { page: SettingCategoryPageName.Robux });
   }, []);
 
-  // An on-device parent is signed in on the child's account, so both reads are self-reads.
+  // An on-device parent is signed in on the child's account, so these reads are self-reads.
+  const { data: odpChildContext } = useGetOdpChildContextQuery();
   const { data: ceilings } = useGetCurrentUserTransferLimitCeilingsQuery();
   const [childSettings] = useGetSettingsAndOptionsV2();
 
-  const subpages = useMemo(
-    () => ({ [RobuxSettingName.TransferLimits]: robuxTransferLimitsPage }),
-    [robuxTransferLimitsPage],
-  );
+  const showTransferLimits = odpChildContext?.canParentManageChildRobuxTransferLimits === true;
+  const showApprovals =
+    odpChildContext?.canParentManageChildRobuxTransferSettings === true &&
+    childSettings?.robuxTransferApprovalMode !== undefined;
 
   const pagesWithCurrentValues: Record<string, TSettingsPage> = useMemo(() => {
-    const effectiveLimits = toEffectiveRobuxTransferLimits(
-      toRobuxTransferLimitsInputFromSetting(childSettings?.robuxTransferLimits),
-      ceilings,
-    );
-    if (effectiveLimits === undefined) {
-      return subpages;
+    const pages: Record<string, TSettingsPage> = {};
+
+    if (showTransferLimits) {
+      const effectiveLimits = toEffectiveRobuxTransferLimits(
+        toRobuxTransferLimitsInputFromSetting(childSettings?.robuxTransferLimits),
+        ceilings,
+      );
+      pages[RobuxSettingName.TransferLimits] = {
+        ...robuxTransferLimitsPage,
+        currentValueComponent:
+          effectiveLimits !== undefined ? (
+            <span className="flex items-center gap-xsmall">
+              <Icon name="icon-filled-robux" size="Small" />
+              <span>
+                {translate(robuxTransferLimits.dailyLimitValue, {
+                  limit: formatNumber(effectiveLimits.daily),
+                })}
+              </span>
+              <span>•</span>
+              <Icon name="icon-filled-robux" size="Small" />
+              <span>
+                {translate(robuxTransferLimits.monthlyLimitValue, {
+                  limit: formatNumber(effectiveLimits.monthly),
+                })}
+              </span>
+            </span>
+          ) : undefined,
+      };
     }
 
-    return {
-      ...subpages,
-      [RobuxSettingName.TransferLimits]: {
-        ...subpages[RobuxSettingName.TransferLimits],
-        currentValueComponent: (
-          <span className="flex items-center gap-xsmall">
-            <Icon name="icon-filled-robux" size="Small" />
-            <span>
-              {translate(robuxTransferLimits.dailyLimitValue, {
-                limit: formatNumber(effectiveLimits.daily),
-              })}
-            </span>
-            <span>•</span>
-            <Icon name="icon-filled-robux" size="Small" />
-            <span>
-              {translate(robuxTransferLimits.monthlyLimitValue, {
-                limit: formatNumber(effectiveLimits.monthly),
-              })}
-            </span>
-          </span>
-        ),
-      },
-    };
-  }, [subpages, childSettings, ceilings, translate, robuxTransferLimits]);
+    if (showApprovals) {
+      const approvalMode = childSettings?.robuxTransferApprovalMode?.currentValue;
+      const approvalLabel = approvalMode != null ? approvalModeLabels[approvalMode] : undefined;
+      pages[RobuxSettingName.Approvals] = {
+        ...robuxApprovalsPage,
+        currentValueComponent:
+          approvalLabel != null ? <span>{translate(approvalLabel)}</span> : undefined,
+      };
+    }
+
+    return pages;
+  }, [
+    showTransferLimits,
+    showApprovals,
+    childSettings,
+    ceilings,
+    robuxTransferLimitsPage,
+    robuxApprovalsPage,
+    translate,
+    robuxTransferLimits,
+  ]);
 
   return <SettingsList subPages={pagesWithCurrentValues} />;
 };

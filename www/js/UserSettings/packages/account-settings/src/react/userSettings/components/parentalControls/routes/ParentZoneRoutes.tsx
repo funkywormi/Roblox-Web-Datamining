@@ -14,6 +14,7 @@ import OdpTopGameDetails from "../parentZone/OdpTopGameDetails";
 import OdpSettingsPage from "../parentZone/OdpSettingsPage";
 import { odpSettingsPageList } from "../parentZone/odpSettingsPages";
 import OdpRobuxPage from "../parentZone/OdpRobuxPage";
+import OdpRobuxApprovals from "../parentZone/OdpRobuxApprovals";
 import OdpRobuxTransferLimits from "../parentZone/OdpRobuxTransferLimits";
 import OdpScreentimeLimitPage from "../parentZone/OdpScreentimeLimitPage";
 import useSettingsJourneyScreen from "../../../hooks/useSettingsJourneyScreen";
@@ -53,13 +54,20 @@ export const ParentZoneRoutes = (): JSX.Element => {
         </Route>
       )}
 
+      {odpChildContext?.canParentManageChildRobuxTransferSettings === true && (
+        <Route exact path={parentZonePages.robuxApprovalsPage.path}>
+          <OdpRobuxApprovals />
+        </Route>
+      )}
+
       {odpChildContext?.canParentManageChildRobuxTransferLimits === true && (
         <Route exact path={parentZonePages.robuxTransferLimitsPage.path}>
           <OdpRobuxTransferLimits />
         </Route>
       )}
 
-      {odpChildContext?.canParentManageChildRobuxTransferLimits === true && (
+      {(odpChildContext?.canParentManageChildRobuxTransferLimits === true ||
+        odpChildContext?.canParentManageChildRobuxTransferSettings === true) && (
         <Route exact path={parentZonePages.robuxPage.path}>
           <OdpRobuxPage />
         </Route>

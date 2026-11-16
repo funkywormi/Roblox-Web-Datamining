@@ -255,6 +255,13 @@ export const getChildSettingsPages = (linkedChildDetailsPath: string) => {
       }`,
       titleTranslationKey: pageTitles[RobuxSettingName.TransferLimits],
     },
+    [RobuxSettingName.Approvals]: {
+      name: RobuxSettingName.Approvals,
+      path: `${childSettingCategoryPages[SettingCategoryPageName.Robux].path}/${
+        RobuxSettingName.Approvals
+      }`,
+      titleTranslationKey: pageTitles[RobuxSettingName.Approvals],
+    },
   };
 
   const visibilityAndPrivateServersPages: Record<string, TSettingsPage> = {

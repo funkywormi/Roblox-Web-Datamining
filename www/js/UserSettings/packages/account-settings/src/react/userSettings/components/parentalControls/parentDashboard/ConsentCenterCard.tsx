@@ -7,6 +7,7 @@ import { UserProfileField, useUserProfiles } from "@rbx/user-profile-api-client"
 import {
   TUpdateChildSettingsError,
   UpdateChildSettingsErrorCode,
+  RobuxTransferApprovalMode,
   UserSetting,
   useSnackbar,
 } from "@rbx/user-settings";
@@ -183,7 +184,12 @@ const ConsentCenterCard = ({
         if (settingName) {
           const settings = { ...childSettings, ...childSettingsV2 };
           const currValue = settings[settingName as keyof typeof settings]?.currentValue;
-          return getTranslatedSettingValue(settingName, currValue);
+          // An absent approval mode is Always ask, same as the Approvals page.
+          const resolvedValue =
+            settingName === UserSetting.robuxTransferApprovalMode && currValue === undefined
+              ? RobuxTransferApprovalMode.AlwaysAsk
+              : currValue;
+          return getTranslatedSettingValue(settingName, resolvedValue);
         }
         return "";
       }

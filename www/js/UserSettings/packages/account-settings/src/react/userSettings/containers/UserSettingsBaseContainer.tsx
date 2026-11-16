@@ -90,6 +90,19 @@ export const UserSettingsBaseContainer = (): JSX.Element => {
       content: <PrivacySettingsContainer />,
     },
     {
+      id: RouterPath.ManageRecommendations,
+      path: `/${RouterPath.ManageRecommendations}`,
+      title: navigationTranslationConstants.manageRecommendationsHeading,
+      // Hidden from the nav until the policy turns it on, so it doesn't flash for everyone while
+      // the policy loads. The route stays, so a deep link works once the policy allows it. (The
+      // class also hides the tab content, which renders nothing until then anyway.)
+      hideInNav: true,
+      isDefault: false,
+      name: RouterPath.ManageRecommendations,
+      show: true,
+      content: <ManageRecommendationsContainer />,
+    },
+    {
       id: RouterPath.Notifications,
       path: `/${RouterPath.Notifications}`,
       title: navigationTranslationConstants.notificationsHeading,
@@ -151,19 +164,6 @@ export const UserSettingsBaseContainer = (): JSX.Element => {
       name: RouterPath.BrowserPreferences,
       show: !deviceMeta.getDeviceMeta()?.isInApp,
       content: <BrowserPreferencesContainer />,
-    },
-    {
-      id: RouterPath.ManageRecommendations,
-      path: `/${RouterPath.ManageRecommendations}`,
-      title: navigationTranslationConstants.manageRecommendationsHeading,
-      // Hidden from the nav until the policy turns it on, so it doesn't flash for everyone while
-      // the policy loads. The route stays, so a deep link works once the policy allows it. (The
-      // class also hides the tab content, which renders nothing until then anyway.)
-      hideInNav: true,
-      isDefault: false,
-      name: RouterPath.ManageRecommendations,
-      show: true,
-      content: <ManageRecommendationsContainer />,
     },
   ]);
 

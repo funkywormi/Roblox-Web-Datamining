@@ -2016,5 +2016,6 @@
     "Description.ActivityUpdatesUpgradeUpsell": "Create a parent account to receive a weekly email with your child's activity.",
     "ScopeType.UniverseNotificationString": "your experience notification strings",
     "ScopeType.UniverseFollowing": "the experiences you follow",
-    "ScopeType.NotificationReport": "your notification reports"
+    "ScopeType.NotificationReport": "your notification reports",
+    "Description.ParentSide.ExperienceChat.TFNotifications": "Your child can chat with trusted friends who are playing the same experience. Notifications about new trusted friends will be sent to all linked parent accounts with emails. {linkStart}View details{linkEnd}."
 }

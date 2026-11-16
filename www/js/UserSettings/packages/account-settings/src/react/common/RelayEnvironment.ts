@@ -1,43 +1,6 @@
-import {
-  Environment,
-  Network,
-  RecordSource,
-  Store,
-  FetchFunction,
-  GraphQLResponse,
-} from "relay-runtime";
-import { EnvironmentUrls } from "Roblox";
-import * as http from "@rbx/core-scripts/http";
-import { UrlConfig } from "@rbx/core-scripts/http";
-
-const accountManagementGraphQLUrl = `${EnvironmentUrls.apiGatewayUrl}/account-management-api/graphql`;
-
-const fetchFn: FetchFunction = async (request, variables) => {
-  if (request.id) {
-    const urlConfig: UrlConfig = {
-      url: `${accountManagementGraphQLUrl}/${request.name}/${request.id}`,
-      withCredentials: true,
-    };
-
-    const { data } = await http.get<GraphQLResponse>(urlConfig, {
-      variables: JSON.stringify(variables),
-    });
-
-    return data;
-  }
-
-  const urlConfig: UrlConfig = {
-    url: accountManagementGraphQLUrl,
-    withCredentials: true,
-  };
-
-  const { data } = await http.post<GraphQLResponse>(urlConfig, {
-    query: request.text,
-    variables,
-  });
-
-  return data;
-};
+import { Environment, Network, RecordSource, Store } from "relay-runtime";
+// Persisted mutations go as POSTs, which the settings surface's updateUserSetting needs.
+import { fetchFn } from "../settingsSurface/RelayEnvironment";
 
 function createRelayEnvironment() {
   return new Environment({

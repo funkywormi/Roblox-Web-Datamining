@@ -19,6 +19,7 @@ type TParentZonePages = {
   topGameDetailsPage: TSettingsPage;
   robuxPage: TSettingsPage;
   robuxTransferLimitsPage: TSettingsPage;
+  robuxApprovalsPage: TSettingsPage;
 };
 
 // Pages an on-device parent can reach from Parent Zone. There is only ever one child here, so
@@ -61,6 +62,11 @@ export const parentZonePages: TParentZonePages = {
     name: RobuxSettingName.TransferLimits,
     path: `${robuxPath}/${RobuxSettingName.TransferLimits}`,
     titleTranslationKey: pageTitles[RobuxSettingName.TransferLimits],
+  },
+  robuxApprovalsPage: {
+    name: RobuxSettingName.Approvals,
+    path: `${robuxPath}/${RobuxSettingName.Approvals}`,
+    titleTranslationKey: pageTitles[RobuxSettingName.Approvals],
   },
 };
 
