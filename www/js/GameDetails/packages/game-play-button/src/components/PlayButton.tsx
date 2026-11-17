@@ -33,6 +33,7 @@ import {
   handleShareLinkEventLogging,
   launchGame,
   launchLogin,
+  launchSignup,
   startAvatarVideoOptInOverlayFlow,
   startVerificationFlow,
   startVoiceOptInOverlayFlow,
@@ -50,6 +51,7 @@ import {
 } from "./SecondaryPlayButton";
 import UnplayableButton from "./UnplayableButton";
 import useLaunchGameWithPlayableUxTreatment from "../hooks/useLaunchGameWithPlayableUxTreatment";
+import useMobileWebSignupForPlay from "../hooks/useMobileWebSignupForPlay";
 import usePurchaseProductData from "../hooks/usePurchaseProductData";
 import useWasmJoinId from "../hooks/useWasmJoinId";
 import { AgeCheckNeededButton } from "./AgeCheckNeededButton";
@@ -192,7 +194,7 @@ export const PlayButton = ({
   status,
   eventProperties = EMPTY_OBJECT,
   appsFlyerReferralProperties = EMPTY_OBJECT,
-  iconClassName = "icon-common-play",
+  iconClassName = "icon icon-filled-play-large size-700",
   buttonWidth = buttonWidths.full,
   buttonClassName = "btn-common-play-game-lg game-play-button-lg",
   disableLoadingState = false,
@@ -220,8 +222,8 @@ export const PlayButton = ({
   );
 
   const { data: isVNGRedirectEnabled } = useQuery({
-    queryKey: ["getIsVNGLandingRedirectEnabled"],
-    queryFn: NavigationService.getIsVNGLandingRedirectEnabled,
+    queryKey: ["tryGetIsVNGLandingRedirectEnabled"],
+    queryFn: NavigationService.tryGetIsVNGLandingRedirectEnabled,
     retry: false,
   });
 
@@ -295,6 +297,12 @@ export const PlayButton = ({
       skipPlayabilityFetch,
     );
 
+  const { isMobileWebSignupEnabled, logMobileWebSignupExposure } = useMobileWebSignupForPlay(
+    status,
+    pageContext,
+    isVNGRedirectEnabled,
+  );
+
   if (showVerification === undefined && !disableLoadingState) {
     return <LoadingButton buttonClassName={buttonClassName} buttonWidth={buttonWidth} />;
   }
@@ -359,7 +367,12 @@ export const PlayButton = ({
               // redirct to login page
               NavigationService.navigateToLoginWithRedirect();
             } else {
-              launchLogin(placeId, appsFlyerReferralProperties);
+              logMobileWebSignupExposure();
+              if (isMobileWebSignupEnabled) {
+                launchSignup(placeId);
+              } else {
+                launchLogin(placeId, appsFlyerReferralProperties);
+              }
             }
           }
 

@@ -1,3 +1,5 @@
+import { RobuxTransferApprovalMode } from "@rbx/user-settings";
+
 const translationConstants = {
   transfersHeading: "Label.Transfers",
   robuxTransactions: "Label.RobuxTransactions",
@@ -16,8 +18,21 @@ const translationConstants = {
   waitingForParentDescription: "Description.WaitingForParentToChangeTransferLimits",
   pendingBadge: "Label.Pending",
   cancelRequest: "Header.CancelRequest",
+  transferApprovalsHeading: "Heading.TransferApprovals",
   transactionHistory: "Label.TransactionHistory",
   loadingError: "Message.Error.Default",
+  childControlTransferApprovals: {
+    [RobuxTransferApprovalMode.AlwaysAsk]: {
+      title: "Label.ApprovalNeededForEveryone",
+      cardDescription: "Description.ParentApprovesEachTransfer",
+      pageDescription: "Description.ParentApprovesEveryRobuxTransfer",
+    },
+    [RobuxTransferApprovalMode.TrustedFriendsAutoApproved]: {
+      title: "Label.NoApprovalNeededForTrustedFriends",
+      cardDescription: "Label.ParentAllowedTrustedFriendsTransfers",
+      pageDescription: "Label.ParentAllowedTrustedFriendsTransfers",
+    },
+  },
 };
 
 export default translationConstants;

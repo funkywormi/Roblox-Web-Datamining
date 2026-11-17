@@ -583,7 +583,7 @@
     "Heading.ConversationalRequest.LiftPlatformAccessRestriction": "Do you allow your child to use Roblox?",
     "Description.LiftPlatformAccessRestrictionConsent": "With your permission, your child will be able to sign in to Roblox.",
     "Response.ODPBirthdayNotAllowed": "This date can't be used for your child's account. Try another date.",
-    "Description.VPCRequestSpendNotifications": "Notifications will be sent to all parent accounts with emails.",
+    "Description.VPCRequestSpendNotifications": "Notifications will be sent to all linked parent accounts with emails.",
     "Heading.ODPUpgradeAlreadyCompleted": "Alert",
     "Description.ODPUpgradeAlreadyCompleted": "Email can no longer be changed after a Roblox parent account has been linked to this PIN",
     "Heading.ConversationalRequest.DoNotDisturb": "Allow your child to get notifications throughout the day?",

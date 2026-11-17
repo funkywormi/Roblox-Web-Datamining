@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { window as browserWindow } from "@rbx/core-lib/browser";
 import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
-import { getJoindata, openPlayOnWeb, PlayOnWebVariant, useWasmJoinId } from "@rbx/game-play-button";
+import {
+  getJoindata,
+  openPlayOnWeb,
+  PlayOnWebVariant,
+  useWasmJoinId,
+  wasmRedirectDialogClickEventContext,
+} from "@rbx/game-play-button";
+import { EventStreamMetadata } from "../../common/constants/eventStreamConstants";
+import { PageContext } from "../../common/types/pageContext";
 import metadataConstants from "../constants/metadataConstants";
 import { usePlayOnWebVariant } from "../hooks/usePlayOnWebVariant";
 import DesktopWasmRedirect from "./DesktopWasmRedirect";
@@ -31,8 +39,14 @@ const WasmRedirectFlow = (): React.JSX.Element | null => {
   // Same split as launchGame, whose protocol launch and install dialog the desktop flow relies on.
   // Phones, tablets (including iPads that report as Macs) and ChromeOS launch through AppsFlyer.
   const isDesktop = !(isIosDevice || isAndroidDevice || isIos13Ipad() || isChromeOs);
+  const eventProperties = {
+    [EventStreamMetadata.PlaceId]: placeId,
+    [EventStreamMetadata.UniverseId]: universeId,
+    [EventStreamMetadata.PlayContext]: PageContext.GameDetailPage,
+  };
   // OneButton and TwoButton both offer Play on Web on the EDP.
-  const playOnWebEnabled = usePlayOnWebVariant(universeId) !== PlayOnWebVariant.None;
+  const playOnWebEnabled =
+    usePlayOnWebVariant(universeId).playOnWebVariant !== PlayOnWebVariant.None;
   const { wasmJoinId } = useWasmJoinId();
   // Opens the WASM link, once Play on Web is enabled and the user's join id is known.
   const playOnWeb =
@@ -44,8 +58,10 @@ const WasmRedirectFlow = (): React.JSX.Element | null => {
             universeId,
             privateServerLinkCode,
             gameInstanceId,
+            eventProperties,
             wasmJoinId,
             joinData,
+            eventContext: wasmRedirectDialogClickEventContext,
           })
       : undefined;
 

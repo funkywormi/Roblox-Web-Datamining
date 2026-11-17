@@ -1,7 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { buildPlayGameProperties, launchGame } from "@rbx/core-scripts/game";
-import { Button } from "@rbx/core-ui";
+import { buildPlayGameProperties } from "@rbx/core-scripts/game";
+import { Button } from "@rbx/foundation-ui";
+import { launchPlayGame } from "@rbx/game-play-button/game-launcher";
 import playerConstants from "../constants/playerConstants";
 
 function PlayerAction({ playerData, dismissModal, isPlayable, translate }) {
@@ -25,15 +26,17 @@ function PlayerAction({ playerData, dismissModal, isPlayable, translate }) {
       properties: propertiesForEvent,
       gamePlayIntentEventCtx: gamePlayIntentInPlacesList.ctx,
     };
-    launchGame(playGameProperties, eventStreamProperties);
+    launchPlayGame(playGameProperties, eventStreamProperties);
     dismissModal(e);
   };
 
   return (
-    <div className="border-bottom player-info">
-      <span className="player-name">{nameForDisplay}</span>
+    <div className="player-interaction-info flex items-center justify-between grow min-width-0">
+      <span className="player-interaction-name text-truncate-end">{nameForDisplay}</span>
       <Button
-        className="cursor-pointer btn-primary-sm player-action"
+        className="player-interaction-join"
+        variant="Emphasis"
+        size="Small"
         onClick={joinGame}
         isDisabled={!isPlayable}
       >

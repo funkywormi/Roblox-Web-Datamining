@@ -1,4 +1,4 @@
-import React, { isValidElement } from "react";
+import React, { isValidElement, useMemo, useRef } from "react";
 import { clsx } from "clsx";
 import {
   type SduiRendererInjectedProps,
@@ -17,6 +17,9 @@ import { useHoverIntent } from "@rbx/sdui-core/client";
 import "./css/sduiGameTile.css";
 import { SDUI_GAME_TILE_DEFAULTS } from "../consts/defaults";
 import { useIsEligibleForVideoPreview } from "../hooks/useIsEligibleForVideoPreview";
+import { useIsTouchVideoAutoplay } from "../hooks/useIsTouchVideoAutoplay";
+import { useViewportVideoAutoplay } from "../hooks/useViewportVideoAutoplay";
+import { VideoPlaybackAutoplayContext } from "./sduiVideoPlayer/VideoPlaybackAutoplayContext";
 import { WwwThumbnail2d } from "./primitives/WwwThumbnail2d";
 
 const RATING_ICON_CLASS = SUPPORTED_ICON_CLASSES["icons/status/games/rating_small"];
@@ -119,14 +122,34 @@ export function SduiGameTile({
 
   const hasActivationHandler = Boolean(onActivated?.onActivated);
 
+  const tileRef = useRef<HTMLDivElement>(null);
   const { isHovered, onHoverStart, onHoverEnd } = useHoverIntent();
   const hasVideo = videoPlayer != null && Boolean(universeId);
+  // A coarse primary pointer cannot hover, so the video plays while the tile is in the viewport.
+  const isTouchInput = useIsTouchVideoAutoplay();
+  const isHoverPlaybackEnabled = hasVideo && !isTouchInput;
   const { isEligibleForVideoPreview, isLoadingEligibility } = useIsEligibleForVideoPreview(
     universeId ?? "",
     hasVideo,
   );
-  const showEligibilityShimmer = isHovered && hasVideo && isLoadingEligibility;
-  const showEligiblePlayer = isHovered && hasVideo && isEligibleForVideoPreview;
+  // Ineligible tiles never mount a player, so they must not claim the autoplay slot.
+  // Reduced motion is checked inside the hook, at registration time.
+  const {
+    markEnded,
+    markBlocked,
+    isPlaybackRequested: isViewportPlaybackRequested,
+  } = useViewportVideoAutoplay({
+    enabled: hasVideo && isTouchInput && isEligibleForVideoPreview,
+    universeId,
+    elementRef: tileRef,
+  });
+  const playbackCallbacks = useMemo(
+    () => ({ onPlaybackEnded: markEnded, onPlaybackBlocked: markBlocked }),
+    [markEnded, markBlocked],
+  );
+  const isPlaybackRequested = isTouchInput ? isViewportPlaybackRequested : isHovered;
+  const showEligibilityShimmer = isPlaybackRequested && hasVideo && isLoadingEligibility;
+  const showEligiblePlayer = isPlaybackRequested && hasVideo && isEligibleForVideoPreview;
 
   // image node: prefer passed imageComponent, then thumbnail/img, then placeholder
   const parsedImage = typeof image === "string" ? parseImageString(image) : null;
@@ -225,7 +248,9 @@ export function SduiGameTile({
                 className="shimmer absolute inset-[0] pointer-events-none"
               />
             ) : (
-              videoPlayer
+              <VideoPlaybackAutoplayContext.Provider value={playbackCallbacks}>
+                {videoPlayer}
+              </VideoPlaybackAutoplayContext.Provider>
             )}
           </div>
         ) : null}
@@ -273,6 +298,7 @@ export function SduiGameTile({
 
   return (
     <div
+      ref={tileRef}
       data-testid="sdui-game-tile"
       // Use relative positioning on this parent element and static positioning on the
       // main content element so the main content's stretched ::after
@@ -296,10 +322,10 @@ export function SduiGameTile({
           ? { borderRadius: cornerRadiusPx }
           : undefined
       }
-      onMouseOver={hasVideo ? onHoverStart : undefined}
-      onMouseLeave={hasVideo ? onHoverEnd : undefined}
-      onFocus={hasVideo ? onHoverStart : undefined}
-      onBlur={hasVideo ? onHoverEnd : undefined}
+      onMouseOver={isHoverPlaybackEnabled ? onHoverStart : undefined}
+      onMouseLeave={isHoverPlaybackEnabled ? onHoverEnd : undefined}
+      onFocus={isHoverPlaybackEnabled ? onHoverStart : undefined}
+      onBlur={isHoverPlaybackEnabled ? onHoverEnd : undefined}
     >
       {mainContent}
       {isContained && (titleNode != null || footerRow != null) ? (

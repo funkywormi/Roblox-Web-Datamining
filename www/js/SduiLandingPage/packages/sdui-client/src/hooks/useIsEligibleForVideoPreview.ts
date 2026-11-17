@@ -21,10 +21,12 @@ import {
  *
  * @param universeId - The universe ID of the experience
  * @param enabled - When false, skip the check and report not eligible. Defaults to true.
+ * @param skipPlayabilityFetch - Skip playability when the caller does not need it.
  */
 export const useIsEligibleForVideoPreview = (
   universeId: string,
   enabled = true,
+  skipPlayabilityFetch = false,
 ): {
   isEligibleForVideoPreview: boolean;
   isLoadingEligibility: boolean;
@@ -61,7 +63,7 @@ export const useIsEligibleForVideoPreview = (
 
   const { playabilityStatus, isPlayable, isFetchingPlayability } = usePlayabilityStatus(
     universeId,
-    enabled,
+    enabled && !skipPlayabilityFetch,
   );
 
   const isAuthenticated = Boolean(authenticatedUser()?.isAuthenticated);

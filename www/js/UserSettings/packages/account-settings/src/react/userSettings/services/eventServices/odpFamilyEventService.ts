@@ -9,6 +9,7 @@ import { isUnder13, userId } from "@rbx/core-scripts/meta/user";
 import wrapEventServiceWithTryCatch from "../../../../core/utils/eventUtils";
 import type { TParentInfo } from "../../../../types/parentInfoTypes";
 import { ManagementAction } from "../../../../types/parentConsentsTypes";
+import ParentalControlsPageName from "../../../../enums/parentalControls/ParentalControlsPageName";
 
 const EventName = {
   Pageload: "authPageload",
@@ -40,6 +41,7 @@ const AssociatedText = {
     "Parental controls - Family - Screen time 7-day average / Top friends / Top games / Managed by parent / Parent settings",
   CreatePin: "Ask a parent on this device",
   CreateAccount: "Create your own Roblox account > Continue",
+  ActivityUpdatesCreateAccount: "Activity updates > Create",
   LinkedParents: "Linked parents",
   AddParent: "Add parent",
   PendingRequests: "Sent requests",
@@ -69,6 +71,7 @@ const PageTitle: Record<string, string> = {
   ThirdPartyApplications: "Third-party applications",
   Notifications: "Notifications",
   AgeCheck: "Age check",
+  ActivityUpdates: "Activity updates",
   ScreentimeManagement: "Screen time limit",
   FriendManagement: "Connections",
   TopGameDetails: "Game details",
@@ -175,6 +178,17 @@ export const btnClickCreatePin = wrapEventServiceWithTryCatch(
 export const btnClickOdpCreateAccount = wrapEventServiceWithTryCatch(
   (parents: TParentInfo[] | undefined): void => {
     sendOdpFamilyButtonClick(Button.CreateAccount, AssociatedText.CreateAccount, parents);
+  },
+);
+
+export const btnClickOdpActivityUpdatesCreateAccount = wrapEventServiceWithTryCatch(
+  (parents: TParentInfo[] | undefined): void => {
+    sendOdpFamilyButtonClick(
+      Button.CreateAccount,
+      AssociatedText.ActivityUpdatesCreateAccount,
+      parents,
+      ParentalControlsPageName.ActivityUpdates,
+    );
   },
 );
 

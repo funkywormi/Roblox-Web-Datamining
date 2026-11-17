@@ -31,6 +31,7 @@ enum SettingCategoryPageName {
 
   // Robux settings
   Robux = "Robux",
+  TransferApprovals = "TransferApprovals",
 
   // Notifications
   Notifications = "Notifications",

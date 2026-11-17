@@ -88,7 +88,7 @@ const PlayOnWebButton = ({
         aria-label={isOneButton ? playOnWebText : undefined}
         onClick={handleClick}
       >
-        {isOneButton ? <span className="icon-common-play" /> : playOnWebText}
+        {isOneButton ? <span className="icon icon-filled-play-large size-700" /> : playOnWebText}
       </Button>
       <span
         data-testid="play-on-web-beta-notice"

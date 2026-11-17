@@ -48,7 +48,7 @@ export type TPurchaseButtonContainerProps = {
 export const PurchaseButtonContainer = ({
   universeId,
   placeId,
-  iconClassName = "icon-robux-white",
+  iconClassName = "icon icon-regular-robux size-400",
   buttonWidth = buttonWidths.full,
   buttonClassName = "btn-economy-robux-white-lg game-play-button-purchase-lg",
   refetchPlayabilityStatus,

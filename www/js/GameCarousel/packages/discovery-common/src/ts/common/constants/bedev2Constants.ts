@@ -28,10 +28,6 @@ const url = {
     url: `${apiGatewayUrl}/search-landing-page-api/v1`,
     withCredentials: true,
   },
-  getSpotlightData: (): UrlConfig => ({
-    url: `${apiGatewayUrl}/landing-page-api/spotlight`,
-    withCredentials: true,
-  }),
   // Charts SDUI v2 (charts-api) endpoints — main page feed and See All sort detail.
   getChartsPage: (): UrlConfig => ({
     url: `${apiGatewayUrl}/charts-api/v1/charts-page`,
@@ -43,10 +39,6 @@ const url = {
   }),
   postUserSignal: (): UrlConfig => ({
     url: `${apiGatewayUrl}/user-signal-http-gateway/v1/user-signal/ingest`,
-    withCredentials: true,
-  }),
-  getPreAuthLandingPage: (): UrlConfig => ({
-    url: `${apiGatewayUrl}/landing-page-api/pre-auth-landing`,
     withCredentials: true,
   }),
 };

@@ -76,7 +76,9 @@ export const GameTilePlayButtonV2 = ({
       eventProperties={playButtonEventProperties}
       disableLoadingState={disableLoadingState}
       buttonClassName={
-        isPurchaseRequired ? "btn-economy-robux-white-lg purchase-button" : undefined
+        isPurchaseRequired
+          ? "btn-economy-robux-white-lg game-play-button-purchase-lg purchase-button"
+          : undefined
       }
       hideButtonText={!isPurchaseRequired}
       redirectPurchaseUrl={isPurchaseRequired ? redirectPurchaseUrl : undefined}

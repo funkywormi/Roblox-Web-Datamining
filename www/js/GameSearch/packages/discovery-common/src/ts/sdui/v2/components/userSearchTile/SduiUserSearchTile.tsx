@@ -74,6 +74,7 @@ export function SduiUserSearchTile({
       onActivated={onActivated}
       source={source}
       targetUserId={targetUserId}
+      viewerUserId={viewerUserId}
     />
   );
 }

@@ -1,5 +1,6 @@
 import { TExploreApiSearchPillsSort } from "../common/types/bedev2Types";
 import SearchPillCarousel from "../searchLandingPage/searchPill/SearchPillCarousel";
+import HomeSortHeader from "../common/components/HomeSortHeader";
 import { TranslateFunction } from "@rbx/core-scripts/react";
 
 type TSearchPillCarouselFeedItemProps = {
@@ -27,6 +28,7 @@ const SearchPillCarouselFeedItem = ({
       positionId={positionId}
       isNewScrollArrowsEnabled={isNewScrollArrowsEnabled}
       isNewSortHeaderEnabled={isNewSortHeaderEnabled}
+      NewSortHeader={HomeSortHeader}
       translate={translate}
     />
   );

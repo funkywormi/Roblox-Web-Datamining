@@ -87,11 +87,12 @@ export const editorSourceFromMode = (mode: ComposerMode): EditorSource => {
  *
  * `newDraft` and `editDraft` deliberately share `'composing'`: when the user saves their first
  * draft, `mode` transitions `newDraft → editDraft`, but the editor's content (and the
- * `<FileUpload>` child's `localPreviewSrc`) MUST persist — otherwise the just-uploaded image
- * preview is replaced by `<Thumbnail2d>` rendering the draft's `imageAssetId`, which the
- * thumbnail service serves as a moderation placeholder while the draft is in `Pending`. Since
- * the `defaultTitle`/`defaultContent` props are only consumed at mount, sharing the key is safe:
- * the editor's internal state already matches the user's just-typed content.
+ * `<AnnouncementImageUpload>` child's `localPreviewSrc`) MUST persist — otherwise the
+ * just-uploaded image preview is replaced by `<Thumbnail2d>` rendering the draft's
+ * `imageAssetId`, which the thumbnail service serves as a moderation placeholder while the draft
+ * is in `Pending`. Since the `defaultTitle`/`defaultContent` props are only consumed at mount,
+ * sharing the key is safe: the editor's internal state already matches the user's just-typed
+ * content.
  */
 export const editorKeyFromMode = (mode: ComposerMode): string => {
   switch (mode.kind) {

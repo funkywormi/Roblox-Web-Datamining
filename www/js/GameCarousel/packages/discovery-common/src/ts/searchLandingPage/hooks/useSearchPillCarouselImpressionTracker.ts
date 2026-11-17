@@ -1,6 +1,6 @@
 import { RefObject, useCallback } from "react";
 import "@rbx/core-scripts/global";
-import { eventStreamService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
+import { sendEvent } from "@rbx/core-scripts/event-stream";
 import { useCollectionItemsIntersectionTracker } from "@rbx/unified-logging";
 import { fireEvent } from "@rbx/www-common/event-tracker";
 import eventStreamConstants, {
@@ -57,7 +57,7 @@ const useSearchPillCarouselImpressionTracker = (
 
       if (params !== undefined) {
         const [eventConfig, eventParams] = eventStreamConstants.queryImpressions(params);
-        eventStreamService.sendEvent(eventConfig, eventParams);
+        sendEvent(eventConfig, eventParams);
       } else {
         fireEvent(searchLandingPage.SearchPillCarouselImpressionsUndefinedError);
       }

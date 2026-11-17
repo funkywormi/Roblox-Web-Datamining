@@ -499,7 +499,7 @@ const WideGameTile = React.forwardRef(
                       placeId={referralPlaceId.toString()}
                       playButtonEventProperties={playButtonEventProperties}
                       buttonClassName="btn-growth-xs play-button"
-                      purchaseIconClassName="icon-robux-white"
+                      purchaseIconClassName="icon icon-regular-robux size-400"
                       clientReferralUrl={clientReferralUrl}
                       shouldPurchaseNavigateToDetails
                       page={page}
@@ -524,7 +524,7 @@ const WideGameTile = React.forwardRef(
                   placeId={referralPlaceId.toString()}
                   playButtonEventProperties={playButtonEventProperties}
                   buttonClassName="btn-growth-xs play-button"
-                  purchaseIconClassName="icon-robux-white"
+                  purchaseIconClassName="icon icon-regular-robux size-400"
                   clientReferralUrl={clientReferralUrl}
                   shouldPurchaseNavigateToDetails
                   page={page}

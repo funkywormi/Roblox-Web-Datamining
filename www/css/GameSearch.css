@@ -1159,6 +1159,51 @@
     height: 28px
 }
 
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-filled-play-large,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-filled-play-large,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-filled-play-large,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-filled-play-large,
+.game-card-link .game-card-name-info .play-button .icon-filled-play-large,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-regular-robux,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-regular-robux,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-regular-robux,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-regular-robux,
+.game-card-link .game-card-name-info .play-button .icon-regular-robux,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-filled-circle-slash,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-filled-circle-slash,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-filled-circle-slash,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-filled-circle-slash,
+.game-card-link .game-card-name-info .play-button .icon-filled-circle-slash {
+    vertical-align: middle
+}
+
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-filled-play-large,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-filled-play-large,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-filled-play-large,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-filled-play-large,
+.game-card-link .game-card-name-info .play-button .icon-filled-play-large {
+    width: 34px;
+    height: 34px
+}
+
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-regular-robux,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-regular-robux,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-regular-robux,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-regular-robux,
+.game-card-link .game-card-name-info .play-button .icon-regular-robux {
+    width: 28px;
+    height: 28px
+}
+
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-filled-circle-slash,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-filled-circle-slash,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-filled-circle-slash,
+.game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-filled-circle-slash,
+.game-card-link .game-card-name-info .play-button .icon-filled-circle-slash {
+    width: 25px;
+    height: 25px
+}
+
 .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-status-private,
 .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-status-private,
 .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-status-private,
@@ -1409,7 +1454,58 @@
     .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-robux-white,
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-unplayable-lg .icon-robux-white,
     .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-robux-white,
-    .game-card-link .game-card-name-info .play-button .icon-robux-white,
+    .game-card-link .game-card-name-info .play-button .icon-robux-white {
+        background-position: 0 -36px;
+        background-size: 200%;
+        width: 18px;
+        height: 18px
+    }
+
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-filled-play-large,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-filled-play-large,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-filled-play-large,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-filled-play-large,
+    .game-card-link .game-card-name-info .play-button .icon-filled-play-large,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-regular-robux,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-regular-robux,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-regular-robux,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-regular-robux,
+    .game-card-link .game-card-name-info .play-button .icon-regular-robux,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-filled-circle-slash,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-filled-circle-slash,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-filled-circle-slash,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-filled-circle-slash,
+    .game-card-link .game-card-name-info .play-button .icon-filled-circle-slash {
+        vertical-align: middle
+    }
+
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-filled-play-large,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-filled-play-large,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-filled-play-large,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-filled-play-large,
+    .game-card-link .game-card-name-info .play-button .icon-filled-play-large {
+        width: 23px;
+        height: 23px
+    }
+
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-regular-robux,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-regular-robux,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-regular-robux,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-regular-robux,
+    .game-card-link .game-card-name-info .play-button .icon-regular-robux {
+        width: 18px;
+        height: 18px
+    }
+
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-filled-circle-slash,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-purchase-lg .icon-filled-circle-slash,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-action-needed-lg .icon-filled-circle-slash,
+    .game-card-link .game-card-name-info .btn-full-width.game-play-button-unplayable-lg .icon-filled-circle-slash,
+    .game-card-link .game-card-name-info .play-button .icon-filled-circle-slash {
+        width: 16px;
+        height: 16px
+    }
+
     .game-card-link .game-card-name-info .btn-full-width.btn-common-play-game-lg .icon-status-private,
     .game-card-link .game-card-name-info .btn-full-width.game-play-button-lg .icon-status-private,
     .game-card-link .game-card-name-info .btn-full-width.btn-economy-robux-white-lg .icon-status-private,
@@ -2780,17 +2876,13 @@
     display: flex
 }
 
-.hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.regular-play-button .icon-common-play,
-.hover-game-tile.event-tile.image-overlay .play-button-container .play-button.regular-play-button .icon-common-play,
-.hover-game-tile.interest-tile.image-overlay .play-button-container .play-button.regular-play-button .icon-common-play,
-.hover-game-tile.experience-events-tile.image-overlay .play-button-container .play-button.regular-play-button .icon-common-play {
+.hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.regular-play-button .icon-filled-play-large,
+.hover-game-tile.event-tile.image-overlay .play-button-container .play-button.regular-play-button .icon-filled-play-large,
+.hover-game-tile.interest-tile.image-overlay .play-button-container .play-button.regular-play-button .icon-filled-play-large,
+.hover-game-tile.experience-events-tile.image-overlay .play-button-container .play-button.regular-play-button .icon-filled-play-large {
     opacity: .8;
-    background-position: 0 0;
-    background-size: 230%;
-    width: 13px;
-    height: 16.5px;
-    margin-top: 1px;
-    margin-left: 1px
+    width: 18px;
+    height: 18px
 }
 
 .hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.regular-play-button:hover,
@@ -2803,10 +2895,10 @@
     margin-right: -1px
 }
 
-.hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.regular-play-button:hover .icon-common-play,
-.hover-game-tile.event-tile.image-overlay .play-button-container .play-button.regular-play-button:hover .icon-common-play,
-.hover-game-tile.interest-tile.image-overlay .play-button-container .play-button.regular-play-button:hover .icon-common-play,
-.hover-game-tile.experience-events-tile.image-overlay .play-button-container .play-button.regular-play-button:hover .icon-common-play {
+.hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.regular-play-button:hover .icon-filled-play-large,
+.hover-game-tile.event-tile.image-overlay .play-button-container .play-button.regular-play-button:hover .icon-filled-play-large,
+.hover-game-tile.interest-tile.image-overlay .play-button-container .play-button.regular-play-button:hover .icon-filled-play-large,
+.hover-game-tile.experience-events-tile.image-overlay .play-button-container .play-button.regular-play-button:hover .icon-filled-play-large {
     opacity: 1
 }
 
@@ -2838,13 +2930,13 @@
     margin-left: -3px
 }
 
-.hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.purchase-button .icon-robux-white,
-.hover-game-tile.event-tile.image-overlay .play-button-container .play-button.purchase-button .icon-robux-white,
-.hover-game-tile.interest-tile.image-overlay .play-button-container .play-button.purchase-button .icon-robux-white,
-.hover-game-tile.experience-events-tile.image-overlay .play-button-container .play-button.purchase-button .icon-robux-white {
-    margin-top: -2px;
-    margin-left: -3px;
-    transform: scale(.6429)
+.hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.purchase-button .icon-regular-robux,
+.hover-game-tile.event-tile.image-overlay .play-button-container .play-button.purchase-button .icon-regular-robux,
+.hover-game-tile.interest-tile.image-overlay .play-button-container .play-button.purchase-button .icon-regular-robux,
+.hover-game-tile.experience-events-tile.image-overlay .play-button-container .play-button.purchase-button .icon-regular-robux {
+    width: 20px;
+    height: 20px;
+    margin: 4px 5px 0 1px
 }
 
 .hover-game-tile.grid-tile.image-overlay .play-button-container .play-button.notification-button,
@@ -4664,6 +4756,11 @@ button.game-play-button-unplayable-lg {
     height: auto
 }
 
+button.game-play-button-unplayable {
+    border: 1px solid var(--color-content-default);
+    color: var(--color-content-muted)
+}
+
 .play-on-web-button-container {
     -ms-flex-direction: column;
     flex-direction: column;
@@ -5019,6 +5116,27 @@ button.game-play-button-unplayable-lg {
     height: 36px !important
 }
 
+.sdui-play-button .icon-filled-play-large,
+.sdui-play-button .icon-regular-robux,
+.sdui-play-button .icon-filled-circle-slash {
+    vertical-align: middle
+}
+
+.sdui-play-button .icon-filled-play-large {
+    width: 34px !important;
+    height: 34px !important
+}
+
+.sdui-play-button .icon-regular-robux {
+    width: 28px !important;
+    height: 28px !important
+}
+
+.sdui-play-button .icon-filled-circle-slash {
+    width: 32px !important;
+    height: 32px !important
+}
+
 @media (max-width:543px) {
     .sdui-play-button {
         height: 27px
@@ -5069,6 +5187,21 @@ button.game-play-button-unplayable-lg {
         background-position: 0 -90px !important;
         width: 18px !important;
         height: 18px !important
+    }
+
+    .sdui-play-button .icon-filled-play-large {
+        width: 23px !important;
+        height: 23px !important
+    }
+
+    .sdui-play-button .icon-regular-robux {
+        width: 18px !important;
+        height: 18px !important
+    }
+
+    .sdui-play-button .icon-filled-circle-slash {
+        width: 16px !important;
+        height: 16px !important
     }
 }
 
@@ -5633,7 +5766,8 @@ button.download-link-underline {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M11.7142 2.56785C12.0165 1.43977 13.176 0.77031 14.3041 1.07258L20.4318 2.71451C21.5599 3.01678 22.2294 4.17631 21.9271 5.3044L20.2852 11.4321C19.9829 12.5602 18.8234 13.2297 17.6953 12.9274L11.5676 11.2855C10.4395 10.9832 9.77001 9.82369 10.0723 8.6956L11.7142 2.56785Z' fill='black'/%3E %3Cpath d='M6.83768 18.9378C7.33735 16.6394 9.37144 15 11.7236 15H20.2758C22.2895 15 24.0702 16.2016 24.8544 17.9896C22.0823 16.4893 18.9997 18.6863 18.9997 21.558V30.292C18.9997 30.4921 19.0147 30.689 19.0435 30.8816C18.1348 30.9572 17.1239 31 15.9997 31C9.18851 31 6.53782 29.4282 5.57598 28.5242C5.06195 28.0411 5.00192 27.3824 5.1067 26.9004L6.83768 18.9378Z' fill='black'/%3E %3Cpath d='M30.5172 25.0405C31.1605 25.4412 31.1605 26.4088 30.5172 26.8095L23.5048 31.1764C22.8901 31.5592 22.1202 31.1604 22.0124 30.4603C22.0041 30.4059 21.9997 30.3497 21.9997 30.292V21.558C21.9997 20.7563 22.8424 20.2611 23.5048 20.6736L30.5172 25.0405Z' fill='black'/%3E%3C/svg%3E")
 }
 
-.icon-regular-play-large {
+.icon-regular-play-large,
+.icon-filled-play-large {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M8 6.02693C8 5.24964 8.84797 4.76953 9.5145 5.16944L26.5708 15.4033C27.2182 15.7917 27.2182 16.7298 26.5708 17.1182L9.5145 27.352C8.84797 27.752 8 27.2718 8 26.4946L8 6.02693Z' fill='black'/%3E%3C/svg%3E")
 }
 
@@ -5650,6 +5784,7 @@ button.download-link-underline {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M13.8555 2.5606C15.1824 1.81313 16.8176 1.81313 18.1445 2.5606L26.8555 7.46782C28.1824 8.21534 28.9999 9.59781 29 11.0928V20.9073C29 22.4024 28.1824 23.7847 26.8555 24.5323L18.1445 29.4395L17.8926 29.5704C16.6996 30.143 15.3004 30.143 14.1074 29.5704L13.8555 29.4395L11.0176 27.8409C10.3887 27.4864 10 26.8196 10 26.0977V12.001C10.0002 10.8967 10.8957 10.0012 12 10.001L20 10.0001C21.1044 10 21.9998 10.8957 22 12.0001V19.0001C22 20.1046 21.1046 21.0001 20 21.0001H16C15.4477 21.0001 15 20.5523 15 20.0001C15.0002 19.4479 15.4478 19.0001 16 19.0001H20V12.0001L12 12.001V26.0987L14.8369 27.6973C15.5545 28.1016 16.4455 28.1016 17.1631 27.6973L25.874 22.7891C26.5863 22.3877 27 21.6636 27 20.9073V11.0928C26.9999 10.3366 26.5863 9.61234 25.874 9.21099L17.1631 4.30278C16.4456 3.89864 15.5544 3.89864 14.8369 4.30278L6.12598 9.21099C5.41372 9.61234 5.00013 10.3366 5 11.0928V20.9073C5 21.6636 5.4137 22.3877 6.12598 22.7891L6.49023 22.9942C6.80495 23.1714 7 23.5051 7 23.8663C6.99984 24.6314 6.17549 25.1128 5.50879 24.7374L5.14453 24.5323C3.81763 23.7847 3 22.4024 3 20.9073V11.0928C3.00012 9.69126 3.71827 8.38846 4.90137 7.61528L5.14453 7.46782L13.8555 2.5606Z' fill='black'/%3E%3C/svg%3E")
 }
 
+.icon-regular-robux,
 .icon-filled-robux {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M15.0762 7.29574C15.6479 6.96571 16.3521 6.96571 16.9238 7.29574L23.0762 10.8479C23.6479 11.1779 24 11.7878 24 12.4479V19.5521C24 20.2122 23.6479 20.8221 23.0762 21.1521L16.9238 24.7043C16.3521 25.0343 15.6479 25.0343 15.0762 24.7043L8.92376 21.1521C8.35214 20.8221 8 20.2122 8 19.5521V12.4479C8 11.7878 8.35214 11.1779 8.92376 10.8479L15.0762 7.29574ZM11.9998 13V19C11.9998 19.5523 12.4475 20 12.9998 20H18.9998C19.5521 20 19.9998 19.5523 19.9998 19V13C19.9998 12.4477 19.5521 12 18.9998 12H12.9998C12.4475 12 11.9998 12.4477 11.9998 13Z' fill='black'/%3E %3Cpath d='M13.8556 2.56068C15.1825 1.81311 16.8175 1.81311 18.1444 2.56068L26.8556 7.46819C28.1825 8.21577 29 9.59734 29 11.0925V20.9075C29 22.4027 28.1825 23.7842 26.8556 24.5318L18.1444 29.4393C16.8175 30.1869 15.1825 30.1869 13.8556 29.4393L5.14444 24.5318C3.81746 23.7842 3 22.4027 3 20.9075V11.0925C3 9.59734 3.81746 8.21577 5.14444 7.46819L13.8556 2.56068ZM17.1628 4.30319C16.4452 3.89894 15.5548 3.89894 14.8372 4.30319L6.12611 9.2107C5.41362 9.61209 5 10.336 5 11.0925V20.9075C5 21.664 5.41362 22.3879 6.12611 22.7893L14.8372 27.6968C15.5548 28.1011 16.4452 28.1011 17.1628 27.6968L25.8739 22.7893C26.5864 22.3879 27 21.664 27 20.9075V11.0925C27 10.336 26.5864 9.61209 25.8739 9.2107L17.1628 4.30319Z' fill='black'/%3E%3C/svg%3E")
 }

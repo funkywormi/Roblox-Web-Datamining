@@ -8,6 +8,7 @@ import { getChildSettingsPages } from "../../../../apis/slices/childPagesSlice";
 import { TChildSettingsInfo } from "../../../../../types/childrenInfoTypes";
 import SpendSettingName from "../../../../../enums/SpendSettingName";
 import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
+import ParentalControlsPageName from "../../../../../enums/parentalControls/ParentalControlsPageName";
 import PrivacySettingName from "../../../../../enums/privacy/PrivacySettingName";
 import { TSettingsPage } from "../../../../../types/commonTypes";
 import { TGetOdpChildContextResponse } from "../../../../../types/odpChildContextTypes";
@@ -38,6 +39,7 @@ export const odpSettingsPageList: TSettingsPage[] = [
   categories.ThirdPartyApplications,
   categories.Notifications,
   categories.AgeCheck,
+  categories.ActivityUpdates,
 ];
 
 export const odpSettingsSubpageGroups: Record<string, Record<string, TSettingsPage>> = {
@@ -216,7 +218,8 @@ export const getOdpSettingsPages = (
     [UserSetting.monthlySpendLimit, spendControls?.monthlyLimitVisible],
     [
       UserSetting.monthlySpendLimitNotificationType,
-      hasRemoteParent && spendControls?.notificationSettingVisible,
+      (hasRemoteParent || policy?.showRemoteOnlySettingsForAnyLinkedParent === true) &&
+        spendControls?.notificationSettingVisible,
     ],
   ];
   spendingSettings.forEach(([setting, isSettingVisible]) => {
@@ -282,6 +285,13 @@ export const getOdpSettingsPages = (
       true,
     ],
   ]);
+  // Activity updates are remote-parent only, so an ODP sees an upgrade upsell instead.
+  addPage(
+    ParentalControlsPageName.ActivityUpdates,
+    [],
+    policy?.showRemoteOnlySettingsForAnyLinkedParent === true &&
+      context.eligibleForAccountUpgradeUpsell === true,
+  );
 
   return pages;
 };

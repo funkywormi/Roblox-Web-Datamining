@@ -80,6 +80,7 @@ export type TSettingsUIPolicyBody = {
   notificationSettingsRedesignEnabled: boolean;
   selfServeAccountDeletionEnabled: boolean;
   selfServeDataAccessEnabled: boolean;
+  selfServeParentalPrivacyRequestsEnabled: boolean;
   disableAutoSettingUpdateModal: boolean;
   isAllowedExperiencesEnabled: boolean;
   shouldShowTFRestrictiveCommsCopy: boolean;
@@ -92,6 +93,7 @@ export type TSettingsUIPolicyBody = {
   canSeeChatTerminology: boolean;
   appThemesAccess: AppThemesAccess;
   onDeviceParentalControlsEnabled: boolean;
+  showRemoteOnlySettingsForAnyLinkedParent?: boolean;
 };
 
 export type TSettingsUIRequest = {

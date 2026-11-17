@@ -23,7 +23,6 @@ type TransferLimitsSectionProps = {
 };
 
 const SECURITY_SETTINGS_URL = "/my/account#!/security";
-const TRANSACTION_HISTORY_URL = "/transactions";
 const HIGHER_LIMITS_LEARN_MORE_ARTICLE_PATH = "/hc/articles/48510707796756";
 const higherLimitsLearnMoreUrl = `${environmentUrls.helpSite}${HIGHER_LIMITS_LEARN_MORE_ARTICLE_PATH}`;
 
@@ -273,26 +272,6 @@ const TransferLimitsSection = ({
           )}
         </Fragment>
       )}
-
-      <div className="container-header margin-top-large padding-top-medium">
-        <h2 className="setting-section-header">
-          {translate(translationConstants.robuxTransactions)}
-        </h2>
-      </div>
-
-      <div className="radius-large stroke-standard stroke-muted padding-x-large">
-        <a
-          href={TRANSACTION_HISTORY_URL}
-          className="settings-list-item-container margin-none padding-medium"
-        >
-          <span className="setting-name text-title-medium">
-            {translate(translationConstants.transactionHistory)}
-          </span>
-          <div className="settings-list-item-value-arrow">
-            <Icon name="icon-regular-arrow-up-right-from-square" size="Medium" />
-          </div>
-        </a>
-      </div>
     </div>
   );
 };

@@ -34,9 +34,12 @@ export type UseAnnouncementTrackingResult = {
     isReactionAdded: boolean;
     hasRichText?: boolean;
   }) => void;
-  trackAnnouncementViewed: (input: { announcementId: string }) => void;
+  trackAnnouncementViewed: (input: { announcementId: string; hasRichText?: boolean }) => void;
   trackAnnouncementClicked: (input: { announcementId: string; hasRichText?: boolean }) => void;
-  trackAnnouncementArchiveAnnouncementViewed: (input: { announcementId: string }) => void;
+  trackAnnouncementArchiveAnnouncementViewed: (input: {
+    announcementId: string;
+    hasRichText?: boolean;
+  }) => void;
   trackAnnouncementSeeMoreButtonShown: (input: { announcementId: string }) => void;
   trackAnnouncementSeeMoreButtonClick: (input: { announcementId: string }) => void;
 };
@@ -147,11 +150,12 @@ export const useAnnouncementTracking = ({
   const trackAnnouncementViewed = useCallback<
     UseAnnouncementTrackingResult['trackAnnouncementViewed']
   >(
-    ({ announcementId }) => {
+    ({ announcementId, hasRichText }) => {
       CommunityEventStream.sendEvent(
         CommunityMetric.AnnouncementViewed({
           ...common,
-          announcementId
+          announcementId,
+          ...(hasRichText !== undefined && { hasRichText })
         })
       );
     },
@@ -166,7 +170,7 @@ export const useAnnouncementTracking = ({
         CommunityMetric.AnnouncementClicked({
           ...common,
           announcementId,
-          ...(hasRichText && { hasRichText })
+          ...(hasRichText !== undefined && { hasRichText })
         })
       );
     },
@@ -176,11 +180,12 @@ export const useAnnouncementTracking = ({
   const trackAnnouncementArchiveAnnouncementViewed = useCallback<
     UseAnnouncementTrackingResult['trackAnnouncementArchiveAnnouncementViewed']
   >(
-    ({ announcementId }) => {
+    ({ announcementId, hasRichText }) => {
       CommunityEventStream.sendEvent(
         CommunityMetric.AnnouncementArchiveAnnouncementViewed({
           ...common,
-          announcementId
+          announcementId,
+          ...(hasRichText !== undefined && { hasRichText })
         })
       );
     },

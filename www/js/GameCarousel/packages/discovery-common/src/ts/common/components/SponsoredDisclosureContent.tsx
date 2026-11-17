@@ -1,6 +1,6 @@
 import { TranslateFunction } from "@rbx/core-scripts/react";
 import Intl from "@rbx/core-scripts/intl";
-import { getHelpDeskUrl } from "@rbx/core-scripts/util/url";
+import { getHelpDeskUrl } from "@rbx/www-common/help-desk";
 import { Loading } from "@rbx/core-ui";
 import { FeatureGameDetails } from "../constants/translationConstants";
 import useGameDetailsForUniverseId from "../../gameDetails/hooks/useGameDetailsForUniverseId";

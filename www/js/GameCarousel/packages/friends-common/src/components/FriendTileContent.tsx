@@ -33,55 +33,52 @@ const FriendTileContent = ({
 }): JSX.Element => {
   const showPlus = useIsPlusBadgeEnabled() && isRobloxPlus === true;
   return (
-    <div className="friend-tile-content">
+    <div className="flex flex-col gap-xsmall hover:underline">
       <AvatarHeadshot
         id={id}
         translate={translate}
         userProfileUrl={userProfileUrl}
         handleImageClick={sendClickEvent}
       />
-
       <a
         href={userProfileUrl}
         onClick={sendClickEvent}
-        className="friends-carousel-tile-labels"
         data-testid="friends-carousel-tile-labels"
+        className="flex flex-col items-center gap-xxsmall max-width-2400 text-no-wrap"
       >
-        <div className="friends-carousel-tile-label">
-          <div className="friends-carousel-tile-name">
-            <span className="friends-carousel-display-name">{displayName}</span>
-            {hasVerifiedBadge && (
-              <div className="friend-tile-verified-badge">
-                <div className="friend-tile-spacer" />
-                <VerifiedBadgeIcon
-                  size="Medium"
-                  className="verified-badge"
-                  titleText={translate(
-                    VERIFIED_BADGE_ARIA_LABEL_KEY,
-                    undefined,
-                    VERIFIED_BADGE_ARIA_LABEL,
-                  )}
-                />
-              </div>
-            )}
-            {showPlus && (
-              <DisplayNameBadges
-                isRobloxPlus
-                size="Small"
-                plusBadgeAriaLabel={translate(
-                  PLUS_BADGE_ARIA_LABEL_KEY,
+        <div className="width-full flex justify-center items-center gap-xxsmall text-title-small">
+          <span className="text-truncate-end">{displayName}</span>
+          {hasVerifiedBadge && (
+            <div className="friend-tile-verified-badge">
+              <div className="friend-tile-spacer" />
+              <VerifiedBadgeIcon
+                size="Medium"
+                className="verified-badge"
+                titleText={translate(
+                  VERIFIED_BADGE_ARIA_LABEL_KEY,
                   undefined,
-                  PLUS_BADGE_ARIA_LABEL,
+                  VERIFIED_BADGE_ARIA_LABEL,
                 )}
               />
-            )}
-          </div>
-        </div>
-        <div className="friends-carousel-tile-sublabel">
-          {userPresence != null && (
-            <div className="friends-carousel-tile-experience">{userPresence}</div>
+            </div>
+          )}
+          {showPlus && (
+            <DisplayNameBadges
+              isRobloxPlus
+              size="Small"
+              plusBadgeAriaLabel={translate(
+                PLUS_BADGE_ARIA_LABEL_KEY,
+                undefined,
+                PLUS_BADGE_ARIA_LABEL,
+              )}
+            />
           )}
         </div>
+        {userPresence != null && (
+          <div className="width-full content-muted text-label-small text-truncate-end">
+            {userPresence}
+          </div>
+        )}
       </a>
     </div>
   );

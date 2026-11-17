@@ -71,7 +71,7 @@ export const GameTilePlayButton = ({
           <HoverTilePurchaseButton
             placeId={placeId}
             clientReferralUrl={clientReferralUrl}
-            purchaseIconClassName={purchaseIconClassName ?? "icon-common-play"}
+            purchaseIconClassName={purchaseIconClassName ?? "icon icon-filled-play-large size-700"}
             buttonClassName={classNames(
               buttonClassName ?? "btn-growth-lg play-button",
               "purchase-button",
@@ -83,7 +83,7 @@ export const GameTilePlayButton = ({
         <PurchaseButton
           universeId={universeId}
           placeId={placeId}
-          iconClassName={purchaseIconClassName ?? "icon-common-play"}
+          iconClassName={purchaseIconClassName ?? "icon icon-filled-play-large size-700"}
           refetchPlayabilityStatus={refetchPlayabilityData}
           buttonClassName={buttonClassName}
           playabilityStatus={PlayabilityStatus.PurchaseRequired}

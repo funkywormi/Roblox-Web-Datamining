@@ -26,6 +26,10 @@ export type FriendRequestStart = {
 };
 
 const inFlightFriendRequestsByTargetUserId = new Map<string, Promise<FriendRequestResult>>();
+const inFlightFriendRequestAcceptancesByTargetUserId = new Map<
+  string,
+  Promise<FriendRequestResult>
+>();
 
 function normalizeResponseUserId(userId: number | string | undefined): string | undefined {
   if (typeof userId === "number" && Number.isSafeInteger(userId) && userId > 0) {
@@ -100,6 +104,21 @@ export async function sendFriendRequest(
   }
 }
 
+export async function acceptFriendRequest(targetUserId: string): Promise<FriendRequestResult> {
+  try {
+    await http.post({
+      url: `${environmentUrls.friendsApi}/v1/users/${targetUserId}/accept-friend-request`,
+      withCredentials: true,
+    });
+    return "success";
+  } catch (error) {
+    if (error != null && http.parseErrorCode(error) === 5) {
+      return "already-friends";
+    }
+    throw error;
+  }
+}
+
 export function startFriendRequest(
   targetUserId: string,
   friendshipOriginSource: string | undefined,
@@ -118,6 +137,31 @@ export function startFriendRequest(
     }
   });
   inFlightFriendRequestsByTargetUserId.set(targetUserId, requestCompletion);
+  return {
+    requestCompletion,
+    didStart: true,
+  };
+}
+
+export function startAcceptFriendRequest(targetUserId: string): {
+  requestCompletion: Promise<FriendRequestResult>;
+  didStart: boolean;
+} {
+  const inFlightFriendRequestAcceptance =
+    inFlightFriendRequestAcceptancesByTargetUserId.get(targetUserId);
+  if (inFlightFriendRequestAcceptance != null) {
+    return {
+      requestCompletion: inFlightFriendRequestAcceptance,
+      didStart: false,
+    };
+  }
+
+  const requestCompletion = acceptFriendRequest(targetUserId).finally(() => {
+    if (inFlightFriendRequestAcceptancesByTargetUserId.get(targetUserId) === requestCompletion) {
+      inFlightFriendRequestAcceptancesByTargetUserId.delete(targetUserId);
+    }
+  });
+  inFlightFriendRequestAcceptancesByTargetUserId.set(targetUserId, requestCompletion);
   return {
     requestCompletion,
     didStart: true,

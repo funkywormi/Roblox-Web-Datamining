@@ -9,6 +9,7 @@ enum ParentalControlsPageName {
   TopGames = "TopGames",
   TopGameDetails = "TopGameDetails",
   ActivityUpdates = "ActivityUpdates",
+  PrivacyRights = "PrivacyRights",
   ManageOnDeviceParent = "ManageOnDeviceParent",
 }
 

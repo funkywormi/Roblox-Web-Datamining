@@ -3,13 +3,14 @@ import type { AnalyticsContext, SduiAnalyticsReporter, SduiPageContext } from "@
 import { getLocaleFromDocument } from "@rbx/www-common/intl";
 
 const PLAYER_FRIEND_ADD_EVENT_NAME = "playerFriendAdd";
+const PLAYER_FRIEND_ACCEPT_EVENT_NAME = "playerFriendAccept";
 const DEFAULT_CONTENT_TYPE = "User";
 const DEFAULT_EVENT_CONTEXT = "playerSearch";
 
 type TelemetryFieldValue = string | number;
 type AnalyticsSnapshot = Record<string, string | number | boolean>;
 
-type ReportPlayerFriendAddOptions = {
+type ReportPlayerFriendActionOptions = {
   analyticsContext?: AnalyticsContext;
   analyticsReporter: SduiAnalyticsReporter;
   pageContext: SduiPageContext;
@@ -56,12 +57,16 @@ function stringifyTelemetryField(value: TelemetryFieldValue | undefined): string
   return value == null ? undefined : String(value);
 }
 
-export function reportPlayerFriendAdd({
-  analyticsContext,
-  analyticsReporter,
-  pageContext,
-  targetUserId,
-}: ReportPlayerFriendAddOptions): void {
+// Fields shared by the usersearch PlayerFriendAdd and PlayerFriendAccept schemas
+// (proto-schemas: production/eventstream/usersearch/player_friend_{add,accept}.proto).
+function buildPlayerFriendActionFields(
+  {
+    analyticsContext,
+    pageContext,
+    targetUserId,
+  }: Omit<ReportPlayerFriendActionOptions, "analyticsReporter">,
+  actionType: string,
+): Record<string, TelemetryFieldValue> {
   const analyticsData: AnalyticsSnapshot = analyticsContext
     ? {
         ...analyticsContext.getAncestorAnalyticsDataSnapshot(),
@@ -90,8 +95,8 @@ export function reportPlayerFriendAdd({
     readAnalyticsField(analyticsData, "contentType") ??
     toTelemetryFieldValue(collectionData?.contentType) ??
     DEFAULT_CONTENT_TYPE;
-  const fields: Record<string, TelemetryFieldValue> = {
-    actionType: "RequestFriendship",
+  return {
+    actionType,
     contentType,
     eventContext,
     interactionUuid: generateRandomUuid(),
@@ -131,13 +136,28 @@ export function reportPlayerFriendAdd({
     ),
     locale: getLocaleFromDocument(),
   };
+}
 
+function reportPlayerFriendAction(
+  eventName: string,
+  actionType: string,
+  { analyticsReporter, ...options }: ReportPlayerFriendActionOptions,
+): void {
+  const fields = buildPlayerFriendActionFields(options, actionType);
   analyticsReporter.logEvent(
     {
-      name: PLAYER_FRIEND_ADD_EVENT_NAME,
-      type: PLAYER_FRIEND_ADD_EVENT_NAME,
-      context: String(eventContext),
+      name: eventName,
+      type: eventName,
+      context: String(fields.eventContext),
     },
     fields,
   );
+}
+
+export function reportPlayerFriendAdd(options: ReportPlayerFriendActionOptions): void {
+  reportPlayerFriendAction(PLAYER_FRIEND_ADD_EVENT_NAME, "RequestFriendship", options);
+}
+
+export function reportPlayerFriendAccept(options: ReportPlayerFriendActionOptions): void {
+  reportPlayerFriendAction(PLAYER_FRIEND_ACCEPT_EVENT_NAME, "AcceptFriendship", options);
 }

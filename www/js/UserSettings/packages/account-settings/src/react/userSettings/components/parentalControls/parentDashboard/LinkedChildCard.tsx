@@ -34,11 +34,24 @@ export const LinkedChildCard = ({
   isMultiChildView?: boolean;
 }): JSX.Element => {
   const { translate } = useTranslation();
+  const showDeletionTombstone = Boolean(isMultiChildView && childInfo.isAccountDeletionRequested);
 
   const childPages = useAppSelector(selectChildPagesForChildUserId(childInfo.userId));
   const { allConsents, hasMore } = useGetAllPendingParentalConsents(childInfo?.userId);
 
   const getChildThumbnail = (): JSX.Element => {
+    if (showDeletionTombstone) {
+      return (
+        <div
+          className="linked-profile-deletion-placeholder"
+          data-testid="account-deletion-tombstone-thumbnail"
+          aria-hidden="true"
+        >
+          <span className="icon-inactive" />
+        </div>
+      );
+    }
+
     const thumbnail = (
       <Thumbnail2d
         containerClass="linked-profile-thumbnail"
@@ -53,7 +66,9 @@ export const LinkedChildCard = ({
     return thumbnail;
   };
 
-  const childAge = birthdayUtils.calculateAgeFromISO(childInfo.birthDate);
+  const childAge = showDeletionTombstone
+    ? 0
+    : birthdayUtils.calculateAgeFromISO(childInfo.birthDate);
 
   const [showNebraskaTooltip, setShowNebraskaTooltip] = useState(
     !!childInfo.shouldShowNebraskaU18Copy,
@@ -92,9 +107,13 @@ export const LinkedChildCard = ({
           </Link>
         </span>
       )}
-      <a href={getProfileUrl(childInfo?.userId)}>
+      {showDeletionTombstone ? (
         <div className="linked-profile-card-thumbnails-container">{getChildThumbnail()}</div>
-      </a>
+      ) : (
+        <a href={getProfileUrl(childInfo?.userId)}>
+          <div className="linked-profile-card-thumbnails-container">{getChildThumbnail()}</div>
+        </a>
+      )}
       <span className="card-display-name font-header-1">{childInfo?.displayName}</span>
       {childInfo.shouldShowNebraskaU18Copy ? (
         <EducationalTooltip open={showNebraskaTooltip} onOpenChange={setShowNebraskaTooltip}>
@@ -115,9 +134,17 @@ export const LinkedChildCard = ({
       ) : (
         <span className="small text">{childUsername}</span>
       )}
-      <span className="small text child-description">
-        {translate(parentalControlsTranslationConstants.ageLabel, { ageInYears: childAge })}
-      </span>
+      {showDeletionTombstone ? (
+        <span className="small text child-description">
+          {translate(
+            parentalControlsTranslationConstants.privacyRequests.deleteAccount.receivedHeading,
+          )}
+        </span>
+      ) : (
+        <span className="small text child-description">
+          {translate(parentalControlsTranslationConstants.ageLabel, { ageInYears: childAge })}
+        </span>
+      )}
     </React.Fragment>
   );
 
@@ -133,10 +160,11 @@ export const LinkedChildCard = ({
 
   const cardClassNames = classNames("linked-profile-card", {
     "section-content": isMultiChildView,
+    "linked-profile-card-deletion-requested": showDeletionTombstone,
   });
   return (
-    <div className={cardClassNames}>
-      {isMultiChildView ? (
+    <div className={cardClassNames} data-testid="linked-child-card">
+      {isMultiChildView && !showDeletionTombstone ? (
         <NavLink
           className="linked-profile-card-link"
           to={getLinkedChildDetailsPath(childInfo.userId)}
@@ -147,7 +175,7 @@ export const LinkedChildCard = ({
         childCard
       )}
 
-      {isMultiChildView && numPendingConsents > 0 && childPages && (
+      {isMultiChildView && !showDeletionTombstone && numPendingConsents > 0 && childPages && (
         <React.Fragment>
           <div className="rbx-divider" />
           {/* If there is only 1 request, go directly to that consent's detail page instead of the consent center */}

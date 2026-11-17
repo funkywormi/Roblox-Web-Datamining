@@ -115,6 +115,15 @@ export enum AcbAgeRating {
   R18 = "ACB_AGE_R18",
 }
 
+/**
+ * How a parent approves a child's Robux transfers. An absent value means Always ask.
+ * Wire values are the short names; the proto prefixes them with ROBUX_TRANSFER_APPROVAL_MODE_.
+ */
+export enum RobuxTransferApprovalMode {
+  AlwaysAsk = "AlwaysAsk",
+  TrustedFriendsAutoApproved = "TrustedFriendsAutoApproved",
+}
+
 export enum UserSetting {
   contentAgeRestriction = "contentAgeRestriction",
   phoneNumberDiscoverability = "phoneNumberDiscoverability",
@@ -166,6 +175,7 @@ export enum UserSetting {
   privatePlaytest = "privatePlaytest",
   allowIdentityVerification = "allowIdentityVerification",
   robuxTransferLimits = "robuxTransferLimits",
+  robuxTransferApprovalMode = "robuxTransferApprovalMode",
   iarcAgeRating = "iarcAgeRating",
   allowThirdPartyFriendAccess = "allowThirdPartyFriendAccess",
   whoCanSeeMyFriendsList = "whoCanSeeMyFriendsList",

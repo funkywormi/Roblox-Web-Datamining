@@ -15,6 +15,7 @@ import { TSettingsPage } from "../../../../types/commonTypes";
 import PrivacySettingName from "../../../../enums/privacy/PrivacySettingName";
 import {
   getEventParams,
+  type ChildPrivacyRequestAction,
   type ParentalControlsLandingLayout,
   type TAddParentButtons,
 } from "../../constants/eventConstants";
@@ -120,6 +121,51 @@ const parentalControlsEventService = {
     const params = getEventParams.authPageloadSettingsPControlsChild(state);
     eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
   }),
+  authPageloadSettingsPControlsPrivacyRequest: wrapEventServiceWithTryCatch(
+    (child: TChildInfo): void => {
+      const params = getEventParams.authPageloadSettingsPControlsPrivacyRequest(
+        parentalControlsChildState(child),
+      );
+      eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
+    },
+  ),
+  authButtonClickSettingsPControlsPrivacyRequest: wrapEventServiceWithTryCatch(
+    (child: TChildInfo, action: ChildPrivacyRequestAction): void => {
+      const params = getEventParams.authButtonClickSettingsPControlsPrivacyRequest(
+        parentalControlsChildState(child),
+        action,
+      );
+      eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
+    },
+  ),
+  authButtonClickSettingsPControlsPrivacyRequestConfirm: wrapEventServiceWithTryCatch(
+    (child: TChildInfo, action: ChildPrivacyRequestAction): void => {
+      const params = getEventParams.authButtonClickSettingsPControlsPrivacyRequestConfirm(
+        parentalControlsChildState(child),
+        action,
+      );
+      eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
+    },
+  ),
+  authButtonClickSettingsPControlsPrivacyRequestSuccess: wrapEventServiceWithTryCatch(
+    (child: TChildInfo, action: ChildPrivacyRequestAction): void => {
+      const params = getEventParams.authButtonClickSettingsPControlsPrivacyRequestSuccess(
+        parentalControlsChildState(child),
+        action,
+      );
+      eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
+    },
+  ),
+  authMsgShownSettingsPControlsPrivacyRequestError: wrapEventServiceWithTryCatch(
+    (child: TChildInfo, action: ChildPrivacyRequestAction, errorType: string): void => {
+      const params = getEventParams.authMsgShownSettingsPControlsPrivacyRequestError(
+        parentalControlsChildState(child),
+        action,
+        errorType,
+      );
+      eventStreamService.sendEventWithTarget(params.type, params.context, params.params);
+    },
+  ),
   authPageloadSettingsPControlsConsentCenter: wrapEventServiceWithTryCatch(
     (state: string): void => {
       const params = getEventParams.authPageloadSettingsPControlsConsentCenter(state);

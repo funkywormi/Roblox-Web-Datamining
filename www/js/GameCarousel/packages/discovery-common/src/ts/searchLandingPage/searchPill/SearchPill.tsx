@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { Chip } from "@rbx/foundation-ui";
-import { Link } from "@rbx/core-ui";
 import { getAbsoluteUrl } from "@rbx/core-scripts/util/url";
 
 type TSearchPillProps = {
@@ -16,14 +15,14 @@ const SearchPill = ({ queryText, index, onClick }: TSearchPillProps): React.JSX.
   );
 
   return (
-    <Link
-      url={searchUrl}
+    <a
+      href={searchUrl}
       onClick={() => {
         onClick(queryText, index);
       }}
     >
       <Chip text={queryText} isChecked={false} />
-    </Link>
+    </a>
   );
 };
 

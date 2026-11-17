@@ -2,18 +2,30 @@ import type { EntityData, HydrationRead, HydrationStore } from "../../types";
 import { tryGetPathFromData } from "../tryGetPathFromData";
 import { createDataCache, type DataCache } from "./core/DataCache";
 
-export interface EntityStoreOptions<E extends EntityData = EntityData> {
+/**
+ * One typed function per derived field name. Each returns that field's value.
+ * `id` is the cache key the field was read under.
+ */
+export type DerivedFieldComputers<E, Derived extends object> = {
+  [K in keyof Derived]: (entityData: E, id: string) => Derived[K];
+};
+
+export interface EntityStoreOptions<
+  E extends EntityData = EntityData,
+  Derived extends object = Record<never, never>,
+> {
   /**
    * Seed entities by id at construction. Useful for SSR handoff and tests.
    */
   initial?: Record<string, E>;
 
   /**
-   * Compute a virtual field on demand from the raw record. Called only
-   * when the field is missing on the entity, so existing fields always
-   * win. Returns `undefined` to fall through.
+   * Derived fields, keyed by field name. Each function's return type is
+   * checked against `Derived`. Called only when the field is missing on the
+   * entity, so a stored field always wins. `id` is the cache key `getField`
+   * was called with.
    */
-  derivedFieldComputer?: (fieldName: string, entityData: E) => unknown;
+  derivedFieldComputers?: DerivedFieldComputers<E, Derived>;
 }
 
 /**
@@ -30,6 +42,9 @@ export interface EntityStoreOptions<E extends EntityData = EntityData> {
  *
  * `E` (defaults to `EntityData`) lets subclasses narrow the record
  * shape so `cache`, `getEntity`, and `snapshot` are typed end-to-end.
+ * `Derived` types the return value of each derived field function. It does not
+ * type `getField`: a stored field of the same name is returned instead, and
+ * `applyUpdate` does not check stored values against `Derived`.
  * `applyUpdate` keeps the wide `HydrationStore` parameter type so the
  * subclass still satisfies the interface; incoming records are
  * runtime-guarded before being treated as `E`.
@@ -53,17 +68,21 @@ export interface EntityStoreOptions<E extends EntityData = EntityData> {
  * intentionally allowed so tests can spin up generic, ad-hoc entity stores
  * without having to subclass.
  */
-export class EntityStore<E extends EntityData = EntityData> implements HydrationStore {
+export class EntityStore<
+  E extends EntityData = EntityData,
+  Derived extends object = Record<never, never>,
+> implements HydrationStore
+{
   // Keyed by subclass constructor; values are `unknown` so subclasses
   // with different `E` share one map. `instanceof this` below is the
   // actual type guard.
   private static readonly instances = new WeakMap<object, unknown>();
 
-  // `<any>` is required: `EntityStore<E>` is invariant in `E`, so a
-  // narrowed subclass like `FavoritesStore` won't satisfy a fixed
-  // `this:`. `instanceof this` is the real guard; `T` stays typed.
+  // `<any>` is required: `EntityStore` is invariant in `E` and `Derived`, so a
+  // narrowed subclass won't satisfy a fixed `this:`. `instanceof this` is
+  // the real guard; `T` stays typed.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see comment above.
-  static getInstance<T extends EntityStore<any>, A extends unknown[]>(
+  static getInstance<T extends EntityStore<any, any>, A extends unknown[]>(
     this: new (...args: A) => T,
     ...args: A
   ): T {
@@ -86,16 +105,16 @@ export class EntityStore<E extends EntityData = EntityData> implements Hydration
    * process-scoped store.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see getInstance comment.
-  static __resetForTesting(this: new () => EntityStore<any>): void {
+  static __resetForTesting(this: new () => EntityStore<any, any>): void {
     EntityStore.instances.delete(this);
   }
 
   protected readonly cache: DataCache<E>;
-  private readonly derivedFieldComputer?: (fieldName: string, entityData: E) => unknown;
+  private readonly derivedFieldComputers?: DerivedFieldComputers<E, Derived>;
 
-  constructor(options: EntityStoreOptions<E> = {}) {
+  constructor(options: EntityStoreOptions<E, Derived> = {}) {
     this.cache = createDataCache<E>({ ttlMs: Number.POSITIVE_INFINITY });
-    this.derivedFieldComputer = options.derivedFieldComputer;
+    this.derivedFieldComputers = options.derivedFieldComputers;
     if (options.initial) {
       this.cache.replaceItems(options.initial);
     }
@@ -112,7 +131,7 @@ export class EntityStore<E extends EntityData = EntityData> implements Hydration
    * (passive `EntityStore` instances never flip to `failed` on their
    * own).
    */
-  getField(id: string, path: string[]): HydrationRead {
+  getField(id: string, path: readonly string[]): HydrationRead {
     const { item } = this.cache.getItem(id);
     const status = item.status.value;
     const entity = item.data.value;
@@ -125,7 +144,17 @@ export class EntityStore<E extends EntityData = EntityData> implements Hydration
     if (path.length !== 1) return { value: undefined, status };
     const headField = path[0];
     if (headField === undefined) return { value: undefined, status };
-    return { value: this.derivedFieldComputer?.(headField, entity), status };
+    return { value: this.readDerivedField(headField, entity, id), status };
+  }
+
+  private readDerivedField(fieldName: string, entity: E, id: string): unknown {
+    const { derivedFieldComputers } = this;
+    if (derivedFieldComputers && Object.hasOwn(derivedFieldComputers, fieldName)) {
+      // `hasOwn` proves `fieldName` is a key of this store's `Derived`.
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- see comment above.
+      return derivedFieldComputers[fieldName as keyof Derived](entity, id);
+    }
+    return undefined;
   }
 
   getEntity(id: string): HydrationRead<E> {

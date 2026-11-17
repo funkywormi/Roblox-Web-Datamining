@@ -13,7 +13,7 @@ export interface UnkeyedStoreOptions<R extends EntityData = EntityData> {
   /**
    * If provided, `clear()` re-seeds signals via `applyUpdate(reseed())`
    * instead of zeroing them. Use for process-singleton stores whose
-   * source of truth (`window.Roblox.CurrentUser`, viewport, …) outlives
+   * source of truth (user-data meta tag, viewport, …) outlives
    * any single page — without re-seeding, the cached singleton would
    * stay permanently empty after page churn until full reload.
    */

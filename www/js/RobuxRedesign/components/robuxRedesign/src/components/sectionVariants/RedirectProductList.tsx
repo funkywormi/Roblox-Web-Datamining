@@ -16,6 +16,7 @@ import { withRedirectProductItem } from "../ProductItem/WithRedirectProductItem"
 import { getSectionTrackingProps } from "../../hooks/useScrollTracking";
 import { ExpirationBadge } from "../ExpirationBadge";
 import { resolveLimitedTimeBonusDaysLeft } from "../../utils/resolveLimitedTimeBonusDaysLeft";
+import { PersonalizedRecommendationsMenu } from "../PersonalizedRecommendationsMenu";
 
 type ProductListProps = BaseSectionProps & {
   sectionBase: SectionBase;
@@ -59,7 +60,12 @@ export function RedirectProductList({ isPrimary, sectionBase, redirectOptions }:
                 : redirectOptions.titleTranslationKey,
             )}
           </SectionHeader>
-          {daysLeft.success && <ExpirationBadge daysLeft={daysLeft.value} />}
+          <div className="flex flex-row items-center gap-small">
+            {daysLeft.success && <ExpirationBadge daysLeft={daysLeft.value} />}
+            {sectionBase.showPersonalizedRecommendationsMenu && (
+              <PersonalizedRecommendationsMenu surfaceKey="Web_BuyRobux_Packages" />
+            )}
+          </div>
         </div>
         {redirectOptions.bodyTranslationKey && (
           <SectionSubHeader>

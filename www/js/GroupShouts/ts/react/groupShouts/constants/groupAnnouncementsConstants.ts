@@ -135,6 +135,8 @@ export default {
     contentMinLength: 3,
     contentMaxLength: 1000
   },
+  // Rendered size of an announcement image (matches ThumbnailAssetsSize.width930).
+  imageDisplayDimensions: '930 × 480px',
   // Vertical identifier pre-configured in the Custom Forms API; must match server-side config.
   customFormsVertical: 'fe02680f247961a1369a66f681f990ec1e4a8708a2e84871019a93a7287ae7dd'
 };

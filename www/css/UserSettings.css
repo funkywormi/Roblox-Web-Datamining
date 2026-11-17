@@ -4135,6 +4135,23 @@ input[type=button].btn-block {
     height: 64px
 }
 
+.linked-profile-deletion-placeholder {
+    background-color: #dadcdd;
+    border-radius: 50%;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    width: 64px;
+    height: 64px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.dark-theme .linked-profile-deletion-placeholder {
+    background-color: #2e3032
+}
+
 .friend-list {
     overflow: auto
 }
@@ -4370,6 +4387,10 @@ input[type=button].btn-block {
 
 .linked-profile-card .child-description {
     margin-top: 12px
+}
+
+.linked-profile-card-deletion-requested {
+    opacity: .5
 }
 
 .setting-option-pill {

@@ -1,4 +1,4 @@
-import { isIos13Ipad } from "@rbx/core-scripts/meta/device";
+import { isIos13Ipad } from "@rbx/www-common/device/client";
 import { window } from "@rbx/core-lib/browser";
 import { DeviceMeta } from "@rbx/www-common/device/types";
 import { getGameLauncher } from "@rbx/www-common/game-launch";

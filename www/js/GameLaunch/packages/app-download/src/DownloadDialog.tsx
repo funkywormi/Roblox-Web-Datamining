@@ -97,6 +97,40 @@ const useCloseWhenClientStarts = (unmount: () => void): boolean => {
   return data === undefined && !isError;
 };
 
+const WasmLinkDialog = ({
+  closeLabel,
+  title,
+  description,
+  button,
+  unmount,
+}: {
+  closeLabel: string;
+  title: string;
+  description?: string;
+  button: React.ReactNode;
+  unmount: () => void;
+}) => (
+  <Dialog
+    hasCloseAffordance
+    closeLabel={closeLabel}
+    isModal
+    open
+    size="Medium"
+    onOpenChange={unmount}
+  >
+    <DialogContent className="download-dialog">
+      <DialogBody className="flex flex-col items-center gap-xlarge">
+        <AppIcon className="size-1600" />
+        <DialogTitle className="text-heading-small padding-x-xxlarge padding-y-none text-align-x-center">
+          {title}
+        </DialogTitle>
+        {description && <p className="text-body-medium text-align-x-center">{description}</p>}
+      </DialogBody>
+      <DialogFooter className="flex">{button}</DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
+
 /**
  * The install dialog shown when a launch finds no client: download, then install steps and the
  * mobile QR code. Needs a `use-intl` provider with `downloadDialogNamespaces`.
@@ -104,10 +138,12 @@ const useCloseWhenClientStarts = (unmount: () => void): boolean => {
 const DownloadDialog = ({
   download,
   launchGame,
+  getPlayOnWeb,
   unmount,
 }: {
   download: () => Promise<void>;
   launchGame?: () => Promise<void>;
+  getPlayOnWeb?: () => (() => void) | undefined;
   unmount: () => void;
 }) => {
   const [downloaded, setDownloaded] = useState(false);
@@ -115,6 +151,87 @@ const DownloadDialog = ({
   const isLoading = useCloseWhenClientStarts(unmount);
 
   if (!downloaded) {
+    if (getPlayOnWeb) {
+      const closeLabel = translate("Action.Close");
+      if (isLoading) {
+        return (
+          <WasmLinkDialog
+            closeLabel={closeLabel}
+            title={translate(
+              "PlayOnWebModal.Label.CheckingForRoblox",
+              undefined,
+              "Checking for Roblox...",
+            )}
+            button={<Button variant="Emphasis" size="Medium" className="grow" isLoading />}
+            unmount={unmount}
+          />
+        );
+      }
+
+      const playOnWeb = getPlayOnWeb();
+      if (playOnWeb) {
+        return (
+          <WasmLinkDialog
+            closeLabel={closeLabel}
+            title={translate(
+              "PlayOnWebModal.Label.RobloxDidNotOpen",
+              undefined,
+              "Roblox didn't open?",
+            )}
+            description={translate(
+              "PlayOnWebModal.Label.PlayInBrowserInstead",
+              undefined,
+              "You can play this game in your browser instead.",
+            )}
+            button={
+              <Button
+                variant="Emphasis"
+                size="Medium"
+                className="grow"
+                onClick={() => {
+                  playOnWeb();
+                  unmount();
+                }}
+              >
+                {translate("PlayButtonText.PlayOnWeb")}
+              </Button>
+            }
+            unmount={unmount}
+          />
+        );
+      }
+
+      return (
+        <WasmLinkDialog
+          closeLabel={closeLabel}
+          title={translate("Label.RobloxExciteToDownload")}
+          button={
+            <Button
+              variant="Emphasis"
+              size="Medium"
+              className="grow"
+              // eslint-disable-next-line @typescript-eslint/no-misused-promises
+              onClick={async () => {
+                try {
+                  const resolvedDownload = resolveAppDownload();
+                  if (resolvedDownload) {
+                    sendPrimaryAppDownloadClickEvent(resolvedDownload.link.name);
+                  }
+                } catch {
+                  // ignore
+                }
+                setDownloaded(true);
+                await download();
+              }}
+            >
+              {translate("PlayOnWebModal.Action.Get", undefined, "Get")}
+            </Button>
+          }
+          unmount={unmount}
+        />
+      );
+    }
+
     const title = translate(
       isLoading ? "Label.RobloxLoadingToPlay" : "Label.RobloxExciteToDownload",
     );

@@ -26,9 +26,10 @@ const productTypeToValueMap: Record<string, string> = {
 
 type BannerProps = {
   personalizedBonus: SectionPersonalizedBonus;
+  showPersonalizedRecommendationsMenu?: boolean;
 };
 
-const Banner = ({ personalizedBonus }: BannerProps) => {
+const Banner = ({ personalizedBonus, showPersonalizedRecommendationsMenu }: BannerProps) => {
   const [bonus] = personalizedBonus.bonuses;
   if (!bonus) {
     return null;
@@ -45,14 +46,24 @@ const Banner = ({ personalizedBonus }: BannerProps) => {
       return null;
     }
 
-    return <CollectibleItemBonusBanner metadata={collectibleItemMetadata} />;
+    return (
+      <CollectibleItemBonusBanner
+        metadata={collectibleItemMetadata}
+        showPersonalizedRecommendationsMenu={showPersonalizedRecommendationsMenu}
+      />
+    );
   } else if (productType === productTypeToValueMap.PRODUCT_TYPE_GAME_PASS_PRODUCT) {
     if (!gamePassMetadata) {
       trackCounter("BonusItemMissingMetadata", { productType });
       return null;
     }
 
-    return <GamePassBonusBanner metadata={gamePassMetadata} />;
+    return (
+      <GamePassBonusBanner
+        metadata={gamePassMetadata}
+        showPersonalizedRecommendationsMenu={showPersonalizedRecommendationsMenu}
+      />
+    );
   }
 
   trackCounter("BonusItemUnsupportedType", { productType });
@@ -106,7 +117,15 @@ export function PersonalizedBonus({
           </SectionSubHeader>
         )}
       </div>
-      <SectionBody isPrimary={isPrimary} banner={<Banner personalizedBonus={personalizedBonus} />}>
+      <SectionBody
+        isPrimary={isPrimary}
+        banner={
+          <Banner
+            personalizedBonus={personalizedBonus}
+            showPersonalizedRecommendationsMenu={sectionBase.showPersonalizedRecommendationsMenu}
+          />
+        }
+      >
         <SectionBodyProductList
           onProductClick={clickHandler}
           products={sectionBase.products ?? []}

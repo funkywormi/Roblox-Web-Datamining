@@ -24,6 +24,7 @@ export type GameLaunchParams = {
   launchData?: ParamValue;
   eventId?: ParamValue;
   conversationId?: ParamValue;
+  getPlayOnWeb?: () => (() => void) | undefined;
 };
 
 const sitetestDomains = [

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import React, { forwardRef, useMemo, useRef, useState } from "react";
 import { window as browserWindow } from "@rbx/core-lib/browser";
 import {
   capCollectionItemConfigs,
@@ -142,7 +142,7 @@ export function SduiCollectionGridV2({
     onItemsPerRowChange(columnCount);
   }, [columnCount, onItemsPerRowChange]);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const ResizeObserverConstructor = browserWindow?.ResizeObserver;
     if (!isPooled || isItemHeightFromWidthApplied || !ResizeObserverConstructor) return undefined;
 
@@ -174,7 +174,7 @@ export function SduiCollectionGridV2({
     };
   }, [isItemHeightFromWidthApplied, isPooled, visibleItemConfigs]);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!isPooled || isItemHeightFromWidthApplied) {
       setRowHeight(undefined);
       return;

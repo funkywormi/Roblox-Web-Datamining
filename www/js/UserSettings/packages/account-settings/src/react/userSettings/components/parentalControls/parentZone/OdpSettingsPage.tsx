@@ -12,6 +12,7 @@ import useWrappedTranslation from "../../../hooks/useWrappedTranslation";
 import InformationalScreen from "../../../../common/components/InformationalScreen";
 import PrivacySettingName from "../../../../../enums/privacy/PrivacySettingName";
 import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
+import ParentalControlsPageName from "../../../../../enums/parentalControls/ParentalControlsPageName";
 import ChildContentRestrictionsRoutes from "../routes/ChildContentRestrictionsRoutes";
 import ChildCommunicationRoutes from "../routes/ChildCommunicationRoutes";
 import ChildSpendingRestrictionRoutes from "../routes/ChildSpendingRestrictionRoutes";
@@ -22,6 +23,7 @@ import AllowThirdPartyAppsSetting from "../../appPermissions/AllowThirdPartyApps
 import ChildNotificationSettings from "../parentDashboard/ChildNotificationSettings";
 import AgeCheck from "../parentDashboard/AgeCheck";
 import OdpBlockedUsers from "./OdpBlockedUsers";
+import OdpActivityUpdatesUpgradeItem from "./OdpActivityUpdatesUpgradeItem";
 import { TOdpSettingsPage, getOdpSettingsSubpages } from "./odpSettingsPages";
 import useManageOdpSetting from "./hooks/useManageOdpSetting";
 import useOdpSettingsAndPages from "./hooks/useOdpSettingsAndPages";
@@ -109,6 +111,8 @@ export const OdpSettingsList = ({
           showIdv={hasSetting(UserSetting.allowIdentityVerification)}
         />
       );
+    case ParentalControlsPageName.ActivityUpdates:
+      return <OdpActivityUpdatesUpgradeItem />;
     default:
       return <React.Fragment />;
   }

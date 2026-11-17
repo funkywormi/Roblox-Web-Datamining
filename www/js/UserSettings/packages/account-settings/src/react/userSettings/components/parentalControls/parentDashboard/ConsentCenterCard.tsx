@@ -21,6 +21,7 @@ import RobuxSettingName from "../../../../../enums/RobuxSettingName";
 import { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import { RobuxTransfer } from "../../../../../types/robuxTransferTypes";
 import { useAnswerConsentRequestMutation } from "../../../../apis/parentalControlsApi";
+import { useGetParentalSpendControlsQuery } from "../../../../apis/billingApi";
 import {
   ConsentAnswer,
   ParentConsentType,
@@ -91,6 +92,10 @@ const ConsentCenterCard = ({
   }, [consent, userProfiles]);
 
   const settingName = useMemo(() => getFirstSettingNameInConsentData(consent), [consent]);
+  // Spend notifications come from billing rather than child settings.
+  const { data: spendControlSettings } = useGetParentalSpendControlsQuery(consent?.childUserId, {
+    skip: settingName !== UserSetting.monthlySpendLimitNotificationType,
+  });
   const sessionId = useMemo(() => uuidService.generateRandomUuid(), []);
 
   const actionNameTranslation: string | undefined = useMemo(() => {
@@ -181,6 +186,12 @@ const ConsentCenterCard = ({
       case ParentConsentType.UpdateBirthdate:
         return birthdayUtils.formatBirthdateFromISO(child.birthDate);
       case ParentConsentType.UpdateUserSetting: {
+        if (settingName === UserSetting.monthlySpendLimitNotificationType) {
+          return getTranslatedSettingValue(
+            settingName,
+            spendControlSettings?.spendNotificationSetting,
+          );
+        }
         if (settingName) {
           const settings = { ...childSettings, ...childSettingsV2 };
           const currValue = settings[settingName as keyof typeof settings]?.currentValue;
@@ -255,6 +266,24 @@ const ConsentCenterCard = ({
           parentConsentsLegallySensitiveContent.consentCenterAllowActionConsentName,
           { actionName: `<b>${actionNameTranslation}</b>` },
         ];
+
+      case UserSetting.monthlySpendLimitNotificationType: {
+        const currentValue = getCurrentValue();
+        const proposedValue = getProposedValue();
+        if (!currentValue || !proposedValue) {
+          return [undefined, undefined];
+        }
+
+        // Update {settingName} on your child's account from {currentValue} to {proposedValue}
+        return [
+          parentConsentsLegallySensitiveContent.consentCenterUpdateSettingParentFacingWithValueConsentName,
+          {
+            settingName: `<b>${actionNameTranslation}</b>`,
+            currentValue: currentValue,
+            proposedValue: `<b>${proposedValue}</b>`,
+          },
+        ];
+      }
 
       default: {
         const currentValue = getCurrentValue();

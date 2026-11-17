@@ -128,6 +128,7 @@ export const openMarketplaceTryOnTelemetryHandler: SduiActionTelemetryHandler = 
 
   const fields = {
     source,
+    omniSearchSessionId: ctx.sessionStore.get("omniSearchSessionInfo"),
     actionType: ACTION_TYPE_NAME,
     pageContext: appPage,
     itemId: params.itemId,

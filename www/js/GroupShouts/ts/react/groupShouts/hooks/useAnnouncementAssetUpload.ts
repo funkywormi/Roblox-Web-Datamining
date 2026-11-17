@@ -36,11 +36,14 @@ export type UseAnnouncementAssetUploadResult = {
   isUploading: boolean;
   /** Translation key of the most recent upload error, or null. */
   errorKey: string | null;
-  /** Bump-key for `<FileUpload key={...}>` so a failed upload (or explicit remove) remounts. */
+  /**
+   * Bump-key for `<AnnouncementImageUpload key={...}>` so a failed upload (or explicit remove)
+   * remounts.
+   */
   resetKey: number;
-  /** Pass to `<FileUpload onChange={...} />`. */
+  /** Pass to `<AnnouncementImageUpload onChange={...} />`. */
   selectFiles: (files: FileList | File[]) => void;
-  /** Clear the composer's current image. Pair with `<FileUpload onRemove={...} />`. */
+  /** Clear the composer's current image. Pair with `<AnnouncementImageUpload onRemove={...} />`. */
   removeImage: () => void;
   /** Validation options pinned by the hook so the caller and `useFileUpload` agree. */
   validation: FileValidationOptions;

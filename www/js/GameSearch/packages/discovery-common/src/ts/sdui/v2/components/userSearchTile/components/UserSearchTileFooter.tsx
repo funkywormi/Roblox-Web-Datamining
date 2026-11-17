@@ -13,7 +13,7 @@ export function UserSearchTileFooter({
         @{username}
       </div>
       {contextText == null ? null : (
-        <div className="text-body-small content-muted text-truncate-end max-width-full">
+        <div className="text-body-small content-muted text-align-x-center text-no-wrap text-truncate-end max-width-full">
           {contextText}
         </div>
       )}

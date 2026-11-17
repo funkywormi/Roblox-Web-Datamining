@@ -1,13 +1,10 @@
 import React, { useCallback, useRef } from "react";
 import classNames from "classnames";
 import { Button } from "@rbx/foundation-ui";
-import environmentUrls from "@rbx/environment-urls";
-import { WASM_HASH_PARAM } from "@rbx/wasm-hash";
 import { useTranslations } from "@rbx/www-common/i18n";
 import playButtonConstants from "../constants/playButtonConstants";
 import { fuiButtonStyle } from "../constants/buttonWidths";
-import { getJoindata, sendPlayOnWebClickEvents } from "../utils/playButtonUtils";
-import { firePlayOnWebClickCounter } from "../utils/playOnWebTelemetryCounters";
+import { openPlayOnWeb } from "../utils/openPlayOnWeb";
 import usePlayOnWebImpression from "../hooks/usePlayOnWebImpression";
 import { PlayOnWebVariant, type TPlayOnWebVariant } from "../types/playButtonTypes";
 
@@ -15,7 +12,10 @@ const { playButtonTextTranslationMap } = playButtonConstants;
 
 export type TPlayOnWebButtonProps = {
   placeId: string;
+  rootPlaceId?: string;
   universeId: string;
+  privateServerLinkCode?: string;
+  gameInstanceId?: string;
   eventProperties?: Record<string, string | number | undefined>;
   wasmJoinId?: string;
   playOnWebVariant: Exclude<TPlayOnWebVariant, typeof PlayOnWebVariant.None>;
@@ -23,12 +23,14 @@ export type TPlayOnWebButtonProps = {
 
 const PlayOnWebButton = ({
   placeId,
+  rootPlaceId,
   universeId,
+  privateServerLinkCode,
+  gameInstanceId,
   eventProperties,
   wasmJoinId,
   playOnWebVariant,
 }: TPlayOnWebButtonProps): React.JSX.Element | null => {
-  const playOnWebUrl = `${environmentUrls.playWebsite}/games/start?placeId=${placeId}`;
   const tExperienceDetails = useTranslations("Feature.ExperienceDetails");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const isButtonRendered = Boolean(wasmJoinId);
@@ -38,37 +40,25 @@ const PlayOnWebButton = ({
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      firePlayOnWebClickCounter();
-      const joinData = getJoindata(
-        eventProperties?.launchData != null ? String(eventProperties.launchData) : undefined,
-      );
-      const { joinAttemptId, joinAttemptOrigin } = sendPlayOnWebClickEvents(
+      openPlayOnWeb({
         placeId,
+        rootPlaceId,
         universeId,
+        privateServerLinkCode,
+        gameInstanceId,
         eventProperties,
-        joinData,
-      );
-
-      const url = new URL(playOnWebUrl);
-
-      if (joinData.launchData) {
-        url.searchParams.set("launchData", joinData.launchData);
-      }
-      if (joinData.eventId) {
-        url.searchParams.set("eventId", joinData.eventId);
-      }
-      if (joinAttemptId) {
-        url.searchParams.set("joinAttemptId", joinAttemptId);
-      }
-      if (joinAttemptOrigin != null) {
-        url.searchParams.set("joinAttemptOrigin", String(joinAttemptOrigin));
-      }
-      if (wasmJoinId) {
-        url.searchParams.set(WASM_HASH_PARAM, wasmJoinId);
-      }
-      window.open(url.toString(), "_blank", "noopener");
+        wasmJoinId,
+      });
     },
-    [placeId, universeId, eventProperties, playOnWebUrl, wasmJoinId],
+    [
+      placeId,
+      rootPlaceId,
+      universeId,
+      privateServerLinkCode,
+      gameInstanceId,
+      eventProperties,
+      wasmJoinId,
+    ],
   );
 
   if (!isButtonRendered) {
@@ -98,7 +88,7 @@ const PlayOnWebButton = ({
         aria-label={isOneButton ? playOnWebText : undefined}
         onClick={handleClick}
       >
-        {isOneButton ? <span className="icon-common-play" /> : playOnWebText}
+        {isOneButton ? <span className="icon icon-filled-play-large size-700" /> : playOnWebText}
       </Button>
       <span
         data-testid="play-on-web-beta-notice"

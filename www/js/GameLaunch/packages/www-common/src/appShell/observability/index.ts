@@ -5,6 +5,8 @@ import type { RegistryInput } from "@rbx/observability-framework/schema";
  * .NET both send them. The "Frontend: AppShell" dashboard is generated from this registry.
  *
  * - `host` is `nextjs` or `dotnet`. The trackers add it, so callers don't pass it.
+ * - `page` is the internal page name for pages in `appShellPages` (./host), `other` for the rest.
+ *   The trackers add it too.
  * - `ShellStart` is sent once per page load, including Next.js pages with a custom nav (download,
  *   gift cards). Nav, chat and realtime only load with the default nav, so their counts are much
  *   lower than `ShellStart` on Next.js.
@@ -17,24 +19,24 @@ export const observabilityRegistry = {
   features: {
     page: {
       counters: [
-        { name: "ShellStart", dimensions: ["host", "auth_state"] },
+        { name: "ShellStart", dimensions: ["host", "page", "auth_state"] },
         { name: "PageHeartbeat", dimensions: ["host", "page", "beat"] },
       ],
     },
     presence: {
-      counters: [{ name: "PresenceHeartbeat", dimensions: ["host", "outcome"] }],
+      counters: [{ name: "PresenceHeartbeat", dimensions: ["host", "page", "outcome"] }],
     },
     navigation: {
-      counters: [{ name: "NavLoad", dimensions: ["host", "outcome"] }],
+      counters: [{ name: "NavLoad", dimensions: ["host", "page", "outcome"] }],
     },
     realtime: {
-      counters: [{ name: "RealtimeStart", dimensions: ["host", "outcome"] }],
+      counters: [{ name: "RealtimeStart", dimensions: ["host", "page", "outcome"] }],
     },
     chat: {
-      counters: [{ name: "ChatLoad", dimensions: ["host", "outcome"] }],
+      counters: [{ name: "ChatLoad", dimensions: ["host", "page", "outcome"] }],
     },
     gameLaunch: {
-      counters: [{ name: "GameLaunch", dimensions: ["host", "outcome"] }],
+      counters: [{ name: "GameLaunch", dimensions: ["host", "page", "outcome"] }],
     },
   },
 } as const satisfies RegistryInput;

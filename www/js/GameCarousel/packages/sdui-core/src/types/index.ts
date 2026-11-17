@@ -15,6 +15,7 @@ import {
 } from "./binding";
 import { SduiErrorReporter } from "./error";
 import { DataStatus } from "./hydration";
+import type { SduiSessionStore } from "../analytics/SduiSessionStore";
 
 // ─── Proto Enum Re-exports ───
 
@@ -357,6 +358,7 @@ export interface SduiActionContext {
   analyticsReporter: SduiAnalyticsReporter;
   errorReporter: SduiErrorReporter;
   pageContext: SduiPageContext;
+  sessionStore: SduiSessionStore;
   translate?: TranslateFunction;
 }
 
@@ -395,11 +397,12 @@ export interface SduiActionHandlerConfig {
   /**
    * Resolves an action param to a named telemetry handler at activation time.
    * An explicit `Action.telemetry_handler` takes precedence.
+   * An unregistered resolved name falls back to `telemetryHandler`, when supplied.
    */
   resolveTelemetryHandlerName?: SduiTelemetryHandlerNameResolver;
   /**
    * Per-`ActionType` custom telemetry hook. Suppressed when the
-   * explicit or resolved named-handler branch is selected.
+   * explicit named-handler branch or a registered resolved handler is selected.
    */
   telemetryHandler?: SduiActionTelemetryHandler;
   /**

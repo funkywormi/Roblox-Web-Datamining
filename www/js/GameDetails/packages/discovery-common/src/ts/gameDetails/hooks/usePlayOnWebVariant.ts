@@ -26,11 +26,15 @@ const playOnWebVariants = new Set<string>(Object.values(PlayOnWebVariant));
 const isPlayOnWebVariant = (value: string): value is TPlayOnWebVariant =>
   playOnWebVariants.has(value);
 
-export const usePlayOnWebVariant = (universeId: string, enabled = true): TPlayOnWebVariant => {
+export const usePlayOnWebVariant = (
+  universeId: string,
+  enabled = true,
+): { playOnWebVariant: TPlayOnWebVariant; isLoading: boolean } => {
   const { playabilityStatus } = usePlayabilityStatus(universeId, enabled);
   const { ixpData, isLoading } = useExperimentValues(
     layerNames[playInBrowserLayer],
     defaultValues[playInBrowserLayer],
+    { enabled },
   );
   const eligibleForPlayOnWeb =
     enabled &&
@@ -51,8 +55,13 @@ export const usePlayOnWebVariant = (universeId: string, enabled = true): TPlayOn
     }
   }, [shouldLogExposure]);
 
-  if (!eligibleForPlayOnWeb || !isPlayOnWebVariant(ixpData.PlayOnWebVariant)) {
-    return PlayOnWebVariant.None;
-  }
-  return ixpData.PlayOnWebVariant;
+  return {
+    playOnWebVariant:
+      eligibleForPlayOnWeb && isPlayOnWebVariant(ixpData.PlayOnWebVariant)
+        ? ixpData.PlayOnWebVariant
+        : PlayOnWebVariant.None,
+    // If playability status is determined to not be playable we no longer need to wait.
+    isLoading:
+      enabled && isLoading && (playabilityStatus === undefined || playabilityStatus === "Playable"),
+  };
 };

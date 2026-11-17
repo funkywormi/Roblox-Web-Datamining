@@ -102,7 +102,7 @@ function PriceTag({ amount, currencyCode, tagClassName }: TPriceTagProps): React
     tagClassName,
   });
   return (
-    <div className="d-flex-inline gap-1 justify-content-start align-items-center">
+    <div className="inline-flex items-center gap-xsmall">
       {isNegative && <span className={className}>{MINUS_SIGN}</span>}
       <span className={className}>{formattedAmount}</span>
     </div>

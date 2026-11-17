@@ -41,11 +41,14 @@ const useLaunchGameWithPlayableUxTreatment = (
   universeId: string,
   doGameLaunch: () => void,
   pageContext: TPlayButtonPageContext,
+  skipPlayabilityFetch = false,
 ): TLaunchGameWithPlayableUxTreatment => {
   const [isReconfirmModalOpen, setIsReconfirmModalOpen] = useState<boolean>(false);
 
-  const { playabilityStatus, playableUxTreatment, isFetchingPlayability } =
-    usePlayabilityStatus(universeId);
+  const { playabilityStatus, playableUxTreatment, isFetchingPlayability } = usePlayabilityStatus(
+    universeId,
+    !skipPlayabilityFetch,
+  );
 
   const sendUnlockPlayIntent = useCallback(
     (upsellName: string) => {
@@ -55,6 +58,11 @@ const useLaunchGameWithPlayableUxTreatment = (
   );
 
   const doGameLaunchWithPlayableUxTreatment = useCallback(() => {
+    if (skipPlayabilityFetch) {
+      doGameLaunch();
+      return;
+    }
+
     if (isFetchingPlayability) {
       // When we render play buttons with disableLoadingState, we intentionally want to support
       // game launch even when playability status fails or has not resolved to unblock play.
@@ -97,6 +105,7 @@ const useLaunchGameWithPlayableUxTreatment = (
     isFetchingPlayability,
     playabilityStatus,
     playableUxTreatment,
+    skipPlayabilityFetch,
     doGameLaunch,
     sendUnlockPlayIntent,
   ]);

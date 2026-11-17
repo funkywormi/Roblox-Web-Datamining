@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { useFormatter, useTranslations } from "@rbx/www-common/i18n";
 import { Button } from "@rbx/foundation-ui";
 import { SubscriptionButton } from "@rbx/subscriptions-common";
-import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
+import type { DeviceMeta } from "@rbx/www-common/device/types";
 import { window } from "@rbx/core-lib/browser";
 import { getSubscriptionProductTrackingProps } from "../../hooks/useScrollTracking";
 

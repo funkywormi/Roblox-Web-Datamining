@@ -85,6 +85,12 @@ export const getParentalControlsLandingLayout = (
 
 const ERROR_MESSAGE = "errorMessage";
 export const accountSettingsOrigin = "AccountSettings";
+export type ChildPrivacyRequestAction = "dataAccess" | "accountDeletion";
+
+const childPrivacyRequestAssociatedText: Record<ChildPrivacyRequestAction, string> = {
+  dataAccess: "Request Child Data",
+  accountDeletion: "Delete Child Account",
+};
 
 export const btnClickEvent = (btnName: string, eventName?: string): TEventParams => ({
   name: eventName || `${btnName}BtnClicked`,
@@ -132,6 +138,7 @@ const eventContext = {
   settingsPControlsCreatorCollab: "settingsPControlsCreatorCollab",
   settingsPControlsAgeCheck: "settingsPControlsAgeCheck",
   settingsPControlsGiftRobux: "settingsPControlsGiftRobux",
+  settingsPControlsPrivacyRequests: "settingsPControlsPrivacyRequests",
 };
 
 // Per-tab event data for the shell-level page load emitted when a settings tab becomes active.
@@ -1038,6 +1045,69 @@ export const getEventParams = {
     params: {
       btn: "requestAccountDataConfirmSuccess",
       associatedText: "Request Account Data",
+    },
+  }),
+  authPageloadSettingsPControlsPrivacyRequest: (state: string): TEventParams => ({
+    name: authEventNames.authPageload,
+    type: authEventNames.authPageload,
+    context: eventContext.settingsPControlsPrivacyRequests,
+    params: {
+      state,
+      associatedText: "Child Privacy Requests",
+    },
+  }),
+  authButtonClickSettingsPControlsPrivacyRequest: (
+    state: string,
+    action: ChildPrivacyRequestAction,
+  ): TEventParams => ({
+    name: authEventNames.authButtonClick,
+    type: authEventNames.authButtonClick,
+    context: eventContext.settingsPControlsPrivacyRequests,
+    params: {
+      state,
+      btn: action,
+      associatedText: childPrivacyRequestAssociatedText[action],
+    },
+  }),
+  authButtonClickSettingsPControlsPrivacyRequestConfirm: (
+    state: string,
+    action: ChildPrivacyRequestAction,
+  ): TEventParams => ({
+    name: authEventNames.authButtonClick,
+    type: authEventNames.authButtonClick,
+    context: eventContext.settingsPControlsPrivacyRequests,
+    params: {
+      state,
+      btn: `${action}Confirm`,
+      associatedText: childPrivacyRequestAssociatedText[action],
+    },
+  }),
+  authButtonClickSettingsPControlsPrivacyRequestSuccess: (
+    state: string,
+    action: ChildPrivacyRequestAction,
+  ): TEventParams => ({
+    name: authEventNames.authButtonClick,
+    type: authEventNames.authButtonClick,
+    context: eventContext.settingsPControlsPrivacyRequests,
+    params: {
+      state,
+      btn: `${action}ConfirmSuccess`,
+      associatedText: childPrivacyRequestAssociatedText[action],
+    },
+  }),
+  authMsgShownSettingsPControlsPrivacyRequestError: (
+    state: string,
+    action: ChildPrivacyRequestAction,
+    errorType: string,
+  ): TEventParams => ({
+    name: authEventNames.authMsgShown,
+    type: authEventNames.authMsgShown,
+    context: eventContext.settingsPControlsPrivacyRequests,
+    params: {
+      state,
+      field: ERROR_MESSAGE,
+      associatedText: childPrivacyRequestAssociatedText[action],
+      errorCode: errorType,
     },
   }),
   authPageloadSettingsPControlsChild: (state: string): TEventParams => {

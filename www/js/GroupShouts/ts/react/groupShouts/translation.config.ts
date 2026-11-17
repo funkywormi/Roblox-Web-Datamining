@@ -1,7 +1,7 @@
 import type { TranslationConfig } from 'react-utilities';
 
 export const groupAnnouncementsConfig: TranslationConfig = {
-  common: ['Feature.CustomForms'],
+  common: ['Feature.CustomForms', 'Feature.FileUploadComponent'],
   feature: 'Feature.Groups'
 };
 

@@ -2,11 +2,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useHistory, useLocation } from 'react-router-dom';
 import { useSystemFeedback } from 'react-style-guide';
 import { withTranslations, WithTranslationsProps } from 'react-utilities';
-import { Checkbox } from '@rbx/foundation-ui';
-import { ThumbnailAssetsSize } from 'roblox-thumbnails';
+import { Badge, Checkbox } from '@rbx/foundation-ui';
 import { groupAnnouncementsConfig } from '../translation.config';
 import TextContentEditor from '../../shared/components/content/TextContentEditor';
-import FileUpload from '../../shared/components/fileUpload/FileUpload';
 import useGuacConfig from '../../shared/hooks/useGuacConfig';
 import groupAnnouncementsConsts from '../constants/groupAnnouncementsConstants';
 import {
@@ -20,6 +18,7 @@ import { MessageContent } from '../../shared/types';
 import { hasRichTextContent } from '../../shared/utils/messageContentUtils';
 import { useCommunityProductFeatures } from '../../shared/contexts/CommunityProductFeaturesContext';
 import AnnouncementFooterControls from './AnnouncementFooterControls';
+import AnnouncementImageUpload from './AnnouncementImageUpload';
 import {
   useComposerMode,
   editorSourceFromMode,
@@ -495,6 +494,19 @@ const AnnouncementComposer: React.FC<AnnouncementComposerProps> = ({
     [saveDisabled, actions.isSaving, publishDisabled, commitPublishIntent, isEditingPublished]
   );
 
+  const renderAttachmentsSection = (card: React.ReactNode) => (
+    <section className='announcement-attachments'>
+      <div className='announcement-attachments-header'>
+        <h4 className='text-heading-small content-emphasis'>{translate('Heading.Attachments')}</h4>
+        <Badge variant='Emphasis' label={translate('Label.New')} />
+      </div>
+      <p className='text-body-medium content-default announcement-attachments-description'>
+        {translate('Description.Attachments')}
+      </p>
+      {card}
+    </section>
+  );
+
   return (
     <div className='announcement-composer' data-testid='announcement-composer'>
       <MetricsElement
@@ -511,11 +523,11 @@ const AnnouncementComposer: React.FC<AnnouncementComposerProps> = ({
         headerText={translate(
           isEditingPublished ? 'Action.EditAnnouncement' : 'Action.CreateAnnouncement'
         )}
+        headerDescription={translate('Description.CreateAnnouncement')}
         contentPlaceholder={translate('Label.WriteSomething')}
         submitText={translate(saveButtonTextKey)}
         titleLabel={translate('Label.Title')}
         contentLabel={translate('Label.Content')}
-        childLabel={translate('Label.Image')}
         defaultTitle={editorSource.title}
         titleMaxLength={groupAnnouncementsConsts.validation.titleMaxLength}
         defaultContent={defaultContentValue}
@@ -534,27 +546,30 @@ const AnnouncementComposer: React.FC<AnnouncementComposerProps> = ({
         isRichTextEnabled={features.AnnouncementsRichTextWrite}
         footerControls={composerControls}>
         <div className='announcement-composer-file-upload'>
-          <FileUpload
+          <h5 className='text-content-editor-label'>{translate('Label.Image')}</h5>
+          <AnnouncementImageUpload
             key={asset.resetKey}
-            dragFileTextKey='Label.DragImage'
             onChange={asset.selectFiles}
             onRemove={asset.removeImage}
             previewAssetId={asset.assetId}
             validation={asset.validation}
-            displayDimensions={ThumbnailAssetsSize.width930}
-            blockOnValidationError
+            displayDimensions={groupAnnouncementsConsts.imageDisplayDimensions}
             isUploading={asset.isUploading}
+            translate={translate}
           />
         </div>
         {isPollsEnabled && (
+          // PollSection renders the section itself so it can drop it, heading included, when a
+          // read-only poll is missing, still loading or failed to load.
           <PollSection
             groupId={groupId}
             vertical={groupAnnouncementsConsts.customFormsVertical}
             existingFormId={existingFormId}
-            isReadOnly={mode.kind === 'editPublished'}
+            isReadOnly={isEditingPublished}
             onPollCreated={setFormId}
             onPollRemoved={() => setFormId(null)}
             translate={translate}
+            renderContainer={renderAttachmentsSection}
           />
         )}
         {showNotificationsCheckbox && (

@@ -9,6 +9,7 @@ const HYDRATION_CONTENT_TYPE_TO_FIELD_KEY: Record<ValidHydrationContentType, str
   [HydrationContentType.EVENT]: "event",
   [HydrationContentType.SONG]: "song",
   [HydrationContentType.GAME_PASS]: "gamePass",
+  [HydrationContentType.GAME_PASS_VOTE]: "gamePassVote",
   [HydrationContentType.MEDIA_ASSET]: "mediaAsset",
   [HydrationContentType.SOCIAL_LINK]: "socialLink",
   [HydrationContentType.GAME_DEVELOPER_PRODUCT]: "gameDeveloperProduct",

@@ -6,7 +6,11 @@ import { isValidHttpUrl } from "@rbx/core-scripts/util/url";
 import environmentUrls from "@rbx/environment-urls";
 import { DefaultPlayButton, PlayabilityStatus, usePlayabilityStatus } from "@rbx/game-play-button";
 import { Loading } from "@rbx/sdui-common";
-import { findAnalyticsFieldInAncestors, type SduiRendererInjectedProps } from "@rbx/sdui-core";
+import {
+  decorateAnalyticsPayloadWithSessionData,
+  findAnalyticsFieldInAncestors,
+  type SduiRendererInjectedProps,
+} from "@rbx/sdui-core";
 import { useSduiServices } from "@rbx/sdui-core/client";
 import { getSduiEventContext } from "../utils/getSduiEventContext";
 import "./css/sduiPlayButton.css";
@@ -43,7 +47,7 @@ function SduiPlayButtonContents({
   includeRootPlaceId: boolean;
   analyticsContext?: SduiPlayButtonProps["analyticsContext"];
 }) {
-  const { pageContext } = useSduiServices();
+  const { pageContext, sessionStore } = useSduiServices();
   const { playabilityStatus, demoModeAvailable, refetchPlayabilityData } =
     usePlayabilityStatus(universeId);
   // shouldShowVpcPlayButtonUpsells is undefined while fetching the app-policy
@@ -74,13 +78,15 @@ function SduiPlayButtonContents({
   const eventProperties = useMemo(() => {
     const adFlag = findAnalyticsFieldInAncestors("adFlag", analyticsContext);
 
-    return {
+    const fields = {
       universeId,
       placeId,
       ...(includeRootPlaceId ? { rootPlaceId } : {}),
       ...(adFlag != null ? { isAd: String(adFlag) } : {}),
       playContext: pageContext.pageName,
     };
+
+    return decorateAnalyticsPayloadWithSessionData(fields, sessionStore.getSessionData());
   }, [
     analyticsContext,
     includeRootPlaceId,
@@ -88,6 +94,7 @@ function SduiPlayButtonContents({
     placeId,
     rootPlaceId,
     universeId,
+    sessionStore,
   ]);
 
   if (shouldShowVpcPlayButtonUpsells === undefined) {
@@ -108,7 +115,9 @@ function SduiPlayButtonContents({
       playabilityStatus={playabilityStatus}
       eventProperties={eventProperties}
       buttonClassName={
-        isPurchaseRequired ? "btn-economy-robux-white-lg purchase-button" : undefined
+        isPurchaseRequired
+          ? "btn-economy-robux-white-lg game-play-button-purchase-lg purchase-button"
+          : undefined
       }
       hideButtonText={!isPurchaseRequired}
       redirectPurchaseUrl={

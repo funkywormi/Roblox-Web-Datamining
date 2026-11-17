@@ -111,8 +111,11 @@ function joinMultiplayerGame(
     params = generateGameLaunchParams(params, joinAttemptId, joinAttemptOrigin);
   }
 
-  const deferred = AuthenticationChecker.restrictGuests(params).then(
-    gameLauncher.gameLaunchInterface.joinMultiplayerGame,
+  const deferred = AuthenticationChecker.restrictGuests(params).then(guestCheckedParams =>
+    gameLauncher.gameLaunchInterface.joinMultiplayerGame(
+      guestCheckedParams,
+      joinData?.getPlayOnWeb,
+    ),
   );
   return deferred;
 }
@@ -138,6 +141,7 @@ function joinGameInstance(
   joinAttemptId,
   joinAttemptOrigin,
   referredByPlayerId,
+  getPlayOnWeb,
 ) {
   let params = {
     placeId,
@@ -150,13 +154,20 @@ function joinGameInstance(
     params = generateGameLaunchParams(params, joinAttemptId, joinAttemptOrigin);
   }
 
-  const deferred = AuthenticationChecker.restrictGuests(params).then(
-    gameLauncher.gameLaunchInterface.joinGameInstance,
+  const deferred = AuthenticationChecker.restrictGuests(params).then(guestCheckedParams =>
+    gameLauncher.gameLaunchInterface.joinGameInstance(guestCheckedParams, getPlayOnWeb),
   );
   return deferred;
 }
 
-async function joinPrivateGame(placeId, accessCode, linkCode, joinAttemptId, joinAttemptOrigin) {
+async function joinPrivateGame(
+  placeId,
+  accessCode,
+  linkCode,
+  joinAttemptId,
+  joinAttemptOrigin,
+  getPlayOnWeb,
+) {
   await gameLauncher.initialized;
   let params = {
     placeId,
@@ -168,7 +179,7 @@ async function joinPrivateGame(placeId, accessCode, linkCode, joinAttemptId, joi
     params = generateGameLaunchParams(params, joinAttemptId, joinAttemptOrigin);
   }
 
-  const deferred = gameLauncher.gameLaunchInterface.joinPrivateGame(params);
+  const deferred = gameLauncher.gameLaunchInterface.joinPrivateGame(params, getPlayOnWeb);
   return deferred;
 }
 

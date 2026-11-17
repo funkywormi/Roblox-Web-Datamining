@@ -21,10 +21,12 @@ import {
  *
  * @param universeId - The universe ID of the experience
  * @param enabled - When false, skip the check and report not eligible. Defaults to true.
+ * @param skipPlayabilityFetch - Skip playability when the caller does not need it.
  */
 export const useIsEligibleForVideoPreview = (
   universeId: string,
   enabled = true,
+  skipPlayabilityFetch = false,
 ): {
   isEligibleForVideoPreview: boolean;
   isLoadingEligibility: boolean;
@@ -61,7 +63,7 @@ export const useIsEligibleForVideoPreview = (
 
   const { playabilityStatus, isPlayable, isFetchingPlayability } = usePlayabilityStatus(
     universeId,
-    enabled,
+    enabled && !skipPlayabilityFetch,
   );
 
   const isAuthenticated = Boolean(authenticatedUser()?.isAuthenticated);
@@ -114,7 +116,11 @@ export const useIsEligibleForVideoPreview = (
       };
     }
 
-    if (isFetchingPlayability) {
+    // Only the first fetch, which has no status yet, should
+    // hide the preview. Dropping eligibility on a refetch unregisters a playing tile.
+    const isInitialPlayabilityFetch =
+      isFetchingPlayability && playabilityStatus === undefined && isPlayable === undefined;
+    if (isInitialPlayabilityFetch) {
       return {
         isEligibleForVideoPreview: false,
         isLoadingEligibility: true,

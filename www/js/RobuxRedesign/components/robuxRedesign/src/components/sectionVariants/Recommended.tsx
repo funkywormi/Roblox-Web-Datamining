@@ -12,6 +12,7 @@ import {
   getRobuxProductTrackingProps,
   getSectionTrackingProps,
 } from "../../hooks/useScrollTracking";
+import { PersonalizedRecommendationsMenu } from "../PersonalizedRecommendationsMenu";
 
 type RecommendedProps = BaseSectionProps & {
   sectionBase: SectionBase;
@@ -36,7 +37,12 @@ export function Recommended({ isPrimary, sectionBase }: RecommendedProps) {
 
   return (
     <Section {...getSectionTrackingProps(sectionBase)}>
-      <SectionHeader>{translateFullKey(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
+      <div className="flex flex-row justify-between items-center self-stretch">
+        <SectionHeader>{translateFullKey(sectionBase.sectionHeaderTranslationKey)}</SectionHeader>
+        {sectionBase.showPersonalizedRecommendationsMenu && (
+          <PersonalizedRecommendationsMenu surfaceKey="Web_BuyRobux_Packages" />
+        )}
+      </div>
       <SectionBody isPrimary={isPrimary}>
         <div className="flex flex-col self-stretch medium:flex-row medium:justify-between medium:items-center">
           <div className="flex flex-col self-stretch gap-small padding-bottom-large medium:padding-bottom-none medium:self-auto">

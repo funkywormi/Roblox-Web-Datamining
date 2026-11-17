@@ -44,6 +44,7 @@ export default {
   ok: "Action.OK",
   cancel: "Action.Cancel",
   done: "Action.Done",
+  tryAgain: "Action.TryAgain",
   continue: "Action.Continue",
   submitAction: "Action.Submit",
   seeAll: "Action.SeeAll",

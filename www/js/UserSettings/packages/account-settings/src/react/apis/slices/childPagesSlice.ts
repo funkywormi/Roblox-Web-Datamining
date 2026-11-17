@@ -111,7 +111,6 @@ export const getChildSettingsPages = (linkedChildDetailsPath: string) => {
       path: `${linkedChildDetailsPath}/${SettingCategoryPageName.AgeCheck}`,
       titleTranslationKey: privacyPageTitles[SettingCategoryPageName.AgeCheck],
     },
-
     // Top-level Spend Notifications page (Spending Insights)
     [SpendSettingName.SpendNotifications]: {
       name: SpendSettingName.SpendNotifications,
@@ -124,6 +123,12 @@ export const getChildSettingsPages = (linkedChildDetailsPath: string) => {
       name: ParentalControlsPageName.ActivityUpdates,
       path: `${linkedChildDetailsPath}/${ParentalControlsPageName.ActivityUpdates}`,
       titleTranslationKey: pageTitles[ParentalControlsPageName.ActivityUpdates],
+    },
+    // Keep child-account privacy actions at the bottom of Settings you manage.
+    [ParentalControlsPageName.PrivacyRights]: {
+      name: ParentalControlsPageName.PrivacyRights,
+      path: `${linkedChildDetailsPath}/${ParentalControlsPageName.PrivacyRights}`,
+      titleTranslationKey: pageTitles[ParentalControlsPageName.PrivacyRights],
     },
   };
 

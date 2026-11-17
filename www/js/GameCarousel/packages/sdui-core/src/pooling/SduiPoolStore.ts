@@ -11,6 +11,7 @@ import type {
   NormalizedPool,
   PoolCell,
   PoolId,
+  PoolItem,
   PoolSnapshot,
   RegisteredPoolSection,
   SectionAllocation,
@@ -26,6 +27,7 @@ export interface SduiPoolStore {
   applySnapshot(snapshot: PoolSnapshot): void;
   setFallbackLayoutSource(source: CollectionLayoutSource | undefined): void;
   mountContainerMeasurement(): SduiContainerMeasurement;
+  getPoolItem(poolId: PoolId, poolIndex: number): ReadonlySignal<PoolItem | undefined>;
   getSectionPoolId(sectionId: SectionId): PoolId | undefined;
   getLayoutSourceSignal(): ReadonlySignal<CollectionLayoutSource | undefined>;
   getSectionCells(sectionId: SectionId): ReadonlySignal<readonly PoolCell[]>;
@@ -135,6 +137,7 @@ function reportPoolIssue(
 
 export function createSduiPoolStore(options: CreateSduiPoolStoreOptions): SduiPoolStore {
   const poolSignals = new Map<PoolId, Signal<NormalizedPool | undefined>>();
+  const poolItemSignals = new Map<PoolId, Map<number, ReadonlySignal<PoolItem | undefined>>>();
   const sectionSignals = new Map<SectionId, Signal<RegisteredPoolSection | undefined>>();
   const initialContainerWidth = options.fallbackLayout.screenWidth;
   const layoutSourceSignal = signal<CollectionLayoutSource | undefined>(
@@ -156,6 +159,21 @@ export function createSduiPoolStore(options: CreateSduiPoolStoreOptions): SduiPo
       poolSignals.set(poolId, poolSignal);
     }
     return poolSignal;
+  }
+
+  function getPoolItem(poolId: PoolId, poolIndex: number): ReadonlySignal<PoolItem | undefined> {
+    let itemSignals = poolItemSignals.get(poolId);
+    if (!itemSignals) {
+      itemSignals = new Map();
+      poolItemSignals.set(poolId, itemSignals);
+    }
+
+    let itemSignal = itemSignals.get(poolIndex);
+    if (!itemSignal) {
+      itemSignal = computed(() => getPoolSignal(poolId).value?.items[poolIndex]);
+      itemSignals.set(poolIndex, itemSignal);
+    }
+    return itemSignal;
   }
 
   function getSectionSignal(sectionId: SectionId): Signal<RegisteredPoolSection | undefined> {
@@ -363,6 +381,7 @@ export function createSduiPoolStore(options: CreateSduiPoolStoreOptions): SduiPo
       for (const sectionSignal of sectionSignals.values()) {
         sectionSignal.value = undefined;
       }
+      poolItemSignals.clear();
       activeMeasurement = undefined;
       layoutSourceSignal.value = undefined;
     });
@@ -390,6 +409,7 @@ export function createSduiPoolStore(options: CreateSduiPoolStoreOptions): SduiPo
       activeMeasurement = measurement;
       return measurement;
     },
+    getPoolItem,
     getSectionPoolId,
     getLayoutSourceSignal,
     getSectionCells,

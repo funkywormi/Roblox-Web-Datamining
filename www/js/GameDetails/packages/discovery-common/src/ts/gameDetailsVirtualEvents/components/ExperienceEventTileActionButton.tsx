@@ -33,7 +33,7 @@ const ExperienceEventTileActionButton = ({
         className="btn-growth-xs play-button regular-play-button"
         aria-label={getTranslationStringForKeyWithFallback(translate, "joinEvent")}
       >
-        <span className="icon-common-play" />
+        <span className="icon icon-filled-play-large size-700" />
       </button>
     );
   }

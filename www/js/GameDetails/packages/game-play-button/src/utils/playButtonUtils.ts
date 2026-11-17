@@ -12,6 +12,7 @@ import {
 import { composeQueryString } from "@rbx/core-scripts/util/url";
 import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
+import { getSignupUrl } from "@rbx/navigation/auth-links";
 import { fireEvent } from "@rbx/www-common/event-tracker";
 import {
   showAvatarVideoOptInOverlay,
@@ -28,7 +29,10 @@ import {
   type TPlayButtonPageContext,
   type TPrivatePlaytestInfo,
 } from "../types/playButtonTypes";
-import playButtonConstants, { playOnWebActionType } from "../constants/playButtonConstants";
+import playButtonConstants, {
+  playGameClickedEventContext,
+  playOnWebActionType,
+} from "../constants/playButtonConstants";
 
 export const PlaytestUnlockUpsellType = {
   AgeVerification: "AgeVerification",
@@ -66,6 +70,7 @@ function sendPlayGameClickedEvent(
   placeId: string,
   joinDataProperties: JoinDataProperties,
   actionType?: string,
+  context = playGameClickedEventContext,
 ): TEventProperties {
   const { getPlayOnWeb: _getPlayOnWeb, ...joinDataEventProperties } = joinDataProperties;
   const mergedProperties: TEventProperties = {
@@ -76,7 +81,7 @@ function sendPlayGameClickedEvent(
     ...(actionType == null ? {} : { actionType }),
   };
 
-  sendEventWithTarget("playGameClicked", "click", mergedProperties);
+  sendEventWithTarget("playGameClicked", context, mergedProperties);
 
   return mergedProperties;
 }
@@ -241,6 +246,19 @@ export const launchLogin = (
       playButtonConstants.eventStreamProperties(placeId, {}),
     );
   }
+};
+
+// Mirrors website#2241's game page check: /CreateAccount only offers sign-up for these returnUrls.
+const gamePagePathPattern = /^(\/[a-z]{2}(-[a-z]{2})?)?\/games\/[0-9]+(\/|$)/i;
+
+export const launchSignup = (placeId: string): void => {
+  sendPlayGameClickedEvent({}, placeId, {});
+  // The game page also renders on /games/start (WASM links), which isn't a game page returnUrl.
+  const gamePagePath = `/games/${placeId}`;
+  const returnLocation = gamePagePathPattern.test(window.location.pathname)
+    ? undefined
+    : { pathname: gamePagePath, search: "", href: getAbsoluteUrl(gamePagePath) };
+  window.location.assign(getSignupUrl(false, returnLocation));
 };
 
 // The global type declares this service as required, but it is only installed by the
@@ -466,6 +484,7 @@ export const sendPlayOnWebClickEvents = (
   universeId: string,
   eventProperties: TEventProperties = {},
   joinData: JoinDataProperties = {},
+  context?: string,
 ): TJoinAttemptProperties => {
   handleShareLinkEventLogging(placeId, universeId);
   const { joinAttemptId, joinAttemptOrigin } = sendPlayGameClickedEvent(
@@ -473,6 +492,7 @@ export const sendPlayOnWebClickEvents = (
     placeId,
     joinData,
     playOnWebActionType,
+    context,
   );
   if (!isJoinAttemptIdEnabled() || typeof joinAttemptId !== "string" || joinAttemptId === "") {
     return {};

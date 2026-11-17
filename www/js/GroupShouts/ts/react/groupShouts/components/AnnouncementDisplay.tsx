@@ -76,7 +76,13 @@ const AnnouncementDisplay = ({
   const history = useHistory();
   const { systemFeedbackService } = useSystemFeedback();
   const { trackReactionToggled, trackDeleteBannerShown } = useAnnouncementTracking({ groupId });
-  const announcementViewRef = useAnnouncementViewExposure(groupId, announcement.id, locationTab);
+  const announcementViewRef = useAnnouncementViewExposure(
+    groupId,
+    announcement.id,
+    locationTab,
+    'announcement',
+    hasRichText
+  );
 
   useEffect(() => {
     if (

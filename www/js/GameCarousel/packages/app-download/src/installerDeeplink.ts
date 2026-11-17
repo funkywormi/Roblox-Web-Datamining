@@ -45,10 +45,9 @@ export const getInstallerDeeplinkQueryParams = async (url: string): Promise<stri
   if (!linkId) {
     return "";
   }
-  const params = await getDownloadLinkParams({
+  const { token } = await getDownloadLinkParams({
     linkId,
     downloadSource: downloadSourceType.Installer,
   });
-  const token = params.get("token");
   return token ? `?token=${token}` : "";
 };

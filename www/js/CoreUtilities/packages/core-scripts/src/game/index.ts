@@ -8,6 +8,7 @@ import { getDeviceMeta } from "../meta/device";
 export type JoinDataProperties = {
   launchData?: string;
   eventId?: string;
+  getPlayOnWeb?: () => (() => void) | undefined;
 };
 
 export type PlayGameProperties = {
@@ -116,6 +117,7 @@ const joinGame = (
         joinAttemptId,
         currentESProperties.gamePlayIntentEventCtx,
         referredByPlayerId,
+        joinData?.getPlayOnWeb,
       );
     } else if (rootPlaceId && playerId) {
       currentESProperties.properties.playerId = playerId;
@@ -146,6 +148,7 @@ const joinGame = (
         privateServerLinkCode,
         joinAttemptId,
         currentESProperties.gamePlayIntentEventCtx,
+        joinData?.getPlayOnWeb,
       );
     } else {
       sendEventStream(currentESProperties);

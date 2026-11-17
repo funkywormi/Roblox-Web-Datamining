@@ -100,6 +100,8 @@ export const chatHelpPageUrl = "https://help.roblox.com/hc/articles/206224956";
 export const studioCollaborationHelpPageUrl = "https://help.roblox.com/hc/articles/45695280942228";
 export const trustedConnectionsHelpPageUrl = "https://help.roblox.com/hc/articles/37725513985812";
 export const rightToAccessHelpPageUrl = "https://help.roblox.com/hc/articles/40630460625556";
+export const accountDeletionHelpPageUrl =
+  "https://en.help.roblox.com/hc/en-us/articles/203313050-How-do-I-deactivate-or-delete-my-account";
 export const getForgetUserUrl = (userId: number): string =>
   `${EnvironmentUrls.apiGatewayUrl}/privacy/v1/users/${userId}/forget`;
 export const getRequestDataUrl = (userId: number): string =>

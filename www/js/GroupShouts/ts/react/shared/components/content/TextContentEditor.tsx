@@ -16,6 +16,8 @@ import useStatefulForm from '../../hooks/useStatefulForm';
 export type TextContentEditorProps = {
   hasTitle: boolean;
   headerText: string;
+  /** Optional supporting copy rendered beneath the header. */
+  headerDescription?: string;
   contentPlaceholder: string;
   submitText: string;
   submitDisabled?: boolean;
@@ -60,6 +62,7 @@ const VALIDATION_DEBOUNCE_MS = 500;
 const TextContentEditor = ({
   hasTitle,
   headerText,
+  headerDescription,
   contentPlaceholder,
   submitText,
   submitDisabled,
@@ -229,6 +232,11 @@ const TextContentEditor = ({
     <TextContentEditorContext.Provider value={contextValue}>
       <div className='text-content-editor'>
         <SectionHeader headerText={headerText} onBack={onBack} />
+        {headerDescription && (
+          <p className='text-content-editor-header-description text-body-medium content-default'>
+            {headerDescription}
+          </p>
+        )}
         {!!customControls && (
           <div className='text-content-editor-controls'>
             {customControls}

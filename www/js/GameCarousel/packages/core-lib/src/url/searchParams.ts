@@ -9,6 +9,13 @@ const newURLSearchParams = (
 /** A search parameter value. Numbers and booleans are converted with {@link String}. */
 export type SearchParamValue = string | number | boolean;
 
+/**
+ * How a search parameter key is matched by {@link UrlSearchParams} lookups. `caseSensitive` is the
+ * `URLSearchParams` behavior. `caseInsensitive` also matches keys that differ only in case (for
+ * example `get("keyword")` finds `?Keyword=x`), preferring an exact match.
+ */
+export type CaseSensitivity = "caseSensitive" | "caseInsensitive";
+
 /** The various types that can be constructed into a {@link UrlSearchParams}. */
 export type IntoSearchParams =
   | Readonly<Record<string, SearchParamValue>>
@@ -119,30 +126,68 @@ export class UrlSearchParams {
     return UrlSearchParams.fromUnique(sanitize ? sanitizeSearchParams(searchParams) : searchParams);
   }
 
+  /**
+   * Resolves {@link name} to the key actually stored. When {@link caseSensitivity} is
+   * `caseInsensitive` (the default): an exact match if present, otherwise the first key (in order) that matches
+   * case-insensitively. Otherwise, and when nothing matches, {@link name} unchanged.
+   */
+  private resolveName(name: string, caseSensitivity: CaseSensitivity): string {
+    if (caseSensitivity === "caseSensitive" || this.searchParams.has(name)) {
+      return name;
+    }
+    const lowerName = name.toLowerCase();
+    for (const key of this.searchParams.keys()) {
+      if (key.toLowerCase() === lowerName) {
+        return key;
+      }
+    }
+    return name;
+  }
+
   /** The total number of search parameter entries. */
   get size(): number {
     return this.searchParams.size;
   }
 
-  /** Returns the first search parameter value associated with {@link name}. */
-  get(name: string): string | null {
-    return this.searchParams.get(name);
+  /**
+   * Returns the first search parameter value associated with {@link name}.
+   *
+   * By default (`caseInsensitive`) the key is matched ignoring case, preferring an exact match:
+   * `get("keyword")` finds `?Keyword=x` unless `keyword` is also present. Pass `caseSensitive` for
+   * the `URLSearchParams` behavior. Stored keys keep their original casing.
+   */
+  get(name: string, caseSensitivity: CaseSensitivity = "caseInsensitive"): string | null {
+    return this.searchParams.get(this.resolveName(name, caseSensitivity));
   }
 
-  /** Returns all the search parameter values associated with {@link name}. */
-  getAll(name: string): string[] {
-    return this.searchParams.getAll(name);
+  /**
+   * Returns all the search parameter values associated with {@link name}. By default
+   * (`caseInsensitive`) this includes the values of every spelling of the key, in order.
+   */
+  getAll(name: string, caseSensitivity: CaseSensitivity = "caseInsensitive"): string[] {
+    if (caseSensitivity === "caseSensitive") {
+      return this.searchParams.getAll(name);
+    }
+    const lowerName = name.toLowerCase();
+    return [...this.searchParams.entries()]
+      .filter(([key]) => key.toLowerCase() === lowerName)
+      .map(([, value]) => value);
   }
 
   /**
    * Returns whether {@link name} is present in the search parameters. If {@link value} is provided,
    * returns whether {@link name} with that particular {@link value} is present the search parameters.
    *
-   * Numbers and booleans are compared as their {@link String} form.
+   * Key matching follows {@link caseSensitivity} like {@link get}. Numbers and booleans are
+   * compared as their {@link String} form.
    */
-  has(name: string, value?: SearchParamValue): boolean {
+  has(
+    name: string,
+    value?: SearchParamValue,
+    caseSensitivity: CaseSensitivity = "caseInsensitive",
+  ): boolean {
     return this.searchParams.has(
-      name,
+      this.resolveName(name, caseSensitivity),
       value === undefined ? undefined : toSearchParamString(value),
     );
   }
@@ -176,30 +221,61 @@ export class UrlSearchParams {
    * Makes a copy of this {@link UrlSearchParams} and sets {@link name}={@link value} as a parameter.
    *
    * If multiple search parameters already exist with the key {@link name}, then they are all
-   * removed/replaced with a single {@link name}={@link value} parameter.
+   * removed/replaced with a single {@link name}={@link value} parameter. By default
+   * (`caseInsensitive`) every spelling of the key is replaced, in the position of the first one.
    *
    * Numbers and booleans are converted with {@link String}.
    */
-  copyAndSet(name: string, value: SearchParamValue): UrlSearchParams {
-    const searchParams = newURLSearchParams(this.searchParams);
-    searchParams.set(name, toSearchParamString(value));
-    return UrlSearchParams.fromUnique(searchParams);
+  copyAndSet(
+    name: string,
+    value: SearchParamValue,
+    caseSensitivity: CaseSensitivity = "caseInsensitive",
+  ): UrlSearchParams {
+    if (caseSensitivity === "caseSensitive") {
+      const searchParams = newURLSearchParams(this.searchParams);
+      searchParams.set(name, toSearchParamString(value));
+      return UrlSearchParams.fromUnique(searchParams);
+    }
+    const lowerName = name.toLowerCase();
+    const entries: [string, string][] = [];
+    let isSet = false;
+    for (const [key, val] of this.searchParams.entries()) {
+      if (key.toLowerCase() !== lowerName) {
+        entries.push([key, val]);
+      } else if (!isSet) {
+        entries.push([name, toSearchParamString(value)]);
+        isSet = true;
+      }
+    }
+    if (!isSet) {
+      entries.push([name, toSearchParamString(value)]);
+    }
+    return UrlSearchParams.fromUnique(newURLSearchParams(entries));
   }
 
   /**
    * Makes a copy of this {@link UrlSearchParams} and deletes all parameters with the key {@link name}.
+   * By default (`caseInsensitive`), every spelling of the key is removed. Pass `caseSensitive` to
+   * remove only the exact key.
    * If {@link value} is provided, then only parameters also matching that value are removed.
    *
    * Numbers and booleans are compared as their {@link String} form.
    */
-  copyAndDelete(name: string, value?: SearchParamValue): UrlSearchParams {
+  copyAndDelete(
+    name: string,
+    value?: SearchParamValue,
+    caseSensitivity: CaseSensitivity = "caseInsensitive",
+  ): UrlSearchParams {
+    const lowerName = name.toLowerCase();
     const stringValue = value === undefined ? undefined : toSearchParamString(value);
-    if (this.searchParams.has(name, stringValue)) {
-      const searchParams = newURLSearchParams(this.searchParams);
-      searchParams.delete(name, stringValue);
-      return UrlSearchParams.fromUnique(searchParams);
+    const isDeleted = ([key, val]: [string, string]) =>
+      (caseSensitivity === "caseSensitive" ? key === name : key.toLowerCase() === lowerName) &&
+      (stringValue === undefined || val === stringValue);
+    const entries = [...this.searchParams.entries()];
+    if (!entries.some(isDeleted)) {
+      return this;
     }
-    return this;
+    return UrlSearchParams.fromUnique(newURLSearchParams(entries.filter(e => !isDeleted(e))));
   }
 
   /** Makes a copy of this {@link UrlSearchParams} and stably sorts parameters by their keys. */

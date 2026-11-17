@@ -8,7 +8,8 @@ const useAnnouncementViewExposure = <T extends HTMLElement = HTMLDivElement>(
   groupId: number,
   announcementId: string,
   locationTab: AnnouncementLocationTab = 'home',
-  viewEvent: AnnouncementViewEvent = 'announcement'
+  viewEvent: AnnouncementViewEvent = 'announcement',
+  hasRichText?: boolean
 ): RefCallback<T> => {
   const {
     trackAnnouncementViewed,
@@ -17,9 +18,15 @@ const useAnnouncementViewExposure = <T extends HTMLElement = HTMLDivElement>(
   const trackExposure = useCallback(
     () =>
       viewEvent === 'archiveAnnouncement'
-        ? trackAnnouncementArchiveAnnouncementViewed({ announcementId })
-        : trackAnnouncementViewed({ announcementId }),
-    [announcementId, trackAnnouncementArchiveAnnouncementViewed, trackAnnouncementViewed, viewEvent]
+        ? trackAnnouncementArchiveAnnouncementViewed({ announcementId, hasRichText })
+        : trackAnnouncementViewed({ announcementId, hasRichText }),
+    [
+      announcementId,
+      hasRichText,
+      trackAnnouncementArchiveAnnouncementViewed,
+      trackAnnouncementViewed,
+      viewEvent
+    ]
   );
 
   return useVisibilityExposure<T>(true, announcementId, trackExposure);

@@ -33,7 +33,7 @@ const parseBatchResponse = (response: ThumbnailBatchResponse): Map<string, Resol
     if (state === "Completed") {
       resolved.set(id, imageUrl != null ? { state, imageUrl } : { state: "Error" });
     } else {
-      resolved.set(id, { state });
+      resolved.set(id, imageUrl != null ? { state, imageUrl } : { state });
     }
   });
   return resolved;

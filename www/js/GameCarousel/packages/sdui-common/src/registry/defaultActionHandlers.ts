@@ -12,7 +12,10 @@ import {
   resolveActionSequenceHref,
   resolveActionSequenceTarget,
 } from "../actions/actionSequence";
-import { resolveCustomAnalyticsTelemetryHandlerName } from "../actions/customAnalyticsEvent";
+import {
+  customAnalyticsEventTelemetryHandler,
+  resolveCustomAnalyticsTelemetryHandlerName,
+} from "../actions/customAnalyticsEvent";
 import { loadMoreFromApiHandler } from "../actions/loadMoreFromApi";
 import { refreshFeedEntryFromApiHandler } from "../actions/refreshFeedEntryFromApi";
 
@@ -44,6 +47,8 @@ export const DEFAULT_ACTION_HANDLERS: Partial<Record<ActionType, SduiActionHandl
 
   // Currently only http(s) URLs are supported. Deeplinks should also be supported in the future.
   [ActionTypeEnum.OPEN_EXTERNAL_LINK]: {
+    // Web navigates directly: there is no leave-Roblox confirmation, so
+    // onContinue is intentionally not executed (and no `continue` event is sent).
     resolveHref: params => resolveValidHttpUrl(readParam(params, "url")),
     resolveTarget: params =>
       readParam(params, "openBehavior", "open_behavior") === OpenBehavior.Default
@@ -95,10 +100,11 @@ export const DEFAULT_ACTION_HANDLERS: Partial<Record<ActionType, SduiActionHandl
   [ActionTypeEnum.PLAY_BUTTON_CLICK]: {
     skipUnifiedLogging: true,
   },
-  // This action is itself telemetry. The event name selects a typed handler
-  // contributed by the consuming surface.
+  // This action is itself telemetry. Surface-specific typed overrides take precedence;
+  // other event names use the generic sender, matching app's CustomAnalyticsEvent.
   [ActionTypeEnum.CUSTOM_ANALYTICS_EVENT]: {
     resolveTelemetryHandlerName: resolveCustomAnalyticsTelemetryHandlerName,
+    telemetryHandler: customAnalyticsEventTelemetryHandler,
     skipUnifiedLogging: true,
   },
   [ActionTypeEnum.LOAD_MORE_FROM_API]: {

@@ -106,10 +106,15 @@ export function useTracking(): Tracking {
   );
 
   useEffect(() => {
-    if (robuxBalance !== undefined && applePayAvailability !== undefined) {
-      trackFlow(PRODUCT_PURCHASE, VIEW_SHOWN);
-    }
-  }, [robuxBalance, applePayAvailability, trackFlow, PRODUCT_PURCHASE, VIEW_SHOWN]);
+    // Only this page-view ViewShown uses fetch. Impressions and other trackFlow calls stay on the image beacon.
+    pfas.sendUserPurchaseFlowEventViaFetch({
+      triggerContext: getTriggerContext(deviceMeta, false),
+      isMidPurchaseStep: true,
+      viewName: PRODUCT_PURCHASE,
+      purchaseEventType: VIEW_SHOWN,
+      eventMetadata: contextMetadata,
+    });
+  }, [contextMetadata, deviceMeta, PRODUCT_PURCHASE, VIEW_SHOWN]);
 
   useEffect(() => {
     if (seenProducts.length > 0 || seenSections.length > 0 || seenSubscriptionProducts.length > 0) {

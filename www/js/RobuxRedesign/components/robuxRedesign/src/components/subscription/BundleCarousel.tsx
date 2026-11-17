@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import type { DeviceMeta } from "@rbx/core-scripts/meta/device";
+import type { DeviceMeta } from "@rbx/www-common/device/types";
 import { useResolvedColorMode } from "@rbx/foundation-ui";
 import { Carousel } from "@rbx/payments/components/carousel";
 

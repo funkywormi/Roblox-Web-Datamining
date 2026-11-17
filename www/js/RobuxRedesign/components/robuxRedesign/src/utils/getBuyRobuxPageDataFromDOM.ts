@@ -1,6 +1,6 @@
 import { document } from "@rbx/core-lib/browser";
 import { ROOT_ELEMENT_ID } from "../constants";
-import { trackCriticalError } from "../observability";
+import { reportNoRoot, trackCriticalError } from "../observability";
 import { BuyRobuxPageData } from "../types/buyRobuxPageData";
 
 export function getBuyRobuxPageDataFromDOM(): BuyRobuxPageData | undefined {
@@ -12,7 +12,7 @@ export function getBuyRobuxPageDataFromDOM(): BuyRobuxPageData | undefined {
   // before handing off to BuyRobuxPageContainer
   const container = document.getElementById(ROOT_ELEMENT_ID);
   if (!container) {
-    trackCriticalError("NoRoot");
+    reportNoRoot();
     return;
   }
 

@@ -44,6 +44,7 @@ export const LinkedChildDetails = ({
     child.canParentManageChildsPresetChatSetting ||
     child.canParentManageChildsPrivatePlaytestSetting ||
     child.canParentManageChildsAllowIdentityVerificationSetting ||
+    uiPolicy?.selfServeParentalPrivacyRequestsEnabled ||
     uiPolicy?.enableParentLinkActivityUpdates;
 
   const handleRobuxBalanceSectionError = React.useCallback(() => {

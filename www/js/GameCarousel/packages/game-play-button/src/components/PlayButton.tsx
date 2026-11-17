@@ -17,18 +17,23 @@ import {
 } from "../constants/buttonWidths";
 import playButtonService from "../services/playButtonService";
 import {
+  PlayOnWebVariant,
   TAppsFlyerReferralProperties,
   TPlayabilityStatus,
   TPlayabilityStatuses,
+  TPrivatePlaytestInfo,
   TShowAgeVerificationOverlayResponse,
   TUniversePlaceVoiceEnabledSettings,
   type TPlayButtonPageContext,
+  type TPlayOnWebVariant,
 } from "../types/playButtonTypes";
 import {
   getJoindata,
+  isPrivatePlaytestAvailable,
   handleShareLinkEventLogging,
   launchGame,
   launchLogin,
+  launchSignup,
   startAvatarVideoOptInOverlayFlow,
   startVerificationFlow,
   startVoiceOptInOverlayFlow,
@@ -38,6 +43,7 @@ import ParentalControlsActionNeededButton from "./ParentalControlsActionNeededBu
 import PurchaseButton from "./PurchaseButtonContainer";
 import { DemoButton } from "./DemoButton";
 import PlayOnWebButton from "./PlayOnWebButton";
+import { PlaytestButton } from "./PlaytestButton";
 import {
   getSecondaryPlayButton,
   StackedPlayButtons,
@@ -45,7 +51,9 @@ import {
 } from "./SecondaryPlayButton";
 import UnplayableButton from "./UnplayableButton";
 import useLaunchGameWithPlayableUxTreatment from "../hooks/useLaunchGameWithPlayableUxTreatment";
+import useMobileWebSignupForPlay from "../hooks/useMobileWebSignupForPlay";
 import usePurchaseProductData from "../hooks/usePurchaseProductData";
+import useWasmJoinId from "../hooks/useWasmJoinId";
 import { AgeCheckNeededButton } from "./AgeCheckNeededButton";
 import LoadingButton from "./LoadingButton";
 import "./playButton.css";
@@ -146,6 +154,11 @@ const demoPrimaryStatuses: ReadonlySet<TPlayabilityStatus> = new Set<TPlayabilit
   PlayabilityStatus.ContextualPlayabilityRegionalAvailability,
 ]);
 
+// Primary statuses Playtest may appear alongside.
+const playtestPrimaryStatuses: ReadonlySet<TPlayabilityStatus> = new Set<TPlayabilityStatus>(
+  Object.values(PlayabilityStatus).filter(status => status !== PlayabilityStatus.GuestProhibited),
+);
+
 // Primary statuses Play on Web may appear alongside.
 const playOnWebPrimaryStatuses: ReadonlySet<TPlayabilityStatus> = new Set<TPlayabilityStatus>([
   PlayabilityStatus.Playable,
@@ -164,6 +177,7 @@ export type TPlayButtonProps = {
   appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
   status: TPlayabilityStatuses["Playable"] | TPlayabilityStatuses["GuestProhibited"];
   disableLoadingState?: boolean;
+  skipPlayabilityFetch?: boolean;
   buttonText?: string | undefined;
   hideIcon?: boolean;
   analyticsCallback?: () => void;
@@ -180,10 +194,11 @@ export const PlayButton = ({
   status,
   eventProperties = EMPTY_OBJECT,
   appsFlyerReferralProperties = EMPTY_OBJECT,
-  iconClassName = "icon-common-play",
+  iconClassName = "icon icon-filled-play-large size-700",
   buttonWidth = buttonWidths.full,
-  buttonClassName = "btn-common-play-game-lg",
+  buttonClassName = "btn-common-play-game-lg game-play-button-lg",
   disableLoadingState = false,
+  skipPlayabilityFetch = false,
   buttonText = undefined,
   hideIcon = false,
   analyticsCallback = undefined,
@@ -207,8 +222,8 @@ export const PlayButton = ({
   );
 
   const { data: isVNGRedirectEnabled } = useQuery({
-    queryKey: ["getIsVNGLandingRedirectEnabled"],
-    queryFn: NavigationService.getIsVNGLandingRedirectEnabled,
+    queryKey: ["tryGetIsVNGLandingRedirectEnabled"],
+    queryFn: NavigationService.tryGetIsVNGLandingRedirectEnabled,
     retry: false,
   });
 
@@ -275,7 +290,18 @@ export const PlayButton = ({
   ]);
 
   const { doGameLaunchWithPlayableUxTreatment, playableUxTreatmentModal } =
-    useLaunchGameWithPlayableUxTreatment(universeId, doGameLaunch, pageContext);
+    useLaunchGameWithPlayableUxTreatment(
+      universeId,
+      doGameLaunch,
+      pageContext,
+      skipPlayabilityFetch,
+    );
+
+  const { isMobileWebSignupEnabled, logMobileWebSignupExposure } = useMobileWebSignupForPlay(
+    status,
+    pageContext,
+    isVNGRedirectEnabled,
+  );
 
   if (showVerification === undefined && !disableLoadingState) {
     return <LoadingButton buttonClassName={buttonClassName} buttonWidth={buttonWidth} />;
@@ -341,7 +367,12 @@ export const PlayButton = ({
               // redirct to login page
               NavigationService.navigateToLoginWithRedirect();
             } else {
-              launchLogin(placeId, appsFlyerReferralProperties);
+              logMobileWebSignupExposure();
+              if (isMobileWebSignupEnabled) {
+                launchSignup(placeId);
+              } else {
+                launchLogin(placeId, appsFlyerReferralProperties);
+              }
             }
           }
 
@@ -368,10 +399,13 @@ export type TDefaultPlayButtonProps = {
   refetchPlayabilityStatus: () => void;
   playabilityStatus: TPlayabilityStatus | undefined;
   demoModeAvailable?: boolean;
+  privatePlaytestInfo?: TPrivatePlaytestInfo;
+  creatorId?: number;
   hideButtonText?: boolean;
   eventProperties?: Record<string, number | string | undefined>;
   appsFlyerReferralProperties?: TAppsFlyerReferralProperties;
   disableLoadingState?: boolean;
+  skipPlayabilityFetch?: boolean;
   buttonClassName?: string;
   iconClassName?: string;
   purchaseIconClassName?: string;
@@ -386,7 +420,7 @@ export type TDefaultPlayButtonProps = {
     >
   >;
   pageContext: TPlayButtonPageContext;
-  playOnWebEnabled?: boolean;
+  playOnWebVariant?: TPlayOnWebVariant;
 };
 
 export const DefaultPlayButton = ({
@@ -398,10 +432,13 @@ export const DefaultPlayButton = ({
   refetchPlayabilityStatus,
   playabilityStatus,
   demoModeAvailable,
+  privatePlaytestInfo,
+  creatorId,
   hideButtonText,
   eventProperties = EMPTY_OBJECT,
   appsFlyerReferralProperties = EMPTY_OBJECT,
   disableLoadingState,
+  skipPlayabilityFetch,
   buttonClassName,
   iconClassName,
   purchaseIconClassName,
@@ -411,7 +448,7 @@ export const DefaultPlayButton = ({
   shouldShowVpcPlayButtonUpsells,
   playabilityStatusCtaOverrides,
   pageContext,
-  playOnWebEnabled,
+  playOnWebVariant = PlayOnWebVariant.None,
 }: TDefaultPlayButtonProps): React.JSX.Element => {
   // Share the purchase button's product-data loading (react-query dedupes the
   // fetch) so the secondary button is withheld until the purchase button is ready,
@@ -425,9 +462,31 @@ export const DefaultPlayButton = ({
     productDetails,
   } = usePurchaseProductData(universeId, placeId, isPurchaseStatus);
 
+  const isPlaytestAvailable = isPrivatePlaytestAvailable(privatePlaytestInfo);
+  const { wasmJoinId, isLoading: isWasmJoinIdLoading } = useWasmJoinId();
+
   // Secondary CTAs that can stack under the primary button. Each case lists the primary
   // statuses it may appear alongside; the first enabled match is shown.
   const secondaryPlayButtonCases: TSecondaryPlayButtonCase[] = [
+    {
+      isEnabled: isPlaytestAvailable,
+      primaryStatuses: playtestPrimaryStatuses,
+      render: () => (
+        <PlaytestButton
+          universeId={universeId}
+          placeId={placeId}
+          rootPlaceId={rootPlaceId}
+          creatorId={creatorId}
+          // isEnabled guarantees privatePlaytestInfo is defined when this renders.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          privatePlaytestInfo={privatePlaytestInfo!}
+          refetchPlayabilityStatus={refetchPlayabilityStatus}
+          pageContext={pageContext}
+          eventProperties={eventProperties}
+          appsFlyerReferralProperties={appsFlyerReferralProperties}
+        />
+      ),
+    },
     {
       isEnabled: Boolean(demoModeAvailable),
       primaryStatuses: demoPrimaryStatuses,
@@ -444,13 +503,18 @@ export const DefaultPlayButton = ({
       ),
     },
     {
-      isEnabled: Boolean(playOnWebEnabled),
+      isEnabled: playOnWebVariant === PlayOnWebVariant.TwoButton,
       primaryStatuses: playOnWebPrimaryStatuses,
       render: () => (
         <PlayOnWebButton
           placeId={placeId}
+          rootPlaceId={rootPlaceId}
           universeId={universeId}
+          privateServerLinkCode={privateServerLinkCode}
+          gameInstanceId={gameInstanceId}
           eventProperties={eventProperties}
+          wasmJoinId={wasmJoinId}
+          playOnWebVariant={PlayOnWebVariant.TwoButton}
         />
       ),
     },
@@ -479,6 +543,7 @@ export const DefaultPlayButton = ({
           eventProperties={eventProperties}
           appsFlyerReferralProperties={appsFlyerReferralProperties}
           disableLoadingState={disableLoadingState}
+          skipPlayabilityFetch={skipPlayabilityFetch}
           buttonClassName={buttonClassName}
           iconClassName={iconClassName}
           pageContext={pageContext}
@@ -495,6 +560,34 @@ export const DefaultPlayButton = ({
         break;
       }
 
+      // Play on Web replaces the Play button
+      if (
+        playabilityStatus === PlayabilityStatus.Playable &&
+        playOnWebVariant === PlayOnWebVariant.OneButton
+      ) {
+        if (isWasmJoinIdLoading && !disableLoadingState) {
+          primaryButton = <LoadingButton buttonClassName={buttonClassName} />;
+          isPrimaryButtonLoading = true;
+          break;
+        }
+
+        if (wasmJoinId) {
+          primaryButton = (
+            <PlayOnWebButton
+              placeId={placeId}
+              rootPlaceId={rootPlaceId}
+              universeId={universeId}
+              privateServerLinkCode={privateServerLinkCode}
+              gameInstanceId={gameInstanceId}
+              eventProperties={eventProperties}
+              wasmJoinId={wasmJoinId}
+              playOnWebVariant={PlayOnWebVariant.OneButton}
+            />
+          );
+          break;
+        }
+      }
+
       primaryButton = (
         <PlayButton
           universeId={universeId}
@@ -506,6 +599,7 @@ export const DefaultPlayButton = ({
           eventProperties={eventProperties}
           appsFlyerReferralProperties={appsFlyerReferralProperties}
           disableLoadingState={disableLoadingState}
+          skipPlayabilityFetch={skipPlayabilityFetch}
           buttonClassName={buttonClassName}
           iconClassName={iconClassName}
           pageContext={pageContext}
@@ -637,6 +731,8 @@ export const DefaultPlayButton = ({
     case PlayabilityStatus.UniverseRootPlaceIsPrivate:
     case PlayabilityStatus.InsufficientPermissionFriendsOnly:
     case PlayabilityStatus.InsufficientPermissionGroupOnly:
+    case PlayabilityStatus.InsufficientPermissionEditorsOnly:
+    case PlayabilityStatus.InsufficientPermissionPlayTestersOnly:
     case PlayabilityStatus.DeviceRestricted:
     case PlayabilityStatus.UnderReview:
     case PlayabilityStatus.AccountRestricted:
@@ -646,6 +742,7 @@ export const DefaultPlayButton = ({
     case PlayabilityStatus.ContextualPlayabilityAgeGated:
     case PlayabilityStatus.PlaceHasNoPublishedVersion:
     case PlayabilityStatus.ContextualPlayabilityUnrated:
+    case PlayabilityStatus.ContextualPlayabilityGeneral:
     case PlayabilityStatus.ContextualPlayabilityAgeGatedByDescriptor:
     case PlayabilityStatus.ContextualPlayabilityExperienceBlockedParentalControls:
     case PlayabilityStatus.ContextualPlayabilityCoreGated:

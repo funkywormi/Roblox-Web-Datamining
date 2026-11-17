@@ -3,6 +3,7 @@ import { useFullKeyTranslations, useTranslations } from "@rbx/www-common/i18n";
 import { Badge } from "@rbx/foundation-ui";
 import { CollectibleItemMetadata } from "../../types/buyRobuxPageData";
 import { BlueCheckIcon } from "../BlueCheckIcon";
+import { PersonalizedRecommendationsMenu } from "../PersonalizedRecommendationsMenu";
 
 const pacificDateFormat = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Los_Angeles",
@@ -27,9 +28,13 @@ function getDaysUntilCampaignEnd(): number {
 
 type BannerProps = {
   metadata: CollectibleItemMetadata;
+  showPersonalizedRecommendationsMenu?: boolean;
 };
 
-export function CollectibleItemBonusBanner({ metadata }: BannerProps) {
+export function CollectibleItemBonusBanner({
+  metadata,
+  showPersonalizedRecommendationsMenu,
+}: BannerProps) {
   const { translateFullKey } = useFullKeyTranslations();
   const translatePersonalizedBonus = useTranslations("Feature.PersonalizedBonus");
 
@@ -48,7 +53,7 @@ export function CollectibleItemBonusBanner({ metadata }: BannerProps) {
         alt="bonus item"
         className="min-width-2000 max-width-2000 min-height-2000 max-height-2000 medium:min-width-3000 medium:max-width-3000 medium:min-height-3000 medium:max-height-3000"
       />
-      <div className="flex flex-col gap-small medium:gap-medium self-stretch items-start justify-center">
+      <div className="flex flex-col grow-1 gap-small medium:gap-medium self-stretch items-start justify-center">
         <div className="text-title-large medium:text-heading-small content-emphasis text-wrap">
           {translateFullKey(metadata.translationKey)}
         </div>
@@ -72,6 +77,9 @@ export function CollectibleItemBonusBanner({ metadata }: BannerProps) {
           />
         </div>
       </div>
+      {showPersonalizedRecommendationsMenu && (
+        <PersonalizedRecommendationsMenu surfaceKey="Web_BuyRobux_BonusItem" className="shrink-0" />
+      )}
     </div>
   );
 }

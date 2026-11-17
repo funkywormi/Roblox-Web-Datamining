@@ -68,7 +68,12 @@ const ParentalControlsActionNeededButton = ({
 
   if (!hasError && isFetching) {
     return (
-      <LoadingButton buttonClassName={buttonClassName ?? "btn-common-play-game-action-needed-lg"} />
+      <LoadingButton
+        buttonClassName={
+          buttonClassName ??
+          "btn-common-play-game-action-needed-lg game-play-button-action-needed-lg"
+        }
+      />
     );
   }
 

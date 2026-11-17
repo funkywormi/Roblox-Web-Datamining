@@ -1,11 +1,8 @@
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { attachRelativeUrlLocale } from "@rbx/core-scripts/endpoints";
 import { game } from "@rbx/core-scripts/entity-url";
-import {
-  getUrlWithQueries,
-  getAbsoluteUrl,
-  getRelativeUrlWithQueries,
-} from "@rbx/core-scripts/util/url";
+import { getUrlWithQueries, getAbsoluteUrl } from "@rbx/core-scripts/util/url";
+import { getRelativeUrlWithQueries } from "@rbx/core-scripts/util/query-string";
 import { formatStableSeoName } from "@rbx/core-scripts/format/string";
 import { url } from "../constants/browserConstants";
 import { TSortDetailReferral, TGameDetailReferral } from "../constants/eventStreamConstants";

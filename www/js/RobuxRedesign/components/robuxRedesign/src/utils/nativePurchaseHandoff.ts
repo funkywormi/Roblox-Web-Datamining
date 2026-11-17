@@ -19,8 +19,17 @@ const NATIVE_PURCHASE_UI_SHOWN_BUCKETS = [
 
 export type NativePurchaseUiShownBucket =
   | (typeof NATIVE_PURCHASE_UI_SHOWN_BUCKETS)[number]["label"]
-  | "timeout"
-  | "superseded";
+  | "timeout";
+
+const NATIVE_PURCHASE_TAP_COUNT_BUCKETS = [
+  { max: 1, label: "1" },
+  { max: 2, label: "2" },
+  { max: 3, label: "3" },
+] as const;
+
+export type NativePurchaseTapCountBucket =
+  | (typeof NATIVE_PURCHASE_TAP_COUNT_BUCKETS)[number]["label"]
+  | "4+";
 
 type NativePurchaseContext = {
   appMinorVersion: string;
@@ -32,6 +41,11 @@ type NativePurchaseContext = {
 export function getNativePurchaseUiShownBucket(elapsedMs: number): NativePurchaseUiShownBucket {
   const bucket = NATIVE_PURCHASE_UI_SHOWN_BUCKETS.find(({ maxMs }) => elapsedMs <= maxMs);
   return bucket?.label ?? "timeout";
+}
+
+export function getNativePurchaseTapCountBucket(tapCount: number): NativePurchaseTapCountBucket {
+  const bucket = NATIVE_PURCHASE_TAP_COUNT_BUCKETS.find(({ max }) => tapCount <= max);
+  return bucket?.label ?? "4+";
 }
 
 function getNativePurchaseContext(
@@ -54,9 +68,11 @@ function trackNativePurchaseUiShown(
 ): void {
   const bucket =
     result.outcome === "shown" ? getNativePurchaseUiShownBucket(result.elapsedMs) : result.outcome;
+  const tapCount = getNativePurchaseTapCountBucket(result.tapCount);
 
   trackCounter("NativePurchaseUiShownTime", {
     bucket,
+    tapCount,
     appMinorVersion: context.appMinorVersion,
     isSub: context.isSub,
   });
@@ -70,6 +86,7 @@ function trackNativePurchaseUiShown(
       isSub: context.isSub,
       productId: context.productId,
       outcome: result.outcome,
+      tapCount: String(result.tapCount),
       ...(result.outcome === "shown" ? { elapsedMs: String(result.elapsedMs) } : {}),
     },
   });

@@ -147,6 +147,7 @@ function showDialog(gameLaunchParams, launchGame) {
             }
           }}
           launchGame={async () => await launchGame()}
+          getPlayOnWeb={gameLaunchParams?.getPlayOnWeb}
           unmount={unmount}
         />
       </QueryClientProvider>

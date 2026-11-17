@@ -3,11 +3,14 @@
 import Presence from "@rbx/presence";
 import type { AnalyticsContext, SduiResolvedAction } from "@rbx/sdui-core";
 import { useSduiTranslateWithFallback } from "@rbx/sdui-core/client";
+import type { UserId } from "@rbx/www-common/user";
 import { useFriendshipStatus } from "../../friendRequestButton/useFriendshipStatus";
 import { getContextText } from "../getContextText";
+import { getShouldDisplayUserSearchTileCta } from "../getShouldDisplayUserSearchTileCta";
 import { useFollowingStatus } from "../hooks/useFollowingStatus";
 import { useRenameFriendsPolicy } from "../hooks/useRenameFriendsPolicy";
 import { useUserSearchProfileInsights } from "../hooks/useUserSearchProfileInsights";
+import { useUserBlockStatus } from "../hooks/useUserBlockStatus";
 import { selectUserSearchContext } from "../userSearchContext";
 import { IN_GAME_PRESENCE_TYPE, ONLINE_PRESENCE_TYPES } from "../userSearchTileConstants";
 import { BaseUserSearchTile } from "./BaseUserSearchTile";
@@ -22,6 +25,7 @@ export interface AuthenticatedUserSearchTileProps {
   onActivated?: SduiResolvedAction;
   source?: string;
   targetUserId: string;
+  viewerUserId: UserId;
 }
 
 export function AuthenticatedUserSearchTile({
@@ -33,6 +37,7 @@ export function AuthenticatedUserSearchTile({
   onActivated,
   source,
   targetUserId,
+  viewerUserId,
 }: AuthenticatedUserSearchTileProps): React.JSX.Element {
   const translate = useSduiTranslateWithFallback();
   const targetUserIdNumber = Number(targetUserId);
@@ -40,6 +45,10 @@ export function AuthenticatedUserSearchTile({
   const { friendshipStatus } = useFriendshipStatus(targetUserId);
   const isFollowing = useFollowingStatus(targetUserIdNumber);
   const profileInsights = useUserSearchProfileInsights(targetUserIdNumber);
+  const isBlocked = useUserBlockStatus({
+    targetUserId: targetUserIdNumber,
+    viewerUserId,
+  });
   const renameFriendsToConnections = useRenameFriendsPolicy();
   const isInGame = presence.userPresenceType === IN_GAME_PRESENCE_TYPE;
   const userSearchContext = selectUserSearchContext({
@@ -52,6 +61,19 @@ export function AuthenticatedUserSearchTile({
     profileInsights,
     renameFriendsToConnections,
   });
+  const ctaState = {
+    friendshipStatus,
+    isBlocked,
+  };
+  const actionComponent = getShouldDisplayUserSearchTileCta(ctaState) ? (
+    <UserSearchTileAction
+      analyticsContext={analyticsContext}
+      friendshipStatus={ctaState.friendshipStatus}
+      presence={presence}
+      source={source}
+      targetUserId={targetUserId}
+    />
+  ) : undefined;
 
   return (
     <BaseUserSearchTile
@@ -62,15 +84,7 @@ export function AuthenticatedUserSearchTile({
       isOnline={ONLINE_PRESENCE_TYPES.has(presence.userPresenceType)}
       name={name}
       onActivated={onActivated}
-      actionComponent={
-        <UserSearchTileAction
-          analyticsContext={analyticsContext}
-          friendshipStatus={friendshipStatus}
-          presence={presence}
-          source={source}
-          targetUserId={targetUserId}
-        />
-      }
+      actionComponent={actionComponent}
     />
   );
 }

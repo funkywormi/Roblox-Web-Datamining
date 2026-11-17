@@ -38,6 +38,7 @@ import TopGameDetails from "../parentDashboard/TopGameDetails";
 import BlockedUsersList from "../../privacy/BlockedUsersList";
 import { useGetSettingsUiPolicyQuery } from "../../../../apis/universalAppConfigurationApi";
 import AgeCheck from "../parentDashboard/AgeCheck";
+import ChildPrivacyRequests from "../parentDashboard/ChildPrivacyRequests";
 
 // Defines routes for parents to view and manage their child's details and settings
 export const ChildRoutes = ({
@@ -52,6 +53,7 @@ export const ChildRoutes = ({
   const [childSettings] = useGetSettingsAndOptions(child.userId);
   const [settingsAndOptionsV2] = useGetSettingsAndOptionsV2(child.userId);
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
+  const showParentalPrivacyRequests = uiPolicy?.selfServeParentalPrivacyRequestsEnabled === true;
 
   const shouldDisplayScreenTime = useMemo(() => {
     return childSettings?.dailyScreenTimeLimit !== undefined;
@@ -164,6 +166,9 @@ export const ChildRoutes = ({
     if (!showAgeCheckPage) {
       delete subpages[SettingCategoryPageName.AgeCheck];
     }
+    if (!showParentalPrivacyRequests) {
+      delete subpages[ParentalControlsPageName.PrivacyRights];
+    }
     return subpages;
   }, [
     childPages,
@@ -173,6 +178,7 @@ export const ChildRoutes = ({
     childSettings,
     showChildContentRestrictions,
     showAgeCheckPage,
+    showParentalPrivacyRequests,
     uiPolicy?.enableParentLinkActivityUpdates,
   ]);
 
@@ -305,6 +311,11 @@ export const ChildRoutes = ({
       {showAgeCheckPage && (
         <Route path={filteredChildCategoryPages[SettingCategoryPageName.AgeCheck]?.path}>
           <AgeCheck child={child} showFae={showFae} showIdv={showIdv} />
+        </Route>
+      )}
+      {showParentalPrivacyRequests && (
+        <Route path={filteredChildCategoryPages[ParentalControlsPageName.PrivacyRights]?.path}>
+          <ChildPrivacyRequests child={child} />
         </Route>
       )}
     </React.Fragment>

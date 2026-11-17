@@ -66,7 +66,10 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
         privatePlaytestInfo: undefined,
       }
     : fetchedPlayability;
-  const playOnWebVariant = usePlayOnWebVariant(universeId, !isCrawler);
+  const { playOnWebVariant, isLoading: isPlayOnWebVariantLoading } = usePlayOnWebVariant(
+    universeId,
+    !isCrawler,
+  );
   const { gameDetails } = useGameDetailsForUniverseId(universeId);
   const { experienceDetailsNoticeType, shouldShowVpcPlayButtonUpsells, isFetchingPolicy } =
     useGetAppPolicyData();
@@ -159,7 +162,12 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
       ? String(referralParams[EventStreamMetadata.LaunchData])
       : undefined;
 
-  if (isFetchingPolicy || isResolvingPlaceId || isDownloadButtonExperimentLoading) {
+  if (
+    isFetchingPolicy ||
+    isResolvingPlaceId ||
+    isDownloadButtonExperimentLoading ||
+    isPlayOnWebVariantLoading
+  ) {
     return <Loading />;
   }
 

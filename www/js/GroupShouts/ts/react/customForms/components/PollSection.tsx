@@ -6,16 +6,19 @@ import {
   DialogContent,
   DialogTitle,
   DialogBody,
-  DialogFooter
+  DialogFooter,
+  Icon
 } from '@rbx/foundation-ui';
 import { PollBuilderForm, PollDisplay } from '@rbx/custom-forms';
 import type { CreateFormRequest, CustomForm } from '@rbx/custom-forms';
 import type { WithTranslationsProps } from 'react-utilities';
+import classNames from 'classnames';
 
 import useCreatePoll from '../hooks/useCreatePoll';
 import customFormsService from '../services/customFormsService';
 import { extractServerErrors } from '../utils/errorUtils';
 import queryKeys from '../utils/queryKeys';
+import AttachmentCard from '../../shared/components/AttachmentCard';
 import MetricsElement from '../../shared/components/MetricsElement';
 import CommunityEventStream from '../../shared/utils/eventStream';
 import {
@@ -31,6 +34,11 @@ export type PollSectionProps = {
   translate: WithTranslationsProps['translate'];
   existingFormId?: number;
   isReadOnly?: boolean;
+  /**
+   * Wraps the poll card (e.g. in a section with its own heading). Only called when there is a card
+   * to show, so the wrapper never renders empty around a read-only section with no poll.
+   */
+  renderContainer?: (card: React.ReactNode) => React.ReactNode;
 };
 
 const renderBody = (body: React.ReactNode) => (
@@ -48,7 +56,8 @@ const PollSection: React.FC<PollSectionProps> = ({
   onPollRemoved,
   translate,
   existingFormId,
-  isReadOnly = false
+  isReadOnly = false,
+  renderContainer
 }) => {
   const [isBuilderOpen, setBuilderOpen] = useState(false);
   const [createdForm, setCreatedForm] = useState<CustomForm | null>(null);
@@ -105,41 +114,54 @@ const PollSection: React.FC<PollSectionProps> = ({
   const showRemoveButton = !!displayForm && !isReadOnly;
   const showPlaceholder = !isReadOnly && !displayForm;
 
-  return (
+  // Read-only with no poll has nothing to show or do, so skip the empty card entirely. That covers
+  // a published announcement that never had one, and one whose poll is still loading or failed to.
+  if (isReadOnly && !displayForm) return null;
+
+  let action: React.ReactNode = null;
+  if (showPlaceholder) {
+    action = (
+      <MetricsElement metric={getPollCreationButtonClickEvent('create')}>
+        <Button
+          variant='Standard'
+          size='Medium'
+          onClick={() => setBuilderOpen(true)}
+          isDisabled={isCreatePollLoading}>
+          <span className='attachment-card-button-content'>
+            <Icon name='icon-regular-plus-large' size='Small' />
+            {translate('Action.AddPoll')}
+          </span>
+        </Button>
+      </MetricsElement>
+    );
+  } else if (showRemoveButton) {
+    action = (
+      <MetricsElement metric={getPollCreationButtonClickEvent('remove')}>
+        <Button
+          className='poll-section-remove-btn'
+          variant='Standard'
+          size='Medium'
+          onClick={handleRemove}>
+          {translate('Action.RemovePoll')}
+        </Button>
+      </MetricsElement>
+    );
+  }
+
+  const section = (
     <div className='poll-section'>
       {showPlaceholder && <MetricsElement metric={getPollCreateShownEvent()} isOneTimeEvent />}
-      <div className='poll-section-header'>
-        <h5 className='text-content-editor-label'>{translate('Heading.Poll')}</h5>
-        {showRemoveButton && (
-          <MetricsElement metric={getPollCreationButtonClickEvent('remove')}>
-            <button
-              type='button'
-              className='poll-section-remove-btn text-link'
-              onClick={handleRemove}>
-              {translate('Action.RemovePoll')}
-            </button>
-          </MetricsElement>
-        )}
-      </div>
-      <div className='poll-section-body radius-medium stroke-standard stroke-contrast-alpha'>
-        {displayForm ? (
+      <AttachmentCard
+        className={classNames('poll-section-body', showPlaceholder && 'poll-section-placeholder')}
+        media={<Icon name='icon-regular-chart-three-horizontal-bars' size='Medium' />}
+        mediaSize='Small'
+        title={translate('Heading.Poll')}
+        description={translate('Description.AnnouncementPoll')}
+        action={action}>
+        {displayForm && (
           <PollDisplay form={displayForm} hideDescription disabled translate={translate} />
-        ) : (
-          !isReadOnly && (
-            <div className='poll-section-placeholder'>
-              <MetricsElement metric={getPollCreationButtonClickEvent('create')}>
-                <Button
-                  variant='Standard'
-                  size='Medium'
-                  onClick={() => setBuilderOpen(true)}
-                  isDisabled={isCreatePollLoading}>
-                  {translate('Action.Create')}
-                </Button>
-              </MetricsElement>
-            </div>
-          )
         )}
-      </div>
+      </AttachmentCard>
       {!isReadOnly && (
         <Dialog
           open={isBuilderOpen}
@@ -169,6 +191,8 @@ const PollSection: React.FC<PollSectionProps> = ({
       )}
     </div>
   );
+
+  return <React.Fragment>{renderContainer ? renderContainer(section) : section}</React.Fragment>;
 };
 
 PollSection.displayName = 'PollSection';

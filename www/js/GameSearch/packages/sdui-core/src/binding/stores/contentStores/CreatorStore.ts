@@ -30,6 +30,6 @@ export interface CreatorData extends EntityData {
  * `createSduiServices()` request.
  *
  * No derived fields — every consumed field exists on the raw record. To add
- * one, pass `derivedFieldComputer` to `super()`.
+ * one, pass `derivedFieldComputers` to `super()`.
  */
 export class CreatorStore extends EntityStore<CreatorData> {}

@@ -21,6 +21,7 @@ export default {
     [ParentalControlsPageName.TopGames]: "Heading.TopGamesThisWeek",
     [ParentalControlsPageName.TopGameDetails]: "Heading.GameDetails",
     [ParentalControlsPageName.ActivityUpdates]: "Heading.ActivityUpdates",
+    [ParentalControlsPageName.PrivacyRights]: "Heading.PrivacyRequestAndAccountDeletion",
     [ParentalControlsPageName.ManageOnDeviceParent]: "Heading.ManagePin",
     [SettingCategoryPageName.ThirdPartyApplications]: "Label.ThirdPartyApplications",
 
@@ -278,6 +279,8 @@ export default {
     consentCenterAllowActionConsentName: "consentCenterAllowAction",
     consentCenterUpdateSettingNoValueConsentName: "consentCenterUpdateSettingNoValue",
     consentCenterUpdateSettingWithValueConsentName: "consentCenterUpdateSettingWithValue",
+    consentCenterUpdateSettingParentFacingWithValueConsentName:
+      "consentCenterUpdateSettingParentFacingWithValue",
     legallySensitiveConsentSurfaceName: "consent-center",
   },
   parentalConsents: {
@@ -321,6 +324,32 @@ export default {
   },
   settingManagement: {
     heading: "Heading.SettingsYouManage",
+  },
+  privacyRequests: {
+    description: "Description.ParentSide.PrivacyRequests",
+    descriptionAddYourEmail: "Description.ParentSide.PrivacyRequestsAddYourEmail",
+    requestData: {
+      heading: "Heading.RequestChildData",
+      description: "Description.RequestChildData",
+      action: "Action.RequestChildData",
+      confirmationHeading: "Heading.RequestChildDataConfirmation",
+      confirmationBody: "Description.RequestChildDataConfirmation",
+      receivedHeading: "Heading.RequestChildDataReceived",
+      receivedBody: "Description.RequestChildDataReceived",
+    },
+    deleteAccount: {
+      heading: "Heading.DeleteChildAccount",
+      description: "Description.DeleteChildAccount",
+      action: "Action.DeleteChildAccount",
+      confirmationHeading: "Heading.DeleteChildAccountConfirmation",
+      confirmationBody: "Description.DeleteChildAccountConfirmation",
+      receivedHeading: "Heading.DeleteChildAccountReceived",
+      receivedBody: "Description.DeleteChildAccountReceived",
+    },
+    ongoing: {
+      heading: "Heading.ChildPrivacyRequestOngoing",
+      body: "Description.ChildPrivacyRequestOngoing",
+    },
   },
   spendingInsights: {
     heading: "Heading.SpendingInsights",
@@ -422,5 +451,7 @@ export default {
   },
   activityUpdates: {
     description: "Description.ParentSide.ActivityUpdates",
+    upgradeUpsellDescription: "Description.ActivityUpdatesUpgradeUpsell",
+    upgradeUpsellAction: "Action.Create",
   },
 };

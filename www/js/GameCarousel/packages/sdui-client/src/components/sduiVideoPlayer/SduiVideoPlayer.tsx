@@ -1,6 +1,14 @@
 "use client";
 
-import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type SyntheticEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { md5 } from "js-md5";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { useTheme } from "@rbx/core-scripts/react";
@@ -15,6 +23,7 @@ import { CacheProvider, createCache, UIThemeProvider } from "@rbx/ui";
 import { type SduiRendererInjectedProps, type SduiScaleType } from "@rbx/sdui-core";
 import { SduiErrorBoundary, useClientOnlyValue, useSduiServices } from "@rbx/sdui-core/client";
 import { getVideoPlayerStyles } from "./videoPlayerStyleUtils";
+import { VideoPlaybackAutoplayContext } from "./VideoPlaybackAutoplayContext";
 import { VideoPlayerLoadingFallback } from "./VideoPlayerLoadingFallback";
 import { resolveVideoMaxQuality, VIDEO_PLAYBACK_BEHAVIOR } from "./sduiVideoPlayerConstants";
 import { SduiVideoError } from "../../telemetry/sduiVideoErrorConstants";
@@ -66,6 +75,9 @@ function SduiVideoPlayerInner({
 }: SduiVideoPlayerInnerProps) {
   const theme = useTheme();
   const { errorReporter, pageContext } = useSduiServices();
+  const playbackCallbacks = useContext(VideoPlaybackAutoplayContext);
+  const onPlaybackEnded = playbackCallbacks?.onPlaybackEnded;
+  const onPlaybackBlocked = playbackCallbacks?.onPlaybackBlocked;
   const videoRef = useRef<VideoPlayerRef | null>(null);
   const isMountedRef = useRef(true);
   const [isReady, setIsReady] = useState(false);
@@ -126,7 +138,8 @@ function SduiVideoPlayerInner({
 
   const handleFailure = useCallback(() => {
     setHasFailed(true);
-  }, []);
+    onPlaybackEnded?.();
+  }, [onPlaybackEnded]);
 
   useEffect(() => {
     if (browserCompatibility === null || browserCompatibility.isSupported) {
@@ -144,7 +157,9 @@ function SduiVideoPlayerInner({
       formatErrorDetails("BrowserUnsupported", message),
       pageContext,
     );
-  }, [browserCompatibility, errorReporter, pageContext]);
+    // No player will mount on this browser, so stop autoplay for the whole page.
+    onPlaybackBlocked?.();
+  }, [browserCompatibility, errorReporter, onPlaybackBlocked, pageContext]);
 
   const playVideo = useCallback(async () => {
     if (!isBrowserSupported) {
@@ -162,18 +177,20 @@ function SduiVideoPlayerInner({
         ),
         pageContext,
       );
+      onPlaybackEnded?.();
       return;
     }
 
     try {
       await video.play();
     } catch (error) {
-      // Parent unmount (e.g. tile hover end) tears down MediaSource while play() is in flight,
+      // Parent unmount (e.g. tile playback stop) tears down MediaSource while play() is in flight,
       // so don't report errors in this case.
       if (!isMountedRef.current) {
         return;
       }
 
+      const isBlocked = error instanceof Error && error.name === "NotAllowedError";
       const name = error instanceof Error ? error.name : "UnknownError";
       const message = error instanceof Error && error.message ? error.message : String(error);
       reportSduiVideoError(
@@ -182,11 +199,26 @@ function SduiVideoPlayerInner({
         formatErrorDetails(name, `RobloxVideoPlayer play() rejected: ${message}`),
         pageContext,
       );
+
+      // Autoplay blocked (for example Low Power Mode) applies to every tile on the page, so
+      // stop them all. Any other failure only releases this tile.
+      if (isBlocked) {
+        onPlaybackBlocked?.();
+      } else {
+        onPlaybackEnded?.();
+      }
     }
-  }, [errorReporter, isBrowserSupported, pageContext]);
+  }, [errorReporter, isBrowserSupported, onPlaybackBlocked, onPlaybackEnded, pageContext]);
 
   const shouldPlayWhenReady = playbackBehavior === VIDEO_PLAYBACK_BEHAVIOR.PlayWhenReady;
   const resolvedMaxQuality = resolveVideoMaxQuality(maxQuality);
+
+  // Without autoplay this video never starts, so release the tile's autoplay slot now.
+  useEffect(() => {
+    if (!shouldPlayWhenReady) {
+      onPlaybackEnded?.();
+    }
+  }, [onPlaybackEnded, shouldPlayWhenReady]);
 
   const handleVideoLoadEnd = useCallback(() => {
     setIsReady(true);
@@ -274,6 +306,7 @@ function SduiVideoPlayerInner({
                 enableAnalytics
                 analyticsConfig={analyticsConfig}
                 onLoadVideoEnd={handleVideoLoadEnd}
+                onEnded={onPlaybackEnded}
                 onError={handleMediaError}
                 onLoadError={handleLoadError}
                 cmcdInstanceType={cmcdInstanceType}
@@ -290,6 +323,16 @@ function SduiVideoPlayerInner({
 }
 
 export function SduiVideoPlayer(props: SduiVideoPlayerProps) {
+  const playbackCallbacks = useContext(VideoPlaybackAutoplayContext);
+  const hasVideoAssetId = Boolean(props.videoAssetId);
+
+  // No video to play, so release the tile's autoplay slot.
+  useEffect(() => {
+    if (!hasVideoAssetId) {
+      playbackCallbacks?.onPlaybackEnded();
+    }
+  }, [hasVideoAssetId, playbackCallbacks]);
+
   if (!props.videoAssetId) {
     return null;
   }

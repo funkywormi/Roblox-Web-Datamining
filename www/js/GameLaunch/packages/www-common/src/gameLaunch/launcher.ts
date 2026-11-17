@@ -113,10 +113,19 @@ export type EditGameInStudioParams = {
 };
 
 export type GameLauncher = {
-  joinMultiplayerGame: (params: MultiplayerGameParams) => Promise<void>;
+  joinMultiplayerGame: (
+    params: MultiplayerGameParams,
+    getPlayOnWeb?: () => (() => void) | undefined,
+  ) => Promise<void>;
   followPlayerIntoGame: (params: FollowPlayerParams) => Promise<void>;
-  joinGameInstance: (params: GameInstanceParams) => Promise<void>;
-  joinPrivateGame: (params: PrivateGameParams) => Promise<void>;
+  joinGameInstance: (
+    params: GameInstanceParams,
+    getPlayOnWeb?: () => (() => void) | undefined,
+  ) => Promise<void>;
+  joinPrivateGame: (
+    params: PrivateGameParams,
+    getPlayOnWeb?: () => (() => void) | undefined,
+  ) => Promise<void>;
   playTogetherGame: (params: PlayTogetherGameParams) => Promise<void>;
   openStudio: () => Promise<void>;
   editGameInStudio: (params: EditGameInStudioParams) => Promise<void>;
@@ -276,7 +285,7 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
   };
 
   return {
-    joinMultiplayerGame: params =>
+    joinMultiplayerGame: (params, getPlayOnWeb) =>
       restrictGuests(() =>
         joinInApp(
           {
@@ -292,6 +301,7 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
               isPlayTogetherGame: params.isPlayTogetherGame === true,
               launchData: params.launchData,
               eventId: params.eventId,
+              getPlayOnWeb,
             }),
         ),
       ),
@@ -303,7 +313,7 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
           }),
         ),
       ),
-    joinGameInstance: params =>
+    joinGameInstance: (params, getPlayOnWeb) =>
       restrictGuests(() =>
         joinInApp(
           {
@@ -318,11 +328,12 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
               otherParams: { placelauncherurl: placeLauncherUrl("RequestGameJob", params) },
               placeId: params.placeId,
               isPlayTogetherGame: params.isPlayTogetherGame === true,
+              getPlayOnWeb,
             }),
         ),
       ),
     // .NET's app interface drops linkCode; it's passed here so share links can reach a private server.
-    joinPrivateGame: params =>
+    joinPrivateGame: (params, getPlayOnWeb) =>
       joinInApp(
         {
           requestType: "RequestPrivateGame",
@@ -335,6 +346,7 @@ export const createGameLauncher = (host: GameLaunchHost): GameLauncher => {
           startGame({
             otherParams: { placelauncherurl: placeLauncherUrl("RequestPrivateGame", params) },
             placeId: params.placeId,
+            getPlayOnWeb,
           }),
       ),
     // The apps have no play-together mode; .NET sends a simple game with the conversation.
