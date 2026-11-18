@@ -48,12 +48,9 @@ function inventoryService($q, $filter, inventoryConstants, assetsConstants, asse
 
       return $q
         .when(
-          loadMyPrivateServersPage({
-            cursor: pagingParameters.cursor,
-            v2Enabled: isMyPrivateServersTab && pagingParameters.privateServersV2Enabled === true,
-            fetchV1,
-            fetchV2
-          })
+          isMyPrivateServersTab
+            ? loadMyPrivateServersPage(fetchV2, pagingParameters.cursor)
+            : fetchV1(pagingParameters.cursor)
         )
         .then(function (page) {
           const { items } = page;

@@ -45,7 +45,7 @@
     "Action.Next": "Next",
     "Description.SendCodeContactMethodConfirmation": "We'll send a 6-digit verification code to the contact method you provided if it's associated with a Roblox account.",
     "Action.SendCode": "Send me a code",
-    "Label.EmailPhone": "Email/Phone",
+    "Label.EmailPhone": "Email or phone number",
     "Label.EnterCode": "Enter the code",
     "Label.SixDigitCode": "6-digit code",
     "Label.ResendCodeTimer": "Resend code in {timeLeft}s",

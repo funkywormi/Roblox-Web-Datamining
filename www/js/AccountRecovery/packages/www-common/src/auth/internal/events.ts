@@ -1,6 +1,6 @@
 import environmentUrls from "@rbx/environment-urls";
 import { Configuration, Tracker } from "@rbx/event-stream";
-import type { BatGenerationErrorInfo } from "./types";
+import type { BatGenerationErrorInfo, SaiGenerationErrorInfo } from "./types";
 
 // Sampling constant.
 export const ONE_MILLION = 1_000_000;
@@ -18,7 +18,7 @@ const getTracker = (): Tracker => {
 };
 
 // Both .NET and Next.js send through @rbx/event-stream. Unlike .NET's EventStream global this omits
-// the page's session/guest IDs, which aren't needed for these BAT signals.
+// the page's session/guest IDs, which aren't needed for these HBA signals.
 const sendHbaEvent = (eventName: string, additionalProperties: EventProperties): void => {
   if (typeof window === "undefined") {
     return;
@@ -48,4 +48,12 @@ export const sendBATMissingEvent = (
   if (shouldSampleEvent) {
     sendHbaEvent("batMissing", { field: url, kind: errorInfo.kind, messageRaw: errorInfo.message });
   }
+};
+
+export const sendSAISuccessEvent = (): void => {
+  sendHbaEvent("saiCreated", {});
+};
+
+export const sendSAIMissingEvent = (errorInfo: SaiGenerationErrorInfo): void => {
+  sendHbaEvent("saiMissing", { messageRaw: errorInfo.message });
 };

@@ -1,7 +1,3 @@
-.\!relative {
-    position: relative !important
-}
-
 .inset-\[0\] {
     top: 0;
     bottom: 0;
@@ -61,6 +57,10 @@
 
 .opacity-\[0\.5\] {
     opacity: .5
+}
+
+.icon-regular-check {
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M23.7071 10.2929C24.0976 10.6834 24.0976 11.3166 23.7071 11.7071L13.7071 21.7071C13.3166 22.0976 12.6834 22.0976 12.2929 21.7071L8.29289 17.7071C7.90237 17.3166 7.90237 16.6834 8.29289 16.2929C8.68342 15.9024 9.31658 15.9024 9.70711 16.2929L13 19.5858L22.2929 10.2929C22.6834 9.90237 23.3166 9.90237 23.7071 10.2929Z' fill='black'/%3E%3C/svg%3E")
 }
 
 .icon-filled-circle-check {
@@ -124,26 +124,7 @@
     font-family: text-security-disc !important
 }
 
-.input-field.recovery-input {
-    height: 48px
-}
-
-.input-field.recovery-input .input-row {
-    background-color: transparent;
-    -ms-flex-direction: row;
-    flex-direction: row;
-    -ms-flex-pack: start;
-    justify-content: flex-start;
-    -ms-flex-align: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    display: -ms-flexbox;
-    display: flex;
-    position: relative
-}
-
-.input-field.recovery-input .input-row .phone-prefix-section {
+.variable-input-control .phone-prefix-section {
     opacity: 0;
     -ms-flex-align: center;
     align-items: center;
@@ -151,10 +132,16 @@
     height: 100%;
     transition: max-width .2s ease-out, opacity .2s;
     display: -ms-flexbox;
-    display: flex
+    display: flex;
+    overflow: hidden
 }
 
-.input-field.recovery-input .input-row .phone-prefix-section .phone-prefix-wrapper {
+.variable-input-control .phone-prefix-section.visible {
+    opacity: 1;
+    max-width: 100px
+}
+
+.variable-input-control .phone-prefix-section .phone-prefix-wrapper {
     width: -webkit-fit-content;
     width: -moz-fit-content;
     -ms-flex-align: center;
@@ -166,16 +153,15 @@
     position: relative
 }
 
-.input-field.recovery-input .input-row .phone-prefix-section .phone-prefix-wrapper .select-preview {
+.variable-input-control .phone-prefix-section .phone-prefix-wrapper .select-preview {
     text-align: right;
     pointer-events: none;
-    opacity: 1;
     white-space: nowrap;
     padding-right: 12px;
     display: inline-block
 }
 
-.input-field.recovery-input .input-row .phone-prefix-section .phone-prefix-wrapper .phone-prefix-dropdown {
+.variable-input-control .phone-prefix-section .phone-prefix-wrapper .phone-prefix-dropdown {
     z-index: 1;
     opacity: 0;
     cursor: pointer;
@@ -187,39 +173,15 @@
     left: 0
 }
 
-.input-field.recovery-input .input-row .phone-prefix-section .phone-divider {
+.variable-input-control .phone-prefix-section .phone-divider {
     border-left: 1px solid #707070;
     width: 0;
-    height: 80%;
+    height: 60%;
     padding-right: 12px
 }
 
-.input-field.recovery-input .input-row .phone-prefix-section.visible {
-    opacity: 1;
-    max-width: 100px
-}
-
-.input-field.recovery-input .input-row .identifier-input {
-    background: 0 0;
-    border: none;
-    -ms-flex-positive: 1;
-    flex-grow: 1;
-    height: 100%;
-    transition: width .2s;
-    position: relative;
-    overflow: scroll
-}
-
-.input-field.recovery-input .input-row .identifier-input::-webkit-input-placeholder {
-    font: var(--typography-body-large-font)
-}
-
-.input-field.recovery-input .input-row .identifier-input::placeholder {
-    font: var(--typography-body-large-font)
-}
-
-.input-field.recovery-input .input-row .identifier-input::placeholder {
-    font: var(--typography-body-large-font)
+.variable-input-control-concealed input {
+    font-family: text-security-disc !important
 }
 
 .form-control-label.error-text {
@@ -1039,6 +1001,26 @@ input[type=button].btn-block {
 
 .data-\[state\=indeterminate\]\:icon-filled-minus[data-state=indeterminate] {
     --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M23.5 14.5C24.3284 14.5 25 15.1716 25 16C25 16.8284 24.3284 17.5 23.5 17.5C13.0512 17.5 19.8215 17.5 8.5 17.5C7.67157 17.5 7 16.8284 7 16C7 15.1716 7.67157 14.5 8.5 14.5C19.1461 14.5 11.9213 14.5 23.5 14.5Z' fill='black'/%3E%3C/svg%3E")
+}
+
+.\[\&_input\:\:placeholder\]\:text-body-large input::-webkit-input-placeholder {
+    font: var(--typography-body-large-font);
+    letter-spacing: var(--typography-body-large-letter-spacing)
+}
+
+.\[\&_input\:\:placeholder\]\:text-body-large input::-ms-input-placeholder {
+    font: var(--typography-body-large-font);
+    letter-spacing: var(--typography-body-large-letter-spacing)
+}
+
+.\[\&_input\:\:placeholder\]\:text-body-large input::placeholder {
+    font: var(--typography-body-large-font);
+    letter-spacing: var(--typography-body-large-letter-spacing)
+}
+
+.\[\&_input\]\:text-body-large input {
+    font: var(--typography-body-large-font);
+    letter-spacing: var(--typography-body-large-letter-spacing)
 }
 
 .\[\&_input\]\:bg-action-utility input {

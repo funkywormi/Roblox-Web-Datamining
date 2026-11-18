@@ -163,7 +163,7 @@
         },
         {
             "name": "Authentication.AccountRecovery",
-            "url": "https://js.rbxcdn.com/b4af3f41f6bd6a8d99dc3996b3a6da57069507911601d6ff96cc8419c976f5c7.js",
+            "url": "https://js.rbxcdn.com/84536df03f65568fd59262a747d26f4f8e9989c4dd087de0794e76ff824aec5e.js",
             "sources": [
                 "/login/forgot-password-or-username"
             ]
@@ -4248,7 +4248,7 @@
         },
         {
             "name": "AccountRecovery",
-            "url": "https://js.rbxcdn.com/0bf254cf81d42c8bfe6456c9af2c1f51c76b4eb5c145d51120ff0d741e79f0e2-AccountRecovery.js",
+            "url": "https://js.rbxcdn.com/aa47fe457bbdb4cd9dd23c9ae19732eae8b4ef257d84dd1aa8b697a0bffab2e7-AccountRecovery.js",
             "sources": [
                 "/login/forgot-password-or-username"
             ]
@@ -5683,7 +5683,7 @@
         },
         {
             "name": "Inventory",
-            "url": "https://js.rbxcdn.com/bed386583413490cc149eaeefa21ed1d2d1aeb38ee93b136660904409db2ea1c-Inventory.js",
+            "url": "https://js.rbxcdn.com/33a84040c45e320642fa535ad1d66d9b0e9436411aa5a01371ff8f0f1f0919ce-Inventory.js",
             "sources": [
                 "/users/inventory"
             ]
@@ -7605,7 +7605,7 @@
         },
         {
             "name": "AccountRecovery",
-            "url": "https://css.rbxcdn.com/de0daad4191d9073556480825d0468706dd6f41d48f2bb57251d13845d847a25-AccountRecovery.css",
+            "url": "https://css.rbxcdn.com/a1f3774f35af358dfeb0c9840ce95aa1398e97a6d12606b532a3475797c611ab-AccountRecovery.css",
             "sources": [
                 "/login/forgot-password-or-username"
             ]

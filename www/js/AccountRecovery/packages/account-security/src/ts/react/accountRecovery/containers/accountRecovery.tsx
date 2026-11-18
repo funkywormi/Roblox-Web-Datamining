@@ -166,6 +166,7 @@ const AccountRecoveryContainer: React.FC = () => {
       recoveryState: RecoveryState;
       recoverySessionId: string;
       processedIdentifier: ProcessedIdentifier;
+      contactMethodHint?: string;
     } | null,
     identifier: string,
   ) => {
@@ -196,6 +197,7 @@ const AccountRecoveryContainer: React.FC = () => {
               requestRecoveryResult.processedIdentifier.identifierType !== "username"
                 ? identifier
                 : "",
+            contactMethodHint: requestRecoveryResult.contactMethodHint,
           },
         });
         break;

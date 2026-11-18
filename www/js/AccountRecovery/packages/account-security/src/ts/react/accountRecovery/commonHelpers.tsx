@@ -166,6 +166,7 @@ export const handleRequestRecovery = async (
   recoveryState: RecoveryState;
   recoverySessionId: string;
   processedIdentifier: ProcessedIdentifier;
+  contactMethodHint?: string;
 } | null> => {
   const processedIdentifier = processIdentifier(identifier, phonePrefixList, phonePrefixIndex);
   const requestRecoveryResult = await requestService.accountRecoveryApi.requestRecovery(
@@ -206,6 +207,7 @@ export const handleRequestRecovery = async (
     recoveryState: requestRecoveryResult.value.recoveryState,
     recoverySessionId: requestRecoveryResult.value.recoverySessionId,
     processedIdentifier,
+    contactMethodHint: requestRecoveryMetadata?.contactMethodHint,
   };
 };
 
@@ -664,8 +666,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
           />
         </span>
       </div>
-      <h3 className="padding-bottom-none padding-top-large">{combinedName ?? ""}</h3>
-      <span className="text-body-medium">{formatUsername(username)}</span>
+      <h3 className="text-label-large padding-bottom-none padding-top-large">
+        {combinedName ?? ""}
+      </h3>
+      <span className="text-body-small">{formatUsername(username)}</span>
     </div>
   );
 };

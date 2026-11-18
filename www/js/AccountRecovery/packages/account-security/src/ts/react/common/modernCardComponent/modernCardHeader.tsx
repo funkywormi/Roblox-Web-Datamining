@@ -12,6 +12,7 @@ type Props = {
 export const ModernCardHeader: React.FC<Props> = ({ headerText, children }: Props) => {
   return (
     <div className="card-header">
+      {/* TODO: The latest account recovery design uses text-heading-small for this header on all screens. */}
       <span className="card-title text-heading-large">{headerText}</span>
       {children}
     </div>

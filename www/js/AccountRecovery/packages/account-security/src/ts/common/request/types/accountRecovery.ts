@@ -39,6 +39,8 @@ export type RequestRecoveryMetadata = {
   userID: number;
   shouldResetPassword?: boolean;
   shouldRecover2sv?: boolean;
+  /** A masked contact method the user can verify to recover their account, e.g. "j*****@g*****.com". */
+  contactMethodHint?: string;
 };
 
 export type RequestRecoveryReturnType = {

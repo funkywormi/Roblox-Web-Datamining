@@ -5,6 +5,7 @@ import { PhoneNumber } from "libphonenumber-js";
 import { Modal } from "react-style-guide";
 import { SystemBanner, Button } from "@rbx/foundation-ui";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
 import {
   ContactMethodType,
   contactMethodTypeToString,
@@ -34,7 +35,6 @@ import { mapAccountRecoveryErrorToResource } from "../constants/resources";
 import { AccountRecoveryActionType } from "../store/action";
 import { validateTrue } from "../../common/inputControl";
 import { BACKUP_CODE_LENGTH } from "../app.config";
-import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
 
 type processedContactMethod =
   | {
@@ -138,6 +138,7 @@ const SendCode: React.FC = () => {
   let contactMethodNumber = 0;
   let previousRecoveryMethod = "";
   let nextRecoveryMethodTypes: RecoveryMethodType[] = [];
+  let contactMethodHint: string | undefined;
   if (componentStateAndProps.componentState === ComponentState.SEND_CODE) {
     contactMethodAutoFill = componentStateAndProps.additionalComponentProps.contactMethodAutoFill;
     phonePrefixIndexAutoFill =
@@ -147,6 +148,7 @@ const SendCode: React.FC = () => {
       componentStateAndProps.additionalComponentProps.previousRecoveryMethod ?? "";
     nextRecoveryMethodTypes =
       componentStateAndProps.additionalComponentProps.nextRecoveryMethodTypes ?? [];
+    ({ contactMethodHint } = componentStateAndProps.additionalComponentProps);
   }
 
   // Experiment layer for recovery-account-based recovery
@@ -344,6 +346,13 @@ const SendCode: React.FC = () => {
         ? resources.Description.EnterContactMethodAssociatedWithYourAccount
         : resources.Description.SendCodeContactMethodConfirmation;
 
+  // The hint is for the first contact method the user is asked for, and only applies to
+  // email/phone input, not backup codes.
+  const contactMethodHintLabel =
+    contactMethodHint && contactMethodNumber !== 1 && !useBackupCode
+      ? resources.Label.ContactMethodHint(contactMethodHint)
+      : undefined;
+
   const positiveButtonEnabled = () => {
     if (requestInFlight || validationError !== null) {
       return false;
@@ -453,6 +462,7 @@ const SendCode: React.FC = () => {
           setValue={setContactMethod}
           canSubmit={positiveButtonEnabled()}
           error={validationError || requestError}
+          bottomLabel={contactMethodHintLabel}
           setError={setValidationError}
           validate={validateTrue}
           handleSubmit={useBackupCode ? attemptVerifyBackupCode : sendCodeToContactMethod}

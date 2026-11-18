@@ -122,6 +122,7 @@ const IdentifierInput: React.FC = () => {
           additionalComponentProps: {
             phonePrefixIndexAutoFill: phonePrefixIndex,
             contactMethodAutoFill: "",
+            contactMethodHint: requestRecoveryResult.contactMethodHint,
           },
         });
         break;

@@ -127,12 +127,6 @@ function inventoryContentController(
     });
   };
 
-  const getPrivateServersV2Enabled = () => {
-    return $q.when(inventoryExperimentsService.getPrivateServersV2Enabled()).catch(() => {
-      return false;
-    });
-  };
-
   const getCategories = () => {
     return inventoryService
       .getCategories(ctrl.userId)
@@ -220,8 +214,7 @@ function inventoryContentController(
         assetTypeId: subcategory.id,
         sortOrder: cursorPaginationConstants.sortOrder.descending,
         type: subcategory.type,
-        inventoryUpdatesEnabled: ctrl.currentData.inventoryUpdatesEnabled,
-        privateServersV2Enabled: ctrl.currentData.privateServersV2Enabled
+        inventoryUpdatesEnabled: ctrl.currentData.inventoryUpdatesEnabled
       })
       .then(pageLoaded)
       .catch(pageLoadError);
@@ -301,8 +294,7 @@ function inventoryContentController(
       itemSection: assetsConstants.types.catalog,
       templateVisible: true,
       isRecommendationAvailable: false,
-      inventoryUpdatesEnabled: false,
-      privateServersV2Enabled: false
+      inventoryUpdatesEnabled: false
     };
 
     const loadingPromises = [];
@@ -312,7 +304,6 @@ function inventoryContentController(
     loadingPromises.push(getCategories());
     loadingPromises.push(assetsService.getCatalogMetadata());
     loadingPromises.push(getInventoryUpdatesEnabled());
-    loadingPromises.push(getPrivateServersV2Enabled());
 
     $q.all(loadingPromises).then(results => {
       [
@@ -321,8 +312,7 @@ function inventoryContentController(
         ctrl.assetToSubcategoryMappings,
         ctrl.categories,
         ctrl.catalogMetadata,
-        ctrl.currentData.inventoryUpdatesEnabled,
-        ctrl.currentData.privateServersV2Enabled
+        ctrl.currentData.inventoryUpdatesEnabled
       ] = results;
 
       if (ctrl.currentData.categoryName) {

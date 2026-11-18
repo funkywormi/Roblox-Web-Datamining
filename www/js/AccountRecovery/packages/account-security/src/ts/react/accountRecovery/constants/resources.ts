@@ -21,6 +21,9 @@ export const getResources = (translate: TranslateFunction) =>
       Delete: translate("Action.Delete"),
       DeleteAll: translate("Action.DeleteAll"),
       DontDeleteCredentials: translate("Action.DontDeleteCredentials"),
+      // TODO: Per content design, use "Continue" instead of "Next" for this CTA (Next isn't in
+      // the unified CTA guidelines). Action.Continue already exists. Used by SendCode and
+      // IdentifierInput.
       Next: translate("Action.Next"),
       Ok: translate("Action.Ok"),
       ResetPassword: translate("Action.ResetPassword"),
@@ -126,12 +129,15 @@ export const getResources = (translate: TranslateFunction) =>
       BackupCode: translate("Label.BackupCode"),
       ConfirmNewPasswordV2: translate("Label.ConfirmNewPasswordV2"),
       DoNotUseOldPassword: translate("Label.DoNotUseOldPassword"),
+      // TODO: Per content design, change this label to "Email or phone number" (the guidelines
+      // say not to use a slash). Used by SendCode.
       EmailPhone: translate("Label.EmailPhone"),
       EmailPhoneRecoveryAccount: translate("Label.EmailPhoneRecoveryAccount"),
       Phone: translate("LabelPhone"),
       EnterCode: translate("Label.EnterCode"),
       EnterYourUsernameEmailPhone: translate("Label.EnterYourUsernameEmailPhone"),
       NewPasswordV2: translate("Label.NewPasswordV2"),
+      ContactMethodHint: (hint: string) => translate("Label.ContactMethodHint", { hint }),
       PreviousContactMethodVerification: (contactMethod: string) =>
         translate("Label.PreviousContactMethodVerification", { contactMethod }),
       ResendCode: translate("Label.ResendCode"),

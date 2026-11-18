@@ -116,6 +116,7 @@ export const ACCOUNT_RECOVERY_LANGUAGE_RESOURCES = [
   "Label.Authenticator2sv",
   "Label.Authenticator2svCapitalized",
   "Label.BackupCode",
+  "Label.ContactMethodHint",
   "Label.ConfirmNewPasswordV2",
   "Label.DoNotUseOldPassword",
   "Label.Email2sv",

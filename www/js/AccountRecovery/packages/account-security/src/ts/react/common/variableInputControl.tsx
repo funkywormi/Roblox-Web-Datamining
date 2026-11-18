@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { FormControl, FormGroup } from "react-style-guide";
 import classNames from "classnames";
 import "../../../css/common/inputFieldConcealed.css";
 import "../../../css/common/variableInputControl.css";
 import { useDebounce } from "react-utilities";
+import { TextInput } from "@rbx/foundation-ui";
 import { PhonePrefix } from "../../common/request/types/phone";
 import { InputValidator } from "./inputControl";
 
@@ -41,7 +41,7 @@ const setStateForInput =
     togglePhonePrefixSection: (value: string) => void,
     onChangeCustom?: (value: string) => void,
   ) =>
-  (event: React.FormEvent<FormControl & HTMLInputElement>): void => {
+  (event: React.ChangeEvent<HTMLInputElement>): void => {
     let { value } = event.currentTarget;
     // Force the value back to the original value if we got invalid characters.
     if (validCharactersRegEx !== undefined && !validCharactersRegEx.test(value)) {
@@ -77,7 +77,7 @@ type CommonProps = {
   // eslint-disable-next-line react/require-default-props
   bottomLabel?: string | JSX.Element;
   // eslint-disable-next-line react/require-default-props
-  inputMode?: FormControl.FormControlProps["inputMode"];
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   // eslint-disable-next-line react/require-default-props
   autoComplete?: string;
   // eslint-disable-next-line react/require-default-props
@@ -189,9 +189,6 @@ const VariableInputControl: React.FC<Props> = ({
   const phoneSectionClasses = classNames("phone-prefix-section", {
     visible: shouldShowPhonePrefixSection && phoneProps.phoneSelectorEnabled,
   });
-  const inputClasses = classNames("identifier-input", {
-    "input-field-concealed": concealInput && value.length > 0,
-  });
   const optionStr = (localizedName: string, prefix: string) => `${localizedName} +(${prefix})`;
   const prefixStr = (prefixIndex: number, phonePrefixList: PhonePrefix[]) => {
     const prefix = phonePrefixList[prefixIndex]?.prefix ?? "";
@@ -199,83 +196,84 @@ const VariableInputControl: React.FC<Props> = ({
     return `${countryCode} +${prefix}`;
   };
 
-  const getInputForm = () => {
-    return (
-      <div className="input-field form-control recovery-input">
-        <div className="input-row">
-          {phoneProps.phoneSelectorEnabled && (
-            <div className={phoneSectionClasses}>
-              <span className="phone-prefix-wrapper">
-                <span className="select-preview">
-                  {prefixStr(displayedPhonePrefixIndex, phoneProps.phonePrefixList)}
-                </span>
-                <select
-                  className="phone-prefix-dropdown rbx-select"
-                  onChange={e => {
-                    const targetIndex = Number(e.target.value);
-                    setDisplayedPhonePrefixIndex(targetIndex);
-                    phoneProps.setPhonePrefixIndex(targetIndex);
-                  }}
-                  value={displayedPhonePrefixIndex}
-                >
-                  {phoneProps.phonePrefixList.map((option, index) => (
-                    <option className="prefix-option" value={index} key={option.prefix}>
-                      {optionStr(option.localizedName, option.prefix)}
-                    </option>
-                  ))}
-                </select>
-              </span>
-              <div id="phonenumber-divider" className="phone-divider" />
-            </div>
-          )}
-          <FormControl
-            as="input"
-            className={inputClasses}
-            type={inputType}
-            inputMode={inputMode}
-            autoComplete={autoComplete}
-            maxLength={maxLength}
-            disabled={disabled}
-            value={value}
-            placeholder={placeholder}
-            onChange={setStateForInput(
-              value, // The value prior to change.
-              validCharactersRegEx,
-              setValue,
-              togglePhonePrefixSection,
-              onChangeCustom,
-            )}
-            onKeyDown={handleKeyDown(handleSubmit, canSubmit) as any}
-            autoFocus={autoFocus}
-            spellCheck={false}
-          />
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <div className="input-control-wrapper">
-      {label && (
-        <label className="text-body-small" htmlFor={id}>
-          {label}
-        </label>
-      )}
-      <FormGroup
-        controlId={id}
-        className={`${valueHasFeedback ? "form-has-feedback" : ""} ${
-          valueHasSuccess ? "form-has-success" : ""
-        } ${valueHasError ? "form-has-error" : ""}`}
-      >
-        {getInputForm()}
-        {!disabled && !hideFeedback && valueHasSuccess && <span className="icon-checkmark-on" />}
-        {!disabled && !hideFeedback && valueHasError && <span className="icon-close" />}
-        {/* Prevent reflow of elements when we get an error. */}
-        <div className="form-control-label bottom-label xsmall error-text">
-          {!disabled && valueHasError ? error : bottomLabel || "\u00A0"}
-        </div>
-      </FormGroup>
+  // Rendered inside the input, before the text. It collapses to nothing unless the value
+  // could be a phone number.
+  const phonePrefixSection = phoneProps.phoneSelectorEnabled ? (
+    <div className={phoneSectionClasses}>
+      <span className="phone-prefix-wrapper">
+        <span className="select-preview text-body-large content-emphasis">
+          {prefixStr(displayedPhonePrefixIndex, phoneProps.phonePrefixList)}
+        </span>
+        <select
+          className="phone-prefix-dropdown rbx-select"
+          onChange={e => {
+            const targetIndex = Number(e.target.value);
+            setDisplayedPhonePrefixIndex(targetIndex);
+            phoneProps.setPhonePrefixIndex(targetIndex);
+          }}
+          value={displayedPhonePrefixIndex}
+        >
+          {phoneProps.phonePrefixList.map((option, index) => (
+            <option className="prefix-option" value={index} key={option.prefix}>
+              {optionStr(option.localizedName, option.prefix)}
+            </option>
+          ))}
+        </select>
+      </span>
+      <div id="phonenumber-divider" className="phone-divider" />
     </div>
+  ) : undefined;
+
+  const errorText = !disabled && valueHasError ? error : null;
+  const feedbackIconName =
+    !disabled && !hideFeedback && valueHasFeedback
+      ? valueHasError
+        ? "icon-regular-x"
+        : "icon-regular-check"
+      : undefined;
+
+  const inputProps = {
+    id,
+    size: "Medium",
+    label,
+    type: inputType,
+    inputMode,
+    autoComplete,
+    maxLength,
+    placeholder,
+    "aria-label": label === undefined ? placeholder : undefined,
+    value,
+    isDisabled: disabled,
+    hasError: errorText !== null,
+    // Reserve the hint row so showing an error doesn't shift the layout.
+    helperText: errorText ?? bottomLabel ?? "\u00A0",
+    leadingIconNode: phonePrefixSection,
+    // The phone prefix section spaces itself, so it takes no room while it is collapsed.
+    inputContainerClassStyle: phoneProps.phoneSelectorEnabled ? { columnGap: 0 } : undefined,
+    // 16px text: legacy size, and iOS Safari zooms on focus below it. The background matches
+    // the other Foundation inputs on these pages, which override a global style that targets
+    // inputs and would otherwise give the inner input a different background from the container.
+    className: classNames(
+      "variable-input-control [&_input]:bg-action-utility [&_input::placeholder]:text-body-large [&_input]:text-body-large",
+      { "variable-input-control-concealed": concealInput && value.length > 0 },
+    ),
+    onChange: setStateForInput(
+      value, // The value prior to change.
+      validCharactersRegEx,
+      setValue,
+      togglePhonePrefixSection,
+      onChangeCustom,
+    ),
+    onKeyDown: handleKeyDown(handleSubmit, canSubmit),
+    autoFocus,
+    spellCheck: false,
+  } as const;
+
+  // Two branches because `trailingIconName` can't be passed as `undefined`.
+  return feedbackIconName === undefined ? (
+    <TextInput {...inputProps} />
+  ) : (
+    <TextInput {...inputProps} trailingIconName={feedbackIconName} />
   );
 };
 
