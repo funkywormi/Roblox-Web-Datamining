@@ -12,6 +12,7 @@ import {
 import { composeQueryString } from "@rbx/core-scripts/util/url";
 import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
+import { getSignupUrl } from "@rbx/navigation/auth-links";
 import { fireEvent } from "@rbx/www-common/event-tracker";
 import {
   showAvatarVideoOptInOverlay,
@@ -28,7 +29,10 @@ import {
   type TPlayButtonPageContext,
   type TPrivatePlaytestInfo,
 } from "../types/playButtonTypes";
-import playButtonConstants, { playOnWebActionType } from "../constants/playButtonConstants";
+import playButtonConstants, {
+  playGameClickedEventContext,
+  playOnWebActionType,
+} from "../constants/playButtonConstants";
 
 export const PlaytestUnlockUpsellType = {
   AgeVerification: "AgeVerification",
@@ -66,35 +70,33 @@ function sendPlayGameClickedEvent(
   placeId: string,
   joinDataProperties: JoinDataProperties,
   actionType?: string,
+  context = playGameClickedEventContext,
 ): TEventProperties {
+  const { getPlayOnWeb: _getPlayOnWeb, ...joinDataEventProperties } = joinDataProperties;
   const mergedProperties: TEventProperties = {
     placeId,
     ...eventProperties,
     ...getJoinAttemptProperties(eventProperties),
-    ...joinDataProperties,
+    ...joinDataEventProperties,
     ...(actionType == null ? {} : { actionType }),
   };
 
-  sendEventWithTarget("playGameClicked", "click", mergedProperties);
+  sendEventWithTarget("playGameClicked", context, mergedProperties);
 
   return mergedProperties;
 }
 
-function getEncodedUniversalLink(
-  placeId: string,
-  eventProperties: TEventProperties = {},
-  isEarlyTesting = false,
-): string {
-  let universalLink = `${environmentUrls.websiteUrl}/games/start?placeid=${placeId}`;
+function getJoinQueryString(eventProperties: TEventProperties, isEarlyTesting = false): string {
+  let joinQueryString = "";
 
   if (isJoinAttemptIdEnabled()) {
     const { joinAttemptId, joinAttemptOrigin } = getJoinAttemptProperties(eventProperties);
 
     if (typeof joinAttemptId === "string" && joinAttemptId.length > 0) {
-      universalLink += `&joinAttemptId=${joinAttemptId}`;
+      joinQueryString += `&joinAttemptId=${joinAttemptId}`;
 
       if (typeof joinAttemptOrigin === "string" && joinAttemptOrigin.length > 0) {
-        universalLink += `&joinAttemptOrigin=${joinAttemptOrigin}`;
+        joinQueryString += `&joinAttemptOrigin=${joinAttemptOrigin}`;
       }
     }
   }
@@ -102,16 +104,38 @@ function getEncodedUniversalLink(
   // append join data
   const { launchData, eventId } = eventProperties;
   if (typeof launchData === "string" && launchData.length > 0) {
-    universalLink += `&launchData=${launchData}`;
+    joinQueryString += `&launchData=${launchData}`;
   }
   if (typeof eventId === "string" && eventId.length > 0) {
-    universalLink += `&eventId=${eventId}`;
+    joinQueryString += `&eventId=${eventId}`;
   }
   if (isEarlyTesting) {
-    universalLink += "&isEarlyTesting=true";
+    joinQueryString += "&isEarlyTesting=true";
   }
 
-  return encodeURIComponent(universalLink);
+  return joinQueryString;
+}
+
+function getEncodedUniversalLink(
+  placeId: string,
+  eventProperties: TEventProperties = {},
+  isEarlyTesting = false,
+): string {
+  return encodeURIComponent(
+    `${environmentUrls.websiteUrl}/games/start?placeid=${placeId}${getJoinQueryString(eventProperties, isEarlyTesting)}`,
+  );
+}
+
+// af_dp must be a custom scheme: browsers without Universal Link support (e.g. iOS Chrome) load an
+// https af_dp as a web page instead of falling back to the app store when the app is not installed.
+function getEncodedAppLaunchLink(
+  placeId: string,
+  eventProperties: TEventProperties = {},
+  isEarlyTesting = false,
+): string {
+  return encodeURIComponent(
+    `roblox://experiences/start?placeId=${placeId}${getJoinQueryString(eventProperties, isEarlyTesting)}`,
+  );
 }
 
 export const launchGame = (
@@ -144,12 +168,17 @@ export const launchGame = (
       playGameClickedEventProperties,
       isEarlyTesting,
     );
+    const encodedAppLaunchLink = getEncodedAppLaunchLink(
+      placeId,
+      playGameClickedEventProperties,
+      isEarlyTesting,
+    );
     const afDeeplinkParams = composeQueryString({
       ...defaultAfReferralProperties,
       ...appsFlyerReferralProperties,
     });
     window.open(
-      `https://ro.blox.com/Ebh5?${afDeeplinkParams}&af_dp=${encodedUniversalLink}&af_web_dp=${encodedUniversalLink}&deep_link_value=${encodedUniversalLink}`,
+      `https://ro.blox.com/Ebh5?${afDeeplinkParams}&af_dp=${encodedAppLaunchLink}&af_web_dp=${encodedUniversalLink}&deep_link_value=${encodedUniversalLink}`,
       "_self",
     );
   } else {
@@ -202,12 +231,13 @@ export const launchLogin = (
   ) {
     const playGameClickedEventProperties = sendPlayGameClickedEvent({}, placeId, {});
     const encodedUniversalLink = getEncodedUniversalLink(placeId, playGameClickedEventProperties);
+    const encodedAppLaunchLink = getEncodedAppLaunchLink(placeId, playGameClickedEventProperties);
     const afDeeplinkParams = composeQueryString({
       ...defaultAfReferralProperties,
       ...appsFlyerReferralProperties,
     });
     window.open(
-      `https://ro.blox.com/Ebh5?${afDeeplinkParams}&af_dp=${encodedUniversalLink}&af_web_dp=${encodedUniversalLink}&deep_link_value=${encodedUniversalLink}`,
+      `https://ro.blox.com/Ebh5?${afDeeplinkParams}&af_dp=${encodedAppLaunchLink}&af_web_dp=${encodedUniversalLink}&deep_link_value=${encodedUniversalLink}`,
       "_self",
     );
   } else {
@@ -216,6 +246,19 @@ export const launchLogin = (
       playButtonConstants.eventStreamProperties(placeId, {}),
     );
   }
+};
+
+// Mirrors website#2241's game page check: /CreateAccount only offers sign-up for these returnUrls.
+const gamePagePathPattern = /^(\/[a-z]{2}(-[a-z]{2})?)?\/games\/[0-9]+(\/|$)/i;
+
+export const launchSignup = (placeId: string): void => {
+  sendPlayGameClickedEvent({}, placeId, {});
+  // The game page also renders on /games/start (WASM links), which isn't a game page returnUrl.
+  const gamePagePath = `/games/${placeId}`;
+  const returnLocation = gamePagePathPattern.test(window.location.pathname)
+    ? undefined
+    : { pathname: gamePagePath, search: "", href: getAbsoluteUrl(gamePagePath) };
+  window.location.assign(getSignupUrl(false, returnLocation));
 };
 
 // The global type declares this service as required, but it is only installed by the
@@ -441,6 +484,7 @@ export const sendPlayOnWebClickEvents = (
   universeId: string,
   eventProperties: TEventProperties = {},
   joinData: JoinDataProperties = {},
+  context?: string,
 ): TJoinAttemptProperties => {
   handleShareLinkEventLogging(placeId, universeId);
   const { joinAttemptId, joinAttemptOrigin } = sendPlayGameClickedEvent(
@@ -448,6 +492,7 @@ export const sendPlayOnWebClickEvents = (
     placeId,
     joinData,
     playOnWebActionType,
+    context,
   );
   if (!isJoinAttemptIdEnabled() || typeof joinAttemptId !== "string" || joinAttemptId === "") {
     return {};

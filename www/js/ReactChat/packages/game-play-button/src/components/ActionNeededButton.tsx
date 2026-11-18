@@ -21,7 +21,7 @@ export type TActionNeededProps = {
 const ActionNeededButton = ({
   onButtonClick,
   buttonWidth = buttonWidths.full,
-  buttonClassName = "btn-common-play-game-action-needed-lg",
+  buttonClassName = "btn-common-play-game-action-needed-lg game-play-button-action-needed-lg",
 }: TActionNeededProps) => {
   const translate = usePlayButtonTranslate();
   return (

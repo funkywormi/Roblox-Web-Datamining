@@ -4,8 +4,8 @@ import { HelpArticle, ZendeskArticleTranslationsResponse } from "../core/types/c
 import { DEFAULT_LOCALE } from "./useGetUserLocale";
 /**
  * @param locale a standard locale string, e.g. 'en-US', 'zh-CN' following ISO 639-1 and ISO 3166-1 alpha-2 standards.
- * Zendesk uses a slightly different format, so we need to normalize it to a 2-letter language code.
- * There are some exceptions for languages like Chinese or English, where we need to handle variants.
+ * Zendesk uses a slightly different format. Most languages use the language code. A few regions,
+ * including English, Chinese, en-gb, and fr-ca, stay intact.
  * @returns
  */
 const toZendeskLocale = (locale?: string): string | undefined => {
@@ -14,6 +14,9 @@ const toZendeskLocale = (locale?: string): string | undefined => {
 
   // English
   if (normalized === "en" || normalized === "en_us") return "en-us";
+  // Regional Help Center locales. Zendesk keeps these distinct, matching www-common helpDesk.ts.
+  if (normalized === "en_gb") return "en-gb";
+  if (normalized === "fr_ca") return "fr-ca";
 
   // Chinese variants
   if (normalized === "zh_cn") return "zh-cn";
@@ -46,9 +49,9 @@ const fetchArticleInfo = async (
     }
 
     const response = await fetch(
-      `https://en.help.roblox.com/api/v2/help_center/articles/${articleId}/translations?locales=${requestedLocales.join(
-        ",",
-      )}`,
+      `https://en.help.roblox.com/api/v2/help_center/articles/${articleId}/translations?locales=${requestedLocales
+        .map(locale => encodeURIComponent(locale))
+        .join(",")}`,
     );
     if (!response.ok) return null;
 

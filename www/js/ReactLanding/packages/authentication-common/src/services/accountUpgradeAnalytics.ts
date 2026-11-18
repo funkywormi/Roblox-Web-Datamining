@@ -36,6 +36,7 @@ export const ACCOUNT_UPGRADE_COUNTERS = {
   failure: "Failure",
   marketingConsentWriteSuccess: "MarketingConsentWriteSuccess",
   marketingConsentWriteFailure: "MarketingConsentWriteFailure",
+  agreementIdsMissing: "AgreementIdsMissing",
 } as const;
 
 const safely = (report: () => void): void => {
@@ -163,6 +164,10 @@ export const reportSucceeded = (): void => {
     origin: ORIGIN,
   });
   fireCounter(ACCOUNT_UPGRADE_COUNTERS.success);
+};
+
+export const reportAgreementIdsMissing = (): void => {
+  fireCounter(ACCOUNT_UPGRADE_COUNTERS.agreementIdsMissing);
 };
 
 // Every failure sends authClientError; the first failure in an opening also reports the

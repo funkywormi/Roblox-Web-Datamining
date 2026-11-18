@@ -245,6 +245,10 @@ export const USER_AGREEMENTS = {
 };
 export const PARENTALCONSENT = "ParentalConsent";
 export const OPTIONAL_PERSONAL_INFORMATION_POLICY = "OptionalPersonalInformationPolicy";
+export const PERSONAL_INFORMATION_POLICY = "PersonalInformationPolicy";
+export const THIRD_PARTY_PERSONAL_INFORMATION_POLICY = "ThirdPartyPersonalInformationPolicy";
+export const TRANSFER_PERSONAL_INFORMATION_POLICY = "TransferPersonalInformationPolicy";
+export const GLOBAL_REGULATION_TYPE = "Global";
 export const requestTypeParam = "requestType";
 export const sessionIdParam = "sessionId";
 export const defaultLandingBackgroundClass = "default-background";

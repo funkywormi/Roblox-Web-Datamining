@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
 import EVENT_CONSTANTS from "@rbx/authentication-common/constants/eventsConstants";
 import { TSignupParams } from "@rbx/authentication-common/types/signupTypes";
 import usePasskeyRegistration, {
@@ -53,7 +54,7 @@ type PasswordSignUpFormProps = Extract<
 
 export type SignUpContainerV2FormProps = Omit<
   PasswordSignUpFormProps,
-  "submissionMode" | "onSubmit" | "isSubmitting" | "isSubmitDisabled"
+  "submissionMode" | "translate" | "onSubmit" | "isSubmitting" | "isSubmitDisabled"
 >;
 
 export type SignUpContainerV2Props = {
@@ -80,6 +81,7 @@ export type SignUpContainerV2Props = {
   isPasswordSubmitDisabled?: boolean;
   isPasskeySubmitDisabled?: boolean;
   beginComplianceInterruption?: () => Promise<boolean> | null;
+  translate: WithTranslationsProps["translate"];
 };
 
 const getAddAuthMethodLayout = (treatment: SignUpV2Treatment): AddAuthMethodLayout => {
@@ -121,6 +123,7 @@ const SignUpContainerV2 = ({
   isPasswordSubmitDisabled = false,
   isPasskeySubmitDisabled = false,
   beginComplianceInterruption,
+  translate,
 }: SignUpContainerV2Props): JSX.Element => {
   const {
     step,
@@ -306,6 +309,7 @@ const SignUpContainerV2 = ({
         <div ref={signUpFormPanelRef} className="self-start width-full">
           <SignUpFormV2
             {...sharedFormProps}
+            translate={translate}
             cardClassName={signupV2CardContentClassName}
             submissionMode={SignUpFormV2SubmissionMode.Password}
             onUsernameChange={onUsernameChange}
@@ -342,6 +346,7 @@ const SignUpContainerV2 = ({
         >
           <SignUpFormV2
             {...sharedFormProps}
+            translate={translate}
             cardClassName={signupV2CardContentClassName}
             submissionMode={SignUpFormV2SubmissionMode.Passkey}
             headingRef={signUpHeadingRef}
@@ -397,8 +402,11 @@ const SignUpContainerV2 = ({
           <AddAuthMethodPage
             layout={getAddAuthMethodLayout(treatment)}
             labels={addAuthMethodLabels}
+            translate={translate}
+            isHidden={!isAddAuthMethodStep}
             headingRef={addAuthMethodHeadingRef}
             cardClassName={signupV2CardContentClassName}
+            username={formProps.isMobileWebLayout ? formProps.username : undefined}
             password={password}
             isPasswordVisible={isPasswordVisible}
             passwordRequirements={passwordRequirements}
@@ -431,6 +439,7 @@ const SignUpContainerV2 = ({
               sendAddAuthMethodBackEvent();
               backToSignUpForm();
             }}
+            onClose={formProps.onClose}
           />
         </div>
       </div>

@@ -7,7 +7,7 @@ import {
   ThumbnailGameThumbnailSize,
   ThumbnailTypes,
 } from "@rbx/thumbnails";
-import "../../../css/common/_gameTiles.scss";
+import "../../../css/common/gameTiles.css";
 import { isValidHttpUrl } from "@rbx/core-scripts/util/url";
 import classNames from "classnames";
 import useFocused from "../hooks/useFocused";

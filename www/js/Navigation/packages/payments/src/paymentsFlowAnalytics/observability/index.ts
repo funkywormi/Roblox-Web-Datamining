@@ -9,7 +9,11 @@ export const observabilityRegistry = {
 
   features: {
     PaymentFlow: {
-      counters: ["UserPaymentFlowMidPurchaseStepTriggeredWithoutCtx", "UserPaymentFlowFlowEnded"],
+      counters: [
+        "UserPaymentFlowMidPurchaseStepTriggeredWithoutCtx",
+        "UserPaymentFlowFlowEnded",
+        { name: "UserPaymentFlowEventSent", dimensions: ["transport", "requestedTransport"] },
+      ],
       errors: [
         "UserPaymentFlowWrongUsageOfMethod",
         "UserPaymentFlowSendEventWithoutUuidOrCtx",
@@ -18,6 +22,7 @@ export const observabilityRegistry = {
         "UserPaymentFlowSendUserEventError",
         "UserPaymentFlowStartFlowError",
         "UserPaymentFlowFlowEndedWithoutTriggerContext",
+        "UserPaymentFlowSendEventKeepaliveError",
       ],
     },
   },

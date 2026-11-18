@@ -78,7 +78,7 @@ export function useTracking(): Tracking {
       viewMessage?: ViewMessage,
       eventMetadata?: Record<string, string>,
     ) => {
-      pfas.sendUserPurchaseFlowEvent({
+      pfas.sendUserPurchaseFlowEventViaFetch({
         triggerContext: getTriggerContext(deviceMeta, viewName === PREMIUM_PURCHASE),
         isMidPurchaseStep: true,
         viewName,
@@ -95,7 +95,7 @@ export function useTracking(): Tracking {
 
   const trackStatus = useCallback(
     (viewName: ViewName, status: PurchaseStatus, viewMessage?: string) => {
-      pfas.sendUserPurchaseStatusEvent({
+      pfas.sendUserPurchaseStatusEventViaFetch({
         triggerContext: getTriggerContext(deviceMeta, viewName === PREMIUM_PURCHASE),
         status,
         viewMessage,
@@ -106,7 +106,6 @@ export function useTracking(): Tracking {
   );
 
   useEffect(() => {
-    // Only this page-view ViewShown uses fetch. Impressions and other trackFlow calls stay on the image beacon.
     pfas.sendUserPurchaseFlowEventViaFetch({
       triggerContext: getTriggerContext(deviceMeta, false),
       isMidPurchaseStep: true,

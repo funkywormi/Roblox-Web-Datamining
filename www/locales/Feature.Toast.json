@@ -1,3 +1,4 @@
 {
-    "NetworkingError.SomethingIsWrong": "Something went wrong. Please try again."
+    "NetworkingError.SomethingIsWrong": "Something went wrong. Please try again.",
+    "VoteError.NotSaved": "Vote wasn’t saved"
 }

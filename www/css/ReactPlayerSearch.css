@@ -136,6 +136,36 @@
     position: relative
 }
 
+.player-search-profile-link,
+.player-search-profile-link:hover {
+    color: inherit;
+    text-decoration: none
+}
+
+.player-search-profile-link:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0
+}
+
+.player-search-profile-link:focus-visible {
+    outline: none
+}
+
+.player-search-profile-link:focus-visible:after {
+    border-radius: var(--radius-medium);
+    outline-offset: -2px;
+    outline: 2px auto
+}
+
+.player-search-card-caption a:not(.player-search-profile-link) {
+    z-index: 1;
+    position: relative
+}
+
 .player-search-avatar-clip {
     background-color: var(--surface-200, #c9ccd1);
     border-radius: 50%;

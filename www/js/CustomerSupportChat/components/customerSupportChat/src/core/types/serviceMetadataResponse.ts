@@ -30,6 +30,14 @@ export enum MainCategory {
   DiscoveryContentQuality = "top_disccntnt",
 }
 
+/**
+ * Main-category `name` values. Use these when a category can't be told apart by identifier:
+ * AppealDecision and the legacy Moderation category both use the "moderation" identifier.
+ */
+export enum MainCategoryName {
+  AppealDecision = "AppealDecision",
+}
+
 export enum SubCategory {
   AccountHacked = "account_hacked",
   ForgotPassword = "forgot_pw",
@@ -122,6 +130,12 @@ export type SupportMetaData = {
   usernameCheckUrl?: string | null;
   isRobloxEmployee?: boolean;
   isEmailVerificationRequired?: boolean;
+  /**
+   * False when a logged-out user is outside the EU/AU/UK and in the appeal login gate rollout, so
+   * the form requires login to appeal. Null or undefined (backend not deployed yet) leaves the form
+   * unchanged.
+   */
+  isInEuAuUk?: boolean | null;
   /** Whether the user gets the new support experience. Always true for employees. */
   isNewSupportExperienceEnabled?: boolean;
   /**

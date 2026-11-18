@@ -3,6 +3,7 @@ import {
   authUiVariants,
   getAssignedAuthUiVariant,
 } from "@rbx/authentication-common/utils/authUiVariantUtils";
+import { isMobileWebSignup } from "../../utils/mobileWebSignupUtils";
 
 export enum SignUpV2Treatment {
   PasswordFirst = "passwordFirst",
@@ -69,6 +70,15 @@ export const getSignUpV2Experiment = (
 
   try {
     const authUiVariant = getAssignedAuthUiVariant();
+    // The mobile-web layout is built on the password-first V2 form, so neither experiment's arm,
+    // the SSO control included, can take it away. A refresh arm is still passed on for events.
+    if (isMobileWebSignup()) {
+      return {
+        isSignUpV2: true,
+        treatment: SignUpV2Treatment.PasswordFirst,
+        authUiVariant: authUiVariant === authUiVariants.control ? undefined : authUiVariant,
+      };
+    }
     if (authUiVariant === undefined) {
       return getSignUpV2DataResolution();
     }

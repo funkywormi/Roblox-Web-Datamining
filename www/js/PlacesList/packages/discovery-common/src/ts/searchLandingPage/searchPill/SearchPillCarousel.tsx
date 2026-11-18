@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useRef } from "react";
-import { eventStreamService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
+import { sendEvent } from "@rbx/core-scripts/event-stream";
 import { TranslateFunction } from "@rbx/core-scripts/react";
 import { PageContext } from "../../common/types/pageContext";
 import { getSessionInfoTypeFromPageContext } from "../../common/utils/parsingUtils";
@@ -10,7 +10,8 @@ import eventStreamConstants, {
 import { TExploreApiSearchPillsSort, TQueryData } from "../../common/types/bedev2Types";
 import SearchPill from "./SearchPill";
 import SearchLandingPageSessionContext from "../SearchLandingPageSessionContext";
-import GameCarouselContainerHeader from "../../common/components/GameCarouselContainerHeader";
+import GameCarouselContainerHeaderBase from "../../common/components/GameCarouselContainerHeaderBase";
+import type HomeSortHeader from "../../common/components/HomeSortHeader";
 import VariableItemWidthCarousel from "../../common/components/VariableItemWidthCarousel";
 import useSearchPillCarouselImpressionTracker from "../hooks/useSearchPillCarouselImpressionTracker";
 
@@ -19,6 +20,7 @@ type TSearchPillCarouselProps = {
   positionId: number;
   isNewScrollArrowsEnabled?: boolean;
   isNewSortHeaderEnabled?: boolean;
+  NewSortHeader?: typeof HomeSortHeader;
   translate: TranslateFunction;
 };
 
@@ -31,6 +33,7 @@ const SearchPillCarousel = ({
   positionId,
   isNewScrollArrowsEnabled,
   isNewSortHeaderEnabled,
+  NewSortHeader,
   translate,
 }: TSearchPillCarouselProps): React.JSX.Element => {
   const sessionInfo = useContext(SearchLandingPageSessionContext);
@@ -62,7 +65,7 @@ const SearchPillCarousel = ({
         [EventStreamMetadata.Context]: getEventContext(page),
         ...(sessionInfoType && sessionInfo && { [sessionInfoType]: sessionInfo }),
       });
-      eventStreamService.sendEvent(eventConfig, eventParams);
+      sendEvent(eventConfig, eventParams);
     },
     [positionId, sessionInfo, sort.topicLayoutData?.componentType, sort.sortId, page],
   );
@@ -75,9 +78,10 @@ const SearchPillCarousel = ({
   );
 
   const headerComponent = (
-    <GameCarouselContainerHeader
+    <GameCarouselContainerHeaderBase
       sortTitle={sort.topic}
       isNewSortHeaderEnabled={isNewSortHeaderEnabled}
+      NewSortHeader={NewSortHeader}
       hideSeeAll
       titleContainerClassName="padding-bottom-small"
       seeAllLink={undefined}

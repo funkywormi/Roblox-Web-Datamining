@@ -15,6 +15,19 @@ import {
 } from "../types/bedev1Types";
 
 const { url, defaultCacheCriteria } = bedev1Constants;
+
+export type TDiscoveryTransport = {
+  getFriendsPresence: () => Promise<{ userData?: TGetFriendsResponse[] }>;
+  getPlaceDetails: (placeId: string) => Promise<TGetPlaceDetails>;
+};
+
+let transport: Partial<TDiscoveryTransport> = {};
+
+export const registerDiscoveryTransport = (next: Partial<TDiscoveryTransport>): void => {
+  transport = next;
+};
+
+export const getDiscoveryTransport = (): Partial<TDiscoveryTransport> => transport;
 const { gamesDataStore, userDataStoreV2, localeDataStore } = dataStores;
 const { FriendsUserSortType } = dataStores.userDataStore;
 
@@ -29,6 +42,10 @@ export const getGameRecommendations = async (
 };
 
 export const getFriendsPresence = (): Promise<{ userData?: TGetFriendsResponse[] }> => {
+  const override = getDiscoveryTransport().getFriendsPresence;
+  if (override) {
+    return override();
+  }
   return userDataStoreV2.getFriends(
     {
       userId: authenticatedUser()?.id!,
@@ -40,6 +57,10 @@ export const getFriendsPresence = (): Promise<{ userData?: TGetFriendsResponse[]
 };
 
 export const getPlaceDetails = async (placeId: string): Promise<TGetPlaceDetails> => {
+  const override = getDiscoveryTransport().getPlaceDetails;
+  if (override) {
+    return override(placeId);
+  }
   const { data = [] } = await gamesDataStore.getPlaceDetails([placeId as unknown as number]);
   return data[0] as TGetPlaceDetails;
 };

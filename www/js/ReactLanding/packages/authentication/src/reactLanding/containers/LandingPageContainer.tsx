@@ -14,6 +14,7 @@ import { sendAppClickEvent } from "../services/eventService";
 import { qualifyAffiliateLogin } from "../services/affiliateLinksService";
 import { urlConstants, landingPageStrings, experimentLayer } from "../constants/landingConstants";
 import { getReturnUrl, isVerifiedParentConsentSignup } from "../utils/signupUtils";
+import { isMobileWebSignup } from "../utils/mobileWebSignupUtils";
 import { navigateToPage } from "@rbx/authentication-common/utils/browserUtils";
 import useExperiments from "@rbx/authentication-common/hooks/useExperiments";
 import useLandingBackground from "../hooks/useLandingBackground";
@@ -67,9 +68,17 @@ export const LandingPageContainer = ({
     signupV2Treatment !== undefined && treatmentsWithFoundationSignIn.includes(signupV2Treatment);
   const shouldShowActionBar =
     !(isVPCSignup || authenticatedUser.isAuthenticated) && !hidesShellLogIn;
+  // The server only marks the page for phones it let past the download-the-app page, so
+  // desktop and tablet keep the card layout at any viewport width.
+  const usesMobileWebLayout = isSignUpV2 && isMobileWebSignup();
   const signupContainerClassName = isSignUpV2
-    ? `signup-v2-chrome${hidesShellLogIn ? " signup-v2-no-shell-log-in" : ""}`
+    ? `signup-v2-chrome${hidesShellLogIn ? " signup-v2-no-shell-log-in" : ""}${
+        usesMobileWebLayout ? " signup-v2-mobile-web" : ""
+      }`
     : undefined;
+  const pageBackgroundClassName = usesMobileWebLayout
+    ? "signup-v2-mobile-web-page"
+    : `rollercoaster-background ${landingBackgroundClass}`;
   const appStoreSpacingClassName = isSignUpV2
     ? "margin-top-large padding-top-xxlarge"
     : "padding-top-xxlarge";
@@ -104,9 +113,9 @@ export const LandingPageContainer = ({
   return (
     <div id="landing-page-container dark-theme">
       <section
-        className={`row full-height-section rollercoaster-background ${
+        className={`row full-height-section ${
           isEligibleForUsernameSuggestionExperiment ? "fixed-background" : ""
-        } ${landingBackgroundClass}`}
+        } ${pageBackgroundClassName}`}
         id="RollerContainer"
       >
         <div className="col-md-12 inner-full-height-section" id="InnerRollerContainer">
@@ -121,7 +130,7 @@ export const LandingPageContainer = ({
             <div id="signup-container" className={signupContainerClassName}>
               {/* The wordmark is positioned against this container, so it belongs to the
                   page rather than to whichever signup experience fills the slot. */}
-              <SignupHeader />
+              {!usesMobileWebLayout && <SignupHeader />}
               {signupContent ?? (
                 <SignupFormContainer
                   isEligibleForUsernameSuggestionExperiment={
@@ -151,7 +160,7 @@ export const LandingPageContainer = ({
                 />
               )}
             </div>
-            {!isVPCSignup && (
+            {!isVPCSignup && !usesMobileWebLayout && (
               <div className={appStoreSpacingClassName}>
                 <AppStoreContainer onAppClick={sendAppClickEvent} translate={translate} />
               </div>

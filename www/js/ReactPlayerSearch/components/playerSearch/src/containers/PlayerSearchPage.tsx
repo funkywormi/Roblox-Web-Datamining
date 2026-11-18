@@ -149,14 +149,6 @@ const PlayerSearchPage = (): React.JSX.Element => {
     setUrlKeyword(normalizedKeyword);
   }, [inputValue, setUrlKeyword, urlKeyword]);
 
-  const onOpenProfile = useCallback(
-    (user: SearchResultUser) => {
-      firePlayerTileClickEvent(user);
-      window.location.assign(user.profileUrl);
-    },
-    [firePlayerTileClickEvent],
-  );
-
   const onAddFriend = useCallback(
     (user: SearchResultUser) => {
       setPendingUserId(user.id);
@@ -309,7 +301,7 @@ const PlayerSearchPage = (): React.JSX.Element => {
               onAddFriend(userToAdd);
             }}
             onJoinGame={onJoinGame}
-            onOpenProfile={onOpenProfile}
+            onProfileClick={firePlayerTileClickEvent}
             onStartChat={onStartChat}
             renameFriendsToConnections={renameFriendsToConnections}
             user={user}

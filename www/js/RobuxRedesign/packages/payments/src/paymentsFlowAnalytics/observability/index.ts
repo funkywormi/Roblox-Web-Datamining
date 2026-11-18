@@ -13,6 +13,7 @@ export const observabilityRegistry = {
         "UserPaymentFlowMidPurchaseStepTriggeredWithoutCtx",
         "UserPaymentFlowFlowEnded",
         { name: "UserPaymentFlowEventSent", dimensions: ["transport", "requestedTransport"] },
+        { name: "UserPaymentFlowEventFetchFailed", dimensions: ["eventName"] },
       ],
       errors: [
         "UserPaymentFlowWrongUsageOfMethod",

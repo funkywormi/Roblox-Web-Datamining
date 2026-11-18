@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useRef } from "react";
+import React, { forwardRef, useCallback, useContext, useRef } from "react";
 import { WithTranslationsProps } from "@rbx/core-scripts/react";
 import { TBuildEventProperties } from "../common/components/GameTileUtils";
 import { EventStreamMetadata, SessionInfoType } from "../common/constants/eventStreamConstants";
@@ -6,8 +6,10 @@ import { PageContext } from "../common/types/pageContext";
 import useGameImpressionsIntersectionTracker, {
   TBuildCarouselGameImpressionsEventProperties,
 } from "../common/hooks/useGameImpressionsIntersectionTracker";
-import GameCarouselContainerHeader from "../common/components/GameCarouselContainerHeader";
-import GameCarouselHorizontalScroll from "../gamesPage/components/GameCarouselHorizontalScroll";
+import GameCarouselContainerHeaderBase from "../common/components/GameCarouselContainerHeaderBase";
+import GameCarouselHorizontalScrollBase from "../gamesPage/components/GameCarouselHorizontalScrollBase";
+import GameTileContent from "../common/components/GameTileContent";
+import type { TGameTileTypeMapProps } from "../common/components/GameTileTypeMap";
 import {
   getSponsoredAdImpressionsData,
   getThumbnailAssetIdImpressionsData,
@@ -17,6 +19,13 @@ import SearchLandingPageSessionContext from "./SearchLandingPageSessionContext";
 import { getSortTargetIdMetadata } from "../omniFeed/utils/gameSortUtils";
 import { TExploreApiGameSort } from "../common/types/bedev2Types";
 import { TGameData, TGetFriendsResponse } from "../common/types/bedev1Types";
+
+const SearchLandingTile = forwardRef<HTMLDivElement, TGameTileTypeMapProps>(
+  ({ componentType: _componentType, ...tileProps }, ref) => (
+    <GameTileContent ref={ref} {...tileProps} />
+  ),
+);
+SearchLandingTile.displayName = "SearchLandingTile";
 
 type SearchLandingPageGamesCarouselProps = {
   positionId: number;
@@ -89,7 +98,7 @@ const SearchLandingPageGamesCarousel = ({
   return (
     // TODO CLIGROW-2261 Support component type / wide (16:9) aspect ratio tiles
     <React.Fragment>
-      <GameCarouselContainerHeader
+      <GameCarouselContainerHeaderBase
         sortTitle={sort.topic}
         sortSubtitle={sort.subtitle}
         shouldShowSeparateSubtitleLink={false}
@@ -101,7 +110,8 @@ const SearchLandingPageGamesCarousel = ({
         subtitleLink={undefined}
         shouldShowSponsoredTooltip={undefined}
       />
-      <GameCarouselHorizontalScroll
+      <GameCarouselHorizontalScrollBase
+        TileComponent={SearchLandingTile}
         gameData={gameData}
         sort={sort}
         positionId={positionId}

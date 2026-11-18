@@ -1,7 +1,6 @@
 import { JSX } from "react";
 import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
-import { Icon } from "@rbx/foundation-ui";
-import { Badge } from "@rbx/foundation-ui-old-badge";
+import { Icon, StatusIndicator } from "@rbx/foundation-ui";
 
 const formatFriendRequestBadgeLabel = (count: number): string =>
   count > 99 ? "99+" : String(count);
@@ -20,10 +19,11 @@ const AddFriendsTile = ({
       <a href="/users/friends#!/friend-requests" className="flex flex-col gap-xsmall">
         <div className="add-friends-icon-container">
           {badgeCount > 0 && (
-            <Badge
-              className="friend-request-badge"
-              variant="Alert"
-              label={formatFriendRequestBadgeLabel(badgeCount)}
+            <StatusIndicator
+              variant="Numeric"
+              size="Large"
+              value={formatFriendRequestBadgeLabel(badgeCount)}
+              className="absolute top-[var(--size-100)] right-[var(--size-100)] [z-index:1]"
             />
           )}
           <Icon

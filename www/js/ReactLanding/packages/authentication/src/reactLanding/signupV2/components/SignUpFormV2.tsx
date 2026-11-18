@@ -8,6 +8,7 @@ import {
   MenuSection,
   TextInput,
 } from "@rbx/foundation-ui";
+import { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
 import { Gender } from "@rbx/authentication-common/types/signupTypes";
 import GenderChips from "@rbx/authentication-common/components/GenderChips";
 import UsernameRequirementList, {
@@ -15,6 +16,9 @@ import UsernameRequirementList, {
 } from "@rbx/authentication-common/components/UsernameRequirementList";
 import signupV2CardClassName from "../constants/signupV2Styles";
 import UsernameSuggestions from "@rbx/authentication-common/components/UsernameSuggestions";
+import BirthdaySheetField from "./BirthdaySheetField";
+import { signupFormStrings } from "../../constants/signupConstants";
+import useSignupAuditContent from "../../hooks/useSignupAuditContent";
 
 // Hoisted out of the JSX because `react/jsx-no-literals` rejects bare strings there.
 const requiredFieldMarker = "*";
@@ -43,12 +47,12 @@ export type SignUpFormV2BirthdayField = {
 export type SignUpFormV2Labels = {
   heading: string;
   subheading: string;
-  birthday: string;
-  username: string;
+  birthdayDatePlaceholder: string;
+  birthdaySheetTitle: string;
+  birthdayDone: string;
+  close: string;
   usernamePlaceholder: string;
-  password: string;
   passwordPlaceholder: string;
-  gender: string;
   continue: string;
   createAccount: string;
   showPassword: string;
@@ -57,6 +61,7 @@ export type SignUpFormV2Labels = {
 
 type SignUpFormV2BaseProps = {
   labels: SignUpFormV2Labels;
+  translate: WithTranslationsProps["translate"];
   birthdayFields: ReadonlyArray<SignUpFormV2BirthdayField>;
   birthdayError?: string;
   username: string;
@@ -75,8 +80,10 @@ type SignUpFormV2BaseProps = {
   generalError?: string;
   isSubmitting?: boolean;
   isSubmitDisabled?: boolean;
+  isMobileWebLayout?: boolean;
   cardClassName?: string;
   headingRef?: Ref<HTMLHeadingElement>;
+  onClose?: () => void;
   onBirthdayChange: (field: SignUpFormV2BirthdayFieldName, value: string) => void;
   onUsernameChange: (username: string) => void;
   onUsernameSuggestionSelect?: (username: string) => void;
@@ -116,10 +123,13 @@ const birthdayFieldIdByName: Record<SignUpFormV2BirthdayFieldName, string> = {
   year: "YearDropdown",
 };
 
+const birthdaySheetFieldId = "signup-v2-birthday";
+
 const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
   const {
     submissionMode,
     labels,
+    translate,
     birthdayFields,
     birthdayError,
     username,
@@ -135,8 +145,10 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
     generalError,
     isSubmitting = false,
     isSubmitDisabled = false,
+    isMobileWebLayout = false,
     cardClassName = signupV2CardClassName,
     headingRef,
+    onClose,
     onBirthdayChange,
     onUsernameChange,
     onUsernameSuggestionSelect,
@@ -145,6 +157,13 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
     onGenderChange,
     onSubmit,
   } = props;
+  useSignupAuditContent(signupFormStrings.Birthday, translate);
+  useSignupAuditContent(signupFormStrings.Username, translate);
+  useSignupAuditContent(
+    submissionMode === SignUpFormV2SubmissionMode.Password ? signupFormStrings.Password : null,
+    translate,
+  );
+  useSignupAuditContent(onGenderChange ? signupFormStrings.Gender : null, translate);
   const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const isUsernamePointerDownRef = useRef(false);
   const isUsernameBlurPendingRef = useRef(false);
@@ -220,7 +239,7 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
         name="signupPassword"
         type={isPasswordVisible ? "text" : "password"}
         size="Medium"
-        label={labels.password}
+        label={translate(signupFormStrings.Password)}
         placeholder={labels.passwordPlaceholder}
         autoComplete="new-password"
         isRequired
@@ -260,7 +279,19 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
       noValidate
       data-testid="signup-form-v2"
     >
-      <div className="flex width-full flex-col items-start">
+      <div className="signup-v2-title-bar flex width-full flex-col items-start">
+        {isMobileWebLayout && onClose && (
+          <IconButton
+            type="button"
+            icon="icon-regular-x"
+            ariaLabel={labels.close}
+            size="Medium"
+            variant="Utility"
+            isDisabled={isSubmitting}
+            onClick={onClose}
+            className="signup-v2-close-button margin-right-[-12px]"
+          />
+        )}
         {/* The StyleGuide gives every heading element vertical padding, which would
             otherwise push the title below the card's own inset. */}
         <h1
@@ -270,65 +301,84 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
         >
           {labels.heading}
         </h1>
-        <p className="content-default text-body-medium">{labels.subheading}</p>
+        <p className="signup-v2-subheading content-default text-body-medium">{labels.subheading}</p>
       </div>
 
       <div className="flex width-full flex-col items-center gap-[20px]">
         <div className="flex width-full flex-col gap-large">
-          <div
-            role="group"
-            aria-labelledby="signup-v2-birthday-label"
-            aria-describedby={birthdayError ? "signup-v2-birthday-error" : undefined}
-          >
-            <span
-              id="signup-v2-birthday-label"
-              className="content-emphasis text-title-medium padding-bottom-small block"
+          {isMobileWebLayout ? (
+            <BirthdaySheetField
+              id={birthdaySheetFieldId}
+              label={translate(signupFormStrings.Birthday)}
+              placeholder={labels.birthdayDatePlaceholder}
+              sheetTitle={labels.birthdaySheetTitle}
+              doneLabel={labels.birthdayDone}
+              closeLabel={labels.close}
+              fields={birthdayFields}
+              error={birthdayError}
+              isDisabled={isSubmitting}
+              onBirthdayChange={onBirthdayChange}
+            />
+          ) : (
+            <div
+              role="group"
+              aria-labelledby="signup-v2-birthday-label"
+              aria-describedby={birthdayError ? "signup-v2-birthday-error" : undefined}
             >
-              {labels.birthday}{" "}
-              {/* Birthday is a Dropdown group rather than a Foundation field, so it has
+              <span
+                id="signup-v2-birthday-label"
+                className="content-emphasis text-title-medium padding-bottom-small block"
+              >
+                {translate(signupFormStrings.Birthday)}{" "}
+                {/* Birthday is a Dropdown group rather than a Foundation field, so it has
                   to reproduce the marker TextInput renders for `isRequired`.
                   TODO: validate with RTL languages https://roblox.atlassian.net/browse/AA-7421 */}
-              <span className="content-default">{requiredFieldMarker}</span>
-            </span>
-            <div className="flex width-full gap-small">
-              {birthdayFields.map(field => (
-                <div
-                  id={birthdayFieldIdByName[field.name]}
-                  className="min-width-0 grow-1 basis-0"
-                  key={field.name}
-                  data-testid={`birthday-${field.name}`}
-                >
-                  <Dropdown
-                    size="Medium"
-                    value={field.value || undefined}
-                    placeholder={field.placeholder}
-                    ariaLabel={field.label}
-                    isDisabled={isSubmitting}
-                    hasError={Boolean(birthdayError)}
-                    onValueChange={value => onBirthdayChange(field.name, value)}
-                    onOpenChange={field.onOpenChange}
-                  >
-                    <Menu>
-                      <MenuSection>
-                        {field.options.map(option => (
-                          <MenuItem key={option.value} value={option.value} title={option.title} />
-                        ))}
-                      </MenuSection>
-                    </Menu>
-                  </Dropdown>
-                </div>
-              ))}
-            </div>
-            {birthdayError && (
-              <span
-                id="signup-v2-birthday-error"
-                className="content-system-alert text-caption-small padding-top-small block"
-                aria-live="polite"
-              >
-                {birthdayError}
+                <span className="content-default">{requiredFieldMarker}</span>
               </span>
-            )}
-          </div>
+              <div className="flex width-full gap-small">
+                {birthdayFields.map(field => (
+                  <div
+                    id={birthdayFieldIdByName[field.name]}
+                    className="min-width-0 grow-1 basis-0"
+                    key={field.name}
+                    data-testid={`birthday-${field.name}`}
+                  >
+                    <Dropdown
+                      size="Medium"
+                      value={field.value || undefined}
+                      placeholder={field.placeholder}
+                      ariaLabel={field.label}
+                      isDisabled={isSubmitting}
+                      hasError={Boolean(birthdayError)}
+                      onValueChange={value => onBirthdayChange(field.name, value)}
+                      onOpenChange={field.onOpenChange}
+                    >
+                      <Menu>
+                        <MenuSection>
+                          {field.options.map(option => (
+                            <MenuItem
+                              key={option.value}
+                              value={option.value}
+                              title={option.title}
+                            />
+                          ))}
+                        </MenuSection>
+                      </Menu>
+                    </Dropdown>
+                  </div>
+                ))}
+              </div>
+              {birthdayError && (
+                <span
+                  id="signup-v2-birthday-error"
+                  className="content-system-alert text-caption-small padding-top-small block"
+                  aria-live="polite"
+                >
+                  {birthdayError}
+                </span>
+              )}
+            </div>
+          )}
 
           <div className="flex width-full flex-col gap-small">
             <TextInput
@@ -336,9 +386,11 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
               name="signupUsername"
               type="text"
               size="Medium"
-              label={labels.username}
+              label={translate(signupFormStrings.Username)}
               placeholder={labels.usernamePlaceholder}
-              autoComplete="username"
+              // Android Chrome reads a lone username field as a login and covers it with its
+              // saved-password sheet, which fills in an existing account's name.
+              autoComplete={isMobileWebLayout ? "off" : "username"}
               isRequired
               value={username}
               onChange={event => onUsernameChange(event.target.value)}
@@ -392,7 +444,7 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
                 // GenderChips' wrapper gap-small already spaces the label above the chips;
                 // padding-bottom-small here would double it.
                 labelClassName="content-emphasis text-title-medium block"
-                label={labels.gender}
+                label={translate(signupFormStrings.Gender)}
                 onChange={nextGender => {
                   onGenderChange?.(nextGender);
                 }}
@@ -430,7 +482,8 @@ const SignUpFormV2 = (props: SignUpFormV2Props): JSX.Element => {
           {signInContent && (
             // The design sizes this row like a Medium button, 16px below the controls above it.
             // Padding rather than margin-top-small, which legacy page CSS overrides to 20px.
-            <div className="width-full padding-top-small">
+            // The mobile-web design keeps the row at the column's 8px gap instead.
+            <div className={isMobileWebLayout ? "width-full" : "width-full padding-top-small"}>
               <div className="flex width-full items-center height-1000">
                 {signInContent({ isDisabled: isSubmitting })}
               </div>

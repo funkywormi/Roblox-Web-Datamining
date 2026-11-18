@@ -11,7 +11,9 @@ import {
   THoverStyle,
 } from "../types/bedev2Types";
 import GameTileTypeMap from "./GameTileTypeMap";
-import "../../../css/common/_gameCarousel.scss";
+import "../../../css/gameTiles/coreHoverTile.css";
+import "../../../css/gameTiles/gridTile.css";
+import "../../../css/common/gameCarousel.css";
 
 export type TGameCarouselProps = {
   gameData: TGameData[];

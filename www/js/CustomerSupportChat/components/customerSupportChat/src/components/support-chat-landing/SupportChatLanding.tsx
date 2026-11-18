@@ -20,6 +20,10 @@ type SupportChatLandingProps = {
   onSend?: (message: string) => void | Promise<void>;
   /** Follows the message box, so text typed while the first message sends can move to the chat. */
   onDraftChange?: (draft: string) => void;
+  /** The title of the Help Center article the visitor came from, once it is known. */
+  articlePrefill?: string;
+  /** The visitor edited or cleared that title, so a remount must not fill it again. */
+  onPrefillDismiss?: () => void;
 };
 
 /**
@@ -30,10 +34,16 @@ type SupportChatLandingProps = {
 const SupportChatLanding = ({
   onSend,
   onDraftChange,
+  articlePrefill,
+  onPrefillDismiss,
 }: SupportChatLandingProps): React.ReactElement => {
   // `carried` is text already in the box when an issue was chosen, so it stays in the box.
   const [pending, setPending] = useState<{ text: string; carried: string }>();
   const [homeDraft, setHomeDraft] = useState("");
+  // The home composer unmounts while a message is sending, so this has to outlive it. Once the
+  // visitor changes the prefilled title, a new composer must not put that title back.
+  const [prefillDismissed, setPrefillDismissed] = useState(false);
+  const sawPrefill = useRef(false);
   // What is in the home box, and what is in the chat frame's box while the first message sends.
   const homeBox = useRef("");
   const followUp = useRef("");
@@ -46,6 +56,25 @@ const SupportChatLanding = ({
     },
     [],
   );
+
+  const noteHomeDraft = (draft: string) => {
+    homeBox.current = draft;
+    if (prefillDismissed) {
+      return;
+    }
+    if (articlePrefill && draft === articlePrefill) {
+      sawPrefill.current = true;
+      return;
+    }
+    // "" is the box before the title is written in. The visitor's own text, or clearing the title
+    // after it was shown, means a later remount must not fill the title again.
+    const visitorTypedTheirOwn = draft !== "" && draft !== articlePrefill;
+    const visitorClearedTheTitle = sawPrefill.current && draft !== articlePrefill;
+    if (visitorTypedTheirOwn || visitorClearedTheTitle) {
+      setPrefillDismissed(true);
+      onPrefillDismiss?.();
+    }
+  };
 
   const send = async (text: string, wasTyped: boolean) => {
     if (!canSend) {
@@ -106,9 +135,8 @@ const SupportChatLanding = ({
         maxLength={MESSAGE_MAX_LENGTH}
         focusOnMount
         initialDraft={homeDraft}
-        onDraftChange={draft => {
-          homeBox.current = draft;
-        }}
+        prefill={prefillDismissed ? undefined : articlePrefill}
+        onDraftChange={noteHomeDraft}
       />
 
       <ul className="support-chat-landing-issues" aria-label={COMMON_ISSUES_LABEL}>

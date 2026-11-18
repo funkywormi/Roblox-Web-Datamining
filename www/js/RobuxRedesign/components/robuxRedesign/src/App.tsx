@@ -52,7 +52,7 @@ export const App = ({ enhancedBuyRobuxPageData, urlParams, deviceMeta }: AppProp
     // Temporarily message to user to restart app for this incident - https://rbx.enterprise.slack.com/archives/C0CEG3QV77D
     isWarningShown.current = true;
     trackCounter("IosPurchaseRestartAlertShown");
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEventViaFetch({
       triggerContext: getTriggerContext(deviceMeta),
       isMidPurchaseStep: true,
       viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.IOS_PURCHASE_RESTART_ALERT,

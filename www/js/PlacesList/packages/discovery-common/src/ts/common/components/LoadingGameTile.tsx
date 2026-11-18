@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../css/common/_gameTiles.scss";
+import "../../../css/common/gameTiles.css";
 
 export const LoadingGameTile = (): JSX.Element => {
   return (

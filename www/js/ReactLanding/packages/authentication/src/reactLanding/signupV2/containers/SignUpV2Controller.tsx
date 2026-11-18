@@ -47,6 +47,7 @@ import {
   buildSignupParams as buildProductionSignupParams,
 } from "../../utils/signupRequestUtils";
 import { getProductionSignupAgreementIds, SignupAgreement } from "../../utils/signupAgreementUtils";
+import { isMobileWebSignup } from "../../utils/mobileWebSignupUtils";
 import {
   SubmitSignupOptions,
   submitSignup as submitProductionSignup,
@@ -95,7 +96,6 @@ import useSignUpV2Compliance from "../hooks/useSignUpV2Compliance";
 import useUsernameSuggestions from "@rbx/authentication-common/hooks/useUsernameSuggestions";
 import { SignUpFormV2BirthdayFieldName } from "../components/SignUpFormV2";
 import SignInPrompt from "../components/SignInPrompt";
-import SignUpV2AuditContent from "../components/SignUpV2AuditContent";
 import {
   getPasswordRequirements,
   PasswordRequirement,
@@ -131,7 +131,8 @@ type SignUpV2ControllerProps = {
 const { focused, unfocused, selected, unselected } = EVENT_CONSTANTS.state;
 const { birthdayDay, birthdayMonth, birthdayYear, signupUsername, signupPassword } =
   EVENT_CONSTANTS.field;
-const { genderMale, genderFemale, signIn, usernameSuggestion } = EVENT_CONSTANTS.btn;
+const { genderMale, genderFemale, signIn, usernameSuggestion, dismissCornerX } =
+  EVENT_CONSTANTS.btn;
 const formInteractionCtx = EVENT_CONSTANTS.context.signupForm;
 
 const birthdayInteractionField: Record<SignUpFormV2BirthdayFieldName, string> = {
@@ -261,7 +262,10 @@ const SignUpV2Controller = ({
     ),
   });
   const authUiPolicy = useAuthUiPolicy();
+  const usesMobileWebLayout = isMobileWebSignup();
+  // SSO is not supported on mobile web yet, so the mobile-web form never offers it.
   const isSsoOffered =
+    !usesMobileWebLayout &&
     authUiVariant === authUiVariants.refreshSsoInline &&
     !authUiPolicy.isLoading &&
     !authUiPolicy.isExternalIdentityLoginExcluded &&
@@ -615,16 +619,25 @@ const SignUpV2Controller = ({
     lastSubmissionRef.current = null;
   };
 
+  const pageHeading = usesMobileWebLayout
+    ? translate(signupFormStrings.CreateAccountToPlay) || "Create account to play"
+    : translate(signupFormStrings.CreateAccountSentenceCase);
+
+  const signInReturnUrl = usesMobileWebLayout ? getReturnUrl() : "";
+  const signInUrl = signInReturnUrl
+    ? `${urlConstants.login}?${new URLSearchParams({ returnUrl: signInReturnUrl }).toString()}`
+    : urlConstants.login;
+
   const formProps: SignUpContainerV2FormProps = {
     labels: {
-      heading: translate(signupFormStrings.CreateAccountSentenceCase),
+      heading: pageHeading,
       subheading: translate(signupFormStrings.HeadingPlayCreateConnect),
-      birthday: translate(signupFormStrings.Birthday),
-      username: translate(signupFormStrings.Username),
+      birthdayDatePlaceholder: translate(signupFormStrings.EnterDate),
+      birthdaySheetTitle: translate(signupFormStrings.SelectBirthday) || "Select birthday",
+      birthdayDone: translate("Action.OK"),
+      close: translate("Action.Close"),
       usernamePlaceholder: translate(signupFormStrings.UsernamePlaceholder),
-      password: translate(signupFormStrings.Password),
       passwordPlaceholder: translate(signupFormStrings.PasswordPlaceholder),
-      gender: translate(signupFormStrings.Gender),
       continue: translate("Action.Continue"),
       createAccount: translate(signupFormStrings.CreateAccountSentenceCase),
       showPassword: translate("Label.ShowPassword"),
@@ -644,6 +657,13 @@ const SignUpV2Controller = ({
     isPasswordVisible,
     gender,
     legalContent: compliance.legalContent,
+    isMobileWebLayout: usesMobileWebLayout,
+    onClose: usesMobileWebLayout
+      ? () => {
+          sendAuthButtonClickEvent(dismissCornerX, "", signupCtx);
+          navigateToPage(getReturnUrl() || "/");
+        }
+      : undefined,
     signInContent:
       treatment === SignUpV2Treatment.FoundationControl
         ? undefined
@@ -651,7 +671,7 @@ const SignUpV2Controller = ({
             <SignInPrompt
               translate={translate}
               translationKey={signupFormStrings.AlreadyHaveAccountSignIn}
-              href={urlConstants.login}
+              href={signInUrl}
               isDisabled={isDisabled || isAccountLimitReached}
               onClick={() => {
                 sendAuthButtonClickEvent(signIn, "", signupCtx);
@@ -714,6 +734,11 @@ const SignUpV2Controller = ({
     },
     onUsernameBlur: () => {
       sendAuthFormInteractionEvent(formInteractionCtx, signupUsername, unfocused);
+      // Browser sheets on phones take focus before anyone types, which shouldn't count as leaving
+      // the field empty.
+      if (usesMobileWebLayout && !username && usernameStatus === FormFieldStatus.Incomplete) {
+        return;
+      }
       // eslint-disable-next-line no-void
       void validateUsername();
     },
@@ -744,7 +769,6 @@ const SignUpV2Controller = ({
 
   return (
     <React.Fragment>
-      <SignUpV2AuditContent treatment={treatment} translate={translate} />
       {compliance.interstitial}
       {/* Stays mounted under the consent page so the pending Continue can resume. */}
       <div hidden={Boolean(compliance.interstitial)}>
@@ -753,10 +777,13 @@ const SignUpV2Controller = ({
           formProps={formProps}
           addAuthMethodLabels={{
             back: translate("Action.Back"),
-            heading: translate(signupFormStrings.CreateAccountSentenceCase),
+            close: translate("Action.Close"),
+            heading: pageHeading,
             greeting: translate("Heading.UserGreetingWithName", { username }),
-            subheading: translate("Description.ChooseHowYouSignIn"),
-            passwordLabel: translate(signupFormStrings.Password),
+            subheading: usesMobileWebLayout
+              ? translate(signupFormStrings.ChooseHowToSecureAccount) ||
+                "Choose how to secure your account."
+              : translate("Description.ChooseHowYouSignIn"),
             passwordPlaceholder: translate(signupFormStrings.PasswordPlaceholder),
             showPassword: translate("Label.ShowPassword"),
             hidePassword: translate("Label.HidePassword"),
@@ -791,6 +818,7 @@ const SignUpV2Controller = ({
           isPasswordSubmitDisabled={!isBaseFormValid || !isPasswordValid || isAccountLimitReached}
           isPasskeySubmitDisabled={!isBaseFormValid || isAccountLimitReached}
           beginComplianceInterruption={compliance.beginInterruption}
+          translate={translate}
         />
       </div>
       <AccountSwitcherRestrictionComponent

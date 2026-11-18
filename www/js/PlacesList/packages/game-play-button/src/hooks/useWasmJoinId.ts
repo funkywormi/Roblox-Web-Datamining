@@ -6,18 +6,19 @@ export const WASM_JOIN_ID_QUERY_KEY = "wasmJoinId";
 
 /**
  * Computes the current user's WASM join hash.
- * This happens asynchronously and will be undefined while being computed.
+ * This happens asynchronously and will be undefined while being computed, or when no
+ * user is signed in or computing it fails.
  */
-const useWasmJoinId = (): string | undefined => {
+const useWasmJoinId = (): { wasmJoinId: string | undefined; isLoading: boolean } => {
   const userId = getCurrentUser()?.id;
-  const { data } = useQuery({
+  const { data, isInitialLoading } = useQuery({
     queryKey: [WASM_JOIN_ID_QUERY_KEY, userId],
     queryFn: () => (userId == null ? Promise.resolve(null) : createWasmHash({ userId })),
     enabled: userId != null,
     staleTime: Infinity,
     retry: false,
   });
-  return data ?? undefined;
+  return { wasmJoinId: data ?? undefined, isLoading: isInitialLoading };
 };
 
 export default useWasmJoinId;

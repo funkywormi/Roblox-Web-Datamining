@@ -1,3 +1,4 @@
+import { batchQuery } from "@rbx/core-lib/promise";
 import environmentUrls from "@rbx/environment-urls";
 import * as http from "@rbx/core-scripts/http";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
@@ -59,4 +60,11 @@ const batchCheckReciprocalBlock = async (
   return data;
 };
 
-export { blockUser, unblockUser, isBlockedUser, batchCheckReciprocalBlock };
+const requestIsUserBlocked = batchQuery(
+  { delay: 10, maxSize: 50 },
+  batchCheckReciprocalBlock,
+  (response: BatchReciprocalBlockResponse, userId: number): boolean =>
+    response.users.find(user => user.userId === userId)?.isBlocked === true,
+);
+
+export { blockUser, unblockUser, isBlockedUser, batchCheckReciprocalBlock, requestIsUserBlocked };

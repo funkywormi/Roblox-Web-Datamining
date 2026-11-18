@@ -30,7 +30,8 @@ type PlayerCardProps = {
   onAcceptFriend: (user: SearchResultUser) => void;
   onAddFriend: (user: SearchResultUser) => void;
   onJoinGame: (user: SearchResultUser) => void;
-  onOpenProfile: (user: SearchResultUser) => void;
+  /** Fires on a left or middle click of the profile link. The browser does the navigation. */
+  onProfileClick: (user: SearchResultUser) => void;
   onStartChat: (user: SearchResultUser) => void;
 };
 
@@ -101,10 +102,6 @@ const presenceLabelKeys: Record<number, string> = {
   [userPresenceTypes.invisible]: "Label.Invisible",
 };
 
-const stopCardActivation = (event: React.MouseEvent | React.KeyboardEvent): void => {
-  event.stopPropagation();
-};
-
 const getPresenceText = (user: SearchResultUser, translate: Translate): string => {
   const labelKey = presenceLabelKeys[user.userPresenceType ?? userPresenceTypes.offline];
 
@@ -127,11 +124,9 @@ const statusIndicatorColors: Record<number, TStatusIndicatorColor | undefined> =
 const PresenceText = ({
   user,
   translate,
-  onLinkClick,
 }: {
   user: SearchResultUser;
   translate: Translate;
-  onLinkClick: (event: React.MouseEvent) => void;
 }): React.JSX.Element => {
   const trimmedLastLocation = user.lastLocation?.trim();
 
@@ -140,7 +135,6 @@ const PresenceText = ({
       <a
         className="text-link"
         href={`${environmentUrls.websiteUrl}/games/${user.rootPlaceId}`}
-        onClick={onLinkClick}
         title={trimmedLastLocation}
       >
         {trimmedLastLocation}
@@ -180,7 +174,7 @@ const PlayerCard = ({
   onAcceptFriend,
   onAddFriend,
   onJoinGame,
-  onOpenProfile,
+  onProfileClick,
   onStartChat,
 }: PlayerCardProps): React.JSX.Element => {
   const { translate } = useTranslation();
@@ -200,25 +194,9 @@ const PlayerCard = ({
       )}
       data-testid={`player-card-${user.id}`}
     >
-      {/* role=button, not <button>: the caption links cannot nest inside one. */}
-      <div
-        className="player-search-card-body flex width-full grow cursor-pointer items-start gap-large padding-large"
-        onClick={() => {
-          onOpenProfile(user);
-        }}
-        onKeyDown={event => {
-          if (event.target !== event.currentTarget) {
-            return;
-          }
-
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            onOpenProfile(user);
-          }
-        }}
-        role="button"
-        tabIndex={0}
-      >
+      {/* The name link stretches over this body (see .player-search-profile-link in ../main.css), so
+          the whole body is one real link. A wrapping <a> would nest the caption links inside it. */}
+      <div className="player-search-card-body relative flex width-full grow items-start gap-large padding-large">
         <span className="player-search-avatar shrink-0">
           <span className="player-search-avatar-clip">
             <Thumbnail2d
@@ -252,11 +230,24 @@ const PlayerCard = ({
                   : "player-search-card-name flex items-center gap-xxsmall text-body-large content-emphasis"
               }
             >
+              {/* Rendered while the names load too, so the card stays a link; the label names it. */}
+              <a
+                aria-label={user.areNamesLoading ? user.displayName : undefined}
+                className="player-search-profile-link min-width-0 text-truncate-end"
+                href={user.profileUrl}
+                onAuxClick={event => {
+                  if (event.button === 1) {
+                    onProfileClick(user);
+                  }
+                }}
+                onClick={() => {
+                  onProfileClick(user);
+                }}
+              >
+                {user.areNamesLoading ? null : (user.primaryName ?? user.displayName)}
+              </a>
               {user.areNamesLoading ? null : (
                 <React.Fragment>
-                  <span className="min-width-0 text-truncate-end">
-                    {user.primaryName ?? user.displayName}
-                  </span>
                   {user.hasVerifiedBadge ? (
                     <VerifiedBadgeIconContainer
                       additionalImgClass="player-search-verified-badge"
@@ -298,7 +289,6 @@ const PlayerCard = ({
               <a
                 className="player-search-card-line text-link"
                 href={user.primaryGroup?.url}
-                onClick={stopCardActivation}
                 title={groupName}
               >
                 {groupName}
@@ -307,7 +297,7 @@ const PlayerCard = ({
           ) : null}
           {shouldShowPresenceRow(user, isUserGuest) ? (
             <p className="text-body-small content-muted">
-              <PresenceText onLinkClick={stopCardActivation} translate={translate} user={user} />
+              <PresenceText translate={translate} user={user} />
             </p>
           ) : null}
         </div>

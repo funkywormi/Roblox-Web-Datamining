@@ -2,7 +2,7 @@ import { document, window } from "@rbx/core-lib/browser";
 import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import environmentUrls from "@rbx/environment-urls";
-import { Configuration, Tracker } from "@rbx/event-stream";
+import { Configuration, Tracker, type TrackerRequest } from "@rbx/event-stream";
 import { PaymentFlowContext } from "./paymentFlowContext";
 import { trackCounter, trackError } from "./observability";
 import {
@@ -70,6 +70,25 @@ const eventStreamTracker = new Tracker(
     baseUrl: `https://ecsv2.${environmentUrls.domain}/www`,
   }),
 );
+
+/**
+ * Image beacons are cancelled when the page unloads or a webview closes. `sendEventViaFetch`
+ * finishes a `keepalive` request anyway and builds the same e.png url. Only
+ * `sendUserPurchaseFlowEventViaFetch` uses this. `sendEvent` stays on the image beacon.
+ */
+const canSendEventViaFetch = (): boolean => typeof window?.fetch === "function";
+
+const sendEventStreamEventViaFetch = (request: TrackerRequest): void => {
+  if (!canSendEventViaFetch()) {
+    trackCounter("UserPaymentFlowEventSent", { transport: "img", requestedTransport: "fetch" });
+    eventStreamTracker.sendEventViaImg(request);
+    return;
+  }
+  trackCounter("UserPaymentFlowEventSent", { transport: "fetch", requestedTransport: "fetch" });
+  eventStreamTracker.sendEventViaFetch(request).catch((error: unknown) => {
+    trackError("UserPaymentFlowSendEventKeepaliveError", null, error);
+  });
+};
 
 export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
   public purchaseFlowUuid = "";
@@ -297,6 +316,54 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
   }
 
   /**
+   * Copy of `sendUserPurchaseFlowEvent` that sends with the keepalive fetch.
+   * Buy Robux page-view ViewShown is the only caller. Every other event stays on the image beacon
+   * so we can compare the two transports on one event before moving the rest.
+   */
+  public sendUserPurchaseFlowEventViaFetch({
+    triggerContext,
+    isMidPurchaseStep,
+    viewName,
+    purchaseEventType,
+    viewMessage,
+    eventMetadata = {},
+    isTerminalView = false,
+  }: SendUserPurchaseFlowEventParams): void {
+    if (!isBrowser()) {
+      return;
+    }
+    try {
+      const sanitizedTriggerContext =
+        PaymentFlowAnalyticsService.reclassifyPlatformTriggeringContext({ triggerContext });
+      this.eventMetadata = { ...this.eventMetadata, ...eventMetadata };
+      if (!viewName && !purchaseEventType && !viewMessage) {
+        trackError("UserPaymentFlowWrongUsageOfMethod");
+        return;
+      }
+      this.adoptSharedTriggerContext();
+      if (!this.triggerContext) {
+        this.triggerContext = sanitizedTriggerContext;
+        this.writePaymentFlowContextIntoCookie();
+        if (isMidPurchaseStep) {
+          trackCounter("UserPaymentFlowMidPurchaseStepTriggeredWithoutCtx");
+        }
+      }
+      this.sendEventViaFetch({
+        eventName: EVENT_NAME.USER_PURCHASE_FLOW,
+        viewName,
+        purchaseEventType,
+        viewMessage,
+      });
+
+      if (isTerminalView) {
+        this.handleTerminalPage();
+      }
+    } catch (error) {
+      trackError("UserPaymentFlowSendUserEventError", null, error);
+    }
+  }
+
+  /**
    * Send a user purchase status event
    * A status event should never be used as flow starter but a middle of purchase state indicator
    */
@@ -405,9 +472,64 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
     const metadata = JSON.stringify({
       ...this.eventMetadata,
       ...(this.webStack === undefined ? {} : { webStack: this.webStack }),
+      eventTransport: "img",
     });
 
+    trackCounter("UserPaymentFlowEventSent", { transport: "img", requestedTransport: "img" });
     eventStreamTracker.sendEventViaImg({
+      target: "www",
+      localTime: new Date(),
+      eventType: eventName,
+      context: this.triggerContext,
+      additionalProperties: {
+        purchase_flow_uuid: this.purchaseFlowUuid,
+        view_name: viewName,
+        purchase_event_type: purchaseEventType,
+        view_message: viewMessage,
+        status,
+        refurl: referralUrl.substring(0, 200), // Max 200 should be sufficient for logging urls
+        prev_view_path: previousView,
+        current_view_path: currentView,
+        event_metadata: metadata,
+      },
+    });
+  }
+
+  /** Duplicate of `sendEvent` that uses the keepalive fetch transport. */
+  private sendEventViaFetch({
+    eventName,
+    viewName,
+    purchaseEventType,
+    viewMessage,
+    status,
+  }: {
+    eventName: EventName;
+    viewName?: ViewName;
+    purchaseEventType?: PurchaseEventType;
+    viewMessage?: string;
+    status?: PurchaseStatus;
+  }): void {
+    this.adoptSharedFlowUuid();
+    if (!this.purchaseFlowUuid || !this.triggerContext) {
+      trackError("UserPaymentFlowSendEventWithoutUuidOrCtx");
+      return;
+    }
+    const currentWindow = window;
+    if (currentWindow == null) {
+      return;
+    }
+
+    const referralUrl = PaymentFlowAnalyticsService.getReferralUrl();
+    const previousView = PaymentFlowAnalyticsService.extractView(referralUrl);
+    const currentView = PaymentFlowAnalyticsService.extractView(currentWindow.location.href);
+    const eventTransport = canSendEventViaFetch() ? "fetch" : "img";
+    const metadata = JSON.stringify({
+      ...this.eventMetadata,
+      ...(this.webStack === undefined ? {} : { webStack: this.webStack }),
+      eventTransport,
+    });
+
+    sendEventStreamEventViaFetch({
       target: "www",
       localTime: new Date(),
       eventType: eventName,

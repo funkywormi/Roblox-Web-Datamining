@@ -1,5 +1,8 @@
 import React, { FormEvent, Ref, useState } from "react";
 import { Button, Divider, IconButton, TextInput } from "@rbx/foundation-ui";
+import { WithTranslationsProps } from "@rbx/core-scripts/legacy/react-utilities";
+import { signupFormStrings } from "../../constants/signupConstants";
+import useSignupAuditContent from "../../hooks/useSignupAuditContent";
 import signupV2CardClassName from "../constants/signupV2Styles";
 import PasswordRequirementList, { PasswordRequirementItem } from "./PasswordRequirementList";
 
@@ -10,10 +13,10 @@ export enum AddAuthMethodLayout {
 
 export type AddAuthMethodPageLabels = {
   back: string;
+  close: string;
   heading: string;
   greeting: string;
   subheading: string;
-  passwordLabel: string;
   passwordPlaceholder: string;
   showPassword: string;
   hidePassword: string;
@@ -25,6 +28,10 @@ export type AddAuthMethodPageLabels = {
 export type AddAuthMethodPageProps = {
   layout: AddAuthMethodLayout;
   labels: AddAuthMethodPageLabels;
+  translate: WithTranslationsProps["translate"];
+  /** True while the page stays mounted out of view. A hidden page adds no labels to the audit content. */
+  isHidden?: boolean;
+  username?: string;
   password: string;
   isPasswordVisible?: boolean;
   passwordRequirements?: PasswordRequirementItem[];
@@ -42,6 +49,7 @@ export type AddAuthMethodPageProps = {
   onCreatePassword: () => void;
   onCreatePasskey: () => void;
   onBack: () => void;
+  onClose?: () => void;
 };
 
 // Divider hardcodes `self-stretch`, pinning its zero-height box to the top of the row.
@@ -66,6 +74,9 @@ const OrDivider = ({ label }: { label: string }): JSX.Element => (
 const AddAuthMethodPage = ({
   layout,
   labels,
+  translate,
+  isHidden = false,
+  username,
   password,
   isPasswordVisible = false,
   passwordRequirements = [],
@@ -83,7 +94,9 @@ const AddAuthMethodPage = ({
   onCreatePassword,
   onCreatePasskey,
   onBack,
+  onClose,
 }: AddAuthMethodPageProps): JSX.Element => {
+  useSignupAuditContent(isHidden ? null : signupFormStrings.Password, translate);
   const isBusy = isCreatingPassword || isCreatingPasskey;
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
@@ -118,7 +131,7 @@ const AddAuthMethodPage = ({
           id={passwordInputId}
           type={isPasswordVisible ? "text" : "password"}
           size="Medium"
-          label={labels.passwordLabel}
+          label={translate(signupFormStrings.Password)}
           placeholder={labels.passwordPlaceholder}
           autoComplete="new-password"
           value={password}
@@ -197,7 +210,18 @@ const AddAuthMethodPage = ({
       aria-busy={isBusy}
       data-testid="add-auth-method-page"
     >
-      <div className="flex width-full items-center gap-small">
+      {/* Without a username in this form, password managers save the new password nameless. */}
+      {username && (
+        <input
+          type="text"
+          name="username"
+          autoComplete="username"
+          value={username}
+          readOnly
+          hidden
+        />
+      )}
+      <div className="signup-v2-title-bar flex width-full items-center gap-small">
         <IconButton
           type="button"
           icon="icon-regular-chevron-large-left"
@@ -207,7 +231,7 @@ const AddAuthMethodPage = ({
           isDisabled={isBusy}
           onClick={onBack}
           // Pulls the glyph back to the card's content edge, past the button's own padding.
-          className="margin-left-[-12px]"
+          className="signup-v2-back-button margin-left-[-12px]"
         />
         {/* StyleGuide pads every heading element, pushing the title off the card's inset. */}
         <h1
@@ -217,6 +241,18 @@ const AddAuthMethodPage = ({
         >
           {labels.heading}
         </h1>
+        {onClose && (
+          <IconButton
+            type="button"
+            icon="icon-regular-x"
+            ariaLabel={labels.close}
+            size="Medium"
+            variant="Utility"
+            isDisabled={isBusy}
+            onClick={onClose}
+            className="signup-v2-close-button margin-right-[-12px]"
+          />
+        )}
       </div>
 
       {/* Legacy `.dark-theme p` outranks Foundation content tokens, so this copy and the

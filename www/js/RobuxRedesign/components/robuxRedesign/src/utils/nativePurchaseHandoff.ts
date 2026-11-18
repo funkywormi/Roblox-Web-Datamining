@@ -76,7 +76,7 @@ function trackNativePurchaseUiShown(
     appMinorVersion: context.appMinorVersion,
     isSub: context.isSub,
   });
-  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+  paymentFlowAnalyticsService.sendUserPurchaseFlowEventViaFetch({
     triggerContext: context.triggerContext,
     isMidPurchaseStep: true,
     viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.NATIVE_PURCHASE_UI_SHOWN_TIME,

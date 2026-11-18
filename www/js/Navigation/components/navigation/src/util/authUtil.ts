@@ -25,6 +25,7 @@ import {
   getSignupUrl,
   isLoginLinkAvailable,
   navigateToLoginWithRedirect,
+  tryGetIsVNGLandingRedirectEnabled,
 } from "./authLinkUtil";
 
 const { logoutEvent } = layoutConstants;
@@ -108,6 +109,7 @@ export {
   isLoginLinkAvailable,
   openAccountSwitcher,
   getIsVNGLandingRedirectEnabled,
+  tryGetIsVNGLandingRedirectEnabled,
   navigateToLoginWithRedirect,
   cacheUserId,
 };

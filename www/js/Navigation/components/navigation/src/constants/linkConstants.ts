@@ -2,6 +2,7 @@ import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import environmentUrls from "@rbx/environment-urls";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import { TIconProps } from "@rbx/foundation-ui";
+import { getDevelopUrl } from "../util/developUtil";
 
 type BaseUniversalSearchLink = {
   url: string;
@@ -53,7 +54,7 @@ const miscSearchLink: UniversalSearchLink[] = [
     foundationIcon: "icon-regular-three-people",
   },
   {
-    url: `https://create.${environmentUrls.domain}/store/models?keyword=`,
+    url: `${getDevelopUrl()}store/models?keyword=`,
     label: "Label.CreatorStore",
     pageSort: ["develop"],
     // Deviation: no foundation bookshelf glyph, so this follows the row's label.
