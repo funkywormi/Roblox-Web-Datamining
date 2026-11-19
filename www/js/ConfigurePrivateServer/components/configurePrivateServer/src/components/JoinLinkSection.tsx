@@ -12,6 +12,7 @@ type JoinLinkSectionProps = {
   privacyDisclaimerText: string;
   privacyRedirectLink: string;
   onUpdateJoinLink: () => Promise<void>;
+  onCopyJoinLink: () => void;
 };
 
 const JoinLinkSection = ({
@@ -26,11 +27,13 @@ const JoinLinkSection = ({
   privacyDisclaimerText,
   privacyRedirectLink,
   onUpdateJoinLink,
+  onCopyJoinLink,
 }: JoinLinkSectionProps) => {
   const copyJoinLink = async () => {
     if (!joinLink) {
       return;
     }
+    onCopyJoinLink();
     try {
       await navigator.clipboard.writeText(joinLink);
     } catch {

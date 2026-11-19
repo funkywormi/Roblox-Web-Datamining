@@ -115,9 +115,7 @@ function SduiPlayButtonContents({
       playabilityStatus={playabilityStatus}
       eventProperties={eventProperties}
       buttonClassName={
-        isPurchaseRequired
-          ? "btn-economy-robux-white-lg game-play-button-purchase-lg purchase-button"
-          : undefined
+        isPurchaseRequired ? "game-play-button-purchase-lg purchase-button" : undefined
       }
       hideButtonText={!isPurchaseRequired}
       redirectPurchaseUrl={

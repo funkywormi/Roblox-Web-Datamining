@@ -1,5 +1,5 @@
 import type { MouseEvent } from "react";
-import { window as browserWindow } from "@rbx/core-lib/browser";
+import { document as browserDocument, window as browserWindow } from "@rbx/core-lib/browser";
 import DownloadButton from "./DownloadButton";
 import type { DownloadButtonProps } from "./DownloadButton";
 import { downloadSourceType } from "./deferredDeeplinkConstants";
@@ -38,7 +38,7 @@ function resolveTokenizedDownloadTarget(
 }
 
 /**
- * DownloadButton variant that creates a deferred-deeplink token before navigating to a direct
+ * DownloadButton variant that creates a deferred-deeplink token before starting a direct
  * installer download. Token creation stitches the link ID, browser tracker ID (`btId`), optional
  * auth ticket, and download source into a server-issued token that is appended to the download URL.
  * If token creation fails, navigation falls back to the original URL.
@@ -75,7 +75,16 @@ function TokenizedDownloadButton({
     const resolvedLinkId = linkId ?? browserWindow?.location.href;
     const params = await getDownloadLinkParams({ linkId: resolvedLinkId, downloadSource });
     const url = download.href.withSearchParamsAppended(params);
-    window.location.assign(url.toString());
+    // A top-level navigation to the installer never finishes when the file is served
+    // inline, so the page that opened it never continues. A hidden frame starts the
+    // download and leaves this page in place.
+    const frame = browserDocument?.createElement("iframe");
+    if (frame != null && browserDocument?.body != null) {
+      frame.hidden = true;
+      frame.title = "Roblox installer";
+      frame.src = url.toString();
+      browserDocument.body.appendChild(frame);
+    }
   };
 
   const download =

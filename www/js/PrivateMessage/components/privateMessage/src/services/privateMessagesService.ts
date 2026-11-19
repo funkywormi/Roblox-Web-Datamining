@@ -26,21 +26,38 @@ const messageUrlConfig = (url: string, noCache = false): MessageUrlConfig => ({
 export const getPrivateMessagesRules = (): Promise<PrivateMessagesRules> =>
   transport.getGuacBundle<PrivateMessagesRules>("private-messages-ui");
 
-export const getMessages = async (
-  tabName: MessageTab,
-  pageNumber: number,
-): Promise<MessagePage> => {
-  const data = await transport.get<RawMessagePage>(
-    messageUrlConfig(endpoint("/v1/messages"), true),
-    {
-      pageNumber,
-      pageSize: MESSAGE_PAGE_SIZE,
-      messageTab: tabName,
-    },
-  );
+const inFlightMessagePages = new Map<string, Promise<MessagePage>>();
 
-  return normalizeMessagePage(data);
+// Loads one GET /v1/messages page, sharing an in-flight request with identical parameters. Repeat
+// navigation to a page that is still loading, such as a double-click on Next, then sends one
+// request, which matters because the endpoint is rate limited per user.
+const getMessagePage = (
+  params: Record<string, string | number | boolean>,
+): Promise<MessagePage> => {
+  const key = JSON.stringify(params);
+  const inFlight = inFlightMessagePages.get(key);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const request = transport
+    .get<RawMessagePage>(messageUrlConfig(endpoint("/v1/messages"), true), params)
+    .then(normalizeMessagePage)
+    .finally(() => {
+      if (inFlightMessagePages.get(key) === request) {
+        inFlightMessagePages.delete(key);
+      }
+    });
+  inFlightMessagePages.set(key, request);
+  return request;
 };
+
+export const getMessages = (tabName: MessageTab, pageNumber: number): Promise<MessagePage> =>
+  getMessagePage({
+    pageNumber,
+    pageSize: MESSAGE_PAGE_SIZE,
+    messageTab: tabName,
+  });
 
 /**
  * Loads one cursor-mode page of `tabName`. A null `pageToken` loads the first page, as does the
@@ -49,22 +66,16 @@ export const getMessages = async (
  * Servers without cursor mode ignore these parameters and return the first offset page, which
  * normalizes with `cursorPagination: null`.
  */
-export const getMessagesByPageToken = async (
+export const getMessagesByPageToken = (
   tabName: MessageTab,
   pageToken: string | null,
-): Promise<MessagePage> => {
-  const data = await transport.get<RawMessagePage>(
-    messageUrlConfig(endpoint("/v1/messages"), true),
-    {
-      pageSize: MESSAGE_PAGE_SIZE,
-      messageTab: tabName,
-      useCursor: true,
-      ...(pageToken ? { pageToken } : {}),
-    },
-  );
-
-  return normalizeMessagePage(data);
-};
+): Promise<MessagePage> =>
+  getMessagePage({
+    pageSize: MESSAGE_PAGE_SIZE,
+    messageTab: tabName,
+    useCursor: true,
+    ...(pageToken ? { pageToken } : {}),
+  });
 
 /**
  * Whether `error` is the 400 that GET /v1/messages returns for a page token it cannot verify or
@@ -98,17 +109,26 @@ export const getMessageDetailById = async (messageId: number): Promise<MessageIt
 export const updateMessages = (tabName: MessageTab, pageNumber: number): Promise<MessagePage> =>
   tabName === MESSAGE_TABS.notifications ? getAnnouncements() : getMessages(tabName, pageNumber);
 
+// Page requests sent before a read-state or archive write settles may return the messages as they
+// were before the write, so loads that start after the write must not join them.
+const invalidateMessagePages = () => {
+  inFlightMessagePages.clear();
+};
+
 export const markMessagesRead = (messageIds: number[], markRead: boolean): Promise<unknown> =>
-  transport.post(
-    messageUrlConfig(endpoint(markRead ? "/v1/messages/mark-read" : "/v1/messages/mark-unread")),
-    { messageIds },
-  );
+  transport
+    .post(
+      messageUrlConfig(endpoint(markRead ? "/v1/messages/mark-read" : "/v1/messages/mark-unread")),
+      { messageIds },
+    )
+    .finally(invalidateMessagePages);
 
 export const setArchiveMessages = (messageIds: number[], archive: boolean): Promise<unknown> =>
-  transport.post(
-    messageUrlConfig(endpoint(archive ? "/v1/messages/archive" : "/v1/messages/unarchive")),
-    { messageIds },
-  );
+  transport
+    .post(messageUrlConfig(endpoint(archive ? "/v1/messages/archive" : "/v1/messages/unarchive")), {
+      messageIds,
+    })
+    .finally(invalidateMessagePages);
 
 type SendMessageResult = {
   success?: boolean;

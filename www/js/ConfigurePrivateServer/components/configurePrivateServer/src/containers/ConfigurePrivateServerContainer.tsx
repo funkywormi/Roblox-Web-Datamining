@@ -6,7 +6,9 @@ import ConfirmationDialog from "../components/modals/ConfirmationDialog";
 import JoinLinkSection from "../components/JoinLinkSection";
 import ServerMembersSection from "../components/ServerMembersSection";
 import ServerDetailsCard from "../components/ServerDetailsCard";
+import { eventComponents, eventSubcomponents } from "../constants/configurePrivateServerConstants";
 import { useConfigurePrivateServer } from "../hooks/useConfigurePrivateServer";
+import { sendClickEvent } from "../utils/privateServerConfigEvents";
 
 const ARROW_RIGHT = "\u2192";
 
@@ -100,6 +102,7 @@ const ConfigurePrivateServerContainer = () => {
           gameLink={gameLink}
           language={language}
           onOpenChangeNameDialog={() => {
+            sendClickEvent(server, eventComponents.page, eventSubcomponents.editName);
             setIsNameDialogOpen(true);
           }}
           onToggleSubscriptionStatus={toggleSubscriptionStatus}
@@ -165,6 +168,7 @@ const ConfigurePrivateServerContainer = () => {
             serverMembersText={language.labelServerMembers}
             noMembersText={language.labelNoMembersAdded}
             onOpenAddPlayersDialog={() => {
+              sendClickEvent(server, eventComponents.page, eventSubcomponents.addPlayersBtn);
               setIsAddPlayersDialogOpen(true);
             }}
             onRemovePlayer={removePlayer}
@@ -185,6 +189,9 @@ const ConfigurePrivateServerContainer = () => {
             privacyDisclaimerText={language.descriptionUnableToShareLinkPrivacySettingsPrefix}
             privacyRedirectLink={privacyRedirectLink}
             onUpdateJoinLink={updateJoinLink}
+            onCopyJoinLink={() => {
+              sendClickEvent(server, eventComponents.page, eventSubcomponents.copyLinkBtn);
+            }}
           />
         </div>
       </div>

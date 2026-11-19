@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
 import { urlService } from "@rbx/core-scripts/legacy/core-utilities";
+import { eventComponents, eventSubcomponents } from "../constants/configurePrivateServerConstants";
 import { configurePrivateServerService } from "../services/configurePrivateServerService";
+import { sendClickEvent, sendShowEvent, toTargetState } from "../utils/privateServerConfigEvents";
 import type {
   PrivateServer,
   PrivateServerSubscription,
@@ -21,6 +23,13 @@ export type RemovePlayerConfirmationState = {
   player: PrivateServerUser;
   displayValue: string;
 } | null;
+
+const getSubscriptionModalComponent = ({
+  type,
+}: NonNullable<SubscriptionConfirmationState>): string =>
+  type === "insufficientFunds"
+    ? eventComponents.insufficientFundsModal
+    : eventComponents.renewSubscriptionModal;
 
 type UseConfigurePrivateServerMutationsParams = {
   privateServerId: string | null;
@@ -55,6 +64,7 @@ export const useConfigurePrivateServerMutations = ({
       if (!privateServerId || !server) {
         return;
       }
+      sendClickEvent(server, eventComponents.editNameModal, eventSubcomponents.ctaBtn);
       if (newName === server.name) {
         showSuccess(language.labelChangeNameSuccess);
         return;
@@ -85,6 +95,9 @@ export const useConfigurePrivateServerMutations = ({
       return;
     }
     const currentStatus = server.active;
+    sendClickEvent(server, eventComponents.page, eventSubcomponents.allowJoiningToggle, {
+      target_state: toTargetState(!currentStatus),
+    });
     try {
       const updated = await configurePrivateServerService.updateServer(privateServerId, {
         active: !currentStatus,
@@ -119,6 +132,9 @@ export const useConfigurePrivateServerMutations = ({
     if (!privateServerId || !server) {
       return;
     }
+    sendClickEvent(server, eventComponents.page, eventSubcomponents.generateLinkBtn, {
+      action: server.joinLink ? "regenerate" : "generate",
+    });
     try {
       const updated = await configurePrivateServerService.updateServer(privateServerId, {
         newJoinCode: true,
@@ -153,6 +169,9 @@ export const useConfigurePrivateServerMutations = ({
       if (!privateServerId || !server || !server.active || displayPrivacyDisclaimer) {
         return;
       }
+      sendClickEvent(server, eventComponents.page, eventSubcomponents.friendsAllowedToggle, {
+        target_state: toTargetState(!server.permissions.friendsAllowed),
+      });
       try {
         const permissions = await configurePrivateServerService.updatePermissions(privateServerId, {
           friendsAllowed: !server.permissions.friendsAllowed,
@@ -239,6 +258,9 @@ export const useConfigurePrivateServerMutations = ({
     }
     const currentStatus = server.subscription.active;
     const currentPrice = server.subscription.price ?? 0;
+    sendClickEvent(server, eventComponents.page, eventSubcomponents.subscriptionToggle, {
+      target_state: toTargetState(!currentStatus),
+    });
 
     if (currentStatus) {
       await updateSubscriptionStatus(currentStatus, currentPrice);
@@ -247,18 +269,26 @@ export const useConfigurePrivateServerMutations = ({
 
     const insufficientRobux = userRobux !== null && currentPrice > userRobux;
     const insufficientAmount = insufficientRobux ? currentPrice - userRobux : undefined;
-    setSubscriptionConfirmation({
+    const confirmation: NonNullable<SubscriptionConfirmationState> = {
       type: insufficientRobux ? "insufficientFunds" : "renewSubscription",
       currentStatus,
       currentPrice,
       insufficientAmount,
-    });
+    };
+    sendShowEvent(server, getSubscriptionModalComponent(confirmation), { price: currentPrice });
+    setSubscriptionConfirmation(confirmation);
   }, [server, updateSubscriptionStatus, userRobux]);
 
   const confirmSubscriptionAction = useCallback(async () => {
-    if (!subscriptionConfirmation) {
+    if (!server || !subscriptionConfirmation) {
       return;
     }
+    sendClickEvent(
+      server,
+      getSubscriptionModalComponent(subscriptionConfirmation),
+      eventSubcomponents.ctaBtn,
+      { price: subscriptionConfirmation.currentPrice },
+    );
     if (subscriptionConfirmation.type === "insufficientFunds") {
       window.open(urlService.getAbsoluteUrl("/Upgrades/Robux.aspx"), "_blank");
       setSubscriptionConfirmation(null);
@@ -269,17 +299,28 @@ export const useConfigurePrivateServerMutations = ({
       subscriptionConfirmation.currentPrice,
     );
     setSubscriptionConfirmation(null);
-  }, [subscriptionConfirmation, updateSubscriptionStatus]);
+  }, [server, subscriptionConfirmation, updateSubscriptionStatus]);
 
   const cancelSubscriptionAction = useCallback(() => {
+    if (server && subscriptionConfirmation) {
+      sendClickEvent(
+        server,
+        getSubscriptionModalComponent(subscriptionConfirmation),
+        eventSubcomponents.cancelBtn,
+        { price: subscriptionConfirmation.currentPrice },
+      );
+    }
     setSubscriptionConfirmation(null);
-  }, []);
+  }, [server, subscriptionConfirmation]);
 
   const addPlayers = useCallback(
     async (players: PrivateServerUser[]) => {
-      if (!privateServerId || players.length === 0) {
+      if (!privateServerId || !server || players.length === 0) {
         return;
       }
+      sendClickEvent(server, eventComponents.addPlayersModal, eventSubcomponents.ctaBtn, {
+        added_count: players.length,
+      });
       try {
         const permissions = await configurePrivateServerService.updatePermissions(privateServerId, {
           usersToAdd: players.map(player => player.id.toString()),
@@ -301,6 +342,7 @@ export const useConfigurePrivateServerMutations = ({
       language.labelAddedPlayersError,
       language.labelAddedPlayersSuccess,
       privateServerId,
+      server,
       setServer,
       showSuccess,
       showWarning,
@@ -308,18 +350,25 @@ export const useConfigurePrivateServerMutations = ({
     ],
   );
 
-  const requestRemovePlayer = useCallback((player: PrivateServerUser) => {
-    const displayValue = player.displayName ?? player.name;
-    setRemovePlayerConfirmation({
-      player,
-      displayValue,
-    });
-  }, []);
+  const requestRemovePlayer = useCallback(
+    (player: PrivateServerUser) => {
+      if (server) {
+        sendClickEvent(server, eventComponents.page, eventSubcomponents.removePlayerBtn);
+      }
+      const displayValue = player.displayName ?? player.name;
+      setRemovePlayerConfirmation({
+        player,
+        displayValue,
+      });
+    },
+    [server],
+  );
 
   const confirmRemovePlayer = useCallback(async () => {
-    if (!privateServerId || !removePlayerConfirmation) {
+    if (!privateServerId || !server || !removePlayerConfirmation) {
       return;
     }
+    sendClickEvent(server, eventComponents.removePlayersModal, eventSubcomponents.ctaBtn);
     try {
       const permissions = await configurePrivateServerService.updatePermissions(privateServerId, {
         usersToRemove: [removePlayerConfirmation.player.id],
@@ -343,6 +392,7 @@ export const useConfigurePrivateServerMutations = ({
     language.labelRemovePlayerSuccess,
     privateServerId,
     removePlayerConfirmation,
+    server,
     setServer,
     showSuccess,
     showWarning,

@@ -83,7 +83,7 @@ const PlayOnWebButton = ({
         style={fuiButtonStyle}
         className={classNames(
           "btn-full-width play-on-web-button",
-          isOneButton ? "btn-common-play-game-lg" : "btn-control-lg",
+          isOneButton ? "game-play-button-lg" : "btn-control-lg",
         )}
         aria-label={isOneButton ? playOnWebText : undefined}
         onClick={handleClick}

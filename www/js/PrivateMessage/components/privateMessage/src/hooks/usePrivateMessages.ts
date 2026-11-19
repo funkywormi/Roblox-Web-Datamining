@@ -30,6 +30,7 @@ import {
   trackCounter,
   trackCriticalError,
   trackError,
+  trackFirstLoadSettled,
   type ErrorName,
 } from "../observability";
 import { getStatusCode } from "../utils/getStatusCode";
@@ -141,6 +142,10 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
   const [newsCount, setNewsCount] = useState(0);
   const skipNextRouteLoad = useRef(false);
   const initialTab = useRef(route.tab);
+  // Identifies the most recent loadCurrentRoute call. Overlapping loads can settle in any order,
+  // particularly when one joins an earlier in-flight request, so only the latest updates state.
+  const latestLoadId = useRef(0);
+  const firstLoadSettled = useRef(false);
 
   const tabs = useMemo(() => {
     const baseTabs: { name: MessageTab; label: string; count?: number }[] = [
@@ -156,6 +161,9 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
   }, [newsCount, rules.displayNewsTab, translate]);
 
   const loadCurrentRoute = useCallback(async () => {
+    latestLoadId.current += 1;
+    const loadId = latestLoadId.current;
+    const isSuperseded = () => loadId !== latestLoadId.current;
     setLoading(true);
     setError(null);
     setSelectedMessageIds(new Set());
@@ -163,6 +171,9 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
     try {
       if (route.conversationId != null) {
         const message = await getMessageDetailById(route.conversationId);
+        if (isSuperseded()) {
+          return;
+        }
         setPage(null);
         setSelectedMessage(prepareMessageForDetail(message));
         setSendReplyState(initialSendReplyState);
@@ -186,6 +197,9 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
         const result = shouldLoadByPageToken(await awaitRulesForListLoad(rulesRequest), route)
           ? await getMessagesByPageToken(route.tab, route.pageToken)
           : await updateMessages(route.tab, route.page - 1);
+        if (isSuperseded()) {
+          return;
+        }
         setPage(result);
         setModuleState(
           route.messageIdx == null ? MESSAGE_MODULE_STATE.list : MESSAGE_MODULE_STATE.detail,
@@ -201,6 +215,9 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
         dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
       }
     } catch (loadError) {
+      if (isSuperseded()) {
+        return;
+      }
       if (
         route.conversationId == null &&
         route.pageToken != null &&
@@ -220,9 +237,23 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
       setModuleState(MESSAGE_MODULE_STATE.list);
       setError(getErrorMessage(loadError, translate("Message.UnknownError")));
     } finally {
-      setLoading(false);
+      if (!isSuperseded()) {
+        setLoading(false);
+      }
     }
   }, [route, rulesRequest, setRoute, translate]);
+
+  // Callers that await before reloading, such as markArchive, reload through this ref so the
+  // reload targets the route current when it runs. Calling a loadCurrentRoute captured before the
+  // await would load the earlier route and supersede the newer route's load.
+  const loadCurrentRouteRef = useRef(loadCurrentRoute);
+  useEffect(() => {
+    loadCurrentRouteRef.current = loadCurrentRoute;
+  }, [loadCurrentRoute]);
+  const currentRouteRef = useRef(route);
+  useEffect(() => {
+    currentRouteRef.current = route;
+  }, [route]);
 
   useEffect(() => {
     trackCounter("PageView", { host, tab: initialTab.current });
@@ -243,6 +274,14 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
         setNewsCount(0);
       });
   }, [rulesRequest]);
+
+  // Runs after render, so the time includes drawing the list.
+  useEffect(() => {
+    if (!loading && !firstLoadSettled.current) {
+      firstLoadSettled.current = true;
+      trackFirstLoadSettled(route.tab, page != null && moduleState === MESSAGE_MODULE_STATE.list);
+    }
+  }, [loading, moduleState, page, route.tab]);
 
   useEffect(() => {
     if (skipNextRouteLoad.current) {
@@ -366,8 +405,13 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
     setModuleState(MESSAGE_MODULE_STATE.list);
     if (wasViewingDetail) {
       setRoute({ ...route, messageIdx: null, conversationId: null });
+    } else if (currentRouteRef.current.messageIdx != null) {
+      // A message opened while the archive was pending is no longer at its `messageIdx` once the
+      // archived rows are gone, so return to its list page rather than reload the detail by index.
+      // Replace the history entry so Back cannot reopen that index either.
+      setRoute({ ...currentRouteRef.current, messageIdx: null }, { replace: true });
     } else {
-      await loadCurrentRoute();
+      await loadCurrentRouteRef.current();
     }
     dispatchLegacyMessageEvent(MESSAGE_EVENTS.countChanged);
   };

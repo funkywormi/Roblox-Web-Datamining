@@ -241,7 +241,7 @@ const AddPlayersDialog = ({
                   <Chip
                     className="padding-left-[var(--size-1000)]"
                     text={user.displayName ?? user.name}
-                    trailing="icon-filled-x"
+                    trailingIconName="icon-filled-x"
                     size="Large"
                     isChecked={false}
                     onCheckedChange={() => {

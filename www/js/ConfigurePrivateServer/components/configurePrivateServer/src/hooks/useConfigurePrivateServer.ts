@@ -3,9 +3,15 @@ import { CurrentUser } from "@rbx/core-scripts/legacy/Roblox";
 import { urlService } from "@rbx/core-scripts/legacy/core-utilities";
 import {
   configurePrivateServerConstants,
+  eventComponents,
   getPrivateServerIdFromContainer,
 } from "../constants/configurePrivateServerConstants";
 import { configurePrivateServerService } from "../services/configurePrivateServerService";
+import {
+  getOfferDetails,
+  getSubscriptionStatus,
+  sendShowEvent,
+} from "../utils/privateServerConfigEvents";
 import { useConfigurePrivateServerLanguage } from "./useConfigurePrivateServerLanguage";
 import { useConfigurePrivateServerMutations } from "./useConfigurePrivateServerMutations";
 import { usePrivateServerPrivacy } from "./usePrivateServerPrivacy";
@@ -21,20 +27,37 @@ const buildJoinLink = (joinCode?: string, link?: string, gameLink?: string): str
   return `${gameLink}${configurePrivateServerConstants.queryPrefix}${joinCode}`;
 };
 
-const toErrorMessage = (error: unknown, fallbackMessage: string): string => {
-  if (typeof error === "object" && error !== null && "errors" in error) {
-    const { errors } = error;
-    if (Array.isArray(errors) && errors.length > 0) {
-      const first: unknown = errors[0];
-      if (typeof first === "object" && first !== null && "userFacingMessage" in first) {
-        const { userFacingMessage } = first;
-        if (typeof userFacingMessage === "string") {
-          return userFacingMessage;
+export const toErrorMessage = (error: unknown, fallbackMessage: string): string => {
+  // httpService rejects with the response body under `error.data`, so the
+  // legacy `{ errors: [{ userFacingMessage }] }` payload lives at
+  // `error.data.errors` — not the top level.
+  if (typeof error === "object" && error !== null && "data" in error) {
+    const { data } = error;
+    if (typeof data === "object" && data !== null && "errors" in data) {
+      const { errors } = data;
+      if (Array.isArray(errors) && errors.length > 0) {
+        const first: unknown = errors[0];
+        if (typeof first === "object" && first !== null && "userFacingMessage" in first) {
+          const { userFacingMessage } = first;
+          if (typeof userFacingMessage === "string" && userFacingMessage.length > 0) {
+            return userFacingMessage;
+          }
         }
       }
     }
   }
   return fallbackMessage;
+};
+
+const sendPageImpression = (server: PrivateServer) => {
+  sendShowEvent(server, eventComponents.page, {
+    subscription_status: getSubscriptionStatus(server.subscription),
+    server_active: server.active,
+    friends_allowed: server.permissions.friendsAllowed,
+    price: server.subscription.price ?? 0,
+    num_server_members: server.permissions.users.length,
+    ...getOfferDetails(server.subscription),
+  });
 };
 
 export type SnackbarState = {
@@ -192,7 +215,9 @@ export const useConfigurePrivateServer = () => {
         if (!isMounted) {
           return;
         }
-        setServer(refreshServer(response));
+        const loadedServer = refreshServer(response);
+        setServer(loadedServer);
+        sendPageImpression(loadedServer);
       } catch (error) {
         if (!isMounted) {
           return;

@@ -1,6 +1,8 @@
 import International from "@rbx/core-scripts/intl";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import { escapeHtml } from "@rbx/core-scripts/format/string";
+import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
+import { linkifyText } from "@rbx/linkify/segments";
 import { MESSAGE_EVENTS, ROBLOX_USER } from "../constants";
 import type {
   CursorPagination,
@@ -118,24 +120,8 @@ export const htmlToPlainText = (html: string): string => {
   return element.textContent || element.innerText || "";
 };
 
-const escapeHtmlAttribute = (value: string): string =>
-  value.replace(/[&"]/g, character => (character === "&" ? "&amp;" : "&quot;"));
-
-export const linkifyMessageBody = (body: string): string => {
-  const urlPattern = /(https?:\/\/[^\s<]+)/g;
-  let lastIndex = 0;
-  let result = "";
-
-  body.replace(urlPattern, (url, _match, offset: number) => {
-    result += escapeHtml(body.slice(lastIndex, offset));
-    result += `<a href="${escapeHtmlAttribute(url)}" target="_blank" rel="noreferrer">${escapeHtml(url)}</a>`;
-    lastIndex = offset + url.length;
-    return url;
-  });
-
-  result += escapeHtml(body.slice(lastIndex));
-  return result.replace(/\n/g, "<br />");
-};
+export const linkifyMessageBody = (body: string): string =>
+  linkifyText(body, getDeviceMeta()?.isPhone ?? false).replace(/\n/g, "<br />");
 
 export const formatListDate = (created: string): string => {
   const date = new Date(created);

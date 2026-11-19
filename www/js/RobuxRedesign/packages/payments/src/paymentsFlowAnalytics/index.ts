@@ -73,6 +73,14 @@ const eventStreamTracker = new Tracker(
 
 type EventTransport = "img" | "fetch";
 
+type EventPlatform = "iosApp" | "androidApp" | "otherApp" | "browser";
+
+type ElapsedBucket = "lt100ms" | "lt1s" | "lt10s" | "gte10s";
+
+const ELAPSED_LT_100_MS = 100;
+const ELAPSED_LT_1_S = 1_000;
+const ELAPSED_LT_10_S = 10_000;
+
 /**
  * Image beacons are cancelled when the page unloads or a webview closes. `sendEventViaFetch`
  * finishes a `keepalive` request anyway and builds the same e.png url. Only the `*ViaFetch`
@@ -80,17 +88,84 @@ type EventTransport = "img" | "fetch";
  */
 const canSendEventViaFetch = (): boolean => typeof window?.fetch === "function";
 
+const eventPlatform = (): EventPlatform => {
+  const meta = getDeviceMeta();
+  if (meta?.isIosApp) {
+    return "iosApp";
+  }
+  if (meta?.isAndroidApp) {
+    return "androidApp";
+  }
+  const isOtherApp = [
+    meta?.isInApp,
+    meta?.isAmazonApp,
+    meta?.isUWPApp,
+    meta?.isXboxApp,
+    meta?.isWin32App,
+    meta?.isUniversalApp,
+    meta?.isSamsungGalaxyStoreApp,
+    meta?.isPcGdkApp,
+    meta?.isStudio,
+  ].some(value => value === true);
+  return isOtherApp ? "otherApp" : "browser";
+};
+
+const elapsedBucket = (elapsedMs: number): ElapsedBucket => {
+  if (elapsedMs < ELAPSED_LT_100_MS) {
+    return "lt100ms";
+  }
+  if (elapsedMs < ELAPSED_LT_1_S) {
+    return "lt1s";
+  }
+  if (elapsedMs < ELAPSED_LT_10_S) {
+    return "lt10s";
+  }
+  return "gte10s";
+};
+
+const pageVisibility = (): string => document?.visibilityState ?? "unknown";
+
+const trackTransportFailure = (
+  counter: "UserPaymentFlowEventFetchFailed" | "UserPaymentFlowEventImgFailed",
+  eventName: EventName,
+  viewName: string,
+  platform: EventPlatform,
+  startedAt: number,
+): void => {
+  trackCounter(counter, {
+    eventName,
+    viewName,
+    platform,
+    visibility: pageVisibility(),
+    elapsed: elapsedBucket(Date.now() - startedAt),
+  });
+};
+
 const sendEventStreamEvent = (
   request: TrackerRequest,
   eventName: EventName,
+  viewName: ViewName | undefined,
   requestedTransport: EventTransport,
 ): void => {
-  if (requestedTransport === "img" || !canSendEventViaFetch()) {
-    trackCounter("UserPaymentFlowEventSent", { transport: "img", requestedTransport });
-    eventStreamTracker.sendEventViaImg(request);
+  const platform = eventPlatform();
+  const reportedViewName = viewName ?? "";
+  const transport = requestedTransport === "fetch" && canSendEventViaFetch() ? "fetch" : "img";
+  trackCounter("UserPaymentFlowEventSent", { transport, requestedTransport, eventName });
+  const startedAt = Date.now();
+  if (transport === "img") {
+    eventStreamTracker.sendEventViaImg(request, ok => {
+      if (!ok) {
+        trackTransportFailure(
+          "UserPaymentFlowEventImgFailed",
+          eventName,
+          reportedViewName,
+          platform,
+          startedAt,
+        );
+      }
+    });
     return;
   }
-  trackCounter("UserPaymentFlowEventSent", { transport: "fetch", requestedTransport });
   // `sendEventViaFetch` reports the outcome through the callback. ecsv2 answers www's credentialed
   // CORS request, so `ok` is false when the fetch failed or its delivery wasn't confirmed (e.g. the
   // connection reset after ecsv2 logged it). It isn't retried on the image, which could duplicate the
@@ -99,7 +174,13 @@ const sendEventStreamEvent = (
   eventStreamTracker
     .sendEventViaFetch(request, ok => {
       if (!ok) {
-        trackCounter("UserPaymentFlowEventFetchFailed", { eventName });
+        trackTransportFailure(
+          "UserPaymentFlowEventFetchFailed",
+          eventName,
+          reportedViewName,
+          platform,
+          startedAt,
+        );
       }
     })
     .catch((error: unknown) => {
@@ -494,6 +575,7 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
         },
       },
       eventName,
+      viewName,
       requestedTransport,
     );
   }

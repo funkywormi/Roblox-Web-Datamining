@@ -50,7 +50,7 @@ const ServerMembersSection = ({
               <Chip
                 className="padding-left-[var(--size-1000)]"
                 text={player.displayName ?? player.name}
-                trailing="icon-filled-x"
+                trailingIconName="icon-filled-x"
                 size="Large"
                 isChecked={false}
                 isDisabled={!server.active}

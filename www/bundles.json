@@ -8,6 +8,7 @@
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -163,7 +164,7 @@
         },
         {
             "name": "Authentication.AccountRecovery",
-            "url": "https://js.rbxcdn.com/84536df03f65568fd59262a747d26f4f8e9989c4dd087de0794e76ff824aec5e.js",
+            "url": "https://js.rbxcdn.com/97187acdc8f3a5bc01f1a0779f716c88ab0847b711392bfe778c894d47ebe92b.js",
             "sources": [
                 "/login/forgot-password-or-username"
             ]
@@ -173,12 +174,12 @@
             "url": "https://js.rbxcdn.com/cc8d5562b127dd2ee85a41b82efd3c6f9355bf9f5ed15de3f5038c02ca2404b9.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -231,6 +232,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -293,6 +295,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -340,12 +343,12 @@
             "url": "https://js.rbxcdn.com/537d3ec6e2cbc418604174fc9628078ed3fd4adc40e41637bc716c735a60677a.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -398,6 +401,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -445,12 +449,12 @@
             "url": "https://js.rbxcdn.com/1f5c50ba918a5773a2e4a0308683747225b446c67f5089282954865c0e0f76a6.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -511,7 +515,6 @@
             "url": "https://js.rbxcdn.com/c28ce880968f0f98937886a5a2dd3874edcdb54c2632f3027e1bf0f854f55da4.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -536,6 +539,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -590,6 +594,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -644,7 +649,6 @@
             "name": "Common.Captcha",
             "url": "https://js.rbxcdn.com/5f2ee2913bf919a8576bbe4120a6d41b933e814a4779a0a3fc1d9d941c5ee368.js",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -687,6 +691,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -748,6 +753,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -848,7 +854,7 @@
         },
         {
             "name": "CommonUI.Features",
-            "url": "https://js.rbxcdn.com/bb2781b20d80e0042b7bb26edc61b24ad95895f12ba4c41a5cac1f9334da7ef4.js",
+            "url": "https://js.rbxcdn.com/96caa7da712c3e7b1207f022182f77405f2faa0482c7af73eda1334bcd6e1ce3.js",
             "sources": [
                 "/home",
                 "/",
@@ -904,7 +910,7 @@
         },
         {
             "name": "CommonUI.Messages",
-            "url": "https://js.rbxcdn.com/30f0fa1431843fcc647e0407091e22efb370a26038b8fedfe41fb07d3d46ed83.js",
+            "url": "https://js.rbxcdn.com/cae863b74eff85cc130d7c0bdd7e7cb381127ba3adb8da7caae2878a4d4a2e9c.js",
             "sources": [
                 "/home",
                 "/",
@@ -914,6 +920,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -968,6 +975,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1206,12 +1214,13 @@
         },
         {
             "name": "Feature.AppealsPortal",
-            "url": "https://js.rbxcdn.com/cc60c9883fcc4fed064fddbee4bec2da0522b9273d28503a2719a6dd7fd27e19.js",
+            "url": "https://js.rbxcdn.com/983705fc239ecb8049cd8bff85d47d419702ffa996810a2a37bf4f875c11b581.js",
             "sources": [
                 "/home",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1278,6 +1287,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1353,6 +1363,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1407,6 +1418,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1450,12 +1462,13 @@
         },
         {
             "name": "Feature.Chat",
-            "url": "https://js.rbxcdn.com/cb0684e75b3c1cd07dc4c5fd7cd58e40d79d2588bb29d55c02d36127e47327df.js",
+            "url": "https://js.rbxcdn.com/ded959a3f02567c23a858b164f77d297f22a00ee847eb0a424791a67b3efbabb.js",
             "sources": [
                 "/home",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1530,6 +1543,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1592,6 +1606,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1661,6 +1676,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1743,6 +1759,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1797,6 +1814,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1868,6 +1886,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1922,6 +1941,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -1976,6 +1996,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2110,6 +2131,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2270,6 +2292,7 @@
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2328,6 +2351,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2389,6 +2413,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2434,7 +2459,6 @@
             "name": "Feature.Landing",
             "url": "https://js.rbxcdn.com/686bd55707be42af370b81d2f36f55b6e10c56edb105502b3f9f0a34f7412bf5.js",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount"
             ]
@@ -2521,6 +2545,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2573,7 +2598,7 @@
         },
         {
             "name": "Feature.Parents",
-            "url": "https://js.rbxcdn.com/5fb71313e799647a00ced2d34e3ecc5fd282391197009a5ea7f4877a95b99839.js",
+            "url": "https://js.rbxcdn.com/51f261430776f184514dff9dcdeaedb0ce03e65765dcdd59ad0e132e7114e3ad.js",
             "sources": [
                 "/home",
                 "/",
@@ -2672,6 +2697,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2719,6 +2745,7 @@
             "url": "https://js.rbxcdn.com/7774e92ccee60b92717e18209b9060b35988362a9493cadb5234c96550e27d90.js",
             "sources": [
                 "/home",
+                "/",
                 "/charts",
                 "/discover/?Keyword=roblox",
                 "/users/1/profile"
@@ -2732,6 +2759,7 @@
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2785,6 +2813,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2839,6 +2868,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2892,6 +2922,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -2980,6 +3011,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3043,6 +3075,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3097,6 +3130,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3151,6 +3185,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3198,12 +3233,12 @@
             "url": "https://js.rbxcdn.com/7cae8592d1cd45c8d5935159d37363a6951926fa0532dcdd627b057c76ce268e.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3252,6 +3287,7 @@
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3310,7 +3346,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/745a339a64bf10838d57e2b844c41e0d3e7d487ba77b72dd968726d4e96d36b1.js",
+            "url": "https://js.rbxcdn.com/27c31a9d23a4d4492a7b03373c992e1b0491d4b01caeb979062fc1cdeb39a03c.js",
             "sources": [
                 "/home",
                 "/",
@@ -3376,6 +3412,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3441,6 +3478,13 @@
             ]
         },
         {
+            "name": "Feature.SduiLandingPage",
+            "url": "https://js.rbxcdn.com/5e740513671abfd8b06b4e8eebe99f64123b585b131d5798a48bb8e1811de323.js",
+            "sources": [
+                "/"
+            ]
+        },
+        {
             "name": "Feature.SearchDropdownComponent",
             "url": "https://js.rbxcdn.com/d6ffeed49fbdc41c1589d170c60383f5415c915849d72401bfa3f07f4b2096de.js",
             "sources": [
@@ -3460,6 +3504,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3522,12 +3567,12 @@
             "url": "https://js.rbxcdn.com/13b3b0cf97cfb5da4538eb0c59f252188b4f724f9328c264a58d24a714e41fe5.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3644,6 +3689,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3701,7 +3747,7 @@
         },
         {
             "name": "Feature.Transactions",
-            "url": "https://js.rbxcdn.com/f4bb5d7fbd1ba866c1669af333e42c86af8bdd165d75adf9aeeed7ef9b3b1366.js",
+            "url": "https://js.rbxcdn.com/c5ffa84959de9bd34ccfe9dd4b7fd61e2b19aa3eeea28f1fd4215633fe7d8141.js",
             "sources": [
                 "/transactions",
                 "/communities/configure"
@@ -3715,6 +3761,7 @@
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3819,7 +3866,7 @@
         },
         {
             "name": "Feature.VIPServer",
-            "url": "https://js.rbxcdn.com/7135019f19b3ec9de80ce3bacd039523cd9ae3cfe82ac7a371471febbd1a70ba.js",
+            "url": "https://js.rbxcdn.com/b8acf5a63a6d0bfb314b88956e0bc745c244918ac7eb7326fe14d03a9d210c62.js",
             "sources": [
                 "/games/1818",
                 "/private-server/configure/527154577"
@@ -3853,6 +3900,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3904,6 +3952,7 @@
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -3971,6 +4020,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -4017,12 +4067,12 @@
             "url": "https://js.rbxcdn.com/78fa168d8370a5d68981080c0a4bd8462d1cf176710385ecf945ec6a71467be7.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -4149,6 +4199,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -4325,12 +4376,12 @@
             "url": "https://js.rbxcdn.com/9101b07ce0b1dc4a02f76a1306b7d23ab9ddc0fb9c5f68bf12b1a2ae2a3bb5d4-AccountSwitcher.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -4383,6 +4434,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -4540,7 +4592,6 @@
             "name": "Captcha",
             "url": "https://js.rbxcdn.com/b604dac29d89b56aef30844f099c5640c2f1870a97a06f4e692208d24097f9ed-Captcha.js",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/support",
@@ -4561,6 +4612,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -4622,6 +4674,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -4691,7 +4744,7 @@
         },
         {
             "name": "ConfigurePrivateServer",
-            "url": "https://js.rbxcdn.com/39e6f1ef72f0d7b2126fb61a9c9c5a0e16a4aadbb1b8359daded7aeacace9c49-ConfigurePrivateServer.js",
+            "url": "https://js.rbxcdn.com/26b4c97f220ccc4ad72a53aff6b7c3047c0081d158f73af956562b6715a18b3e-ConfigurePrivateServer.js",
             "sources": [
                 "/private-server/configure/527154577"
             ]
@@ -4842,6 +4895,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -4947,6 +5001,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -5152,6 +5207,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -5238,7 +5294,7 @@
         },
         {
             "name": "GameDetails",
-            "url": "https://js.rbxcdn.com/28e418438255183f3a7e3460003af37b2e53371a3b47dd77724153d6dccccbce-GameDetails.js",
+            "url": "https://js.rbxcdn.com/40816a3f04a897332d2ef7bfa0dd521effdfdbbba8d857e6304b00ec07add87c-GameDetails.js",
             "sources": [
                 "/games/1818"
             ]
@@ -5252,14 +5308,14 @@
         },
         {
             "name": "GameGuidelines",
-            "url": "https://js.rbxcdn.com/7fce7c18240587db12c65fb12e065151d9383f4298c33053cb6f23a61b3e0353-GameGuidelines.js",
+            "url": "https://js.rbxcdn.com/1bdeb4e56f757409c2204fc10d12eda8d4d81fd171d83ab79a365cd18da03899-GameGuidelines.js",
             "sources": [
                 "/games/1818"
             ]
         },
         {
             "name": "GameLaunch",
-            "url": "https://js.rbxcdn.com/92cd89a1aef6470316613e9bdd2abcbdc48832b01de25e31ca8e64bdeb2e6cb6-GameLaunch.js",
+            "url": "https://js.rbxcdn.com/31372f1c7c82f87161b3abefd72b6f023b356949eab8cd7a6c0c2c039cf586ab-GameLaunch.js",
             "sources": [
                 "/home",
                 "/",
@@ -5269,6 +5325,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -5312,7 +5369,7 @@
         },
         {
             "name": "GameSearch",
-            "url": "https://js.rbxcdn.com/2d34ab6bc617bf39c8734a4cd452f2212b253d2a5894ccc6cc12bfa17118e338-GameSearch.js",
+            "url": "https://js.rbxcdn.com/eb76fc121dfe43edbdde97b5266c3b1bcdf067ad1a62bbcbbacaf9f238959bb6-GameSearch.js",
             "sources": [
                 "/discover/?Keyword=roblox"
             ]
@@ -5529,6 +5586,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -5582,6 +5640,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -5708,6 +5767,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -5797,6 +5857,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -5850,6 +5911,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -5930,6 +5992,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -5980,15 +6043,15 @@
         },
         {
             "name": "Navigation",
-            "url": "https://js.rbxcdn.com/1e6c1cc384f6b00aef17997ae3764eefa6a528f75437aff7dd2c9ea0cff99c86-Navigation.js",
+            "url": "https://js.rbxcdn.com/4af0376e0a07a7060b3e7201b4f6dbbdab3da1302bf5ffd0c5d02dca140854d4-Navigation.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -6041,6 +6104,7 @@
             "url": "https://js.rbxcdn.com/79c0fb9ab4edd2972e8a5f2fc28ffad0d6345ea228a4737bdc786ab086d7704a-NotificationStream.js",
             "sources": [
                 "/gift-robux",
+                "/plus",
                 "/users/1/profile",
                 "/my/account",
                 "/games/1818",
@@ -6145,10 +6209,9 @@
         },
         {
             "name": "PresenceRegistration",
-            "url": "https://js.rbxcdn.com/215fe9b0fe92491f665645f65f57db6668d716af72e02465db259b715f061118.js",
+            "url": "https://js.rbxcdn.com/c3a7c448698e315d216694b95ebaf665aaea7fcbc7ecb98bb2a37e821253c7e1-PresenceRegistration.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/catalog",
@@ -6175,7 +6238,7 @@
         },
         {
             "name": "PresenceStatus",
-            "url": "https://js.rbxcdn.com/8cbe8cae016852eb8b5e4e58964ae867c02453318f10143445425dbda147d020-PresenceStatus.js",
+            "url": "https://js.rbxcdn.com/6e4d68cc26348996b80be862ab9d663a5332e3ea4136eec9a19638b72082f1f5-PresenceStatus.js",
             "sources": [
                 "/home",
                 "/",
@@ -6185,6 +6248,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -6237,7 +6301,7 @@
         },
         {
             "name": "PrivateMessage",
-            "url": "https://js.rbxcdn.com/8d6cc40b0ce53b611a1659eee6d5265205d5a9a9554dba1b86ab0d16e6c229c6-PrivateMessage.js",
+            "url": "https://js.rbxcdn.com/268a234373d9d2dbdf08337a44ac401356743ebd6527b86e972c49756b024358-PrivateMessage.js",
             "sources": [
                 "/my/messages"
             ]
@@ -6340,12 +6404,13 @@
         },
         {
             "name": "ReactChat",
-            "url": "https://js.rbxcdn.com/dc1a027cc96c5651df9a0420918b878868203fa21e6d30cb422ced81295fbf88-ReactChat.js",
+            "url": "https://js.rbxcdn.com/edb18e0e9db6584e6f19ac8e9aafde8d9ee449143717dbb22477e0bbea22e992-ReactChat.js",
             "sources": [
                 "/home",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -6388,7 +6453,6 @@
             "name": "ReactLanding",
             "url": "https://js.rbxcdn.com/3c455cb509c7d726bebc47df149f1fa5dd5f44088b28de201b613d24afdb31da-ReactLanding.js",
             "sources": [
-                "/",
                 "/CreateAccount"
             ]
         },
@@ -6532,6 +6596,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -6603,6 +6668,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -6660,7 +6726,7 @@
         },
         {
             "name": "RobuxRedesign",
-            "url": "https://js.rbxcdn.com/0a89424488b577b3b69ba84d2bf5613723bd537e9cff3d00fd134e0ede688944-RobuxRedesign.js",
+            "url": "https://js.rbxcdn.com/9a3d215926981b2299f1ee0cbb7200558089548b937dac10ae851f74f457bc2a-RobuxRedesign.js",
             "sources": [
                 "/upgrades/robux"
             ]
@@ -6691,6 +6757,13 @@
             ]
         },
         {
+            "name": "SduiLandingPage",
+            "url": "https://js.rbxcdn.com/5cb16b3da11d529aa1a8fc145073eb327f653dd564f98a2c67db039da3b96931-SduiLandingPage.js",
+            "sources": [
+                "/"
+            ]
+        },
+        {
             "name": "SearchDropdown",
             "url": "https://js.rbxcdn.com/d7b66604b6aed7454c982f0c5e055cb0a91bf6bf02ce81a9069db7578a9c7119.js",
             "sources": [
@@ -6703,12 +6776,12 @@
             "url": "https://js.rbxcdn.com/24a1c1b49140b8e5c860d8aafcc93b47060955d2a61218cf181dd5f24d7c2ec8-SearchLandingPage.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -6764,6 +6837,7 @@
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -6817,6 +6891,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -6923,6 +6998,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7075,6 +7151,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7211,6 +7288,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7264,12 +7342,12 @@
             "url": "https://js.rbxcdn.com/05355f4f42e31d8469852179b730ec7f252467eb07a3139c9f3c2551f378bb9c.js",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7329,6 +7407,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7390,6 +7469,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7509,6 +7589,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7562,6 +7643,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7626,6 +7708,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7679,12 +7762,12 @@
             "url": "https://css.rbxcdn.com/7a9e67ec503d2a15aac8cb8cbfe95ca99a08f78df56f5961d9e10a325c19ddf6-AccountSwitcher.css",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7815,7 +7898,6 @@
             "name": "Captcha",
             "url": "https://css.rbxcdn.com/bc960ab1460ffb77f7d3e4cfd68381d1ee9ed8e96a02991524ee01d72532d365-Captcha.css",
             "sources": [
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/support",
@@ -7836,6 +7918,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7897,6 +7980,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -7955,7 +8039,7 @@
         },
         {
             "name": "ConfigurePrivateServer",
-            "url": "https://css.rbxcdn.com/26cbc06b72c8a97b34eab8b6f72e233db5f71aff2aff3daa7e1b4fa10e280c87-ConfigurePrivateServer.css",
+            "url": "https://css.rbxcdn.com/393bb15bbc1bf4efdafd891bd2ad0e3b3a5353fb8726add51b81616af1443da0-ConfigurePrivateServer.css",
             "sources": [
                 "/private-server/configure/527154577"
             ]
@@ -7972,6 +8056,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -8081,6 +8166,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -8172,6 +8258,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -8315,21 +8402,21 @@
         },
         {
             "name": "GameDetails",
-            "url": "https://css.rbxcdn.com/441306a9d30bb40efbf89d212213407bb2c524425d38e693fdbd406ac2528662-GameDetails.css",
+            "url": "https://css.rbxcdn.com/84f35194bbbb6ada7d78963604ddc5a654c206a4f0b07feeb6ab38d8ad5b227e-GameDetails.css",
             "sources": [
                 "/games/1818"
             ]
         },
         {
             "name": "GameGuidelines",
-            "url": "https://css.rbxcdn.com/b00dec91bc4fb72257498c9f2747f9bea3d609bcfc17ee579993b41d75253713-GameGuidelines.css",
+            "url": "https://css.rbxcdn.com/718709a869d1fe265672950f1f96a15c0b5cccdecc44c7932d662d4369112020-GameGuidelines.css",
             "sources": [
                 "/games/1818"
             ]
         },
         {
             "name": "GameLaunch",
-            "url": "https://css.rbxcdn.com/fe9af26d35dd8ffae5a5118ce336cfe296ade15026696cb34c92f1bbd2cc1bf5-GameLaunch.css",
+            "url": "https://css.rbxcdn.com/9910d3a54874b05c4d31e62438531d2340676b6db3ace94512e20b1a7fb92849-GameLaunch.css",
             "sources": [
                 "/home",
                 "/",
@@ -8339,6 +8426,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -8382,7 +8470,7 @@
         },
         {
             "name": "GameSearch",
-            "url": "https://css.rbxcdn.com/5e65d2032e0e3ae4c54212518f9d206d59a262f65e0e8c353b2427d3227b65dd-GameSearch.css",
+            "url": "https://css.rbxcdn.com/9405492443ca5953a107be05ef53f076ae0706fb5ebcc73aca2e6d5c1bda51ca-GameSearch.css",
             "sources": [
                 "/discover/?Keyword=roblox"
             ]
@@ -8486,6 +8574,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -8590,6 +8679,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -8643,6 +8733,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -8708,12 +8799,12 @@
             "url": "https://css.rbxcdn.com/713fb359872482701dfcc244c14703338b5f5b642c9fca5101a20b050ea1c9fb-Navigation.css",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -8766,6 +8857,7 @@
             "url": "https://css.rbxcdn.com/935fb7331d9761008e6d48890a8f03c8124d73dd41b4f19f93a1844577186103-NotificationStream.css",
             "sources": [
                 "/gift-robux",
+                "/plus",
                 "/users/1/profile",
                 "/my/account",
                 "/games/1818",
@@ -8852,12 +8944,13 @@
         },
         {
             "name": "ReactChat",
-            "url": "https://css.rbxcdn.com/03ebc0103c23a23b007bd3e4eb1fa9728b15d049ac68b4861f4531cf3c5171e2-ReactChat.css",
+            "url": "https://css.rbxcdn.com/435c5f9b133eb42bbef31bd575d5296c1b3cc66980d6a56fdfb1ddde7766f680-ReactChat.css",
             "sources": [
                 "/home",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -8900,7 +8993,6 @@
             "name": "ReactLanding",
             "url": "https://css.rbxcdn.com/75f7be96c4a2a253c0a6745c69e0ea3ef1cd1976d37082043d1ba49397b28c48-ReactLanding.css",
             "sources": [
-                "/",
                 "/CreateAccount"
             ]
         },
@@ -8930,6 +9022,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -9000,6 +9093,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -9060,6 +9154,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -9123,6 +9218,13 @@
             ]
         },
         {
+            "name": "SduiLandingPage",
+            "url": "https://css.rbxcdn.com/4bf3158c9e60cc26aa24deff7f8f0a61f5bc8c3ead83a5568fd4aa3c8868188a-SduiLandingPage.css",
+            "sources": [
+                "/"
+            ]
+        },
+        {
             "name": "SearchDropdown",
             "url": "https://css.rbxcdn.com/9465044f971fd06d5fb1af0ee4e1ce58cd6fe515dce4a57b3343a1ddd920a65f.css",
             "sources": [
@@ -9135,12 +9237,12 @@
             "url": "https://css.rbxcdn.com/195c901a616ae1e8baea44d97a0f478d58bfbbf20898d834488d6b5e68d2b405-SearchLandingPage.css",
             "sources": [
                 "/home",
-                "/",
                 "/login",
                 "/CreateAccount",
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -9196,6 +9298,7 @@
                 "/charts",
                 "/sitemap",
                 "/gift-robux",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -9380,6 +9483,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -9448,6 +9552,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",
@@ -9515,6 +9620,7 @@
                 "/sitemap",
                 "/gift-robux",
                 "/shopgiftcards",
+                "/plus",
                 "/catalog",
                 "/support",
                 "/trades",

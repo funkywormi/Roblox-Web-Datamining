@@ -12,8 +12,18 @@ export const observabilityRegistry = {
       counters: [
         "UserPaymentFlowMidPurchaseStepTriggeredWithoutCtx",
         "UserPaymentFlowFlowEnded",
-        { name: "UserPaymentFlowEventSent", dimensions: ["transport", "requestedTransport"] },
-        { name: "UserPaymentFlowEventFetchFailed", dimensions: ["eventName"] },
+        {
+          name: "UserPaymentFlowEventSent",
+          dimensions: ["transport", "requestedTransport", "eventName"],
+        },
+        {
+          name: "UserPaymentFlowEventFetchFailed",
+          dimensions: ["eventName", "viewName", "platform", "visibility", "elapsed"],
+        },
+        {
+          name: "UserPaymentFlowEventImgFailed",
+          dimensions: ["eventName", "viewName", "platform", "visibility", "elapsed"],
+        },
       ],
       errors: [
         "UserPaymentFlowWrongUsageOfMethod",

@@ -7,4 +7,5 @@ export const trackDotnetAppShellCounter = createAppShellTracker(
   observabilityRegistry,
   createFireTelemetryCounter(observabilityRegistry.featureName),
   "dotnet",
+  { appType: true },
 );

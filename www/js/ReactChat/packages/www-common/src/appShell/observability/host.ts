@@ -1,4 +1,6 @@
 import type { AnyRegistry, MakeObservabilityTypes } from "@rbx/observability-framework/types";
+import { document } from "@rbx/core-lib/browser";
+import { toAppType } from "../../device/appType";
 import { getInternalPageName } from "../../utils/getInternalPageName";
 
 export type AppShellHost = "nextjs" | "dotnet";
@@ -15,25 +17,36 @@ const toAppShellPage = (internalPageName: string | undefined): string =>
 
 type Publish = (name: string, dimensions?: Record<string, string>) => void;
 
+// Reads the meta tag directly: `getDeviceClient` would add zod to every .NET component that
+// sends these counters.
+const readAppType = (): string =>
+  toAppType(document?.querySelector<HTMLMetaElement>('meta[name="device-meta"]')?.dataset.appType);
+
 type Obs<R extends AnyRegistry> = MakeObservabilityTypes<R>;
 
-/** Takes every dimension but `host` and `page`, which the tracker adds. `page` can be overridden. */
+/** Every dimension except `host`, `page` and `appType`, which the tracker adds. */
 export type TrackAppShellCounter<R extends AnyRegistry> = <N extends Obs<R>["CounterName"]>(
   name: N,
-  dimensions: Record<Exclude<Obs<R>["DimensionsFor"][N], "host" | "page">, string> & {
+  dimensions: Record<Exclude<Obs<R>["DimensionsFor"][N], "host" | "page" | "appType">, string> & {
     page?: string;
   },
 ) => void;
 
+export type AppShellTrackerOptions = {
+  /** Adds `appType`. Browser only: the server has no device info. */
+  appType?: boolean;
+};
+
 /**
- * Creates a tracker for `registry`'s counters that adds `host`, and `page` from the page's
- * internal page name when the counter has a `page` dimension and the caller didn't pass one.
+ * Creates a tracker that adds `host`, `appType` (if enabled), and `page` (if the counter has one
+ * and the caller didn't pass it).
  */
 export const createAppShellTracker =
   <R extends AnyRegistry>(
     registry: R,
     publish: Publish,
     host: AppShellHost,
+    { appType = false }: AppShellTrackerOptions = {},
   ): TrackAppShellCounter<R> =>
   (name, dimensions) => {
     const hasPage = Object.values(registry.features).some(feature =>
@@ -50,5 +63,6 @@ export const createAppShellTracker =
         : {}),
       ...dimensions,
       host,
+      ...(appType ? { appType: readAppType() } : {}),
     });
   };

@@ -24,6 +24,28 @@ export const configurePrivateServerConstants = {
   },
 } as const;
 
+export const eventComponents = {
+  page: "private_server_config",
+  editNameModal: "edit_private_server_name_modal",
+  addPlayersModal: "add_players_modal",
+  removePlayersModal: "remove_players_modal",
+  renewSubscriptionModal: "renew_subscription_modal",
+  insufficientFundsModal: "insufficient_funds_modal",
+} as const;
+
+export const eventSubcomponents = {
+  subscriptionToggle: "subscription_toggle",
+  allowJoiningToggle: "allow_joining_toggle",
+  friendsAllowedToggle: "friends_allowed_toggle",
+  editName: "edit_name",
+  addPlayersBtn: "add_players_btn",
+  removePlayerBtn: "remove_player_btn",
+  generateLinkBtn: "generate_private_server_link_btn",
+  copyLinkBtn: "copy_private_server_link_btn",
+  ctaBtn: "cta_btn",
+  cancelBtn: "cancel_btn",
+} as const;
+
 export const getPrivateServerIdFromContainer = (): string | null => {
   const container =
     document.getElementById(CONFIGURE_PRIVATE_SERVER_WEB_APP_ID) ??

@@ -11,6 +11,7 @@ import {
 import { EventStreamMetadata } from "../../common/constants/eventStreamConstants";
 import { PageContext } from "../../common/types/pageContext";
 import metadataConstants from "../constants/metadataConstants";
+import { DeviceCheck, useDeviceCheck } from "../hooks/useDeviceCheck";
 import { usePlayOnWebVariant } from "../hooks/usePlayOnWebVariant";
 import DesktopWasmRedirect from "./DesktopWasmRedirect";
 import MobileWasmRedirect from "./MobileWasmRedirect";
@@ -44,9 +45,12 @@ const WasmRedirectFlow = (): React.JSX.Element | null => {
     [EventStreamMetadata.UniverseId]: universeId,
     [EventStreamMetadata.PlayContext]: PageContext.GameDetailPage,
   };
+  // Unlike the EDP's Play button, waits for the device check, which probes when nothing is stored.
+  const deviceCheck = useDeviceCheck();
   // OneButton and TwoButton both offer Play on Web on the EDP.
   const playOnWebEnabled =
-    usePlayOnWebVariant(universeId).playOnWebVariant !== PlayOnWebVariant.None;
+    usePlayOnWebVariant(universeId, true, deviceCheck === DeviceCheck.Eligible).playOnWebVariant !==
+    PlayOnWebVariant.None;
   const { wasmJoinId } = useWasmJoinId();
   // Opens the WASM link, once Play on Web is enabled and the user's join id is known.
   const playOnWeb =
@@ -79,7 +83,12 @@ const WasmRedirectFlow = (): React.JSX.Element | null => {
     );
   }
 
-  return <MobileWasmRedirect playOnWeb={playOnWeb} />;
+  return (
+    <MobileWasmRedirect
+      playOnWeb={playOnWeb}
+      isCheckingDevice={deviceCheck === DeviceCheck.Checking}
+    />
+  );
 };
 
 /**

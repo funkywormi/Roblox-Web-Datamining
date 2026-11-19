@@ -2,24 +2,38 @@ import React, { useEffect, useState } from "react";
 import PlayOnWebDialog from "@rbx/app-download/PlayOnWebDialog";
 import { useTranslations } from "@rbx/www-common/i18n";
 
-// How long after load Play on Web can still become available, which covers the device check.
+// How long after load Play on Web can still become available. A device check still running at the
+// end extends it.
 const PLAY_ON_WEB_WAIT_MS = 6000;
 
 type TMobileWasmRedirectProps = {
   playOnWeb: (() => void) | undefined;
+  isCheckingDevice: boolean;
 };
 
 /**
  * Opens the Play on Web dialog: it checks until Play on Web becomes available, then offers it.
- * If it isn't available by the end of the wait, the dialog closes and the EDP stays as is.
+ * If it isn't available by the end of the wait and the device check, the dialog closes and the EDP
+ * stays as is.
  */
-const MobileWasmRedirect = ({ playOnWeb }: TMobileWasmRedirectProps): React.JSX.Element | null => {
+const MobileWasmRedirect = ({
+  playOnWeb,
+  isCheckingDevice,
+}: TMobileWasmRedirectProps): React.JSX.Element | null => {
   const tExperienceDetails = useTranslations("Feature.ExperienceDetails");
-  const [isWaiting, setIsWaiting] = useState(true);
+  const [hasWaited, setHasWaited] = useState(false);
   useEffect(() => {
-    const timeout = setTimeout(setIsWaiting, PLAY_ON_WEB_WAIT_MS, false);
+    const timeout = setTimeout(setHasWaited, PLAY_ON_WEB_WAIT_MS, true);
     return () => clearTimeout(timeout);
   }, []);
+  // Ends after the render where the device check finishes, so an answer that makes Play on Web
+  // available is still offered.
+  const [isWaiting, setIsWaiting] = useState(true);
+  useEffect(() => {
+    if (hasWaited && !isCheckingDevice) {
+      setIsWaiting(false);
+    }
+  }, [hasWaited, isCheckingDevice]);
 
   const [hasOfferedPlayOnWeb, setHasOfferedPlayOnWeb] = useState(false);
   const [isDialogClosed, setIsDialogClosed] = useState(false);
