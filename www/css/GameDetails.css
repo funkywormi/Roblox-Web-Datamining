@@ -6051,6 +6051,29 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     padding: 18px 12px 0
 }
 
+.game-title-row {
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -ms-flex-align: center;
+    align-items: center;
+    column-gap: 8px;
+    display: -ms-flexbox;
+    display: flex
+}
+
+.game-title-row>.game-name {
+    min-width: 0;
+    max-width: 100%
+}
+
+.game-title-row #game-title-license-badge:empty {
+    display: none
+}
+
+.game-title-row #game-title-license-badge {
+    padding: 4px 0
+}
+
 .inset-\[0\] {
     top: 0;
     bottom: 0;

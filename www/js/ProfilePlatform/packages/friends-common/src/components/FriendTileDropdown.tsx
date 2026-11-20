@@ -1,7 +1,7 @@
 import { JSX } from "react";
 import "@rbx/core-scripts/global";
 import { chatService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import { Button } from "@rbx/core-ui";
 import { Thumbnail2d, ThumbnailTypes, ThumbnailGameIconSize } from "@rbx/thumbnails";
 import { TFriend } from "../types/friendsCarousel";

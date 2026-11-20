@@ -39,6 +39,7 @@ import * as user from "@rbx/core-scripts/util/user";
 import * as CoreUtilities from "@rbx/core-scripts/legacy/core-utilities";
 import * as CoreRobloxUtilities from "@rbx/core-scripts/legacy/core-roblox-utilities";
 import * as webTelemetry from "@rbx/web-telemetry/fire";
+import { runDeviceProbeInBackground } from "@rbx/device-probe/client";
 
 import Intl from "@rbx/core-scripts/intl";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
@@ -185,6 +186,12 @@ try {
 
 try {
   heartbeatInit();
+} catch {
+  // do nothing for now
+}
+
+try {
+  runDeviceProbeInBackground();
 } catch {
   // do nothing for now
 }

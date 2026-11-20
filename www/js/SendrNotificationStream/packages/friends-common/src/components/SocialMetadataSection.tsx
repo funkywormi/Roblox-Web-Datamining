@@ -1,19 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Thumbnail2d,
-  ThumbnailAvatarHeadshotSize,
-  ThumbnailFormat,
-  ThumbnailTypes,
-} from "@rbx/thumbnails";
 import { Icon } from "@rbx/foundation-ui";
 import { useTranslation } from "@rbx/core-scripts/react";
-import { UserProfileField, useUserProfiles } from "@rbx/user-profile-api-client";
 import { FriendRequestOriginSource } from "../constants/FriendRequestOriginSource";
 import type { ProfileInsightJson } from "../constants/profileInsightsTypes";
 import { trustedFriendsTranslationKeys } from "../constants/trustedFriendsModal";
 import { fetchMultiProfileInsights } from "../services/multiProfileInsights";
 import { formatTrustedFriendConnectionDurationFromUnix } from "../utils/formatTrustedFriendConnectionDurationFromUnix";
+import { useTrustedFriendsModalHost } from "./trustedFriendsModalHost";
 
 type DetailItem = {
   id: string;
@@ -136,6 +130,7 @@ function parseProfileInsights(insights: ProfileInsightJson[]): ParsedSocialInsig
 
 const SocialMetadataSection = ({ userId }: SocialMetadataSectionProps): React.JSX.Element => {
   const { translate } = useTranslation();
+  const { AvatarHeadshot, useUserNames } = useTrustedFriendsModalHost();
 
   const {
     data,
@@ -144,6 +139,9 @@ const SocialMetadataSection = ({ userId }: SocialMetadataSectionProps): React.JS
   } = useQuery({
     queryKey: ["multiProfileInsights", userId],
     queryFn: () => fetchMultiProfileInsights(userId),
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const [insights, setInsights] = useState<InsightsState>(emptyInsightsState);
@@ -169,10 +167,7 @@ const SocialMetadataSection = ({ userId }: SocialMetadataSectionProps): React.JS
     friendRequestOriginDisplay,
   } = insights;
 
-  const userProfileFields = [UserProfileField.Names.CombinedName, UserProfileField.Names.Username];
-  const { data: userProfiles } = useUserProfiles([userId], userProfileFields);
-
-  const profileForUser = userProfiles?.[userId];
+  const userNames = useUserNames(userId);
 
   const connectedForDisplay = useMemo(
     () =>
@@ -253,23 +248,18 @@ const SocialMetadataSection = ({ userId }: SocialMetadataSectionProps): React.JS
     <div className="radius-large bg-shift-100 padding-large flex flex-col gap-large">
       <div className="flex flex-row items-center gap-medium">
         <div className="trusted-friend-social-avatar-circle bg-shift-200">
-          {/* Ungated: only the friends carousel is behind the profile-frame IXP gate. */}
-          <Thumbnail2d
-            containerClass="trusted-friend-social-avatar-thumb radius-circle"
-            type={ThumbnailTypes.avatarHeadshot}
-            size={ThumbnailAvatarHeadshotSize.size48}
-            targetId={userId}
-            format={ThumbnailFormat.webp}
-            includeProfileFrame
+          <AvatarHeadshot
+            userId={userId}
+            className="trusted-friend-social-avatar-thumb radius-circle"
           />
           <div className="trusted-friend-social-avatar-loading-overlay" aria-hidden />
         </div>
         <div className="flex flex-col gap-xxsmall min-width-0">
           <p className="text-heading-small text-overflow-ellipsis margin-none">
-            {profileForUser?.names.combinedName ?? ""}
+            {userNames?.combinedName ?? ""}
           </p>
           <p className="text-body-medium content-default text-overflow-ellipsis margin-none">
-            {profileForUser?.names.username ?? ""}
+            {userNames?.username ?? ""}
           </p>
         </div>
       </div>

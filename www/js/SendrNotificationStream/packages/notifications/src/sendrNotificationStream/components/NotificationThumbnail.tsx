@@ -1,54 +1,45 @@
 import React from "react";
 import { Avatar } from "@rbx/foundation-ui";
-import {
-  Thumbnail2d,
-  ThumbnailTypes,
-  ThumbnailFormat,
-  DefaultThumbnailSize,
-} from "roblox-thumbnails";
 import { VisualItemThumbnail, ThumbnailType } from "../types/NotificationTemplateTypes";
+import {
+  getNotificationStreamHost,
+  type StreamThumbnailType,
+} from "../../notificationStreamData/streamHost";
+import type { JSX } from "react";
 
 export const ThumbnailData: {
   [key: string]: {
-    type: ThumbnailTypes;
+    type: StreamThumbnailType;
     class: string;
-    format: ThumbnailFormat;
   };
 } = {
   [ThumbnailType.User]: {
-    type: ThumbnailTypes.avatarHeadshot,
+    type: "avatarHeadshot",
     class: "avatar-icon-container",
-    format: ThumbnailFormat.webp,
   },
   [ThumbnailType.Game]: {
-    type: ThumbnailTypes.gameIcon,
+    type: "gameIcon",
     class: "game-icon-container",
-    format: ThumbnailFormat.webp,
   },
   [ThumbnailType.Group]: {
-    type: ThumbnailTypes.groupIcon,
+    type: "groupIcon",
     class: "group-icon-container",
-    format: ThumbnailFormat.webp,
   },
   [ThumbnailType.Asset]: {
-    type: ThumbnailTypes.assetThumbnail,
+    type: "assetThumbnail",
     class: "asset-icon-container",
-    format: ThumbnailFormat.webp,
   },
   [ThumbnailType.Bundle]: {
-    type: ThumbnailTypes.bundleThumbnail,
+    type: "bundleThumbnail",
     class: "asset-icon-container",
-    format: ThumbnailFormat.webp,
   },
   [ThumbnailType.GamePass]: {
-    type: ThumbnailTypes.gamePassIcon,
+    type: "gamePassIcon",
     class: "asset-icon-container",
-    format: ThumbnailFormat.webp,
   },
   [ThumbnailType.AvatarImageUrl]: {
-    type: "avatarImageUrl" as ThumbnailTypes,
+    type: "avatarImageUrl" as StreamThumbnailType,
     class: "avatar-icon-container",
-    format: ThumbnailFormat.webp,
   },
 };
 
@@ -79,16 +70,16 @@ export const NotificationThumbnail = ({
     return <Avatar src={thumbnailItem.id} alt="Avatar" size="Large" />;
   }
 
+  const { Thumbnail } = getNotificationStreamHost();
+
   return thumbnailItem.idType === ThumbnailType.User ? (
     <div className="avatar avatar-headshot-sm avatar-sndr-overides">
       <div className="avatar-card-image">
         {/* includeProfileFrame: render a subscriber's frame around their headshot in
           notifications (user avatars only). Shared thumbnails CSS handles the framed
           derivative; other idTypes (game/group/asset) never get a frame. */}
-        <Thumbnail2d
+        <Thumbnail
           type={thumbnailSettings.type}
-          size={DefaultThumbnailSize}
-          format={ThumbnailFormat.webp}
           targetId={parseFloat(thumbnailItem.id)}
           containerClass={thumbnailSettings.class}
           includeProfileFrame
@@ -96,10 +87,8 @@ export const NotificationThumbnail = ({
       </div>
     </div>
   ) : (
-    <Thumbnail2d
+    <Thumbnail
       type={thumbnailSettings.type}
-      size={DefaultThumbnailSize}
-      format={thumbnailSettings.format}
       targetId={parseFloat(thumbnailItem.id)}
       containerClass={thumbnailSettings.class}
     />

@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useRef, useState, type JSX } from "react";
 
 import { buildEntrypointRequest } from "../utils/buildEntrypointRequest";
+import { isErrorOutcome } from "../hooks/walkerReducer";
 import { flowApi } from "../services/flowApi";
 import { WizardHost } from "./WizardHost";
 import { AmpV2WizardEvent, type StartWizardDetail } from "../services/wizardService";
@@ -102,7 +103,7 @@ export function WizardApp(): JSX.Element | null {
           ),
         )
         .then(fragment => {
-          if (fragment.entry === "" && fragment.outcome !== "Error") {
+          if (fragment.entry === "" && !isErrorOutcome(fragment.outcome)) {
             // Nothing to run (granted / denied / no upsell) — resolve without rendering, and do NOT
             // fire onComplete: no flow ran, so there's nothing for the caller to refresh against.
             busyRef.current = false;
@@ -113,6 +114,8 @@ export function WizardApp(): JSX.Element | null {
           // The walker never starts these, so FlowStarted and the exit counters skip them.
           if (fragment.outcome === "Error") {
             trackCounter(WizardCounter.EntryFailed, { cause: "errorFragment" });
+          } else if (fragment.outcome === "RateLimited") {
+            trackCounter(WizardCounter.EntryFailed, { cause: "rateLimited" });
           } else if (fragment.nodes[fragment.entry] == null) {
             trackCounter(WizardCounter.EntryFailed, { cause: "missingEntry" });
           }

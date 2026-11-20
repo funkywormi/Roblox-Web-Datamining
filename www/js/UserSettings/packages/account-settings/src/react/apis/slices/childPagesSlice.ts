@@ -111,6 +111,12 @@ export const getChildSettingsPages = (linkedChildDetailsPath: string) => {
       path: `${linkedChildDetailsPath}/${SettingCategoryPageName.AgeCheck}`,
       titleTranslationKey: privacyPageTitles[SettingCategoryPageName.AgeCheck],
     },
+    [SettingCategoryPageName.ManageRecommendations]: {
+      name: SettingCategoryPageName.ManageRecommendations,
+      path: `${linkedChildDetailsPath}/${SettingCategoryPageName.ManageRecommendations}`,
+      titleTranslationKey: pageTitles[SettingCategoryPageName.ManageRecommendations],
+    },
+
     // Top-level Spend Notifications page (Spending Insights)
     [SpendSettingName.SpendNotifications]: {
       name: SpendSettingName.SpendNotifications,

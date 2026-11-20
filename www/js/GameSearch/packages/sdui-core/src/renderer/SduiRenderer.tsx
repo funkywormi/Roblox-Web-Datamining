@@ -6,10 +6,12 @@ import { reportError } from "../errors/SduiLogger";
 import type { SduiComponentRegistry } from "../registry/SduiComponentRegistry";
 import {
   SDUI_MANAGED_CHILDREN_PROP,
+  SDUI_RESERVED_EXTRA_LOCAL_PROPS,
   type DataStatus,
   type SduiActionResolver,
   type SduiComponentConfig,
   type SduiErrorReporter,
+  type SduiExtraLocalProps,
   type SduiManagedChildList,
   type SduiPageContext,
   type SduiPooledConfigList,
@@ -20,6 +22,8 @@ import { componentTypeName } from "../utils/protoEnum";
 import { needsInteractiveWrapper } from "../utils/rendererHelpers";
 import { isSduiConfig, isSduiConfigArray } from "../utils/typeGuards";
 import { materializeSduiPropValue } from "./materializeSduiPropValue";
+
+const RESERVED_EXTRA_LOCAL_PROPS: ReadonlySet<string> = new Set(SDUI_RESERVED_EXTRA_LOCAL_PROPS);
 
 export interface SduiRendererProps {
   config: SduiComponentConfig;
@@ -35,11 +39,15 @@ export interface SduiRendererProps {
     errorReporter: SduiErrorReporter;
     pageContext: SduiPageContext;
     actionResolver?: SduiActionResolver;
+    extraLocalProps?: SduiExtraLocalProps;
   }>;
   // Resolves `SduiActionData` into runtime actions (e.g. `onActivated`, `href`).
   actionResolver?: SduiActionResolver;
   // Per-prop status map injected by the interactive wrapper.
   propStatuses?: Record<string, DataStatus>;
+  // Parent-supplied props. See `SduiExtraLocalProps` for the merge rules. Nested renders
+  // do not inherit them.
+  extraLocalProps?: SduiExtraLocalProps;
 }
 
 type SduiRendererChildContext = Omit<SduiRendererProps, "config">;
@@ -64,6 +72,7 @@ function renderSduiChild(
   childConfig: SduiComponentConfig,
   reactKey: React.Key | undefined,
   ctx: SduiRendererChildContext,
+  extraLocalProps?: SduiExtraLocalProps,
 ): React.ReactElement {
   return (
     // Recursive render — `SduiRenderer` is defined below as `const` (not hoisted).
@@ -76,6 +85,7 @@ function renderSduiChild(
       pageContext={ctx.pageContext}
       interactiveWrapper={ctx.interactiveWrapper}
       actionResolver={ctx.actionResolver}
+      extraLocalProps={extraLocalProps}
     />
   );
 }
@@ -98,7 +108,7 @@ function createManagedChildList(
   return {
     configs,
     ...(poolLayout ? { poolLayout } : {}),
-    renderItem: (childConfig, index, reactKey) => {
+    renderItem: (childConfig, index, reactKey, extraLocalProps) => {
       const materializedConfig = materializeSduiComponentConfig(childConfig);
       // Deferred builds that throw or return nothing are skipped, like the eager path.
       if (materializedConfig == null) {
@@ -112,6 +122,7 @@ function createManagedChildList(
           materializedConfig.identifier ??
           `${propName}-${index}`,
         ctx,
+        extraLocalProps,
       );
     },
   };
@@ -135,6 +146,7 @@ export const SduiRenderer: React.FC<SduiRendererProps> = ({
   interactiveWrapper,
   actionResolver,
   propStatuses,
+  extraLocalProps,
 }) => {
   if (interactiveWrapper && needsInteractiveWrapper(config)) {
     const Wrapper = interactiveWrapper;
@@ -145,6 +157,7 @@ export const SduiRenderer: React.FC<SduiRendererProps> = ({
         errorReporter={errorReporter}
         pageContext={pageContext}
         actionResolver={actionResolver}
+        extraLocalProps={extraLocalProps}
       />
     );
   }
@@ -169,6 +182,7 @@ export const SduiRenderer: React.FC<SduiRendererProps> = ({
   const childElements: React.ReactElement[] = [];
   let injectedManagedChildrenList: SduiManagedChildList | undefined;
 
+  // `extraLocalProps` stays on this node. Nested renders start without it.
   const childContext: SduiRendererChildContext = {
     registry,
     errorReporter,
@@ -252,6 +266,14 @@ export const SduiRenderer: React.FC<SduiRendererProps> = ({
     const parsed = parser ? parser(materialized.value, {}) : materialized.value;
     if (hasProp || parsed != null) {
       resolvedProps[componentPropName] = parsed;
+    }
+  }
+
+  if (extraLocalProps) {
+    for (const [propName, value] of Object.entries(extraLocalProps)) {
+      if (value !== undefined && !RESERVED_EXTRA_LOCAL_PROPS.has(propName)) {
+        resolvedProps[propName] = value;
+      }
     }
   }
 

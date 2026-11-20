@@ -17,6 +17,9 @@ export const appDownloadType = {
 
 export const pageName = "downloadV2";
 
+/** The `source` the app download banner reports its downloadV2 events under. */
+export const appDownloadBannerSource = "appDownloadBanner";
+
 export const installInstructionsDelayMs = 1000;
 
 export {

@@ -3,16 +3,11 @@ import dataStores from "@rbx/core-scripts/data-store";
 import { authenticatedUser } from "@rbx/core-scripts/meta/user";
 import bedev1Constants from "../constants/bedev1Constants";
 import {
-  TGetOmniRecommendationsMetadataResponse,
-  TOmniRecommendation,
   TGetFriendsResponse,
   TGetPlaceDetails,
   TGetGameDetails,
   TGameData,
   TGetUniverseVoiceStatus,
-  TGamePassesResponse,
-  TGamePass,
-  TSort,
   TGetUserLocaleResponse,
   TSupportedLocale,
   TAssetDataResponse,
@@ -20,17 +15,21 @@ import {
 } from "../types/bedev1Types";
 
 const { url, defaultCacheCriteria } = bedev1Constants;
+
+export type TDiscoveryTransport = {
+  getFriendsPresence: () => Promise<{ userData?: TGetFriendsResponse[] }>;
+  getPlaceDetails: (placeId: string) => Promise<TGetPlaceDetails>;
+};
+
+let transport: Partial<TDiscoveryTransport> = {};
+
+export const registerDiscoveryTransport = (next: Partial<TDiscoveryTransport>): void => {
+  transport = next;
+};
+
+export const getDiscoveryTransport = (): Partial<TDiscoveryTransport> => transport;
 const { gamesDataStore, userDataStoreV2, localeDataStore } = dataStores;
 const { FriendsUserSortType } = dataStores.userDataStore;
-
-export const getGameSorts = async (): Promise<{ sorts: TSort[] }> => {
-  const {
-    data: { sorts },
-  } = await http.get<{ sorts: TSort[] }>(bedev1Constants.url.getGameSorts, {
-    gameSortsContext: "GamesDefaultSorts",
-  });
-  return { sorts };
-};
 
 export const getGameRecommendations = async (
   universeId: string,
@@ -42,28 +41,11 @@ export const getGameRecommendations = async (
   return data as Promise<{ games: TGameData[] }>;
 };
 
-export const getGamePasses = async (placeId: string, max: number): Promise<TGamePass[]> => {
-  return http
-    .get<TGamePassesResponse>(bedev1Constants.url.getGamePasses(placeId, max))
-    .then(response => response.data)
-    .then(response => {
-      // If the price or productId is null, the pass is not for sale
-      return response.data.filter(
-        gamePass => gamePass?.price !== null && gamePass?.productId !== null,
-      );
-    });
-};
-
-export const getOmniRecommendationsMetadata = async (
-  recommendationList: TOmniRecommendation[],
-): Promise<TGetOmniRecommendationsMetadataResponse> => {
-  const { data } = await http.post(bedev1Constants.url.getOmniRecommendationsMetadata, {
-    Contents: recommendationList,
-  });
-  return data as TGetOmniRecommendationsMetadataResponse;
-};
-
 export const getFriendsPresence = (): Promise<{ userData?: TGetFriendsResponse[] }> => {
+  const override = getDiscoveryTransport().getFriendsPresence;
+  if (override) {
+    return override();
+  }
   return userDataStoreV2.getFriends(
     {
       userId: authenticatedUser()?.id!,
@@ -75,6 +57,10 @@ export const getFriendsPresence = (): Promise<{ userData?: TGetFriendsResponse[]
 };
 
 export const getPlaceDetails = async (placeId: string): Promise<TGetPlaceDetails> => {
+  const override = getDiscoveryTransport().getPlaceDetails;
+  if (override) {
+    return override(placeId);
+  }
   const { data = [] } = await gamesDataStore.getPlaceDetails([placeId as unknown as number]);
   return data[0] as TGetPlaceDetails;
 };
@@ -125,10 +111,7 @@ const getPlayabilityStatus = async (
 export default {
   getFriendsPresence,
   getGameDetails,
-  getGamePasses,
   getGameRecommendations,
-  getGameSorts,
-  getOmniRecommendationsMetadata,
   getVoiceStatus,
   getPlaceDetails,
   getUserLocale,

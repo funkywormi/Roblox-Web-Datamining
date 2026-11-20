@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { endSuccess } from "@rbx/www-common/event-tracker";
 
 import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
 import serverListService from "../services/serverListService";
@@ -173,7 +174,7 @@ function useServerList(
       } finally {
         if (params.startTime !== undefined) {
           const timeDifference = performance.now() - Number(params.startTime);
-          window.EventTracker?.endSuccess(PrivateServerEventType.PRIVATE_SERVER_LOAD);
+          endSuccess(PrivateServerEventType.PRIVATE_SERVER_LOAD);
           trackerClient.sendEvent(
             PrivateServerEventType.PRIVATE_SERVER_LOAD,
             PrivateServerEventContext.GAME_TAB,

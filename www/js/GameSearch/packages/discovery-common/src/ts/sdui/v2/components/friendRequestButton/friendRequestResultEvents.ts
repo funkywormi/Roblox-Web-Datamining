@@ -2,15 +2,21 @@ import { window as browserWindow } from "@rbx/core-lib/browser";
 
 export type FriendRequestResult = "success" | "failure";
 export type FriendRequestType = "friend-request-sent" | "friend-request-accepted";
-export type FriendRequestFeedback = {
-  result: FriendRequestResult;
-  type: FriendRequestType;
-};
+type FriendRequestFailureReason = "offline";
+
+export type FriendRequestFeedback = { type: FriendRequestType } & (
+  | { result: "success" }
+  | { result: "failure"; reason?: FriendRequestFailureReason }
+);
 
 const FRIEND_REQUEST_RESULT_EVENT = "sdui:friend-request-result";
 
 function isFriendRequestResult(value: unknown): value is FriendRequestResult {
   return value === "success" || value === "failure";
+}
+
+function isFriendRequestFailureReason(value: unknown): value is FriendRequestFailureReason {
+  return value === "offline";
 }
 
 function isFriendRequestType(value: unknown): value is FriendRequestType {
@@ -56,7 +62,16 @@ export function subscribeToFriendRequestResults(
       "type" in event.detail &&
       isFriendRequestType(event.detail.type)
     ) {
-      listener({ result: event.detail.result, type: event.detail.type });
+      if (event.detail.result === "failure") {
+        listener({
+          result: "failure",
+          type: event.detail.type,
+          ...("reason" in event.detail &&
+            isFriendRequestFailureReason(event.detail.reason) && { reason: event.detail.reason }),
+        });
+      } else {
+        listener({ result: "success", type: event.detail.type });
+      }
     }
   };
 

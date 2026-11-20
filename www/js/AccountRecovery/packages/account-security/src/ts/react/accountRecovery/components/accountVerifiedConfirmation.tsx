@@ -90,7 +90,7 @@ const AccountVerifiedConfirmation: React.FC = () => {
           combinedName={combinedName ?? ""}
           username={username ?? ""}
         />
-        <p className="padding-bottom-large">{bodyText}</p>
+        <p className="text-align-x-left text-body-medium padding-bottom-large">{bodyText}</p>
         {requestError && <p className="text-error xsmall">{requestError}</p>}
       </ModernCardBody>
       <ModernCardFooter positiveButton={positiveButton} negativeButton={null} />

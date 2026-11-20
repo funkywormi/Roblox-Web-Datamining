@@ -1,4 +1,4 @@
-import { document as browserDocument } from "@rbx/core-lib/browser";
+import { document as browserDocument, window as browserWindow } from "@rbx/core-lib/browser";
 import {
   createSduiLoadTimerRegistry,
   type SduiLoadTimerRegistry,
@@ -6,6 +6,8 @@ import {
 import { createSduiBuilder } from "../binding/SduiBuilder";
 import { createSduiDataBinder } from "../binding/SduiDataBinder";
 import { createHydrationStores } from "../binding/stores";
+import { loadAppPolicy } from "../binding/stores/contentStores/loadAppPolicy";
+import { POLICY_CONTENT_TYPE, PolicyStore } from "../binding/stores/contentStores/PolicyStore";
 import { RESPONSIVE_CONTENT_TYPE } from "../binding/stores/contentStores/ResponsiveStore";
 import type { SduiActionHandlerRegistry } from "../registry/SduiActionHandlerRegistry";
 import type { SduiComponentRegistry } from "../registry/SduiComponentRegistry";
@@ -141,6 +143,14 @@ export function createSduiServicesWithStores(
 
   if (options.initialHydrationData) {
     dataBinder.updateDataStores(options.initialHydrationData);
+  }
+
+  const policyStore = stores[POLICY_CONTENT_TYPE];
+  if (browserWindow && policyStore instanceof PolicyStore) {
+    policyStore.setLoader(() => {
+      // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation -- store-level load outside React; failures are reported inside
+      void loadAppPolicy(policyStore, { errorReporter, pageContext });
+    });
   }
 
   const locale = options.locale ?? readAccountLocaleTag();

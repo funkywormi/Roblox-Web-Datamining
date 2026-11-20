@@ -20,6 +20,13 @@ import FriendManagement from "../parentDashboard/FriendManagement";
 import EditChildProfile from "../parentDashboard/EditChildProfile";
 import useHandleUnlinkChild from "../../../hooks/useHandleUnlinkChild";
 import doesUserHaveNotificationSettings from "../../../utils/notificationUtils";
+import {
+  communicationPageSettings,
+  hasAnySetting,
+  hasChildNotificationRows,
+  tradingAndInventoryPageSettings,
+  visibilityPageSettings,
+} from "../../../utils/parentalControls/childSettingsMenuUtils";
 import AllowThirdPartyAppsSetting from "../../appPermissions/AllowThirdPartyAppsSetting";
 import ContentMaturitySlider from "../../privacy/ContentMaturitySlider";
 import FriendDiscovery from "../../privacy/FriendDiscovery";
@@ -38,6 +45,8 @@ import TopGameDetails from "../parentDashboard/TopGameDetails";
 import BlockedUsersList from "../../privacy/BlockedUsersList";
 import { useGetSettingsUiPolicyQuery } from "../../../../apis/universalAppConfigurationApi";
 import AgeCheck from "../parentDashboard/AgeCheck";
+import ChildManageRecommendations from "../parentDashboard/ChildManageRecommendations";
+import useHasChildManageRecommendations from "../parentDashboard/useHasChildManageRecommendations";
 import ChildPrivacyRequests from "../parentDashboard/ChildPrivacyRequests";
 
 // Defines routes for parents to view and manage their child's details and settings
@@ -55,14 +64,36 @@ export const ChildRoutes = ({
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
   const showParentalPrivacyRequests = uiPolicy?.selfServeParentalPrivacyRequestsEnabled === true;
 
-  const shouldDisplayScreenTime = useMemo(() => {
+  // Only managing the limit depends on this setting, while viewing screen time and top games doesn't.
+  const shouldDisplayScreenTimeLimit = useMemo(() => {
     return childSettings?.dailyScreenTimeLimit !== undefined;
   }, [childSettings]);
 
   const doesChildHaveNotificationSettings = useMemo(
-    () => doesUserHaveNotificationSettings(childSettings),
-    [childSettings],
+    () =>
+      doesUserHaveNotificationSettings(childSettings) &&
+      hasChildNotificationRows(child, childSettings, settingsAndOptionsV2),
+    [child, childSettings, settingsAndOptionsV2],
   );
+
+  // Each menu below also needs user-settings to return at least one of its rows' settings,
+  // so it doesn't render empty when user-settings stops offering them to the parent.
+  const showVisibilityAndPrivateServers =
+    child.canParentAccessChildBasicPrivacySettings &&
+    (hasAnySetting(visibilityPageSettings, childSettings, settingsAndOptionsV2) ||
+      !!childSettings?.[UserSetting.privateServerPrivacy]);
+
+  const showTradingAndInventory =
+    child.canParentAccessChildBasicPrivacySettings &&
+    hasAnySetting(tradingAndInventoryPageSettings, childSettings);
+
+  const showCommunication =
+    (child.canParentAccessChildBasicPrivacySettings ||
+      child.canParentViewChildCreatorCollaborationSettings ||
+      child.canParentManageChildsCommunicationSettings ||
+      child.canParentManageChildsInExperienceDirectChatSetting ||
+      child.canParentManageChildsPresetChatSetting) &&
+    hasAnySetting(communicationPageSettings, childSettings, settingsAndOptionsV2);
 
   const showFriendsAndContacts = useMemo(
     () =>
@@ -85,12 +116,8 @@ export const ChildRoutes = ({
 
   const showFae = useMemo(() => {
     const childHasFaeSetting = childSettings?.[UserSetting.allowFacialAgeEstimation];
-    return Boolean(
-      (childHasFaeSetting && uiPolicy?.enableAgeCheckSetting) ||
-        (child.canParentViewChildCreatorCollaborationSettings &&
-          uiPolicy?.vpcForFaeCreatorCollabSettingEnabled),
-    );
-  }, [childSettings, uiPolicy, child]);
+    return Boolean(childHasFaeSetting && uiPolicy?.enableAgeCheckSetting);
+  }, [childSettings, uiPolicy]);
 
   const showIdv = useMemo(
     () =>
@@ -98,6 +125,14 @@ export const ChildRoutes = ({
       !!settingsAndOptionsV2?.[UserSetting.allowIdentityVerification],
     [child, settingsAndOptionsV2],
   );
+
+  // Manage Recommendations (VLOP, e.g. a child under 18 in Brazil), when user-settings returns the
+  // page's settings to the parent. Not the parent's own-tab policy (displayManageRecommendationsTab):
+  // a Brazilian adult parent has no tab of their own. Only the menu item waits for the settings,
+  // since the page shows its own spinner and retry, and leaves when it has no settings.
+  const showManageRecommendations = useHasChildManageRecommendations(child);
+  const manageRecommendationsPage =
+    childPages.childSettingCategoryPages[SettingCategoryPageName.ManageRecommendations];
 
   // The "Facial and ID verification" page (SettingCategoryPageName.AgeCheck) hosts both the
   // facial-verification (FAE) toggle and the identity-verification (IDV) toggle. Show it only when
@@ -109,17 +144,24 @@ export const ChildRoutes = ({
 
     if (!child.canParentAccessChildBasicPrivacySettings) {
       delete subpages[PrivacySettingName.ContentMaturity];
+    }
+
+    if (!showVisibilityAndPrivateServers) {
       delete subpages[SettingCategoryPageName.VisibilityAndPrivateServers];
+    }
+
+    if (!showTradingAndInventory) {
       delete subpages[SettingCategoryPageName.TradingAndInventory];
     }
 
     if (
-      !child.canParentAccessChildBasicPrivacySettings &&
-      !child.canParentViewChildCreatorCollaborationSettings &&
-      !child.canParentManageChildsCommunicationSettings &&
-      !child.canParentManageChildsInExperienceDirectChatSetting &&
-      !child.canParentManageChildsPresetChatSetting
+      !child.canParentAccessChildBasicPrivacySettings ||
+      !childSettings?.[UserSetting.contentAgeRestriction]
     ) {
+      delete subpages[PrivacySettingName.ContentMaturity];
+    }
+
+    if (!showCommunication) {
       delete subpages[SettingCategoryPageName.Communication];
     }
 
@@ -166,6 +208,9 @@ export const ChildRoutes = ({
     if (!showAgeCheckPage) {
       delete subpages[SettingCategoryPageName.AgeCheck];
     }
+    if (!showManageRecommendations) {
+      delete subpages[SettingCategoryPageName.ManageRecommendations];
+    }
     if (!showParentalPrivacyRequests) {
       delete subpages[ParentalControlsPageName.PrivacyRights];
     }
@@ -176,8 +221,12 @@ export const ChildRoutes = ({
     showFriendsAndContacts,
     doesChildHaveNotificationSettings,
     childSettings,
+    showVisibilityAndPrivateServers,
+    showTradingAndInventory,
+    showCommunication,
     showChildContentRestrictions,
     showAgeCheckPage,
+    showManageRecommendations,
     showParentalPrivacyRequests,
     uiPolicy?.enableParentLinkActivityUpdates,
   ]);
@@ -188,7 +237,8 @@ export const ChildRoutes = ({
         <LinkedChildDetails
           child={child}
           filteredChildCategoryPages={filteredChildCategoryPages}
-          shouldDisplayScreenTimeLimit={shouldDisplayScreenTime}
+          shouldDisplayScreenTimeLimit={shouldDisplayScreenTimeLimit}
+          showManageRecommendations={showManageRecommendations}
         />
       </Route>
 
@@ -206,22 +256,18 @@ export const ChildRoutes = ({
         <EditChildProfile child={child} handleUnlinkChild={handleUnlinkChild} />
       </Route>
 
-      {shouldDisplayScreenTime && child.canParentManageChildsScreentime && (
+      {shouldDisplayScreenTimeLimit && child.canParentManageChildsScreentime && (
         <Route path={childPages.screenTimeManagementPage.path}>
           <ChildScreentimeLimit child={child} />
         </Route>
       )}
 
-      {shouldDisplayScreenTime && (
-        <React.Fragment>
-          <Route exact path={childPages.topGamesPage.path}>
-            <TopGames child={child} />
-          </Route>
-          <Route path={getTopGameDetailsRoutePath(child.userId)}>
-            <TopGameDetails child={child} />
-          </Route>
-        </React.Fragment>
-      )}
+      <Route exact path={childPages.topGamesPage.path}>
+        <TopGames child={child} />
+      </Route>
+      <Route path={getTopGameDetailsRoutePath(child.userId)}>
+        <TopGameDetails child={child} />
+      </Route>
 
       {showChildContentRestrictions ? (
         <ChildContentRestrictionsRoutes
@@ -232,30 +278,23 @@ export const ChildRoutes = ({
           subpages={childPages.contentRestrictionPages}
         />
       ) : (
-        child.canParentAccessChildBasicPrivacySettings && (
+        child.canParentAccessChildBasicPrivacySettings &&
+        childSettings?.[UserSetting.contentAgeRestriction] && (
           <Route path={filteredChildCategoryPages[PrivacySettingName.ContentMaturity]?.path}>
             <ContentMaturitySlider childUserId={child.userId} />
           </Route>
         )
       )}
 
-      {child.canParentAccessChildBasicPrivacySettings && (
-        <React.Fragment>
-          <ChildVisibilityAndPrivateServersRoutes child={child} />
+      {showVisibilityAndPrivateServers && <ChildVisibilityAndPrivateServersRoutes child={child} />}
 
-          <Route
-            path={filteredChildCategoryPages[SettingCategoryPageName.TradingAndInventory]?.path}
-          >
-            <InventoryTradePrivacy childUserId={child.userId} />
-          </Route>
-        </React.Fragment>
+      {showTradingAndInventory && (
+        <Route path={filteredChildCategoryPages[SettingCategoryPageName.TradingAndInventory]?.path}>
+          <InventoryTradePrivacy childUserId={child.userId} />
+        </Route>
       )}
 
-      {(child.canParentAccessChildBasicPrivacySettings ||
-        child.canParentViewChildCreatorCollaborationSettings ||
-        child.canParentManageChildsCommunicationSettings ||
-        child.canParentManageChildsInExperienceDirectChatSetting ||
-        child.canParentManageChildsPresetChatSetting) && (
+      {showCommunication && (
         <ChildCommunicationRoutes
           communicationPage={
             filteredChildCategoryPages[SettingCategoryPageName.Communication] as TSettingsPage
@@ -311,6 +350,11 @@ export const ChildRoutes = ({
       {showAgeCheckPage && (
         <Route path={filteredChildCategoryPages[SettingCategoryPageName.AgeCheck]?.path}>
           <AgeCheck child={child} showFae={showFae} showIdv={showIdv} />
+        </Route>
+      )}
+      {manageRecommendationsPage && (
+        <Route path={manageRecommendationsPage.path}>
+          <ChildManageRecommendations child={child} />
         </Route>
       )}
       {showParentalPrivacyRequests && (

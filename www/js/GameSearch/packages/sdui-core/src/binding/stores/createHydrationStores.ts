@@ -18,6 +18,7 @@ import {
   MARKETPLACE_BUNDLE_CONTENT_TYPE,
   MarketplaceBundleStore,
 } from "./contentStores/MarketplaceBundleStore";
+import { POLICY_CONTENT_TYPE, PolicyStore } from "./contentStores/PolicyStore";
 import { QUERY_PARAM_CONTENT_TYPE, QueryParamStore } from "./contentStores/QueryParamStore";
 import { RESPONSIVE_CONTENT_TYPE, ResponsiveStore } from "./contentStores/ResponsiveStore";
 import { SONG_CONTENT_TYPE, SongStore } from "./contentStores/SongStore";
@@ -63,5 +64,6 @@ export function createHydrationStores(
     [CLIENT_PAGE_SCOPE_CONTENT_TYPE]: ClientPageScopeStore.getInstance(),
     [LOCALIZED_LITERALS_CONTENT_TYPE]: LocalizedLiteralsStore.getInstance(),
     [QUERY_PARAM_CONTENT_TYPE]: QueryParamStore.getInstance(),
+    [POLICY_CONTENT_TYPE]: PolicyStore.getInstance(),
   };
 }

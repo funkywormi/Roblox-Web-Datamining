@@ -42,7 +42,6 @@ export const ACCOUNT_RECOVERY_LANGUAGE_RESOURCES = [
   "Action.Delete",
   "Action.DeleteAll",
   "Action.DontDeleteCredentials",
-  "Action.Next",
   "Action.Ok",
   "Action.ResetPassword",
   "Action.Save",

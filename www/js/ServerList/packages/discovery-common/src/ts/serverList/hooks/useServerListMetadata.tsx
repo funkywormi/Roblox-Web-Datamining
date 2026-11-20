@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import gameDetailMetaData from "../../../js/gameData/utils/gameDetailMetaData";
 import fetchServerListMetadata from "../utils/fetchServerListMetadata";
 import { parseUniverseIdFromServersSectionUrl } from "../utils/urlParsingUtils";
@@ -45,13 +46,13 @@ const useServerListMetadata = (): {
       return urlUniverseId;
     }
 
-    window.EventTracker?.fireEvent(EVENT_COUNTER_NAMES.NO_UNIVERSE_ID);
+    fireEvent(EVENT_COUNTER_NAMES.NO_UNIVERSE_ID);
 
     return undefined;
   }, []);
 
   const logMetadataFetchError = () => {
-    window.EventTracker?.fireEvent(EVENT_COUNTER_NAMES.FETCH_ERROR);
+    fireEvent(EVENT_COUNTER_NAMES.FETCH_ERROR);
   };
 
   const {

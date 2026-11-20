@@ -130,5 +130,6 @@
     "Heading.SchoolUnavailable": "Your school is unavailable",
     "Description.SchoolUnavailableBody": "This school isn't currently available on Roblox.",
     "Error.UnidaysEmailNotFound": "UNiDAYS can’t find this email.",
-    "Body.UnidaysTermsWithLinks": "We partner with UNiDAYS to verify your school email address. By clicking \"Continue,\" you agree to UNiDAYS' {tosStart}Terms of Service{tosEnd} and {ppStart}Privacy Policy{ppEnd}."
+    "Body.UnidaysTermsWithLinks": "We partner with UNiDAYS to verify your school email address. By clicking \"Continue,\" you agree to UNiDAYS' {tosStart}Terms of Service{tosEnd} and {ppStart}Privacy Policy{ppEnd}.",
+    "Description.NotificationWebCollege": "Visit Roblox app to verify your college email. Hang out with other players from your college."
 }

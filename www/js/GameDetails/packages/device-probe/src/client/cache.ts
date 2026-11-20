@@ -65,6 +65,8 @@ export type CachedProbeFailure = {
   /** Failures in a row, this one included. */
   failureCount: number;
   reason: ProbeFailureReason;
+  /** On a `crashed` entry a later run has reported, so a run that puts it back doesn't again. */
+  crashReported?: true;
 };
 
 declare module "@rbx/core-lib/local-storage" {
@@ -272,21 +274,25 @@ export const readCachedFailure = (): CachedProbeFailure | null => {
     failureCount: entry.failureCount,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- checked above
     reason: entry.reason as ProbeFailureReason,
+    ...(entry.crashReported === true && { crashReported: true }),
   };
 };
 
 /**
- * Whether a cached failure means the probe isn't run again yet. A `crashed` entry younger than
- * `crashGraceMs` may be a probe still running, in this tab or another, so it doesn't count yet.
+ * The cached failure when it means the probe isn't run again yet, otherwise `null`. A `crashed`
+ * entry younger than `crashGraceMs` may be a probe still running, in this tab or another, so it
+ * doesn't count yet.
  */
-export const hasRecentFailure = (now: number, crashGraceMs: number): boolean => {
+export const readRecentFailure = (now: number, crashGraceMs: number): CachedProbeFailure | null => {
   const failure = readCachedFailure();
   if (failure == null) {
-    return false;
+    return null;
   }
   const age = now - failure.failedAt;
   const maxAge = failure.failureCount >= 2 ? REPEATED_FAILURE_MAX_AGE_MS : FIRST_FAILURE_MAX_AGE_MS;
-  return age >= 0 && age < maxAge && !(failure.reason === "crashed" && age < crashGraceMs);
+  return age >= 0 && age < maxAge && !(failure.reason === "crashed" && age < crashGraceMs)
+    ? failure
+    : null;
 };
 
 /** `false` when the entry couldn't be written (storage full or blocked). */

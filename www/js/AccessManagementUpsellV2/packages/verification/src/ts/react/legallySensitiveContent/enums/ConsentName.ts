@@ -28,6 +28,7 @@ export enum ConsentName {
   consentCenterAllowAction = 'consentCenterAllowAction',
   consentCenterUpdateSettingNoValue = 'consentCenterUpdateSettingNoValue',
   consentCenterUpdateSettingWithValue = 'consentCenterUpdateSettingWithValue',
+  consentCenterUpdateSettingParentFacingWithValue = 'consentCenterUpdateSettingParentFacingWithValue',
   whoCanPartyWithMeTrustedFriends = 'whoCanPartyWithMeTrustedFriends',
   whoCanPartyWithMeTrustedFriendsV2 = 'whoCanPartyWithMeTrustedFriendsV2',
   whoCanPartyWithMeParentSideRemovedComms = 'whoCanPartyWithMeParentSideRemovedComms',

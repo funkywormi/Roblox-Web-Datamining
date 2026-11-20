@@ -61,6 +61,8 @@ export const SUPPORTED_ICON_CLASSES: Record<string, string> = {
   "icons/status/games/rating_small": "icon icon-filled-thumb-up",
   "icons/status/games/people-playing_small": "icon icon-filled-person-play",
   "icons/navigation/pushRight_small": "icon icon-regular-chevron-small-right",
+  "icons/actions/cycleRight": "icon icon-regular-chevron-large-right",
+  "icons/arrows/arrow_wide_right": "icon icon-regular-arrow-wide-right",
   "icons/common/robux": "icon icon-filled-robux",
   "icons/actions/info_small": "icon-moreinfo-16x16",
 };

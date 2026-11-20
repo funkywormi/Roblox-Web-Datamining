@@ -412,6 +412,23 @@ export const getAuditDataForConsent = (
           }
         }
       ];
+    case ConsentName.consentCenterUpdateSettingParentFacingWithValue:
+      content = legallySensitiveContentConstants.consentCenterUpdateSettingParentFacingWithValue;
+      return [
+        {
+          consentStringTemplate: translate(content.textTranslationKey, {
+            settingName: content.settingNameParam,
+            currentValue: content.currentValueParam,
+            proposedValue: content.proposedValueParam
+          }),
+          sourceContentId: content.textSourceContentId,
+          vars: {
+            settingName: translationArgs?.settingName as string,
+            currentValue: translationArgs?.currentValue as string,
+            proposedValue: translationArgs?.proposedValue as string
+          }
+        }
+      ];
     case ConsentName.allowMarketingEmailNotifications:
       return [
         {

@@ -22,7 +22,12 @@ const getSsoPlacement = (
   }
   switch (authUiVariant) {
     case authUiVariants.refreshSsoInline:
-      return loginUiPolicy.isExternalIdentityLoginExcluded ? "hidden" : "underDivider";
+      if (!loginUiPolicy.isExternalIdentityLoginExcluded) {
+        return "underDivider";
+      }
+      return loginUiPolicy.isExternalIdentityOtherSignInOptionsExcluded
+        ? "hidden"
+        : "otherSignInOptions";
     case authUiVariants.refreshSsoDialog:
       return loginUiPolicy.isExternalIdentityOtherSignInOptionsExcluded
         ? "hidden"

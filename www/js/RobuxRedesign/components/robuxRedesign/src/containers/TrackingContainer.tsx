@@ -9,6 +9,7 @@ import { usePurchaseEligibilityTracking } from "../hooks/purchaseEligibility/use
 import { usePurchaseTracking } from "../hooks/purchase/usePurchaseTracking";
 import { useGiftCardTracking } from "../hooks/giftCards/giftCardTracking";
 import { useRedirectTracking } from "../hooks/useRedirectTracking";
+import { useEarlyClickMonitor, useEarlyClickTracking } from "../modules/earlyClick";
 import { useSamsungPaymentMethodsTracking } from "../hooks/samsungPaymentMethods/useSamsungPaymentMethodsTracking";
 import { useTransfersTracking } from "../hooks/useTransfersTracking";
 
@@ -25,6 +26,8 @@ export function TrackingContainer({ children }: { children: ReactNode }) {
   const robuxGiftingTracking = useRobuxGiftingTracking(tracking);
   const subscriptionV2Tracking = useSubscriptionV2Tracking(tracking);
   const redirectTracking = useRedirectTracking(tracking);
+  const earlyClickTracking = useEarlyClickTracking(tracking);
+  useEarlyClickMonitor(earlyClickTracking.trackEarlyClick);
 
   const trackingContextValue = useMemo(
     () => ({
@@ -37,6 +40,7 @@ export function TrackingContainer({ children }: { children: ReactNode }) {
       ...robuxGiftingTracking,
       ...subscriptionV2Tracking,
       ...redirectTracking,
+      ...earlyClickTracking,
       ...transfersTracking,
     }),
     [
@@ -49,6 +53,7 @@ export function TrackingContainer({ children }: { children: ReactNode }) {
       robuxGiftingTracking,
       subscriptionV2Tracking,
       redirectTracking,
+      earlyClickTracking,
       transfersTracking,
     ],
   );

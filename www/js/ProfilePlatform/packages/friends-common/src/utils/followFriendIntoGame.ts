@@ -1,5 +1,5 @@
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
-import { getGameLauncher } from "@rbx/www-common/game-launch";
+import { resolveGameLauncher } from "@rbx/www-common/game-launch";
 
 export type FollowFriendIntoGameOptions = {
   friendUserId: number | string;
@@ -11,11 +11,12 @@ export async function followFriendIntoGame({
   joinAttemptId,
 }: FollowFriendIntoGameOptions): Promise<void> {
   const deviceMeta = getDeviceMeta();
+  const params = { userId: friendUserId, joinAttemptId, joinAttemptOrigin: "JoinUser" };
 
   if (deviceMeta?.isInApp) {
     if (deviceMeta.isDesktop) {
-      // eslint-disable-next-line @typescript-eslint/no-deprecated, @typescript-eslint/no-unnecessary-condition -- keeps the existing in-app desktop launch path; window.Roblox is absent on Next.js
-      window.Roblox?.GameLauncher?.followPlayerIntoGame(friendUserId, joinAttemptId, "JoinUser");
+      // The launcher joins through the desktop app's bridge.
+      await resolveGameLauncher()?.followPlayerIntoGame(params);
     } else {
       window.location.href = `/games/start?userID=${friendUserId}&joinAttemptId=${joinAttemptId}&joinAttemptOrigin=JoinUser`;
     }
@@ -24,14 +25,6 @@ export async function followFriendIntoGame({
   } else if (deviceMeta?.isIosDevice) {
     window.location.href = `robloxmobile://userId=${friendUserId}&joinAttemptId=${joinAttemptId}&joinAttemptOrigin=JoinUser`;
   } else {
-    const params = { userId: friendUserId, joinAttemptId, joinAttemptOrigin: "JoinUser" };
-    // The Next.js host registers the shared launcher; .NET pages keep their protocol handler.
-    const launcher = getGameLauncher();
-    if (launcher != null) {
-      await launcher.followPlayerIntoGame(params);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-deprecated -- .NET fallback, getGameLauncher() is null there
-      await window.Roblox.ProtocolHandlerClientInterface?.followPlayerIntoGame(params);
-    }
+    await resolveGameLauncher()?.followPlayerIntoGame(params);
   }
 }

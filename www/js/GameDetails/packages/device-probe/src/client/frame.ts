@@ -1,11 +1,11 @@
 import { document, window } from "@rbx/core-lib/browser";
 import { DEVICE_PROBE_PATH, RESULT_MESSAGE_TYPE } from "../page";
 import { PACKAGE_VERSION, PROBE_VERSION } from "../version";
-import type { DeviceProbeFailureReason } from "./hooks";
+import type { DeviceProbeFailureReason } from "./telemetry";
 
 export type FrameResult =
   | { ok: true; scores: unknown }
-  | { ok: false; reason: Exclude<DeviceProbeFailureReason, "throttled"> };
+  | { ok: false; reason: Exclude<DeviceProbeFailureReason, "crashed" | "throttled"> };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;

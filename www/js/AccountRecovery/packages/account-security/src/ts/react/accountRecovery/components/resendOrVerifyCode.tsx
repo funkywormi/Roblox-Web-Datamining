@@ -155,7 +155,7 @@ const ResendOrVerifyCode: React.FC = () => {
             </span>
           </div>
         )}
-        <p className="padding-bottom-large">{bodyText}</p>
+        <p className="text-align-x-left text-body-medium padding-bottom-large">{bodyText}</p>
         <VariableInputControl
           id="account-recovery-code-input"
           inputType="text"

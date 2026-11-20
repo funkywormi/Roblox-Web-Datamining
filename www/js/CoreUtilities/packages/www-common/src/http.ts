@@ -4,6 +4,7 @@ import * as http from "@rbx/core-lib/http";
 import { HttpError } from "@rbx/core-lib/http";
 import { retryInterceptor } from "@rbx/core-lib/http/retry";
 import { withResolvers } from "@rbx/core-lib/promise";
+import { Url } from "@rbx/core-lib/url";
 import {
   interceptChallenge,
   Migrate,
@@ -69,8 +70,7 @@ export const setClientInterceptors = ({
           options.headers.set(csrfTokenHeader, csrfToken);
         }
 
-        const isFirstParty =
-          url.host.endsWith(".roblox.com") || url.host.endsWith(".robloxlabs.com");
+        const isFirstParty = Url.parse(url.href).isOk();
         const userId = getUserId();
 
         if (isFirstParty && userId == null) {

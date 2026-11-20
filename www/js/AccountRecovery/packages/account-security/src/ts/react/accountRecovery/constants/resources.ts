@@ -21,10 +21,6 @@ export const getResources = (translate: TranslateFunction) =>
       Delete: translate("Action.Delete"),
       DeleteAll: translate("Action.DeleteAll"),
       DontDeleteCredentials: translate("Action.DontDeleteCredentials"),
-      // TODO: Per content design, use "Continue" instead of "Next" for this CTA (Next isn't in
-      // the unified CTA guidelines). Action.Continue already exists. Used by SendCode and
-      // IdentifierInput.
-      Next: translate("Action.Next"),
       Ok: translate("Action.Ok"),
       ResetPassword: translate("Action.ResetPassword"),
       Save: translate("Action.Save"),

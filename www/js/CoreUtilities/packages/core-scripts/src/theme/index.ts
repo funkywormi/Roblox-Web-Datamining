@@ -1,40 +1,11 @@
 // Do not import anything here without checking if you need to update the rspack config for the coreUtilities component.
 
-import { document, window } from "@rbx/core-lib/browser";
-import * as localStorage from "@rbx/core-lib/local-storage";
+import { document } from "@rbx/core-lib/browser";
 import "@rbx/www-common/global";
-import { getCurrentUser } from "@rbx/www-common/user";
 import { setColorModeOverride } from "@rbx/core-scripts/color-mode";
 import { AppTheme, appThemes, PlusTheme, FreeTheme } from "./constants";
-import { eventData } from "../meta/event";
 
 const appThemeClass = (theme: Exclude<AppTheme, "default">) => `theme-${theme}`;
-
-// TODO: remove this logic once hollow theme is plus only
-const hallowThemeEnabledForNonPlus = () => {
-  const user = getCurrentUser();
-  // Unauth does not have access to hollow theme.
-  // Also, hollow theme is an account level theme for plus users and can be handled normally.
-  if (user == null || user.membership === "blackbird") {
-    return false;
-  }
-
-  // Search param passed into webview from Lua
-  if (new URLSearchParams(window?.location.search).get("deviceThemeOverride") === "Halloween2026") {
-    return true;
-  }
-
-  const event = eventData();
-  if (event?.phase !== 1) {
-    return false;
-  }
-
-  const themeData = localStorage.getItem("event-halloween-2026");
-  if (themeData?.version !== 0) {
-    return false; // No data present, or new version released and we need a page reload
-  }
-  return themeData.data.includes(user.id);
-};
 
 const initialTheme = () => {
   // For CS site which loads CoreUtilities before document body
@@ -43,12 +14,6 @@ const initialTheme = () => {
   }
 
   const { classList } = document.body;
-
-  if (!classList.contains("forced-theme") && hallowThemeEnabledForNonPlus()) {
-    classList.add(appThemeClass("halloween-2026"));
-    setColorModeOverride("dark");
-    return "halloween-2026";
-  }
 
   const appTheme = appThemes.find(
     (theme): theme is Exclude<AppTheme, "default"> =>

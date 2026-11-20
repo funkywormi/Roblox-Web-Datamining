@@ -12,10 +12,13 @@ import SettingsSurfaceFragmentNode from "./__generated__/SettingsSurfaceFragment
 export const SettingsSurface = ({
   surface: surfaceRef,
   userId,
+  hideTitle = false,
 }: {
   surface: SettingsSurfaceFragment$key;
   /** The user the surface was queried for. */
   userId: string;
+  /** Leave out the surface's heading when the host already shows one. The intro still renders. */
+  hideTitle?: boolean;
 }): JSX.Element | null => {
   const { header, settings } = useFragment<SettingsSurfaceFragment$key>(
     SettingsSurfaceFragmentNode,
@@ -36,7 +39,9 @@ export const SettingsSurface = ({
     <section className="flex flex-col gap-medium">
       {presentation && (
         <div className="flex flex-col gap-xsmall">
-          <h2 className="text-heading-small content-emphasis">{presentation.label}</h2>
+          {!hideTitle && (
+            <h2 className="text-heading-small content-emphasis">{presentation.label}</h2>
+          )}
           {presentation.description && (
             <p className="text-body-medium content-default">
               <FormattedText text={presentation.description} />

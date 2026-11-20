@@ -4,6 +4,8 @@ import Roblox from "Roblox";
 import * as Interface from "./interface";
 import { RequestServiceDefault } from "../../common/request";
 import App from "./App";
+// The recovery modals use modal-modern styles. Import them here.
+import "../../../css/common/modalModern.css";
 import "../../../css/common/modernCardContainer.scss";
 import "../../../css/common/modernCardCTARow.scss";
 import "../../../css/accountRecovery/accountRecovery.scss";

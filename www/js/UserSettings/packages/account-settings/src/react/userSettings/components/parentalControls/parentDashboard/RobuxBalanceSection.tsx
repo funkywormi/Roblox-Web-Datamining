@@ -5,8 +5,10 @@ import type { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
 import { selectChildPagesForChildUserId } from "../../../../apis/slices/childPagesSlice";
 import { useAppSelector } from "../../../../redux/hooks";
+import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAndOptionsV2";
 import commonTranslationConstants from "../../../constants/contentConstants/commonTranslationConstants";
 import { trackError } from "../../../giftRobux/observability";
+import { getRobuxSettingsRows } from "../../../utils/parentalControls/robuxSettingsUtils";
 import RobuxBalanceCard from "../shared/RobuxBalanceCard";
 import GiftRobuxErrorBoundary from "./GiftRobuxErrorBoundary";
 import GiftRobuxSheet from "./GiftRobuxSheet";
@@ -42,9 +44,9 @@ const RobuxBalanceSection = ({ child }: { child: TChildInfo }): React.JSX.Elemen
   const canAddRobux = child.canParentGiftChildRobux === true && child.robuxBalance !== undefined;
 
   const childPages = useAppSelector(selectChildPagesForChildUserId(child.userId));
-  const canOpenRobuxSettings =
-    child.canParentManageChildRobuxTransferLimits ||
-    child.canParentManageChildRobuxTransferSettings;
+  const [childSettingsV2] = useGetSettingsAndOptionsV2(child.userId);
+  const { showTransferLimits, showApprovals } = getRobuxSettingsRows(child, childSettingsV2);
+  const canOpenRobuxSettings = showTransferLimits || showApprovals;
   const robuxSettingsPath = canOpenRobuxSettings
     ? childPages?.childSettingCategoryPages[SettingCategoryPageName.Robux]?.path
     : undefined;

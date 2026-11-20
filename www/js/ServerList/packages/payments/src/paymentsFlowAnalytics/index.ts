@@ -2,7 +2,7 @@ import { document, window } from "@rbx/core-lib/browser";
 import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import environmentUrls from "@rbx/environment-urls";
-import { Configuration, Tracker } from "@rbx/event-stream";
+import { Configuration, Tracker, type TrackerRequest } from "@rbx/event-stream";
 import { PaymentFlowContext } from "./paymentFlowContext";
 import { trackCounter, trackError } from "./observability";
 import {
@@ -71,6 +71,43 @@ const eventStreamTracker = new Tracker(
   }),
 );
 
+type EventTransport = "img" | "fetch";
+
+/**
+ * Image beacons are cancelled when the page unloads or a webview closes. `sendEventViaFetch`
+ * finishes a `keepalive` request anyway and builds the same e.png url. Only the `*ViaFetch`
+ * methods use this. The default methods stay on the image beacon.
+ */
+const canSendEventViaFetch = (): boolean => typeof window?.fetch === "function";
+
+const sendEventStreamEvent = (
+  request: TrackerRequest,
+  eventName: EventName,
+  requestedTransport: EventTransport,
+): void => {
+  if (requestedTransport === "img" || !canSendEventViaFetch()) {
+    trackCounter("UserPaymentFlowEventSent", { transport: "img", requestedTransport });
+    eventStreamTracker.sendEventViaImg(request);
+    return;
+  }
+  trackCounter("UserPaymentFlowEventSent", { transport: "fetch", requestedTransport });
+  // `sendEventViaFetch` reports the outcome through the callback. ecsv2 answers www's credentialed
+  // CORS request, so `ok` is false when the fetch failed or its delivery wasn't confirmed (e.g. the
+  // connection reset after ecsv2 logged it). It isn't retried on the image, which could duplicate the
+  // row. The counter misses failures after the page is gone, and failures while the telemetry
+  // transport is also down (e.g. offline), so it undercounts.
+  eventStreamTracker
+    .sendEventViaFetch(request, ok => {
+      if (!ok) {
+        trackCounter("UserPaymentFlowEventFetchFailed", { eventName });
+      }
+    })
+    .catch((error: unknown) => {
+      // Not expected to run: `sendEventViaFetch` reports failures through the callback.
+      trackError("UserPaymentFlowSendEventKeepaliveError", null, error);
+    });
+};
+
 export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
   public purchaseFlowUuid = "";
 
@@ -95,6 +132,8 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
   public readonly ENUM_CUSTOM_EVENT = CUSTOM_EVENT;
 
   private eventMetadata: Record<string, string> = {};
+
+  private webStack?: "dotnet" | "nextjs";
 
   /**
    * Only run when there is redirection, go back/forward might not trigger the constructor if page loaded from cache
@@ -152,6 +191,16 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
     this.purchaseFlowUuid = id;
     this.publishSharedFlowUuid();
     this.writePaymentFlowContextIntoCookie();
+  }
+
+  /**
+   * Identifies the current page's implementation, not where the flow started.
+   * Set before mounting the page; intentionally not persisted across navigation.
+   */
+  public setWebStack(webStack: "dotnet" | "nextjs"): void {
+    if (isBrowser()) {
+      this.webStack = webStack;
+    }
   }
 
   /**
@@ -241,15 +290,27 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
    * user could reach that page by entering the URL. If reached by URL with no valid referrer, we
    * start a new flow using triggerContext as fallback.
    */
-  public sendUserPurchaseFlowEvent({
-    triggerContext,
-    isMidPurchaseStep,
-    viewName,
-    purchaseEventType,
-    viewMessage,
-    eventMetadata = {},
-    isTerminalView = false,
-  }: SendUserPurchaseFlowEventParams): void {
+  public sendUserPurchaseFlowEvent(params: SendUserPurchaseFlowEventParams): void {
+    this.sendFlowEvent(params, "img");
+  }
+
+  /** `sendUserPurchaseFlowEvent` with the keepalive fetch transport. */
+  public sendUserPurchaseFlowEventViaFetch(params: SendUserPurchaseFlowEventParams): void {
+    this.sendFlowEvent(params, "fetch");
+  }
+
+  private sendFlowEvent(
+    {
+      triggerContext,
+      isMidPurchaseStep,
+      viewName,
+      purchaseEventType,
+      viewMessage,
+      eventMetadata = {},
+      isTerminalView = false,
+    }: SendUserPurchaseFlowEventParams,
+    transport: EventTransport,
+  ): void {
     if (!isBrowser()) {
       return;
     }
@@ -269,15 +330,18 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
           trackCounter("UserPaymentFlowMidPurchaseStepTriggeredWithoutCtx");
         }
       }
-      this.sendEvent({
-        eventName: EVENT_NAME.USER_PURCHASE_FLOW,
-        viewName,
-        purchaseEventType,
-        viewMessage,
-      });
+      this.sendEvent(
+        {
+          eventName: EVENT_NAME.USER_PURCHASE_FLOW,
+          viewName,
+          purchaseEventType,
+          viewMessage,
+        },
+        transport,
+      );
 
       if (isTerminalView) {
-        this.handleTerminalPage();
+        this.handleTerminalPage(transport);
       }
     } catch (error) {
       trackError("UserPaymentFlowSendUserEventError", null, error);
@@ -288,12 +352,19 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
    * Send a user purchase status event
    * A status event should never be used as flow starter but a middle of purchase state indicator
    */
-  public sendUserPurchaseStatusEvent({
-    triggerContext,
-    status,
-    viewMessage,
-    viewName,
-  }: SendUserPurchaseStatusEventParams): void {
+  public sendUserPurchaseStatusEvent(params: SendUserPurchaseStatusEventParams): void {
+    this.sendStatusEvent(params, "img");
+  }
+
+  /** `sendUserPurchaseStatusEvent` with the keepalive fetch transport. */
+  public sendUserPurchaseStatusEventViaFetch(params: SendUserPurchaseStatusEventParams): void {
+    this.sendStatusEvent(params, "fetch");
+  }
+
+  private sendStatusEvent(
+    { triggerContext, status, viewMessage, viewName }: SendUserPurchaseStatusEventParams,
+    transport: EventTransport,
+  ): void {
     if (!isBrowser()) {
       return;
     }
@@ -310,15 +381,18 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
         this.writePaymentFlowContextIntoCookie();
       }
 
-      this.sendEvent({
-        eventName: EVENT_NAME.USER_PURCHASE_STATUS,
-        viewName,
-        viewMessage,
-        status,
-      });
+      this.sendEvent(
+        {
+          eventName: EVENT_NAME.USER_PURCHASE_STATUS,
+          viewName,
+          viewMessage,
+          status,
+        },
+        transport,
+      );
 
       if (PaymentFlowAnalyticsService.isTerminalView(viewName)) {
-        this.handleTerminalPage();
+        this.handleTerminalPage(transport);
       }
     } catch (error) {
       trackError("UserPaymentFlowSendStatusEventError", null, error);
@@ -364,19 +438,22 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
     flowCtx.save();
   }
 
-  private sendEvent({
-    eventName,
-    viewName,
-    purchaseEventType,
-    viewMessage,
-    status,
-  }: {
-    eventName: EventName;
-    viewName?: ViewName;
-    purchaseEventType?: PurchaseEventType;
-    viewMessage?: string;
-    status?: PurchaseStatus;
-  }): void {
+  private sendEvent(
+    {
+      eventName,
+      viewName,
+      purchaseEventType,
+      viewMessage,
+      status,
+    }: {
+      eventName: EventName;
+      viewName?: ViewName;
+      purchaseEventType?: PurchaseEventType;
+      viewMessage?: string;
+      status?: PurchaseStatus;
+    },
+    requestedTransport: EventTransport,
+  ): void {
     this.adoptSharedFlowUuid();
     if (!this.purchaseFlowUuid || !this.triggerContext) {
       trackError("UserPaymentFlowSendEventWithoutUuidOrCtx");
@@ -390,25 +467,35 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
     const referralUrl = PaymentFlowAnalyticsService.getReferralUrl();
     const previousView = PaymentFlowAnalyticsService.extractView(referralUrl);
     const currentView = PaymentFlowAnalyticsService.extractView(currentWindow.location.href);
-    const metadata = JSON.stringify(this.eventMetadata);
-
-    eventStreamTracker.sendEventViaImg({
-      target: "www",
-      localTime: new Date(),
-      eventType: eventName,
-      context: this.triggerContext,
-      additionalProperties: {
-        purchase_flow_uuid: this.purchaseFlowUuid,
-        view_name: viewName,
-        purchase_event_type: purchaseEventType,
-        view_message: viewMessage,
-        status,
-        refurl: referralUrl.substring(0, 200), // Max 200 should be sufficient for logging urls
-        prev_view_path: previousView,
-        current_view_path: currentView,
-        event_metadata: metadata,
-      },
+    const eventTransport =
+      requestedTransport === "fetch" && canSendEventViaFetch() ? "fetch" : "img";
+    const metadata = JSON.stringify({
+      ...this.eventMetadata,
+      ...(this.webStack === undefined ? {} : { webStack: this.webStack }),
+      eventTransport,
     });
+
+    sendEventStreamEvent(
+      {
+        target: "www",
+        localTime: new Date(),
+        eventType: eventName,
+        context: this.triggerContext,
+        additionalProperties: {
+          purchase_flow_uuid: this.purchaseFlowUuid,
+          view_name: viewName,
+          purchase_event_type: purchaseEventType,
+          view_message: viewMessage,
+          status,
+          refurl: referralUrl.substring(0, 200), // Max 200 should be sufficient for logging urls
+          prev_view_path: previousView,
+          current_view_path: currentView,
+          event_metadata: metadata,
+        },
+      },
+      eventName,
+      requestedTransport,
+    );
   }
 
   private tryLoadPreExistingCtx(): void {
@@ -460,7 +547,7 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
     return "External";
   }
 
-  private handleTerminalPage(): void {
+  private handleTerminalPage(transport: EventTransport): void {
     if (!this.purchaseFlowUuid) {
       return;
     }
@@ -471,10 +558,10 @@ export class PaymentFlowAnalyticsService implements PaymentFlowAnalytics {
     }
 
     PaymentFlowContext.stop();
-    this.sendUserPurchaseStatusEvent({
-      triggerContext: this.triggerContext,
-      status: PURCHASE_STATUS.PAYMENT_FLOW_ENDED,
-    });
+    this.sendStatusEvent(
+      { triggerContext: this.triggerContext, status: PURCHASE_STATUS.PAYMENT_FLOW_ENDED },
+      transport,
+    );
     trackCounter("UserPaymentFlowFlowEnded");
   }
 

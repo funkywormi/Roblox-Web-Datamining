@@ -41,6 +41,9 @@ enum SettingCategoryPageName {
 
   // Age check
   AgeCheck = "AgeCheck",
+
+  // Personalized recommendations (VLOP), on the parent dashboard
+  ManageRecommendations = "PersonalizedRecommendations",
 }
 
 export default SettingCategoryPageName;

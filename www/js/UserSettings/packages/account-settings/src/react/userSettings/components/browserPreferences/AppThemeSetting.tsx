@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import * as localStorage from "@rbx/core-lib/local-storage";
-import { getCurrentUser } from "@rbx/www-common/user";
 import { useTranslation } from "@rbx/core-scripts/react";
 import {
   getTheme as getThemeGlobal,
@@ -80,7 +78,7 @@ const AppThemeSettingSection = ({
   const freeThemes = useMemo(() => themes.filter(theme => theme.category == null), [themes]);
 
   useEffect(() => {
-    if (!isPlus && freeThemes.length <= 1) {
+    if (!isPlus) {
       return;
     }
     return subscribeToThemeChange(key => {
@@ -93,7 +91,7 @@ const AppThemeSettingSection = ({
         setCategory(theme.category);
       }
     });
-  }, [themesByKey, isPlus, setTheme, freeThemes.length]);
+  }, [themesByKey, isPlus, setTheme]);
 
   const hasFiredExitRef = useRef(false);
   const sawUpsell = useRef(false);
@@ -128,25 +126,7 @@ const AppThemeSettingSection = ({
     }
     if (!isPlus) {
       if (newTheme.category == null) {
-        const id = getCurrentUser()?.id;
-        const localStorageKey = "event-halloween-2026";
-        const hollowEvent = localStorage.getItem(localStorageKey) ?? {
-          version: 0,
-          data: [],
-        };
-        if (id != null && hollowEvent.version === 0) {
-          if (newTheme.key === "halloween-2026") {
-            if (!hollowEvent.data.includes(id)) {
-              hollowEvent.data.push(id);
-              localStorage.setItem(localStorageKey, hollowEvent);
-            }
-          } else {
-            const users = hollowEvent.data.filter(x => x !== id);
-            localStorage.setItem(localStorageKey, { version: 0, data: users });
-          }
-        }
         clearPreviewTheme();
-        setThemeGlobal(newTheme.key);
       } else {
         setPreviewTheme(newTheme.key);
       }

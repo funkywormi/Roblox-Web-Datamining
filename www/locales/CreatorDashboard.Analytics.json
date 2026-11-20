@@ -1253,5 +1253,21 @@
     "Header.OnboardHourlyMetrics": "Get hourly metrics, personalized to your game",
     "Description.OnboardHourlyMetrics": "Track funnels, currency and custom events. Use the /rbx-instrument-analytics skill with Studio MCP or Assistant.",
     "Action.SetUpAnalyticsInStudio": "Set up in Studio",
-    "Label.Annotation.MetricChange.WebPlatformAdded": "Web is now reported as a separate platform."
+    "Label.Annotation.MetricChange.WebPlatformAdded": "Web is now reported as a separate platform.",
+    "Description.Dimension.QueueServiceRequestSource.GameServer": "Game Server",
+    "Description.Dimension.QueueServiceRequestSource.OpenCloud": "Open Cloud",
+    "Description.Dimension.QueueServiceRequestSource.Studio": "Studio",
+    "Label.Dimension.QueueServiceRequestSource": "Request source",
+    "Label.Dimension.QueueServiceRequestSource.GameServer": "Game Server",
+    "Label.Dimension.QueueServiceRequestSource.OpenCloud": "Open Cloud",
+    "Label.Dimension.QueueServiceRequestSource.Studio": "Studio",
+    "Heading.BadgeService": "Badge Service",
+    "Description.BadgeServiceObservability": "Monitor BadgeService requests made by your experience, broken down by API, status, source, and place.",
+    "Label.Dimension.BadgeApi": "API",
+    "Label.Dimension.BadgeSource": "Source",
+    "Label.Dimension.BadgeSource.Server": "Server",
+    "Description.Dimension.BadgeSource.Server": "Requests made from a game server.",
+    "Label.Dimension.BadgeSource.Client": "Client",
+    "Description.Dimension.BadgeSource.Client": "Requests made from a player's client.",
+    "Label.Dimension.BadgeStatus": "Status"
 }

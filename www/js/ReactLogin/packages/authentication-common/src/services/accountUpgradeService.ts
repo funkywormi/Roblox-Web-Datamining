@@ -50,10 +50,17 @@ export const upgradeAccount = async (
   birthday: Date,
   username?: string,
   gender?: number,
+  agreementIds?: string[],
 ): Promise<void> => {
   await http.post(
     { url: ACCOUNT_UPGRADE_URL, withCredentials: true },
-    { upgradeType: "OAuth", birthday, username, gender },
+    {
+      upgradeType: "OAuth",
+      birthday,
+      username,
+      gender,
+      ...(agreementIds?.length ? { agreementIds } : {}),
+    },
   );
 };
 

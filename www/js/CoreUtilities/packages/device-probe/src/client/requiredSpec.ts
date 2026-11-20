@@ -1,0 +1,94 @@
+import type { DeviceFeatures } from "../types";
+
+/**
+ * What a device needs for WASM gameplay. Defined in code ({@link defaultRequiredSpec}) and applied
+ * to the cached scores on every call, so a new value takes effect on deploy without re-probing.
+ */
+export type RequiredSpec = {
+  /**
+   * `features` that must all be true. Names the probe doesn't report fail, so a misspelled name
+   * can't loosen the spec. Leave out `sharedArrayBuffer` and `crossOriginIsolated`: they describe
+   * the probe iframe, which isn't isolated outside Chrome with Document-Isolation-Policy.
+   */
+  requiredFeatures: readonly string[];
+  /** `navigator.deviceMemory` is bucketed (a 6 GB Android phone most likely reports 4). */
+  minDeviceMemoryGiB: number;
+  minEffectiveCores: number;
+  minSingleThreadScore: number;
+  minWebgl2FillPassesPerMs: number;
+  requireWebgl2Renders: boolean;
+};
+
+/**
+ * The required spec (WEB-3756). Changing a value is a normal code change and deploy. The values
+ * are the WEB-3600 tech spec's example until product sets the real minimums.
+ */
+export const defaultRequiredSpec: Readonly<RequiredSpec> = {
+  requiredFeatures: [
+    "wasmSimd",
+    "wasmExceptions",
+    "jspi",
+    "bulkMemory",
+    "atomics",
+    "webWorkers",
+    "webgl2",
+    "can2GBAlloc",
+  ],
+  minDeviceMemoryGiB: 4,
+  minEffectiveCores: 4,
+  minSingleThreadScore: 0,
+  minWebgl2FillPassesPerMs: 0,
+  requireWebgl2Renders: true,
+};
+
+/** The probe's scores that the required spec reads, and all the cache keeps of them. */
+export type DeviceMeasurement = {
+  /** `features.crossOriginIsolated`: whether the probe ran isolated, with precise timers. */
+  isolated: boolean;
+  features: { [Name in keyof DeviceFeatures]: boolean };
+  cpu: { effectiveCores: number; singleThreadScore: number };
+  gpu: { webgl2Renders: boolean; fillPassesPerMs: number };
+  memory: { deviceMemoryGiB: number | null; maxSharedAllocMiB: number };
+};
+
+/** A failed rule: `feature:<name>` or the name of the minimum or requirement. */
+export type RequiredSpecRule =
+  | `feature:${string}`
+  | "minDeviceMemoryGiB"
+  | "minEffectiveCores"
+  | "minSingleThreadScore"
+  | "minWebgl2FillPassesPerMs"
+  | "requireWebgl2Renders";
+
+/** The rules the measurement fails; empty when the device meets the spec. */
+export const failedRules = (
+  measurement: DeviceMeasurement,
+  spec: Readonly<RequiredSpec>,
+): RequiredSpecRule[] => {
+  const failed: RequiredSpecRule[] = spec.requiredFeatures
+    .filter(
+      name =>
+        !Object.hasOwn(measurement.features, name) ||
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- checked by Object.hasOwn
+        !measurement.features[name as keyof DeviceFeatures],
+    )
+    .map(name => `feature:${name}` as const);
+  const { deviceMemoryGiB } = measurement.memory;
+  // Firefox and Safari don't report device memory, which only passes a minimum of 0.
+  if (spec.minDeviceMemoryGiB > 0 && (deviceMemoryGiB ?? 0) < spec.minDeviceMemoryGiB) {
+    failed.push("minDeviceMemoryGiB");
+  }
+  if (measurement.cpu.effectiveCores < spec.minEffectiveCores) {
+    failed.push("minEffectiveCores");
+  }
+  if (measurement.cpu.singleThreadScore < spec.minSingleThreadScore) {
+    failed.push("minSingleThreadScore");
+  }
+  if (measurement.gpu.fillPassesPerMs < spec.minWebgl2FillPassesPerMs) {
+    failed.push("minWebgl2FillPassesPerMs");
+  }
+  if (spec.requireWebgl2Renders && !measurement.gpu.webgl2Renders) {
+    failed.push("requireWebgl2Renders");
+  }
+  return failed;
+};

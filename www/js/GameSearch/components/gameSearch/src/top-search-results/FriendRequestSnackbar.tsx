@@ -15,6 +15,9 @@ type Feedback = FriendRequestFeedback & {
 };
 
 const getFeedbackTitle = (translate: TranslateFunction, feedback: Feedback): string => {
+  if (feedback.result === "failure" && feedback.reason === "offline") {
+    return translate("Label.LoadingMessageRetryWhenConnected") || "Please retry when connected.";
+  }
   if (feedback.type === "friend-request-accepted") {
     return feedback.result === "success"
       ? translate("Action.FriendAdded") || "Friend added."

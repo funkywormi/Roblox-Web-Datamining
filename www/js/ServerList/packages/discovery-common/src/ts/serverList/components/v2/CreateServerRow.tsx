@@ -2,12 +2,12 @@ import "@rbx/core-scripts/global";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Icon, SheetRoot, Snackbar } from "@rbx/foundation-ui";
 import {
-  Thumbnail2d,
   ThumbnailFormat,
   ThumbnailGameIconSize,
   ThumbnailTypes,
   thumbnailService,
 } from "@rbx/thumbnails";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { CurrentUser, ItemPurchaseUpsellService } from "@rbx/legacy-webapp-types/Roblox";
 import serverListConstants from "../../../../js/serverList/constants/serverListConstants";
@@ -18,6 +18,7 @@ import getEconomicRestrictionErrorMsg from "../../../../js/serverList/util/getEc
 import { getJoinScript } from "../../../../js/serverList/util/gameInstanceUtil";
 import usePrivateServerUpsellEvents from "../../hooks/usePrivateServerUpsellEvents";
 import usePrivateServerPurchase from "../../hooks/usePrivateServerPurchase";
+import sendCreatePrivateServerModalEvent from "../../utils/createPrivateServerEvents";
 
 import CreatePrivateServerSheet from "./CreatePrivateServerSheet";
 
@@ -35,9 +36,9 @@ const FirstServerCard = ({ universeId, title, subtitle, actions }: FirstServerCa
     <div className="flex items-center gap-medium min-width-0 fill">
       <div className="grow-0 shrink-0 basis-auto width-[72px] height-[72px]">
         <Thumbnail2d
-          type={ThumbnailTypes.gameIcon}
+          type="GameIcon"
           targetId={universeId}
-          containerClass="radius-medium clip"
+          containerClassName="radius-medium clip"
           imgClassName="size-full"
         />
       </div>
@@ -274,12 +275,23 @@ const CreateServerRow = ({
   }, [price, triggerInsufficientRobuxUpsell]);
 
   const discountTotal = discounts.reduce((sum, d) => sum + d.robux, 0);
+  const createModalOffer = { universeId, price, discountTotal };
+
   const hasDiscount = discountTotal > 0;
   const originalPrice = price + discountTotal;
 
   const isPaidNonPlus = !isPlusUser && price > 0;
   const isFreeNonPlus = !isPlusUser && price === 0;
   const isFreeAndHasPlus = isPlusUser && price === 0;
+
+  // Logged here rather than on sheet mount: the sheet remounts when the row switches layouts.
+  // Free non-Plus users create directly, so a preopened sheet is never shown to them.
+  useEffect(() => {
+    if (createSheetOpen && !isFreeNonPlus) {
+      sendCreatePrivateServerModalEvent("show", undefined, createModalOffer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- log once per open, not on price/discount updates
+  }, [createSheetOpen]);
   const buttonDisabled = !isReady || !canCreatePrivateServer;
 
   // Private server is discounted due to Plus
@@ -344,7 +356,10 @@ const CreateServerRow = ({
       data-testid="create-private-server-sheet-root"
       open
       onOpenChange={(nextOpen: boolean) => {
-        if (!nextOpen) handleCreateSheetClose();
+        if (!nextOpen) {
+          sendCreatePrivateServerModalEvent("click", "cancel_btn", createModalOffer);
+          handleCreateSheetClose();
+        }
       }}
     >
       <CreatePrivateServerSheet
@@ -395,9 +410,9 @@ const CreateServerRow = ({
           <div className="flex items-center gap-medium min-width-0">
             <div className="grow-0 shrink-0 basis-auto width-[72px] height-[72px]">
               <Thumbnail2d
-                type={ThumbnailTypes.gameIcon}
+                type="GameIcon"
                 targetId={universeId}
-                containerClass="radius-medium clip"
+                containerClassName="radius-medium clip"
                 imgClassName="size-full"
               />
             </div>

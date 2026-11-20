@@ -20,6 +20,7 @@ type ServerListItemProps = {
   thumbnailTargetId: number | null;
   thumbnailToken?: string;
   thumbnailType?: string;
+  thumbnailLink?: { href: string; ariaLabel: string };
   secondPlayer?: PlayerThumbnail;
   onJoinClick: () => void;
   isJoinDisabled?: boolean;
@@ -65,6 +66,7 @@ const ServerListItem = ({
   thumbnailTargetId,
   thumbnailToken,
   thumbnailType,
+  thumbnailLink,
   secondPlayer,
   onJoinClick,
   isJoinDisabled = false,
@@ -94,11 +96,21 @@ const ServerListItem = ({
             </div>
           )}
           <div className={`width-[40px] height-[40px] ${secondPlayer ? "relative" : ""}`}>
-            <AvatarThumbnail
-              targetId={thumbnailTargetId}
-              token={thumbnailToken}
-              type={thumbnailType}
-            />
+            {thumbnailLink ? (
+              <a href={thumbnailLink.href} aria-label={thumbnailLink.ariaLabel}>
+                <AvatarThumbnail
+                  targetId={thumbnailTargetId}
+                  token={thumbnailToken}
+                  type={thumbnailType}
+                />
+              </a>
+            ) : (
+              <AvatarThumbnail
+                targetId={thumbnailTargetId}
+                token={thumbnailToken}
+                type={thumbnailType}
+              />
+            )}
           </div>
         </div>
         <div className="flex flex-col min-width-0">

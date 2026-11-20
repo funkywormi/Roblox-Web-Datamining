@@ -1,5 +1,5 @@
 import { Fragment, JSX } from "react";
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import { Button as FoundationButton, Link as FoundationLink } from "@rbx/foundation-ui";
 import { Thumbnail2d, ThumbnailTypes, ThumbnailGameIconSize } from "@rbx/thumbnails";
 

@@ -1,7 +1,7 @@
 import { JSX } from "react";
 import { EventContext } from "@rbx/unified-logging";
 import environmentUrls from "@rbx/environment-urls";
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import Presence from "@rbx/presence";
 import { TFriend } from "../types/friendsCarousel";
 import FriendTileContent from "./FriendTileContent";

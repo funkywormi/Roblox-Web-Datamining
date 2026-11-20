@@ -1610,6 +1610,117 @@
     color: var(--color-extended-white-100)
 }
 
+@keyframes robux-hydration-bar-in {
+    to {
+        opacity: 1
+    }
+}
+
+@keyframes robux-hydration-bar-slide {
+    0% {
+        transform: translate(-120%)
+    }
+
+    to {
+        transform: translate(350%)
+    }
+}
+
+#robux-hydration-bar {
+    z-index: 2000;
+    pointer-events: none;
+    background: var(--color-action-emphasis-background, #335fff);
+    opacity: 0;
+    height: 4px;
+    animation: .2s .3s forwards robux-hydration-bar-in;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden
+}
+
+#robux-hydration-bar:before {
+    content: "";
+    background: rgba(255, 255, 255, .45);
+    width: 35%;
+    height: 100%;
+    animation: 1.1s ease-in-out infinite robux-hydration-bar-slide;
+    display: block
+}
+
+@keyframes robux-early-click-spin {
+    to {
+        transform: rotate(360deg)
+    }
+}
+
+#robux-redesign-page [data-early-click][data-pending] :-webkit-any(button, a) {
+    position: relative
+}
+
+#robux-redesign-page [data-early-click][data-pending] :-moz-any(button, a) {
+    position: relative
+}
+
+#robux-redesign-page [data-early-click][data-pending] :is(button, a) {
+    position: relative
+}
+
+#robux-redesign-page [data-early-click][data-pending] :-webkit-any(button, a)>* {
+    visibility: hidden
+}
+
+#robux-redesign-page [data-early-click][data-pending] :-moz-any(button, a)>* {
+    visibility: hidden
+}
+
+#robux-redesign-page [data-early-click][data-pending] :is(button, a)>* {
+    visibility: hidden
+}
+
+#robux-redesign-page [data-early-click][data-pending] :-webkit-any(button, a):after {
+    content: "";
+    border: 2px solid;
+    border-right-color: transparent;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    animation: .7s linear infinite robux-early-click-spin;
+    position: absolute;
+    top: 50%;
+    left: 50%
+}
+
+#robux-redesign-page [data-early-click][data-pending] :-moz-any(button, a):after {
+    content: "";
+    border: 2px solid;
+    border-right-color: transparent;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    animation: .7s linear infinite robux-early-click-spin;
+    position: absolute;
+    top: 50%;
+    left: 50%
+}
+
+#robux-redesign-page [data-early-click][data-pending] :is(button, a):after {
+    content: "";
+    border: 2px solid;
+    border-right-color: transparent;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    animation: .7s linear infinite robux-early-click-spin;
+    position: absolute;
+    top: 50%;
+    left: 50%
+}
+
 body {
     width: 100%;
     min-width: 320px;
@@ -1912,6 +2023,11 @@ h5 {
     .medium\:self-stretch {
         -ms-flex-item-align: stretch;
         align-self: stretch
+    }
+
+    .medium\:margin-x-large {
+        margin-left: var(--margin-large);
+        margin-right: var(--margin-large)
     }
 
     .medium\:margin-right-\[16px\] {

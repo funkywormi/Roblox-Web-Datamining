@@ -340,7 +340,7 @@ const VerifyRecoveryIntent: React.FC = () => {
           </div>
         )}
         <div className="padding-xsmall" />
-        <p className="text-align-x-left">
+        <p className="text-align-x-left text-body-medium">
           {shouldPollRecoveryIntent
             ? resources.Description.VerifyRecoveryIntentPolling
             : resources.Description.VerifyRecoveryIntent}

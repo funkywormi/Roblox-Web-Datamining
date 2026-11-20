@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3a033f8b8dee39f3825b6d6daf03db01>>
+ * @generated SignedSource<<c2686c336c7c57842cd935e0271183fd>>
  * @relayHash 5e4f6578bd7e6a8fe16494940d967dca
  * @lightSyntaxTransform
  * @nogrep
@@ -13,7 +13,7 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type SettingsSurfaceKey = "ManageRecommendationsPage" | "%future added value";
+export type SettingsSurfaceKey = "ManageRecommendationsPage" | "ManageRecommendationsParentPage" | "%future added value";
 export type SettingsSurfaceQuery$variables = {
   surface: SettingsSurfaceKey;
   userId: string;

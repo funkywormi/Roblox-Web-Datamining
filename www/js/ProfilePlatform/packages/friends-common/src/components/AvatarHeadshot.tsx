@@ -1,6 +1,6 @@
 import { JSX } from "react";
 import { AvatarCardItem } from "@rbx/core-ui";
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import {
   Thumbnail2d,
   ThumbnailTypes,

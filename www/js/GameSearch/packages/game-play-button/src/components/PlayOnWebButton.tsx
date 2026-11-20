@@ -4,9 +4,13 @@ import { Button } from "@rbx/foundation-ui";
 import { useTranslations } from "@rbx/www-common/i18n";
 import playButtonConstants from "../constants/playButtonConstants";
 import { fuiButtonStyle } from "../constants/buttonWidths";
-import { openPlayOnWeb } from "../utils/openPlayOnWeb";
 import usePlayOnWebImpression from "../hooks/usePlayOnWebImpression";
-import { PlayOnWebVariant, type TPlayOnWebVariant } from "../types/playButtonTypes";
+import usePlayOnWeb from "../hooks/usePlayOnWeb";
+import {
+  PlayOnWebVariant,
+  type TPlayButtonPageContext,
+  type TPlayOnWebVariant,
+} from "../types/playButtonTypes";
 
 const { playButtonTextTranslationMap } = playButtonConstants;
 
@@ -19,6 +23,7 @@ export type TPlayOnWebButtonProps = {
   eventProperties?: Record<string, string | number | undefined>;
   wasmJoinId?: string;
   playOnWebVariant: Exclude<TPlayOnWebVariant, typeof PlayOnWebVariant.None>;
+  pageContext: TPlayButtonPageContext;
 };
 
 const PlayOnWebButton = ({
@@ -30,27 +35,15 @@ const PlayOnWebButton = ({
   eventProperties,
   wasmJoinId,
   playOnWebVariant,
+  pageContext,
 }: TPlayOnWebButtonProps): React.JSX.Element | null => {
   const tExperienceDetails = useTranslations("Feature.ExperienceDetails");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const isButtonRendered = Boolean(wasmJoinId);
   usePlayOnWebImpression(buttonRef, universeId, isButtonRendered);
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      openPlayOnWeb({
-        placeId,
-        rootPlaceId,
-        universeId,
-        privateServerLinkCode,
-        gameInstanceId,
-        eventProperties,
-        wasmJoinId,
-      });
-    },
-    [
+  const { playOnWeb, playableUxTreatmentModal } = usePlayOnWeb(
+    {
       placeId,
       rootPlaceId,
       universeId,
@@ -58,7 +51,17 @@ const PlayOnWebButton = ({
       gameInstanceId,
       eventProperties,
       wasmJoinId,
-    ],
+    },
+    pageContext,
+  );
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      playOnWeb();
+    },
+    [playOnWeb],
   );
 
   if (!isButtonRendered) {
@@ -100,6 +103,7 @@ const PlayOnWebButton = ({
           "Play in browser is in beta",
         )}
       </span>
+      {playableUxTreatmentModal}
     </div>
   );
 };

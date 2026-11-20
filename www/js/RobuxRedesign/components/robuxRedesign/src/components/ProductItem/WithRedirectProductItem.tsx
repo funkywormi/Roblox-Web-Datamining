@@ -1,3 +1,4 @@
+import { earlyClickRedirectHref } from "../../modules/earlyClick";
 import { ProductItemDefault, ProductItemDefaultProps } from "./ProductItemDefault";
 
 export const withRedirectProductItem = (redirectUrl: string) => {
@@ -7,7 +8,10 @@ export const withRedirectProductItem = (redirectUrl: string) => {
       buttonProps={{
         className: componentProps.buttonProps?.className,
         as: "a",
-        href: `${redirectUrl}&ap=${componentProps.product.productId}`,
+        href: earlyClickRedirectHref(
+          `${redirectUrl}&ap=${componentProps.product.productId}`,
+          Boolean(redirectUrl),
+        ),
         rel: "noreferrer",
         role: "button",
         target: "_blank",

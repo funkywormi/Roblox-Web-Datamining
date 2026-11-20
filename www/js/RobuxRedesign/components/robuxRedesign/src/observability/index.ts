@@ -298,6 +298,30 @@ export const observabilityRegistry = {
         "LoginRedirectLayerExposureError",
       ],
     },
+    earlyClick: {
+      // Every tap the inline capture script (modules/earlyClick/utils/capture.ts) held is counted as `held`
+      // once React sees it, then once more with how it ended. `held` minus the outcomes is taps
+      // whose page died without even a visibility change.
+      counters: [
+        {
+          name: "EarlyClickTap",
+          dimensions: ["outcome", "kind", "waitingFor", "waitBucket", "tapCount", "os"],
+          steps: {
+            dimension: "outcome",
+            values: [
+              { value: "held", role: "start" },
+              { value: "replayed", role: "success" },
+              { value: "activationLost", role: "drop" },
+              { value: "gaveUp", role: "error" },
+              { value: "expired", role: "error" },
+              { value: "abandoned", role: "drop" },
+              { value: "dropped", role: "drop" },
+              { value: "replaced", role: "drop" },
+            ],
+          },
+        },
+      ],
+    },
     limitedTimeBonus: {
       errors: ["ResolveLimitedTimeBonusExpirationInvalidTimestamp"],
     },

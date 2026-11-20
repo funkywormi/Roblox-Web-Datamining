@@ -4,6 +4,7 @@ import { UserSetting } from "@rbx/user-settings";
 import { TSettingUpdateProps } from "../../../../../types/settingUpdateTypes";
 import { TChildSettingsInfo } from "../../../../../types/childrenInfoTypes";
 import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOptions";
+import useGetSettingsAndOptionsV2 from "../../../../apis/hooks/useGetSettingsAndOptionsV2";
 import SettingCategoryPageName from "../../../../../enums/SettingCategoryPageName";
 import { TSettingsPage } from "../../../../../types/commonTypes";
 import PrivacySettingName from "../../../../../enums/privacy/PrivacySettingName";
@@ -17,6 +18,10 @@ import { useAppSelector } from "../../../../redux/hooks";
 import PrivateServerPrivacy from "../../privacy/PrivateServerPrivacy";
 import { getTranslatedOptionValue } from "../../../constants/contentConstants/consentTranslationConstants";
 import { useWrappedTranslation } from "../../../hooks/useWrappedTranslation";
+import {
+  hasAnySetting,
+  visibilityPageSettings,
+} from "../../../utils/parentalControls/childSettingsMenuUtils";
 
 export const ChildVisibilityAndPrivateServersRoutes = ({
   child,
@@ -36,8 +41,11 @@ export const ChildVisibilityAndPrivateServersRoutes = ({
     childPages?.childSettingCategoryPages[SettingCategoryPageName.VisibilityAndPrivateServers];
 
   const [childSettings] = useGetSettingsAndOptions(child.userId);
+  const [childSettingsV2] = useGetSettingsAndOptionsV2(child.userId);
 
   const subpages = childPages?.visibilityAndPrivateServersPages || {};
+  const displayVisibility = hasAnySetting(visibilityPageSettings, childSettings, childSettingsV2);
+  const displayPrivateServerPrivacy = childSettings?.[UserSetting.privateServerPrivacy];
 
   // Fetch labels for current setting values
   const pagesWithCurrentValues: Record<string, TSettingsPage> = useMemo(() => {
@@ -59,8 +67,17 @@ export const ChildVisibilityAndPrivateServersRoutes = ({
         currentValueComponent: <span>{currValueLabel}</span>,
       };
     });
+
+    if (!displayVisibility) {
+      delete result[SettingCategoryPageName.Visibility];
+    }
+
+    if (!displayPrivateServerPrivacy) {
+      delete result[PrivacySettingName.PrivateServerPrivacy];
+    }
+
     return result;
-  }, [childSettings, subpages]);
+  }, [childSettings, subpages, displayVisibility, displayPrivateServerPrivacy]);
 
   return (
     <React.Fragment>
@@ -68,7 +85,7 @@ export const ChildVisibilityAndPrivateServersRoutes = ({
         subPages={pagesWithCurrentValues}
         routingPath={visibilityAndPrivateServersPage?.path}
       />
-      {subpages[SettingCategoryPageName.Visibility] && (
+      {displayVisibility && subpages[SettingCategoryPageName.Visibility] && (
         <Route path={subpages[SettingCategoryPageName.Visibility]?.path}>
           <VisibilitySettings
             child={child}
@@ -77,7 +94,7 @@ export const ChildVisibilityAndPrivateServersRoutes = ({
           />
         </Route>
       )}
-      {subpages[PrivacySettingName.PrivateServerPrivacy] && (
+      {displayPrivateServerPrivacy && subpages[PrivacySettingName.PrivateServerPrivacy] && (
         <Route path={subpages[PrivacySettingName.PrivateServerPrivacy]?.path}>
           <PrivateServerPrivacy child={child} onUpdateSetting={onUpdateSetting} />
         </Route>

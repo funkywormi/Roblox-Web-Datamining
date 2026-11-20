@@ -2,56 +2,41 @@ import React, { useEffect, useState } from "react";
 import PlayOnWebDialog from "@rbx/app-download/PlayOnWebDialog";
 import { useTranslations } from "@rbx/www-common/i18n";
 
-// How long after load Play on Web can still become available. A device check still running at the
-// end extends it.
-const PLAY_ON_WEB_WAIT_MS = 6000;
-
 type TMobileWasmRedirectProps = {
   playOnWeb: (() => void) | undefined;
-  isCheckingDevice: boolean;
+  isCheckingPlayOnWeb: boolean;
 };
 
 /**
- * Opens the Play on Web dialog: it checks until Play on Web becomes available, then offers it.
- * If it isn't available by the end of the wait and the device check, the dialog closes and the EDP
- * stays as is.
+ * Opens the Play on Web dialog: it checks until Play on Web is known to be available, then offers
+ * it. If the check finds it isn't, the dialog closes and the EDP stays as is.
  */
 const MobileWasmRedirect = ({
   playOnWeb,
-  isCheckingDevice,
+  isCheckingPlayOnWeb,
 }: TMobileWasmRedirectProps): React.JSX.Element | null => {
   const tExperienceDetails = useTranslations("Feature.ExperienceDetails");
-  const [hasWaited, setHasWaited] = useState(false);
-  useEffect(() => {
-    const timeout = setTimeout(setHasWaited, PLAY_ON_WEB_WAIT_MS, true);
-    return () => clearTimeout(timeout);
-  }, []);
-  // Ends after the render where the device check finishes, so an answer that makes Play on Web
-  // available is still offered.
-  const [isWaiting, setIsWaiting] = useState(true);
-  useEffect(() => {
-    if (hasWaited && !isCheckingDevice) {
-      setIsWaiting(false);
-    }
-  }, [hasWaited, isCheckingDevice]);
-
-  const [hasOfferedPlayOnWeb, setHasOfferedPlayOnWeb] = useState(false);
   const [isDialogClosed, setIsDialogClosed] = useState(false);
+  const hasPlayOnWeb = playOnWeb != null;
+  // Closes it as if the user had, so a later playability refetch doesn't reopen it.
   useEffect(() => {
-    if (isWaiting && playOnWeb) {
-      setHasOfferedPlayOnWeb(true);
+    if (!hasPlayOnWeb && !isCheckingPlayOnWeb) {
+      setIsDialogClosed(true);
     }
-  }, [isWaiting, playOnWeb]);
+  }, [hasPlayOnWeb, isCheckingPlayOnWeb]);
 
-  // Not only the state, so a Play on Web that's available on the first render skips checking.
-  const isOffered = hasOfferedPlayOnWeb || (isWaiting && playOnWeb != null);
-  if (isDialogClosed || !(isOffered || isWaiting)) {
+  // The user closed the dialog, or the check found no Play on Web.
+  if (isDialogClosed) {
+    return null;
+  }
+  // The check is done and found no Play on Web.
+  if (!hasPlayOnWeb && !isCheckingPlayOnWeb) {
     return null;
   }
   return (
     <PlayOnWebDialog
       title={
-        isOffered
+        hasPlayOnWeb
           ? tExperienceDetails.dynamic(
               "PlayOnWebModal.Label.PlayInYourBrowser",
               undefined,
@@ -64,7 +49,7 @@ const MobileWasmRedirect = ({
             )
       }
       description={
-        isOffered
+        hasPlayOnWeb
           ? tExperienceDetails.dynamic(
               "PlayOnWebModal.Label.PlayWithoutDownloading",
               undefined,
@@ -72,7 +57,7 @@ const MobileWasmRedirect = ({
             )
           : undefined
       }
-      isChecking={!isOffered}
+      isChecking={!hasPlayOnWeb}
       onPlayOnWeb={() => playOnWeb?.()}
       onClose={() => setIsDialogClosed(true)}
     />

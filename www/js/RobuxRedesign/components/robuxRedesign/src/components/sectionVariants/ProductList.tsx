@@ -18,6 +18,7 @@ import { ExpirationBadge } from "../ExpirationBadge";
 import { resolveLimitedTimeBonusDaysLeft } from "../../utils/resolveLimitedTimeBonusDaysLeft";
 import { getExternalLinkProps } from "../../utils/openExternalBrowser";
 import { PersonalizedRecommendationsMenu } from "../PersonalizedRecommendationsMenu";
+import { EarlyClickScope } from "../../modules/earlyClick";
 
 type ProductListProps = BaseSectionProps & {
   sectionBase: RobuxPageSection;
@@ -80,10 +81,12 @@ export function ProductList({ isPrimary, sectionBase }: ProductListProps) {
         )}
       </div>
       <SectionBody isPrimary={isPrimary}>
-        <SectionBodyProductList
-          onProductClick={clickHandler}
-          products={sectionBase.products ?? []}
-        />
+        <EarlyClickScope scope="productsList">
+          <SectionBodyProductList
+            onProductClick={clickHandler}
+            products={sectionBase.products ?? []}
+          />
+        </EarlyClickScope>
       </SectionBody>
     </Section>
   );

@@ -20,6 +20,7 @@ import SettingsList from "../../../../common/components/routing/SettingsList";
 import parentalControlsTranslationConstants from "../../../constants/contentConstants/parentalControlsTranslationConstants";
 import ChildRobuxApprovals from "../parentDashboard/ChildRobuxApprovals";
 import ChildRobuxTransferLimits from "../parentDashboard/ChildRobuxTransferLimits";
+import { getRobuxSettingsRows } from "../../../utils/parentalControls/robuxSettingsUtils";
 
 export const ChildRobuxRoutes = ({ child }: { child: TChildInfo }): JSX.Element | null => {
   const { translate } = useTranslation();
@@ -31,13 +32,8 @@ export const ChildRobuxRoutes = ({ child }: { child: TChildInfo }): JSX.Element 
   const robuxPage = childPages?.childSettingCategoryPages[SettingCategoryPageName.Robux];
   const subpages = useMemo(() => ({ ...childPages?.robuxPages }), [childPages]);
 
-  // Either permission opens this page, so each row checks its own. Transfer
-  // limits stays listed whether or not that setting came back. Approvals also
-  // needs that setting. An empty approval value still means Always ask.
-  const showTransferLimits = child.canParentManageChildRobuxTransferLimits === true;
-  const showApprovals =
-    child.canParentManageChildRobuxTransferSettings === true &&
-    childSettings?.robuxTransferApprovalMode !== undefined;
+  // An empty approval value still means Always ask.
+  const { showTransferLimits, showApprovals } = getRobuxSettingsRows(child, childSettings);
 
   const pagesWithCurrentValues: Record<string, TSettingsPage> = useMemo(() => {
     const pages: Record<string, TSettingsPage> = {};

@@ -5,6 +5,11 @@ import { Product } from "../../types/buyRobuxPageData";
 import { RobuxAmount } from "../sections/RobuxAmount";
 import { formatAmount } from "../../utils/formatMoney";
 import { getRobuxProductTrackingProps } from "../../hooks/useScrollTracking";
+import {
+  robuxProductEarlyClickKey,
+  useEarlyClickRedirectRow,
+  useEarlyClickScope,
+} from "../../modules/earlyClick";
 
 // TODO: Make @rbx/foundation-ui Button Next.js SSR compatible so `size` can follow the
 // viewport and this override can go away. `size="Small"` is the base; from `small` (361px)
@@ -28,6 +33,13 @@ export const ProductItemDefault = ({
   onProductClick,
   buttonProps,
 }: ProductItemDefaultProps) => {
+  const earlyClickScope = useEarlyClickScope();
+  const redirectButtonProps = buttonProps?.as === "a" ? buttonProps : undefined;
+  const { rowProps: earlyClickRowProps, linkProps } = useEarlyClickRedirectRow(
+    robuxProductEarlyClickKey(product.productId, earlyClickScope),
+    { isRedirect: Boolean(redirectButtonProps), hasUrl: Boolean(redirectButtonProps?.href) },
+  );
+
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
     onProductClick(product, event);
   };
@@ -38,6 +50,7 @@ export const ProductItemDefault = ({
     <div
       key={product.productId}
       {...getRobuxProductTrackingProps(product.productId)}
+      {...earlyClickRowProps}
       className={classNames("self-stretch flex flex-row justify-between items-center gap-small", {
         hidden: product.isCollapsible && !isExpanded,
       })}
@@ -62,6 +75,7 @@ export const ProductItemDefault = ({
         )}
         onClick={handleClick}
         {...restButtonProps}
+        {...linkProps}
         icon={
           restButtonProps.as === "a" && restButtonProps.href
             ? "icon-regular-arrow-up-right-from-square"

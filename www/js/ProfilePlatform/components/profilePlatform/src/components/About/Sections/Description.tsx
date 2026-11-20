@@ -32,7 +32,7 @@ const Description: React.FC<About> = ({ description }) => {
             // Should be no vulnerability here because we control the linkified description
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: linkifiedDescription }}
-            className="text-wrap text-body-medium text-align-x-left description-content"
+            className="text-wrap text-body-medium text-align-x-left description-content description-content-full"
           />
         ) : (
           <div className="text-body-medium">{translate("Label.NoBioYet")}</div>

@@ -9,6 +9,7 @@ import { gameDetailsPage } from "../common/constants/configConstants";
 import InviteLinkInvalidModal from "./components/InviteLinkInvalidModal";
 import CarouselContainer from "./containers/CarouselContainer";
 import PlayButton from "./containers/PlayButton";
+import LicensedBadgeContainer from "../gameGuidelines/components/LicensedBadgeContainer";
 import WasmRedirect from "./components/WasmRedirect";
 import AboutTab from "./containers/AboutTab";
 import metadataConstants from "./constants/metadataConstants";
@@ -35,6 +36,30 @@ import carouselService from "./services/carouselService";
 
 const playButtonNamespaces = [...appDownloadNamespaces, ...gamePlayButtonNamespaces];
 
+const insertGameTitleLicenseBadge = (): void => {
+  const title = document.querySelector<HTMLHeadingElement>(".game-title-container > h1.game-name");
+  const titleParent = title?.parentElement;
+  if (!title || !titleParent || document.getElementById("game-title-license-badge")) {
+    return;
+  }
+
+  const titleRow = document.createElement("div");
+  titleRow.className = "game-title-row";
+  titleParent.insertBefore(titleRow, title);
+  titleRow.appendChild(title);
+
+  const badgeMount = document.createElement("div");
+  badgeMount.id = "game-title-license-badge";
+  titleRow.appendChild(badgeMount);
+
+  renderWithErrorBoundary(
+    <QueryClientProvider client={queryClient}>
+      <LicensedBadgeContainer />
+    </QueryClientProvider>,
+    badgeMount,
+  );
+};
+
 export default (): void => {
   // Don't show the rest of the details page if the experience is unavailable
   if (unavailableConstants.gameDetailsUnavailableContainer()) {
@@ -49,6 +74,7 @@ export default (): void => {
 
   // EDP creator-byline telemetry (GRPS-3058/3059): instrument the byline after the availability guard.
   instrumentCreatorByline();
+  insertGameTitleLicenseBadge();
 
   const { referralSessionInfo, referralPage } = sessionReferralUtils.extractReferralInfo();
   const attributionId = getAttributionId(AttributionType.GameDetailReferral);

@@ -5,10 +5,10 @@ import { document, navigator, window } from "@rbx/core-lib/browser";
 import { isSupportedBrowserAndDevice } from "./browserGate";
 import {
   browserCacheKey,
-  hasRecentFailure,
   measurementFromScores,
   readCachedFailure,
   readCachedMeasurement,
+  readRecentFailure,
   removeCachedMeasurement,
   restoreCachedFailure,
   writeCachedFailure,
@@ -29,16 +29,7 @@ export {
   type DeviceProbeConfig,
   type DeviceProbeConfigInput,
 } from "./config";
-export {
-  setBrowserGate,
-  setDeviceProbeTelemetry,
-  type DeviceProbeBrowserGate,
-  type DeviceProbeCompletedEvent,
-  type DeviceProbeFailedEvent,
-  type DeviceProbeFailureReason,
-  type DeviceProbeTelemetry,
-  type DeviceSpecNotMetEvent,
-} from "./hooks";
+export { setBrowserGate, type DeviceProbeBrowserGate } from "./hooks";
 export {
   defaultRequiredSpec,
   type DeviceMeasurement,
@@ -50,6 +41,16 @@ export {
 const LOCK_NAME = "rbx-device-probe";
 
 let inFlight: Promise<DeviceMeasurement | null> | null = null;
+
+// A recent failure on this device answers no without probing again. Reported as a skipped probe,
+// so the answers the backoff denied show.
+const backingOff = (now: number, crashGraceMs: number): boolean => {
+  const failure = readRecentFailure(now, crashGraceMs);
+  if (failure != null) {
+    report("probeSkipped", { reason: failure.reason, browser: failure.browser });
+  }
+  return failure != null;
+};
 
 // A run holds the lock until it replaces its crash marker, and the browser releases it when the
 // run's page goes away. So with the lock held, a crash marker of any age is from a run that never
@@ -101,7 +102,7 @@ const attemptProbe = async (): Promise<DeviceMeasurement | null> => {
     if (cached != null) {
       return cached;
     }
-    if (hasRecentFailure(Date.now(), crashGraceMs)) {
+    if (backingOff(Date.now(), crashGraceMs)) {
       return null;
     }
     // The host may have turned the client off while this call waited for the lock. Not a failed
@@ -109,9 +110,9 @@ const attemptProbe = async (): Promise<DeviceMeasurement | null> => {
     if (!getDeviceProbeConfig().enabled) {
       return null;
     }
-    const browser = browserCacheKey();
+    // Hidden again, or still hidden after another copy's run the tab hid. Not a run, so nothing is
+    // reported: only the copy that runs the probe reports its outcome.
     if (document?.visibilityState === "hidden") {
-      report("probeFailed", { reason: "hidden", durationMs: 0, browser, isolated: null });
       return null;
     }
 
@@ -119,11 +120,24 @@ const attemptProbe = async (): Promise<DeviceMeasurement | null> => {
     // failure once it's older than the timeout. Every way the run settles replaces it. When it
     // can't be written (storage full or blocked), nothing would stop the probe running again on
     // every page view, so it doesn't run. Not a failed probe, so nothing is reported.
-    const previousFailure = readCachedFailure();
+    let previousFailure = readCachedFailure();
     const failureCount = (previousFailure?.failureCount ?? 0) + 1;
     const startedAt = Date.now();
     if (!writeCachedFailure("crashed", failureCount, startedAt)) {
       return null;
+    }
+    const browser = browserCacheKey();
+    report("probeStarted", { browser });
+    // A crash marker from an earlier run that never settled, reported once: this run's marker has
+    // just replaced it, and a hidden or throttled run puts it back marked as reported. Without Web
+    // Locks a younger one may be a run in another tab.
+    if (
+      previousFailure?.reason === "crashed" &&
+      previousFailure.crashReported !== true &&
+      startedAt - previousFailure.failedAt >= crashGraceMs
+    ) {
+      report("probeFailed", { reason: "crashed", durationMs: null, browser, isolated: null });
+      previousFailure = { ...previousFailure, crashReported: true };
     }
     const result = await runProbeFrame(getDeviceProbeConfig().timeoutMs).catch(
       (): FrameResult => ({ ok: false, reason: "error" }),
@@ -149,11 +163,12 @@ const attemptProbe = async (): Promise<DeviceMeasurement | null> => {
     }
 
     writeCachedMeasurement(measurement, Date.now());
-    report("probeCompleted", { durationMs, browser, isolated, scores: measurement });
-    const failed = failedRules(measurement, getDeviceProbeConfig().requiredSpec);
-    if (failed.length > 0) {
-      report("specNotMet", { failedRules: failed, browser, isolated, scores: measurement });
-    }
+    report("probeCompleted", {
+      durationMs,
+      browser,
+      isolated,
+      failedRules: failedRules(measurement, getDeviceProbeConfig().requiredSpec),
+    });
     return measurement;
   });
 };
@@ -166,7 +181,7 @@ const probeDevice = async (): Promise<DeviceMeasurement | null> => {
   } catch {
     report("probeFailed", {
       reason: "error",
-      durationMs: 0,
+      durationMs: null,
       browser: browserCacheKey(),
       isolated: null,
     });
@@ -194,8 +209,7 @@ export const meetsRequiredSpec = async (): Promise<boolean> => {
     }
     let measurement = readCachedMeasurement(Date.now());
     if (measurement == null) {
-      // A recent failure on this device answers no without probing again.
-      if (hasRecentFailure(Date.now(), getDeviceProbeConfig().timeoutMs)) {
+      if (backingOff(Date.now(), getDeviceProbeConfig().timeoutMs)) {
         return false;
       }
       // The kill switch stops new probes, not answers from the cache.
@@ -235,7 +249,7 @@ export const cachedMeetsRequiredSpec = (): boolean | null => {
     const now = Date.now();
     const measurement = readCachedMeasurement(now);
     if (measurement == null) {
-      return hasRecentFailure(now, getDeviceProbeConfig().timeoutMs) ? false : null;
+      return readRecentFailure(now, getDeviceProbeConfig().timeoutMs) == null ? null : false;
     }
     return failedRules(measurement, getDeviceProbeConfig().requiredSpec).length === 0;
   } catch {

@@ -24,10 +24,13 @@ export const LinkedChildDetails = ({
   child,
   filteredChildCategoryPages,
   shouldDisplayScreenTimeLimit,
+  showManageRecommendations = false,
 }: {
   child: TChildInfo;
   filteredChildCategoryPages: Record<string, TSettingsPage>;
   shouldDisplayScreenTimeLimit: boolean;
+  /** The child has the Manage Recommendations page, which can be the only setting a parent manages. */
+  showManageRecommendations?: boolean;
 }): JSX.Element => {
   const { translate } = useTranslation();
   const childPages = useAppSelector(selectChildPagesForChildUserId(child.userId));
@@ -45,7 +48,8 @@ export const LinkedChildDetails = ({
     child.canParentManageChildsPrivatePlaytestSetting ||
     child.canParentManageChildsAllowIdentityVerificationSetting ||
     uiPolicy?.selfServeParentalPrivacyRequestsEnabled ||
-    uiPolicy?.enableParentLinkActivityUpdates;
+    uiPolicy?.enableParentLinkActivityUpdates ||
+    showManageRecommendations;
 
   const handleRobuxBalanceSectionError = React.useCallback(() => {
     trackError("RobuxBalanceSectionRenderError");
@@ -64,13 +68,12 @@ export const LinkedChildDetails = ({
             <RobuxBalanceSection child={child} />
           </GiftRobuxErrorBoundary>
 
-          {shouldDisplayScreenTimeLimit && (
-            <React.Fragment>
-              <div className="rbx-divider" />
-              <ScreentimePreview child={child} />
-              <TopGamesPreview child={child} />
-            </React.Fragment>
-          )}
+          <div className="rbx-divider" />
+          <ScreentimePreview
+            child={child}
+            shouldDisplayScreenTimeLimit={shouldDisplayScreenTimeLimit}
+          />
+          <TopGamesPreview child={child} />
 
           {child.canParentViewChildFriends && (
             <React.Fragment>
@@ -79,7 +82,8 @@ export const LinkedChildDetails = ({
             </React.Fragment>
           )}
 
-          {canParentViewChildSettingMenu && (
+          {/* The menu also needs a row, so it doesn't render empty when every row is hidden */}
+          {canParentViewChildSettingMenu && Object.keys(filteredChildCategoryPages).length > 0 && (
             <React.Fragment>
               <div className="rbx-divider" />
               <PreviewCard

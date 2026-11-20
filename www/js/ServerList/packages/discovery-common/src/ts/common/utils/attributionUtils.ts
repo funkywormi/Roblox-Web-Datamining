@@ -1,4 +1,4 @@
-import { uuidService } from "@rbx/core-scripts/legacy/core-utilities";
+import { generateRandomUuid } from "@rbx/core-lib/uuid";
 
 const AttributionIdsKey = "robloxAttributionIds";
 
@@ -17,7 +17,7 @@ export const getAttributionId = (type: AttributionType): string => {
 
   let attributionId = attributionIds[type];
   if (!attributionId) {
-    attributionId = uuidService.generateRandomUuid();
+    attributionId = generateRandomUuid();
     attributionIds[type] = attributionId;
   }
 

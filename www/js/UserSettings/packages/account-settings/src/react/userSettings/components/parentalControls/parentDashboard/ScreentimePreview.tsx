@@ -8,11 +8,18 @@ import parentalControlsTranslationConstants from "../../../constants/contentCons
 import { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import parentalControlsEventService from "../../../services/eventServices/parentalControlsEventService";
 
-const ScreentimePreview = ({ child }: { child: TChildInfo }): JSX.Element => {
+const ScreentimePreview = ({
+  child,
+  shouldDisplayScreenTimeLimit,
+}: {
+  child: TChildInfo;
+  shouldDisplayScreenTimeLimit: boolean;
+}): JSX.Element => {
   const { translate } = useTranslation();
 
   const childUserId = child.userId;
-  const canManageScreentime = child.canParentManageChildsScreentime ?? false;
+  const canManageScreentime =
+    shouldDisplayScreenTimeLimit && (child.canParentManageChildsScreentime ?? false);
 
   const childPages = useAppSelector(selectChildPagesForChildUserId(childUserId));
 

@@ -32,6 +32,7 @@ import { Gender } from "../types/signupTypes";
 import { Birthday, constructValidUTCBirthdate } from "../utils/birthdayUtils";
 import { usernameValidationMessage } from "../utils/signupUsernameValidation";
 import useMarketingConsent from "../hooks/useMarketingConsent";
+import useSignupAgreementIds from "../hooks/useSignupAgreementIds";
 import useUsernameSuggestions from "../hooks/useUsernameSuggestions";
 import UsernameSuggestions from "./UsernameSuggestions";
 import {
@@ -169,11 +170,24 @@ function BirthdayComplianceModalContent({
     consentText: translate(MARKETING_CONSENT_TRANSLATION_KEY),
   });
 
+  const getAgreementIds = useSignupAgreementIds();
+
   const { mutate: submitUpgrade, isPending: isSubmitting } = useMutation({
     mutationFn: async (validBirthday: Date) => {
+      const agreementIds = await getAgreementIds();
+      // Missing IDs do not block the upgrade, here or on the server. The user agreements check
+      // asks the user to accept later.
+      if (agreementIds === undefined) {
+        accountUpgradeAnalytics.reportAgreementIdsMissing();
+      }
       let isAlreadyLifted = false;
       try {
-        await upgradeAccount(validBirthday, isUsernameChanged ? username : undefined, gender);
+        await upgradeAccount(
+          validBirthday,
+          isUsernameChanged ? username : undefined,
+          gender,
+          agreementIds,
+        );
       } catch (error) {
         if (!isRestrictionAlreadyLifted(error)) {
           throw error;

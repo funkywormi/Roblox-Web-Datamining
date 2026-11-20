@@ -13,6 +13,7 @@ import {
   getSectionTrackingProps,
 } from "../../hooks/useScrollTracking";
 import { PersonalizedRecommendationsMenu } from "../PersonalizedRecommendationsMenu";
+import { robuxProductEarlyClickKey, useEarlyClickRow } from "../../modules/earlyClick";
 
 type RecommendedProps = BaseSectionProps & {
   sectionBase: SectionBase;
@@ -31,6 +32,10 @@ export function Recommended({ isPrimary, sectionBase }: RecommendedProps) {
   );
 
   const [product] = sectionBase.products ?? [];
+  const earlyClickRowProps = useEarlyClickRow(
+    robuxProductEarlyClickKey(product?.productId ?? "recommended", "recommended"),
+    { isEnabled: Boolean(product) },
+  );
   if (!product) {
     return null;
   }
@@ -44,7 +49,10 @@ export function Recommended({ isPrimary, sectionBase }: RecommendedProps) {
         )}
       </div>
       <SectionBody isPrimary={isPrimary}>
-        <div className="flex flex-col self-stretch medium:flex-row medium:justify-between medium:items-center">
+        <div
+          className="flex flex-col self-stretch medium:flex-row medium:justify-between medium:items-center"
+          {...earlyClickRowProps}
+        >
           <div className="flex flex-col self-stretch gap-small padding-bottom-large medium:padding-bottom-none medium:self-auto">
             {/* Section Title */}
             <RobuxAmount

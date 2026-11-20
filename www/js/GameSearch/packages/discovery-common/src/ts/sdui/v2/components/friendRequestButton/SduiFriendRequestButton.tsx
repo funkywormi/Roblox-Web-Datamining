@@ -1,17 +1,13 @@
 "use client";
 
 import { useCallback, type MouseEvent } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { onlineManager, useMutation, useQueryClient } from "@tanstack/react-query";
 import { IconButton, type TIconButtonSize } from "@rbx/foundation-ui";
 import type { SduiRendererInjectedProps } from "@rbx/sdui-core";
 import { useSduiServices } from "@rbx/sdui-core/client";
 import type { UserId } from "@rbx/www-common/user";
 import { publishFriendRequestResult } from "./friendRequestResultEvents";
-import {
-  startAcceptFriendRequest,
-  startFriendRequest,
-  type FriendRequestResult,
-} from "./friendshipService";
+import { startAcceptFriendRequest, startFriendRequest } from "./friendshipService";
 import { friendshipStatuses, type FriendshipStatus } from "./friendshipStatus";
 import { friendshipStatusQueryKey, useFriendshipStatus } from "./useFriendshipStatus";
 import { reportPlayerFriendAccept, reportPlayerFriendAdd } from "./reportPlayerFriendAdd";
@@ -32,8 +28,9 @@ export interface SduiFriendRequestButtonProps extends SduiRendererInjectedProps 
   userId?: string;
 }
 
-type FriendRequestAcceptanceMutation = {
-  requestCompletion: Promise<FriendRequestResult>;
+class OfflineFriendRequestError extends Error {}
+
+type FriendRequestMutation = {
   targetUserId: UserId;
   viewerUserId: UserId;
 };
@@ -47,27 +44,104 @@ export function SduiFriendRequestButton({
   const services = useSduiServices();
   const queryClient = useQueryClient();
   const { mutate: trackFriendRequestAcceptance } = useMutation({
-    mutationFn: ({ requestCompletion }: FriendRequestAcceptanceMutation) => requestCompletion,
+    onMutate: async ({ targetUserId, viewerUserId }: FriendRequestMutation) => {
+      if (!onlineManager.isOnline()) {
+        throw new OfflineFriendRequestError("Cannot accept a friend request while offline.");
+      }
+      const queryKey = friendshipStatusQueryKey(viewerUserId, targetUserId);
+      await queryClient.cancelQueries({ queryKey });
+      const previousStatus = queryClient.getQueryData<FriendshipStatus>(queryKey);
+      queryClient.setQueryData(queryKey, friendshipStatuses.friends);
+      return { previousStatus };
+    },
+    mutationFn: ({ targetUserId }: FriendRequestMutation) => {
+      const request = startAcceptFriendRequest(targetUserId);
+      if (request.didStart) {
+        reportPlayerFriendAccept({
+          analyticsContext,
+          analyticsReporter: services.analyticsReporter,
+          pageContext: services.pageContext,
+          targetUserId,
+        });
+      }
+      return request.requestCompletion;
+    },
     onSuccess: () => {
       publishFriendRequestResult({
         result: "success",
         type: "friend-request-accepted",
       });
     },
-    onError: (_error, { targetUserId, viewerUserId }: FriendRequestAcceptanceMutation) => {
+    onError: (error, { targetUserId, viewerUserId }: FriendRequestMutation, context) => {
       const friendshipStatusCacheKey = friendshipStatusQueryKey(viewerUserId, targetUserId);
       queryClient.setQueryData<FriendshipStatus | undefined>(
         friendshipStatusCacheKey,
         currentFriendshipStatus =>
-          currentFriendshipStatus === friendshipStatuses.friends
-            ? friendshipStatuses.requestReceived
+          context != null && currentFriendshipStatus === friendshipStatuses.friends
+            ? context.previousStatus
             : currentFriendshipStatus,
       );
       publishFriendRequestResult({
         result: "failure",
+        ...(error instanceof OfflineFriendRequestError && {
+          reason: "offline",
+        }),
         type: "friend-request-accepted",
       });
       return queryClient.invalidateQueries({ queryKey: friendshipStatusCacheKey });
+    },
+  });
+  const { mutate: trackFriendRequestSent } = useMutation({
+    onMutate: async ({ targetUserId, viewerUserId }: FriendRequestMutation) => {
+      if (!onlineManager.isOnline()) {
+        throw new OfflineFriendRequestError("Cannot send a friend request while offline.");
+      }
+      const queryKey = friendshipStatusQueryKey(viewerUserId, targetUserId);
+      await queryClient.cancelQueries({ queryKey });
+      const previousStatus = queryClient.getQueryData<FriendshipStatus>(queryKey);
+      queryClient.setQueryData(queryKey, friendshipStatuses.requestSent);
+      return { previousStatus };
+    },
+    mutationFn: ({ targetUserId }: FriendRequestMutation) => {
+      const request = startFriendRequest(targetUserId, source);
+      if (request.didStart) {
+        reportPlayerFriendAdd({
+          analyticsContext,
+          analyticsReporter: services.analyticsReporter,
+          pageContext: services.pageContext,
+          targetUserId,
+        });
+      }
+      return request.requestCompletion;
+    },
+    onSuccess: (status, { targetUserId, viewerUserId }: FriendRequestMutation) => {
+      if (status === "already-friends") {
+        queryClient.setQueryData(
+          friendshipStatusQueryKey(viewerUserId, targetUserId),
+          friendshipStatuses.friends,
+        );
+        return;
+      }
+      publishFriendRequestResult({
+        result: "success",
+        type: "friend-request-sent",
+      });
+    },
+    onError: (error, { targetUserId, viewerUserId }: FriendRequestMutation, context) => {
+      queryClient.setQueryData<FriendshipStatus | undefined>(
+        friendshipStatusQueryKey(viewerUserId, targetUserId),
+        currentFriendshipStatus =>
+          context != null && currentFriendshipStatus === friendshipStatuses.requestSent
+            ? context.previousStatus
+            : currentFriendshipStatus,
+      );
+      publishFriendRequestResult({
+        result: "failure",
+        ...(error instanceof OfflineFriendRequestError && {
+          reason: "offline",
+        }),
+        type: "friend-request-sent",
+      });
     },
   });
   const { friendshipStatus, isFriendshipStatusLoading, isSelf, targetUserId, viewerUserId } =
@@ -83,22 +157,8 @@ export function SduiFriendRequestButton({
         return;
       }
 
-      const friendshipStatusCacheKey = friendshipStatusQueryKey(viewerUserId, targetUserId);
       if (friendshipStatus === friendshipStatuses.requestReceived) {
-        const friendRequestAcceptance = startAcceptFriendRequest(targetUserId);
-        if (!friendRequestAcceptance.didStart) {
-          return;
-        }
-
-        queryClient.setQueryData(friendshipStatusCacheKey, friendshipStatuses.friends);
-        reportPlayerFriendAccept({
-          analyticsContext,
-          analyticsReporter: services.analyticsReporter,
-          pageContext: services.pageContext,
-          targetUserId,
-        });
         trackFriendRequestAcceptance({
-          requestCompletion: friendRequestAcceptance.requestCompletion,
           targetUserId,
           viewerUserId,
         });
@@ -109,56 +169,16 @@ export function SduiFriendRequestButton({
         return;
       }
 
-      const friendRequestStart = startFriendRequest(targetUserId, source);
-      if (!friendRequestStart.didStart) {
-        return;
-      }
-
-      queryClient.setQueryData(friendshipStatusCacheKey, friendshipStatuses.requestSent);
-      reportPlayerFriendAdd({
-        analyticsContext,
-        analyticsReporter: services.analyticsReporter,
-        pageContext: services.pageContext,
+      trackFriendRequestSent({
         targetUserId,
+        viewerUserId,
       });
-
-      // The service owns cross-component deduplication; completion only updates its exact cache entry.
-      // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation
-      void friendRequestStart.requestCompletion.then(
-        status => {
-          if (status === "already-friends") {
-            queryClient.setQueryData(friendshipStatusCacheKey, friendshipStatuses.friends);
-            return;
-          }
-          publishFriendRequestResult({
-            result: "success",
-            type: "friend-request-sent",
-          });
-        },
-        () => {
-          queryClient.setQueryData<FriendshipStatus | undefined>(
-            friendshipStatusCacheKey,
-            currentFriendshipStatus =>
-              currentFriendshipStatus === friendshipStatuses.requestSent
-                ? friendshipStatus
-                : currentFriendshipStatus,
-          );
-          publishFriendRequestResult({
-            result: "failure",
-            type: "friend-request-sent",
-          });
-        },
-      );
     },
     [
-      analyticsContext,
       friendshipStatus,
       isButtonDisabled,
-      queryClient,
-      services.analyticsReporter,
-      services.pageContext,
-      source,
       targetUserId,
+      trackFriendRequestSent,
       trackFriendRequestAcceptance,
       viewerUserId,
     ],

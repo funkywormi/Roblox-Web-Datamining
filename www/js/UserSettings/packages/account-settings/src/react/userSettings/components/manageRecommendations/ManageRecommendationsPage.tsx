@@ -19,12 +19,29 @@ import { SettingsSurfaceError } from "../../../settingsSurface/SettingsSurfaceEr
 /** The surface the user's own Manage Recommendations tab shows. */
 export const manageRecommendationsSurfaceKey: SettingsSurfaceKey = "ManageRecommendationsPage";
 
-type TPageProps = {
+export type TManageRecommendationsPageOptions = {
+  /** Where to send the user when the surface has no settings for them. */
+  emptyRedirectPath?: string;
+  /** Leave out the surface's heading when the host already shows one (e.g. parental controls). */
+  hideTitle?: boolean;
+};
+
+type TPageProps = TManageRecommendationsPageOptions & {
   /** The surface to show. A host picks its own, e.g. for parent-facing copy. */
   surfaceKey: SettingsSurfaceKey;
   userId: string;
   onRetry: () => void;
 };
+
+const defaultEmptyRedirectPath = `/${RouterPath.Info}`;
+
+/** The intro is legally required, so the page only renders a surface with a title and intro. */
+const hasRequiredCopy = (
+  presentation:
+    | { readonly label: string; readonly description: { readonly text: string } | null | undefined }
+    | null
+    | undefined,
+): boolean => Boolean(presentation?.label && presentation.description?.text);
 
 const useIssueCounter = (surfaceKey: SettingsSurfaceKey, issue: SettingsSurfaceIssue | null) => {
   useEffect(() => {
@@ -44,10 +61,12 @@ const ManageRecommendationsSurface = ({
   surfaceKey,
   userId,
   onRetry,
+  emptyRedirectPath = defaultEmptyRedirectPath,
+  hideTitle,
 }: TPageProps & { surface: SettingsSurfaceFragment$key }): React.JSX.Element => {
   const data = useFragment<SettingsSurfaceFragment$key>(SettingsSurfaceFragmentNode, surfaceRef);
   const { presentation } = data.header;
-  const hasCopy = Boolean(presentation?.label && presentation.description?.text);
+  const hasCopy = hasRequiredCopy(presentation);
   useIssueCounter(surfaceKey, hasCopy ? null : "SurfaceWithoutPresentation");
 
   if (!hasCopy) {
@@ -60,11 +79,11 @@ const ManageRecommendationsSurface = ({
   }
   if (!data.settings.some(setting => setting != null)) {
     // Ineligible, or the surface is switched off.
-    return <Redirect to={`/${RouterPath.Info}`} />;
+    return <Redirect to={emptyRedirectPath} />;
   }
   return (
     <section className="settings-container-v2" data-testid="manage-recommendations-page">
-      <SettingsSurface surface={surfaceRef} userId={userId} />
+      <SettingsSurface surface={surfaceRef} userId={userId} hideTitle={hideTitle} />
     </section>
   );
 };
@@ -79,6 +98,7 @@ const ManageRecommendationsPage = ({
   userId,
   fetchKey,
   onRetry,
+  ...options
 }: TPageProps & { fetchKey: number }): React.JSX.Element => {
   const data = useLazyLoadQuery<SettingsSurfaceQuery>(
     SettingsSurfaceQueryNode,
@@ -103,6 +123,7 @@ const ManageRecommendationsPage = ({
       surfaceKey={surfaceKey}
       userId={userId}
       onRetry={onRetry}
+      {...options}
     />
   );
 };

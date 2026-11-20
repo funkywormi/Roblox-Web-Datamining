@@ -338,7 +338,7 @@ const SendCode: React.FC = () => {
   /*
    * Component Markup
    */
-  const buttonText = userIdToRecover ? resources.Action.Next : resources.Action.SendCode;
+  const buttonText = userIdToRecover ? resources.Action.Continue : resources.Action.SendCode;
   const bodyText =
     userIdToRecover && isRecoveryAccountBasedRecoveryEnabled
       ? resources.Description.EnterContactMethodAssociatedWithYourAccountV2
@@ -422,7 +422,7 @@ const SendCode: React.FC = () => {
               title={resources.Label.PreviousContactMethodVerification(previousRecoveryMethod)}
             />
             <div className="padding-xsmall" />
-            <p className="text-align-x-left">
+            <p className="text-align-x-left text-body-medium">
               {useBackupCode
                 ? resources.Description.EnterABackupCode
                 : disallowPhone
@@ -434,7 +434,9 @@ const SendCode: React.FC = () => {
             <div className="padding-bottom-large" />
           </React.Fragment>
         )}
-        {contactMethodNumber !== 1 && <p className="padding-bottom-large">{bodyText}</p>}
+        {contactMethodNumber !== 1 && (
+          <p className="text-align-x-left text-body-medium padding-bottom-large">{bodyText}</p>
+        )}
         <VariableInputControl
           id="inputIdentifier"
           label={

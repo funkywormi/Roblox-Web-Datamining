@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import { useQuery } from "@tanstack/react-query";
 import "../trustedFriends.css";
-import { AccessManagementUpsellV2Service } from "Roblox";
 import {
   Button,
   Dialog,
@@ -34,6 +33,7 @@ import {
 import { useGetTrustedFriendsModalButtons } from "../hooks/useGetTrustedFriendsModalButtons";
 import { getTrustedFriendAction } from "../services/trustedFriends";
 import SocialMetadataSection from "./SocialMetadataSection";
+import { useTrustedFriendsModalHost } from "./trustedFriendsModalHost";
 
 export type TrustedFriendsModalProps = {
   open: boolean;
@@ -165,6 +165,7 @@ const TrustedFriendsModalActionsPreCheck = ({
   onComplete,
 }: TrustedFriendsModalProps): React.JSX.Element | null => {
   const { translate } = useTranslation();
+  const { startAccessManagementUpsell } = useTrustedFriendsModalHost();
 
   const {
     data: trustedFriendAction,
@@ -174,6 +175,9 @@ const TrustedFriendsModalActionsPreCheck = ({
     queryKey: trustedFriendActionQueryKey(userId, linkTokens),
     queryFn: () => getTrustedFriendAction(userId, { friendRequestToken: linkTokens }),
     enabled: open,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -194,7 +198,7 @@ const TrustedFriendsModalActionsPreCheck = ({
 
   const startUpsell = useCallback(async (): Promise<void> => {
     try {
-      const success = await AccessManagementUpsellV2Service.startAccessManagementUpsell({
+      const success = await startAccessManagementUpsell({
         featureName: "TriggerAgeCheckUpsellIncludingVPC",
         namespace: "core_content/CoreContent",
         isAsyncCall: false,
@@ -211,7 +215,7 @@ const TrustedFriendsModalActionsPreCheck = ({
     } catch {
       onClose(false);
     }
-  }, [onClose, refetch]);
+  }, [onClose, refetch, startAccessManagementUpsell]);
 
   useEffect(() => {
     if (modalVariant === "pending") {

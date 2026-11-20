@@ -1,20 +1,23 @@
 import { Suspense, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Loading } from "react-style-guide";
-import ManageRecommendationsPage from "./ManageRecommendationsPage";
+import ManageRecommendationsPage, {
+  type TManageRecommendationsPageOptions,
+} from "./ManageRecommendationsPage";
 import { SettingsSurfaceError } from "../../../settingsSurface/SettingsSurfaceError";
 import { fireSettingsSurfaceIssueCounter } from "./manageRecommendationsCounters";
 import type { SettingsSurfaceKey } from "../../../settingsSurface/__generated__/SettingsSurfaceQuery.graphql";
 
 /**
- * Loads the page for a user and surface, with the loading, error and retry states around it. Its
- * strings use the legacy `useTranslation`, so render it inside the account settings
- * `TranslationProvider`.
+ * Loads the page for a user and surface, with the loading, error and retry states around it.
+ * `userId` is the viewer on their own tab, or a linked child on the parent dashboard. Its strings
+ * use the legacy `useTranslation`, so render it inside the account settings `TranslationProvider`.
  */
 const ManageRecommendationsLoader = ({
   surfaceKey,
   userId,
-}: {
+  ...options
+}: TManageRecommendationsPageOptions & {
   /** The surface to show, e.g. `manageRecommendationsSurfaceKey` on the user's own tab. */
   surfaceKey: SettingsSurfaceKey;
   userId: string;
@@ -43,6 +46,7 @@ const ManageRecommendationsLoader = ({
           userId={userId}
           fetchKey={fetchKey}
           onRetry={retry}
+          {...options}
         />
       </Suspense>
     </ErrorBoundary>

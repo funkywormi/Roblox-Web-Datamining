@@ -67,12 +67,13 @@ export function GamePassBonusBanner({
         }}
       />
 
-      <div className="width-2000 height-2000 margin-left-small" style={{ zIndex: 1 }}>
+      <div className="width-2000 height-2000 margin-left-small shrink-0" style={{ zIndex: 1 }}>
         {bonusItemImageUrl && (
           <img src={bonusItemImageUrl} alt="bonus item" className="width-full height-full" />
         )}
       </div>
       <div
+        className="min-width-0"
         style={{
           margin: "auto auto auto 0",
           padding: "21px 16px 21px 0",
@@ -80,19 +81,23 @@ export function GamePassBonusBanner({
         }}
       >
         <div className="flex flex-col gap-xsmall self-stretch items-start justify-center">
-          <div className="flex flex-row items-center text-title-large content-[var(--dark-mode-content-emphasis)] text-wrap">
-            <div>{metadata.experienceDisplayName}</div>
-            <Tooltip position="bottom-center" title={translate("Action.ReportItem")}>
-              <TooltipTrigger asChild>
-                <IconButton
-                  variant="Utility"
-                  size="XSmall"
-                  icon="icon-regular-circle-i"
-                  ariaLabel="More information"
-                  onClick={iconReportHandler}
-                />
-              </TooltipTrigger>
-            </Tooltip>
+          <div className="flex flex-row items-center max-width-full text-title-large content-[var(--dark-mode-content-emphasis)] text-wrap">
+            <div className="min-width-0 text-truncate-end text-no-wrap">
+              {metadata.experienceDisplayName}
+            </div>
+            {!showPersonalizedRecommendationsMenu && (
+              <Tooltip position="bottom-center" title={translate("Action.ReportItem")}>
+                <TooltipTrigger asChild>
+                  <IconButton
+                    variant="Utility"
+                    size="XSmall"
+                    icon="icon-regular-circle-i"
+                    ariaLabel="More information"
+                    onClick={iconReportHandler}
+                  />
+                </TooltipTrigger>
+              </Tooltip>
+            )}
           </div>
           <div className="text-body-large content-[var(--dark-mode-content-default)] text-wrap">
             {metadata.gamePassDisplayName}
@@ -102,7 +107,8 @@ export function GamePassBonusBanner({
       {showPersonalizedRecommendationsMenu && (
         <PersonalizedRecommendationsMenu
           surfaceKey="Web_BuyRobux_BonusItem"
-          className="shrink-0 relative z-10 margin-x-large"
+          className="shrink-0 relative z-10 margin-right-medium medium:margin-x-large"
+          reportItem={{ title: translate("Action.ReportItem"), onSelect: iconReportHandler }}
         />
       )}
     </div>

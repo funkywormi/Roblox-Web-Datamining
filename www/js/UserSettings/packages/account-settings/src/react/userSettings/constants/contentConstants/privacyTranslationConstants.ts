@@ -227,6 +227,8 @@ export default {
   tfRestrictedExperienceChatChildSide: "Description.ChildSide.ExperienceChat.TrustedFriendsOnly",
   tfRestrictedDirectChatChildSide: "Description.ChildSide.DirectChatSetting.TrustedFriendsOnly",
   tfRestrictedExperienceChatPageParentSide: "Description.ParentSide.ExperienceChat.TrustedFriends",
+  tfRestrictedExperienceChatPageParentSideWithNotifications:
+    "Description.ParentSide.ExperienceChat.TFNotifications",
   tfRestrictedExperienceChatSettingParentSide:
     "Description.ParentSide.ExperienceChatSetting.TrustedFriends",
   tfRestrictedDirectChatSettingParentSide:

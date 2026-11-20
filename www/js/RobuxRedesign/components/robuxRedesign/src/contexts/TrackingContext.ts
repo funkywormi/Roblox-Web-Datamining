@@ -6,6 +6,7 @@ import { PurchaseEligibilityTracking } from "../hooks/purchaseEligibility/usePur
 import { PurchaseTracking } from "../hooks/purchase/usePurchaseTracking";
 import { GiftCardTracking } from "../hooks/giftCards/giftCardTracking";
 import { RedirectTracking } from "../hooks/useRedirectTracking";
+import type { EarlyClickTracking } from "../modules/earlyClick";
 import { SamsungPaymentMethodsTracking } from "../hooks/samsungPaymentMethods/useSamsungPaymentMethodsTracking";
 import type { SubscriptionV2Tracking } from "../hooks/subscriptionV2/useSubscriptionV2Tracking";
 import { TransfersTracking } from "../hooks/useTransfersTracking";
@@ -20,6 +21,7 @@ export interface TrackingContextProps
     RobuxGiftingTracking,
     SubscriptionV2Tracking,
     RedirectTracking,
+    EarlyClickTracking,
     SamsungPaymentMethodsTracking,
     TransfersTracking {}
 
@@ -44,6 +46,7 @@ export const TrackingContext = createContext<TrackingContextProps>({
   trackSubscriptionV2SubscribeClick: () => undefined,
   trackSubscriptionV2LearnMoreClick: () => undefined,
   trackRedirectClick: () => undefined,
+  trackEarlyClick: () => undefined,
   trackSamsungPaymentMethodsCancel: () => undefined,
   trackSamsungPaymentMethodsRedeemCreditClick: () => undefined,
   trackSamsungPaymentMethodsSamsungPayClick: () => undefined,

@@ -155,9 +155,9 @@ const IdentifierInput: React.FC = () => {
     content: requestInFlight ? (
       <span className="spin spinner-xs spinner-no-margin" />
     ) : (
-      resources.Action.Next
+      resources.Action.Continue
     ),
-    label: resources.Action.Next,
+    label: resources.Action.Continue,
     enabled: !requestInFlight && identifier.length > 2,
     action: requestRecovery,
   };

@@ -128,3 +128,69 @@ export async function getTrustedFriendAction(
 
   return data.components?.TrustedFriendActions?.action;
 }
+
+export type TrustedFriendRequestItem = {
+  senderId: number;
+  sentAt: string;
+};
+
+type TrustedFriendRequestsResponse = {
+  data: TrustedFriendRequestItem[];
+  nextPageExclusiveStartKey?: string;
+  previousPageExclusiveStartKey?: string;
+};
+
+type GetTrustedFriendRequestsParams = {
+  limit?: number;
+  cursor?: string;
+};
+
+export async function getTrustedFriendRequests({
+  limit = 10,
+  cursor,
+}: GetTrustedFriendRequestsParams = {}): Promise<TrustedFriendRequestsResponse> {
+  const params = new URLSearchParams({
+    limit: String(limit),
+  });
+  if (cursor) {
+    params.set("cursor", cursor);
+  }
+  const urlConfig: UrlConfig = {
+    url: `${friendsTrustedBase()}/my/trusted-friends/requests?${params.toString()}`,
+    ...trustedUrlConfig(),
+  };
+  const { data } = await http.get<TrustedFriendRequestsResponse>(urlConfig);
+
+  return {
+    data: data.data.filter(item => item.senderId > 0),
+    nextPageExclusiveStartKey: data.nextPageExclusiveStartKey,
+    previousPageExclusiveStartKey: data.previousPageExclusiveStartKey,
+  };
+}
+
+export async function getTrustedFriendRequestsCount(): Promise<number> {
+  const urlConfig: UrlConfig = {
+    url: `${friendsTrustedBase()}/user/trusted-friend-requests/count`,
+    ...trustedUrlConfig(),
+  };
+  const { data } = await http.get<{ count?: number }>(urlConfig);
+  return data.count ?? 0;
+}
+
+export async function ignoreTrustedFriendRequest(senderId: number): Promise<unknown> {
+  const urlConfig: UrlConfig = {
+    url: `${friendsTrustedBase()}/users/${senderId}/ignore-trusted-friend-request`,
+    ...trustedUrlConfig(),
+  };
+  const { data } = await http.post<unknown>(urlConfig, {});
+  return data;
+}
+
+export async function ignoreAllTrustedFriendRequests(): Promise<unknown> {
+  const urlConfig: UrlConfig = {
+    url: `${friendsTrustedBase()}/user/trusted-friend-requests/ignore-all`,
+    ...trustedUrlConfig(),
+  };
+  const { data } = await http.post<unknown>(urlConfig, {});
+  return data;
+}

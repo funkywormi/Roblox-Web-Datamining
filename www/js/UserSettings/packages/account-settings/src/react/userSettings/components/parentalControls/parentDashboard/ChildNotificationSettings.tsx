@@ -63,7 +63,7 @@ export const ChildNotificationSettings = ({
           />
         )}
         {/* Do Not Disturb */}
-        {child.canParentManageChildsDoNotDisturb && (
+        {child.canParentManageChildsDoNotDisturb && childSettings?.[UserSetting.doNotDisturb] && (
           <DoNotDisturbToggle
             onUpdateSetting={onUpdateSetting}
             label={translate(notifications.doNotDisturb.title)}

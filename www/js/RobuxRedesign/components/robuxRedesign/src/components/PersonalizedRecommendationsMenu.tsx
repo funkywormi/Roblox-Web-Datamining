@@ -17,6 +17,11 @@ type PersonalizedRecommendationsMenuProps = {
   surfaceKey: string;
   // Layout classes for the trigger, so the caller can place it without a wrapper element
   className?: string;
+  // Adds a "Report item" entry, for surfaces whose own report button is hidden while the menu shows
+  reportItem?: {
+    title: string;
+    onSelect: () => void;
+  };
 };
 
 /**
@@ -27,6 +32,7 @@ type PersonalizedRecommendationsMenuProps = {
 export function PersonalizedRecommendationsMenu({
   surfaceKey,
   className,
+  reportItem,
 }: PersonalizedRecommendationsMenuProps) {
   const [open, setOpen] = useState(false);
   const translate = useTranslations("Feature.BuyRobux");
@@ -55,6 +61,17 @@ export function PersonalizedRecommendationsMenu({
               openAccountSettings({ surfaceKey });
             }}
           />
+          {reportItem && (
+            <MenuItem
+              value="report-item"
+              title={reportItem.title}
+              leading={<Icon name="icon-regular-circle-i" />}
+              onSelect={() => {
+                setOpen(false);
+                reportItem.onSelect();
+              }}
+            />
+          )}
         </Menu>
       </PopoverContent>
     </Popover>

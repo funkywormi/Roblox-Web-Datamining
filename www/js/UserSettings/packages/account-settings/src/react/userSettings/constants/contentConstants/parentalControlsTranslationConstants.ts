@@ -24,6 +24,8 @@ export default {
     [ParentalControlsPageName.PrivacyRights]: "Heading.PrivacyRequestAndAccountDeletion",
     [ParentalControlsPageName.ManageOnDeviceParent]: "Heading.ManagePin",
     [SettingCategoryPageName.ThirdPartyApplications]: "Label.ThirdPartyApplications",
+    // Same key as the viewer's own Manage Recommendations tab.
+    [SettingCategoryPageName.ManageRecommendations]: "Heading.Tab.PersonalizedRecommendations",
 
     // Spend restrictions
     [SettingCategoryPageName.Spending]: "Heading.SpendingRestriction",

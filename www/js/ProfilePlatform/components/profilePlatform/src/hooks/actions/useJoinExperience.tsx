@@ -19,13 +19,10 @@ interface PresenceService {
 declare const RobloxPresence: PresenceService;
 
 const useJoinExperience = (): ActionHookResult => {
-  const { profileData } = useProfilePlatformContext();
+  const { profileId, profileData } = useProfilePlatformContext();
   const { systemFeedbackService } = useSystemFeedback();
   const { translate } = useTranslation();
-  const presence = RobloxPresence.usePresence(
-    parseInt(profileData?.profileId ?? "0", 10),
-    undefined,
-  );
+  const presence = RobloxPresence.usePresence(parseInt(profileId, 10), undefined);
 
   // TODO: SOCI-2583 (use standard join)
   const handler = useCallback(() => {

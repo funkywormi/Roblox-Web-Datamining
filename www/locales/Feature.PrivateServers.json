@@ -71,5 +71,7 @@
     "Description.PerMonth": "{price}/month",
     "Label.StatusFilterAll": "All",
     "Label.StatusFilterActive": "Active",
-    "Label.StatusFilterInactive": "Inactive"
+    "Label.StatusFilterInactive": "Inactive",
+    "Label.PerMonthAbbv": "{price}/mo",
+    "Label.ExpiresOnDate": "Expires {date}"
 }

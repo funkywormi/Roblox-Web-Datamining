@@ -2,13 +2,7 @@ import React, { useCallback, useState } from "react";
 import classNames from "classnames";
 import { Button } from "@rbx/foundation-ui";
 import type { TranslateFunction, WithTranslationsProps } from "@rbx/core-scripts/react";
-import {
-  Thumbnail2d,
-  ThumbnailTypes,
-  ThumbnailFormat,
-  ThumbnailGameIconSize,
-  ThumbnailAvatarHeadshotSize,
-} from "@rbx/thumbnails";
+import { Thumbnail2d, ThumbnailGameIconSize } from "@rbx/www-common/components/thumbnail";
 import parsingUtils, { GAME_STATS_PLACEHOLDER_STRING } from "../utils/parsingUtils";
 import browserUtils from "../utils/browserUtils";
 import { common, homePage } from "../constants/configConstants";
@@ -91,14 +85,16 @@ export const GameTileBase = ({
       <GameTileOverlayPill gameLayoutData={gameLayoutData} isFocused={!!isFocused} />
       <div className="game-card-thumb-container">
         <Thumbnail2d
-          type={ThumbnailTypes.gameIcon}
+          type="GameIcon"
           size={iconSize}
           targetId={gameData.universeId}
           // The Games Page relies on staticly defined heights for the thumbnail
           // so it needs to use "game-card-thumb" whereas other pages rely on
           // the height being filled
-          containerClass={page === PageContext.GamesPage ? "game-card-thumb" : "game-tile-thumb"}
-          format={ThumbnailFormat.jpeg}
+          containerClassName={
+            page === PageContext.GamesPage ? "game-card-thumb" : "game-tile-thumb"
+          }
+          format="jpeg"
           altName={gameData.name}
         />
       </div>
@@ -305,12 +301,12 @@ export const GameTileUndoButton = ({
 const GameTileAvatarThumbnail = ({ user }: { user: TGetFriendsResponse }): JSX.Element => {
   return (
     <Thumbnail2d
-      type={ThumbnailTypes.avatarHeadshot}
-      size={ThumbnailAvatarHeadshotSize.size48}
+      type="AvatarHeadShot"
+      size="48x48"
       targetId={user.id}
-      containerClass="avatar avatar-headshot avatar-headshot-xs"
+      containerClassName="avatar avatar-headshot avatar-headshot-xs"
       imgClassName="avatar-card-image"
-      format={ThumbnailFormat.webp}
+      format="webp"
       altName={user.displayName}
     />
   );

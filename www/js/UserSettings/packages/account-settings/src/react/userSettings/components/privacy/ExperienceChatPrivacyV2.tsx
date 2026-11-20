@@ -261,7 +261,9 @@ export const ExperienceChatPrivacyV2 = ({
       dangerouslySetInnerHTML={{
         __html: translate(
           shouldShowTFRestrictiveCommsCopy
-            ? privacyTranslationConstants.tfRestrictedExperienceChatPageParentSide
+            ? uiPolicy?.showRemoteOnlySettingsForAnyLinkedParent === true
+              ? privacyTranslationConstants.tfRestrictedExperienceChatPageParentSideWithNotifications
+              : privacyTranslationConstants.tfRestrictedExperienceChatPageParentSide
             : privacyTranslationConstants.parentSideExperienceChatDescriptionV2,
           {
             linkStart: `<a class="text-link" href=${experienceChatHelpPageUrl} target="_blank" rel="noreferrer">`,

@@ -1,5 +1,6 @@
 import React from "react";
 import { StyledText } from "../types/NotificationTemplateTypes";
+import type { JSX } from "react";
 
 export const highlightElement = (e: JSX.Element, key: number): JSX.Element => {
   return <b key={key}>{e}</b>;

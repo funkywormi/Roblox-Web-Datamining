@@ -17,6 +17,7 @@ import { getSectionTrackingProps } from "../../hooks/useScrollTracking";
 import { ExpirationBadge } from "../ExpirationBadge";
 import { resolveLimitedTimeBonusDaysLeft } from "../../utils/resolveLimitedTimeBonusDaysLeft";
 import { PersonalizedRecommendationsMenu } from "../PersonalizedRecommendationsMenu";
+import { EarlyClickScope } from "../../modules/earlyClick";
 
 type ProductListProps = BaseSectionProps & {
   sectionBase: SectionBase;
@@ -74,11 +75,13 @@ export function RedirectProductList({ isPrimary, sectionBase, redirectOptions }:
         )}
       </div>
       <SectionBody isPrimary={isPrimary}>
-        <SectionBodyProductList
-          onProductClick={handleProductClick}
-          products={sectionBase.products ?? []}
-          OverrideProductItemComponent={ProductItemComponent}
-        />
+        <EarlyClickScope scope="redirect">
+          <SectionBodyProductList
+            onProductClick={handleProductClick}
+            products={sectionBase.products ?? []}
+            OverrideProductItemComponent={ProductItemComponent}
+          />
+        </EarlyClickScope>
       </SectionBody>
     </Section>
   );

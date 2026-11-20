@@ -34,7 +34,9 @@ const CannotRecoverAccount: React.FC = () => {
           combinedName={combinedName ?? ""}
           username={username ?? ""}
         />
-        <p className="padding-bottom-large">{resources.Description.CannotRecoverAccount}</p>
+        <p className="text-align-x-left text-body-medium padding-bottom-large">
+          {resources.Description.CannotRecoverAccount}
+        </p>
       </ModernCardBody>
       <ModernCardFooter positiveButton={okButton} negativeButton={null} />
     </React.Fragment>

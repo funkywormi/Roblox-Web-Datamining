@@ -31,7 +31,6 @@ export const ChildContentRestrictionsRoutes = ({
   subpages: Record<string, TSettingsPage>;
   onManageExperience?: TManageExperience;
 } & TSettingUpdateProps): JSX.Element => {
-  const displayContentMaturity = child.canParentAccessChildBasicPrivacySettings;
   const remoteParentChild = "parentUserId" in child ? child : undefined;
   const { translate } = useTranslation();
   const [childSettings] = useGetSettingsAndOptions(child.userId);
@@ -39,6 +38,9 @@ export const ChildContentRestrictionsRoutes = ({
   const { data: uiPolicy } = useGetSettingsUiPolicyQuery();
 
   const displayAllowedExperiences = uiPolicy?.isAllowedExperiencesEnabled;
+  const displayContentMaturity =
+    child.canParentAccessChildBasicPrivacySettings &&
+    childSettings?.[UserSetting.contentAgeRestriction];
   const displaySensitiveIssues = childSettings?.[UserSetting.allowSensitiveIssues];
   const displayPrivatePlaytest =
     child.canParentManageChildsPrivatePlaytestSetting &&

@@ -515,6 +515,7 @@ export const DefaultPlayButton = ({
           eventProperties={eventProperties}
           wasmJoinId={wasmJoinId}
           playOnWebVariant={PlayOnWebVariant.TwoButton}
+          pageContext={pageContext}
         />
       ),
     },
@@ -582,6 +583,7 @@ export const DefaultPlayButton = ({
               eventProperties={eventProperties}
               wasmJoinId={wasmJoinId}
               playOnWebVariant={PlayOnWebVariant.OneButton}
+              pageContext={pageContext}
             />
           );
           break;

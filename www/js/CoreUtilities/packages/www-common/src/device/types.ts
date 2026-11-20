@@ -1,4 +1,7 @@
 import * as z from "zod/mini";
+import { AppType } from "./appType";
+
+export { AppType } from "./appType";
 
 export const OperatingSystem = [
   "ios",
@@ -13,18 +16,6 @@ export const OperatingSystem = [
   "unknown",
 ] as const;
 export type OperatingSystem = (typeof OperatingSystem)[number];
-
-export const AppType = [
-  "android",
-  "ios",
-  "xbox",
-  "uwp",
-  "amazon",
-  "win32",
-  "universalApp",
-  "unknown",
-] as const;
-export type AppType = (typeof AppType)[number];
 
 export const DeviceType = ["computer", "tablet", "phone", "console", "vr", "unknown"] as const;
 export type DeviceType = (typeof DeviceType)[number];

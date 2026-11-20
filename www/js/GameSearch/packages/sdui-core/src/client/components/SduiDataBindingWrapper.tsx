@@ -4,10 +4,12 @@ import type {
   SduiActionResolver,
   SduiComponentConfig,
   SduiErrorReporter,
+  SduiExtraLocalProps,
   SduiPageContext,
 } from "../../types";
 import type { SduiComponentRegistry } from "../../registry/SduiComponentRegistry";
 import { SduiRenderer } from "../../renderer/SduiRenderer";
+import { shallowEqual } from "../../signals/computedEqual";
 import { resolveInteractiveConfig } from "../utils/resolveInteractiveConfig";
 
 /** Props for the client-only `interactiveWrapper` passed into `SduiRenderer`. */
@@ -17,6 +19,20 @@ export interface SduiDataBindingWrapperProps {
   errorReporter: SduiErrorReporter;
   pageContext: SduiPageContext;
   actionResolver?: SduiActionResolver;
+  extraLocalProps?: SduiExtraLocalProps;
+}
+
+function areSduiDataBindingWrapperPropsEqual(
+  previous: SduiDataBindingWrapperProps,
+  next: SduiDataBindingWrapperProps,
+): boolean {
+  const { extraLocalProps: previousExtraLocalProps, ...previousRest } = previous;
+  const { extraLocalProps: nextExtraLocalProps, ...nextRest } = next;
+
+  return (
+    shallowEqual(previousRest, nextRest) &&
+    shallowEqual(previousExtraLocalProps, nextExtraLocalProps)
+  );
 }
 
 /**
@@ -32,6 +48,7 @@ export const SduiDataBindingWrapper = memo(function SduiDataBindingWrapper({
   errorReporter,
   pageContext,
   actionResolver,
+  extraLocalProps,
 }: SduiDataBindingWrapperProps) {
   useSignals();
 
@@ -52,8 +69,9 @@ export const SduiDataBindingWrapper = memo(function SduiDataBindingWrapper({
       interactiveWrapper={SduiDataBindingWrapper}
       actionResolver={actionResolver}
       propStatuses={propStatuses}
+      extraLocalProps={extraLocalProps}
     />
   );
-});
+}, areSduiDataBindingWrapperPropsEqual);
 
 SduiDataBindingWrapper.displayName = "SduiDataBindingWrapper";

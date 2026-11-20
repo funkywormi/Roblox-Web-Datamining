@@ -31,6 +31,11 @@ export type WalkerAction =
   | { type: typeof WalkerActionType.ContinueFailed; message?: string }
   | { type: typeof WalkerActionType.AcknowledgeError };
 
+/** Terminal outcomes the wizard presents as an error screen rather than closing as Completed. */
+export function isErrorOutcome(outcome?: string): boolean {
+  return outcome === "Error" || outcome === "RateLimited";
+}
+
 function appendStep(history: FlowStep[], step: FlowStep): FlowStep[] {
   return [...history, step];
 }
@@ -72,7 +77,7 @@ function enterFragment(
   const hasEntry = response.entry !== "";
   const entryRenderable = hasEntry && response.nodes[response.entry] != null;
 
-  const presentingError = !hasEntry && response.outcome === "Error";
+  const presentingError = !hasEntry && isErrorOutcome(response.outcome);
   let exitResult: FlowExitResult | undefined;
   if (!hasEntry) {
     exitResult = presentingError
