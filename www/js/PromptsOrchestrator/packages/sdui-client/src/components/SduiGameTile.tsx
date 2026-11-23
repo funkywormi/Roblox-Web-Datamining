@@ -1,7 +1,7 @@
-import React, { isValidElement } from "react";
+import React, { isValidElement, useMemo, useRef } from "react";
 import { clsx } from "clsx";
-import { Thumbnail2d, ThumbnailFormat } from "@rbx/thumbnails";
 import {
+  type SduiManagedChildList,
   type SduiRendererInjectedProps,
   type SduiResolvedAction,
   type SduiTokenOrLiteral,
@@ -10,6 +10,7 @@ import {
   getSduiToken,
   toHtmlElement,
   parseImageString,
+  renderSduiNestedChild,
   SUPPORTED_ICON_CLASSES,
 } from "@rbx/sdui-core";
 import { abbreviateNumber } from "@rbx/core-scripts/format/number";
@@ -18,6 +19,10 @@ import { useHoverIntent } from "@rbx/sdui-core/client";
 import "./css/sduiGameTile.css";
 import { SDUI_GAME_TILE_DEFAULTS } from "../consts/defaults";
 import { useIsEligibleForVideoPreview } from "../hooks/useIsEligibleForVideoPreview";
+import { useIsTouchVideoAutoplay } from "../hooks/useIsTouchVideoAutoplay";
+import { useViewportVideoAutoplay } from "../hooks/useViewportVideoAutoplay";
+import { VideoPlaybackAutoplayContext } from "./sduiVideoPlayer/VideoPlaybackAutoplayContext";
+import { WwwThumbnail2d } from "./primitives/WwwThumbnail2d";
 
 const RATING_ICON_CLASS = SUPPORTED_ICON_CLASSES["icons/status/games/rating_small"];
 const PLAYER_COUNT_ICON_CLASS = SUPPORTED_ICON_CLASSES["icons/status/games/people-playing_small"];
@@ -42,7 +47,8 @@ export interface SduiGameTileProps extends SduiRendererInjectedProps {
   ctaButtonComponent?: React.ReactNode;
   footerComponent?: React.ReactNode;
   imageComponent?: React.ReactNode;
-  videoPlayer?: React.ReactNode;
+  /** `LazyNestedComponentProp`: arrives unrendered so the tile controls when it mounts. */
+  videoPlayer?: React.ReactNode | SduiManagedChildList;
   thumbnailOverlayComponent?: React.ReactNode;
   titleComponent?: React.ReactNode;
   thumbnailBackgroundStyle?: string;
@@ -68,8 +74,8 @@ export interface SduiGameTileProps extends SduiRendererInjectedProps {
  * Client-side game tile. Renders a thumbnail image with title text, an
  * optional footer, and an optional CTA button.
  *
- * Lives in sdui-client (not sdui-core) because it depends on @rbx/thumbnails
- * (Thumbnail2d), which is a browser-only package.
+ * Lives in sdui-client (not sdui-core) because it renders Thumbnail2d, a client component that
+ * fetches thumbnails.
  *
  * Structure:
  *   div.sdui-game-tile
@@ -119,14 +125,34 @@ export function SduiGameTile({
 
   const hasActivationHandler = Boolean(onActivated?.onActivated);
 
+  const tileRef = useRef<HTMLDivElement>(null);
   const { isHovered, onHoverStart, onHoverEnd } = useHoverIntent();
   const hasVideo = videoPlayer != null && Boolean(universeId);
+  // A coarse primary pointer cannot hover, so the video plays while the tile is in the viewport.
+  const isTouchInput = useIsTouchVideoAutoplay();
+  const isHoverPlaybackEnabled = hasVideo && !isTouchInput;
   const { isEligibleForVideoPreview, isLoadingEligibility } = useIsEligibleForVideoPreview(
     universeId ?? "",
     hasVideo,
   );
-  const showEligibilityShimmer = isHovered && hasVideo && isLoadingEligibility;
-  const showEligiblePlayer = isHovered && hasVideo && isEligibleForVideoPreview;
+  // Ineligible tiles never mount a player, so they must not claim the autoplay slot.
+  // Reduced motion is checked inside the hook, at registration time.
+  const {
+    markEnded,
+    markBlocked,
+    isPlaybackRequested: isViewportPlaybackRequested,
+  } = useViewportVideoAutoplay({
+    enabled: hasVideo && isTouchInput && isEligibleForVideoPreview,
+    universeId,
+    elementRef: tileRef,
+  });
+  const playbackCallbacks = useMemo(
+    () => ({ onPlaybackEnded: markEnded, onPlaybackBlocked: markBlocked }),
+    [markEnded, markBlocked],
+  );
+  const isPlaybackRequested = isTouchInput ? isViewportPlaybackRequested : isHovered;
+  const showEligibilityShimmer = isPlaybackRequested && hasVideo && isLoadingEligibility;
+  const showEligiblePlayer = isPlaybackRequested && hasVideo && isEligibleForVideoPreview;
 
   // image node: prefer passed imageComponent, then thumbnail/img, then placeholder
   const parsedImage = typeof image === "string" ? parseImageString(image) : null;
@@ -134,14 +160,9 @@ export function SduiGameTile({
   const imageNode =
     imageComponent ??
     (parsedImage?.kind === "thumbnail" ? (
-      <Thumbnail2d
-        type={parsedImage.thumbnail.type}
-        targetId={parsedImage.thumbnail.targetId}
-        format={ThumbnailFormat.webp}
-        size={parsedImage.thumbnail.size}
-        includeBackground={parsedImage.thumbnail.includeBackground}
-        includeProfileFrame={parsedImage.thumbnail.includeProfileFrame}
-        containerClass="sdui-thumbnail-image-container"
+      <WwwThumbnail2d
+        thumbnail={parsedImage.thumbnail}
+        containerClassName="sdui-thumbnail-image-container"
       />
     ) : isValidElement(image) ? (
       image
@@ -230,7 +251,9 @@ export function SduiGameTile({
                 className="shimmer absolute inset-[0] pointer-events-none"
               />
             ) : (
-              videoPlayer
+              <VideoPlaybackAutoplayContext.Provider value={playbackCallbacks}>
+                {renderSduiNestedChild(videoPlayer)}
+              </VideoPlaybackAutoplayContext.Provider>
             )}
           </div>
         ) : null}
@@ -278,6 +301,7 @@ export function SduiGameTile({
 
   return (
     <div
+      ref={tileRef}
       data-testid="sdui-game-tile"
       // Use relative positioning on this parent element and static positioning on the
       // main content element so the main content's stretched ::after
@@ -301,10 +325,10 @@ export function SduiGameTile({
           ? { borderRadius: cornerRadiusPx }
           : undefined
       }
-      onMouseOver={hasVideo ? onHoverStart : undefined}
-      onMouseLeave={hasVideo ? onHoverEnd : undefined}
-      onFocus={hasVideo ? onHoverStart : undefined}
-      onBlur={hasVideo ? onHoverEnd : undefined}
+      onMouseOver={isHoverPlaybackEnabled ? onHoverStart : undefined}
+      onMouseLeave={isHoverPlaybackEnabled ? onHoverEnd : undefined}
+      onFocus={isHoverPlaybackEnabled ? onHoverStart : undefined}
+      onBlur={isHoverPlaybackEnabled ? onHoverEnd : undefined}
     >
       {mainContent}
       {isContained && (titleNode != null || footerRow != null) ? (

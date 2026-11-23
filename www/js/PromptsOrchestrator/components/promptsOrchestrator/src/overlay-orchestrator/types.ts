@@ -1,4 +1,5 @@
 import "@rbx/core-scripts/global";
+import type { DialogRenderFunction } from "../overlay/types";
 
 import type { ClientAttributes, PromptEntry } from "../common/types/promptTypes";
 import type { AppPage } from "../common/constants/pageConstants";
@@ -24,6 +25,7 @@ export type OverlayNotOpenedReason =
   (typeof OverlayNotOpenedReason)[keyof typeof OverlayNotOpenedReason];
 
 export const OverlayRenderer = {
+  CustomRenderDialog: "custom-render-dialog",
   DialogPrompt: "dialog-prompt",
   FaeUpsell: "fae-upsell",
 } as const;
@@ -56,11 +58,13 @@ type NotOpenedOutcome = {
 
 export type DedupePolicy = "in-flight" | "session";
 
+export type OverlayPromptTriggerType = "action" | "prompts-service";
+
 export type BaseOverlayPrompt = {
   id: string;
   dedupeKey: string;
   dedupePolicy: DedupePolicy;
-  triggerType: "action" | "prompts-service";
+  triggerType: OverlayPromptTriggerType;
 };
 
 /**
@@ -83,6 +87,23 @@ export type SduiPromptPayload = {
 
 type DialogPromptPayload = SduiPromptPayload;
 
+type CustomRenderDialogPayload = {
+  render: DialogRenderFunction;
+  appPage?: AppPage;
+};
+
+type CustomRenderDialogOutcome =
+  | ClosedOutcomeWithoutError<
+      Extract<
+        OverlayClosedReason,
+        | typeof OverlayClosedReason.Completed
+        | typeof OverlayClosedReason.Dismissed
+        | typeof OverlayClosedReason.Navigation
+      >
+    >
+  | ClosedOutcomeWithError
+  | NotOpenedOutcome;
+
 type FaeOutcome =
   | ClosedOutcomeWithoutError<"success" | "failed" | "navigation">
   | ClosedOutcomeWithError
@@ -98,6 +119,10 @@ type FaeUpsellPayload = {
 };
 
 type OverlayRendererContract = {
+  [OverlayRenderer.CustomRenderDialog]: {
+    payload: CustomRenderDialogPayload;
+    outcome: CustomRenderDialogOutcome;
+  };
   [OverlayRenderer.DialogPrompt]: {
     payload: DialogPromptPayload;
     outcome: DialogOutcome;

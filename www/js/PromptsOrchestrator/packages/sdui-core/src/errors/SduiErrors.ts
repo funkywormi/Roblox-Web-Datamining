@@ -12,6 +12,7 @@ export enum SduiErrorName {
   FailedToDecodeResponse = "FailedToDecodeResponse",
   FailedToExecuteAction = "FailedToExecuteAction",
   FailedToEvaluateConditionalProp = "FailedToEvaluateConditionalProp",
+  FailedToFetchAppPolicy = "FailedToFetchAppPolicy",
   FailedToFetchPage = "FailedToFetchPage",
   FailedToFindBindingSource = "FailedToFindBindingSource",
   FailedToFindTemplate = "FailedToFindTemplate",

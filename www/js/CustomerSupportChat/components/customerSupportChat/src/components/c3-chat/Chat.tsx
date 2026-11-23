@@ -12,6 +12,7 @@ import ChatInput from "./chat-input/ChatInput";
 import ChatFeedback from "./chat-feedback/ChatFeedback";
 import SupportChatSession from "../support-chat-landing/SupportChatSession";
 import SupportChatComposer from "../support-chat-landing/SupportChatComposer";
+import { AI_DISCLOSURE } from "../support-chat-landing/SupportChatDisclaimers";
 import SupportChatContent from "../support-chat-landing/SupportChatContent";
 import {
   SupportChatAssistantText,
@@ -59,7 +60,8 @@ const Chat: React.FC<ChatProps> = ({
   const { messages, handleSendMessage, isChatEnded, waitingForResponse } = useChat(chatConfig);
 
   if (embedded) {
-    const latestMessage = messages.at(-1);
+    // The local failure line is no answer, so it never takes over the reply's control.
+    const latestMessage = messages.filter(message => !message.isClientError).at(-1);
     // Only the newest answer's control can be used, and only while nothing else is pending.
     const answerable =
       latestMessage && !latestMessage.isUser && !waitingForResponse && !isChatEnded
@@ -71,9 +73,14 @@ const Chat: React.FC<ChatProps> = ({
         scrollKey={`${messages.length}-${waitingForResponse}-${isChatEnded}`}
         dock={
           isChatEnded ? (
-            <p className="c3-chat-ended-message-container">
-              {t("Chat.Description.ConversationEnded")}
-            </p>
+            <div className="c3-chat-ended">
+              <p className="c3-chat-ended-message-container">
+                {t("Chat.Description.ConversationEnded")}
+              </p>
+              <p className="c3-chat-ended-disclosure text-caption-small content-default">
+                {AI_DISCLOSURE}
+              </p>
+            </div>
           ) : (
             <SupportChatComposer
               onSubmit={handleSendMessage}

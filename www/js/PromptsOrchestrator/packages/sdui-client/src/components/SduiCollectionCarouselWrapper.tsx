@@ -159,8 +159,10 @@ export function SduiCollectionCarousel({
           data-testid={`sdui-carousel-item-${index}`}
           className="height-full"
           aria-hidden={!isVisible}
-          // @ts-expect-error @types/react does not include the standard inert attribute yet.
-          inert={isVisible ? undefined : ""}
+          // Set inert on the DOM node: React 17 needs inert="" but React 19 drops it as a boolean.
+          ref={node => {
+            node?.toggleAttribute("inert", !isVisible);
+          }}
         >
           {items?.renderItem(materializedConfig, index) ?? <React.Fragment key={index} />}
         </div>

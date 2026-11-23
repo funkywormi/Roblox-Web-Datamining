@@ -75,19 +75,31 @@ export const usePostChatMessage = (
   conversationId: string,
   conversationAuthToken: string,
 ): { postChatMessage: (interaction: C3Interaction) => void; failureCount: number } => {
-  const { mutate: postChatMessage, failureCount } = useMutation({
-    mutationFn: async (interaction: C3Interaction) => {
+  const { mutate, failureCount } = useMutation({
+    // The idempotency key travels with the mutation variables, so every retry of the
+    // same message reuses it. Creating it inside mutationFn would give each retry a new
+    // key, and the backend could not tell a retry from a second message.
+    mutationFn: async ({
+      interaction,
+      idempotencyKey,
+    }: {
+      interaction: C3Interaction;
+      idempotencyKey: string;
+    }) => {
       const urlConfig = buildPostMessageUrlConfig(conversationId);
 
       const { data: postData } = await httpService.post(urlConfig, {
         conversationAuthToken,
-        idempotencyKey: uuidService.generateRandomUuid(),
+        idempotencyKey,
         interaction,
       });
       return postData;
     },
     retry: CHAT_MESSAGE_POST_RETRIES,
   });
+  const postChatMessage = (interaction: C3Interaction): void => {
+    mutate({ interaction, idempotencyKey: uuidService.generateRandomUuid() });
+  };
   return {
     postChatMessage,
     failureCount,

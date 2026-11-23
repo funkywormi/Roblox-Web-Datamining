@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import type { ValueOf } from "@rbx/core-types";
+import type { ValueOf } from "@rbx/core-lib";
 import { getAbsoluteUrl } from "@rbx/core-scripts/endpoints";
 import type { Icon } from "@rbx/foundation-ui";
 
@@ -16,6 +16,9 @@ export const appDownloadType = {
 } as const;
 
 export const pageName = "downloadV2";
+
+/** The `source` the app download banner reports its downloadV2 events under. */
+export const appDownloadBannerSource = "appDownloadBanner";
 
 export const installInstructionsDelayMs = 1000;
 

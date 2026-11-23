@@ -17,7 +17,12 @@ const SenderAvatar = ({
     activeTab !== MESSAGE_TABS.sent && message.sender.id === ROBLOX_USER.id;
 
   return (
-    <a href={user.profileLink} className="size-800 shrink-0 flex items-center justify-center">
+    // Named here, not by the thumbnail's alt: a thumbnail that fails to load leaves the link unnamed.
+    <a
+      href={user.profileLink}
+      className="size-800 shrink-0 flex items-center justify-center"
+      aria-label={user.displayName}
+    >
       {isRobloxSystemUser ? (
         <SystemRobloxLogo className="size-800" />
       ) : (

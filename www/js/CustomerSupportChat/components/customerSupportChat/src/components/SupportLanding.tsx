@@ -5,7 +5,6 @@ import { WithTranslationsProps } from "@rbx/core-scripts/react";
 import { authenticatedUser } from "@rbx/core-scripts/legacy/header-scripts";
 import SupportForm from "../SupportForm";
 import SupportChatLanding from "./support-chat-landing/SupportChatLanding";
-import SupportSignInGate from "./support-chat-landing/SupportSignInGate";
 import { Chat } from "./c3-chat/Chat";
 import {
   SupportUiChoice,
@@ -17,11 +16,6 @@ import {
   storeSupportUiChoice,
 } from "../core/helpers/supportUiPrototype";
 import { isProd } from "../core/helpers/supportEnvironment";
-import {
-  declineSupportSignIn,
-  hasDeclinedSupportSignIn,
-} from "../core/helpers/supportSignInDecline";
-import { supportLoginPath } from "../core/helpers/supportLoginPath";
 import {
   fitSupportFormFallbackMessage,
   SupportFormPrefill,
@@ -58,7 +52,6 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
   // rather than the URL so it can't be bookmarked to skip the new experience, and a refresh goes
   // back to the new experience.
   const [hasFallenBackToForm, setHasFallenBackToForm] = useState(false);
-  const [hasDeclinedSignIn, setHasDeclinedSignIn] = useState(hasDeclinedSupportSignIn);
   const [supportFormPrefill, setSupportFormPrefill] = useState<SupportFormPrefill>();
   // Set once the visitor edits the prefilled article title, so a remounted landing leaves it out.
   const [articlePrefillDismissed, setArticlePrefillDismissed] = useState(false);
@@ -70,8 +63,7 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
   const urlChoice = isEmployee ? getSupportUiChoiceFromUrl(search) : undefined;
 
   const isSignedIn = authenticatedUser.isAuthenticated;
-  // The preview itself is limited to sitetest. Signed-out visitors there get the gate first.
-  // Declining sign-in stays on the form for this browser tab, including after a trip to chat.
+  // The preview itself is limited to sitetest. A signed-out visitor gets the regular form.
   // The failure redirect's form URL is limited the same way, so it can't skip the backend's
   // choice of experience in production.
   const showRegularForm = !isProd && isSupportRegularFormUrl(search);
@@ -80,9 +72,9 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
     !isProd &&
     !showRegularForm &&
     isSupportLandingPreviewUrl(search);
-  const showSignInGate = isLandingPreview && !isSignedIn && !hasDeclinedSignIn;
+  const showSignedOutPreview = isLandingPreview && !isSignedIn;
   const getShowNewExperience = (): boolean => {
-    if (hasFallenBackToForm || hasDeclinedSignIn) {
+    if (hasFallenBackToForm) {
       return false;
     }
     if (!isEmployee) {
@@ -99,7 +91,7 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
   const showLanding =
     metadataReady &&
     chatConfig === null &&
-    !showSignInGate &&
+    !showSignedOutPreview &&
     !showRegularForm &&
     ((showLandingPreview && !hasFallenBackToForm) || showNewExperience);
 
@@ -156,8 +148,6 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
         setSupportFormPrefill({
           message: fallback.message,
           messageWasShortened: fallback.wasShortened,
-          // Tickets from the new experience stay tagged, as they were from the prototype.
-          fromSupportAsk: true,
         });
         setHasFallenBackToForm(true);
         history.replace({ pathname, search: regularSupportFormSearch(search) });
@@ -174,30 +164,12 @@ const SupportLanding: React.FC<WithTranslationsProps> = props => {
     setSupportFormPrefill(undefined);
   };
 
-  if (showSignInGate) {
-    // pathname keeps a locale prefix such as /fr, on both the login page and the return URL.
-    const returnUrl = `${window.location.origin}${pathname}${search}`;
-    return (
-      <SupportSignInGate
-        onSignIn={() => {
-          window.location.assign(
-            `${supportLoginPath(pathname)}?returnUrl=${encodeURIComponent(returnUrl)}`,
-          );
-        }}
-        onContinueWithoutSigningIn={() => {
-          declineSupportSignIn();
-          setHasDeclinedSignIn(true);
-        }}
-      />
-    );
-  }
-
   if (chatConfig !== null) {
     return <Chat embedded c3ChatConfig={chatConfig} initialDraft={chatInitialDraft} />;
   }
 
   const renderExperience = () => {
-    if (showRegularForm) {
+    if (showRegularForm || showSignedOutPreview) {
       return <SupportForm {...props} prefill={supportFormPrefill} />;
     }
     if ((showLandingPreview && !hasFallenBackToForm) || showNewExperience) {

@@ -1,18 +1,18 @@
 /** Query key that lets an employee pick the `/support` experience. Not linked from production. */
 export const SUPPORT_UI_PROTOTYPE_QUERY_PARAM = "rbxSupportUi";
 
-/** `prototype` is the ask prototype; `classic` is the support form. */
+/** `prototype` is the stored employee choice for the new landing; `classic` is the support form. */
 export type SupportUiChoice = "prototype" | "classic";
 
 /**
  * Sitetest preview of the new landing. It is not a stored choice, so opening it does not
- * replace the ask prototype. Remove the prototype once this landing is ready to take its place.
+ * replace an employee's saved choice.
  */
 const SUPPORT_UI_LANDING_PREVIEW = "landing";
 
 /**
- * Opens the regular support form and skips the landing and the sign-in gate. A failed
- * conversation would otherwise land back on one of those. This value is not stored, and like
+ * Opens the regular support form and skips the landing. A failed
+ * conversation would otherwise land back on the landing. This value is not stored, and like
  * the landing preview it only applies outside production.
  */
 const SUPPORT_UI_REGULAR_FORM = "form";

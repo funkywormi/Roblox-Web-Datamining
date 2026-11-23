@@ -69,6 +69,16 @@ const useChat = (
   const [waitingForResponse, setWaitingForResponse] = useState(true);
   const [lastMessageOrdinal, setLastMessageOrdinal] = useState(0);
   const [isChatEnded, setChatEnded] = useState(false);
+  // A turn runs from a send (or the first message) until a reply arrives. Failure counts belong
+  // to the turn that is still open: a POST count lingers until the next send, and polling goes on
+  // after a reply, so neither may add an error once the turn has been answered. The ref lets the
+  // error effect see an answer that arrived in the same commit.
+  const [isTurnAnswered, setTurnAnsweredState] = useState(false);
+  const isTurnAnsweredRef = useRef(false);
+  const setTurnAnswered = (answered: boolean) => {
+    isTurnAnsweredRef.current = answered;
+    setTurnAnsweredState(answered);
+  };
   const { resetChatTimeout, clearChatTimeout } = useChatTimeout(() => {
     setWaitingForResponse(false);
   });
@@ -109,7 +119,12 @@ const useChat = (
                 isUser: false,
               }) as C3ChatMessage,
           );
-        setMessages(prevMessages => [...prevMessages, ...newMessages]);
+        // A poll failure is only a stand-in. The stored reply replaces it.
+        setMessages(prevMessages => [
+          ...prevMessages.filter(message => !message.isClientError),
+          ...newMessages,
+        ]);
+        setTurnAnswered(true);
         setWaitingForResponse(false);
         setLastMessageOrdinal(c3GetMessageResponse[c3GetMessageResponse.length - 1]!.ordinal);
         // conversation ended
@@ -143,21 +158,36 @@ const useChat = (
       isUser: true,
     };
     postChatMessage(newC3Interaction);
-    setMessages(prevMessages => [...prevMessages, newMessage]);
+    // A new send opens a new turn, so the previous failure no longer applies.
+    setMessages(prevMessages => [
+      ...prevMessages.filter(prevMessage => !prevMessage.isClientError),
+      newMessage,
+    ]);
+    setTurnAnswered(false);
     setWaitingForResponse(true);
     resetChatTimeout();
   };
 
-  // there might be errors, but we're still retrying get the messages, so we don't want to show the error message
-  // until the timeout is reached which sets waiutingForResponse to false
+  // We keep retrying while a reply is pending, so a failure only shows once waiting has ended,
+  // and only for a turn that no reply has answered. React Query resets a query's failure count to 0 at the start of every refetch, so during an
+  // outage the count cycles 0 -> 1 -> 0 and this flag goes false -> true on each poll. The
+  // line below is therefore kept until a reply arrives or the user sends, not tied to the flag.
   const showErrorMessage =
-    (failureCountGetMessage || failureCountPostMessage) && !waitingForResponse;
+    (failureCountGetMessage > 0 || failureCountPostMessage > 0) &&
+    !waitingForResponse &&
+    !isTurnAnswered;
 
-  // show an error message if we have a new error: when showErrorMessage changes from `false` to `true`
   useEffect(
     () => {
-      if (showErrorMessage) {
-        setMessages(prevMessages => [
+      if (!showErrorMessage || isTurnAnsweredRef.current) {
+        return;
+      }
+
+      setMessages(prevMessages => {
+        if (prevMessages.some(message => message.isClientError)) {
+          return prevMessages;
+        }
+        return [
           ...prevMessages,
           {
             id: uuidService.generateRandomUuid(),
@@ -165,11 +195,12 @@ const useChat = (
             type: C3ChatMessageType.Message,
             ordinal: lastMessageOrdinal + 1,
             isUser: false,
+            isClientError: true,
           },
-        ]);
-      }
+        ];
+      });
     },
-    // TODO: fix me
+    // Later failed polls find the line already there and leave it alone.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [showErrorMessage],
   );

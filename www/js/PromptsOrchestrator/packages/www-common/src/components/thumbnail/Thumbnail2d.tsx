@@ -1,24 +1,25 @@
 import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@rbx/foundation-ui";
+import { retryPendingThumbnail, THUMBNAIL_PENDING } from "./pendingPoll";
 import { resolveThumbnail } from "./thumbnailService";
-import { logMeasurement } from "./thumbnailMeasurement";
+import { resolveIncludeBackground } from "./headshotBackground";
+import {
+  logMeasurement,
+  metricThumbnailType,
+  shouldSampleMeasurement,
+} from "./thumbnailMeasurement";
 import type { ResolvedThumbnail, ThumbnailFormat, ThumbnailType } from "./types";
 import "./thumbnailContainer.css";
 import "./thumbnailStatus.css";
 
-const MAX_PENDING_POLLS = 5;
-
-// useQuery only registers a failure on a throw, so a still-generating thumbnail throws this to drive
-// retry (the poll) — not a real error.
-const PENDING = new Error("thumbnail pending");
-
 // Status placeholder class (styled by thumbnailStatus.css); "" when the image is ready or loading.
+// An image the API returns for these states is drawn over the placeholder, as .NET does.
 const statusClass = (data: ResolvedThumbnail | undefined, isError: boolean, error: unknown) => {
   if (data?.state === "Blocked") return "icon-blocked";
   if (data?.state === "InReview") return "icon-in-review";
   if (data?.state === "Error") return "icon-broken";
-  if (isError) return error === PENDING ? "icon-pending" : "icon-broken";
+  if (isError) return error === THUMBNAIL_PENDING ? "icon-pending" : "icon-broken";
   return "";
 };
 
@@ -46,7 +47,7 @@ const Thumbnail2d = ({
   format,
   version,
   headShape,
-  includeBackground,
+  includeBackground: includeBackgroundProp,
   includeProfileFrame,
   altName = "",
   imgClassName = "",
@@ -57,6 +58,8 @@ const Thumbnail2d = ({
   const startRef = useRef(Date.now());
   const pollCountRef = useRef(0);
   const loggedRef = useRef(false);
+  const loadLoggedRef = useRef(false);
+  const includeBackground = resolveIncludeBackground(type, includeBackgroundProp);
 
   const { data, isError, error, isPending, isLoading } = useQuery({
     queryKey: [
@@ -74,7 +77,7 @@ const Thumbnail2d = ({
     // focus/mount/reconnect. Error and timed-out Pending results hold no data and still refetch.
     staleTime: Infinity,
     // Only the Pending poll retries here; transient transport failures are retried in http.post.
-    retry: (failureCount, err) => err === PENDING && failureCount < MAX_PENDING_POLLS,
+    retry: retryPendingThumbnail,
     queryFn: async (): Promise<ResolvedThumbnail> => {
       const resolved = await resolveThumbnail({
         type,
@@ -86,10 +89,17 @@ const Thumbnail2d = ({
         includeBackground,
         includeProfileFrame,
       });
+      pollCountRef.current += resolved.transportRetries ?? 0;
       if (resolved.state === "Pending") {
         pollCountRef.current += 1;
         // eslint-disable-next-line no-restricted-syntax -- useQuery signals "retry" only via a throw
-        throw PENDING;
+        throw THUMBNAIL_PENDING;
+      }
+      if (shouldSampleMeasurement()) {
+        logMeasurement("ThumbnailStatusCountWebapp", {
+          Status: resolved.state,
+          ThumbnailType: metricThumbnailType(type),
+        });
       }
       return resolved;
     },
@@ -100,41 +110,41 @@ const Thumbnail2d = ({
     startRef.current = Date.now();
     pollCountRef.current = 0;
     loggedRef.current = false;
+    loadLoggedRef.current = false;
   }, [type, targetId, size, format, version, headShape, includeBackground, includeProfileFrame]);
 
-  // Fire load measurements once per resolution (react-query v5 has no onSuccess/onError callback).
+  // Fire the timeout measurement once per request (react-query v5 has no onError callback).
   useEffect(() => {
-    if (loggedRef.current) {
+    if (loggedRef.current || !isError || error !== THUMBNAIL_PENDING) {
       return;
     }
-    const thumbnailType = `${type}_2d`;
-    if (data) {
-      loggedRef.current = true;
-      logMeasurement("ThumbnailStatusCountWebapp", {
-        Status: data.state,
-        ThumbnailType: thumbnailType,
-      });
-      if (data.state === "Completed") {
-        const retries = pollCountRef.current;
-        logMeasurement("ThumbnailLoadDurationWebapp", {
-          Status: "Success",
-          ThumbnailType: thumbnailType,
-          Value: String(Date.now() - startRef.current),
-        });
-        logMeasurement(
-          retries === 0 ? "ThumbnailNoRetrySuccessWebapp" : "ThumbnailRetryWebapp",
-          retries === 0
-            ? { ThumbnailType: thumbnailType }
-            : { ThumbnailType: thumbnailType, Value: String(retries) },
-        );
-      }
-    } else if (isError && error === PENDING) {
-      loggedRef.current = true;
-      logMeasurement("ThumbnailTimeoutWebapp", { ThumbnailType: thumbnailType });
+    loggedRef.current = true;
+    if (shouldSampleMeasurement()) {
+      logMeasurement("ThumbnailTimeoutWebapp", { ThumbnailType: metricThumbnailType(type) });
     }
-  }, [data, isError, error, type]);
+  }, [isError, error, type]);
 
-  const imageUrl = data?.state === "Completed" ? data.imageUrl : null;
+  const handleLoad = () => {
+    if (!loadLoggedRef.current && data?.state === "Completed") {
+      loadLoggedRef.current = true;
+      const thumbnailType = metricThumbnailType(type);
+      const retries = pollCountRef.current;
+      logMeasurement("ThumbnailLoadDurationWebapp", {
+        Status: "Success",
+        ThumbnailType: thumbnailType,
+        Value: String(Date.now() - startRef.current),
+      });
+      logMeasurement(
+        retries === 0 ? "ThumbnailNoRetrySuccessWebapp" : "ThumbnailRetryWebapp",
+        retries === 0
+          ? { ThumbnailType: thumbnailType }
+          : { ThumbnailType: thumbnailType, Value: String(retries) },
+      );
+    }
+    onLoad?.();
+  };
+
+  const imageUrl = data?.imageUrl ?? null;
   const stateClass = statusClass(data, isError, error);
   // isPending is react-query v5; v4 exposes the same state as isLoading. The v5 dev types don't
   // express that isPending is undefined under a v4 host, so the nullish check reads as unnecessary.
@@ -145,19 +155,27 @@ const Thumbnail2d = ({
     "thumbnail-2d-container float-left overflow-hidden",
     containerClassName,
     stateClass,
+    showSkeleton && "thumbnail-2d-loading",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
     <span className={wrapperClass}>
-      {showSkeleton && <Skeleton variant="Rectangle" width="100%" height="100%" />}
-      {imageUrl != null && (
+      {showSkeleton && (
+        <Skeleton
+          className="thumbnail-2d-skeleton"
+          variant="Rectangle"
+          width="100%"
+          height="100%"
+        />
+      )}
+      {imageUrl != null && imageUrl !== "" && (
         <img
           className={["size-full", imgClassName].filter(Boolean).join(" ")}
           src={imageUrl}
           alt={altName}
-          onLoad={onLoad}
+          onLoad={handleLoad}
         />
       )}
     </span>

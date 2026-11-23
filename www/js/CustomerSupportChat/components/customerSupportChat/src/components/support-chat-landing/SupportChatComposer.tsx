@@ -1,14 +1,46 @@
-import React, { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
-import { IconButton, TextArea } from "@rbx/foundation-ui";
+import React, {
+  FormEvent,
+  KeyboardEvent,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { IconButton, TextArea, VisuallyHidden } from "@rbx/foundation-ui";
+import SupportChatDisclaimers, { AI_DISCLOSURE } from "./SupportChatDisclaimers";
 import "./SupportChatComposer.scss";
 
-const LABEL = "Describe what happened";
+const LABEL = { chat: "Write a message", landing: "Describe what happened" } as const;
 const SUBMIT = "Send message";
-const CAPTION = "Don’t share your password or full payment information.";
 // Only one message box is on the page at a time.
 const LIMIT_WARNING_ID = "support-chat-composer-limit";
-const limitWarning = (maxLength: number) =>
-  `Messages can be up to ${maxLength.toLocaleString("en-US")} characters. Shorten yours to send it.`;
+const AI_DISCLOSURE_ID = "support-chat-composer-ai";
+// Said once, when the draft first crosses the limit. The count itself changes on every keystroke.
+const LIMIT_ANNOUNCEMENT = "Message is too long to send.";
+// Used when the stylesheet's max-height can't be read. The stylesheet also caps the chat field by
+// the space left in a short window.
+const FIELD_MAX_HEIGHT = { chat: 200, landing: 240 } as const;
+
+/**
+ * Grows the field to fit its text, up to its max-height, then lets it scroll. The chat field stays
+ * one pill, with the send button on the last line, so a taller draft grows up from the bottom of
+ * the frame. The landing field grows down.
+ */
+const fitToText = (field: HTMLTextAreaElement, fallbackMax: number) => {
+  const styledMax = Number.parseFloat(getComputedStyle(field).maxHeight);
+  const max = Number.isFinite(styledMax) ? styledMax : fallbackMax;
+  // max-height would clip scrollHeight, so it is cleared while measuring.
+  field.style.maxHeight = "none";
+  field.style.height = "auto";
+  const full = field.scrollHeight;
+  field.style.maxHeight = "";
+  field.style.height = `${Math.min(full, max)}px`;
+  field.style.overflowY = full > max ? "auto" : "hidden";
+};
+
+const count = (value: number) => value.toLocaleString("en-US");
+const limitWarning = (length: number, maxLength: number) =>
+  `${count(length)} / ${count(maxLength)} characters. Remove ${count(length - maxLength)} to send.`;
 
 /**
  * Enter sends; Shift+Enter and an open IME composition keep typing. Safari fires the Enter that
@@ -46,11 +78,11 @@ type SupportChatComposerProps = {
    */
   prefill?: string;
   onDraftChange?: (draft: string) => void;
-  /** The landing's box is taller and raised, and has no privacy reminder below it. */
+  /** The landing's box is taller and raised, and has no reminders below it. */
   variant?: "chat" | "landing";
 };
 
-/** The support message box, with the send button inside it and the privacy reminder below. */
+/** The support message box, with the send button inside it and the AI and privacy reminders below. */
 const SupportChatComposer = ({
   onSubmit,
   isDisabled = false,
@@ -62,6 +94,7 @@ const SupportChatComposer = ({
   variant = "chat",
 }: SupportChatComposerProps): React.ReactElement => {
   const [draft, setDraft] = useState(initialDraft);
+  const fieldRef = useRef<HTMLTextAreaElement>(null);
   const isMounted = useRef(true);
   const hasTyped = useRef(false);
   const isTooLong = draft.length > maxLength;
@@ -82,6 +115,40 @@ const SupportChatComposer = ({
   useEffect(() => {
     onDraftChange?.(draft);
   }, [draft, onDraftChange]);
+
+  const maxHeight = FIELD_MAX_HEIGHT[variant];
+  const label = LABEL[variant];
+  useLayoutEffect(() => {
+    if (fieldRef.current) {
+      fitToText(fieldRef.current, maxHeight);
+    }
+  }, [draft, maxHeight]);
+
+  // The same text wraps onto more lines when the field narrows or its font loads. The chat cap
+  // follows the window height and --support-session-top, which the session sets after this first
+  // fit and again when a banner arrives; a lower cap resizes the field, so the observer catches it.
+  // Refitting leaves the size unchanged, so the observer doesn't fire again.
+  useEffect(() => {
+    const field = fieldRef.current;
+    if (!field) {
+      return undefined;
+    }
+    const refit = () => {
+      fitToText(field, maxHeight);
+    };
+    const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(refit);
+    observer?.observe(field);
+    window.addEventListener("resize", refit);
+    // jsdom has no font loading API.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    document.fonts?.addEventListener("loadingdone", refit);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", refit);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      document.fonts?.removeEventListener("loadingdone", refit);
+    };
+  }, [maxHeight]);
 
   const submit = async () => {
     const message = draft.trim();
@@ -109,11 +176,18 @@ const SupportChatComposer = ({
     >
       <div className="support-chat-composer-surface">
         <TextArea
-          aria-label={LABEL}
-          aria-describedby={isTooLong ? LIMIT_WARNING_ID : undefined}
-          placeholder={LABEL}
+          ref={fieldRef}
+          aria-label={label}
+          aria-describedby={
+            isTooLong
+              ? variant === "chat"
+                ? `${LIMIT_WARNING_ID} ${AI_DISCLOSURE_ID}`
+                : LIMIT_WARNING_ID
+              : undefined
+          }
+          placeholder={label}
           size={variant === "landing" ? "Large" : "Medium"}
-          rows={variant === "landing" ? 1 : 2}
+          rows={1}
           hasError={isTooLong}
           textareaClassName="support-chat-composer-field"
           value={draft}
@@ -138,19 +212,24 @@ const SupportChatComposer = ({
         </span>
       </div>
       <div aria-live="polite">
-        {isTooLong && (
-          <p
-            id={LIMIT_WARNING_ID}
-            className="support-chat-composer-warning text-caption-small text-system-alert"
-          >
-            {limitWarning(maxLength)}
-          </p>
-        )}
+        {isTooLong && <VisuallyHidden>{LIMIT_ANNOUNCEMENT}</VisuallyHidden>}
       </div>
-      {variant === "chat" && (
-        <p className="support-chat-composer-caption text-caption-small content-default">
-          {CAPTION}
+      {isTooLong && (
+        <p
+          id={LIMIT_WARNING_ID}
+          className="support-chat-composer-warning text-caption-small text-system-alert"
+        >
+          {limitWarning(draft.length, maxLength)}
         </p>
+      )}
+      {/* Hidden rather than unmounted, so a visitor's pause survives the count. */}
+      {variant === "chat" && (
+        <div hidden={isTooLong}>
+          <SupportChatDisclaimers />
+        </div>
+      )}
+      {variant === "chat" && isTooLong && (
+        <VisuallyHidden id={AI_DISCLOSURE_ID}>{AI_DISCLOSURE}</VisuallyHidden>
       )}
     </form>
   );

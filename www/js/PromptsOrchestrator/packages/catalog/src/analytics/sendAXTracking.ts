@@ -1,6 +1,7 @@
 import { sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
-import { fireEvent } from "@rbx/legacy-webapp-types/roblox-event-tracker";
+import { window } from "@rbx/core-lib/browser";
+import { fireEvent } from "@rbx/www-common/event-tracker";
 import {
   AXSendTrackingContextType,
   AXSendTrackingActionType,
@@ -28,6 +29,15 @@ const isMobileDevice = (): boolean => {
   );
 };
 
+// sessionStorage can be missing (server render) or throw (storage disabled); logging is optional.
+const isDebugLoggingEnabled = (): boolean => {
+  try {
+    return !!window?.sessionStorage.getItem("AXAnalyticsDebugLogging");
+  } catch {
+    return false;
+  }
+};
+
 const sendAXTracking = ({
   itemName,
   counterName,
@@ -37,7 +47,7 @@ const sendAXTracking = ({
   excludeTelemetry = false,
 }: AXSendTrackingContextType): void => {
   // Debug logging
-  const enableDebugLogging = sessionStorage.getItem("AXAnalyticsDebugLogging");
+  const enableDebugLogging = isDebugLoggingEnabled();
   const isMobile = isMobileDevice();
   const counterPrefix = `AXTracking_${isMobile ? "Mweb" : "Web"}`;
 

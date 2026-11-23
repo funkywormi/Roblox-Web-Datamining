@@ -4,6 +4,7 @@ import TokenizedDownloadButton from "@rbx/app-download/TokenizedDownloadButton";
 import type { ResolvedAppDownload } from "@rbx/app-download";
 import type { DownloadButtonProps } from "@rbx/app-download/DownloadButton";
 import type { SduiRendererInjectedProps, SduiResolvedAction } from "@rbx/sdui-core";
+import { buildSduiAppsFlyerParams } from "./sduiAppsFlyerParams";
 
 export interface SduiDownloadButtonProps extends SduiRendererInjectedProps {
   text?: string;
@@ -14,6 +15,12 @@ export interface SduiDownloadButtonProps extends SduiRendererInjectedProps {
   isDisabled?: boolean;
   isVisible?: boolean;
   useFoundationSize?: boolean;
+  /** AppsFlyer in-app destination. Unset keeps `roblox://navigation/home`. */
+  afDp?: string;
+  /** Web URL AppsFlyer opens when the app is not installed. */
+  afWebDp?: string;
+  /** AppsFlyer `deep_link_value`. Unset omits the parameter. */
+  deepLinkValue?: string;
   onActivated?: SduiResolvedAction;
 }
 
@@ -30,7 +37,11 @@ export function SduiDownloadButton({
   isDisabled,
   isVisible,
   useFoundationSize,
+  afDp,
+  afWebDp,
+  deepLinkValue,
   onActivated,
+  analyticsContext,
 }: SduiDownloadButtonProps) {
   const handleActivated = useCallback(() => {
     onActivated?.onActivated();
@@ -50,6 +61,11 @@ export function SduiDownloadButton({
       isVisible={isVisible}
       useFoundationSize={useFoundationSize}
       href={onActivated?.href}
+      appsFlyerParams={buildSduiAppsFlyerParams(analyticsContext, {
+        afDp,
+        afWebDp,
+        deepLinkValue,
+      })}
       onClick={onActivated ? handleActivated : undefined}
     />
   );

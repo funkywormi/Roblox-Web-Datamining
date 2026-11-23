@@ -5,7 +5,6 @@ var externals = {
   "@rbx/core-scripts/auth/fido2": ["Roblox", "core-scripts", "auth", "fido2"],
   "@rbx/core-scripts/auth/hba": ["Roblox", "core-scripts", "auth", "hba"],
   "@rbx/core-scripts/auth/hybrid-response": ["Roblox", "core-scripts", "auth", "hybridResponse"],
-  "@rbx/core-scripts/auth/sai": ["Roblox", "core-scripts", "auth", "sai"],
   "@rbx/core-scripts/auth/xsrfToken": ["Roblox", "core-scripts", "auth", "xsrfToken"],
   "@rbx/core-scripts/data-store": ["Roblox", "core-scripts", "dataStore"],
   "@rbx/core-scripts/deep-link": ["Roblox", "core-scripts", "deepLink"],

@@ -46,6 +46,7 @@ function buildPropObject(
 ): BuiltPropObject {
   const props: Record<string, unknown> = {};
   const propSignals: Record<string, PropSignalEntry> = {};
+  const nestedComponentConfigPropNames = new Set<string>();
   const buildProp = createPropBuildDispatcher({
     dataSources: scope.dataSources,
     dataBinder: scope.dataBinder,
@@ -56,6 +57,9 @@ function buildPropObject(
     const propCtx: BindingContext = { ...scope.rootCtx, propName };
     try {
       const result = buildProp(rawProp, propCtx);
+      if (result.isNestedComponentConfig) {
+        nestedComponentConfigPropNames.add(propName);
+      }
 
       if (result.category === "propSignal") {
         propSignals[propName] = result.statusSignal
@@ -89,7 +93,9 @@ function buildPropObject(
     }
   }
 
-  return { props, propSignals };
+  return nestedComponentConfigPropNames.size > 0
+    ? { props, propSignals, nestedComponentConfigPropNames }
+    : { props, propSignals };
 }
 
 /**
@@ -177,10 +183,14 @@ function buildComponentConfig(
     parentAnalyticsContext: analyticsContext,
   };
 
-  const { props, propSignals } = buildPropObject(template.props, scope, {
-    action: actionCtx,
-    nested: nestedContextForChildren,
-  });
+  const { props, propSignals, nestedComponentConfigPropNames } = buildPropObject(
+    template.props,
+    scope,
+    {
+      action: actionCtx,
+      nested: nestedContextForChildren,
+    },
+  );
 
   const hasPropSignals = Object.keys(propSignals).length > 0;
 
@@ -191,6 +201,7 @@ function buildComponentConfig(
     ...(hasPropSignals ? { propSignals } : {}),
     analyticsContext,
     ...(isComponentFilteredSignal ? { isComponentFilteredSignal } : {}),
+    ...(nestedComponentConfigPropNames ? { nestedComponentConfigPropNames } : {}),
   };
 }
 
@@ -202,7 +213,7 @@ function buildComponentConfig(
  *   classes at render time, whereas Lua resolves to a token value at build time.
  */
 export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
-  const { dataBinder, templateStore, errorReporter, poolRegistry } = deps;
+  const { dataBinder, templateStore, errorReporter, poolRegistry, locale } = deps;
 
   const builder: SduiBuilder = {
     poolRegistry,
@@ -228,6 +239,7 @@ export function createSduiBuilder(deps: SduiBuilderDeps): SduiBuilder {
         pageContext: builderConfig.pageContext,
         configKey: builderConfig.configKey,
         componentType: String(template.shared.componentType),
+        locale,
       };
 
       // Shared-scope (inline_component): reuse the parent's resolved

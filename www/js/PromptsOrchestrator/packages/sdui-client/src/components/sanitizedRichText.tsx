@@ -1,5 +1,5 @@
 import { createElement, Fragment, type ReactNode } from "react";
-import domPurify from "dompurify";
+import { isSupported, sanitize } from "isomorphic-dompurify";
 import { renderRobloxGlyphText } from "@rbx/sdui-common";
 
 const DOM_PURIFY_CONFIG = {
@@ -36,11 +36,11 @@ function sanitizedNodeToReact(node: Node): ReactNode {
 
 /**
  * Sanitizes HTML and rebuilds it as React elements so Roblox glyphs can become icons.
- * When DOMPurify has no DOM (SSR), falls back to glyph substitution on the raw string.
+ * When DOMPurify is unsupported in the browser, falls back to glyph substitution on the raw string.
  */
 export function renderSanitizedRichText(html: string): ReactNode {
-  if (!domPurify.isSupported) {
+  if (!isSupported) {
     return renderRobloxGlyphText(html);
   }
-  return sanitizedNodeToReact(domPurify.sanitize(html, SANITIZE_TO_FRAGMENT_CONFIG));
+  return sanitizedNodeToReact(sanitize(html, SANITIZE_TO_FRAGMENT_CONFIG));
 }

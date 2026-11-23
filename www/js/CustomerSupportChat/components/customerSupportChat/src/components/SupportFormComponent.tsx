@@ -125,8 +125,6 @@ export const UnwrappedSupportFormComponent: React.FC<
   const [supportFormData, setSupportFormData] = useState<SupportFormState>(defaultTicketFormFields);
   // Applied once; cleared after the categories are matched so later edits are not overwritten.
   const [askPrefill, setAskPrefill] = useState(prefill);
-  // Cleared with the form, so a later ticket in this same mount is not tagged.
-  const [fromSupportAsk, setFromSupportAsk] = useState(prefill?.fromSupportAsk === true);
   const [messageWasShortened] = useState(prefill?.messageWasShortened === true);
 
   const userViewedHelpArticleRef = useRef(false);
@@ -468,7 +466,6 @@ export const UnwrappedSupportFormComponent: React.FC<
     updateSupportInquiryContext({ [SupportTicketStateKey.SubmittedSupportFormData]: undefined });
     setSupportFormData(defaultTicketFormFields());
     setSelectedItems(defaultTicketFormSelectables());
-    setFromSupportAsk(false);
     resetSubmitRequest();
     resetVerification(); // Clear OTP session token and verification state
   }, [updateSupportInquiryContext, resetSubmitRequest, resetVerification]);
@@ -675,7 +672,6 @@ export const UnwrappedSupportFormComponent: React.FC<
             helpCenterArticleLang,
             ageCategory,
             otpSessionToken || undefined,
-            fromSupportAsk,
           ),
         });
 
@@ -775,7 +771,6 @@ export const UnwrappedSupportFormComponent: React.FC<
       helpCenterArticleId,
       helpCenterArticleLang,
       ageCategory,
-      fromSupportAsk,
       showSuccessDialog,
       pushSegment,
       showErrorDialog,

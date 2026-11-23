@@ -1,3 +1,5 @@
+import { readAccountLocaleTag } from "../../utils/readAccountLocaleTag";
+
 const DATE_FORMAT: Intl.DateTimeFormatOptions = {
   month: "short",
   day: "numeric",
@@ -5,7 +7,8 @@ const DATE_FORMAT: Intl.DateTimeFormatOptions = {
 };
 
 /**
- * Format an SDUI hydration timestamp as a locale date (e.g. "Feb 18, 2026").
+ * Format an SDUI hydration timestamp in the account language
+ * (e.g. "Feb 18, 2026" for `en-US`).
  *
  * Accepts the two shapes the wire format emits:
  * - JSON ISO 8601 string ("2026-02-18T08:47:39.272Z")
@@ -22,7 +25,7 @@ export function hydrationTimestampToLocalDateString(timestampValue: unknown): st
     const parsedDate = new Date(timestampValue);
     return Number.isNaN(parsedDate.getTime())
       ? undefined
-      : parsedDate.toLocaleDateString(undefined, DATE_FORMAT);
+      : parsedDate.toLocaleDateString(readAccountLocaleTag(), DATE_FORMAT);
   }
 
   if (typeof timestampValue !== "object") return undefined;
@@ -31,5 +34,5 @@ export function hydrationTimestampToLocalDateString(timestampValue: unknown): st
   const epochSeconds = Number(protoTimestamp.seconds ?? protoTimestamp.Seconds);
   if (!epochSeconds || Number.isNaN(epochSeconds)) return undefined;
 
-  return new Date(epochSeconds * 1000).toLocaleDateString(undefined, DATE_FORMAT);
+  return new Date(epochSeconds * 1000).toLocaleDateString(readAccountLocaleTag(), DATE_FORMAT);
 }

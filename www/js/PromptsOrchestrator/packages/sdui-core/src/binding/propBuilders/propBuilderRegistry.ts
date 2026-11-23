@@ -29,6 +29,8 @@ import {
   parseVector2Prop,
 } from "./utils/sduiParsers";
 import { buildLazyNestedComponentListProp } from "./buildLazyNestedComponentListProp";
+import { buildLazyNestedComponentProp } from "./buildLazyNestedComponentProp";
+import { buildNestedComponentListProp } from "./buildNestedComponentListProp";
 import { buildActionProp } from "./buildActionProp";
 import { buildRepeatedProp } from "./buildRepeatedProp";
 import { buildStructuredProp } from "./buildStructuredProp";
@@ -103,12 +105,8 @@ const PROP_BUILDERS: Partial<Record<PropDescriptorName, PropBuilder>> = {
   TemplateArg: buildDefaultProp,
   AnalyticsDataField: buildDefaultProp,
   NestedComponentProp: buildNestedComponentProp,
-  // TODO(web-sdui): Preserve the raw config for parent-controlled rendering.
-  // Eager rendering is the current web fallback until per-prop lazy rendering exists.
-  LazyNestedComponentProp: buildNestedComponentProp,
-  // TODO(web-sdui): Add descriptor-driven lazy rendering so these prop types can
-  // diverge. Explicit ComponentList.deferItemBuild is handled by capable parents.
-  NestedComponentListProp: buildLazyNestedComponentListProp,
+  LazyNestedComponentProp: buildLazyNestedComponentProp,
+  NestedComponentListProp: buildNestedComponentListProp,
   LazyNestedComponentListProp: buildLazyNestedComponentListProp,
   StringArrayProp: withDefaultParser(parseStringArrayProp),
   ActionProp: buildActionProp,

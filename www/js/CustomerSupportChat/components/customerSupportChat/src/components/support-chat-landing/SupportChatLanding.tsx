@@ -122,7 +122,12 @@ const SupportChatLanding = ({
   return (
     <div className="support-chat-landing-home" data-testid="support-chat-landing">
       <div className="support-chat-landing-intro">
-        <Icon name="icon-regular-headphones" size="XXLarge" aria-hidden />
+        <Icon
+          name="icon-regular-headphones"
+          size="XXLarge"
+          className="support-chat-landing-mark"
+          aria-hidden
+        />
         <h1 id="support-chat-heading" className="text-heading-medium content-emphasis">
           {HEADING}
         </h1>
@@ -144,12 +149,11 @@ const SupportChatLanding = ({
           <li key={issue.text}>
             <button
               type="button"
-              className="support-chat-landing-issue text-body-medium"
+              className="support-chat-landing-issue text-label-medium"
               disabled={!canSend}
               onClick={() => send(issue.text, false)}
             >
-              <Icon name={issue.iconName} size="Small" aria-hidden />
-              {issue.text}
+              <span className="support-chat-landing-issue-text">{issue.text}</span>
             </button>
           </li>
         ))}

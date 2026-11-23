@@ -4,7 +4,7 @@
  */
 import type React from "react";
 import { extractDescriptorName } from "../binding/propBuilders/resolveDescriptorName";
-import type { SduiComponentConfig, SduiManagedChildList } from "../types";
+import type { SduiComponentConfig, SduiExtraLocalProps, SduiManagedChildList } from "../types";
 
 import { hasPropSignals } from "./builderHelpers";
 import { isOneOf } from "./oneOfHelper";
@@ -44,6 +44,31 @@ export function expandManagedList(
     );
   }
   return node;
+}
+
+/**
+ * Renders a single nested component prop, adding `extraLocalProps`. A
+ * `LazyNestedComponentProp`, or any nested prop of a component registered with
+ * `doesManageChildren`, arrives as a `SduiManagedChildList` and renders through
+ * `renderChild`, the same way the renderer renders an eager prop. This is the web
+ * counterpart of Lua's `getSduiComponentWrapper` with `extraLocalProps`. A hand-built
+ * list without `renderChild` falls back to `renderItem`. An already-rendered node is
+ * returned unchanged, without the extra props.
+ */
+export function renderSduiNestedChild(
+  node: React.ReactNode | SduiManagedChildList | undefined,
+  extraLocalProps?: SduiExtraLocalProps,
+): React.ReactNode {
+  if (!isSduiManagedChildList(node)) {
+    return node;
+  }
+  const [childConfig] = node.configs;
+  if (!childConfig) {
+    return null;
+  }
+  return node.renderChild
+    ? node.renderChild(childConfig, undefined, extraLocalProps)
+    : node.renderItem(childConfig, 0, undefined, extraLocalProps);
 }
 
 /**

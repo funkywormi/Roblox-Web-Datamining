@@ -6,7 +6,6 @@ import {
   MESSAGE_TABS,
   NEWS_OPEN_CONTENT_CONTEXT,
   NEWS_OPEN_CONTENT_EVENT,
-  RULES_WAIT_MS,
 } from "../constants";
 import {
   dispatchLegacyMessageEvent,
@@ -74,27 +73,10 @@ const getErrorMessage = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
-// Cursor mode applies to inbox, sent, and archive when the GUAC flag is on. A page past the first
-// without a token (an offset bookmark, or the offset pager shown when the server ignored cursor
-// mode) still loads by page number.
-export const shouldLoadByPageToken = (rules: PrivateMessagesRules, route: MessageRoute): boolean =>
-  rules.enableCursorPagination === true &&
-  route.tab !== MESSAGE_TABS.notifications &&
-  (route.pageToken != null || route.page <= 1);
-
-// Resolves to no rules if `rulesRequest` is still pending after RULES_WAIT_MS, so a slow GUAC
-// response cannot block the list. That load uses offset paging; later loads see the real rules.
-export const awaitRulesForListLoad = (
-  rulesRequest: Promise<PrivateMessagesRules>,
-): Promise<PrivateMessagesRules> =>
-  Promise.race([
-    rulesRequest,
-    new Promise<PrivateMessagesRules>(resolve => {
-      setTimeout(() => {
-        resolve({});
-      }, RULES_WAIT_MS);
-    }),
-  ]);
+// Cursor mode applies to inbox, sent, and archive. A page past the first without a token (an offset
+// bookmark such as `?page=3`) still loads by page number.
+export const shouldLoadByPageToken = (route: MessageRoute): boolean =>
+  route.tab !== MESSAGE_TABS.notifications && (route.pageToken != null || route.page <= 1);
 
 // Cursor paging when the response carries a page window; otherwise offset paging from the 0-based
 // `pageNumber` and `totalPages`, falling back to the route's page while nothing is loaded.
@@ -122,8 +104,6 @@ const trackAndRethrow =
 
 export const usePrivateMessages = ({ translate }: { translate: (key: string) => string }) => {
   const { route, setRoute } = useMessageRoute();
-  // List loads wait for this, up to RULES_WAIT_MS, so the first request knows whether to use cursor
-  // mode.
   const [rulesRequest] = useState(() =>
     getPrivateMessagesRules().catch((rulesError: unknown): PrivateMessagesRules => {
       trackError("RulesLoadFailed", { statusCode: getStatusCode(rulesError) }, rulesError);
@@ -194,7 +174,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
           );
         }
       } else {
-        const result = shouldLoadByPageToken(await awaitRulesForListLoad(rulesRequest), route)
+        const result = shouldLoadByPageToken(route)
           ? await getMessagesByPageToken(route.tab, route.pageToken)
           : await updateMessages(route.tab, route.page - 1);
         if (isSuperseded()) {
@@ -241,7 +221,7 @@ export const usePrivateMessages = ({ translate }: { translate: (key: string) => 
         setLoading(false);
       }
     }
-  }, [route, rulesRequest, setRoute, translate]);
+  }, [route, setRoute, translate]);
 
   // Callers that await before reloading, such as markArchive, reload through this ref so the
   // reload targets the route current when it runs. Calling a loadCurrentRoute captured before the

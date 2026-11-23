@@ -1,4 +1,4 @@
-import { document as browserDocument } from "@rbx/core-lib/browser";
+import { document as browserDocument, window as browserWindow } from "@rbx/core-lib/browser";
 import {
   createSduiLoadTimerRegistry,
   type SduiLoadTimerRegistry,
@@ -6,6 +6,8 @@ import {
 import { createSduiBuilder } from "../binding/SduiBuilder";
 import { createSduiDataBinder } from "../binding/SduiDataBinder";
 import { createHydrationStores } from "../binding/stores";
+import { loadAppPolicy } from "../binding/stores/contentStores/loadAppPolicy";
+import { POLICY_CONTENT_TYPE, PolicyStore } from "../binding/stores/contentStores/PolicyStore";
 import { RESPONSIVE_CONTENT_TYPE } from "../binding/stores/contentStores/ResponsiveStore";
 import type { SduiActionHandlerRegistry } from "../registry/SduiActionHandlerRegistry";
 import type { SduiComponentRegistry } from "../registry/SduiComponentRegistry";
@@ -15,6 +17,9 @@ import type { SduiTelemetryHandlerNameRegistry } from "../registry/SduiTelemetry
 import { createSduiApiStore } from "../store/SduiApiStore";
 import { createSduiTemplateStore } from "../store/SduiTemplateStore";
 import { createDeduplicatingErrorReporter } from "../errors/DeduplicatingSduiErrorReporter";
+import { createSessionAttributingAnalyticsReporter } from "../analytics/SessionAttributingAnalyticsReporter";
+import { SduiSessionStore, type SduiSessionData } from "../analytics/SduiSessionStore";
+import { readAccountLocaleTag } from "../utils/readAccountLocaleTag";
 import type {
   HydrationContent,
   HydrationStore,
@@ -45,6 +50,8 @@ export interface SduiServices {
   analyticsReporter: SduiAnalyticsReporter;
   errorReporter: SduiErrorReporter;
   loadTimerRegistry: SduiLoadTimerRegistry;
+  /** Session values appended to every `analyticsReporter` event. */
+  sessionStore: SduiSessionStore;
   pageContext: SduiPageContext;
   translate?: TranslateFunction;
 }
@@ -67,9 +74,16 @@ export interface CreateSduiServicesOptions {
   pageContext: SduiPageContext;
   /** Seed entity hydration data at creation time. */
   initialHydrationData?: HydrationContent;
+  /** Seed the session store at creation time. */
+  initialSessionData?: SduiSessionData;
 
   /** Locale-aware translate function. */
   translate?: TranslateFunction;
+  /**
+   * BCP-47 locale for number formatters, such as `en-US`.
+   * Defaults to the account language on the document.
+   */
+  locale?: string;
 }
 
 // ─── Service Construction ───
@@ -89,12 +103,16 @@ export function createSduiServicesWithStores(
     actionHandlerRegistry,
     telemetryHandlerNameRegistry,
     impressionHandlerRegistry,
-    analyticsReporter,
     observeWebVitals,
     pageLoadPlatformAdapter,
     pageContext,
   } = options;
   const errorReporter = createDeduplicatingErrorReporter(options.errorReporter);
+  const sessionStore = new SduiSessionStore(options.initialSessionData);
+  const analyticsReporter = createSessionAttributingAnalyticsReporter(
+    options.analyticsReporter,
+    sessionStore,
+  );
   const loadTimerRegistry = createSduiLoadTimerRegistry(errorReporter, {
     analyticsReporter,
     observeWebVitals,
@@ -127,11 +145,21 @@ export function createSduiServicesWithStores(
     dataBinder.updateDataStores(options.initialHydrationData);
   }
 
+  const policyStore = stores[POLICY_CONTENT_TYPE];
+  if (browserWindow && policyStore instanceof PolicyStore) {
+    policyStore.setLoader(() => {
+      // eslint-disable-next-line no-void, @rbx/promises/prefer-query-mutation -- store-level load outside React; failures are reported inside
+      void loadAppPolicy(policyStore, { errorReporter, pageContext });
+    });
+  }
+
+  const locale = options.locale ?? readAccountLocaleTag();
   const builder = createSduiBuilder({
     dataBinder,
     templateStore,
     errorReporter,
     poolRegistry,
+    locale,
   });
 
   const apiStore = createSduiApiStore({
@@ -157,6 +185,7 @@ export function createSduiServicesWithStores(
     analyticsReporter,
     errorReporter,
     loadTimerRegistry,
+    sessionStore,
     pageContext,
     translate: options.translate,
   };
@@ -241,6 +270,7 @@ export function disposePageServices(pageKey: string): void {
   services.poolRegistry.clear();
   services.dataBinder.clear();
   services.templateStore.clear();
+  services.sessionStore.clear();
   pageServicesByKey.delete(pageKey);
 }
 

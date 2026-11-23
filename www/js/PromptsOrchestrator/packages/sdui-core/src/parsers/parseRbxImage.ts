@@ -1,12 +1,5 @@
 import { RBX_THUMB_DEFAULTS } from "../consts/defaults";
 
-// rbxthumb URIs use the thumbnails API spelling.
-const THUMBNAIL_2D_TYPE_BY_RBXTHUMB_TYPE: Record<string, string> = {
-  // Thumbnail2d's caller enum spells this one value `AvatarHeadshot`
-  // then maps it back to the API.
-  AvatarHeadShot: "AvatarHeadshot",
-};
-
 export interface RbxThumbParams {
   type: string;
   targetId: number;
@@ -41,7 +34,7 @@ export function parseRbxThumb(raw: string): RbxThumbParams | null {
   if (!raw.startsWith("rbxthumb://")) return null;
 
   const params = new URLSearchParams(raw.slice("rbxthumb://".length));
-  const rawType = params.get("type") ?? RBX_THUMB_DEFAULTS.type;
+  const type = params.get("type") ?? RBX_THUMB_DEFAULTS.type;
   const id = params.get("id");
   const width = params.get("w") ?? RBX_THUMB_DEFAULTS.width;
   const height = params.get("h") ?? RBX_THUMB_DEFAULTS.height;
@@ -58,7 +51,7 @@ export function parseRbxThumb(raw: string): RbxThumbParams | null {
   if (!Number.isFinite(targetId) || targetId === 0) return null;
 
   return {
-    type: THUMBNAIL_2D_TYPE_BY_RBXTHUMB_TYPE[rawType] ?? rawType,
+    type,
     targetId,
     size: `${width}x${height}`,
     ...(includeBackground != null ? { includeBackground } : {}),

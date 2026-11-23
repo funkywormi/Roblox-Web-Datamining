@@ -8,6 +8,7 @@ import {
   fullWidthClassName,
   TButtonWidth,
 } from "../constants/buttonWidths";
+import "./playButton.css";
 
 const { playButtonTextTranslationMap } = playButtonConstants;
 
@@ -19,18 +20,24 @@ export type TUnplayableProps = {
 };
 
 const UnplayableButton = ({
-  iconClassName = "icon-status-unavailable-secondary",
+  iconClassName = "icon icon-filled-circle-slash size-400",
   buttonWidth = buttonWidths.full,
-  buttonClassName = "btn-common-play-game-unplayable-lg",
+  buttonClassName = "game-play-button-unplayable-lg",
   hideButtonText = false,
 }: TUnplayableProps) => {
   const translate = usePlayButtonTranslate();
   return (
     <Button
       data-testid="play-unplayable-button"
-      variant="Emphasis"
+      // Transparent like core-ui's outlined unplayable button; playButton.css adds its border on
+      // game-play-button-unplayable, which callers' buttonClassName can't drop.
+      variant="Utility"
       style={fuiButtonStyle}
-      className={classNames(fullWidthClassName(buttonWidth), buttonClassName)}
+      className={classNames(
+        fullWidthClassName(buttonWidth),
+        "game-play-button-unplayable",
+        buttonClassName,
+      )}
       isDisabled
       onClick={() => null}
     >

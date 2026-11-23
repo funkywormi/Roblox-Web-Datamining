@@ -2,6 +2,8 @@ export const AppPage = {
   Communities: "Communities",
   Home: "Home",
   ProfilePlatform: "ProfilePlatform",
+  PreAuthLandingPage: "PreAuthLandingPage",
+  Spotlight: "Spotlight",
 } as const;
 
 export type AppPage = (typeof AppPage)[keyof typeof AppPage];

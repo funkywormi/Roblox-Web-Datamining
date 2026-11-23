@@ -17,6 +17,8 @@ export type C3Interaction = {
 
 export type C3ChatMessage = C3Interaction & {
   isUser: boolean;
+  /** Local failure line. Removed when a stored reply arrives or the user sends, never sent. */
+  isClientError?: boolean;
 };
 
 export type C3GetChatMessagesResponse = C3Interaction[];

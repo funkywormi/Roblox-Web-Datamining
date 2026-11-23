@@ -10,6 +10,9 @@ import { Unique } from "./types";
  *
  * An {@link AnyUrl} is guaranteed to have no username or password.
  *
+ * This is intended mainly as an escape hatch (e.g., for tests).
+ * You should use the `Url` or `InternalUrl` type in most cases.
+ *
  * ```
  * const url = AnyUrl.parse("http://anyhost").getOrThrow();
  * const url2 = url.withPort(80);

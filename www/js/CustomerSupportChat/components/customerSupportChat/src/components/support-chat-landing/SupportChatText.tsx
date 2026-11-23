@@ -3,7 +3,7 @@ import { VisuallyHidden } from "@rbx/foundation-ui";
 
 const ASSISTANT_SAID = "Roblox Support said:";
 const USER_SAID = "You said:";
-const THINKING = "Roblox Support is typing";
+const THINKING = "Working on it";
 
 /** A Roblox Support message in the v14 session: plain text on the page. */
 export const SupportChatAssistantText = ({
@@ -29,14 +29,9 @@ export const SupportChatUserText = ({
   </div>
 );
 
-/** Shown while Roblox Support is answering. */
+/** Shown while Roblox Support is answering, with a highlight sweeping across the text. */
 export const SupportChatThinking = (): React.ReactElement => (
   <div className="support-chat-assistant" role="status">
-    <VisuallyHidden>{THINKING}</VisuallyHidden>
-    <span className="support-chat-thinking" aria-hidden>
-      <span />
-      <span />
-      <span />
-    </span>
+    <span className="support-chat-thinking text-body-medium">{THINKING}</span>
   </div>
 );

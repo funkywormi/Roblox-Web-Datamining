@@ -54,6 +54,11 @@ type TTrackedItem = {
   itemType?: string;
 };
 
+type TItemCardClickMeta = TTrackedItem & {
+  /** IXP `animatedItemCardEnabled` at click time (Catalog hover-preview experiment). */
+  animatedItemCardEnabled?: boolean;
+};
+
 // The AX telemetry schema only exposes `totalValue` and `metaData` columns, so
 // all custom dimensions are packed into `metaData` as a JSON string. This
 // mirrors how the existing purchase-success events send their params.
@@ -71,11 +76,12 @@ const sendClickEvent = (
   });
 };
 
-export const trackItemCardClick = (source: TItemCardSource, item: TTrackedItem): void => {
+export const trackItemCardClick = (source: TItemCardSource, item: TItemCardClickMeta): void => {
   sendClickEvent(AXAnalyticsConstants.ItemCardClick, {
     source,
     itemId: item.itemId,
     itemType: item.itemType,
+    animatedItemCardEnabled: item.animatedItemCardEnabled,
   });
 };
 

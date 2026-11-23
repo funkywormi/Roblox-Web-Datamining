@@ -242,9 +242,9 @@ function selectMatchingBranch(
  * `{ kind: "action", build }`) so action / nested-component branches keep
  * their parent telemetry and template wiring.
  *
- * When a branch resolves to a `SduiComponentConfig`, it's detected structurally
- * at render time (`renderer/typeGuards.ts` → `__sduiKind: "config"` brand),
- * so no flag plumbing is needed here.
+ * `generateConditionalPropValue` itself stays descriptor-agnostic: callers
+ * (`buildNestedComponentProp`, `buildNestedComponentListProp`) tag the returned
+ * `propSignal` with `isNestedComponentConfig` when the descriptor is eager.
  */
 export function generateConditionalPropValue(
   rawValue: Record<string, unknown> | Record<string, unknown>[],

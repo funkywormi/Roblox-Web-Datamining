@@ -163,7 +163,6 @@ export const toSupportTicketRequestModel = (
   helpCenterArticleLang: string | null | undefined,
   ageCategory: string,
   otpSessionToken?: string | null,
-  fromSupportAsk = false,
 ): CreateSupportTicketRequestModel => ({
   username: normalizeUsername(state[SupportTicketStateKey.Username]),
   message: state[SupportTicketStateKey.Message] ?? "",
@@ -190,7 +189,6 @@ export const toSupportTicketRequestModel = (
   ...(helpCenterArticleId && { helpCenterArticleId }),
   ...(helpCenterArticleLang && { helpCenterArticleLang }),
   ...(otpSessionToken && { otpSessionToken }),
-  ...(fromSupportAsk && { fromSupportAsk: true }),
   ...(state[SupportTicketStateKey.HelpCategoryType] === "AppealDecision" && {
     optOutCommunication: state[SupportTicketStateKey.OptOutCommunication] === "true",
   }),

@@ -15,6 +15,7 @@ import {
 } from "./binding";
 import { SduiErrorReporter } from "./error";
 import { DataStatus } from "./hydration";
+import type { SduiSessionStore } from "../analytics/SduiSessionStore";
 
 // ─── Proto Enum Re-exports ───
 
@@ -22,6 +23,15 @@ export {
   ActionType,
   ActionTypeSchema,
 } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/actions_pb.js";
+export {
+  Capability,
+  CapabilitySchema,
+} from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/capability_pb.js";
+export {
+  Platform,
+  PlatformSchema,
+} from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/client_capabilities_pb.js";
+export type { ClientCapabilities } from "@rbx/service-contracts-proto/roblox/apppageplatform/shared/v1beta1/client_capabilities_pb.js";
 export {
   HydrationContentType,
   HydrationContentTypeSchema,
@@ -270,17 +280,6 @@ export interface PropDefinition {
   value: PropKind<unknown>;
 }
 
-/** Nested configs + render callback when `doesManageChildren` is true (SSR-safe closure). */
-export interface SduiManagedChildList {
-  configs: SduiComponentConfig[];
-  renderItem: (
-    childConfig: SduiComponentConfig,
-    index: number,
-    reactKey?: Key,
-  ) => ReactElement | null;
-  poolLayout?: PoolSectionLayoutMetadata;
-}
-
 /**
  * Stable key for nested configs injected when they bind to React `children` under
  * `doesManageChildren` (cannot pass `{ configs, renderItem }` as real children).
@@ -290,6 +289,56 @@ export interface SduiManagedChildList {
  * stay aligned with `SduiRenderer`.
  */
 export const SDUI_MANAGED_CHILDREN_PROP = "sduiManagedChildren" as const;
+
+/** Names the renderer owns. A parent cannot set these through {@link SduiExtraLocalProps}. */
+export const SDUI_RESERVED_EXTRA_LOCAL_PROPS = [
+  "propStatuses",
+  "analyticsContext",
+  "componentType",
+  SDUI_MANAGED_CHILDREN_PROP,
+  "children",
+  "key",
+  "ref",
+] as const;
+
+type SduiReservedExtraLocalProp = (typeof SDUI_RESERVED_EXTRA_LOCAL_PROPS)[number];
+
+/**
+ * Props a parent component supplies for one SDUI node. Same role as lua-apps
+ * `extraLocalProps`. Keys are component prop names, after any template prop renaming,
+ * and values reach the component as given, without the template prop parsers.
+ * A value overrides the template prop of the same name. An `undefined` value is
+ * ignored, so the template prop stays. The reserved names are rejected by the type
+ * and dropped at runtime, so a parent cannot replace renderer-owned props.
+ */
+// The index signature is what makes a reserved name resolve to `never`. `Record<string, unknown>`
+// would accept those names.
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style -- see above
+export interface SduiExtraLocalProps extends Partial<Record<SduiReservedExtraLocalProp, never>> {
+  readonly [key: string]: unknown;
+}
+
+/** Nested configs + render callback when `doesManageChildren` is true (SSR-safe closure). */
+export interface SduiManagedChildList {
+  configs: SduiComponentConfig[];
+  renderItem: (
+    childConfig: SduiComponentConfig,
+    index: number,
+    reactKey?: Key,
+    extraLocalProps?: SduiExtraLocalProps,
+  ) => ReactElement | null;
+  /**
+   * Renders a config as a nested child rather than a list item, so it gets no
+   * list position analytics. Use it for single nested component props. Lists the
+   * renderer creates always have it.
+   */
+  renderChild?: (
+    childConfig: SduiComponentConfig,
+    reactKey?: Key,
+    extraLocalProps?: SduiExtraLocalProps,
+  ) => ReactElement | null;
+  poolLayout?: PoolSectionLayoutMetadata;
+}
 
 /**
  * Optional props the isomorphic renderer may merge into leaf components when
@@ -348,6 +397,7 @@ export interface SduiActionContext {
   analyticsReporter: SduiAnalyticsReporter;
   errorReporter: SduiErrorReporter;
   pageContext: SduiPageContext;
+  sessionStore: SduiSessionStore;
   translate?: TranslateFunction;
 }
 
@@ -386,11 +436,12 @@ export interface SduiActionHandlerConfig {
   /**
    * Resolves an action param to a named telemetry handler at activation time.
    * An explicit `Action.telemetry_handler` takes precedence.
+   * An unregistered resolved name falls back to `telemetryHandler`, when supplied.
    */
   resolveTelemetryHandlerName?: SduiTelemetryHandlerNameResolver;
   /**
    * Per-`ActionType` custom telemetry hook. Suppressed when the
-   * explicit or resolved named-handler branch is selected.
+   * explicit named-handler branch or a registered resolved handler is selected.
    */
   telemetryHandler?: SduiActionTelemetryHandler;
   /**

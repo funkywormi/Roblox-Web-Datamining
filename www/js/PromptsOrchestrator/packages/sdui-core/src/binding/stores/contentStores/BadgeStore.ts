@@ -1,5 +1,5 @@
 import type { EntityData } from "../../../types";
-import { EntityStore } from "../EntityStore";
+import { EntityStore, type DerivedFieldComputers } from "../EntityStore";
 import { hydrationTimestampToLocalDateString } from "../derivedFieldHelpers";
 
 /** Content-type key under which badges are registered on the data binder. */
@@ -34,20 +34,33 @@ export interface BadgeData extends EntityData {
  * badge record. Both snake and camel are accepted on input and output to match
  * the wire-format and runtime case tolerance.
  */
-const TIMESTAMP_DERIVED_FIELDS: Record<string, readonly [snake: string, camel: string]> = {
-  created_time_formatted: ["created_time", "createdTime"],
-  createdTimeFormatted: ["created_time", "createdTime"],
-  updated_time_formatted: ["updated_time", "updatedTime"],
-  updatedTimeFormatted: ["updated_time", "updatedTime"],
-  awarded_time_formatted: ["awarded_time", "awardedTime"],
-  awardedTimeFormatted: ["awarded_time", "awardedTime"],
-};
+/** Virtual timestamp strings. They are not stored on `BadgeData`. */
+export interface BadgeDerivedFields {
+  created_time_formatted: string | undefined;
+  createdTimeFormatted: string | undefined;
+  updated_time_formatted: string | undefined;
+  updatedTimeFormatted: string | undefined;
+  awarded_time_formatted: string | undefined;
+  awardedTimeFormatted: string | undefined;
+}
 
-function calculateBadgeDerivedField(fieldName: string, badgeData: BadgeData): unknown {
-  const sourceFields = TIMESTAMP_DERIVED_FIELDS[fieldName];
-  if (!sourceFields) return undefined;
-  const [snakeKey, camelKey] = sourceFields;
+function formattedTimestamp(
+  badgeData: BadgeData,
+  snakeKey: string,
+  camelKey: string,
+): string | undefined {
   return hydrationTimestampToLocalDateString(badgeData[snakeKey] ?? badgeData[camelKey]);
+}
+
+function createBadgeDerivedFields(): DerivedFieldComputers<BadgeData, BadgeDerivedFields> {
+  return {
+    created_time_formatted: data => formattedTimestamp(data, "created_time", "createdTime"),
+    createdTimeFormatted: data => formattedTimestamp(data, "created_time", "createdTime"),
+    updated_time_formatted: data => formattedTimestamp(data, "updated_time", "updatedTime"),
+    updatedTimeFormatted: data => formattedTimestamp(data, "updated_time", "updatedTime"),
+    awarded_time_formatted: data => formattedTimestamp(data, "awarded_time", "awardedTime"),
+    awardedTimeFormatted: data => formattedTimestamp(data, "awarded_time", "awardedTime"),
+  };
 }
 
 /**
@@ -59,8 +72,8 @@ function calculateBadgeDerivedField(fieldName: string, badgeData: BadgeData): un
  *
  * Provides derived `*_formatted` timestamp fields from the raw record.
  */
-export class BadgeStore extends EntityStore<BadgeData> {
+export class BadgeStore extends EntityStore<BadgeData, BadgeDerivedFields> {
   constructor() {
-    super({ derivedFieldComputer: calculateBadgeDerivedField });
+    super({ derivedFieldComputers: createBadgeDerivedFields() });
   }
 }

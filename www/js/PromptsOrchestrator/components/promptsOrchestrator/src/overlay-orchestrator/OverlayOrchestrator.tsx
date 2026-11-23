@@ -2,6 +2,7 @@ import { selectActiveOverlay } from "./store/overlay-queue/overlayQueueSelectors
 import { useOverlayOrchestratorStore } from "./store/overlayOrchestratorStore";
 import { OverlayRenderer, type OverlayPrompt } from "./types";
 import { FaeUpsellAdapter } from "./adapter/faeUpsellAdapter";
+import { CustomRenderDialogAdapter } from "./adapter/customRenderDialogAdapter";
 import { SduiOverlayAdapter } from "./adapter/sduiOverlayAdapter";
 import { useOverlayScheduler } from "./scheduler/useOverlayScheduler";
 import { isSduiOverlayPrompt } from "./scheduler/utils";
@@ -14,9 +15,8 @@ const OverlayAdapter = ({ prompt }: OverlayAdapterProps) => {
   }
 
   switch (prompt.renderer) {
-    // disable for now to establish the pattern. new prompt types will be
-    // added later and this eslint disable should be removed
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    case OverlayRenderer.CustomRenderDialog:
+      return <CustomRenderDialogAdapter prompt={prompt} />;
     case OverlayRenderer.FaeUpsell:
       return <FaeUpsellAdapter prompt={prompt} />;
     default:

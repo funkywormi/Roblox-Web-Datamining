@@ -7,7 +7,6 @@ export type SupportFormPrefill = {
   message: string;
   category?: string;
   subcategory?: string;
-  fromSupportAsk?: boolean;
   /** The landing fallback had to shorten the text to fit the description field. */
   messageWasShortened?: boolean;
 };
@@ -18,7 +17,7 @@ export type SupportFormCategorySelection = {
 };
 
 /**
- * The dropdowns key off the metadata identifier, while the ask reply names the pair.
+ * The dropdowns key off the metadata identifier, while a prefill names the pair.
  * Both have to be categories this user is offered, or neither is selected.
  */
 export const supportFormSelectionFromPrefill = (

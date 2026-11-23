@@ -66,8 +66,17 @@ export const playerTileClickTelemetryHandler: SduiActionTelemetryHandler = (
       ? startRowNumber + calculatedRowInSort - 1
       : undefined;
 
+  const omniSearchSessionId = ctx.sessionStore.get("omniSearchSessionInfo");
   const fields = parseEventParams({
     playerId,
+    "SD.OmniSearch.MD.omniSearchUuid": omniSearchSessionId,
+    "SD.OmniSearch.ID": omniSearchSessionId,
+    "SD.OmniSearch.MD.searchType": asString(
+      readField(actionConfig, analyticsContext, "omniSearchType"),
+    ),
+    "SD.OmniSearch.MD.searchKeyword": asString(
+      readField(actionConfig, analyticsContext, "searchKeyword"),
+    ),
     locale: navigator.language,
     pageContext:
       asStringIfStringOrFiniteNumber(readField(actionConfig, analyticsContext, "pageContext")) ??

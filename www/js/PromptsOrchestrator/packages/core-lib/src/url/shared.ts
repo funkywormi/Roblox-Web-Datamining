@@ -98,7 +98,9 @@ const fromUniqueURL = <T>(
   }
   if (
     !domainAllowlist.some(domain =>
-      domain.startsWith(".") ? url.hostname.endsWith(domain) : url.hostname === domain,
+      domain.startsWith(".")
+        ? url.hostname.endsWith(domain) || url.hostname === domain.substring(".".length)
+        : url.hostname === domain,
     )
   ) {
     return err({ code: "ForbiddenHost", host: url.host });

@@ -1,9 +1,9 @@
 import { PromptErrorName } from "../constants";
-import type { AppPage } from "../../constants/pageConstants";
-import type { PromptErrorPayload } from "../promptErrorPayload";
+import type { AppPageOrOverlay } from "../../constants/pageConstants";
+import type { OverlayErrorPayload } from "../promptErrorPayload";
 
 export type PromptRenderErrorInput = {
-  appPage: AppPage;
+  appPage: AppPageOrOverlay;
   componentType: string;
   errorMessage: string;
 };
@@ -16,7 +16,7 @@ export const renderErrors = {
     appPage,
     componentType,
     errorMessage,
-  }: PromptRenderErrorInput): PromptErrorPayload => ({
+  }: PromptRenderErrorInput): OverlayErrorPayload => ({
     errorName: PromptErrorName.UncaughtRenderError,
     errorMessage,
     appPage,
