@@ -286,7 +286,7 @@
         },
         {
             "name": "Authentication.Login",
-            "url": "https://js.rbxcdn.com/4e577e54e45b449c045588831b81ade1125e17e0422d343a47be8f12a70d22c8.js",
+            "url": "https://js.rbxcdn.com/4a62bd19cbf8ec8094d6d2e908ab4608042fee4b6a3972143ce890b28d463004.js",
             "sources": [
                 "/home",
                 "/",
@@ -915,7 +915,7 @@
         },
         {
             "name": "CommonUI.Messages",
-            "url": "https://js.rbxcdn.com/cae863b74eff85cc130d7c0bdd7e7cb381127ba3adb8da7caae2878a4d4a2e9c.js",
+            "url": "https://js.rbxcdn.com/726682c0c066e0150513ead10cf4b31f2d98410c67109a38fe3adf1216e8688f.js",
             "sources": [
                 "/home",
                 "/",
@@ -1098,7 +1098,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/49679eb51647b6e5391acf4059f9ef8b5464427deb5cf5da3f9e884553f37be4.js",
+            "url": "https://js.rbxcdn.com/37da617e3d7f100ed63a4cdc13ecd9b5e5682bf3905cb65c2776820022cd34bc.js",
             "sources": [
                 "/home",
                 "/",
@@ -2975,7 +2975,6 @@
             "url": "https://js.rbxcdn.com/23a4d7c1405e017062c61b8ee0b488a1912d095511cc8dfa82e87ce0f13c5c21.js",
             "sources": [
                 "/users/inventory",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/badges/176685910",
                 "/catalog/3360689775",
@@ -2986,6 +2985,7 @@
             "name": "Feature.PrivateServers",
             "url": "https://js.rbxcdn.com/a7ffc5ddc95a355ea10934dc8b924a8e53eba52c39502a0510b7bcbd52e4bc92.js",
             "sources": [
+                "/users/inventory",
                 "/games/1818"
             ]
         },
@@ -2996,7 +2996,6 @@
                 "/home",
                 "/users/inventory",
                 "/users/1/profile",
-                "/users/1/favorites",
                 "/users/profile/edit",
                 "/my/avatar",
                 "/badges/176685910",
@@ -3737,7 +3736,6 @@
             "sources": [
                 "/trades",
                 "/users/inventory",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/my/account",
                 "/badges/176685910",
@@ -4499,7 +4497,6 @@
             "url": "https://js.rbxcdn.com/22854f063a47132a0b95cdcbb024cf148a0e69eec0f1644dabffee8ba69aa84c-AvatarAccoutrementRules.js",
             "sources": [
                 "/users/inventory",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/badges/176685910",
                 "/catalog/3360689775",
@@ -4527,7 +4524,6 @@
                 "/catalog",
                 "/trades",
                 "/users/inventory",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/badges/176685910",
                 "/catalog/3360689775",
@@ -5170,7 +5166,7 @@
         },
         {
             "name": "Favorites",
-            "url": "https://js.rbxcdn.com/4e56a8b6e15d27201de7323fc94217719e6c76c46d8fb5de9636268a4fff0b5c-Favorites.js",
+            "url": "https://js.rbxcdn.com/b4307571d67a3ae277deb4c6e13bd598014faa0a776e2682f457db2a1691f4fd-Favorites.js",
             "sources": [
                 "/users/1/favorites"
             ]
@@ -5745,7 +5741,7 @@
         },
         {
             "name": "Inventory",
-            "url": "https://js.rbxcdn.com/33a84040c45e320642fa535ad1d66d9b0e9436411aa5a01371ff8f0f1f0919ce-Inventory.js",
+            "url": "https://js.rbxcdn.com/ced488dbefe35ca85b231c55cb5572d02953a073f22a0e8bbd94f25b95f86cfb-Inventory.js",
             "sources": [
                 "/users/inventory"
             ]
@@ -5825,7 +5821,6 @@
             "url": "https://js.rbxcdn.com/2f01a3c960a2d561bd165ef721af1c53f7d071ce750194fc64cfdb5533f7694e-ItemDetailsLimitedInventory.js",
             "sources": [
                 "/users/inventory",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/badges/176685910",
                 "/catalog/3360689775",
@@ -5961,7 +5956,6 @@
             "url": "https://js.rbxcdn.com/e2337bd9308b19d2970d5f910b8a02b2a0c8eac6f9541bae6d5803905bffc6fe-ItemResale.js",
             "sources": [
                 "/users/inventory",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/badges/176685910",
                 "/catalog/3360689775",
@@ -6649,7 +6643,6 @@
             "url": "https://js.rbxcdn.com/bf9c1abdc96925420d0a05da0fe7f7faedc84b97189208e9abfb132ee2e107b7-Recommendations.js",
             "sources": [
                 "/users/inventory",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/badges/176685910"
             ]
@@ -7068,7 +7061,6 @@
                 "/trades",
                 "/users/inventory",
                 "/users/1/profile",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/my/account",
                 "/search/communities",
@@ -8220,7 +8212,7 @@
         },
         {
             "name": "Favorites",
-            "url": "https://css.rbxcdn.com/8609ef54b3175cfefc279396c56ee4504e5dcd62dcd8eabecad3475e8927cc2e-Favorites.css",
+            "url": "https://css.rbxcdn.com/4b8d31781cf3c9c1bd2ec1eebef393166c4052536a77736f0dc38c74869c3293-Favorites.css",
             "sources": [
                 "/users/1/favorites"
             ]
@@ -8620,7 +8612,7 @@
         },
         {
             "name": "Inventory",
-            "url": "https://css.rbxcdn.com/8609ef54b3175cfefc279396c56ee4504e5dcd62dcd8eabecad3475e8927cc2e-Inventory.css",
+            "url": "https://css.rbxcdn.com/1d6446639d8602b3633d7f2a0c29951de5d58da51b1c0ec7848366004e7d09c3-Inventory.css",
             "sources": [
                 "/users/inventory"
             ]
@@ -8646,7 +8638,6 @@
             "url": "https://css.rbxcdn.com/2058f19493637e403f9c1cb94e40535ba2d095545b1e6eabb37c1a89c702a7c6-ItemDetailsLimitedInventory.css",
             "sources": [
                 "/users/inventory",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/badges/176685910",
                 "/catalog/3360689775",
@@ -8782,7 +8773,6 @@
             "url": "https://css.rbxcdn.com/f5ec4a109cba5b5d89ada32a4d88976753d0e2963970f47488a0893cf22aef60-ItemResale.css",
             "sources": [
                 "/users/inventory",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/badges/176685910",
                 "/catalog/3360689775",
@@ -9072,7 +9062,6 @@
             "url": "https://css.rbxcdn.com/d0ee7fdb572457d6ceeb30aa7b1bfb4a33d655af95dd0b5f82fc8d17aa144c5e-Recommendations.css",
             "sources": [
                 "/users/inventory",
-                "/users/1/favorites",
                 "/my/avatar",
                 "/badges/176685910"
             ]
