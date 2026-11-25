@@ -60,6 +60,7 @@ export type TSettingsUIPolicyBody = {
   enableAgeCheckSetting: boolean;
   enableParentLinkActivityUpdates: boolean;
   enableChildSideParentDigestEmails: boolean;
+  enableParentSurveyWidget: boolean;
   enableFoundationModals: boolean;
   enableSetEmailModalV2: boolean;
   experienceChatTCBreakthroughEnabled: boolean;

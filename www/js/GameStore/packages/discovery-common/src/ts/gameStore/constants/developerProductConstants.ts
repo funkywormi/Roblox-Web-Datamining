@@ -9,10 +9,6 @@ const url = {
     url: `${apiGatewayUrl}/experience-store/v1/universes/${universeId}/store`,
     withCredentials: true,
   }),
-  listGameTransactions: {
-    url: `${apiGatewayUrl}/game-transactions/v1/receipts`,
-    withCredentials: true,
-  },
   developerProductDetailsPage: (universeId: string, productId: string): UrlConfig => ({
     url: `https://${environmentUrls.domain}/developer-product/${universeId}/product/${productId}`,
   }),

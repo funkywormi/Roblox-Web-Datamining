@@ -6,12 +6,3 @@
 .hlist .list-item .store-card .gear-passes-asset {
     display: inline-block
 }
-
-.inline {
-    display: inline
-}
-
-.grow {
-    -ms-flex: 1 0 auto;
-    flex: 1 0 auto
-}

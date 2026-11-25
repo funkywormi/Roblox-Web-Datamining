@@ -10,7 +10,6 @@ import {
 import { FeatureDeveloperProducts } from "../../common/constants/translationConstants";
 import developerProductConstants from "../constants/developerProductConstants";
 import { TDeveloperProduct, TDiscount } from "../types/developerProductTypes";
-import DeveloperProductPendingBadge from "./DeveloperProductPendingBadge";
 
 type DiscountInformation = {
   originalPrice: number;
@@ -54,7 +53,6 @@ type TDeveloperProductCardProps = {
   sellerName: string;
   sellerId: number;
   universeId: number;
-  pendingCount: number;
 };
 
 const DeveloperProductCard = ({
@@ -63,7 +61,6 @@ const DeveloperProductCard = ({
   sellerId,
   universeId,
   translate,
-  pendingCount,
 }: TDeveloperProductCardProps): JSX.Element | null => {
   const [ItemPurchase, itemPurchaseService] = window.RobloxItemPurchase.createItemPurchase();
   const developerProductDetailsLink = developerProductConstants.url.developerProductDetailsPage(
@@ -93,13 +90,6 @@ const DeveloperProductCard = ({
       <div className="store-card">
         <div className="store-product-card-thumbnail">
           <a href={developerProductDetailsLink}>{thumbnailComponent}</a>
-          {pendingCount ? (
-            <DeveloperProductPendingBadge
-              count={pendingCount}
-              translate={translate}
-              productId={developerProduct.productId}
-            />
-          ) : null}
         </div>
         <div className="store-product-card-caption">
           <div className="store-product-card-name" title={developerProduct.name}>

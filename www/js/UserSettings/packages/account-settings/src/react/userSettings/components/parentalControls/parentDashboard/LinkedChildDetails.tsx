@@ -19,6 +19,7 @@ import { useGetSettingsUiPolicyQuery } from "../../../../apis/universalAppConfig
 import { trackError } from "../../../giftRobux/observability";
 import GiftRobuxErrorBoundary from "./GiftRobuxErrorBoundary";
 import RobuxBalanceSection from "./RobuxBalanceSection";
+import ParentSurveyWidget from "./ParentSurveyWidget";
 
 export const LinkedChildDetails = ({
   child,
@@ -60,6 +61,7 @@ export const LinkedChildDetails = ({
       <LinkedChildCard childInfo={child} />
       {childPages && (
         <React.Fragment>
+          {uiPolicy?.enableParentSurveyWidget && <ParentSurveyWidget />}
           <div className="rbx-divider" />
           <PendingRequestList childUserId={child.userId} />
 

@@ -9,7 +9,6 @@ type TDeveloperProductsGridProps = {
   translate: TranslateFunction;
   developerProducts: TDeveloperProduct[];
   gameDetails: TGetGameDetails;
-  pendingDeveloperProducts: Map<number, number>;
   resultsPerPage: number;
   currentPage: number;
   onChangePage: (newPage: number) => void;
@@ -20,12 +19,11 @@ const DeveloperProductsGrid = ({
   translate,
   developerProducts,
   gameDetails,
-  pendingDeveloperProducts,
   resultsPerPage,
   currentPage,
   onChangePage,
   numDeveloperProducts,
-}: TDeveloperProductsGridProps): JSX.Element => {
+}: TDeveloperProductsGridProps) => {
   const numPages = Math.ceil(numDeveloperProducts / resultsPerPage);
   const pagination =
     numDeveloperProducts > resultsPerPage ? (
@@ -39,7 +37,6 @@ const DeveloperProductsGrid = ({
       <ul className="hlist store-cards store-developer-products-row">
         {developerProducts.map(product => (
           <DeveloperProductCard
-            pendingCount={pendingDeveloperProducts.get(product.productId) ?? 0}
             developerProduct={product}
             sellerName={gameDetails.creator.name}
             sellerId={gameDetails.creator.id}

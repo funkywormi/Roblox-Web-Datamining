@@ -1098,7 +1098,7 @@
         },
         {
             "name": "Feature.AccountSettings",
-            "url": "https://js.rbxcdn.com/8efe8b5aee79d500ab6eebdb92975049332fd14ab45c0d3510851e3963050fae.js",
+            "url": "https://js.rbxcdn.com/5fad4d5010e55bbf48b504026042cb2b43290d75f5b3c010379374dfbcacaef4.js",
             "sources": [
                 "/home",
                 "/",
@@ -3178,6 +3178,13 @@
             ]
         },
         {
+            "name": "Feature.QualtricsSurveyPrompt",
+            "url": "https://js.rbxcdn.com/0b0a47d81e2f2f2f38fe00000487423b65aa8a261a509e23c12c0bf8430befbb.js",
+            "sources": [
+                "/my/account"
+            ]
+        },
+        {
             "name": "Feature.Reauthentication",
             "url": "https://js.rbxcdn.com/730fcbf0eba6dd82de9b0029e157627f023e6f448059c5b4c6a4f356222b3ac0.js",
             "sources": [
@@ -3351,7 +3358,7 @@
         },
         {
             "name": "Feature.RobloxSubscription",
-            "url": "https://js.rbxcdn.com/27c31a9d23a4d4492a7b03373c992e1b0491d4b01caeb979062fc1cdeb39a03c.js",
+            "url": "https://js.rbxcdn.com/6416583aa808f3281caa24af1222f8223c689a77da8cd791a1608ac541bf791b.js",
             "sources": [
                 "/home",
                 "/",
@@ -5375,7 +5382,7 @@
         },
         {
             "name": "GameStore",
-            "url": "https://js.rbxcdn.com/dc5bb1b40e7e24f203ce9ddd73fe3b4a6d28f3389f3315eb6c5e2fe1d8badb66-GameStore.js",
+            "url": "https://js.rbxcdn.com/dfc07c81c64f09a96fd433c88e3a385c20c194f5205842ce99821544cb5761c3-GameStore.js",
             "sources": [
                 "/games/1818"
             ]
@@ -6105,8 +6112,7 @@
                 "/plus",
                 "/my/account",
                 "/games/1818",
-                "/game-pass/58000",
-                "/badges/176685910"
+                "/game-pass/58000"
             ]
         },
         {
@@ -7382,7 +7388,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://js.rbxcdn.com/2f2b7ff431435eadd8d9a785237d36c03b2da173bfba075400dd9deca5b51099-UserSettings.js",
+            "url": "https://js.rbxcdn.com/8fc9f39617342c4ca1d4079cb805985d86299bcf7da1982e09385702b82d16f7-UserSettings.js",
             "sources": [
                 "/my/account"
             ]
@@ -8471,7 +8477,7 @@
         },
         {
             "name": "GameStore",
-            "url": "https://css.rbxcdn.com/4d2396a8c3ae7447c3dc72f3b4a9689761d7f5748ab6869b8c0b54bf634cfd10-GameStore.css",
+            "url": "https://css.rbxcdn.com/cda1e349ea7f785caee3d708ad8d7b3bd4aac957363840419629e6940fc5d321-GameStore.css",
             "sources": [
                 "/games/1818"
             ]
@@ -8853,8 +8859,7 @@
                 "/plus",
                 "/my/account",
                 "/games/1818",
-                "/game-pass/58000",
-                "/badges/176685910"
+                "/game-pass/58000"
             ]
         },
         {
@@ -9589,7 +9594,7 @@
         },
         {
             "name": "UserSettings",
-            "url": "https://css.rbxcdn.com/2776b66fa379d0cc18cfa243b825313bf472c56683066825fd123f40fe0792da-UserSettings.css",
+            "url": "https://css.rbxcdn.com/32ce1f76a0d92877db2218ac787359c48bf9233f172f1e42291a4dbf45f55f57-UserSettings.css",
             "sources": [
                 "/my/account"
             ]
