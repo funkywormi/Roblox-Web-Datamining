@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<c2686c336c7c57842cd935e0271183fd>>
- * @relayHash 5e4f6578bd7e6a8fe16494940d967dca
+ * @generated SignedSource<<f90f61bc9491d47eb91d7ec615dc82c4>>
+ * @relayHash 07166272c29e8279f2f606887e20d67c
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID QSl7x0zXCKFmpg_Dx5l83A
+// @relayRequestID H8IXxVZT-zXZBxmO-9QNPQ
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -65,7 +65,14 @@ v4 = [
     "variableName": "surface"
   }
 ],
-v5 = {
+v5 = [
+  {
+    "kind": "Variable",
+    "name": "surface",
+    "variableName": "surface"
+  }
+],
+v6 = {
   "alias": null,
   "args": null,
   "concreteType": "DisplayText",
@@ -133,14 +140,14 @@ v5 = {
   ],
   "storageKey": null
 },
-v6 = {
+v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "value",
   "storageKey": null
 },
-v7 = [
+v8 = [
   {
     "alias": null,
     "args": null,
@@ -149,7 +156,7 @@ v7 = [
     "name": "option",
     "plural": false,
     "selections": [
-      (v6/*: any*/)
+      (v7/*: any*/)
     ],
     "storageKey": null
   },
@@ -208,7 +215,7 @@ return {
                 "plural": false,
                 "selections": [
                   {
-                    "args": null,
+                    "args": (v5/*: any*/),
                     "kind": "FragmentSpread",
                     "name": "SettingsSurfaceFragment"
                   }
@@ -267,7 +274,7 @@ return {
                     "name": "header",
                     "plural": false,
                     "selections": [
-                      (v5/*: any*/)
+                      (v6/*: any*/)
                     ],
                     "storageKey": null
                   },
@@ -296,14 +303,21 @@ return {
                         "selections": [
                           {
                             "alias": null,
+                            "args": (v5/*: any*/),
+                            "kind": "ScalarField",
+                            "name": "auditData",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
                             "args": null,
                             "concreteType": "PresentableValue",
                             "kind": "LinkedField",
                             "name": "setting",
                             "plural": false,
                             "selections": [
-                              (v6/*: any*/),
-                              (v5/*: any*/)
+                              (v7/*: any*/),
+                              (v6/*: any*/)
                             ],
                             "storageKey": null
                           },
@@ -321,7 +335,7 @@ return {
                             "kind": "LinkedField",
                             "name": "on",
                             "plural": false,
-                            "selections": (v7/*: any*/),
+                            "selections": (v8/*: any*/),
                             "storageKey": null
                           },
                           {
@@ -331,7 +345,7 @@ return {
                             "kind": "LinkedField",
                             "name": "off",
                             "plural": false,
-                            "selections": (v7/*: any*/),
+                            "selections": (v8/*: any*/),
                             "storageKey": null
                           }
                         ],
@@ -353,7 +367,7 @@ return {
     ]
   },
   "params": {
-    "id": "QSl7x0zXCKFmpg_Dx5l83A",
+    "id": "H8IXxVZT-zXZBxmO-9QNPQ",
     "metadata": {},
     "name": "SettingsSurfaceQuery",
     "operationKind": "query",
@@ -362,6 +376,6 @@ return {
 };
 })();
 
-(node as any).hash = "1e220e916b1afd963618aaaea23ee53e";
+(node as any).hash = "9fcc649eae707c850302355bf0039265";
 
 export default node;

@@ -20,6 +20,9 @@ const savedKey = "Description.SuccessDialogMessage";
  * Switching it saves at once and shows the new value until the server answers. A snackbar says
  * whether the change was saved; if it wasn't, the row shows the setting's current value. A host can save
  * it another way instead by providing `SettingSaveContext`.
+ *
+ * A legally sensitive setting's write carries the `auditData` the row was loaded with, for the
+ * surface it's shown on, so the audit log records the copy the user was shown there.
  */
 export const BooleanSettingRow = ({
   setting: settingRef,
@@ -29,7 +32,7 @@ export const BooleanSettingRow = ({
   /** The user whose setting this is. */
   userId: string;
 }): JSX.Element | null => {
-  const { id, setting, enabled, on, off } = useFragment<BooleanSettingRowFragment$key>(
+  const { id, auditData, setting, enabled, on, off } = useFragment<BooleanSettingRowFragment$key>(
     BooleanSettingRowFragmentNode,
     settingRef,
   );
@@ -59,7 +62,13 @@ export const BooleanSettingRow = ({
     // returning its promise counts as a rejection and doesn't leave the row ignoring toggles.
     new Promise<void>(resolve => {
       resolve(
-        saveSetting({ id, name: setting.value, option: target.option.value, enabled: !enabled }),
+        saveSetting({
+          id,
+          name: setting.value,
+          option: target.option.value,
+          enabled: !enabled,
+          auditData: auditData ?? null,
+        }),
       );
     })
       // The host reports failures itself.
@@ -80,7 +89,14 @@ export const BooleanSettingRow = ({
       snackbarService.warning(translate(notSavedKey));
     };
     commitUpdate({
-      variables: { userId, input: { name: setting.value, value: { option: target.option.value } } },
+      variables: {
+        userId,
+        input: {
+          name: setting.value,
+          value: { option: target.option.value },
+          ...(auditData != null && { auditData }),
+        },
+      },
       optimisticUpdater: store => {
         store.get(id)?.setValue(!enabled, "enabled");
       },

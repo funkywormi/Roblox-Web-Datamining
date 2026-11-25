@@ -3,7 +3,12 @@ import * as device from "@rbx/core-scripts/meta/device";
 import { eventTypes, sendEventWithTarget } from "@rbx/core-scripts/event-stream";
 import browserIdentifier from "./browserIdentifier";
 
-import { appDownloadType, installInstructionStrings, pageName } from "./constants";
+import {
+  appDownloadBannerSource,
+  appDownloadType,
+  installInstructionStrings,
+  pageName,
+} from "./constants";
 
 function isWindows() {
   return device.isWindows();
@@ -85,5 +90,14 @@ export const sendPrimaryAppDownloadClickEvent = (appName: string, source?: strin
     field: `${appName}DownloadLink`,
     aType: "click",
     ...(source ? { source } : {}),
+  });
+};
+
+/** The app download banner's own events. Its Get clicks report through `onAppDownloadClick`. */
+export const sendAppDownloadBannerEvent = (aType: "shown" | "dismissed") => {
+  sendEventWithTarget(eventTypes.formInteraction, pageName, {
+    field: appDownloadBannerSource,
+    aType,
+    source: appDownloadBannerSource,
   });
 };

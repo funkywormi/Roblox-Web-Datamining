@@ -1,5 +1,6 @@
 export const ABUSE_VECTOR_PLACE = "place";
 export const ABUSE_VECTOR_GAME_TILE = "game_tile";
+export const ABUSE_VECTOR_AD = "ad_v2";
 
 /**
  * Retrieves the abuse report URL with the specified parameters.
@@ -30,7 +31,7 @@ export function getAbuseReportRevampUrl({
     stringId: universeId,
   };
 
-  if (abuseVector === "ad_v2" && adCreativeAssetId) {
+  if (abuseVector === ABUSE_VECTOR_AD && adCreativeAssetId) {
     customData.adCreativeAssetId = adCreativeAssetId;
   }
 

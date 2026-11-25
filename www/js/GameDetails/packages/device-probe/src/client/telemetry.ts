@@ -40,14 +40,23 @@ export type DeviceProbeFailedEvent = {
 export type DeviceProbeCompletedEvent = {
   durationMs: number;
   browser: string;
-  isolated: boolean;
-  /** The required-spec rules the scores failed; empty when the device meets the spec. */
+  /** `null` when the client stopped on what the browser reports, without mounting the probe. */
+  isolated: boolean | null;
+  /**
+   * The required-spec rules the scores failed, or the quick checks it stopped on; empty when the
+   * device meets the spec.
+   */
   failedRules: RequiredSpecRule[];
 };
 
+/**
+ * Why a call answered no without probing: the reason of the failure entry that's backing off, or
+ * `attemptCap` when the probe already started as often as the circuit breaker allows.
+ */
+type DeviceProbeSkipReason = ProbeFailureReason | "attemptCap";
+
 export type DeviceProbeSkippedEvent = {
-  /** The reason of the failure entry that's backing off. */
-  reason: ProbeFailureReason;
+  reason: DeviceProbeSkipReason;
   browser: string;
 };
 
@@ -105,12 +114,15 @@ export const deviceProbeTelemetry = {
   probeCompleted: ({ durationMs, browser, isolated, failedRules }: DeviceProbeCompletedEvent) => {
     const common = labels(browser, isolated);
     count("ProbeCompleted", { meets: failedRules.length === 0, ...common });
-    record("ProbeDurationMs", { isolated }, durationMs);
+    record("ProbeDurationMs", isolated == null ? {} : { isolated }, durationMs);
     for (const rule of failedRules) {
       count(specNotMetName(rule), common);
     }
   },
-  /** A recent failure on this device answered a `meetsRequiredSpec()` call no without probing. */
+  /**
+   * A recent failure on this device, or the start cap, answered a `meetsRequiredSpec()` call no
+   * without probing.
+   */
   probeSkipped: ({ reason, browser }: DeviceProbeSkippedEvent): void => {
     count("ProbeSkipped", { reason, browser: browserFamily(browser) });
   },

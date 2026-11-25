@@ -13,6 +13,9 @@ const PROFILE_TYPE = {
   Group: "Group",
   Community: "Community",
 } as const;
+const FRIENDSHIP_ORIGIN_SOURCE = {
+  PlayerSearch: "PlayerSearch",
+} as const;
 
 function reportMalformedParam(ctx: SduiActionContext, message: string, propName: string): void {
   ctx.errorReporter.reportSduiError(SduiErrorName.MalformedActionParam, message, ctx.pageContext, {
@@ -24,7 +27,7 @@ function reportMalformedParam(ctx: SduiActionContext, message: string, propName:
 function getValidatedProfileParams(
   actionParams: Record<string, unknown>,
   ctx: SduiActionContext,
-): { profileId: string; profileType: string } | undefined {
+): { profileId: string; profileType: string; source: string | undefined } | undefined {
   const profileId = readStringActionParam(actionParams, "profileId", undefined);
   if (profileId === undefined || profileId.trim() === "") {
     reportMalformedParam(ctx, `Missing or invalid profileId for ${ACTION_TYPE_NAME}`, "profileId");
@@ -41,7 +44,17 @@ function getValidatedProfileParams(
     return undefined;
   }
 
-  return { profileId, profileType };
+  let source = readStringActionParam(actionParams, "source", undefined);
+  if (
+    profileType === PROFILE_TYPE.User &&
+    actionParams.source !== undefined &&
+    !Object.values(FRIENDSHIP_ORIGIN_SOURCE).some(validSource => validSource === source)
+  ) {
+    reportMalformedParam(ctx, `Invalid source for ${ACTION_TYPE_NAME}`, "source");
+    source = undefined;
+  }
+
+  return { profileId, profileType, source };
 }
 
 export function openProfileResolveHref(
@@ -53,7 +66,7 @@ export function openProfileResolveHref(
     return undefined;
   }
 
-  const { profileId } = params;
+  const { profileId, source } = params;
   let { profileType } = params;
   if (profileType === PROFILE_TYPE.Group) {
     profileType = PROFILE_TYPE.Community;
@@ -66,9 +79,12 @@ export function openProfileResolveHref(
     path = `/communities/${profileId}`;
   }
 
-  const source = readStringActionParam(actionParams, "source", undefined);
   if (source !== undefined) {
     path += `?source=${encodeURIComponent(source)}`;
+    if (profileType === PROFILE_TYPE.User) {
+      // Profile Add Friend reads friendshipSourceType to attribute the request.
+      path += `&friendshipSourceType=${encodeURIComponent(source)}`;
+    }
   }
 
   return getAbsoluteUrl(path);

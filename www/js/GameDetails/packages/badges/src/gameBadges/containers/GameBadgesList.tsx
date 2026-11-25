@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
-import { withTranslations, TranslateFunction } from "react-utilities";
+import { withTranslations, type TranslateFunction } from "react-utilities";
 import { Button } from "react-style-guide";
 import GameBadge from "../components/GameBadge";
 import { TBadge } from "../types/gameBadgesTypes";

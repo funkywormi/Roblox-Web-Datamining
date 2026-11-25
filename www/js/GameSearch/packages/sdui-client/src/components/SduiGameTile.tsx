@@ -1,6 +1,11 @@
-import React, { isValidElement, useMemo, useRef } from "react";
+import React, { isValidElement, useCallback, useEffect, useMemo, useRef } from "react";
 import { clsx } from "clsx";
 import {
+  ActionType,
+  DataStatus,
+  createActionResolver,
+  isSduiManagedChildList,
+  type SduiManagedChildList,
   type SduiRendererInjectedProps,
   type SduiResolvedAction,
   type SduiTokenOrLiteral,
@@ -9,16 +14,25 @@ import {
   getSduiToken,
   toHtmlElement,
   parseImageString,
+  renderSduiNestedChild,
   SUPPORTED_ICON_CLASSES,
 } from "@rbx/sdui-core";
 import { abbreviateNumber } from "@rbx/core-scripts/format/number";
-import { ActionWrapper, renderRobloxGlyphText, SduiTileFooter } from "@rbx/sdui-common";
-import { useHoverIntent } from "@rbx/sdui-core/client";
+import {
+  ActionWrapper,
+  renderRobloxGlyphText,
+  SDUI_TILE_OVERFLOW_MENU_HOST_CLASS,
+  SduiTileFooter,
+  SduiTileOverflowMenu,
+  useSduiTilePointerHover,
+} from "@rbx/sdui-common";
+import { useHoverIntent, useOptionalSduiServices } from "@rbx/sdui-core/client";
 import "./css/sduiGameTile.css";
 import { SDUI_GAME_TILE_DEFAULTS } from "../consts/defaults";
 import { useIsEligibleForVideoPreview } from "../hooks/useIsEligibleForVideoPreview";
 import { useIsTouchVideoAutoplay } from "../hooks/useIsTouchVideoAutoplay";
 import { useViewportVideoAutoplay } from "../hooks/useViewportVideoAutoplay";
+import { useHiddenGameTile } from "./gameTileFeedback/useHiddenGameTile";
 import { VideoPlaybackAutoplayContext } from "./sduiVideoPlayer/VideoPlaybackAutoplayContext";
 import { WwwThumbnail2d } from "./primitives/WwwThumbnail2d";
 
@@ -34,6 +48,16 @@ function formatPlayerCount(playerCount: number): string {
   return abbreviateNumber(playerCount);
 }
 
+export type SduiGameTileOverflowMenuOpenChange = {
+  isOpen: boolean;
+  universeId: string;
+  collectionId: string;
+  availableMenuItemIds: string[];
+};
+
+/** A `LazyNestedComponentProp` arrives unrendered, so the tile decides when and how it renders. */
+type SduiLazyNestedComponent = React.ReactNode | SduiManagedChildList;
+
 export interface SduiGameTileProps extends SduiRendererInjectedProps {
   // TODO: Support the remaining GameTile schema features
   imageAspectRatio?: number;
@@ -45,14 +69,17 @@ export interface SduiGameTileProps extends SduiRendererInjectedProps {
   ctaButtonComponent?: React.ReactNode;
   footerComponent?: React.ReactNode;
   imageComponent?: React.ReactNode;
-  videoPlayer?: React.ReactNode;
+  /** Mounted only while the preview plays. */
+  videoPlayer?: SduiLazyNestedComponent;
   thumbnailOverlayComponent?: React.ReactNode;
   titleComponent?: React.ReactNode;
   thumbnailBackgroundStyle?: string;
   titleFont?: string;
   titleHeadingLevel?: string;
-  /** Bound from GameTileSchema `universe_id`. The hover preview uses it for eligibility. */
-  universeId?: string;
+  /** Bound from GameTileSchema `universe_id`. Used for hover preview and default OpenGameDetails navigation. */
+  universeId?: string | number;
+  /** Bound from GameTileSchema `place_id`. Used for default OpenGameDetails navigation when `onActivated` is omitted. */
+  placeId?: string | number;
   isContained?: boolean;
   /**
    * Pixels on the left, right, and bottom of the title and footer.
@@ -65,6 +92,20 @@ export interface SduiGameTileProps extends SduiRendererInjectedProps {
   ratingText?: string;
   /* Shown on the tile footer when `ratingText` is non-empty. */
   playerCount?: number;
+  /** Sort the tile belongs to. "Not interested" hides the tile within this collection only. */
+  collectionId?: string;
+  /** OVERFLOW_MENU shown at the thumbnail's top-right on hover or focus. */
+  overflowMenuComponent?: SduiLazyNestedComponent;
+  /**
+   * Shown in place of `overflowMenuComponent` while a mouse hovers the tile and
+   * the menu is closed, typically an X that marks the game "Not interested".
+   * Keyboard focus and touch keep the menu.
+   */
+  directActionComponent?: SduiLazyNestedComponent;
+  /** Replaces the thumbnail once the tile is hidden through "Not interested". */
+  hiddenStateComponent?: SduiLazyNestedComponent;
+  /** Local prop: called when the overflow menu opens or closes, for page telemetry. */
+  onOverflowMenuOpenChange?: (event: SduiGameTileOverflowMenuOpenChange) => void;
 }
 
 /**
@@ -80,6 +121,7 @@ export interface SduiGameTileProps extends SduiRendererInjectedProps {
  *     bottom content: title (if contained), rating footer or footerComponent, and the cta
  */
 export function SduiGameTile({
+  analyticsContext,
   imageAspectRatio = 1,
   titleText,
   image,
@@ -96,12 +138,57 @@ export function SduiGameTile({
   titleFont,
   titleHeadingLevel,
   universeId,
+  placeId,
   isContained,
   containmentPadding,
   disableDefaultFooterLogic,
   ratingText,
   playerCount,
+  collectionId,
+  overflowMenuComponent,
+  directActionComponent: directActionComponentProp,
+  hiddenStateComponent,
+  onOverflowMenuOpenChange,
 }: SduiGameTileProps) {
+  const services = useOptionalSduiServices();
+  const normalizedUniverseId =
+    universeId != null && String(universeId).trim() !== "" ? String(universeId) : undefined;
+  const normalizedPlaceId =
+    placeId != null && String(placeId).trim() !== "" ? String(placeId) : undefined;
+
+  // Matches Lua `SduiGameTile.lua`: when a GameTile template omits `onActivated`
+  // (e.g. HomeGameTile), fall back to `ACTION_TYPE_OPEN_GAME_DETAILS` using placeId + universeId.
+  // Not memoized: the href reads hydrated universe data and analytics fields that update in
+  // place, so a memo would serve a stale referral link.
+  let defaultOnActivated: SduiResolvedAction | undefined;
+  if (
+    onActivated == null &&
+    services &&
+    normalizedPlaceId &&
+    normalizedUniverseId &&
+    services.actionHandlerRegistry.getActionHandler(ActionType.OPEN_GAME_DETAILS)
+  ) {
+    const resolveAction = createActionResolver(services, services.configKey);
+    defaultOnActivated = resolveAction({
+      status: DataStatus.Ready,
+      actionData: {
+        actionType: ActionType.OPEN_GAME_DETAILS,
+        actionParams: {
+          placeId: normalizedPlaceId,
+          universeId: normalizedUniverseId,
+        },
+        analyticsContext,
+      },
+    });
+  }
+
+  const resolvedOnActivated = onActivated ?? defaultOnActivated;
+  // Memoized so the tile's own re-renders, such as hover changes, keep the same element.
+  const directActionComponent = useMemo(
+    () => renderSduiNestedChild(directActionComponentProp),
+    [directActionComponentProp],
+  );
+
   // Containment styling: corner radius, padding, surface color
   const cornerRadiusPx = getSduiNumeric(cornerRadius);
   const cornerRadiusClass = buildFoundationTokenCss(getSduiToken(cornerRadius));
@@ -120,27 +207,48 @@ export function SduiGameTile({
         )
       : undefined;
 
-  const hasActivationHandler = Boolean(onActivated?.onActivated);
+  const hasActivationHandler = Boolean(resolvedOnActivated?.onActivated);
 
   const tileRef = useRef<HTMLDivElement>(null);
   const { isHovered, onHoverStart, onHoverEnd } = useHoverIntent();
-  const hasVideo = videoPlayer != null && Boolean(universeId);
+  const hasVideo =
+    (isSduiManagedChildList(videoPlayer) ? videoPlayer.configs.length > 0 : Boolean(videoPlayer)) &&
+    Boolean(normalizedUniverseId);
   // A coarse primary pointer cannot hover, so the video plays while the tile is in the viewport.
   const isTouchInput = useIsTouchVideoAutoplay();
   const isHoverPlaybackEnabled = hasVideo && !isTouchInput;
   const { isEligibleForVideoPreview, isLoadingEligibility } = useIsEligibleForVideoPreview(
-    universeId ?? "",
+    normalizedUniverseId ?? "",
     hasVideo,
   );
-  // Ineligible tiles never mount a player, so they must not claim the autoplay slot.
+  // The menu and hidden state take local props, so both must arrive unrendered.
+  const feedbackConfig =
+    isSduiManagedChildList(overflowMenuComponent) &&
+    isSduiManagedChildList(hiddenStateComponent) &&
+    collectionId &&
+    normalizedUniverseId
+      ? { collectionId, universeId: normalizedUniverseId, overflowMenuComponent }
+      : undefined;
+  const isFeedbackSupported = feedbackConfig != null;
+  const hiddenTile = useHiddenGameTile(feedbackConfig?.collectionId, feedbackConfig?.universeId);
+  const isHidden = hiddenTile != null;
+  const isFeedbackSent = hiddenTile?.isFeedbackSent;
+  const hiddenState = useMemo(
+    () =>
+      isFeedbackSent == null
+        ? null
+        : renderSduiNestedChild(hiddenStateComponent, { isFeedbackSent }),
+    [hiddenStateComponent, isFeedbackSent],
+  );
+  // Ineligible and hidden tiles never mount a player, so they must not claim the autoplay slot.
   // Reduced motion is checked inside the hook, at registration time.
   const {
     markEnded,
     markBlocked,
     isPlaybackRequested: isViewportPlaybackRequested,
   } = useViewportVideoAutoplay({
-    enabled: hasVideo && isTouchInput && isEligibleForVideoPreview,
-    universeId,
+    enabled: hasVideo && isTouchInput && isEligibleForVideoPreview && !isHidden,
+    universeId: normalizedUniverseId,
     elementRef: tileRef,
   });
   const playbackCallbacks = useMemo(
@@ -151,8 +259,38 @@ export function SduiGameTile({
   const showEligibilityShimmer = isPlaybackRequested && hasVideo && isLoadingEligibility;
   const showEligiblePlayer = isPlaybackRequested && hasVideo && isEligibleForVideoPreview;
 
+  // The hidden tile has no hover handlers, so a restored tile would otherwise keep a stale hover
+  // and start its preview with the pointer elsewhere.
+  useEffect(() => {
+    if (isHidden) {
+      onHoverEnd();
+    }
+  }, [isHidden, onHoverEnd]);
+  const { isPointerHovering, handlers: pointerHoverHandlers } = useSduiTilePointerHover(
+    isFeedbackSupported && directActionComponent != null,
+  );
+  const onMenuOpenChange = useCallback(
+    (isOpen: boolean, availableMenuItemIds: string[]) => {
+      if (collectionId && normalizedUniverseId) {
+        onOverflowMenuOpenChange?.({
+          isOpen,
+          universeId: normalizedUniverseId,
+          collectionId,
+          availableMenuItemIds,
+        });
+      }
+    },
+    [collectionId, normalizedUniverseId, onOverflowMenuOpenChange],
+  );
+
   // image node: prefer passed imageComponent, then thumbnail/img, then placeholder
   const parsedImage = typeof image === "string" ? parseImageString(image) : null;
+  const tilePosterImage =
+    imageComponent == null && typeof image === "string" && parsedImage != null ? image : undefined;
+  const videoPosterProps = useMemo(
+    () => (tilePosterImage != null ? { defaultLoadingImage: tilePosterImage } : undefined),
+    [tilePosterImage],
+  );
 
   const imageNode =
     imageComponent ??
@@ -215,8 +353,9 @@ export function SduiGameTile({
   const mainContent = (
     <ActionWrapper
       className={clsx("sdui-game-tile-primary", "static", "flex", "flex-col", "gap-small")}
-      onClick={onActivated?.onActivated}
-      href={onActivated?.href}
+      onClick={resolvedOnActivated?.onActivated}
+      href={resolvedOnActivated?.href}
+      target={resolvedOnActivated?.target}
       ariaLabel={titleText}
     >
       <div
@@ -241,7 +380,10 @@ export function SduiGameTile({
         {imageNode}
         {/* The image stays mounted underneath and acts as the poster. */}
         {showEligibilityShimmer || showEligiblePlayer ? (
-          <div data-testid="sdui-tile-video-container" className="absolute inset-[0]">
+          <div
+            data-testid="sdui-tile-video-container"
+            className="sdui-tile-video-container absolute inset-[0]"
+          >
             {showEligibilityShimmer ? (
               <span
                 data-testid="sdui-tile-video-shimmer"
@@ -249,7 +391,7 @@ export function SduiGameTile({
               />
             ) : (
               <VideoPlaybackAutoplayContext.Provider value={playbackCallbacks}>
-                {videoPlayer}
+                {renderSduiNestedChild(videoPlayer, videoPosterProps)}
               </VideoPlaybackAutoplayContext.Provider>
             )}
           </div>
@@ -296,6 +438,34 @@ export function SduiGameTile({
       </div>
     ) : null;
 
+  if (isHidden) {
+    return (
+      <div
+        ref={tileRef}
+        data-testid="sdui-game-tile"
+        className="sdui-game-tile relative flex flex-col width-full"
+        {...pointerHoverHandlers}
+      >
+        <div
+          data-testid="sdui-tile-hidden-container"
+          className={clsx("width-full", "clip", cornerRadiusClass ?? "radius-medium")}
+          style={{ aspectRatio: String(imageAspectRatio) }}
+        >
+          {hiddenState}
+        </div>
+      </div>
+    );
+  }
+
+  const overflowMenu = feedbackConfig ? (
+    <SduiTileOverflowMenu
+      overflowMenuComponent={feedbackConfig.overflowMenuComponent}
+      directActionComponent={directActionComponent}
+      isPointerHovering={isPointerHovering}
+      onOpenChange={onMenuOpenChange}
+    />
+  ) : null;
+
   return (
     <div
       ref={tileRef}
@@ -305,6 +475,7 @@ export function SduiGameTile({
       // pseudo-element uses the parent as the containing block.
       className={clsx(
         "sdui-game-tile",
+        isFeedbackSupported && SDUI_TILE_OVERFLOW_MENU_HOST_CLASS,
         "relative",
         "flex",
         "flex-col",
@@ -326,8 +497,10 @@ export function SduiGameTile({
       onMouseLeave={isHoverPlaybackEnabled ? onHoverEnd : undefined}
       onFocus={isHoverPlaybackEnabled ? onHoverStart : undefined}
       onBlur={isHoverPlaybackEnabled ? onHoverEnd : undefined}
+      {...pointerHoverHandlers}
     >
       {mainContent}
+      {overflowMenu}
       {isContained && (titleNode != null || footerRow != null) ? (
         <div
           data-testid="sdui-tile-bottom-content"

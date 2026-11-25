@@ -71,10 +71,9 @@ export type User = {
   isPremiumUser: boolean;
   membership?: typeof blackbirdMembership;
   isVerified: boolean;
+  /** @deprecated Use `@rbx/www-common/core-content` instead. */
   isUnder13: boolean;
-  /**
-   * @deprecated Use `id` instead.
-   */
+  /** @deprecated Use `id` instead. */
   isAuthenticated: true;
 };
 

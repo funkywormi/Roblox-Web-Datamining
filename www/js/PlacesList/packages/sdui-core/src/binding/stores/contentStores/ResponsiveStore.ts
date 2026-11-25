@@ -1,0 +1,120 @@
+import { UnkeyedStore } from "../UnkeyedStore";
+import { window as browserWindow } from "@rbx/core-lib/browser";
+import {
+  observePreferredInput,
+  PreferredInput,
+  readInitialPreferredInput,
+  type PreferredInput as PreferredInputType,
+} from "./preferredInput";
+import { readDeviceType, type DeviceType } from "./readDeviceType";
+
+export type { DeviceType } from "./readDeviceType";
+
+export { PreferredInput } from "./preferredInput";
+
+/** Content-type key under which viewport state is registered on the data binder. */
+export const RESPONSIVE_CONTENT_TYPE = "responsive";
+
+export interface ResponsiveData {
+  screenWidth: number;
+  screenHeight: number;
+  isPortrait: boolean;
+  preferredInput: PreferredInputType;
+  /**
+   * Device category from the host document. `""` when none was published.
+   * Does not change on resize.
+   */
+  deviceType: DeviceType;
+  [key: string]: unknown;
+}
+
+type ViewportData = Pick<ResponsiveData, "screenWidth" | "screenHeight" | "isPortrait">;
+
+// TODO(sdui-ssr): Replace these hard-coded fallbacks with per-request device
+// metadata (User-Agent / Client Hints) so SSR renders match the requesting
+// device's viewport instead of always assuming desktop. See class docstring.
+const SSR_VIEWPORT_WIDTH = 1280;
+const SSR_VIEWPORT_HEIGHT = 800;
+
+const SSR_DEFAULTS: ResponsiveData = {
+  screenWidth: SSR_VIEWPORT_WIDTH,
+  screenHeight: SSR_VIEWPORT_HEIGHT,
+  isPortrait: false,
+  preferredInput: PreferredInput.Pointer,
+  deviceType: "",
+};
+
+function readViewport(): ViewportData {
+  return {
+    screenWidth: browserWindow ? browserWindow.innerWidth : SSR_VIEWPORT_WIDTH,
+    screenHeight: browserWindow ? browserWindow.innerHeight : SSR_VIEWPORT_HEIGHT,
+    isPortrait: browserWindow ? browserWindow.innerHeight > browserWindow.innerWidth : false,
+  };
+}
+
+function readResponsiveData(): ResponsiveData {
+  const deviceType = readDeviceType();
+  if (!browserWindow) {
+    return { ...SSR_DEFAULTS, deviceType };
+  }
+  return {
+    ...readViewport(),
+    preferredInput: readInitialPreferredInput(),
+    deviceType,
+  };
+}
+
+/**
+ * Responsive store backed by the window viewport. Access via
+ * `ResponsiveStore.getInstance()`.
+ *
+ * Per-field signals (from `UnkeyedStore.applyUpdate`) mean a
+ * horizontal-only resize wakes only `screenWidth` consumers, and
+ * orientation consumers re-evaluate only when `isPortrait` actually flips.
+ *
+ *
+ * Browser: lazy process singleton — shared across services bundles
+ *
+ * SSR: fresh instance per call, scoped to the calling
+ * `createSduiServices()` request.
+ *
+ * The hard-coded SSR viewport is a temporary stub — full SDUI SSR support
+ * requires plumbing per-request device metadata (User-Agent or Client
+ * Hints) through the request context so the seeded viewport matches the
+ * requesting device. Until that lands, mobile-first templates rendered on
+ * SSR will hydrate against desktop dimensions and may flash on the first
+ * client `resize`.
+ *
+ * `deviceType` is separate from the viewport. In the browser it is read once
+ * from `<meta name="device-meta">`, which both .NET and Next.js render. It
+ * stays empty during SSR. A resized window does not change it.
+ */
+export class ResponsiveStore extends UnkeyedStore<ResponsiveData> {
+  constructor() {
+    // Re-seed on `clear()`: this store is a process singleton. The resize
+    // listener would eventually re-seed after the base zero-out, but
+    // consumers would read `undefined` until the user resizes the window.
+    const reseed = (): ResponsiveData => readResponsiveData();
+    super({ initial: reseed(), reseed });
+    if (browserWindow) {
+      browserWindow.addEventListener("resize", () => {
+        this.applyPartialUpdate(readViewport());
+      });
+      observePreferredInput(preferredInput => {
+        this.applyPartialUpdate({ preferredInput });
+      });
+    }
+  }
+
+  public syncFromViewport(): void {
+    if (!browserWindow) return;
+    this.applyPartialUpdate(readViewport());
+  }
+
+  private applyPartialUpdate(update: Partial<ResponsiveData>): void {
+    // UnkeyedStore updates are whole-record replacements. Retain fields that
+    // did not change so input events cannot clear viewport data and resizes
+    // cannot clear preferredInput.
+    this.applyUpdate({ ...this.readSnapshot(), ...update });
+  }
+}

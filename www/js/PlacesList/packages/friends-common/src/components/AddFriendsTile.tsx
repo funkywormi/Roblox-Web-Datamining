@@ -1,5 +1,5 @@
 import { JSX } from "react";
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import { Icon, StatusIndicator } from "@rbx/foundation-ui";
 
 const formatFriendRequestBadgeLabel = (count: number): string =>

@@ -281,8 +281,8 @@ export default {
     consentCenterAllowActionConsentName: "consentCenterAllowAction",
     consentCenterUpdateSettingNoValueConsentName: "consentCenterUpdateSettingNoValue",
     consentCenterUpdateSettingWithValueConsentName: "consentCenterUpdateSettingWithValue",
-    consentCenterUpdateSettingParentFacingWithValueConsentName:
-      "consentCenterUpdateSettingParentFacingWithValue",
+    consentCenterUpdateSettingParentFacingNoValueConsentName:
+      "consentCenterUpdateSettingParentFacingNoValue",
     legallySensitiveConsentSurfaceName: "consent-center",
   },
   parentalConsents: {

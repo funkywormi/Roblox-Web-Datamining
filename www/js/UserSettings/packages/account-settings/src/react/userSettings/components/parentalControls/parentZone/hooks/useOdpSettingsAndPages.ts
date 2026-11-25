@@ -32,15 +32,21 @@ const useOdpSettingsAndPages = (pageName?: string) => {
       showErrorSnackbar: false,
     });
   const policy = useGetSettingsUiPolicyQuery(undefined, { skip: shouldSkipSettingsQueries });
+  const canParentViewSpending =
+    context.data?.canParentViewChildSpendRestrictions === true ||
+    context.data?.shouldParentSeeSpendingInsights === true;
   const spendControls = useGetParentalSpendControlsQuery(undefined, {
-    skip: shouldSkipSettingsQueries || context.data?.canParentViewChildSpendRestrictions !== true,
+    skip: shouldSkipSettingsQueries || !canParentViewSpending,
   });
   const parentInfo = useGetParentInfoQuery(undefined, {
-    skip: shouldSkipSettingsQueries || context.data?.canParentViewChildSpendRestrictions !== true,
+    skip: shouldSkipSettingsQueries || !canParentViewSpending,
   });
   const hasRemoteParent =
     !parentInfo.isError &&
     parentInfo.data?.parents.some(parent => parent.isRemoteParent === true) === true;
+  // Only once the parent lookup confirms it, so a failed lookup doesn't show a wrong value.
+  const hasConfirmedNoRemoteParent =
+    !parentInfo.isError && parentInfo.data !== undefined && !hasRemoteParent;
   const queries = [
     context,
     policy,
@@ -75,6 +81,7 @@ const useOdpSettingsAndPages = (pageName?: string) => {
       queries.some(query => query.isFetching),
     policy: policy.data,
     context: context.data,
+    hasConfirmedNoRemoteParent,
   };
 };
 

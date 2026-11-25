@@ -4,7 +4,7 @@
  */
 
 import { fireEvent } from "roblox-event-tracker";
-import { TranslateFunction } from "react-utilities";
+import type { TranslateFunction } from "react-utilities";
 import { TSystemFeedbackService } from "react-style-guide";
 import { apiErrorStatusCode, trackError } from "../../observability";
 import { ErrorUtils } from "./errorUtils";

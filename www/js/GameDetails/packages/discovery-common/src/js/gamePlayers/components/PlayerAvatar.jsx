@@ -1,21 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {
-  Thumbnail2d,
-  ThumbnailTypes,
-  ThumbnailAvatarHeadshotSize,
-  ThumbnailFormat,
-} from "@rbx/thumbnails";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 
 function PlayerAvatar({ playerId, altName }) {
   return (
     <div className="avatar-card-link">
       <Thumbnail2d
-        type={ThumbnailTypes.avatarHeadshot}
-        size={ThumbnailAvatarHeadshotSize.size48}
+        type="AvatarHeadShot"
+        size="48x48"
         targetId={playerId}
         imgClassName="avatar-card-image"
-        format={ThumbnailFormat.webp}
+        format="webp"
         altName={altName}
       />
     </div>

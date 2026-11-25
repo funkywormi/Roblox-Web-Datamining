@@ -3,20 +3,22 @@ import { computed, type ReadonlySignal } from "@preact/signals-core";
 import { buildAnalyticsContext } from "../analytics/buildAnalyticsContext";
 import { SduiErrorName } from "../errors/SduiErrors";
 import { reportError } from "../errors/SduiLogger";
-import type {
-  ActionBuildContext,
-  AnalyticsContext,
-  BindingContext,
-  BuildPropContext,
-  BuiltPropObject,
-  DataBindingSources,
-  NestedComponentBuildContext,
-  PropSignalEntry,
-  SduiBuilder,
-  SduiBuilderDeps,
-  SduiComponentConfig,
-  SduiDataBinder,
-  UiComponentTemplate,
+import { isSectionId } from "../pooling";
+import {
+  UiComponentType,
+  type ActionBuildContext,
+  type AnalyticsContext,
+  type BindingContext,
+  type BuildPropContext,
+  type BuiltPropObject,
+  type DataBindingSources,
+  type NestedComponentBuildContext,
+  type PropSignalEntry,
+  type SduiBuilder,
+  type SduiBuilderDeps,
+  type SduiComponentConfig,
+  type SduiDataBinder,
+  type UiComponentTemplate,
 } from "../types";
 import { createPropBuildDispatcher } from "./createPropBuildDispatcher";
 import { resolveAnalyticsFields } from "./propBuilders/buildAnalyticsFields";
@@ -46,6 +48,7 @@ function buildPropObject(
 ): BuiltPropObject {
   const props: Record<string, unknown> = {};
   const propSignals: Record<string, PropSignalEntry> = {};
+  const nestedComponentConfigPropNames = new Set<string>();
   const buildProp = createPropBuildDispatcher({
     dataSources: scope.dataSources,
     dataBinder: scope.dataBinder,
@@ -56,6 +59,9 @@ function buildPropObject(
     const propCtx: BindingContext = { ...scope.rootCtx, propName };
     try {
       const result = buildProp(rawProp, propCtx);
+      if (result.isNestedComponentConfig) {
+        nestedComponentConfigPropNames.add(propName);
+      }
 
       if (result.category === "propSignal") {
         propSignals[propName] = result.statusSignal
@@ -89,7 +95,9 @@ function buildPropObject(
     }
   }
 
-  return { props, propSignals };
+  return nestedComponentConfigPropNames.size > 0
+    ? { props, propSignals, nestedComponentConfigPropNames }
+    : { props, propSignals };
 }
 
 /**
@@ -127,6 +135,14 @@ function buildIsFilteredSignal(
   }
   return computed(() => result.value === true);
 }
+
+const POOL_START_ROW_COMPONENT_TYPES: ReadonlySet<UiComponentType> = new Set([
+  UiComponentType.COLLECTION_CAROUSEL,
+  UiComponentType.COLLECTION_GRID,
+  UiComponentType.OPTION_SELECTOR_COLLECTION,
+  UiComponentType.SINGLE_ITEM_COLLECTION,
+  UiComponentType.VARIABLE_ITEM_WIDTH_CAROUSEL,
+]);
 
 /**
  * Builds a fully-resolved `SduiComponentConfig` for one template: data
@@ -172,15 +188,40 @@ function buildComponentConfig(
     analyticsContext,
   };
 
+  const { poolBuildMetadata } = nestedBuildContext;
   const nestedContextForChildren: NestedComponentBuildContext = {
     ...nestedBuildContext,
     parentAnalyticsContext: analyticsContext,
+    ...(poolBuildMetadata?.isSectionRoot
+      ? { poolBuildMetadata: { sectionId: poolBuildMetadata.sectionId } }
+      : {}),
   };
 
-  const { props, propSignals } = buildPropObject(template.props, scope, {
-    action: actionCtx,
-    nested: nestedContextForChildren,
-  });
+  const { props, propSignals, nestedComponentConfigPropNames } = buildPropObject(
+    template.props,
+    scope,
+    {
+      action: actionCtx,
+      nested: nestedContextForChildren,
+    },
+  );
+
+  // Thread the feed section's reactive `startRow` into the section's root collection
+  // (including non-pool carousels and single-item collections, matching Lua
+  // `SduiPoolEntryHelpers.entryConfigExtrasFn`). Nested collections are not feed rows.
+  const sectionId = poolBuildMetadata?.sectionId;
+  if (
+    poolBuildMetadata?.isSectionRoot === true &&
+    POOL_START_ROW_COMPONENT_TYPES.has(template.shared.componentType) &&
+    isSectionId(sectionId) &&
+    propSignals.startRowNumber === undefined
+  ) {
+    const startRowSignal = nestedBuildContext.poolRegistry
+      .getOrCreate(nestedBuildContext.builderConfig.configKey)
+      .getSectionStartRow(sectionId);
+    propSignals.startRowNumber = { value: startRowSignal };
+    props.startRowNumber = startRowSignal.peek();
+  }
 
   const hasPropSignals = Object.keys(propSignals).length > 0;
 
@@ -191,6 +232,7 @@ function buildComponentConfig(
     ...(hasPropSignals ? { propSignals } : {}),
     analyticsContext,
     ...(isComponentFilteredSignal ? { isComponentFilteredSignal } : {}),
+    ...(nestedComponentConfigPropNames ? { nestedComponentConfigPropNames } : {}),
   };
 }
 

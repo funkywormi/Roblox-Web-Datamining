@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { WithTranslationsProps } from "@rbx/core-scripts/react";
 import { Button, Loading } from "@rbx/core-ui";
 import { fireEvent } from "@rbx/www-common/event-tracker";
-import { generateRandomUuid } from "@rbx/core-lib/uuid";
+import { useTranslations } from "@rbx/www-common/i18n";
 import { TGameData, TMetaData, TPaginationMethod } from "../common/types/bedev1Types";
 import bedev2Services from "../common/services/bedev2Services";
 import { gameSearchPage } from "../common/constants/configConstants";
@@ -41,22 +41,31 @@ import {
   isWideTileComponentType,
 } from "../common/utils/parsingUtils";
 import { useVerticalScrollTracker } from "../common/components/useVerticalScrollTracker";
-import { usePageSession, withPageSession } from "../common/utils/PageSessionContext";
+import { usePageSession } from "../common/utils/PageSessionContext";
+import { PersonalizedRecommendationsMenu } from "../personalizedRecommendations/PersonalizedRecommendationsMenu";
+import {
+  PersonalizedRecommendationsPolicyField,
+  usePersonalizedRecommendationsPolicy,
+} from "../personalizedRecommendations/personalizedRecommendationsPolicy";
 import SearchTextContent from "../common/components/SearchTextContent";
 import {
   getSearchResultsGamesList,
   getGameSearchComponentType,
+  getGameSearchPersonalizedRecommendationsSurfaceKey,
   getGameSearchTopicId,
 } from "./utils/gameSearchSortUtils";
 
 const HOTLINE_SEARCH_TEXT_TOPIC_ID = "HotlineSearchText";
 
-function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
+type GameSearchProps = WithTranslationsProps & { gamesTabSessionId: string };
+
+function GameSearch({ translate, gamesTabSessionId }: GameSearchProps): JSX.Element {
+  // Same `CommonUI.Features` "Games" label as lua-apps; `Common.GameSorts` has the same key as "Experiences".
+  const translateFeatures = useTranslations("CommonUI.Features");
   const gridRef = useRef<HTMLDivElement>(null);
   const tileRef = useRef<HTMLDivElement>(null);
   const keyword = searchHelper.getKeyword() as string;
   const omniSearchSessionId = usePageSession();
-  const [gamesTabSessionId] = useState(generateRandomUuid());
   const [gameData, setGameData] = useState<TGameData[] | undefined>(undefined);
   const [textData, setTextData] = useState<TOmniSearchTextDataModel[] | undefined>(undefined);
   const [metaData, setMetaData] = useState<TMetaData | undefined>(undefined);
@@ -65,6 +74,15 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [nextPageToken, setNextPageToken] = useState<string>("");
+  // The menu needs the server's surface key and the policy (Guac); no key means no menu.
+  const personalizedRecommendationsSurfaceKey = useMemo(
+    () => getGameSearchPersonalizedRecommendationsSurfaceKey(sortsData),
+    [sortsData],
+  );
+  const isPolicyEnabled = usePersonalizedRecommendationsPolicy(
+    PersonalizedRecommendationsPolicyField.SearchOmnisearchExperiences,
+    !!personalizedRecommendationsSurfaceKey,
+  );
 
   const topicId = useMemo(() => {
     return getGameSearchTopicId(gameTopicIds);
@@ -260,6 +278,12 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
       })}
     >
       <div ref={searchFeedRef}>
+        {isPolicyEnabled && personalizedRecommendationsSurfaceKey && (
+          <div className="flex items-center justify-between">
+            <h2>{translateFeatures("Label.Games", undefined, "Games")}</h2>
+            <PersonalizedRecommendationsMenu surfaceKey={personalizedRecommendationsSurfaceKey} />
+          </div>
+        )}
         <GameGrid
           ref={gridRef}
           tileRef={tileRef}
@@ -288,4 +312,4 @@ function GameSearch({ translate }: WithTranslationsProps): JSX.Element {
   );
 }
 
-export default withPageSession(GameSearch);
+export default GameSearch;

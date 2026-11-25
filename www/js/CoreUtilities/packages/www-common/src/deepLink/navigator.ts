@@ -1046,6 +1046,11 @@ const deepLinkNavigate = (host: DeepLinkHost, target: DeepLink): Promise<boolean
     // Pass through roblox:// unchanged for protocol / in-app handling.
     // roblox://navigation/plus_referral_dashboard
     urlTarget = target.url;
+  } else if (navigateSubPath === PathPart.PlusOnboarding) {
+    // Pass through roblox:// unchanged for protocol / in-app handling.
+    // There is no web page for the onboarding sheet.
+    // roblox://navigation/plus_onboarding
+    urlTarget = target.url;
   } else if (navigateSubPath === PathPart.PlusSubscribe) {
     // roblox://navigation/plus_subscribe?surface=PlusReferralLandingSheet&referrer_id=123
     const plusParams = UrlSearchParams.new([

@@ -31,6 +31,8 @@ export interface SduiCollectionGridProps extends SduiRendererInjectedProps {
   impressionEventName?: string;
   /** when true, skips the item impression log. */
   skipItemImpressionsLog?: boolean;
+  /** 1-based starting row of this section in a pooled feed (injected by SduiBuilder). */
+  startRowNumber?: number;
 }
 
 /** CSR-only vertical grid (e.g. the Charts "See All" page) wrapping the V1 `CollectionGrid` primitive. */
@@ -45,6 +47,7 @@ export function SduiCollectionGrid({
   maxNumRows,
   impressionEventName,
   skipItemImpressionsLog,
+  startRowNumber,
 }: SduiCollectionGridProps) {
   const tokens = useTokens();
   const { triggerLoadMore, hasNextPage, dataUpdatedTimestamp, isLoadingMore } =
@@ -55,6 +58,7 @@ export function SduiCollectionGrid({
     collectionComponentType: COLLECTION_COMPONENT_TYPE,
     impressionEventName,
     skipItemImpressionsLog,
+    startRowNumber,
   });
 
   const resolvedHeader = headerComponent ? expandManagedList(headerComponent) : null;

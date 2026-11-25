@@ -196,7 +196,7 @@ export const PlayButton = ({
   appsFlyerReferralProperties = EMPTY_OBJECT,
   iconClassName = "icon icon-filled-play-large size-700",
   buttonWidth = buttonWidths.full,
-  buttonClassName = "btn-common-play-game-lg game-play-button-lg",
+  buttonClassName = "game-play-button-lg",
   disableLoadingState = false,
   skipPlayabilityFetch = false,
   buttonText = undefined,
@@ -515,6 +515,7 @@ export const DefaultPlayButton = ({
           eventProperties={eventProperties}
           wasmJoinId={wasmJoinId}
           playOnWebVariant={PlayOnWebVariant.TwoButton}
+          pageContext={pageContext}
         />
       ),
     },
@@ -582,6 +583,7 @@ export const DefaultPlayButton = ({
               eventProperties={eventProperties}
               wasmJoinId={wasmJoinId}
               playOnWebVariant={PlayOnWebVariant.OneButton}
+              pageContext={pageContext}
             />
           );
           break;

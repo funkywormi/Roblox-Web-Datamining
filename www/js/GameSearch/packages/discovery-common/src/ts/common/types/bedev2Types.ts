@@ -115,6 +115,7 @@ export type TTopicLayoutData = {
   sponsoredFooterIncludeRatingContent?: "true" | "false";
   ampUpsellFeatureName?: string;
   ampUpsellNamespace?: string;
+  personalizedRecommendationsSurfaceKey?: string;
 };
 
 type TSharedGameSort = {

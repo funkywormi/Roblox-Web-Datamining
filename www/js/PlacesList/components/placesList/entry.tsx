@@ -1,7 +1,7 @@
 import ready from "@rbx/core-scripts/util/ready";
 import { queryClient, renderWithErrorBoundary, TranslationProvider } from "@rbx/core-scripts/react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { HomePage, HomePageContainer } from "@rbx/discovery-common";
+import { HomePageContainer, HomePageIxpWrapper } from "@rbx/discovery-common";
 import "@rbx/discovery-common/realtimePlacelist.scss";
 import { gamePlayButtonNamespaces } from "@rbx/game-play-button";
 import type { Namespace } from "@rbx/www-common/i18n";
@@ -24,8 +24,7 @@ ready(() => {
       <TranslationProviderSCC namespaces={namespaces}>
         <TranslationProvider config={translations}>
           <QueryClientProvider client={queryClient}>
-            {/* @ts-expect-error: TODO: old, migrated code */}
-            <HomePage />
+            <HomePageIxpWrapper />
           </QueryClientProvider>
         </TranslationProvider>
       </TranslationProviderSCC>,

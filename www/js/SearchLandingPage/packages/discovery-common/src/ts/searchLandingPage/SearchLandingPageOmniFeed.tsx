@@ -1,11 +1,10 @@
-import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/react";
+import type { TranslateFunction } from "@rbx/core-scripts/react";
 import "@rbx/core-scripts/global";
 import React, { useCallback, useEffect, useState, useRef } from "react";
-import { SearchLandingService } from "@rbx/legacy-webapp-types/Roblox";
 import { fireEvent } from "@rbx/www-common/event-tracker";
+import { useTranslations } from "@rbx/www-common/i18n";
 import bedev2Services from "../common/services/bedev2Services";
 import getDeviceFeatures from "../common/utils/deviceFeaturesUtils";
-import { translationConfig } from "./app.config";
 import { mapExploreApiSortsResponse } from "../omniFeed/utils/gameSortUtils";
 import { TExploreApiSorts, TTreatmentType } from "../common/types/bedev2Types";
 import {
@@ -14,13 +13,22 @@ import {
   ShowSearchLandingEventParams,
 } from "./service/modalConstants";
 import SearchLandingPageSessionContext from "./SearchLandingPageSessionContext";
+import SearchLandingService from "./service/searchLandingService";
 import { searchLandingPage } from "../common/constants/configConstants";
-import OmniFeedItem from "../omniFeed/OmniFeedItem";
-import { PageContext } from "../common/types/pageContext";
+import SearchLandingFeedItem from "./SearchLandingFeedItem";
 import useFriendsPresence from "../common/hooks/useFriendsPresence";
 import { LoadingGameTile } from "../common/components/LoadingGameTile";
 
-function SearchLandingPageOmniFeed({ translate }: WithTranslationsProps): JSX.Element | null {
+function SearchLandingPageOmniFeed(): JSX.Element | null {
+  const t = useTranslations("Feature.Recommendations");
+  const translate = useCallback<TranslateFunction>(
+    (key, params) =>
+      t.has(key)
+        ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- legacy params are untyped
+          t.dynamic(key, params as Record<string, string | number | Date> | undefined)
+        : "",
+    [t],
+  );
   const [showSearchLanding, setShowSearchLanding] = useState<boolean>(false);
   const [sessionInfo, setSessionInfo] = useState<string>();
   const [recommendations, setRecommendations] = useState<TExploreApiSorts | undefined>(undefined);
@@ -160,18 +168,13 @@ function SearchLandingPageOmniFeed({ translate }: WithTranslationsProps): JSX.El
         }}
       >
         {recommendations.sorts.map((sort, positionId) => (
-          <OmniFeedItem
+          <SearchLandingFeedItem
             // eslint-disable-next-line react/no-array-index-key
             key={positionId}
             translate={translate}
             sort={sort}
             positionId={positionId}
-            // TODO CLIGROW-2277 write hook to get the starting row
-            startingRow={undefined}
             friendsPresenceData={friendsPresenceData}
-            currentPage={PageContext.SearchLandingPage}
-            itemsPerRow={searchLandingPage.numberOfTilesPerCarousel}
-            isCarouselHorizontalScrollEnabled
           />
         ))}
       </section>
@@ -179,4 +182,4 @@ function SearchLandingPageOmniFeed({ translate }: WithTranslationsProps): JSX.El
   );
 }
 
-export default withTranslations(SearchLandingPageOmniFeed, translationConfig);
+export default SearchLandingPageOmniFeed;

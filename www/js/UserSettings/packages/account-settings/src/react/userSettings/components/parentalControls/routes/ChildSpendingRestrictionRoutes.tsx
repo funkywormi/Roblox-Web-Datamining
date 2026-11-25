@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { Route } from "react-router-dom";
 import { useTranslation } from "react-utilities";
-import { EnabledStatusValue, UserSetting } from "@rbx/user-settings";
+import { EnabledStatusValue, SpendNotificationSetting, UserSetting } from "@rbx/user-settings";
 import useGetSettingsAndOptions from "../../../../apis/hooks/useGetSettingsAndOptions";
 import { useGetParentalSpendControlsQuery } from "../../../../apis/billingApi";
 import SpendSettingName from "../../../../../enums/SpendSettingName";
@@ -26,9 +26,12 @@ export const ChildSpendingRestrictionRoutes = ({
   child,
   pages,
   onUpdateSetting,
+  displayedSpendNotificationSetting,
 }: {
   child: TChildSettingsInfo;
   pages?: Pick<TChildPages, "childSettingCategoryPages" | "spendingPages">;
+  // Shown in place of the billing value when set
+  displayedSpendNotificationSetting?: SpendNotificationSetting;
 } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useTranslation();
   const linkedChildPages = useAppSelector(selectChildPagesForChildUserId(child.userId));
@@ -79,7 +82,7 @@ export const ChildSpendingRestrictionRoutes = ({
         }
         case SpendSettingName.SpendNotifications: {
           const optionTranslation = getTranslatedOptionValue(
-            spendControlSettings?.spendNotificationSetting,
+            displayedSpendNotificationSetting ?? spendControlSettings?.spendNotificationSetting,
             translate,
           );
           currentValueComponent = <span>{optionTranslation}</span>;
@@ -105,7 +108,13 @@ export const ChildSpendingRestrictionRoutes = ({
       };
     });
     return result;
-  }, [subpages, spendControlSettings, childSettings, spendControls]);
+  }, [
+    subpages,
+    spendControlSettings,
+    displayedSpendNotificationSetting,
+    childSettings,
+    spendControls,
+  ]);
 
   const triggerPriceTagRendering = () => {
     window.dispatchEvent(
@@ -153,7 +162,11 @@ export const ChildSpendingRestrictionRoutes = ({
       )}
       {subpages[SpendSettingName.SpendNotifications] && (
         <Route path={subpages[SpendSettingName.SpendNotifications]?.path}>
-          <ChildSpendingNotifications child={child} onUpdateSetting={onUpdateSetting} />
+          <ChildSpendingNotifications
+            child={child}
+            onUpdateSetting={onUpdateSetting}
+            displayedSetting={displayedSpendNotificationSetting}
+          />
         </Route>
       )}
     </div>

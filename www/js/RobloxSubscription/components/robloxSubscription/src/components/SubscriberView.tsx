@@ -14,6 +14,7 @@ import DiscountTierProgressCard from "./DiscountTierProgressCard";
 import InteractWithPlusSection from "./InteractWithPlusSection";
 import ManageButton from "./ManageButton";
 import PlusReferralShareCard from "./PlusReferralShareCard";
+import PlusUpgradeBanner from "./PlusUpgradeBanner";
 import SavingsDashboard from "./SavingsDashboard";
 import SubscriberStatusSummary from "./SubscriberStatusSummary";
 import SubscriptionBenefitsDisplay from "./SubscriptionBenefitsDisplay";
@@ -42,8 +43,12 @@ export type SubscriberViewProps = {
   robloxSubscriptionProduct: SubscriptionProductInfo;
   robloxSubscriptionMembership: Subscription;
   robloxPlusUserBenefits: GetRobloxPlusUserBenefitsResponse | undefined;
+  isEntrypointDisabled: boolean;
   isFaeFreeTrial: boolean;
   shouldDeeplinkToReferral: boolean;
+  /** Set when the server offers the membership an upgrade. */
+  upgradeProduct?: SubscriptionProductInfo;
+  onMobilePurchaseInitiated?: () => void;
   onOpenReferrals: () => void;
 };
 
@@ -52,12 +57,16 @@ const SubscriberView: FC<SubscriberViewProps> = ({
   robloxSubscriptionProduct,
   robloxSubscriptionMembership,
   robloxPlusUserBenefits,
+  isEntrypointDisabled,
   isFaeFreeTrial,
   shouldDeeplinkToReferral,
+  upgradeProduct,
+  onMobilePurchaseInitiated,
   onOpenReferrals,
 }) => {
   const { translate } = useTranslation();
   const { eligibility: senderEligibility } = useSenderReferralEligibility();
+  const isUpgradeable = upgradeProduct !== undefined;
   const savedRobux = robloxPlusUserBenefits?.robuxSavedWithPlus;
   const itemsBoughtWithDiscountCount = robloxPlusUserBenefits?.itemsBoughtWithPlusDiscount;
   const privateServersCreatedCount = robloxPlusUserBenefits?.privateServersCreatedForFree;
@@ -141,11 +150,19 @@ const SubscriberView: FC<SubscriberViewProps> = ({
             activationTimestampMs={robloxSubscriptionMembership.activationTimestampMs}
             expirationTimestampMs={robloxSubscriptionMembership.expirationTimestampMs}
             hasFreeTrial={hasFreeTrial}
+            isUpgradeable={isUpgradeable}
             nextRenewalTimestampMs={robloxSubscriptionMembership.nextRenewalTimestampMs}
           />
           {
             // Keep the existing 8px gap when the banner is hidden.
             <div className="width-full gap-xlarge flex flex-col">
+              {upgradeProduct && !isEntrypointDisabled && (
+                <PlusUpgradeBanner
+                  deviceMeta={deviceMeta}
+                  upgradeProduct={upgradeProduct}
+                  onMobilePurchaseInitiated={onMobilePurchaseInitiated}
+                />
+              )}
               <PendingPlanChangeBanner
                 nextRenewalTimestampMs={robloxSubscriptionMembership.nextRenewalTimestampMs}
                 subscriptionId={robloxSubscriptionMembership.subscriptionId}
@@ -153,9 +170,11 @@ const SubscriberView: FC<SubscriberViewProps> = ({
               <DiscountTierProgressCard
                 activationTimestampMs={robloxSubscriptionMembership.activationTimestampMs}
                 currentDiscountPercent={currentDiscountPercent}
+                // An upgradeable member is asked to upgrade, not to stay subscribed.
                 isCancelled={
-                  robloxSubscriptionMembership.nextRenewalTimestampMs === null ||
-                  robloxSubscriptionMembership.nextRenewalTimestampMs === 0
+                  !isUpgradeable &&
+                  (robloxSubscriptionMembership.nextRenewalTimestampMs === null ||
+                    robloxSubscriptionMembership.nextRenewalTimestampMs === 0)
                 }
                 nextDiscount={discountTier.next}
                 periodType={robloxSubscriptionMembership.periodType}

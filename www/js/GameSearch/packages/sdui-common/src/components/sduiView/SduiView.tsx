@@ -1,6 +1,7 @@
 import {
   expandManagedList,
   SDUI_MANAGED_CHILDREN_PROP,
+  type SduiAutomaticSize,
   type SduiDim2,
   type SduiRendererInjectedProps,
   type SduiScaleBasis,
@@ -16,6 +17,8 @@ export interface SduiViewProps extends SduiRendererInjectedProps {
    */
   classNames?: string;
   size?: SduiDim2;
+  /** Which axes size to content instead of the explicit `size` length. */
+  automaticSize?: SduiAutomaticSize;
   /** Web-only max-width in px (or token). */
   maxWidth?: SduiTokenOrLiteral;
   /** Web-only. What `size.yScale` resolves against — `"parent"` (default) or `"viewport"`. */
@@ -37,6 +40,7 @@ export function SduiView(props: SduiViewProps) {
   const {
     classNames,
     size,
+    automaticSize,
     maxWidth,
     yScaleBasis,
     anchorPoint,
@@ -51,6 +55,7 @@ export function SduiView(props: SduiViewProps) {
   const viewStyles = getViewStyles({
     classNames,
     size,
+    automaticSize,
     maxWidth,
     yScaleBasis,
     anchorPoint,

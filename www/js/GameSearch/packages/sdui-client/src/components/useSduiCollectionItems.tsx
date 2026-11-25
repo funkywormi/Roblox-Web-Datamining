@@ -6,6 +6,7 @@ import {
   computeIsWideTiles,
   createImpressionContext,
   isValidCollectionAnalyticsData,
+  materializeSduiComponentConfig,
   reportImpressions,
   type AnalyticsContext,
   type ItemAnalyticsData,
@@ -27,6 +28,8 @@ export interface UseSduiCollectionItemsArgs {
   impressionEventName?: string;
   /** when true, skips the item impression log. */
   skipItemImpressionsLog?: boolean;
+  /** 1-based starting row of this section in a pooled feed (fallback when `items.poolLayout` is absent). */
+  startRowNumber?: number;
 }
 
 export interface SduiCollectionItems {
@@ -54,6 +57,7 @@ export function useSduiCollectionItems({
   itemsPerRowOverride,
   impressionEventName,
   skipItemImpressionsLog,
+  startRowNumber,
 }: UseSduiCollectionItemsArgs): SduiCollectionItems {
   const services = useSduiServices();
   const { pageContext } = services;
@@ -64,6 +68,15 @@ export function useSduiCollectionItems({
   const itemConfigs: SduiComponentConfig[] = items?.configs ?? [];
   const totalNumberOfItems = itemConfigs.length;
   const isPooled = items?.poolLayout !== undefined;
+  const resolvedStartRowNumber = items?.poolLayout?.startRow ?? startRowNumber;
+  // Wide-tile layout reads props from the first item; materialize deferred shells first.
+  const isWideTiles = useMemo(() => {
+    const firstItem = items?.configs[0];
+    if (firstItem != null) {
+      materializeSduiComponentConfig(firstItem);
+    }
+    return computeIsWideTiles(items?.configs ?? []);
+  }, [items?.configs]);
 
   const collectionAnalyticsData = useMemo(
     () =>
@@ -73,7 +86,8 @@ export function useSduiCollectionItems({
           itemsPerRow,
           totalNumberOfItems,
           collectionComponentType,
-          isWideTiles: computeIsWideTiles(items?.configs ?? []),
+          isWideTiles,
+          startRowNumber: resolvedStartRowNumber,
         },
         pageContext,
         services.errorReporter,
@@ -81,7 +95,8 @@ export function useSduiCollectionItems({
     [
       analyticsContext,
       collectionComponentType,
-      items?.configs,
+      isWideTiles,
+      resolvedStartRowNumber,
       itemsPerRow,
       totalNumberOfItems,
       pageContext,
@@ -111,7 +126,7 @@ export function useSduiCollectionItems({
         impressionIndexes: indexesToSend,
         itemAnalyticsDatas: itemAnalyticsDatasRef.current,
         collectionAnalyticsData,
-        startRowNumber: items?.poolLayout?.startRow,
+        startRowNumber: resolvedStartRowNumber,
         itemCellIndexes: isPooled
           ? items.configs.map((config, index) => config.poolPlacement?.cellIndex ?? index)
           : undefined,
@@ -123,7 +138,7 @@ export function useSduiCollectionItems({
       impressionCtx,
       services.impressionHandlerRegistry,
       collectionAnalyticsData,
-      items?.poolLayout?.startRow,
+      resolvedStartRowNumber,
       items?.configs,
       isPooled,
       itemsPerRow,
@@ -136,14 +151,25 @@ export function useSduiCollectionItems({
 
   const renderItem = useCallback(
     (config: SduiComponentConfig, index: number, _isVisible?: boolean): React.JSX.Element => {
+      // Materialize and invoke `items.renderItem` first so SduiRenderer's
+      // `addListItemAnalytics` populates `itemComponentType` and `itemPosition`
+      // on the item's own snapshot before `buildItemAnalyticsData` reads it.
+      const materializedConfig = materializeSduiComponentConfig(config);
+      if (materializedConfig == null) {
+        itemAnalyticsDatasRef.current[index] = null;
+        return <React.Fragment key={index} />;
+      }
+      const rendered = items?.renderItem(materializedConfig, index) ?? (
+        <React.Fragment key={index} />
+      );
       itemAnalyticsDatasRef.current[index] = buildItemAnalyticsData(
-        config.analyticsContext,
+        materializedConfig.analyticsContext,
         index,
         pageContext,
         services.errorReporter,
         config.poolPlacement ? config.poolPlacement.poolIndex + 1 : undefined,
       );
-      return items?.renderItem(config, index) ?? <React.Fragment key={index} />;
+      return rendered;
     },
     [items, pageContext, services.errorReporter],
   );

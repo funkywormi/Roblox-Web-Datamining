@@ -23,4 +23,6 @@ export enum Event {
   SHARE_CARD_SHOWN = "ShareCardShown",
   SHARE_CARD_INVITE_CLICK = "ShareCardInviteClick",
   SUBSCRIBER_BENEFIT_CLICK = "SubscriberBenefitClick",
+  UPGRADE_BANNER_SHOWN = "UpgradeBannerShown",
+  UPGRADE_BANNER_CLICK = "UpgradeBannerClick",
 }

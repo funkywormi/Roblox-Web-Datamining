@@ -14,11 +14,13 @@ export type FormattedTextValue = {
 
 // Splitting on a capture group puts the placeholder names at the odd indexes.
 const placeholderPattern = /\{([^{}\s]+)\}/;
+const lineBreakPlaceholder = "lineBreak";
 
 /**
  * Renders a server-translated `FormattedText`. The words between a link's opening and closing
- * placeholders become an https link that opens in a new tab. Other placeholders are removed, and
- * a link whose closing placeholder never comes leaves its words as plain text.
+ * placeholders become an https link in the current browsing context. A `{lineBreak}` placeholder
+ * becomes a line break. Other placeholders are removed, and a link whose closing placeholder never
+ * comes leaves its words as plain text.
  */
 export const FormattedText = ({
   text: { text, links },
@@ -33,6 +35,9 @@ export const FormattedText = ({
     if (index % 2 === 0) {
       if (openLink) linkWords += part;
       else nodes.push(part);
+    } else if (!openLink && part === lineBreakPlaceholder) {
+      // eslint-disable-next-line react/no-array-index-key -- the parts of a served text don't reorder
+      nodes.push(<br key={`line-break-${index}`} />);
     } else if (!openLink) {
       openLink = links.find(link => link.opening === part && link.url.startsWith("https://"));
       linkWords = "";
@@ -42,7 +47,6 @@ export const FormattedText = ({
           // eslint-disable-next-line react/no-array-index-key -- the parts of a served text don't reorder
           key={index}
           href={openLink.url}
-          target="_blank"
           rel="noreferrer"
           variant="Inline"
           color="Standard"

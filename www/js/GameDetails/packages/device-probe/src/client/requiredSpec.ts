@@ -51,31 +51,72 @@ export type DeviceMeasurement = {
   memory: { deviceMemoryGiB: number | null; maxSharedAllocMiB: number };
 };
 
-/** A failed rule: `feature:<name>` or the name of the minimum or requirement. */
+/**
+ * A failed rule: `feature:<name>`, the name of the minimum or requirement, or `softwareRenderer`.
+ * Only the probe reports `softwareRenderer`, when it stops before the benchmarks because WebGL
+ * would render in software. The scores stored then fail `requireWebgl2Renders` too.
+ */
 export type RequiredSpecRule =
   | `feature:${string}`
   | "minDeviceMemoryGiB"
   | "minEffectiveCores"
   | "minSingleThreadScore"
   | "minWebgl2FillPassesPerMs"
-  | "requireWebgl2Renders";
+  | "requireWebgl2Renders"
+  | "softwareRenderer";
+
+/** What the browser reports about the device without measuring it. */
+export type ReportedDevice = {
+  /** `navigator.deviceMemory`, `null` where the browser doesn't report it. */
+  deviceMemoryGiB: number | null;
+  /** `navigator.hardwareConcurrency`, at least 1. */
+  reportedCores: number;
+};
+
+/** `feature:<name>` for each of `names` the features lack. Names the probe doesn't report fail. */
+export const failedFeatureRules = (
+  features: DeviceMeasurement["features"],
+  names: readonly string[],
+): RequiredSpecRule[] =>
+  names
+    .filter(
+      name =>
+        !Object.hasOwn(features, name) ||
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- checked by Object.hasOwn
+        !features[name as keyof DeviceFeatures],
+    )
+    .map(name => `feature:${name}` as const);
+
+// Firefox and Safari don't report device memory, which only passes a minimum of 0.
+const tooLittleMemory = (deviceMemoryGiB: number | null, spec: Readonly<RequiredSpec>): boolean =>
+  spec.minDeviceMemoryGiB > 0 && (deviceMemoryGiB ?? 0) < spec.minDeviceMemoryGiB;
+
+/**
+ * The rules that fail on what the browser reports alone, so no measurement could pass them: the
+ * device memory, and fewer reported cores than the minimum (effective cores are measured on at
+ * most the reported ones).
+ */
+export const failedReportedRules = (
+  device: ReportedDevice,
+  spec: Readonly<RequiredSpec>,
+): RequiredSpecRule[] => {
+  const failed: RequiredSpecRule[] = [];
+  if (tooLittleMemory(device.deviceMemoryGiB, spec)) {
+    failed.push("minDeviceMemoryGiB");
+  }
+  if (device.reportedCores < spec.minEffectiveCores) {
+    failed.push("minEffectiveCores");
+  }
+  return failed;
+};
 
 /** The rules the measurement fails; empty when the device meets the spec. */
 export const failedRules = (
   measurement: DeviceMeasurement,
   spec: Readonly<RequiredSpec>,
 ): RequiredSpecRule[] => {
-  const failed: RequiredSpecRule[] = spec.requiredFeatures
-    .filter(
-      name =>
-        !Object.hasOwn(measurement.features, name) ||
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- checked by Object.hasOwn
-        !measurement.features[name as keyof DeviceFeatures],
-    )
-    .map(name => `feature:${name}` as const);
-  const { deviceMemoryGiB } = measurement.memory;
-  // Firefox and Safari don't report device memory, which only passes a minimum of 0.
-  if (spec.minDeviceMemoryGiB > 0 && (deviceMemoryGiB ?? 0) < spec.minDeviceMemoryGiB) {
+  const failed = failedFeatureRules(measurement.features, spec.requiredFeatures);
+  if (tooLittleMemory(measurement.memory.deviceMemoryGiB, spec)) {
     failed.push("minDeviceMemoryGiB");
   }
   if (measurement.cpu.effectiveCores < spec.minEffectiveCores) {

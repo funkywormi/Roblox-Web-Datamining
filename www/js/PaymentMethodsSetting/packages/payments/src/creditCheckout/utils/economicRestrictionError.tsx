@@ -1,4 +1,4 @@
-import { TranslateFunction } from "react-utilities";
+import type { TranslateFunction } from "react-utilities";
 
 type EconomicRestrictionInfo = {
   expirationTimeInMinutes: number;

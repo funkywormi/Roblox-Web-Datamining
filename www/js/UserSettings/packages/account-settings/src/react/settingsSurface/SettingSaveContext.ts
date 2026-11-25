@@ -10,6 +10,12 @@ export type TSaveSettingRequest = {
   option: string;
   /** Whether the toggle is on after the switch. */
   enabled: boolean;
+  /**
+   * The setting's `auditData` on the row's surface, to send with the write so its audit log records
+   * the copy the user was shown. Null when the setting isn't legally sensitive, or its copy is
+   * missing.
+   */
+  auditData: string | null;
 };
 
 /**

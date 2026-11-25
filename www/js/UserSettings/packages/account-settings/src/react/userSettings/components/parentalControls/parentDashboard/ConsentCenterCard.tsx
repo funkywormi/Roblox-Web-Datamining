@@ -21,7 +21,6 @@ import RobuxSettingName from "../../../../../enums/RobuxSettingName";
 import { TChildInfo } from "../../../../../types/childrenInfoTypes";
 import { RobuxTransfer } from "../../../../../types/robuxTransferTypes";
 import { useAnswerConsentRequestMutation } from "../../../../apis/parentalControlsApi";
-import { useGetParentalSpendControlsQuery } from "../../../../apis/billingApi";
 import {
   ConsentAnswer,
   ParentConsentType,
@@ -92,10 +91,6 @@ const ConsentCenterCard = ({
   }, [consent, userProfiles]);
 
   const settingName = useMemo(() => getFirstSettingNameInConsentData(consent), [consent]);
-  // Spend notifications come from billing rather than child settings.
-  const { data: spendControlSettings } = useGetParentalSpendControlsQuery(consent?.childUserId, {
-    skip: settingName !== UserSetting.monthlySpendLimitNotificationType,
-  });
   const sessionId = useMemo(() => uuidService.generateRandomUuid(), []);
 
   const actionNameTranslation: string | undefined = useMemo(() => {
@@ -186,12 +181,6 @@ const ConsentCenterCard = ({
       case ParentConsentType.UpdateBirthdate:
         return birthdayUtils.formatBirthdateFromISO(child.birthDate);
       case ParentConsentType.UpdateUserSetting: {
-        if (settingName === UserSetting.monthlySpendLimitNotificationType) {
-          return getTranslatedSettingValue(
-            settingName,
-            spendControlSettings?.spendNotificationSetting,
-          );
-        }
         if (settingName) {
           const settings = { ...childSettings, ...childSettingsV2 };
           const currValue = settings[settingName as keyof typeof settings]?.currentValue;
@@ -267,23 +256,12 @@ const ConsentCenterCard = ({
           { actionName: `<b>${actionNameTranslation}</b>` },
         ];
 
-      case UserSetting.monthlySpendLimitNotificationType: {
-        const currentValue = getCurrentValue();
-        const proposedValue = getProposedValue();
-        if (!currentValue || !proposedValue) {
-          return [undefined, undefined];
-        }
-
-        // Update {settingName} on your child's account from {currentValue} to {proposedValue}
+      case UserSetting.monthlySpendLimitNotificationType:
+        // Update {settingName} on your child's account
         return [
-          parentConsentsLegallySensitiveContent.consentCenterUpdateSettingParentFacingWithValueConsentName,
-          {
-            settingName: `<b>${actionNameTranslation}</b>`,
-            currentValue: currentValue,
-            proposedValue: `<b>${proposedValue}</b>`,
-          },
+          parentConsentsLegallySensitiveContent.consentCenterUpdateSettingParentFacingNoValueConsentName,
+          { settingName: `<b>${actionNameTranslation}</b>` },
         ];
-      }
 
       default: {
         const currentValue = getCurrentValue();
@@ -434,7 +412,12 @@ const ConsentCenterCard = ({
           path = childPages?.spendingPages[SpendSettingName.MonthlySpendingLimit]?.path;
           break;
         case UserSetting.monthlySpendLimitNotificationType:
-          path = childPages?.spendingPages[SpendSettingName.SpendNotifications]?.path;
+          // Match the page ChildRoutes renders: under Spending, else the spending insights page.
+          if (child.canParentViewChildSpendRestrictions) {
+            path = childPages?.spendingPages[SpendSettingName.SpendNotifications]?.path;
+          } else if (child.shouldParentSeeSpendingInsights) {
+            path = childPages?.childSettingCategoryPages[SpendSettingName.SpendNotifications]?.path;
+          }
           break;
         case UserSetting.dailyScreenTimeLimit:
           path = childPages?.screenTimeManagementPage.path;

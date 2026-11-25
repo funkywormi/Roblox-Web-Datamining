@@ -327,6 +327,16 @@ export interface SduiManagedChildList {
     reactKey?: Key,
     extraLocalProps?: SduiExtraLocalProps,
   ) => ReactElement | null;
+  /**
+   * Renders a config as a nested child rather than a list item, so it gets no
+   * list position analytics. Use it for single nested component props. Lists the
+   * renderer creates always have it.
+   */
+  renderChild?: (
+    childConfig: SduiComponentConfig,
+    reactKey?: Key,
+    extraLocalProps?: SduiExtraLocalProps,
+  ) => ReactElement | null;
   poolLayout?: PoolSectionLayoutMetadata;
 }
 

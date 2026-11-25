@@ -9,7 +9,7 @@ import React, {
   FC,
   PropsWithChildren,
 } from "react";
-import { TranslateFunction } from "react-utilities";
+import type { TranslateFunction } from "react-utilities";
 import { TSystemFeedbackService } from "react-style-guide";
 import { urlService } from "core-utilities";
 import type { Address } from "@rbx/payments/billingAddress";

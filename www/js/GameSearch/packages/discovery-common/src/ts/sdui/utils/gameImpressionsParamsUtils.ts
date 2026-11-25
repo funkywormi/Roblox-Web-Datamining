@@ -41,6 +41,9 @@ const getThumbnailPersonalizationData = (
     [EventStreamMetadata.ThumbnailListIds]: impressionIndexes.map(index =>
       parseStringField(itemAnalyticsDatas[index]?.thumbnailListId, "0"),
     ),
+    [EventStreamMetadata.VideoThumbnailAssetIds]: impressionIndexes.map(index =>
+      parseMaybeStringNumberField(itemAnalyticsDatas[index]?.videoThumbnailAssetId, 0),
+    ),
   };
 };
 
@@ -69,9 +72,14 @@ const getSponsoredAdData = (
   return {
     [EventStreamMetadata.AdsPositions]: adFlags,
     [EventStreamMetadata.AdFlags]: adFlags,
-    [EventStreamMetadata.AdIds]: impressionIndexes.map(index =>
-      parseStringField(itemAnalyticsDatas[index]?.adId, "0"),
-    ),
+    [EventStreamMetadata.AdIds]: impressionIndexes.map((index, i) => {
+      // Matches Lua `SendGameImpressions`: non-ad slots emit "0", never "".
+      if (adFlags[i] !== 1) {
+        return "0";
+      }
+      const adId = parseStringField(itemAnalyticsDatas[index]?.adId, "0");
+      return adId === "" ? "0" : adId;
+    }),
   };
 };
 
@@ -129,12 +137,19 @@ export const buildGameImpressionParams = ({
       parseStringField(itemAnalyticsDatas[index]?.navigationUniverseId, "0"),
     ),
     [EventStreamMetadata.AbsPositions]: impressionIndexes,
-    ...getAbsoluteRowImpressionsData(
-      startRowNumber,
-      collectionAnalyticsData.itemsPerRow,
-      collectionAnalyticsData.totalNumberOfItems,
-      coordinateIndexes,
-    ),
+    [EventStreamMetadata.PositionsInTopic]: impressionIndexes.map(index => {
+      // Canonical 0-based rank in topic/pool (`itemPosition` is 1-based for Lua parity).
+      const itemPosition = parseMaybeStringNumberField(itemAnalyticsDatas[index]?.itemPosition, -1);
+      return itemPosition >= 1 ? itemPosition - 1 : index;
+    }),
+    ...(collectionAnalyticsData.itemsPerRow > 0
+      ? getAbsoluteRowImpressionsData(
+          startRowNumber,
+          collectionAnalyticsData.itemsPerRow,
+          collectionAnalyticsData.totalNumberOfItems,
+          coordinateIndexes,
+        )
+      : {}),
     [EventStreamMetadata.SortPos]:
       // Decremented since server collectionPosition will be 1-indexed for Lua
       collectionAnalyticsData.collectionPosition >= 0

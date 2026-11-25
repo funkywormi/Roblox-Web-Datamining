@@ -6,6 +6,7 @@ export interface SduiSingleItemCollectionProps extends SduiRendererInjectedProps
   item?: SduiManagedChildList;
   impressionEventName?: string;
   skipItemImpressionsLog?: boolean;
+  startRowNumber?: number;
 }
 
 /** A single lazy child with the same viewport impression tracking as other collections. */
@@ -14,6 +15,7 @@ export function SduiSingleItemCollection({
   item,
   impressionEventName,
   skipItemImpressionsLog,
+  startRowNumber,
 }: SduiSingleItemCollectionProps) {
   const { itemsContainerRef, itemConfigs, renderItem } = useSduiCollectionItems({
     analyticsContext,
@@ -22,6 +24,7 @@ export function SduiSingleItemCollection({
     collectionComponentType: "SINGLE_ITEM_COLLECTION",
     impressionEventName,
     skipItemImpressionsLog,
+    startRowNumber,
   });
   const config = itemConfigs[0];
 

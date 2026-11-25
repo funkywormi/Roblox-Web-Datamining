@@ -21,6 +21,8 @@ type TMountOptions = {
   // Suffix used to identify query params whose keys are server-provided (e.g.
   // from analyticsData). The suffix will be stripped before sending the event.
   queryParamSuffixForServerProvidedKeys?: string;
+  // Whether to rewrite the url with only allowlisted query parameters. Defaults to true.
+  scrubQueryParameters?: boolean;
 };
 type TServerProvidedQueryParams = Record<string, string | string[]>;
 const { parseQueryString, composeQueryString } = parsingUtils;
@@ -38,7 +40,7 @@ export const usePageReferralTracker = <T extends Record<string, unknown>>(
   appsFlyerReferralParams: Partial<TAppsFlyerRefParams>;
   serverProvidedQueryParams: TServerProvidedQueryParams;
 } => {
-  const { queryParamSuffixForServerProvidedKeys } = mountOptions;
+  const { queryParamSuffixForServerProvidedKeys, scrubQueryParameters = true } = mountOptions;
   const [referralParams, setReferralParams] = useState<T>(
     parseQueryString(location.search) as unknown as T,
   );
@@ -106,22 +108,24 @@ export const usePageReferralTracker = <T extends Record<string, unknown>>(
       }
       return acc;
     }, {});
-    // Do not want to expose placeId other than the case with launchData
-    if (!parsedQueryParams.launchData && parsedQueryParams.placeId) {
-      delete parsedQueryParams.placeId;
-    }
     setReferralParams(parsedEventParams);
     sessionStorageUtils.setPerTabEventProperties(parsedEventParams);
-    // Handling both react router and regular route pages
-    if (isTReactRouterDOMHistory(history)) {
-      history.replace(`${location.pathname}${composeQueryString(parsedQueryParams)}`);
-    }
-    if (isHistory(history)) {
-      history.replaceState(
-        undefined,
-        "",
-        `${location.pathname}${location.hash}${composeQueryString(parsedQueryParams)}`,
-      );
+    if (scrubQueryParameters) {
+      // Do not want to expose placeId other than the case with launchData
+      if (!parsedQueryParams.launchData && parsedQueryParams.placeId) {
+        delete parsedQueryParams.placeId;
+      }
+      // Handling both react router and regular route pages
+      if (isTReactRouterDOMHistory(history)) {
+        history.replace(`${location.pathname}${composeQueryString(parsedQueryParams)}`);
+      }
+      if (isHistory(history)) {
+        history.replaceState(
+          undefined,
+          "",
+          `${location.pathname}${location.hash}${composeQueryString(parsedQueryParams)}`,
+        );
+      }
     }
 
     // Trigger Event

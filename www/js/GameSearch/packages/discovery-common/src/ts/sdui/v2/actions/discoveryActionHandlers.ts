@@ -1,13 +1,18 @@
-import { ActionType, clientOnly, type SduiActionHandlerConfig } from "@rbx/sdui-core";
+import { ActionType, clientOnly, readParam, type SduiActionHandlerConfig } from "@rbx/sdui-core";
+import { SduiCommonModule } from "@rbx/sdui-common";
 import { openGameDetailsResolveHref } from "./openGameDetailsHandler";
 import { openSongDetailsResolveHref } from "./openSongDetailsHandler";
 import {
   openChartsSortDetailResolveHref,
   openChartsSortDetailResolveRoutePath,
 } from "./openChartsSortDetailHandler";
+import { openAdAbuseReportResolveHref } from "./adAbuseReportHandler";
 import { openSeeAllResolveHref, openSeeAllResolveRoutePath } from "./openSeeAllHandler";
 import { type SortDetailResolver } from "./sortDetailDestination";
 import { pushSduiRoutePath } from "../navigation/sduiClientRouter";
+import { ABUSE_VECTOR_AD } from "../../../common/constants/abuseReportConstants";
+
+const defaultOpenAbuseReport = SduiCommonModule.actionHandlers[ActionType.OPEN_ABUSE_REPORT];
 
 // Sort detail is a route transition wherever it is triggered from, so the
 // in-app push lives here rather than in a per-surface override. Surfaces whose
@@ -46,6 +51,12 @@ function sortDetailHandler(
 export const DISCOVERY_ACTION_HANDLERS: Partial<Record<ActionType, SduiActionHandlerConfig>> = {
   [ActionType.OPEN_GAME_DETAILS]: {
     resolveHref: openGameDetailsResolveHref,
+  },
+  [ActionType.OPEN_ABUSE_REPORT]: {
+    resolveHref: (actionParams, ctx, analyticsContext) =>
+      readParam(actionParams, "abuseVector", "abuse_vector") === ABUSE_VECTOR_AD
+        ? openAdAbuseReportResolveHref(actionParams)
+        : defaultOpenAbuseReport?.resolveHref?.(actionParams, ctx, analyticsContext),
   },
   [ActionType.OPEN_SEE_ALL]: sortDetailHandler(openSeeAllResolveHref, openSeeAllResolveRoutePath),
   [ActionType.OPEN_SONG_DETAIL]: {

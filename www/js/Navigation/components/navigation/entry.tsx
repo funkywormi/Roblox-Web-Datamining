@@ -40,6 +40,7 @@ import "./src/css/_leftnav.css";
 import "./src/css/_themes.css";
 import "./src/css/_searchLanding.css";
 import "./src/css/_downloadAppNavItem.css";
+import "./src/css/_topAppBanner.css";
 
 registerReferrerLookup(referrerId => dataStores.userDataStore.getUser(referrerId));
 

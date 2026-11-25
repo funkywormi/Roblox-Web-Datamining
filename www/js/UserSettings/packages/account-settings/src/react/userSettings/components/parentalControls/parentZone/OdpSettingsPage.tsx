@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { Loading } from "react-style-guide";
-import { UserSetting } from "@rbx/user-settings";
+import { SpendNotificationSetting, UserSetting } from "@rbx/user-settings";
 import { TChildSettingsInfo } from "../../../../../types/childrenInfoTypes";
 import { TSettingUpdateProps } from "../../../../../types/settingUpdateTypes";
 import { TManageExperience } from "../../../../../types/parentConsentsTypes";
@@ -44,11 +44,13 @@ export const OdpSettingsList = ({
   onUpdateSetting,
   onManageExperience,
   policy,
+  hasConfirmedNoRemoteParent = false,
 }: {
   page: TOdpSettingsPage;
   child: TChildSettingsInfo;
   onManageExperience?: TManageExperience;
   policy?: TSettingsUIPolicyBody;
+  hasConfirmedNoRemoteParent?: boolean;
 } & Required<TSettingUpdateProps>): React.JSX.Element => {
   const hasSetting = (...names: UserSetting[]) =>
     page.settings.some(setting => names.includes(setting.name));
@@ -72,6 +74,10 @@ export const OdpSettingsList = ({
         <ChildSpendingRestrictionRoutes
           {...props}
           pages={{ childSettingCategoryPages: { [page.name]: page }, spendingPages: subpages }}
+          // Without a remote parent no one receives spend notifications, so show them as off.
+          displayedSpendNotificationSetting={
+            hasConfirmedNoRemoteParent ? SpendNotificationSetting.NotificationsOff : undefined
+          }
         />
       );
     case SettingCategoryPageName.VisibilityAndPrivateServers:
@@ -119,7 +125,8 @@ export const OdpSettingsList = ({
 };
 
 const OdpSettingsPage = ({ name }: { name: string }): React.JSX.Element => {
-  const { pages, isLoading, isError, isFetching, policy } = useOdpSettingsAndPages(name);
+  const { pages, isLoading, isError, isFetching, policy, hasConfirmedNoRemoteParent } =
+    useOdpSettingsAndPages(name);
   const childQuery = useOdpChildInfo();
   const { manageSetting, isManaging, revision } = useManageOdpSetting();
   const { manageExperience, isManaging: isManagingExperience } = useManageOdpExperience();
@@ -175,6 +182,7 @@ const OdpSettingsPage = ({ name }: { name: string }): React.JSX.Element => {
             page={page}
             child={childQuery.child}
             policy={policy}
+            hasConfirmedNoRemoteParent={hasConfirmedNoRemoteParent}
             onManageExperience={async (universeId, action) => {
               if (
                 !isFetching &&

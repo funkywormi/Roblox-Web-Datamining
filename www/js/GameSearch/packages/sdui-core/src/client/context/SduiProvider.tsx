@@ -9,6 +9,14 @@ export const SduiContext = createContext<SduiContextValue | null>(null);
 SduiContext.displayName = "SduiContext";
 
 /**
+ * Read the SDUI services + page metadata from the nearest `SduiProvider`, or
+ * return null when rendered outside a provider (e.g. standalone tests/stories).
+ */
+export function useOptionalSduiServices(): SduiContextValue | null {
+  return useContext(SduiContext);
+}
+
+/**
  * Read the SDUI services + page metadata from the nearest `SduiProvider`.
  * Throws when called outside a provider so misuse fails loudly at mount.
  */

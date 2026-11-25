@@ -20,6 +20,7 @@ type GetPlayOnWeb = () => (() => void) | undefined;
 // components/gameLaunch/src/js/gameLauncher.js. It checks guests and adds join attempt ids itself,
 // then hands the params to the page's launch interface (protocol handler or the app's bridge).
 type DotNetGameLauncher = {
+  isJoinAttemptIdEnabled: () => boolean | undefined;
   joinMultiplayerGame: (
     placeId: Id,
     isMembershipLevelOk: boolean,
@@ -149,3 +150,10 @@ export const resolveGameLauncher = (): PageGameLauncher | null => {
   const legacy = getDotNetGameLauncher();
   return legacy == null ? null : toDotNet(legacy);
 };
+
+/**
+ * Whether launches should carry a join attempt id. The Next.js launcher always sends one; on .NET it
+ * depends on the page's launch interface (the protocol handler turns it on, the app bridge doesn't).
+ */
+export const isJoinAttemptIdEnabled = (): boolean =>
+  getGameLauncher() != null || (getDotNetGameLauncher()?.isJoinAttemptIdEnabled() ?? false);

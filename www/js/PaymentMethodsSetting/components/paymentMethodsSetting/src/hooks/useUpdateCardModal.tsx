@@ -7,7 +7,7 @@ import {
   getDateFromFormattedExpiration,
   getShortenedDateFormat,
   getMonthAndYearFromFormattedExpiration,
-} from "@rbx/payments/utils";
+} from "../utils/dateUtils";
 import { TRANSLATION_KEYS } from "../constants/translationConstants";
 import { COUNTER_METRICS, getPaymentMethodClassNameMapping } from "../constants/constants";
 import { updateCardExpiry } from "../services/paymentMethodsSettingService";

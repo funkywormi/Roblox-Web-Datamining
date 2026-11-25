@@ -1,9 +1,10 @@
 /**
  * Dispatcher for `LazyNestedComponentListProp` and `NestedComponentListProp`.
  *
- * TODO(web-sdui): Both descriptors behave the same today. Add descriptor-driven
- * lazy rendering so they can diverge. Explicit `ComponentList.deferItemBuild`
- * is handled by capable managed parents.
+ * Both descriptors build the same configs. `buildNestedComponentListProp`
+ * delegates here and marks the result `isNestedComponentConfig` so the renderer
+ * pre-renders it. Lazy results reach the parent unrendered. Explicit
+ * `ComponentList.deferItemBuild` is handled by capable managed parents.
  *
  * Variants:
  * - `array_map`              — DEPRECATED. homogeneous list driven by a binding-path array.

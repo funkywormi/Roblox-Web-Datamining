@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<5545f7b2161a193f884046e4a8804802>>
- * @relayHash 52d0f0e9b80b9dc149e2f2322518d680
+ * @generated SignedSource<<7cb823c0af6d9d400c57254e6a46b26b>>
+ * @relayHash 0ab428f066326ed6e1e4ea6c954dfdf9
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,11 +9,12 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 528EVmtst-oJbFHbns6wEw
+// @relayRequestID cJcRNSfGgBH-FaIUmIfwmw
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type UpdateUserSettingInput = {
+  auditData?: string | null | undefined;
   name: string;
   value: UserSettingValueInput;
 };
@@ -28,12 +29,12 @@ export type UpdateUserSettingMutation$data = {
   readonly updateUserSetting: {
     readonly __typename: "UserSettingUpdateRejected";
     readonly setting: {
-      readonly " $fragmentSpreads": FragmentRefs<"SettingsSurfaceRowFragment">;
+      readonly " $fragmentSpreads": FragmentRefs<"UpdateUserSettingMutationStateFragment">;
     } | null | undefined;
   } | {
     readonly __typename: "UserSettingUpdated";
     readonly settings: ReadonlyArray<{
-      readonly " $fragmentSpreads": FragmentRefs<"SettingsSurfaceRowFragment">;
+      readonly " $fragmentSpreads": FragmentRefs<"UpdateUserSettingMutationStateFragment">;
     } | null | undefined>;
   } | {
     // This will never be '%other', but we need some
@@ -80,17 +81,10 @@ v4 = [
   {
     "args": null,
     "kind": "FragmentSpread",
-    "name": "SettingsSurfaceRowFragment"
+    "name": "UpdateUserSettingMutationStateFragment"
   }
 ],
-v5 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "value",
-  "storageKey": null
-},
-v6 = [
+v5 = [
   {
     "alias": null,
     "args": null,
@@ -99,7 +93,13 @@ v6 = [
     "name": "option",
     "plural": false,
     "selections": [
-      (v5/*: any*/)
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "value",
+        "storageKey": null
+      }
     ],
     "storageKey": null
   },
@@ -122,7 +122,7 @@ v6 = [
     "storageKey": null
   }
 ],
-v7 = [
+v6 = [
   (v3/*: any*/),
   {
     "kind": "TypeDiscriminator",
@@ -141,86 +141,6 @@ v7 = [
       {
         "alias": null,
         "args": null,
-        "concreteType": "PresentableValue",
-        "kind": "LinkedField",
-        "name": "setting",
-        "plural": false,
-        "selections": [
-          (v5/*: any*/),
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "DisplayText",
-            "kind": "LinkedField",
-            "name": "presentation",
-            "plural": false,
-            "selections": [
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
-                "name": "label",
-                "storageKey": null
-              },
-              {
-                "alias": null,
-                "args": null,
-                "concreteType": "FormattedText",
-                "kind": "LinkedField",
-                "name": "description",
-                "plural": false,
-                "selections": [
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
-                    "name": "text",
-                    "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "TextLink",
-                    "kind": "LinkedField",
-                    "name": "links",
-                    "plural": true,
-                    "selections": [
-                      {
-                        "alias": null,
-                        "args": null,
-                        "kind": "ScalarField",
-                        "name": "opening",
-                        "storageKey": null
-                      },
-                      {
-                        "alias": null,
-                        "args": null,
-                        "kind": "ScalarField",
-                        "name": "closing",
-                        "storageKey": null
-                      },
-                      {
-                        "alias": null,
-                        "args": null,
-                        "kind": "ScalarField",
-                        "name": "url",
-                        "storageKey": null
-                      }
-                    ],
-                    "storageKey": null
-                  }
-                ],
-                "storageKey": null
-              }
-            ],
-            "storageKey": null
-          }
-        ],
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
         "kind": "ScalarField",
         "name": "enabled",
         "storageKey": null
@@ -232,7 +152,7 @@ v7 = [
         "kind": "LinkedField",
         "name": "on",
         "plural": false,
-        "selections": (v6/*: any*/),
+        "selections": (v5/*: any*/),
         "storageKey": null
       },
       {
@@ -242,7 +162,7 @@ v7 = [
         "kind": "LinkedField",
         "name": "off",
         "plural": false,
-        "selections": (v6/*: any*/),
+        "selections": (v5/*: any*/),
         "storageKey": null
       }
     ],
@@ -338,7 +258,7 @@ return {
                 "kind": "LinkedField",
                 "name": "settings",
                 "plural": true,
-                "selections": (v7/*: any*/),
+                "selections": (v6/*: any*/),
                 "storageKey": null
               }
             ],
@@ -355,7 +275,7 @@ return {
                 "kind": "LinkedField",
                 "name": "setting",
                 "plural": false,
-                "selections": (v7/*: any*/),
+                "selections": (v6/*: any*/),
                 "storageKey": null
               }
             ],
@@ -368,7 +288,7 @@ return {
     ]
   },
   "params": {
-    "id": "528EVmtst-oJbFHbns6wEw",
+    "id": "cJcRNSfGgBH-FaIUmIfwmw",
     "metadata": {},
     "name": "UpdateUserSettingMutation",
     "operationKind": "mutation",
@@ -377,6 +297,6 @@ return {
 };
 })();
 
-(node as any).hash = "0c5824f3df155da7c25118f19bc114cb";
+(node as any).hash = "db22b85cbd4980dd4e6fce372a1c03e2";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c03ac3493a69b5d1af294ca943a53d4a>>
+ * @generated SignedSource<<1681373ff791d28f9519b8951a3bd8c9>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -37,7 +37,13 @@ export type SettingsSurfaceFragment$key = {
 };
 
 const node: ReaderFragment = {
-  "argumentDefinitions": [],
+  "argumentDefinitions": [
+    {
+      "defaultValue": null,
+      "kind": "LocalArgument",
+      "name": "surface"
+    }
+  ],
   "kind": "Fragment",
   "metadata": null,
   "name": "SettingsSurfaceFragment",
@@ -144,7 +150,13 @@ const node: ReaderFragment = {
           "storageKey": null
         },
         {
-          "args": null,
+          "args": [
+            {
+              "kind": "Variable",
+              "name": "surface",
+              "variableName": "surface"
+            }
+          ],
           "kind": "FragmentSpread",
           "name": "SettingsSurfaceRowFragment"
         }
@@ -156,6 +168,6 @@ const node: ReaderFragment = {
   "abstractKey": null
 };
 
-(node as any).hash = "7533bc8699a4591bc78a07f0ce58f737";
+(node as any).hash = "5563a90c79f2975f3d09286b6ee7eee5";
 
 export default node;

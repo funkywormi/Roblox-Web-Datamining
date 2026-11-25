@@ -21,7 +21,10 @@ import WelcomeView from "./WelcomeView";
 import { robloxPlusApi } from "../clients/robloxSubscriptions";
 import { subscriptionsV2Api } from "../clients/subscriptions";
 import useLatest from "../hooks/useLatest";
-import { sortProductsByAllowanceAscending } from "../utils/subscriptionProductInfo";
+import {
+  getProductMonths,
+  sortProductsByAllowanceAscending,
+} from "../utils/subscriptionProductInfo";
 
 type AppPolicyResponse = {
   DisableBlackbirdEntrypoints?: boolean;
@@ -71,12 +74,11 @@ const Content = () => {
         productType: ProductType.Blackbird,
         expirationTimestampMsStart: Date.now(),
         resultsPerPage: 1,
+        // A granted subscription can be active alongside a purchased one; the latest-expiring one is
+        // the membership.
+        descendingOrder: true,
       });
-      const subscription = subscriptions[0];
-      if (!subscription) {
-        return null;
-      }
-      return subscription;
+      return subscriptions[0] ?? null;
     },
     retry: 3,
     retryDelay: 100,
@@ -121,6 +123,9 @@ const Content = () => {
     retryDelay: 100,
   });
 
+  // The server decides what the list holds: every plan for a non-member, upgrades for an upgradeable
+  // member, and nothing for other members. Any product offered to a member marks them upgradeable,
+  // so plan change targets (includePlanChanges) must not be listed here.
   // Product info is sourced from the user's active subscription when subscribed; otherwise it
   // comes from the available-products list (extended terms and bundles included so the page
   // has every plan). This avoids a redundant GetSubscriptionProductInfo call for subscribed users.
@@ -138,7 +143,9 @@ const Content = () => {
       const { products } =
         await subscriptionsV2Api.subscriptionsV2ListAvailableSubscriptionProducts({
           productType: ProductType.Blackbird,
-          includePurchased: true,
+          // The server ignores includeUpgrades unless includePurchased is false.
+          includePurchased: false,
+          includeUpgrades: true,
           includeBundles: true,
           includeExtendedTermProducts: true,
           skipEligibilityCheck: true,
@@ -146,14 +153,11 @@ const Content = () => {
           // parameters it was actually given.
           referrerId,
         });
-      if (products.length === 0) {
-        return null;
-      }
       return sortProductsByAllowanceAscending(products);
     },
-    enabled: robloxSubscriptionMembershipQuery.data === null,
     retry: 3,
     retryDelay: 100,
+    refetchInterval: isPollingForMembership ? MEMBERSHIP_POLL_REFETCH_INTERVAL_MS : false,
   });
 
   const robloxAvailableProducts = useLatest(
@@ -257,21 +261,43 @@ const Content = () => {
     };
   }, [isPollingForMembership]);
 
+  // The list empties once the server sees the membership, which for an upgradeable member means
+  // the purchase.
+  const hasMembershipLanded =
+    Boolean(robloxSubscriptionMembershipQuery.data) &&
+    robloxAvailableProductsQuery.data?.length === 0;
+
+  const { refetch: refetchMembership } = robloxSubscriptionMembershipQuery;
+
   // When membership is detected during polling, show the appropriate view
   useEffect(() => {
-    if (!isPollingForMembership || !robloxSubscriptionMembershipQuery.data) {
+    if (!isPollingForMembership || !hasMembershipLanded) {
       return;
     }
 
-    setIsPollingForMembership(false);
-    if (!isFreeTrialConfirmation) {
-      enableWelcome();
-    }
+    let cancelled = false;
+    // A membership read made alongside the list can predate the purchase, so read it again.
+    refetchMembership()
+      .then(() => {
+        if (cancelled) {
+          return;
+        }
+        setIsPollingForMembership(false);
+        if (!isFreeTrialConfirmation) {
+          enableWelcome();
+        }
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     enableWelcome,
+    hasMembershipLanded,
     isFreeTrialConfirmation,
     isPollingForMembership,
-    robloxSubscriptionMembershipQuery.data,
+    refetchMembership,
   ]);
 
   const onMobilePurchaseInitiated = useCallback(() => {
@@ -279,9 +305,8 @@ const Content = () => {
   }, []);
 
   if (
-    robloxAvailableProductsQuery.error ||
-    robloxAvailableProductsQuery.data === null ||
-    (robloxSubscriptionMembershipQuery.error && !isPollingForMembership) ||
+    // A failed refetch keeps the last membership, so only a failed first load is an error.
+    (robloxSubscriptionMembershipQuery.isLoadingError && !isPollingForMembership) ||
     appPolicyQuery.error ||
     !deviceMeta
   ) {
@@ -289,19 +314,31 @@ const Content = () => {
   }
 
   if (
-    robloxSubscriptionProduct === undefined ||
     robloxSubscriptionMembership === undefined ||
+    robloxAvailableProductsQuery.isLoading ||
     isEntrypointDisabled === undefined
   ) {
     return <LoadingView />;
   }
 
-  const isSubscribed = robloxSubscriptionMembership !== null;
+  const hasMembership = robloxSubscriptionMembership !== null;
+  // An empty or failed list means a member is subscribed and a non-member has nothing to buy,
+  // except while polling, when the membership read can lag the purchase.
+  const hasPurchasableProducts = (robloxAvailableProducts?.length ?? 0) > 0;
+  if (!hasMembership && !hasPurchasableProducts && !isPollingForMembership) {
+    return <ErrorView />;
+  }
+
+  if (robloxSubscriptionProduct === undefined) {
+    return <LoadingView />;
+  }
+
+  const isSubscribed = hasMembership && !hasPurchasableProducts;
 
   if (isFreeTrialConfirmation) {
     // Wait for the grant to propagate. The membership poll keeps retrying until the subscription
     // is visible (or the poll times out), so we show loading rather than erroring during the wait.
-    if (!isSubscribed) {
+    if (!hasMembership) {
       return isPollingForMembership ? <LoadingView /> : <ErrorView />;
     }
     // Membership is confirmed; verify it's specifically the FAE trial before showing the page.
@@ -317,6 +354,11 @@ const Content = () => {
         onDismiss={dismissFreeTrialConfirmation}
       />
     );
+  }
+
+  // Until the membership is read again, it can still be the subscription held before the purchase.
+  if (isPollingForMembership && hasMembershipLanded) {
+    return <LoadingView />;
   }
 
   if (isWelcome) {
@@ -336,40 +378,46 @@ const Content = () => {
     }
   }
 
-  // `/plus?referrals`: create-link gate (invalid popup if ineligible).
+  // `/plus?referrals`: create-link gate (invalid popup if ineligible). An upgradeable member's Join
+  // CTA buys an upgrade, not the subscription they hold.
+  const referralCtaProduct = robloxAvailableProducts?.[0] ?? robloxSubscriptionProduct;
   if (isReferralsDashboard) {
     return (
       <PlusReferralDashboard
         robloxPlusUserBenefits={robloxPlusUserBenefitsQuery.data}
         subscribeButtonProps={{
-          productId: robloxSubscriptionProduct.productKey.id,
-          productType: robloxSubscriptionProduct.productKey.type,
+          productId: referralCtaProduct.productKey.id,
+          productType: referralCtaProduct.productKey.type,
           deviceMeta,
           // Same policy `PurchaseView` honours: without this the invalid sheet offers a live
           // Join CTA on surfaces where Blackbird entrypoints are turned off.
           isDisabled: isEntrypointDisabled,
+          onMobilePurchaseInitiated,
         }}
         onClose={dismissReferralsDashboard}
       />
     );
   }
 
-  if (isSubscribed) {
+  if (hasMembership) {
     return (
       <SubscriberView
         deviceMeta={deviceMeta}
+        isEntrypointDisabled={isEntrypointDisabled}
         isFaeFreeTrial={faeTrialCheckQuery.data === true}
         robloxPlusUserBenefits={robloxPlusUserBenefitsQuery.data}
         robloxSubscriptionMembership={robloxSubscriptionMembership}
         robloxSubscriptionProduct={robloxSubscriptionProduct}
         shouldDeeplinkToReferral={shouldDeeplinkToReferral}
+        // The upgrade banner prices the plan per month.
+        upgradeProduct={robloxAvailableProducts?.find(product => getProductMonths(product) === 1)}
+        onMobilePurchaseInitiated={onMobilePurchaseInitiated}
         onOpenReferrals={enableReferralsDashboard}
       />
     );
   }
 
   // Not subscribed: the available-products list drives PurchaseView (and the bundle picker).
-  // robloxSubscriptionProduct above guarantees the list has resolved when we reach this point.
   if (!robloxAvailableProducts) {
     return <LoadingView />;
   }

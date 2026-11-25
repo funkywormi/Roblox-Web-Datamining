@@ -1,0 +1,62 @@
+import {
+  makeTokenOrLiteralPropParser,
+  UiComponentType,
+  type SduiComponentDefinition,
+} from "@rbx/sdui-core";
+import { DiscoverySduiSectionHeader } from "./DiscoverySduiSectionHeader";
+import { SduiFilterPillsCarousel } from "./filterPills/SduiFilterPillsCarousel";
+import { SduiHeroUnit } from "./SduiHeroUnit";
+import { SduiHeroUnitBottomRow } from "./SduiHeroUnitBottomRow";
+import { SduiOptionSelectorCollection } from "./SduiOptionSelectorCollection";
+import { SduiSlotOverlay } from "./SduiSlotOverlay";
+import { SduiSongTile } from "./SduiSongTile";
+import { SduiVariableItemWidthCarousel } from "./SduiVariableItemWidthCarousel";
+import { SduiFriendRequestButton } from "./friendRequestButton";
+import { SduiUserSearchTile } from "./userSearchTile";
+
+export const DISCOVERY_V2_COMPONENTS: Partial<Record<UiComponentType, SduiComponentDefinition>> = {
+  [UiComponentType.HERO_UNIT]: {
+    component: SduiHeroUnit,
+  },
+  [UiComponentType.HERO_UNIT_BOTTOM_ROW]: {
+    component: SduiHeroUnitBottomRow,
+  },
+  [UiComponentType.SECTION_HEADER]: {
+    component: DiscoverySduiSectionHeader,
+    propParsers: {
+      verticalGap: makeTokenOrLiteralPropParser("Gap.XXSmall"),
+      titleGap: makeTokenOrLiteralPropParser("Gap.XSmall"),
+    },
+  },
+  [UiComponentType.SONG_TILE]: {
+    component: SduiSongTile,
+    propParsers: {
+      cornerRadius: makeTokenOrLiteralPropParser("Radius.Medium"),
+    },
+  },
+  [UiComponentType.OPTION_SELECTOR_COLLECTION]: {
+    component: SduiOptionSelectorCollection,
+    doesManageChildren: true,
+  },
+  [UiComponentType.SLOT_OVERLAY]: {
+    component: SduiSlotOverlay,
+    propParsers: {
+      padding: makeTokenOrLiteralPropParser(),
+    },
+  },
+  [UiComponentType.VARIABLE_ITEM_WIDTH_CAROUSEL]: {
+    component: SduiVariableItemWidthCarousel,
+    doesManageChildren: true,
+  },
+  [UiComponentType.FILTER_PILLS_CAROUSEL]: {
+    component: SduiFilterPillsCarousel,
+  },
+  [UiComponentType.FRIEND_REQUEST_BUTTON]: {
+    component: SduiFriendRequestButton,
+  },
+  [UiComponentType.USER_SEARCH_TILE]: {
+    component: SduiUserSearchTile,
+  },
+};
+
+export default DISCOVERY_V2_COMPONENTS;

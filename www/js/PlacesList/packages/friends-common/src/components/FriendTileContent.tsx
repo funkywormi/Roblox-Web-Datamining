@@ -1,5 +1,5 @@
 import { JSX } from "react";
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import VerifiedBadgeIcon, {
   VERIFIED_BADGE_ARIA_LABEL,
   VERIFIED_BADGE_ARIA_LABEL_KEY,

@@ -1,0 +1,48 @@
+import type { RegistryInput } from "@rbx/observability-framework/schema";
+import { createTrackers } from "@rbx/observability-framework/trackers";
+import { createFireTelemetryCounter } from "@rbx/web-telemetry/v2/fire";
+import { captureException } from "../../error";
+
+export const observabilityRegistry = {
+  featureName: "PaymentsFlowAnalytics",
+  team: "Economy > Payments & Fraud",
+
+  features: {
+    PaymentFlow: {
+      counters: [
+        "UserPaymentFlowMidPurchaseStepTriggeredWithoutCtx",
+        "UserPaymentFlowFlowEnded",
+        {
+          name: "UserPaymentFlowEventSent",
+          dimensions: ["transport", "requestedTransport", "eventName"],
+        },
+        {
+          name: "UserPaymentFlowEventFetchFailed",
+          dimensions: ["eventName", "viewName", "platform", "visibility", "elapsed"],
+        },
+        {
+          name: "UserPaymentFlowEventImgFailed",
+          dimensions: ["eventName", "viewName", "platform", "visibility", "elapsed"],
+        },
+      ],
+      errors: [
+        "UserPaymentFlowWrongUsageOfMethod",
+        "UserPaymentFlowSendEventWithoutUuidOrCtx",
+        "UserPaymentFlowLoadPreExistingCtxError",
+        "UserPaymentFlowSendStatusEventError",
+        "UserPaymentFlowSendUserEventError",
+        "UserPaymentFlowStartFlowError",
+        "UserPaymentFlowFlowEndedWithoutTriggerContext",
+        "UserPaymentFlowSendEventKeepaliveError",
+      ],
+    },
+  },
+} as const satisfies RegistryInput;
+
+const publishMetric = createFireTelemetryCounter(observabilityRegistry.featureName);
+
+export const { trackCounter, trackError } = createTrackers(observabilityRegistry, {
+  publish: publishMetric,
+  captureException,
+  featureName: observabilityRegistry.featureName,
+});

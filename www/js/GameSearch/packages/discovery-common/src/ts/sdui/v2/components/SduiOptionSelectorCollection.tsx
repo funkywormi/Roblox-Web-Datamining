@@ -40,6 +40,8 @@ export type SduiOptionSelectorCollectionProps = SduiRendererInjectedProps & {
   scrollButtonsEnabled?: boolean;
   optionImpressionEventName?: string;
   skipOptionItemImpressionsLog?: boolean;
+  /** 1-based feed row of this section, injected by the builder when it is a pool section root. */
+  startRowNumber?: number;
 };
 
 /**
@@ -61,6 +63,7 @@ export function SduiOptionSelectorCollection({
   scrollButtonsEnabled,
   optionImpressionEventName = DEFAULT_OPTION_IMPRESSION_EVENT_NAME,
   skipOptionItemImpressionsLog = true,
+  startRowNumber,
   analyticsContext,
   componentType,
 }: SduiOptionSelectorCollectionProps): React.JSX.Element {
@@ -138,11 +141,13 @@ export function SduiOptionSelectorCollection({
 
       if (onOptionActivated) {
         const onActivatedAsync = async (): Promise<void> => {
+          const optionPosition = index + 1;
           analyticsContext?.setLocalAnalyticsData?.({
-            itemPosition: index + 1,
+            itemPosition: optionPosition,
             itemComponentType: componentTypeName(item.componentType),
             ...(typeof optionId === "string" && optionId !== "" ? { id: optionId } : {}),
           });
+          analyticsContext?.setLayoutCellPosition?.(optionPosition);
           await onOptionActivatedHandler(optionId);
         };
         nextProps.onActivated = {
@@ -177,9 +182,11 @@ export function SduiOptionSelectorCollection({
     analyticsContext,
   ]);
 
+  // Matches Lua `SduiOptionSelectorCollection`: the section's start row reaches the real
+  // collection and the option row, not the placeholder.
   const resolvedCollection = useMemo(
-    () => expandManagedList(collectionComponent),
-    [collectionComponent],
+    () => expandManagedList(collectionComponent, { startRowNumber }),
+    [collectionComponent, startRowNumber],
   );
 
   const resolvedPlaceholder = useMemo(
@@ -210,6 +217,7 @@ export function SduiOptionSelectorCollection({
         scrollButtonsEnabled={scrollButtonsEnabled}
         impressionEventName={optionImpressionEventName}
         skipItemImpressionsLog={skipOptionItemImpressionsLog}
+        startRowNumber={startRowNumber}
       />
       <SduiPlaceholderWrapper
         key={effectiveSelectedOption}

@@ -1,12 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Button } from "@rbx/foundation-ui";
-import {
-  Thumbnail2d,
-  ThumbnailTypes,
-  ThumbnailFormat,
-  DefaultThumbnailSize,
-} from "@rbx/thumbnails";
+import { Thumbnail2d } from "@rbx/www-common/components/thumbnail";
 import playerConstants from "../constants/playerConstants";
 
 function CurrentPlayingGame({ game, translate }) {
@@ -14,11 +9,11 @@ function CurrentPlayingGame({ game, translate }) {
 
   const thumbnail = (
     <Thumbnail2d
-      type={ThumbnailTypes.gameIcon}
-      size={DefaultThumbnailSize}
+      type="GameIcon"
+      size="150x150"
       targetId={universeId}
       imgClassName="game-card-thumb"
-      format={ThumbnailFormat.jpeg}
+      format="jpeg"
     />
   );
   return (

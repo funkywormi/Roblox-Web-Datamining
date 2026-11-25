@@ -3,14 +3,9 @@ import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { sendEventWithTarget, sendGamePlayEvent } from "@rbx/core-scripts/event-stream";
 import { getGameLauncher, withJoinAttemptId, type GameLauncher } from "@rbx/www-common/game-launch";
 
-type EventStreamProperties = Parameters<typeof launchLegacyGame>[1];
+export { isJoinAttemptIdEnabled } from "@rbx/www-common/game-launch";
 
-// The Next.js host (NavLayout) registers the shared launcher; .NET pages use window.Roblox.GameLauncher.
-// The shared launcher always sends join attempt ids, like .NET's protocol handler.
-export const isJoinAttemptIdEnabled = (): boolean =>
-  getGameLauncher() != null ||
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- window.Roblox is absent on Next.js
-  (window.Roblox?.GameLauncher?.isJoinAttemptIdEnabled() ?? false);
+type EventStreamProperties = Parameters<typeof launchLegacyGame>[1];
 
 // Same events and launcher calls as @rbx/core-scripts/game launchGame with join attempt ids on.
 // As on .NET, guests are stopped after the events: the launcher's host shows the sign-up dialog.

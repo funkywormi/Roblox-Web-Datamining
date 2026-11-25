@@ -1,16 +1,7 @@
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ComponentType,
-  type JSX,
-  type ReactNode,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState, type JSX } from "react";
 import MetaActionsList from "../components/MetaActionsList";
 import ReportNotificationModal from "../components/ReportNotificationModal";
 import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
-import { getMuiModalArms } from "../mui/muiModalArms";
 import type { TrustedFriendsAcceptModalRequestDetail } from "../clientTriggers/clientTriggerModalBridge";
 import {
   SelectedNotificationState,
@@ -26,10 +17,6 @@ import {
   setNotificationStreamMetaActionsHost,
   setNotificationStreamTrustedFriendsHost,
 } from "../utils/notificationStreamWindowHost";
-
-const PassThrough = ({ children }: { children?: ReactNode }) => (
-  <React.Fragment>{children}</React.Fragment>
-);
 
 const NotificationStreamModalContainer = (): JSX.Element => {
   const { SelectedNotificationProvider, setSelectedNotification } =
@@ -121,30 +108,26 @@ const NotificationStreamModalContainer = (): JSX.Element => {
     return () => setNotificationStreamAbuseReportHost(null);
   }, [showAbuseReportFor]);
 
-  const StyleProvider: ComponentType<{ children?: ReactNode }> =
-    getMuiModalArms()?.StyleProvider ?? PassThrough;
   const { TrustedFriendsModal, TranslationBoundary } = getNotificationStreamHost();
 
   return (
-    <StyleProvider>
-      <TranslationBoundary>
-        <SelectedNotificationProvider>
-          <MetaActionsList
-            show={metaActionsVisible}
-            closeModal={closeMetaActionsList}
-            showAbuseReport={showAbuseReport}
+    <TranslationBoundary>
+      <SelectedNotificationProvider>
+        <MetaActionsList
+          show={metaActionsVisible}
+          closeModal={closeMetaActionsList}
+          showAbuseReport={showAbuseReport}
+        />
+        <ReportNotificationModal isOpen={showReportNotification} closeModal={closeAbuseReport} />
+        {trustedFriendsModalPayload && TrustedFriendsModal ? (
+          <TrustedFriendsModal
+            userId={trustedFriendsModalPayload.userId}
+            linkTokens={trustedFriendsModalPayload.linkTokens}
+            onClose={handleTrustedFriendsModalClose}
           />
-          <ReportNotificationModal isOpen={showReportNotification} closeModal={closeAbuseReport} />
-          {trustedFriendsModalPayload && TrustedFriendsModal ? (
-            <TrustedFriendsModal
-              userId={trustedFriendsModalPayload.userId}
-              linkTokens={trustedFriendsModalPayload.linkTokens}
-              onClose={handleTrustedFriendsModalClose}
-            />
-          ) : null}
-        </SelectedNotificationProvider>
-      </TranslationBoundary>
-    </StyleProvider>
+        ) : null}
+      </SelectedNotificationProvider>
+    </TranslationBoundary>
   );
 };
 

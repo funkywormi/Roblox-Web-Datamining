@@ -9,7 +9,6 @@ import {
 } from "@rbx/foundation-ui";
 import { useNotificationLocalization } from "../context/NotificationsLocalization";
 import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
-import { getFlaggedMuiModalArms } from "../mui/muiModalArms";
 
 type DeeplinkFailModalProps = {
   show: boolean;
@@ -18,10 +17,6 @@ type DeeplinkFailModalProps = {
 
 const DeeplinkFailModalContent = ({ show, closeCallback }: DeeplinkFailModalProps) => {
   const translate = useNotificationLocalization();
-  const MuiDeeplinkFailModal = getFlaggedMuiModalArms()?.DeeplinkFailModal;
-  if (MuiDeeplinkFailModal) {
-    return <MuiDeeplinkFailModal show={show} closeCallback={closeCallback} translate={translate} />;
-  }
   return (
     <Dialog
       open={show}

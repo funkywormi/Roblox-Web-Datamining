@@ -64,6 +64,7 @@ export function reportImpressions(options: ReportImpressionsOptions): void {
       analyticsReporter: ctx.analyticsReporter,
       errorReporter: ctx.errorReporter,
       eventNameOverride: impressionEventName,
+      startRowNumber,
       itemCellIndexes,
     });
   }
@@ -78,6 +79,7 @@ export function reportImpressions(options: ReportImpressionsOptions): void {
     pageContext: ctx.pageContext,
     analyticsReporter: ctx.analyticsReporter,
     errorReporter: ctx.errorReporter,
+    startRowNumber,
     itemCellIndexes,
   });
 }

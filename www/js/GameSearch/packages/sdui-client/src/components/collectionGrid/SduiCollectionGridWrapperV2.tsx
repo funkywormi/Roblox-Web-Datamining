@@ -25,6 +25,9 @@ export interface SduiCollectionGridWrapperV2Props extends SduiRendererInjectedPr
   maxNumRows?: number;
   impressionEventName?: string;
   skipItemImpressionsLog?: boolean;
+  startRowNumber?: number;
+  /** Space between rows in px. Defaults to the column gap. */
+  rowGap?: number;
 }
 
 export function SduiCollectionGridWrapperV2({
@@ -36,6 +39,8 @@ export function SduiCollectionGridWrapperV2({
   maxNumRows,
   impressionEventName,
   skipItemImpressionsLog,
+  startRowNumber,
+  rowGap,
 }: SduiCollectionGridWrapperV2Props): React.JSX.Element | null {
   const resolvedCollectionItemSize =
     parseCollectionItemSize(collectionItemSize) ?? STANDARD_COLLECTION_ITEM_SIZE;
@@ -61,6 +66,7 @@ export function SduiCollectionGridWrapperV2({
     itemsPerRowOverride: items?.poolLayout?.columnCount ?? itemsPerRow,
     impressionEventName,
     skipItemImpressionsLog,
+    startRowNumber,
   });
 
   const resolvedHeader = headerComponent ? expandManagedList(headerComponent) : null;
@@ -80,6 +86,7 @@ export function SduiCollectionGridWrapperV2({
         collectionItemSize={resolvedCollectionItemSize}
         itemHeightFromWidth={itemHeightFromWidth}
         maxNumRows={maxNumRows}
+        rowGap={rowGap}
         onItemsPerRowChange={setItemsPerRow}
       />
     </div>

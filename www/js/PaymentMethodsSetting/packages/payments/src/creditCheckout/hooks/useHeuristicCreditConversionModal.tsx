@@ -1,6 +1,6 @@
 import React, { Fragment, useRef, useEffect } from "react";
 import { TSystemFeedbackService } from "react-style-guide";
-import { TranslateFunction } from "react-utilities";
+import type { TranslateFunction } from "react-utilities";
 import {
   HeuristicCreditConversionContext,
   useHeuristicCreditConversionData,

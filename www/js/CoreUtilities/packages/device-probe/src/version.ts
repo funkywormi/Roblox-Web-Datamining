@@ -6,4 +6,4 @@ export const PROBE_VERSION = 3;
 
 // The package version. The www /device-probe page serves the probe under `?v=<PACKAGE_VERSION>`
 // with a long-lived cache, so every change to shipped code must bump it (see CHANGELOG.md).
-export const PACKAGE_VERSION = "1.3.0";
+export const PACKAGE_VERSION = "1.5.0";

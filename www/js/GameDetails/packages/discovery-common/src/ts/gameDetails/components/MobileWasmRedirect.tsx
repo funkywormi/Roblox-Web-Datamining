@@ -58,7 +58,10 @@ const MobileWasmRedirect = ({
           : undefined
       }
       isChecking={!hasPlayOnWeb}
-      onPlayOnWeb={() => playOnWeb?.()}
+      onPlayOnWeb={() => {
+        setIsDialogClosed(true);
+        playOnWeb?.();
+      }}
       onClose={() => setIsDialogClosed(true)}
     />
   );

@@ -19,6 +19,7 @@ import SearchLandingPageSessionContext from "./SearchLandingPageSessionContext";
 import { getSortTargetIdMetadata } from "../omniFeed/utils/gameSortUtils";
 import { TExploreApiGameSort } from "../common/types/bedev2Types";
 import { TGameData, TGetFriendsResponse } from "../common/types/bedev1Types";
+import { PersonalizedRecommendationsMenu } from "../personalizedRecommendations/PersonalizedRecommendationsMenu";
 
 const SearchLandingTile = forwardRef<HTMLDivElement, TGameTileTypeMapProps>(
   ({ componentType: _componentType, ...tileProps }, ref) => (
@@ -95,6 +96,10 @@ const SearchLandingPageGamesCarousel = ({
     buildGameImpressionsProperties,
   );
 
+  // The server owns visibility: it sends the surface key only to viewers who may see the menu.
+  const personalizedRecommendationsSurfaceKey =
+    sort.topicLayoutData?.personalizedRecommendationsSurfaceKey;
+
   return (
     // TODO CLIGROW-2261 Support component type / wide (16:9) aspect ratio tiles
     <React.Fragment>
@@ -109,6 +114,15 @@ const SearchLandingPageGamesCarousel = ({
         seeAllLink={undefined}
         subtitleLink={undefined}
         shouldShowSponsoredTooltip={undefined}
+        trailingComponent={
+          personalizedRecommendationsSurfaceKey ? (
+            // The search landing page hides when the search input blurs.
+            <PersonalizedRecommendationsMenu
+              surfaceKey={personalizedRecommendationsSurfaceKey}
+              keepFocusOnOpen
+            />
+          ) : undefined
+        }
       />
       <GameCarouselHorizontalScrollBase
         TileComponent={SearchLandingTile}

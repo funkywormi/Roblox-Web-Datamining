@@ -1,6 +1,6 @@
 import React from "react";
 import { Intl } from "@rbx/core-scripts/legacy/Roblox";
-import { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
+import type { TranslateFunction } from "@rbx/core-scripts/legacy/react-utilities";
 import { translateHtml } from "@rbx/translation-utils";
 
 export type TTranslationLink = {

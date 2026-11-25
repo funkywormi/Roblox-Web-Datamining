@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { TranslateFunction } from "react-utilities";
+import type { TranslateFunction } from "react-utilities";
 import { Link } from "react-style-guide";
 import {
   Thumbnail2d,

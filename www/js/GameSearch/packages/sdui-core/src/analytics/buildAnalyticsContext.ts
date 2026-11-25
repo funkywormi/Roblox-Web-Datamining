@@ -82,6 +82,7 @@ export function buildAnalyticsContext(
   // Set by collection components via `setCollectionData` so item children resolve
   // collection context for click/impression analytics.
   let localCollectionData: CollectionAnalyticsData | undefined;
+  let localLayoutCellPosition: number | undefined;
 
   const context: AnalyticsContext = {
     getAnalyticsDataSnapshot(): AnalyticsFieldMap {
@@ -119,6 +120,14 @@ export function buildAnalyticsContext(
 
     getCollectionData(): CollectionAnalyticsData | undefined {
       return localCollectionData ?? parentContext?.getCollectionData?.();
+    },
+
+    setLayoutCellPosition(position: number): void {
+      localLayoutCellPosition = position;
+    },
+
+    getLayoutCellPosition(): number | undefined {
+      return localLayoutCellPosition ?? parentContext?.getLayoutCellPosition?.();
     },
 
     // Lazy accessors so `ctx.analyticsData` / `ctx.ancestorAnalyticsData` reads

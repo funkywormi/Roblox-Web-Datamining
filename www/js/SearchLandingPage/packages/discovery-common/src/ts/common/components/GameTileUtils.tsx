@@ -1,19 +1,8 @@
 import React, { useCallback, useState } from "react";
 import classNames from "classnames";
-import { Modal, Link } from "@rbx/core-ui";
 import { Button } from "@rbx/foundation-ui";
-import {
-  TranslateFunction,
-  WithTranslationsProps,
-  withTranslations,
-} from "@rbx/core-scripts/react";
-import {
-  Thumbnail2d,
-  ThumbnailTypes,
-  ThumbnailFormat,
-  ThumbnailGameIconSize,
-  ThumbnailAvatarHeadshotSize,
-} from "@rbx/thumbnails";
+import type { TranslateFunction, WithTranslationsProps } from "@rbx/core-scripts/react";
+import { Thumbnail2d, ThumbnailGameIconSize } from "@rbx/www-common/components/thumbnail";
 import parsingUtils, { GAME_STATS_PLACEHOLDER_STRING } from "../utils/parsingUtils";
 import browserUtils from "../utils/browserUtils";
 import { common, homePage } from "../constants/configConstants";
@@ -35,8 +24,7 @@ import {
 import { TComponentType, TTreatmentType } from "../types/bedev2Types";
 // @ts-expect-error TODO: old, migrated code.
 import PlayerInteractionModal from "../../../js/gamePlayers/containers/PlayerInteractionModal";
-import placesListTranslationConfig from "../../homePage/translation.config";
-import "../../../css/common/_gameTiles.scss";
+import "../../../css/common/gameTiles.css";
 import { PageContext } from "../types/pageContext";
 import GamesInfoTooltip from "./GamesInfoTooltip";
 import {
@@ -82,8 +70,8 @@ export const GameTileBase = ({
   const gameLayoutData = useGetGameLayoutData(gameData, topicId);
 
   return (
-    <Link
-      url={browserUtils.buildGameDetailUrl(
+    <a
+      href={browserUtils.buildGameDetailUrl(
         gameData.placeId,
         gameData.name,
         buildEventProperties(gameData, id),
@@ -97,14 +85,16 @@ export const GameTileBase = ({
       <GameTileOverlayPill gameLayoutData={gameLayoutData} isFocused={!!isFocused} />
       <div className="game-card-thumb-container">
         <Thumbnail2d
-          type={ThumbnailTypes.gameIcon}
+          type="GameIcon"
           size={iconSize}
           targetId={gameData.universeId}
           // The Games Page relies on staticly defined heights for the thumbnail
           // so it needs to use "game-card-thumb" whereas other pages rely on
           // the height being filled
-          containerClass={page === PageContext.GamesPage ? "game-card-thumb" : "game-tile-thumb"}
-          format={ThumbnailFormat.jpeg}
+          containerClassName={
+            page === PageContext.GamesPage ? "game-card-thumb" : "game-tile-thumb"
+          }
+          format="jpeg"
           altName={gameData.name}
         />
       </div>
@@ -113,7 +103,7 @@ export const GameTileBase = ({
         {gameData.name}
       </div>
       {children}
-    </Link>
+    </a>
   );
 };
 
@@ -311,12 +301,12 @@ export const GameTileUndoButton = ({
 const GameTileAvatarThumbnail = ({ user }: { user: TGetFriendsResponse }): JSX.Element => {
   return (
     <Thumbnail2d
-      type={ThumbnailTypes.avatarHeadshot}
-      size={ThumbnailAvatarHeadshotSize.size48}
+      type="AvatarHeadShot"
+      size="48x48"
       targetId={user.id}
-      containerClass="avatar avatar-headshot avatar-headshot-xs"
+      containerClassName="avatar avatar-headshot avatar-headshot-xs"
       imgClassName="avatar-card-image"
-      format={ThumbnailFormat.webp}
+      format="webp"
       altName={user.displayName}
     />
   );
@@ -493,31 +483,22 @@ type TShimmedPlayerInteractionModalComponentProps = {
   game: TGetPlaceDetails;
 };
 
-export const ShimmedPlayerInteractionModalComponent = ({
+export const ShimmedPlayerInteractionModal = ({
   show,
   onHide,
   friendsDataInGame,
   game,
-  translate,
-}: TShimmedPlayerInteractionModalComponentProps & WithTranslationsProps): JSX.Element => (
-  <Modal show={show} onHide={onHide} size="lg">
-    <PlayerInteractionModal
-      friendsData={friendsDataInGame.map(friend => {
-        return { ...friend, nameForDisplay: friend.displayName };
-      })}
-      friendsInGame={friendsDataInGame.map(friend => friend.id)}
-      game={game}
-      dismissModal={onHide}
-      translate={translate}
-    />
-  </Modal>
+}: TShimmedPlayerInteractionModalComponentProps): JSX.Element => (
+  <PlayerInteractionModal
+    show={show}
+    onHide={onHide}
+    friendsData={friendsDataInGame.map(friend => {
+      return { ...friend, nameForDisplay: friend.displayName };
+    })}
+    friendsInGame={friendsDataInGame.map(friend => friend.id)}
+    game={game}
+  />
 );
-
-export const ShimmedPlayerInteractionModal =
-  withTranslations<TShimmedPlayerInteractionModalComponentProps>(
-    ShimmedPlayerInteractionModalComponent,
-    placesListTranslationConfig,
-  );
 
 export const getNumCarouselTiles = (
   page: PageContext.HomePage | PageContext.GamesPage | PageContext.SearchLandingPage,

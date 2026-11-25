@@ -43,6 +43,8 @@ export interface SduiCollectionCarouselProps extends SduiRendererInjectedProps {
    * Default 6 in the library; pass `-1` to disable windowing via `disableWindowing`.
    */
   numItemsToRenderOffScreen?: number;
+  /** 1-based starting row of this section in a pooled feed (injected by SduiBuilder). */
+  startRowNumber?: number;
 }
 
 // TODO(ltao): migrate this wrapper onto the shared useSduiCollectionItems hook in a follow-up PR (carousel serves production traffic; keeping it untouched here).
@@ -61,6 +63,7 @@ export function SduiCollectionCarousel({
   impressionEventName,
   skipItemImpressionsLog,
   numItemsToRenderOffScreen,
+  startRowNumber,
 }: SduiCollectionCarouselProps) {
   const tokens = useTokens();
   const services = useSduiServices();
@@ -84,10 +87,12 @@ export function SduiCollectionCarousel({
       buildCollectionAnalyticsData(
         analyticsContext,
         {
-          itemsPerRow,
+          // A carousel is one row, so row math must not wrap at the visible column count.
+          itemsPerRow: totalNumberOfItems,
           totalNumberOfItems,
           collectionComponentType: COLLECTION_COMPONENT_TYPE,
           isWideTiles,
+          startRowNumber,
         },
         pageContext,
         services.errorReporter,
@@ -95,8 +100,8 @@ export function SduiCollectionCarousel({
     [
       analyticsContext,
       isWideTiles,
-      itemsPerRow,
       totalNumberOfItems,
+      startRowNumber,
       pageContext,
       services.errorReporter,
     ],
@@ -124,6 +129,7 @@ export function SduiCollectionCarousel({
         impressionIndexes: indexesToSend,
         itemAnalyticsDatas: itemAnalyticsDatasRef.current,
         collectionAnalyticsData,
+        startRowNumber,
         impressionEventName,
         skipItemImpressionsLog,
       });
@@ -132,6 +138,7 @@ export function SduiCollectionCarousel({
       impressionCtx,
       services.impressionHandlerRegistry,
       collectionAnalyticsData,
+      startRowNumber,
       itemsPerRow,
       impressionEventName,
       skipItemImpressionsLog,
@@ -143,11 +150,16 @@ export function SduiCollectionCarousel({
   const renderItem = useCallback(
     (config: SduiComponentConfig, index: number, isVisible: boolean): React.JSX.Element => {
       // Item analytics read config fields, so a deferred shell must be built first.
-      // The managed-list renderer materializes again, which is a no-op after this.
+      // Invoke `items.renderItem` before `buildItemAnalyticsData` so SduiRenderer's
+      // `addListItemAnalytics` populates `itemComponentType` / `itemPosition` first.
       const materializedConfig = materializeSduiComponentConfig(config);
       if (materializedConfig == null) {
+        itemAnalyticsDatasRef.current[index] = null;
         return <React.Fragment key={index} />;
       }
+      const renderedItem = items?.renderItem(materializedConfig, index) ?? (
+        <React.Fragment key={index} />
+      );
       itemAnalyticsDatasRef.current[index] = buildItemAnalyticsData(
         materializedConfig.analyticsContext,
         index,
@@ -164,7 +176,7 @@ export function SduiCollectionCarousel({
             node?.toggleAttribute("inert", !isVisible);
           }}
         >
-          {items?.renderItem(materializedConfig, index) ?? <React.Fragment key={index} />}
+          {renderedItem}
         </div>
       );
     },

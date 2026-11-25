@@ -124,13 +124,15 @@ export const getOmniRecommendationsMetadata = async (
 export const getOmniSearch = async (
   searchQuery: string,
   pageToken: string,
-  sessionId: string,
+  tabSpecificSessionId: string,
   pageType: string,
+  omniSearchSessionId: string,
 ): Promise<TGetOmniSearchParsedResponse> => {
   const { data } = await http.get<TGetOmniSearchResponse>(bedev2Constants.url.getOmniSearch, {
     searchQuery,
     pageToken,
-    sessionId,
+    globalSessionId: omniSearchSessionId,
+    sessionId: tabSpecificSessionId,
     pageType,
   });
 

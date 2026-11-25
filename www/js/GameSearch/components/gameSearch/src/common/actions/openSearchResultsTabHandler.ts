@@ -6,9 +6,12 @@ import {
   ActionType,
   SduiErrorName,
   actionTypeName,
+  clientOnly,
   type AnalyticsContext,
   type SduiActionContext,
 } from "@rbx/sdui-core";
+
+import { getSearchSessionHistoryState } from "../utils/searchSessionHistory";
 
 const OPEN_SEARCH_RESULTS_TAB_ACTION_TYPE = actionTypeName(ActionType.OPEN_SEARCH_RESULTS_TAB);
 
@@ -61,3 +64,29 @@ export function openSearchResultsTabResolveHref(
 
   return getAbsoluteUrl(`${path}?keyword=${keyword}${sessionQuery}`);
 }
+
+export const openSearchResultsTabHandler = clientOnly(({ actionParams }, analyticsContext, ctx) => {
+  const href = openSearchResultsTabResolveHref(actionParams, ctx, analyticsContext);
+
+  if (href === undefined) {
+    return;
+  }
+
+  const { searchType } = actionParams;
+
+  if (searchType === GAMES_SEARCH_TYPE) {
+    if (browserWindow === undefined) {
+      return;
+    }
+
+    const { pathname, search, hash } = new URL(href, browserWindow.location.href);
+    browserWindow.history.pushState(
+      getSearchSessionHistoryState(),
+      "",
+      `${pathname}${search}${hash}`,
+    );
+    return;
+  }
+
+  browserWindow?.location.assign(href);
+});

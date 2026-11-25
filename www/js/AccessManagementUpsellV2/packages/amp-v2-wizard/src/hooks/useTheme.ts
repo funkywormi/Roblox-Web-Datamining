@@ -11,7 +11,7 @@ const isDarkTheme = (): boolean => {
   if (!isNextJs) {
     return document.body.classList.contains("dark-theme");
   }
-  const { classList } = document.documentElement;
+  const { classList } = document.body;
   return (
     classList.contains("color-mode-dark") ||
     (classList.contains("color-mode-system") &&
@@ -30,11 +30,12 @@ const useTheme = (): "dark" | "light" => {
       setDarkTheme(isDarkTheme());
     };
     const observer = new MutationObserver(update);
-    observer.observe(isNextJs ? document.documentElement : document.body, {
+    observer.observe(document.body, {
       attributeFilter: ["class"],
     });
     const media = isNextJs ? window?.matchMedia(darkSchemeQuery) : undefined;
     media?.addEventListener("change", update);
+    update();
     return () => {
       observer.disconnect();
       media?.removeEventListener("change", update);

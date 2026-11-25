@@ -2,7 +2,7 @@ import React from "react";
 import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/react";
 import { SystemFeedbackProvider } from "@rbx/core-ui";
 import ReminderOfNormsDialogContainer from "./reminderOfNorms";
-import HomePage from "./HomePageOmniFeed";
+import HomePageIxpWrapper from "./sduiV2/HomePageIxpWrapper";
 import { CommonUIFeatures } from "../common/constants/translationConstants";
 
 const HomePageContainer = ({ translate }: WithTranslationsProps): JSX.Element => {
@@ -18,8 +18,7 @@ const HomePageContainer = ({ translate }: WithTranslationsProps): JSX.Element =>
       </div>
       <div className="place-list-container">
         <SystemFeedbackProvider>
-          {/* @ts-expect-error TODO: old, migrated code */}
-          <HomePage />
+          <HomePageIxpWrapper />
         </SystemFeedbackProvider>
       </div>
     </div>

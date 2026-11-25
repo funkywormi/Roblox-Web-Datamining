@@ -453,6 +453,16 @@ export const useTranslatedLegallySensitiveContentAndActions = (
             })
           }
         };
+      case ConsentName.consentCenterUpdateSettingParentFacingNoValue:
+        languageConstants =
+          legallySensitiveContentConstants.consentCenterUpdateSettingParentFacingNoValue;
+        return {
+          wordsOfConsent: {
+            text: translate(languageConstants.textTranslationKey, {
+              settingName: translationArgs?.settingName
+            })
+          }
+        };
       case ConsentName.allowMarketingEmailNotifications:
         languageConstants = legallySensitiveContentConstants.allowMarketingEmailNotifications;
         return {

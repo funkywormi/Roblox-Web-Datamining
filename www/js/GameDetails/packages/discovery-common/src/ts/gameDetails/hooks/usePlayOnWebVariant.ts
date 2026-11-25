@@ -38,7 +38,7 @@ export const usePlayOnWebVariant = (
   universeId: string,
   enabled = true,
   deviceEligible?: boolean,
-): { playOnWebVariant: TPlayOnWebVariant; isLoading: boolean } => {
+): { playOnWebVariant: TPlayOnWebVariant; isLoading: boolean; isPending: boolean } => {
   const { playabilityStatus } = usePlayabilityStatus(universeId, enabled);
   const { ixpData, isLoading } = useExperimentValues(
     layerNames[playInBrowserLayer],
@@ -47,11 +47,9 @@ export const usePlayOnWebVariant = (
   );
   const storedAnswer = useStoredAnswer();
   const meetsSpec = deviceEligible ?? storedAnswer === true;
+  const meetsDevice = ixpData.ForcePlayOnWeb || meetsSpec;
   const eligibleForPlayOnWeb =
-    enabled &&
-    !isLoading &&
-    (ixpData.ForcePlayOnWeb || meetsSpec) &&
-    playabilityStatus === "Playable";
+    enabled && !isLoading && meetsDevice && playabilityStatus === "Playable";
   // Forced (QA) sessions aren't logged as exposure.
   const shouldLogExposure = eligibleForPlayOnWeb && !ixpData.ForcePlayOnWeb;
   const hasLoggedExposure = useRef(false);
@@ -74,5 +72,11 @@ export const usePlayOnWebVariant = (
     // If playability status is determined to not be playable we no longer need to wait.
     isLoading:
       enabled && isLoading && (playabilityStatus === undefined || playabilityStatus === "Playable"),
+    // Could still turn out eligible: the variant reads `None` until IXP and playability both load.
+    // Doesn't depend on the arm.
+    isPending:
+      enabled &&
+      meetsDevice &&
+      (playabilityStatus === undefined || (isLoading && playabilityStatus === "Playable")),
   };
 };

@@ -3,6 +3,8 @@ import * as http from "@rbx/core-lib/http";
 import { Url } from "@rbx/core-lib/url";
 import { parseInt } from "@rbx/core-lib/number";
 import { serialize } from "@rbx/core-lib/json";
+import { document } from "@rbx/core-lib/browser";
+import type { ThumbnailType } from "./types";
 
 // Next-clean port of @rbx/thumbnails `logMeasurement` (components/thumbnails/src/metrics). Posts
 // batched perf measurements (ThumbnailLoadDurationWebapp / ThumbnailNoRetrySuccessWebapp /
@@ -55,12 +57,32 @@ const flush = (): void => {
   }
   const measures = queue;
   queue = [];
-  http.postUntyped(measurementsUrl(), measures, {
-    credentials: "include",
-    keepalive: true,
-    signal: AbortSignal.timeout(3_000),
-  });
+  try {
+    http.postUntyped(measurementsUrl(), measures, {
+      credentials: "include",
+      keepalive: true,
+      signal: AbortSignal.timeout(3_000),
+    });
+  } catch {
+    // A missing AbortSignal.timeout (Safari < 16) must not reach Thumbnail2d's queryFn or onLoad.
+  }
 };
+
+const DEFAULT_SAMPLE_SIZE = 10;
+
+/** Samples status and timeout measurements as @rbx/thumbnails `shouldLogMetrics` does. */
+export const shouldSampleMeasurement = (): boolean => {
+  const meta = document?.getElementsByName("thumbnail-meta-data")[0];
+  const sampleSize =
+    meta === undefined
+      ? DEFAULT_SAMPLE_SIZE
+      : parseInt(meta.dataset.thumbnailMetricsSampleSize ?? "");
+  return sampleSize !== null && Math.floor(Math.random() * 100) <= sampleSize;
+};
+
+// @rbx/thumbnails spells the headshot type AvatarHeadshot, so its metric series uses that name.
+export const metricThumbnailType = (type: ThumbnailType): string =>
+  `${type === "AvatarHeadShot" ? "AvatarHeadshot" : type}_2d`;
 
 /** Queue a thumbnail perf measurement; flushed in a batch (matches the legacy batching). */
 export const logMeasurement = (metricName: string, jsonData: ThumbnailMeasurementData): void => {

@@ -282,6 +282,10 @@ export type TGetGameDetails = {
   sourceName?: string;
   sourceDescription?: string;
   licenseDescription?: string;
+  /** Official brand license, from games hydration. */
+  isOfficiallyLicensed?: boolean;
+  /** Community (third-party) brand license, from games hydration. */
+  isCommunityLicensed?: boolean;
   refundLink?: string;
   localizedFiatPrice?: string;
   refundPolicy?: TRefundPolicy;

@@ -1,3 +1,4 @@
+import { AccountSettingsEntryPointsSduiModule } from "@rbx/account-settings-entry-points/sdui";
 import type { TranslateFunction } from "@rbx/core-scripts/react";
 import { DiscoverySduiModule } from "@rbx/discovery-common/sdui";
 import { SessionInfoType } from "@rbx/discovery-common/telemetry";
@@ -15,6 +16,7 @@ import { GameSearchSduiModule } from "../registry/gameSearchSduiModule";
 export const GAME_SEARCH_MODULES = [
   GameSearchSduiModule,
   DiscoverySduiModule,
+  AccountSettingsEntryPointsSduiModule,
   SduiClientModule,
   SduiCommonModule,
 ];

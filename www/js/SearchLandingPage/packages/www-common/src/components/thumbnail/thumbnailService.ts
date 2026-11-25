@@ -1,12 +1,13 @@
 import * as z from "zod/mini";
 import environmentUrls from "@rbx/environment-urls";
 import * as http from "@rbx/core-lib/http";
+import { window } from "@rbx/core-lib/browser";
 import { batchQuery } from "@rbx/core-lib/promise";
 import { Url } from "@rbx/core-lib/url";
-import type { ResolvedThumbnail, ThumbnailRequest } from "./types";
+import type { ResolvedThumbnail, ThumbnailFormat, ThumbnailRequest, ThumbnailType } from "./types";
 
 const DEFAULT_SIZE = "150x150";
-const DEFAULT_FORMAT = "webp";
+const DEFAULT_FORMAT: ThumbnailFormat = "webp";
 
 // Getters, not module-scope consts: parsing at import throws for importers that never fetch (e.g. under jest).
 const thumbnailsUrl = () => Url.parse(environmentUrls.thumbnailsApi).getOrThrow();
@@ -27,13 +28,24 @@ const batchResponseSchema = z.object({
 
 type ThumbnailBatchResponse = z.infer<typeof batchResponseSchema>;
 
-const parseBatchResponse = (response: ThumbnailBatchResponse): Map<string, ResolvedThumbnail> => {
+const parseBatchResponse = (
+  response: ThumbnailBatchResponse,
+  transportRetries: number,
+): Map<string, ResolvedThumbnail> => {
   const resolved = new Map<string, ResolvedThumbnail>();
   response.data.forEach(({ requestId: id, state, imageUrl }) => {
     if (state === "Completed") {
-      resolved.set(id, imageUrl != null ? { state, imageUrl } : { state: "Error" });
+      resolved.set(
+        id,
+        imageUrl != null
+          ? { state, imageUrl, transportRetries }
+          : { state: "Error", transportRetries },
+      );
     } else {
-      resolved.set(id, { state });
+      resolved.set(
+        id,
+        imageUrl != null ? { state, imageUrl, transportRetries } : { state, transportRetries },
+      );
     }
   });
   return resolved;
@@ -59,19 +71,63 @@ const fetchThumbnailBatch = async (
       : {}),
   }));
 
+  let transportRetries = 0;
   const result = await http.post(url, body, batchResponseSchema, {
     credentials: "include",
     headers: { Accept: "application/json" },
     // Retry transient/retryable transport failures (needs the retryInterceptor installed).
-    retry: http.defaultBrowserRetryDelay,
+    retry: (failedRetries, error) => {
+      const delay = http.defaultBrowserRetryDelay(failedRetries, error);
+      if (!Number.isNaN(delay)) {
+        transportRetries += 1;
+      }
+      return delay;
+    },
   });
 
-  return parseBatchResponse(result.getOrThrow());
+  return parseBatchResponse(result.getOrThrow(), transportRetries);
 };
 
-export const resolveThumbnail = batchQuery(
+const resolveBatched = batchQuery(
   { delay: 50, maxSize: 100 },
   fetchThumbnailBatch,
   (resolved, request: ThumbnailRequest): ResolvedThumbnail =>
     resolved.get(requestId(request)) ?? { state: "Error" },
 );
+
+const WEBP_SUPPORT_DATA_URI =
+  "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==";
+
+let isWebpSupported: Promise<boolean> | undefined;
+
+// macOS 10.x Safari can't decode webp.
+const checkWebpSupport = (): Promise<boolean> => {
+  isWebpSupported ??= new Promise(resolve => {
+    if (window === undefined) {
+      resolve(true);
+      return;
+    }
+    const img = new window.Image();
+    img.onload = () => {
+      resolve(img.width > 0 && img.height > 0);
+    };
+    img.onerror = () => {
+      resolve(false);
+    };
+    img.src = WEBP_SUPPORT_DATA_URI;
+  });
+  return isWebpSupported;
+};
+
+const webpOnlyTypes: ReadonlySet<ThumbnailType> = new Set(["GameIcon", "GameThumbnail"]);
+
+const resolveFormat = async ({ type, format }: ThumbnailRequest): Promise<ThumbnailFormat> => {
+  const requested = webpOnlyTypes.has(type) ? "webp" : (format ?? DEFAULT_FORMAT);
+  if (requested !== "webp") {
+    return requested;
+  }
+  return (await checkWebpSupport()) ? "webp" : "png";
+};
+
+export const resolveThumbnail = async (request: ThumbnailRequest): Promise<ResolvedThumbnail> =>
+  resolveBatched({ ...request, format: await resolveFormat(request) });

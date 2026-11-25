@@ -62,3 +62,13 @@ export const getGameSearchComponentType = (
 
   return sort.topicLayoutData?.componentType ?? undefined;
 };
+
+/**
+ * Returns the personalized recommendations surface key of the first sort that has one. The page
+ * shows one header over a flat grid, so one key covers it.
+ */
+export const getGameSearchPersonalizedRecommendationsSurfaceKey = (
+  sortsData: TGameSearchSortData[] | undefined,
+): string | undefined =>
+  sortsData?.find(sortData => !!sortData.topicLayoutData?.personalizedRecommendationsSurfaceKey)
+    ?.topicLayoutData.personalizedRecommendationsSurfaceKey;

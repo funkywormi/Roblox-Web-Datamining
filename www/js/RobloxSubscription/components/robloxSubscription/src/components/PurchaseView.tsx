@@ -1,6 +1,6 @@
-import { paymentFlowAnalyticsService } from "@rbx/core-scripts/legacy/core-roblox-utilities";
 import { useTranslation } from "@rbx/core-scripts/react";
 import { Button } from "@rbx/foundation-ui";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { usePaymentSession } from "@rbx/payments/services/paymentSession";
 import { getFreeTrialDisplay } from "@rbx/payments/services/subscriptions";
 import {
@@ -158,14 +158,14 @@ const PurchaseView: FC<PurchaseViewProps> = ({
     const viewMessage = isFreeTrial
       ? paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.ROBLOX_PLUS_FREE_TRIAL
       : paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.ROBLOX_PLUS_SUBSCRIBE;
-    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBLOX_PLUS_PURCHASE,
-      false,
-      paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_PLUS_LANDING,
-      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+      triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBLOX_PLUS_PURCHASE,
+      isMidPurchaseStep: false,
+      viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_PLUS_LANDING,
+      purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
       viewMessage,
-      paymentSessionId ? { paymentSessionId } : {},
-    );
+      eventMetadata: paymentSessionId ? { paymentSessionId } : {},
+    });
     publishMetric(Event.PURCHASE_VIEW_SHOWN, {
       variant: hasBundles ? "multi" : "single",
       tierCount: String(bundles.length + 1),
@@ -212,17 +212,18 @@ const PurchaseView: FC<PurchaseViewProps> = ({
       const viewMessage = isProductFreeTrial
         ? paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.ROBLOX_PLUS_FREE_TRIAL
         : paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.ROBLOX_PLUS_SUBSCRIBE;
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBLOX_PLUS_PURCHASE,
-        false,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_PLUS_LANDING,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext:
+          paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBLOX_PLUS_PURCHASE,
+        isMidPurchaseStep: false,
+        viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_PLUS_LANDING,
+        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
         viewMessage,
-        {
+        eventMetadata: {
           product_id: product.productKey.id,
           ...(paymentSessionId ? { paymentSessionId } : {}),
         },
-      );
+      });
     },
     [paymentSessionId],
   );

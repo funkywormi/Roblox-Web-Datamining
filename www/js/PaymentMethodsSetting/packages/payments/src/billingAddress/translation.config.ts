@@ -1,4 +1,4 @@
-import { TranslationConfig } from "react-utilities";
+import type { TranslationConfig } from "react-utilities";
 
 const translationConfig: TranslationConfig = {
   common: ["Feature.Payment"],

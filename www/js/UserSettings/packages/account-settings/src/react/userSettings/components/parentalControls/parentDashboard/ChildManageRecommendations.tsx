@@ -55,6 +55,10 @@ export const toUserSettingName = (surfaceSettingName: string): UserSetting =>
  *
  * The save settles once grant-consent answers, so a slow refetch doesn't stop the row from being
  * changed again.
+ *
+ * A legally sensitive setting's `auditData` (the parent surface's copy) goes as the
+ * `rbx-audit-data` header: these writes don't go through account-management-api, so it's
+ * grant-consent's audit filter that sends the audit log.
  */
 const useSaveChildSetting = (child: TChildInfo, surfaceKey: SettingsSurfaceKey): TSaveSetting => {
   const environment = useRelayEnvironment();
@@ -65,7 +69,7 @@ const useSaveChildSetting = (child: TChildInfo, surfaceKey: SettingsSurfaceKey):
   const lastRefetch = useRef<Promise<unknown>>(Promise.resolve());
 
   return useCallback<TSaveSetting>(
-    async ({ id, name, option, enabled }) => {
+    async ({ id, name, option, enabled, auditData }) => {
       const setting = toUserSettingName(name);
       const shown = environment.applyUpdate({
         storeUpdater: store => {
@@ -74,7 +78,13 @@ const useSaveChildSetting = (child: TChildInfo, surfaceKey: SettingsSurfaceKey):
       });
 
       try {
-        await updateChildSetting({ childUserId: child.userId, setting, value: option }).unwrap();
+        await updateChildSetting({
+          childUserId: child.userId,
+          setting,
+          value: option,
+          // grant-consent's audit filter forwards it in the audit log, with the parent as actor.
+          ...(auditData != null && { auditHeader: auditData }),
+        }).unwrap();
       } catch (error) {
         // Back to the value the store had from the server.
         shown.dispose();

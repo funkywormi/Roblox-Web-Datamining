@@ -53,6 +53,10 @@ export const FeaturePlacesList = {
 export const FeatureGameDetails = {
   HeadingDescription: "Heading.Description",
   LabelAgeGuidelines: "Label.AgeGuidelines",
+  LabelOfficialBadge: "Label.OfficialBadge",
+  LabelLicensedBadge: "Label.LicensedBadge",
+  TooltipOfficialBadge: "Tooltip.OfficialBadge",
+  TooltipLicensedBadge: "Tooltip.LicensedBadge",
   LabelLearnMore: "Label.LearnMore",
   LabelBy: "Label.By",
   DescriptionMadeWithBuild: "Description.MadeWithBuild",
@@ -133,7 +137,6 @@ export const FeatureDeveloperProducts = {
   LoadingDetails: "Heading.LoadingDetails",
   HeadingError: "Heading.Error",
   ErrorTryAgain: "ErrorTryAgain",
-  LabelPendingMessageTooltip: "Label.PendingMessageTooltip",
 };
 
 export const FeatureSduiLandingPage = {

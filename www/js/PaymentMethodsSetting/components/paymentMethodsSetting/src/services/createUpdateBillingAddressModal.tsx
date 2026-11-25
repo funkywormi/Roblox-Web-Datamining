@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { TranslateFunction } from "react-utilities";
 import { Button, IModalService, Modal, TSystemFeedbackService } from "react-style-guide";
-import { paymentFlowAnalyticsService } from "core-roblox-utilities";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { BillingInfoForm, type Address } from "@rbx/payments/billingAddress";
 import { TRANSLATION_KEYS } from "../constants/translationConstants";
 

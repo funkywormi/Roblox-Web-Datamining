@@ -5,6 +5,8 @@ import {
 } from "@rbx/sdui-core";
 import { DiscoverySduiSectionHeader } from "./DiscoverySduiSectionHeader";
 import { SduiFilterPillsCarousel } from "./filterPills/SduiFilterPillsCarousel";
+import { SduiHeroUnit } from "./SduiHeroUnit";
+import { SduiHeroUnitBottomRow } from "./SduiHeroUnitBottomRow";
 import { SduiOptionSelectorCollection } from "./SduiOptionSelectorCollection";
 import { SduiSlotOverlay } from "./SduiSlotOverlay";
 import { SduiSongTile } from "./SduiSongTile";
@@ -13,6 +15,12 @@ import { SduiFriendRequestButton } from "./friendRequestButton";
 import { SduiUserSearchTile } from "./userSearchTile";
 
 export const DISCOVERY_V2_COMPONENTS: Partial<Record<UiComponentType, SduiComponentDefinition>> = {
+  [UiComponentType.HERO_UNIT]: {
+    component: SduiHeroUnit,
+  },
+  [UiComponentType.HERO_UNIT_BOTTOM_ROW]: {
+    component: SduiHeroUnitBottomRow,
+  },
   [UiComponentType.SECTION_HEADER]: {
     component: DiscoverySduiSectionHeader,
     propParsers: {

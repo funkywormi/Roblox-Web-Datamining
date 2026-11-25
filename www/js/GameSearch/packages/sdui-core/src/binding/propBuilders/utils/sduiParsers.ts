@@ -65,6 +65,10 @@ export const SUPPORTED_ICON_CLASSES: Record<string, string> = {
   "icons/arrows/arrow_wide_right": "icon icon-regular-arrow-wide-right",
   "icons/common/robux": "icon icon-filled-robux",
   "icons/actions/info_small": "icon-moreinfo-16x16",
+  "icons/actions/block": "icon icon-filled-circle-slash",
+  "icons/actions/info": "icon icon-regular-circle-i",
+  // Shared Home templates send Foundation's IconName.Flag ("flag") rather than a legacy icons/* path.
+  flag: "icon icon-regular-flag",
 };
 
 export function parseIconProp(value: unknown, ctx: BindingContext): unknown {

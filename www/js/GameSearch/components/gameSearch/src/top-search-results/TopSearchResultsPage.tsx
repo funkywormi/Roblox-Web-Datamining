@@ -1,6 +1,5 @@
 import React from "react";
 import type { TranslateFunction } from "@rbx/core-scripts/react";
-import { withPageSession } from "@rbx/discovery-common/session";
 
 import { FriendRequestSnackbar } from "./FriendRequestSnackbar";
 import { TopSearchResultsContainer } from "./TopSearchResultsContainer";
@@ -16,4 +15,4 @@ const TopSearchResultsPage = ({ translate }: TopSearchResultsPageProps) => (
   </React.Fragment>
 );
 
-export default withPageSession(TopSearchResultsPage);
+export default TopSearchResultsPage;

@@ -34,5 +34,6 @@ export function wrapFeedManagedChildList(
       applyFeedEntryAnalytics(materializedConfig, index, collectionPositionOffset);
       return list.renderItem(materializedConfig, index, reactKey, extraLocalProps);
     },
+    ...(list.renderChild ? { renderChild: list.renderChild } : {}),
   };
 }

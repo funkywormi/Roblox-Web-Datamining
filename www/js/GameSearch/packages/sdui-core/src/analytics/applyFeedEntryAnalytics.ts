@@ -28,4 +28,5 @@ export function applyFeedEntryAnalytics(
     // feed entry derives its `collectionPosition` from its position in the feed.
     collectionPosition: feedIndex + collectionPositionOffset,
   });
+  childConfig.analyticsContext?.setLayoutCellPosition?.(feedIndex);
 }

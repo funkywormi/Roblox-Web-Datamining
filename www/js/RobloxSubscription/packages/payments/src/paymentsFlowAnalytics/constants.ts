@@ -137,6 +137,10 @@ export const VIEW_NAME = {
   ROBUX_PENDING_TRANSFERS: "RobuxPendingTransfers",
   REDEEM_CREDIT_FOOTER: "RedeemCreditFooter",
   REDEEM_CREDIT_GET_PLUS_MODAL: "RedeemCreditGetPlusModal",
+  IOS_PURCHASE_RESTART_ALERT: "IosPurchaseRestartAlert",
+  NATIVE_PURCHASE_UI_SHOWN_TIME: "NativePurchaseUiShownTime",
+  EARLY_CLICK: "EarlyClick",
+  BUY_ROBUX_HYDRATION: "BuyRobuxHydration",
 } as const;
 export type ViewName = ValueOf<typeof VIEW_NAME>;
 

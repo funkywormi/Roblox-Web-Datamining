@@ -1,8 +1,9 @@
 import { withTranslations, WithTranslationsProps } from "@rbx/core-scripts/react";
-import { GameSearch } from "@rbx/discovery-common";
+import { SearchSessionProvider } from "./common/contexts/SearchSessionProvider";
 import { translations } from "../component.json";
 import { useSearchType } from "./common/hooks/useSearchType";
 import { useTopSearchResultsIxpWithExposure } from "./common/hooks/useTopSearchResultsIxpWithExposure";
+import GameSearchResultsPage from "./game-search-results/GameSearchResultsPage";
 import TopSearchResultsPage from "./top-search-results/TopSearchResultsPage";
 
 function App(props: WithTranslationsProps) {
@@ -13,7 +14,15 @@ function App(props: WithTranslationsProps) {
     return <TopSearchResultsPage translate={props.translate} />;
   }
 
-  return <GameSearch {...props} />;
+  return <GameSearchResultsPage {...props} />;
 }
 
-export default withTranslations(App, translations);
+function SearchApp(props: WithTranslationsProps): React.JSX.Element {
+  return (
+    <SearchSessionProvider>
+      <App {...props} />
+    </SearchSessionProvider>
+  );
+}
+
+export default withTranslations(SearchApp, translations);

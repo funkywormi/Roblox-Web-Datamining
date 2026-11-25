@@ -61,7 +61,10 @@ const sanitizeRequiredSpec = (spec: Partial<RequiredSpec>): RequiredSpec => {
 /**
  * Set by the page host to turn the client on. `requiredSpec` is an optional override of the
  * code-defined {@link defaultRequiredSpec}. Missing keys use {@link defaultDeviceProbeConfig}, so
- * the probe stays off until a host turns it on; `null` restores the defaults.
+ * the probe stays off until a host turns it on; `null` restores the defaults. The probe page can't
+ * see an override: its quick checks and the cores it measures (at most `minEffectiveCores`) follow
+ * `defaultRequiredSpec`. So an override looser on those rules still gets not-met where the
+ * default fails, and a `minEffectiveCores` above the default can't be met.
  */
 export const setDeviceProbeConfig = (config: DeviceProbeConfigInput | null): void => {
   current =

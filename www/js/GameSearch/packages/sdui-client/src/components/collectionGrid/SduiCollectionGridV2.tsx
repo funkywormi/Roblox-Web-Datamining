@@ -32,6 +32,8 @@ export interface SduiCollectionGridV2Props {
   collectionItemSize?: string;
   itemHeightFromWidth?: SduiDim;
   maxNumRows?: number;
+  /** Space between rows in px. Defaults to the column gap. */
+  rowGap?: number;
   onItemsPerRowChange: (itemsPerRow: number) => void;
 }
 
@@ -112,6 +114,7 @@ export function SduiCollectionGridV2({
   collectionItemSize = STANDARD_COLLECTION_ITEM_SIZE,
   itemHeightFromWidth,
   maxNumRows,
+  rowGap,
   onItemsPerRowChange,
 }: SduiCollectionGridV2Props): React.JSX.Element {
   const poolLayout = items?.poolLayout;
@@ -124,6 +127,7 @@ export function SduiCollectionGridV2({
   const columnCount =
     poolLayout?.columnCount ?? resolveCollectionColumnCount(collectionItemSize, containerWidth);
   const gap = resolveCollectionColumnGap(containerWidth);
+  const resolvedRowGap = rowGap ?? gap;
   const visibleItemConfigs = useMemo(
     () => capCollectionItemConfigs(itemConfigs, columnCount, maxNumRows, poolLayout),
     [columnCount, itemConfigs, maxNumRows, poolLayout],
@@ -197,10 +201,10 @@ export function SduiCollectionGridV2({
       measuredHeights.set(index, naturalHeight);
     });
     lastMeasuredItemHeights.current = measuredHeights;
-    setRowHeight(resolveGridRowHeight(itemHeights, gap));
+    setRowHeight(resolveGridRowHeight(itemHeights, resolvedRowGap));
   }, [
     containerWidth,
-    gap,
+    resolvedRowGap,
     isItemHeightFromWidthApplied,
     isPooled,
     measurementVersion,
@@ -228,7 +232,7 @@ export function SduiCollectionGridV2({
         style={{
           gridTemplateColumns: columnCount > 0 ? `repeat(${columnCount}, minmax(0, 1fr))` : "none",
           gridAutoRows,
-          gap: `${gap}px`,
+          gap: resolvedRowGap === gap ? `${gap}px` : `${resolvedRowGap}px ${gap}px`,
         }}
       >
         {visibleItemConfigs.map((config, index) => {

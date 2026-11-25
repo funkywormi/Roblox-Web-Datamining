@@ -29,6 +29,9 @@ import { PROP_KIND } from "../../types/propKinds";
  * If both are set, `inlineComponent` wins (matches the precedence rule in
  * `ui_component_schema.proto`). Mirrors lua `buildNestedComponentProp`.
  *
+ * Unless `isLazy`, the result carries `isNestedComponentConfig` so the
+ * renderer pre-renders it. `buildLazyNestedComponentProp` passes `isLazy`.
+ *
  * The per-build wiring (template store, builder, builder config) arrives
  * through the `{ kind: "nested" }` variant of `PropBuildOptions`; any other
  * variant is surfaced as a missing-context error.
@@ -38,6 +41,7 @@ export function buildNestedComponentProp(
   propValue: unknown,
   request: PropBuildRequest,
   options: PropBuildOptions = { kind: "none" },
+  isLazy = false,
 ): ResolvedProp {
   const bindingContext: BindingContext = { ...request.ctx, parserName: propType };
   const childRequest: PropBuildRequest = { ...request, ctx: bindingContext };
@@ -46,13 +50,24 @@ export function buildNestedComponentProp(
 
   if (propType === PROP_KIND.CONDITIONAL) {
     const conditionalPayload: RecordOf = isRecord(propValue) ? propValue : {};
-    return generateConditionalPropValue(
+    const branchBuilder = isLazy
+      ? (
+          branchType: string,
+          branchValue: unknown,
+          branchRequest: PropBuildRequest,
+          branchOptions?: PropBuildOptions,
+        ) => buildNestedComponentProp(branchType, branchValue, branchRequest, branchOptions, true)
+      : buildNestedComponentProp;
+    const result = generateConditionalPropValue(
       conditionalPayload,
       childRequest,
-      buildNestedComponentProp,
+      branchBuilder,
       // Forward our typed options so each branch keeps the nested build wiring.
       options,
     );
+    return !isLazy && result.category === "propSignal"
+      ? { ...result, isNestedComponentConfig: true }
+      : result;
   }
 
   if (propType !== PROP_KIND.LITERAL || !nestedBuildContext) {
@@ -116,7 +131,11 @@ export function buildNestedComponentProp(
       nestedBuildContext.poolBuildMetadata,
     );
     return nestedConfig
-      ? { value: nestedConfig, category: "nestedConfig" }
+      ? {
+          value: nestedConfig,
+          category: "nestedConfig",
+          ...(isLazy ? {} : { isNestedComponentConfig: true }),
+        }
       : { value: undefined, category: "failed", error: "Failed to build inline nested config" };
   }
 
@@ -142,6 +161,10 @@ export function buildNestedComponentProp(
     nestedBuildContext.poolBuildMetadata,
   );
   return nestedConfig
-    ? { value: nestedConfig, category: "nestedConfig" }
+    ? {
+        value: nestedConfig,
+        category: "nestedConfig",
+        ...(isLazy ? {} : { isNestedComponentConfig: true }),
+      }
     : { value: undefined, category: "failed", error: "Failed to build nested config" };
 }

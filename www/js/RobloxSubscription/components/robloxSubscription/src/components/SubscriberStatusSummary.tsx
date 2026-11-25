@@ -9,6 +9,8 @@ export type SubscriberStatusSummaryProps = {
   expirationTimestampMs: number;
   nextRenewalTimestampMs: number | null;
   hasFreeTrial: boolean;
+  /** The server only lets granted Plus be upgraded, so an upgradeable membership is free. */
+  isUpgradeable: boolean;
 };
 
 const SubscriberStatusSummary: FC<SubscriberStatusSummaryProps> = ({
@@ -16,6 +18,7 @@ const SubscriberStatusSummary: FC<SubscriberStatusSummaryProps> = ({
   expirationTimestampMs,
   nextRenewalTimestampMs,
   hasFreeTrial,
+  isUpgradeable,
 }) => {
   const { translate, intl } = useTranslation();
   const dateTimeFormatter = useMemo(() => intl.getDateTimeFormatter(), [intl]);
@@ -32,25 +35,28 @@ const SubscriberStatusSummary: FC<SubscriberStatusSummaryProps> = ({
     return <Badge label={translate("Label.Status.Active")} variant="Standard" />;
   };
 
+  const formatDate = (timestampMs: number) =>
+    dateTimeFormatter.getCustomDateTime(timestampMs, {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+
+  const renderStatusText = () => {
+    if (isUpgradeable) {
+      const date = formatDate(expirationTimestampMs);
+      // translate returns the fallback as is, so it carries the date itself.
+      return translate("Description.FreePlusUntil", { date }, `Free Plus until ${date}`);
+    }
+    if (isCancelled) {
+      return translate("Description.ActiveUntil", { date: formatDate(expirationTimestampMs) });
+    }
+    return translate("Description.SubscribedSince", { date: formatDate(activationTimestampMs) });
+  };
+
   return (
     <div className="gap-x-small flex items-center">
-      <span className="text-body-medium content-emphasis">
-        {isCancelled
-          ? translate("Description.ActiveUntil", {
-              date: dateTimeFormatter.getCustomDateTime(expirationTimestampMs, {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              }),
-            })
-          : translate("Description.SubscribedSince", {
-              date: dateTimeFormatter.getCustomDateTime(activationTimestampMs, {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              }),
-            })}
-      </span>
+      <span className="text-body-medium content-emphasis">{renderStatusText()}</span>
       {renderStatusBadge()}
     </div>
   );

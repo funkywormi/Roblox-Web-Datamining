@@ -3,7 +3,6 @@ import { Dialog as FoundationDialog, DialogContent } from "@rbx/foundation-ui";
 import { useSelectedNotification } from "../context/SelectedNotification";
 import isVisualItemAbuseReport from "../utils/isVisualItemAbuseReport";
 import ReportNotificationModalContent from "./ReportNotificationModalContent";
-import { getFlaggedMuiModalArms } from "../mui/muiModalArms";
 
 const ReportNotificationModal: FC<{
   isOpen: boolean;
@@ -38,21 +37,6 @@ const ReportNotificationModal: FC<{
     }
   }, []);
 
-  const closeOnEscape = useCallback(() => handleCloseAbuseReport(false), [handleCloseAbuseReport]);
-
-  const MuiReportNotificationDialog = getFlaggedMuiModalArms()?.ReportNotificationDialog;
-  if (MuiReportNotificationDialog) {
-    return (
-      <MuiReportNotificationDialog
-        isOpen={isOpen}
-        onEscape={closeOnEscape}
-        onClick={stopPropagation}
-      >
-        <ReportNotificationModalContent handleClose={handleCloseAbuseReport} />
-      </MuiReportNotificationDialog>
-    );
-  }
-
   return (
     <FoundationDialog
       open={isOpen}
@@ -70,8 +54,8 @@ const ReportNotificationModal: FC<{
     >
       <DialogContent
         className="report-notification-modal"
-        // Radix close-control props forwarded through DialogContent's ...props spread
-        // to preserve MUI parity: backdrop click does not dismiss (Escape still does),
+        // Radix close-control props forwarded through DialogContent's ...props spread:
+        // backdrop click does not dismiss (Escape still does),
         // and clicks do not propagate to underlying modals. See PHASE_0_4 doc for the
         // foundation-web follow-up to type these natively.
         {...({

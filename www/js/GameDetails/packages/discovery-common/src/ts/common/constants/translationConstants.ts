@@ -137,7 +137,6 @@ export const FeatureDeveloperProducts = {
   LoadingDetails: "Heading.LoadingDetails",
   HeadingError: "Heading.Error",
   ErrorTryAgain: "ErrorTryAgain",
-  LabelPendingMessageTooltip: "Label.PendingMessageTooltip",
 };
 
 export const FeatureSduiLandingPage = {

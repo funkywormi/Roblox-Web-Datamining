@@ -321,12 +321,13 @@ export function createSduiPoolStore(options: CreateSduiPoolStoreOptions): SduiPo
         return 1;
       }
 
+      const previousSection = getSectionSignal(section.previousFeedSectionId).value;
       const previousSectionStartRow = getOrCreateStartRowSignal(
         section.previousFeedSectionId,
       ).value;
-      const previousSectionRowCount = getOrCreateRowCountSignal(
-        section.previousFeedSectionId,
-      ).value;
+      const previousSectionRowCount = previousSection?.doesNotAdvanceStartRow
+        ? 0
+        : getOrCreateRowCountSignal(section.previousFeedSectionId).value;
       return previousSectionStartRow + previousSectionRowCount;
     });
 

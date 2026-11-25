@@ -164,6 +164,7 @@ export enum EventStreamMetadata {
   MenuItem = "menuItem",
   AvailableMenuItems = "availableMenuItems",
   HiddenReason = "hiddenReason",
+  IsDirectAction = "isDirectAction",
 }
 
 export enum EventType {
@@ -502,6 +503,7 @@ export type TGameTileOverflowMenuAction =
       [EventStreamMetadata.ActionType]: GameTileOverflowMenuActionType;
       [EventStreamMetadata.MenuItem]?: GameTileOverflowMenuItems;
       [EventStreamMetadata.AvailableMenuItems]?: string[];
+      [EventStreamMetadata.IsDirectAction]?: boolean;
       [SessionInfoType.HomePageSessionInfo]?: string;
     }
   | {};

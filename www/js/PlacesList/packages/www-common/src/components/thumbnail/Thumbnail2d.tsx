@@ -4,7 +4,11 @@ import { Skeleton } from "@rbx/foundation-ui";
 import { retryPendingThumbnail, THUMBNAIL_PENDING } from "./pendingPoll";
 import { resolveThumbnail } from "./thumbnailService";
 import { resolveIncludeBackground } from "./headshotBackground";
-import { logMeasurement } from "./thumbnailMeasurement";
+import {
+  logMeasurement,
+  metricThumbnailType,
+  shouldSampleMeasurement,
+} from "./thumbnailMeasurement";
 import type { ResolvedThumbnail, ThumbnailFormat, ThumbnailType } from "./types";
 import "./thumbnailContainer.css";
 import "./thumbnailStatus.css";
@@ -54,6 +58,7 @@ const Thumbnail2d = ({
   const startRef = useRef(Date.now());
   const pollCountRef = useRef(0);
   const loggedRef = useRef(false);
+  const loadLoggedRef = useRef(false);
   const includeBackground = resolveIncludeBackground(type, includeBackgroundProp);
 
   const { data, isError, error, isPending, isLoading } = useQuery({
@@ -84,10 +89,17 @@ const Thumbnail2d = ({
         includeBackground,
         includeProfileFrame,
       });
+      pollCountRef.current += resolved.transportRetries ?? 0;
       if (resolved.state === "Pending") {
         pollCountRef.current += 1;
         // eslint-disable-next-line no-restricted-syntax -- useQuery signals "retry" only via a throw
         throw THUMBNAIL_PENDING;
+      }
+      if (shouldSampleMeasurement()) {
+        logMeasurement("ThumbnailStatusCountWebapp", {
+          Status: resolved.state,
+          ThumbnailType: metricThumbnailType(type),
+        });
       }
       return resolved;
     },
@@ -98,39 +110,39 @@ const Thumbnail2d = ({
     startRef.current = Date.now();
     pollCountRef.current = 0;
     loggedRef.current = false;
+    loadLoggedRef.current = false;
   }, [type, targetId, size, format, version, headShape, includeBackground, includeProfileFrame]);
 
-  // Fire load measurements once per resolution (react-query v5 has no onSuccess/onError callback).
+  // Fire the timeout measurement once per request (react-query v5 has no onError callback).
   useEffect(() => {
-    if (loggedRef.current) {
+    if (loggedRef.current || !isError || error !== THUMBNAIL_PENDING) {
       return;
     }
-    const thumbnailType = `${type}_2d`;
-    if (data) {
-      loggedRef.current = true;
-      logMeasurement("ThumbnailStatusCountWebapp", {
-        Status: data.state,
-        ThumbnailType: thumbnailType,
-      });
-      if (data.state === "Completed") {
-        const retries = pollCountRef.current;
-        logMeasurement("ThumbnailLoadDurationWebapp", {
-          Status: "Success",
-          ThumbnailType: thumbnailType,
-          Value: String(Date.now() - startRef.current),
-        });
-        logMeasurement(
-          retries === 0 ? "ThumbnailNoRetrySuccessWebapp" : "ThumbnailRetryWebapp",
-          retries === 0
-            ? { ThumbnailType: thumbnailType }
-            : { ThumbnailType: thumbnailType, Value: String(retries) },
-        );
-      }
-    } else if (isError && error === THUMBNAIL_PENDING) {
-      loggedRef.current = true;
-      logMeasurement("ThumbnailTimeoutWebapp", { ThumbnailType: thumbnailType });
+    loggedRef.current = true;
+    if (shouldSampleMeasurement()) {
+      logMeasurement("ThumbnailTimeoutWebapp", { ThumbnailType: metricThumbnailType(type) });
     }
-  }, [data, isError, error, type]);
+  }, [isError, error, type]);
+
+  const handleLoad = () => {
+    if (!loadLoggedRef.current && data?.state === "Completed") {
+      loadLoggedRef.current = true;
+      const thumbnailType = metricThumbnailType(type);
+      const retries = pollCountRef.current;
+      logMeasurement("ThumbnailLoadDurationWebapp", {
+        Status: "Success",
+        ThumbnailType: thumbnailType,
+        Value: String(Date.now() - startRef.current),
+      });
+      logMeasurement(
+        retries === 0 ? "ThumbnailNoRetrySuccessWebapp" : "ThumbnailRetryWebapp",
+        retries === 0
+          ? { ThumbnailType: thumbnailType }
+          : { ThumbnailType: thumbnailType, Value: String(retries) },
+      );
+    }
+    onLoad?.();
+  };
 
   const imageUrl = data?.imageUrl ?? null;
   const stateClass = statusClass(data, isError, error);
@@ -150,13 +162,20 @@ const Thumbnail2d = ({
 
   return (
     <span className={wrapperClass}>
-      {showSkeleton && <Skeleton variant="Rectangle" width="100%" height="100%" />}
-      {imageUrl != null && (
+      {showSkeleton && (
+        <Skeleton
+          className="thumbnail-2d-skeleton"
+          variant="Rectangle"
+          width="100%"
+          height="100%"
+        />
+      )}
+      {imageUrl != null && imageUrl !== "" && (
         <img
           className={["size-full", imgClassName].filter(Boolean).join(" ")}
           src={imageUrl}
           alt={altName}
-          onLoad={onLoad}
+          onLoad={handleLoad}
         />
       )}
     </span>

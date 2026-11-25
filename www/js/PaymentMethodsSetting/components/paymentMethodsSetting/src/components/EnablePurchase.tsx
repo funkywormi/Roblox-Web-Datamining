@@ -148,9 +148,9 @@ export const EnablePurchase = ({
 
   const getAllowPurchaseDisclaimerText = () => {
     return translate(TRANSLATION_KEYS.AllowPurchaseDisclaimer, {
-      premiumSubscriptionsLinkStart: `<a href="https://help.roblox.com/hc/articles/203312540" class="text-link" target="_blank">`,
+      premiumSubscriptionsLinkStart: `<a href="https://help.roblox.com/hc/articles/47967913158164" class="text-link" target="_blank">`,
       premiumSubscriptionsLinkEnd: "</a>",
-      inExperienceSubscriptionsLinkStart: `<a href="https://help.roblox.com/hc/articles/20292396051220" class="text-link" target="_blank">`,
+      inExperienceSubscriptionsLinkStart: `<a href="https://help.roblox.com/hc/articles/20292312961556" class="text-link" target="_blank">`,
       inExperienceSubscriptionsLinkEnd: "</a>",
     });
   };

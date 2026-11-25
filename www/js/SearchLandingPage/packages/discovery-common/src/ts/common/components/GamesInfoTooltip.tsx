@@ -1,6 +1,16 @@
 import classNames from "classnames";
 import React from "react";
-import { Tooltip } from "@rbx/core-ui";
+import { Tooltip, TooltipTrigger } from "@rbx/foundation-ui";
+
+const positionByPlacement = {
+  top: "top-center",
+  bottom: "bottom-center",
+  left: "left-center",
+  right: "right-center",
+} as const;
+
+const isPlacement = (placement: string): placement is keyof typeof positionByPlacement =>
+  Object.hasOwn(positionByPlacement, placement);
 
 type TGamesInfoTooltipProps = {
   tooltipText: string;
@@ -18,29 +28,34 @@ const GamesInfoTooltip = ({
 }: TGamesInfoTooltipProps): JSX.Element => {
   return (
     <span className={classNames("info-tooltip-container", { "icon-centered": centerIcon })}>
-      <Tooltip
-        id="games-info-tooltip"
-        placement={placement}
-        containerClassName={classNames("games-info-tooltip", { "icon-centered": centerIcon })}
-        content={tooltipText}
-      >
-        <svg
-          width={sizeInPx}
-          height={sizeInPx}
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+      <span className={classNames("games-info-tooltip", { "icon-centered": centerIcon })}>
+        <Tooltip
+          position={isPlacement(placement) ? positionByPlacement[placement] : "top-center"}
+          title={tooltipText}
+          contentClassName="games-info-tooltip-content"
         >
-          <path d="M8.97 5.44H7V4H8.97V5.44Z" fill="currentColor" />
-          <path d="M8.94347 11.9999H7.05347V6.37988H8.94347V11.9999Z" fill="currentColor" />
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16ZM8 14.5C11.5899 14.5 14.5 11.5899 14.5 8C14.5 4.41015 11.5899 1.5 8 1.5C4.41015 1.5 1.5 4.41015 1.5 8C1.5 11.5899 4.41015 14.5 8 14.5Z"
-            fill="currentColor"
-          />
-        </svg>
-      </Tooltip>
+          <TooltipTrigger asChild>
+            <span>
+              <svg
+                width={sizeInPx}
+                height={sizeInPx}
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M8.97 5.44H7V4H8.97V5.44Z" fill="currentColor" />
+                <path d="M8.94347 11.9999H7.05347V6.37988H8.94347V11.9999Z" fill="currentColor" />
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16ZM8 14.5C11.5899 14.5 14.5 11.5899 14.5 8C14.5 4.41015 11.5899 1.5 8 1.5C4.41015 1.5 1.5 4.41015 1.5 8C1.5 11.5899 4.41015 14.5 8 14.5Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </span>
+          </TooltipTrigger>
+        </Tooltip>
+      </span>
     </span>
   );
 };

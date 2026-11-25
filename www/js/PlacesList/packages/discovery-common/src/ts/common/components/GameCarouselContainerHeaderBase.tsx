@@ -1,4 +1,5 @@
-import React, { ComponentType, useCallback, useMemo } from "react";
+import React, { ComponentType, ReactNode, useCallback, useMemo } from "react";
+import classNames from "classnames";
 import { Link as RouterLink } from "react-router-dom";
 import { TranslateFunction } from "@rbx/core-scripts/react";
 import { TLinkComponentProps } from "@rbx/discovery-sdui-components";
@@ -35,6 +36,7 @@ export type TGameCarouselContainerHeaderProps = {
   isNewSortHeaderEnabled?: boolean;
   useRouterLink?: boolean;
   permitLinkClickPropagation?: boolean;
+  trailingComponent?: ReactNode;
   translate: TranslateFunction;
 };
 
@@ -61,6 +63,7 @@ const GameCarouselContainerHeaderBase = ({
   isNewSortHeaderEnabled,
   useRouterLink,
   permitLinkClickPropagation,
+  trailingComponent,
   translate,
   NewSortHeader,
 }: TGameCarouselContainerHeaderBaseProps): JSX.Element => {
@@ -162,12 +165,23 @@ const GameCarouselContainerHeaderBase = ({
 
   return (
     <div className="game-sort-header-container">
-      <div className={titleContainerClassName}>
-        <h2 className="sort-header">
+      <div
+        className={classNames(titleContainerClassName, {
+          "flex items-center": trailingComponent,
+        })}
+      >
+        <h2 className={classNames("sort-header", { grow: trailingComponent })}>
           {sortTitleComponent}
           {tooltipText && <GamesInfoTooltip tooltipText={tooltipText} placement="right" />}
         </h2>
-        {seeAllLinkComponent}
+        {trailingComponent ? (
+          <div className="flex items-center">
+            {seeAllLinkComponent}
+            {trailingComponent}
+          </div>
+        ) : (
+          seeAllLinkComponent
+        )}
       </div>
       <GameCarouselSubtitle
         defaultSubtitle={sortSubtitle}
@@ -192,6 +206,7 @@ GameCarouselContainerHeaderBase.defaultProps = {
   backgroundImageAssetId: undefined,
   isNewSortHeaderEnabled: undefined,
   useRouterLink: false,
+  trailingComponent: undefined,
 };
 
 export default GameCarouselContainerHeaderBase;

@@ -65,7 +65,10 @@ export function buildPoolSnapshot({
       };
     }
 
-    metadataBySectionId.set(sourceEntrySectionId, { sectionId: sourceEntrySectionId });
+    metadataBySectionId.set(sourceEntrySectionId, {
+      sectionId: sourceEntrySectionId,
+      isSectionRoot: true,
+    });
   }
 
   const issues: BuildPoolSnapshotIssue[] = [];

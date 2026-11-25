@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { TranslateFunction } from "react-utilities";
+import type { TranslateFunction } from "react-utilities";
 import { Tooltip } from "react-style-guide";
 import { Icon } from "@rbx/foundation-ui";
 import PriceTag from "../../../priceTag/components/PriceTag";
@@ -70,7 +70,7 @@ export const TaxDisplay = ({
   }
 
   return (
-    <div className="tax-line d-flex justify-content-between row-pad">
+    <div className="tax-line flex justify-between row-pad">
       <span className="flex items-center gap-xsmall bold">
         {baseTaxLabel}
         {taxRateDisplayString && ` (${taxRateDisplayString}%)`}

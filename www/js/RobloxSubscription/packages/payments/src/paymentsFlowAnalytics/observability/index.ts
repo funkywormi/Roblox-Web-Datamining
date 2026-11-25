@@ -9,7 +9,22 @@ export const observabilityRegistry = {
 
   features: {
     PaymentFlow: {
-      counters: ["UserPaymentFlowMidPurchaseStepTriggeredWithoutCtx", "UserPaymentFlowFlowEnded"],
+      counters: [
+        "UserPaymentFlowMidPurchaseStepTriggeredWithoutCtx",
+        "UserPaymentFlowFlowEnded",
+        {
+          name: "UserPaymentFlowEventSent",
+          dimensions: ["transport", "requestedTransport", "eventName"],
+        },
+        {
+          name: "UserPaymentFlowEventFetchFailed",
+          dimensions: ["eventName", "viewName", "platform", "visibility", "elapsed"],
+        },
+        {
+          name: "UserPaymentFlowEventImgFailed",
+          dimensions: ["eventName", "viewName", "platform", "visibility", "elapsed"],
+        },
+      ],
       errors: [
         "UserPaymentFlowWrongUsageOfMethod",
         "UserPaymentFlowSendEventWithoutUuidOrCtx",
@@ -18,6 +33,7 @@ export const observabilityRegistry = {
         "UserPaymentFlowSendUserEventError",
         "UserPaymentFlowStartFlowError",
         "UserPaymentFlowFlowEndedWithoutTriggerContext",
+        "UserPaymentFlowSendEventKeepaliveError",
       ],
     },
   },

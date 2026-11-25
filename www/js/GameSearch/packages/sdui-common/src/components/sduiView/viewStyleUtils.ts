@@ -6,6 +6,7 @@ import {
   buildSduiNumericStyle,
   buildSduiTokenClass,
   buildSizeCss,
+  type SduiAutomaticSize,
   type SduiDim2,
   type SduiScaleBasis,
   type SduiTokenOrLiteral,
@@ -15,6 +16,11 @@ import {
 interface GetViewStylesParams {
   classNames?: string;
   size?: SduiDim2;
+  /**
+   * Drops the explicit CSS length on the named axis so that axis sizes to its content.
+   * The `size` value on that axis is not applied.
+   */
+  automaticSize?: SduiAutomaticSize;
   maxWidth?: SduiTokenOrLiteral;
   /** From `ViewSchema.WebProps.y_scale_basis`. */
   yScaleBasis?: SduiScaleBasis;
@@ -40,6 +46,7 @@ function resolveBackgroundColor(
 export function getViewStyles({
   classNames,
   size,
+  automaticSize,
   maxWidth,
   yScaleBasis,
   anchorPoint,
@@ -57,7 +64,7 @@ export function getViewStyles({
       : {};
 
   const style: CSSProperties = {
-    ...buildSizeCss(size, undefined, { yScaleBasis }),
+    ...buildSizeCss(size, automaticSize, { yScaleBasis }),
     ...buildSduiNumericStyle(maxWidth, value => ({ maxWidth: value })),
     ...placement,
     ...(zIndex != null ? { zIndex } : {}),

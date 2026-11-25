@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { EventContext } from "@rbx/unified-logging";
 import { window as browserWindow } from "@rbx/core-lib/browser";
 import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
 import {
   getJoindata,
-  openPlayOnWeb,
   PlayOnWebVariant,
   usePlayabilityStatus,
+  usePlayOnWeb,
   useWasmJoinId,
   wasmRedirectDialogClickEventContext,
 } from "@rbx/game-play-button";
@@ -41,11 +42,14 @@ const WasmRedirectFlow = (): React.JSX.Element | null => {
   // Same split as launchGame, whose protocol launch and install dialog the desktop flow relies on.
   // Phones, tablets (including iPads that report as Macs) and ChromeOS launch through AppsFlyer.
   const isDesktop = !(isIosDevice || isAndroidDevice || isIos13Ipad() || isChromeOs);
-  const eventProperties = {
-    [EventStreamMetadata.PlaceId]: placeId,
-    [EventStreamMetadata.UniverseId]: universeId,
-    [EventStreamMetadata.PlayContext]: PageContext.GameDetailPage,
-  };
+  const eventProperties = useMemo(
+    () => ({
+      [EventStreamMetadata.PlaceId]: placeId,
+      [EventStreamMetadata.UniverseId]: universeId,
+      [EventStreamMetadata.PlayContext]: PageContext.GameDetailPage,
+    }),
+    [placeId, universeId],
+  );
   // Unlike the EDP's Play button, waits for the device check, which probes when nothing is stored.
   const deviceCheck = useDeviceCheck();
   // OneButton and TwoButton both offer Play on Web on the EDP.
@@ -58,22 +62,23 @@ const WasmRedirectFlow = (): React.JSX.Element | null => {
   const { wasmJoinId, isLoading: isJoinIdLoading } = useWasmJoinId();
   // The variant's isLoading only covers the IXP layer, so playability is checked here too.
   const { playabilityStatus } = usePlayabilityStatus(universeId);
-  // Opens the WASM link, once Play on Web is enabled and the user's join id is known.
-  const playOnWeb =
-    playOnWebEnabled && wasmJoinId != null
-      ? () =>
-          openPlayOnWeb({
-            placeId,
-            rootPlaceId,
-            universeId,
-            privateServerLinkCode,
-            gameInstanceId,
-            eventProperties,
-            wasmJoinId,
-            joinData,
-            eventContext: wasmRedirectDialogClickEventContext,
-          })
-      : undefined;
+  // Opens the WASM link, after the playable UX treatment's modal if there is one.
+  const { playOnWeb: openPlayOnWebWithTreatment, playableUxTreatmentModal } = usePlayOnWeb(
+    {
+      placeId,
+      rootPlaceId,
+      universeId,
+      privateServerLinkCode,
+      gameInstanceId,
+      eventProperties,
+      wasmJoinId,
+      joinData,
+      eventContext: wasmRedirectDialogClickEventContext,
+    },
+    EventContext.GameDetail,
+  );
+  // Offered once Play on Web is enabled and the user's join id is known.
+  const playOnWeb = playOnWebEnabled && wasmJoinId != null ? openPlayOnWebWithTreatment : undefined;
   // Play on Web can still become available while any of these is loading. A device that fails the
   // check doesn't wait for the rest, so a stalled request can't keep it checking.
   const isCheckingPlayOnWeb =
@@ -83,19 +88,27 @@ const WasmRedirectFlow = (): React.JSX.Element | null => {
 
   if (isDesktop) {
     return (
-      <DesktopWasmRedirect
-        placeId={placeId}
-        rootPlaceId={rootPlaceId}
-        universeId={universeId}
-        privateServerLinkCode={privateServerLinkCode}
-        gameInstanceId={gameInstanceId}
-        joinData={joinData}
-        playOnWeb={playOnWeb}
-      />
+      <React.Fragment>
+        <DesktopWasmRedirect
+          placeId={placeId}
+          rootPlaceId={rootPlaceId}
+          universeId={universeId}
+          privateServerLinkCode={privateServerLinkCode}
+          gameInstanceId={gameInstanceId}
+          joinData={joinData}
+          playOnWeb={playOnWeb}
+        />
+        {playableUxTreatmentModal}
+      </React.Fragment>
     );
   }
 
-  return <MobileWasmRedirect playOnWeb={playOnWeb} isCheckingPlayOnWeb={isCheckingPlayOnWeb} />;
+  return (
+    <React.Fragment>
+      <MobileWasmRedirect playOnWeb={playOnWeb} isCheckingPlayOnWeb={isCheckingPlayOnWeb} />
+      {playableUxTreatmentModal}
+    </React.Fragment>
+  );
 };
 
 /**

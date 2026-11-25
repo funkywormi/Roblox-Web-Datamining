@@ -1,8 +1,8 @@
 /* eslint-disable react/no-danger */
 import React, { useState, useEffect, useCallback } from "react";
 import { createModal, Button } from "react-style-guide";
-import { withTranslations, WithTranslationsProps } from "react-utilities";
-import { paymentFlowAnalyticsService } from "core-roblox-utilities";
+import { withTranslations, type WithTranslationsProps } from "react-utilities";
+import { paymentFlowAnalyticsService } from "@rbx/payments/payments-flow-analytics";
 import { window } from "@rbx/core-lib/browser";
 import { BillingInfoForm, type Address } from "@rbx/payments/billingAddress";
 import { apiErrorStatusCode, trackError } from "../../../observability";
@@ -49,14 +49,14 @@ const ConvertCreditModal: React.FC<ConvertCreditModalProps> = ({ translate }) =>
   useEffect(() => {
     if (isConvertModalOpen) {
       modalService.open();
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
-        true,
-        isTaxFlowEnabled
+      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent({
+        triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_REDEEM_PAGE,
+        isMidPurchaseStep: true,
+        viewName: isTaxFlowEnabled
           ? paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_CONVERSION_MODAL_WITH_TAX
           : paymentFlowAnalyticsService.ENUM_VIEW_NAME.CREDIT_CONVERSION_MODAL_WITHOUT_TAX,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
-      );
+        purchaseEventType: paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.VIEW_SHOWN,
+      });
     } else {
       modalService.close();
     }
@@ -142,10 +142,7 @@ const ConvertCreditModal: React.FC<ConvertCreditModalProps> = ({ translate }) =>
                 </div>
               </span>
             </div>
-            <div
-              key="available-credit"
-              className="available-credit d-flex justify-content-between row-pad"
-            >
+            <div key="available-credit" className="available-credit flex justify-between row-pad">
               <span className="bold">
                 {translate("Label.AvailableCredit") || "Available Credit"}
               </span>
@@ -153,7 +150,7 @@ const ConvertCreditModal: React.FC<ConvertCreditModalProps> = ({ translate }) =>
             </div>
             <div
               key="convertible-credit"
-              className="convertible-credit d-flex justify-content-between row-pad"
+              className="convertible-credit flex justify-between row-pad"
             >
               <span className="bold">
                 {translate(TRANSLATION_KEYS.ConvertibleCredit) || "Convertible Credit"}
@@ -172,7 +169,7 @@ const ConvertCreditModal: React.FC<ConvertCreditModalProps> = ({ translate }) =>
               taxDisplay={taxDisplay}
             />
             <div key="divider" className="rbx-divider" />
-            <div className="remaining-balance d-flex justify-content-between row-pad">
+            <div className="remaining-balance flex justify-between row-pad">
               <span className="bold">
                 {translate(TRANSLATION_KEYS.RemainingBalance) || "Remaining Balance"}
               </span>
@@ -210,10 +207,7 @@ const ConvertCreditModal: React.FC<ConvertCreditModalProps> = ({ translate }) =>
           />
         ),
 
-        <div
-          key="modal-footer-buttons"
-          className="modal-footer-buttons d-flex justify-content-between mt-4"
-        >
+        <div key="modal-footer-buttons" className="modal-footer-buttons flex justify-between mt-4">
           {isLoading ? (
             <button
               type="button"

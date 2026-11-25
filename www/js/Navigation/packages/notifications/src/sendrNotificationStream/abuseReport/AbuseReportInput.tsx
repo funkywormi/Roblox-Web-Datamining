@@ -4,7 +4,6 @@ import { TextArea } from "@rbx/foundation-ui";
 import { useNotificationLocalization } from "../context/NotificationsLocalization";
 import { AbuseReportInputProps } from "./abuseReportFormType";
 import { REPORTER_COMMENT_LIMIT } from "./constants/abuseReportConstants";
-import { getFlaggedMuiModalArms } from "../mui/muiModalArms";
 
 const AbuseReportInput: FC<AbuseReportInputProps> = ({
   control,
@@ -31,42 +30,27 @@ const AbuseReportInput: FC<AbuseReportInputProps> = ({
   };
 
   if (config.type === "textfield") {
-    const MuiTextField = getFlaggedMuiModalArms()?.AbuseReportTextField;
     return (
       <Controller
         name={config.name as never}
         control={control}
         rules={config.validation}
-        render={({ field: { onChange, onBlur, value, ref } }) =>
-          MuiTextField ? (
-            <MuiTextField
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              id={config.name}
-              inputRef={ref}
-              placeholder={config.placeHolder}
-              hasError={!!errors[config.name]}
-              helperText={getHelperText(errors[config.name])}
-              disabled={disabled}
-            />
-          ) : (
-            <TextArea
-              value={value as string}
-              onChange={onChange as React.ChangeEventHandler<HTMLTextAreaElement>}
-              onBlur={onBlur as React.FocusEventHandler<HTMLTextAreaElement>}
-              id={config.name}
-              ref={ref as React.Ref<HTMLTextAreaElement>}
-              placeholder={config.placeHolder}
-              hasError={!!errors[config.name]}
-              rows={6}
-              required
-              helperText={getHelperText(errors[config.name])}
-              isDisabled={disabled}
-              className="width-full"
-            />
-          )
-        }
+        render={({ field: { onChange, onBlur, value, ref } }) => (
+          <TextArea
+            value={value as string}
+            onChange={onChange as React.ChangeEventHandler<HTMLTextAreaElement>}
+            onBlur={onBlur as React.FocusEventHandler<HTMLTextAreaElement>}
+            id={config.name}
+            ref={ref as React.Ref<HTMLTextAreaElement>}
+            placeholder={config.placeHolder}
+            hasError={!!errors[config.name]}
+            rows={6}
+            required
+            helperText={getHelperText(errors[config.name])}
+            isDisabled={disabled}
+            className="width-full"
+          />
+        )}
       />
     );
   }

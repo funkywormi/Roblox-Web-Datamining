@@ -176,7 +176,16 @@ button.download-link-underline {
 .thumbnail-2d-container.thumbnail-2d-loading {
     width: 100%;
     height: 100%;
-    display: block
+    display: block;
+    position: relative
+}
+
+.thumbnail-2d-loading>.thumbnail-2d-skeleton {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0
 }
 
 .thumbnail-2d-container img {
@@ -1222,6 +1231,11 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     border-radius: 8px;
     padding: 10px;
     font-size: 10px
+}
+
+.games-info-tooltip-content {
+    box-sizing: border-box;
+    max-width: 220px
 }
 
 .native-ad-label .games-info-tooltip {
@@ -6074,15 +6088,24 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     padding: 4px 0
 }
 
-.inset-\[0\] {
+.inset-\[0\],
+.inset-\[0px\] {
     top: 0;
     bottom: 0;
     left: 0;
     right: 0
 }
 
+.right-\[0px\] {
+    right: 0
+}
+
 .right-\[var\(--size-100\)\] {
     right: var(--size-100)
+}
+
+.top-\[0px\] {
+    top: 0
 }
 
 .top-\[var\(--size-50\)\] {
@@ -6148,6 +6171,14 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     height: calc(min(700px, 50vh))
 }
 
+.max-height-\[2lh\] {
+    max-height: 2lh
+}
+
+.max-width-\[280px\] {
+    max-width: 280px
+}
+
 .max-width-\[296px\] {
     max-width: 296px
 }
@@ -6184,6 +6215,18 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     min-height: 70vh
 }
 
+.min-height-\[calc\(var\(--size-2300\)\*2\)\] {
+    min-height: calc(var(--size-2300)*2)
+}
+
+.min-height-\[calc\(var\(--size-2600\)\*2\)\] {
+    min-height: calc(var(--size-2600)*2)
+}
+
+.min-height-\[calc\(var\(--size-2700\)\*2\)\] {
+    min-height: calc(var(--size-2700)*2)
+}
+
 .min-width-\[240px\] {
     min-width: 240px
 }
@@ -6200,6 +6243,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
     width: -webkit-fit-content;
     width: -moz-fit-content;
     width: fit-content
+}
+
+.\!radius-none {
+    border-radius: var(--radius-none) !important
 }
 
 .padding-right-\[var\(--size-1100\)\] {
@@ -6369,6 +6416,10 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 
 .\[cursor\:pointer\] {
     cursor: pointer
+}
+
+.\[grid-template-columns\:minmax\(0\,1fr\)_auto\] {
+    grid-template-columns: minmax(0, 1fr) auto
 }
 
 .\[height\:40px\] {
@@ -6664,6 +6715,19 @@ game-badges-list .badge-row .badge-stats-container li .badge-stats-info,
 }
 
 @media (min-width:601px) {
+    .medium\:gap-small {
+        gap: var(--gap-small)
+    }
+
+    .medium\:size-1200 {
+        width: var(--size-1200);
+        height: var(--size-1200)
+    }
+
+    .medium\:min-width-1600 {
+        min-width: var(--size-1600)
+    }
+
     .medium\:min-width-\[400px\] {
         min-width: 400px
     }

@@ -48,6 +48,8 @@ export interface SduiVideoPlayerProps extends SduiRendererInjectedProps {
   playbackBehavior?: string;
   /** ImageStringProp value (`rbxassetid://...` or `rbxthumb://...`). */
   loadingImage?: string;
+  /** Fallback `ImageStringProp` supplied by a parent when `loadingImage` is unset or empty. */
+  defaultLoadingImage?: string;
   disableControls?: boolean;
   scaleType?: SduiScaleType;
   /** Arrives unvalidated from the template, so values outside known `standard` / `fhd` are possible. */
@@ -67,6 +69,7 @@ function SduiVideoPlayerInner({
   muted = true,
   playbackBehavior = VIDEO_PLAYBACK_BEHAVIOR.PlayWhenReady,
   loadingImage,
+  defaultLoadingImage,
   disableControls = true,
   scaleType,
   maxQuality,
@@ -277,6 +280,9 @@ function SduiVideoPlayerInner({
     isReady: isReady && !showFailedFallback,
   });
 
+  const effectiveLoadingImage =
+    loadingImage != null && loadingImage.length > 0 ? loadingImage : defaultLoadingImage;
+
   return (
     <CacheProvider cache={getVideoPlayerCache()}>
       <UIThemeProvider
@@ -286,7 +292,7 @@ function SduiVideoPlayerInner({
         <div {...rootStyles} data-testid="sdui-video-player">
           {/* Poster/skeleton stays mounted under the video so the fade-in can blend over it. */}
           <VideoPlayerLoadingFallback
-            loadingImage={loadingImage}
+            loadingImage={effectiveLoadingImage}
             scaleType={scaleType}
             loadingStyles={loadingStyles}
             hasFailed={showFailedFallback}

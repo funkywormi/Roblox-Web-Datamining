@@ -57,6 +57,7 @@ export interface BuildCollectionAnalyticsDataOptions {
   totalNumberOfItems: number;
   collectionComponentType: string;
   isWideTiles?: boolean;
+  startRowNumber?: number;
 }
 
 /**
@@ -69,8 +70,10 @@ export function buildCollectionAnalyticsData(
   pageContext?: SduiPageContext,
   errorReporter?: SduiErrorReporter,
 ): CollectionAnalyticsData {
-  const mergedFields = readMergedAnalyticsFields(analyticsContext);
-  const { itemsPerRow, totalNumberOfItems, collectionComponentType, isWideTiles } = options;
+  const { doesNotAdvanceStartRow: _strippedControlFlag, ...mergedFields } =
+    readMergedAnalyticsFields(analyticsContext);
+  const { itemsPerRow, totalNumberOfItems, collectionComponentType, isWideTiles, startRowNumber } =
+    options;
 
   const collectionData: CollectionAnalyticsData = {
     ...mergedFields,
@@ -89,6 +92,7 @@ export function buildCollectionAnalyticsData(
         DUMMY_COLLECTION_DATA.collectionComponentType,
       ),
     isWideTiles: isWideTiles ?? false,
+    ...(startRowNumber !== undefined ? { startRowNumber } : {}),
   };
 
   const isLayoutPending = itemsPerRow < 0;
@@ -113,6 +117,9 @@ export function buildCollectionAnalyticsData(
  * Builds per-item analytics for impressions. Requires template `id`;
  * uses an explicit canonical position when supplied, otherwise context data
  * followed by the one-based local list index.
+ *
+ * Reads only the item's own snapshot so ancestor/collection fields are not
+ * duplicated into per-item `*_arr` impression columns (Lua parity).
  */
 export function buildItemAnalyticsData(
   childAnalyticsContext: AnalyticsContext | undefined,
@@ -125,16 +132,16 @@ export function buildItemAnalyticsData(
     return null;
   }
 
-  const mergedFields = readMergedAnalyticsFields(childAnalyticsContext);
+  const ownFields = childAnalyticsContext.getAnalyticsDataSnapshot();
   const defaultItemPosition = itemIndex + 1;
 
   const itemData: ItemAnalyticsData = {
-    ...mergedFields,
-    id: parseAnalyticsField(mergedFields.id, DUMMY_ITEM_DATA.id),
+    ...ownFields,
+    id: parseAnalyticsField(ownFields.id, DUMMY_ITEM_DATA.id),
     itemPosition:
-      itemPositionOverride ?? parseAnalyticsField(mergedFields.itemPosition, defaultItemPosition),
+      itemPositionOverride ?? parseAnalyticsField(ownFields.itemPosition, defaultItemPosition),
     itemComponentType: parseAnalyticsField(
-      mergedFields.itemComponentType,
+      ownFields.itemComponentType,
       DUMMY_ITEM_DATA.itemComponentType,
     ),
   };

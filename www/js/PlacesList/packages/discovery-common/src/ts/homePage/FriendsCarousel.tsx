@@ -11,13 +11,15 @@ import "../../css/homePage/friendsCarousel.scss";
 type TFriendsCarouselProps = {
   homePageSessionInfo: string;
   sortId: number | undefined;
-  sortPosition: number;
+  sortPosition: number | undefined;
+  onVisibilityResolved?: (isVisible: boolean) => void;
 };
 
 const FriendsCarousel = ({
   homePageSessionInfo,
   sortId,
   sortPosition,
+  onVisibilityResolved,
 }: TFriendsCarouselProps): JSX.Element => {
   const userDataMetaTag = document.querySelector('meta[name="user-data"]');
   const profileUserId: number = (
@@ -36,6 +38,7 @@ const FriendsCarousel = ({
         homePageSessionInfo={homePageSessionInfo}
         sortId={sortId}
         sortPosition={sortPosition}
+        onVisibilityResolved={onVisibilityResolved}
       />
     </div>
   );

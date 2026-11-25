@@ -2,6 +2,7 @@ import React, { type ReactNode } from "react";
 import { resolveAppDownload, type ResolvedAppDownload } from "@rbx/app-download";
 import { InstallInstructionsWithTranslation } from "@rbx/app-download/InstallInstructions";
 import TokenizedDownloadButton from "@rbx/app-download/TokenizedDownloadButton";
+import { window as browserWindow } from "@rbx/core-lib/browser";
 import { TranslationProvider, useTranslation } from "@rbx/core-scripts/react";
 import { Loading } from "@rbx/core-ui";
 import {
@@ -130,7 +131,10 @@ function PlayButtonContents({ attributionId }: TPlayButtonProps): JSX.Element {
       },
       undefined,
       undefined,
-      { queryParamSuffixForServerProvidedKeys: ANALYTICS_DATA_KEY_SUFFIX },
+      {
+        queryParamSuffixForServerProvidedKeys: ANALYTICS_DATA_KEY_SUFFIX,
+        scrubQueryParameters: !/\/games\/start\/?$/i.test(browserWindow?.location.pathname ?? ""),
+      },
     );
   const resolvedDownload = React.useMemo(
     () =>

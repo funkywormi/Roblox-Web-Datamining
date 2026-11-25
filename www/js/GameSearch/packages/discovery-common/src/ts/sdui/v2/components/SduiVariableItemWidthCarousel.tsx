@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { useCollectionItemsIntersectionTracker } from "@rbx/unified-logging";
 import {
   UiComponentType,
@@ -9,6 +9,7 @@ import {
   createImpressionContext,
   findAnalyticsField,
   isValidCollectionAnalyticsData,
+  materializeSduiComponentConfig,
   parseAnalyticsField,
   reportImpressions,
   type SduiComponentConfig,
@@ -29,6 +30,7 @@ export type SduiVariableItemWidthCarouselProps = SduiRendererInjectedProps & {
   scrollButtonsEnabled?: boolean;
   impressionEventName?: string;
   skipItemImpressionsLog?: boolean;
+  startRowNumber?: number;
 };
 
 export function getCarouselItemKey(itemConfig: SduiComponentConfig, index: number): string {
@@ -52,6 +54,7 @@ export function SduiVariableItemWidthCarousel({
   scrollButtonsEnabled = true,
   impressionEventName,
   skipItemImpressionsLog,
+  startRowNumber,
   componentType,
 }: SduiVariableItemWidthCarouselProps): React.JSX.Element {
   const services = useSduiServices();
@@ -91,6 +94,7 @@ export function SduiVariableItemWidthCarousel({
           itemsPerRow,
           totalNumberOfItems,
           collectionComponentType,
+          startRowNumber,
         },
         pageContext,
         services.errorReporter,
@@ -106,14 +110,14 @@ export function SduiVariableItemWidthCarousel({
       componentType,
       itemsPerRow,
       totalNumberOfItems,
+      startRowNumber,
       pageContext,
       services.errorReporter,
     ],
   );
 
-  useEffect(() => {
-    analyticsContext?.setCollectionData?.(collectionAnalyticsData);
-  }, [analyticsContext, collectionAnalyticsData]);
+  // Set during render so child tiles read collection data on their first render.
+  analyticsContext?.setCollectionData?.(collectionAnalyticsData);
 
   const impressionCtx = useMemo(() => createImpressionContext(services), [services]);
 
@@ -133,6 +137,7 @@ export function SduiVariableItemWidthCarousel({
         impressionIndexes: indexesToSend,
         itemAnalyticsDatas: itemAnalyticsDatasRef.current,
         collectionAnalyticsData,
+        startRowNumber,
         impressionEventName,
         skipItemImpressionsLog,
       });
@@ -141,6 +146,7 @@ export function SduiVariableItemWidthCarousel({
       impressionCtx,
       services.impressionHandlerRegistry,
       collectionAnalyticsData,
+      startRowNumber,
       itemsPerRow,
       impressionEventName,
       skipItemImpressionsLog,
@@ -151,10 +157,15 @@ export function SduiVariableItemWidthCarousel({
 
   const renderItem = useCallback(
     (itemConfig: SduiComponentConfig, index: number) => {
-      const node = items?.renderItem(itemConfig, index) ?? <React.Fragment key={index} />;
+      const materializedConfig = materializeSduiComponentConfig(itemConfig);
+      if (materializedConfig == null) {
+        itemAnalyticsDatasRef.current[index] = null;
+        return <React.Fragment key={index} />;
+      }
+      const node = items?.renderItem(materializedConfig, index) ?? <React.Fragment key={index} />;
 
       itemAnalyticsDatasRef.current[index] = buildItemAnalyticsData(
-        itemConfig.analyticsContext,
+        materializedConfig.analyticsContext,
         index,
         pageContext,
         services.errorReporter,

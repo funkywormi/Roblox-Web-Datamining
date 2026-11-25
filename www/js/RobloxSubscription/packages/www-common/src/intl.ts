@@ -23,8 +23,10 @@ import {
   localeFromUppercaseDash,
   localesLowercaseUnderscore,
   localesUppercaseDash,
+  localeToLowercaseUnderscore,
   localeToUppercaseDash,
   type Locale,
+  type LocaleLowercaseUnderscore,
 } from "./locale";
 
 export type DateTimeFormatOptions = Intl.DateTimeFormatOptions;
@@ -32,6 +34,9 @@ export type NumberFormatOptions = Intl.NumberFormatOptions;
 
 /** Matches `@rbx/core-scripts/intl` meta selector (`localeConstants.js`). */
 const localeMetaTagSelector = 'meta[name="locale-data"]';
+
+/** Roblox locales the browser's `Intl` doesn't know, as `@rbx/core-scripts/intl` maps them. */
+const customLocaleMapping = new Map<string, LocaleLowercaseUnderscore>([["zh_cjv", "zh_cn"]]);
 
 function readLocaleFromHtmlLang(): Locale | undefined {
   if (typeof document === "undefined") {
@@ -56,10 +61,12 @@ function readLocaleFromMetaTag(): Locale | undefined {
     return undefined;
   }
 
-  const robloxLocaleCode = metaElement.dataset.languageCode;
-  if (!robloxLocaleCode) {
+  const { languageCode } = metaElement.dataset;
+  if (!languageCode) {
     return undefined;
   }
+
+  const robloxLocaleCode = customLocaleMapping.get(languageCode) ?? languageCode;
 
   if (!arrayIncludes(localesLowercaseUnderscore, robloxLocaleCode)) {
     return undefined;
@@ -71,6 +78,11 @@ function readLocaleFromMetaTag(): Locale | undefined {
 /** Client document locale; matches `@rbx/www-nextjs/i18n/client` `getLocale`. */
 export function getLocaleFromDocument(): Locale {
   return readLocaleFromHtmlLang() ?? readLocaleFromMetaTag() ?? defaultLocale;
+}
+
+/** The document locale as a Roblox locale code, such as `en_us`, like core-scripts' `getRobloxLocale()`. */
+export function getRobloxLocale(locale?: Locale): LocaleLowercaseUnderscore {
+  return localeToLowercaseUnderscore(locale ?? getLocaleFromDocument());
 }
 
 function resolveLocaleForFormatting(explicit?: Locale): Locale {
@@ -128,4 +140,46 @@ export const format: Formatter = {
 export function useFormatter(explicitLocale?: Locale): Formatter {
   const locale = explicitLocale ?? getLocaleFromDocument();
   return useMemo(() => createFormatter(locale), [locale]);
+}
+
+const fullDateOptions: [DateTimeFormatOptions, DateTimeFormatOptions] = [
+  { year: "numeric", month: "short", day: "numeric" },
+  { hour: "numeric", minute: "numeric" },
+];
+
+/**
+ * The date and time joined by `delimiter`, such as `Jul 1, 2026 | 12:00 PM`, like core-scripts'
+ * `getDateTimeFormatter().getFullDate()`.
+ */
+export function formatFullDate(
+  value: Date | number | string,
+  { delimiter = " | ", locale }: { delimiter?: string; locale?: Locale } = {},
+): string {
+  const formatter = createFormatter(resolveLocaleForFormatting(locale));
+  const date = typeof value === "string" ? new Date(value) : value;
+  return (
+    formatter.dateTime(date, fullDateOptions[0]) +
+    delimiter +
+    formatter.dateTime(date, fullDateOptions[1])
+  );
+}
+
+const asianLocales: readonly Locale[] = ["zh-cn", "zh-tw", "ko-kr", "ja-jp"];
+
+/**
+ * A date part with its unit suffix in Chinese, Japanese and Korean (`5` and `日` are `5日`, and
+ * `5 日` in zh-tw), and the date part alone elsewhere, like core-scripts'
+ * `getFormattedDateString()`.
+ */
+export function formatDateWithModifier(
+  date: string | number,
+  modifier: string,
+  locale?: Locale,
+): string {
+  const text = String(date);
+  const resolved = resolveLocaleForFormatting(locale);
+  if (!modifier || !asianLocales.includes(resolved)) {
+    return text;
+  }
+  return resolved === "zh-tw" ? `${text} ${modifier}` : `${text}${modifier}`;
 }

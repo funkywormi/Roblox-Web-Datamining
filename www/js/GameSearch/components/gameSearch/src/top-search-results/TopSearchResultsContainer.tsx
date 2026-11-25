@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { TranslateFunction } from "@rbx/core-scripts/react";
 import { usePageSession } from "@rbx/discovery-common/session";
 import { Loading } from "@rbx/sdui-common";
@@ -12,8 +12,8 @@ import {
   EventStreamMetadata,
   SessionInfoType,
 } from "@rbx/discovery-common/telemetry";
-import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { buildSearchApiRequestConfig } from "../common/services/searchService";
+import { useSearchSessionForTab } from "../common/contexts/SearchTabSessionContext";
 import { getSduiServices } from "../common/services/sduiServices";
 import { useIsSearchResultsFeedEmpty } from "../common/hooks/useIsSearchResultsFeedEmpty";
 import { normalizeKeyword } from "../common/utils/keywordUtils";
@@ -41,7 +41,7 @@ export const TopSearchResultsContainer = ({ translate }: TopSearchResultsContain
   const omniSearchSessionId = usePageSession();
   // The session is part of the page key so its reporter and API cache stay scoped together.
   const pageKey = getTopSearchResultsPageKey(omniSearchSessionId);
-  const [topTabSessionId] = useState(generateRandomUuid());
+  const topTabSessionId = useSearchSessionForTab("top");
 
   const services = getSduiServices({
     translate,

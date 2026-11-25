@@ -33,7 +33,9 @@ export function getCommonReferralParams(
     false,
     v1PageContext,
   );
-  const adId = parseStringField(findAnalyticsFieldInAncestors("adId", analyticsContext, ""), "");
+  const adId =
+    parseStringField(findAnalyticsFieldInAncestors("nativeAdData", analyticsContext), "") ||
+    parseStringField(findAnalyticsFieldInAncestors("adId", analyticsContext, ""), "");
   const heroUnitId = parseStringField(
     findAnalyticsFieldInAncestors("heroUnitId", analyticsContext, ""),
     "",
@@ -86,8 +88,9 @@ export function getCommonReferralParams(
     [EventStreamMetadata.NumberOfLoadedTiles]: numberOfLoadedTiles,
     [EventStreamMetadata.GameSetTypeId]: gameSetTypeId,
     [EventStreamMetadata.Page]: resolvePageForReferral(pageContext),
-    ...(pageContext.pageName === PageContext.GamesPage && {
-      [EventStreamMetadata.PlayContext]: PageContext.GamesPage,
+    ...((pageContext.pageName === PageContext.GamesPage ||
+      pageContext.pageName === PageContext.HomePage) && {
+      [EventStreamMetadata.PlayContext]: pageContext.pageName,
     }),
     ...buildSessionAnalyticsData(pageSessionInfo, pageContext),
   };

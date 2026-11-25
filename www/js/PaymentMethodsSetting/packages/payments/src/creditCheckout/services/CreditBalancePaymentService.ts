@@ -1,6 +1,11 @@
 import type { AxiosResponse } from "axios";
 import { httpService } from "core-utilities";
-import { upsellUtil, paymentFlowAnalyticsService } from "core-roblox-utilities";
+import { upsellUtil } from "core-roblox-utilities";
+import {
+  paymentFlowAnalyticsService,
+  type PurchaseStatus,
+  type ViewName,
+} from "@rbx/payments/payments-flow-analytics";
 import { EnvironmentUrls } from "@rbx/environment-urls";
 import { PaymentSession } from "@rbx/payments/services/paymentSession";
 import type { Address } from "@rbx/payments/billingAddress";
@@ -196,7 +201,7 @@ export const sendPreparePaymentStatusEvent = (
   robloxManagedTax?: boolean,
   taxRateAvailable?: boolean,
 ): void => {
-  let purchaseStatus = success
+  let purchaseStatus: PurchaseStatus = success
     ? paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.PASSED_PREPARE_PAYMENT_REQUEST
     : paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.FAILED_PREPARE_PAYMENT_REQUEST;
   if (taxRateAvailable) {
@@ -204,7 +209,7 @@ export const sendPreparePaymentStatusEvent = (
       paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.PASSED_PREPARE_PAYMENT_REQUEST_WITH_TAX;
   }
 
-  let viewName;
+  let viewName: ViewName;
   if (success) {
     viewName = robloxManagedTax
       ? paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_CREDIT_CHECKOUT_WITH_TAX
@@ -213,32 +218,30 @@ export const sendPreparePaymentStatusEvent = (
     viewName = paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_CREDIT_CHECKOUT;
   }
 
-  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
-    purchaseStatus,
+  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
+    status: purchaseStatus,
     viewMessage,
     viewName,
-  );
+  });
 };
 
 export const sendUpdateAddressForCheckoutSessionStatusEvent = (success: boolean | true): void => {
-  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
-    success
+  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
+    status: success
       ? paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.PASSED_UPDATE_ADDRESS_FOR_CHECKOUT_SESSION
       : paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.FAILED_UPDATE_ADDRESS_FOR_CHECKOUT_SESSION,
-    undefined,
-    paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_CREDIT_CHECKOUT_WITH_TAX,
-  );
+    viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_CREDIT_CHECKOUT_WITH_TAX,
+  });
 };
 
 export const sendProcessPaymentStatusEvent = (success: boolean | true): void => {
-  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent(
-    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
-    success
+  paymentFlowAnalyticsService.sendUserPurchaseStatusEvent({
+    triggerContext: paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
+    status: success
       ? paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.PASSED_PROCESS_PAYMENT
       : paymentFlowAnalyticsService.ENUM_PURCHASE_STATUS.FAILED_PROCESS_PAYMENT,
-    undefined,
-    paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_CREDIT_CHECKOUT_WITH_TAX,
-  );
+    viewName: paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBLOX_CREDIT_CHECKOUT_WITH_TAX,
+  });
 };

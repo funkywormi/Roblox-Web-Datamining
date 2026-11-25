@@ -36,6 +36,7 @@ export const SearchGlobalSearch = {
 export const CommonUIMessages = {
   ActionClose: "Action.Close",
   ActionReturnHome: "Action.ReturnHome",
+  LabelLoading: "Label.Loading",
   ResponseUnexpectedError: "Response.UnexpectedError",
 };
 
@@ -137,7 +138,6 @@ export const FeatureDeveloperProducts = {
   LoadingDetails: "Heading.LoadingDetails",
   HeadingError: "Heading.Error",
   ErrorTryAgain: "ErrorTryAgain",
-  LabelPendingMessageTooltip: "Label.PendingMessageTooltip",
 };
 
 export const FeatureSduiLandingPage = {

@@ -47,6 +47,7 @@ const FriendsCarouselContainer = ({
   homePageSessionInfo,
   sortId,
   sortPosition,
+  onVisibilityResolved,
 }: {
   profileUserId: number;
   isOwnUser: boolean;
@@ -55,12 +56,15 @@ const FriendsCarouselContainer = ({
   homePageSessionInfo: string | undefined;
   sortId: number | undefined;
   sortPosition: number | undefined;
+  /** Called with the carousel's visibility once the friends data has loaded. */
+  onVisibilityResolved?: (isVisible: boolean) => void;
 }): JSX.Element => {
   const [friendsCount, setFriendsCount] = useState<number | null>(null);
   const [friends, setFriends] = useState<TFriend[] | null>(null);
   const [canChat, setCanChat] = useState<boolean>(false);
   const [newFriendRequestsCount, setNewFriendRequestsCount] = useState<number | null>(null);
   const [showFriendsCarousel, setShowFriendsCarousel] = useState<boolean>(false);
+  const [isVisibilityResolved, setIsVisibilityResolved] = useState<boolean>(false);
   const [experimentationConfig, setExperimentationConfig] = useState<ExperimentationConfig>({
     isBadgeEnabled: false,
     isAddFriendsTileEnabledWeb: false,
@@ -193,12 +197,19 @@ const FriendsCarouselContainer = ({
           experimentationConfigValue.isAddFriendsTileEnabledWeb,
         ),
       );
+      setIsVisibilityResolved(true);
     };
 
     getData().catch((e: unknown) => {
       console.error(e);
     });
   }, [profileUserId, isOwnUser, carouselName]);
+
+  useEffect(() => {
+    if (isVisibilityResolved) {
+      onVisibilityResolved?.(showFriendsCarousel);
+    }
+  }, [isVisibilityResolved, showFriendsCarousel, onVisibilityResolved]);
 
   return !showFriendsCarousel ? (
     <div className="friends-carousel-0-friends" />
@@ -209,6 +220,7 @@ const FriendsCarouselContainer = ({
         translate={translate}
         profileUserId={profileUserId}
         isOwnUser={isOwnUser}
+        carouselName={carouselName}
       />
       <FriendsList
         badgeCount={experimentationConfig.isBadgeEnabled ? (newFriendRequestsCount ?? 0) : 0}

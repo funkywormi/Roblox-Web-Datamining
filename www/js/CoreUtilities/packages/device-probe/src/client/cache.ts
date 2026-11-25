@@ -3,7 +3,12 @@ import { getItem, removeItem, setItem } from "@rbx/core-lib/local-storage";
 import type { DeviceFeatures } from "../types";
 import { PROBE_VERSION } from "../version";
 import { getDeviceProbeConfig } from "./config";
-import { type DeviceMeasurement, failedRules } from "./requiredSpec";
+import {
+  type DeviceMeasurement,
+  failedRules,
+  type ReportedDevice,
+  type RequiredSpecRule,
+} from "./requiredSpec";
 import { RETENTION_MS } from "./retention";
 
 /**
@@ -48,10 +53,11 @@ export type CachedDeviceProbe = DeviceMeasurement & {
 /** Why a probe couldn't finish on this device. `crashed` is a run that never settled. */
 export type ProbeFailureReason = "error" | "timeout" | "crashed";
 
-// After the first failure the probe is skipped for an hour, then for a day after two or more in a
-// row, so a device that never finishes doesn't rerun the benchmark on every page view.
+// After the first failure the probe is skipped for an hour, then for RETENTION_MS (7 days) after
+// two or more in a row: a device that can't finish twice answers no for as long as an entry is
+// kept, instead of rerunning the probe every day.
 export const FIRST_FAILURE_MAX_AGE_MS = 60 * 60 * 1000;
-export const REPEATED_FAILURE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+export const REPEATED_FAILURE_MAX_AGE_MS = RETENTION_MS;
 
 /**
  * Stored in place of the scores when the probe couldn't finish on this device. A probe writes a
@@ -65,6 +71,8 @@ export type CachedProbeFailure = {
   /** Failures in a row, this one included. */
   failureCount: number;
   reason: ProbeFailureReason;
+  /** On a `crashed` entry a later run has reported, so a run that puts it back doesn't again. */
+  crashReported?: true;
 };
 
 declare module "@rbx/core-lib/local-storage" {
@@ -181,15 +189,56 @@ const readMeasurement = (entry: Record<string, unknown>): DeviceMeasurement | nu
   };
 };
 
+const fixedRules = new Set<unknown>([
+  "minDeviceMemoryGiB",
+  "minEffectiveCores",
+  "minSingleThreadScore",
+  "minWebgl2FillPassesPerMs",
+  "requireWebgl2Renders",
+  "softwareRenderer",
+] satisfies Exclude<RequiredSpecRule, `feature:${string}`>[]);
+
+const featureRules = new Set<unknown>(featureNames.map(name => `feature:${name}`));
+
+// The rules are telemetry metric names, so only known ones are accepted.
+const isRequiredSpecRule = (value: unknown): value is RequiredSpecRule =>
+  fixedRules.has(value) || featureRules.has(value);
+
+// The rules a probe that stopped before its benchmarks posted: `null` when it ran them (and from
+// probes before 1.5.0, which always did), `undefined` when they aren't valid.
+const readEarlyStop = (value: unknown): RequiredSpecRule[] | null | undefined => {
+  if (value == null) {
+    return null;
+  }
+  if (
+    !isRecord(value) ||
+    !Array.isArray(value.failedRules) ||
+    value.failedRules.length === 0 ||
+    !value.failedRules.every(isRequiredSpecRule)
+  ) {
+    return undefined;
+  }
+  return value.failedRules;
+};
+
 /**
- * The rule-relevant scores from a result the probe page posted, plus whether the CPU was
- * measured while the tab was visible. `null` when the result isn't shaped like `DeviceScores`,
- * or a benchmark failed.
+ * The rule-relevant scores from a result the probe page posted, whether the CPU was measured
+ * while the tab was visible, and the rules it stopped on when it stopped before its benchmarks
+ * (`earlyStop`, `null` when it ran them). `null` when the result isn't shaped like
+ * `DeviceScores`, or a benchmark failed.
  */
 export const measurementFromScores = (
   scores: unknown,
-): { measurement: DeviceMeasurement; measuredWhileVisible: boolean } | null => {
+): {
+  measurement: DeviceMeasurement;
+  measuredWhileVisible: boolean;
+  earlyStop: RequiredSpecRule[] | null;
+} | null => {
   if (!isRecord(scores) || !isRecord(scores.features) || !isRecord(scores.cpu)) {
+    return null;
+  }
+  const earlyStop = readEarlyStop(scores.earlyStop);
+  if (earlyStop === undefined) {
     return null;
   }
   const { measuredWhileVisible } = scores.cpu;
@@ -204,13 +253,34 @@ export const measurementFromScores = (
   if (measurement == null || typeof measuredWhileVisible !== "boolean") {
     return null;
   }
-  // When a benchmark throws, probe() returns fallback scores instead: `effectiveCores: 0` (a real
-  // run measures at least 1) or a WebGL 2 `renderer` of "error". They aren't a measurement, so
-  // they mustn't be cached as a device that fails the spec.
+  if (earlyStop != null) {
+    // What it didn't measure is 0 or false, so the scores fail every rule that reads it.
+    return { measurement, measuredWhileVisible, earlyStop };
+  }
+  // When a benchmark throws, a probe before 1.5.0 returns fallback scores instead:
+  // `effectiveCores: 0` (a real run measures at least 1) or a WebGL 2 `renderer` of "error". They
+  // aren't a measurement, so they mustn't be cached as a device that fails the spec. A 1.5.0 probe
+  // rejects instead.
   return measurement.cpu.effectiveCores < 1 || webgl2.renderer === "error"
     ? null
-    : { measurement, measuredWhileVisible };
+    : { measurement, measuredWhileVisible, earlyStop: null };
 };
+
+/**
+ * Scores for a device that fails on what the browser reports alone, so the client stores an
+ * answer without mounting the probe: its device memory, and 0 or false for everything it didn't
+ * measure, so they fail every rule that reads it.
+ */
+export const unmeasuredDevice = ({ deviceMemoryGiB }: ReportedDevice): DeviceMeasurement => ({
+  isolated: false,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- every name is set
+  features: Object.fromEntries(
+    featureNames.map(name => [name, false]),
+  ) as DeviceMeasurement["features"],
+  cpu: { effectiveCores: 0, singleThreadScore: 0 },
+  gpu: { webgl2Renders: false, fillPassesPerMs: 0 },
+  memory: { deviceMemoryGiB, maxSharedAllocMiB: 0 },
+});
 
 /**
  * The cached measurement, or `null` when there's none or it's invalid: from another browser major
@@ -272,21 +342,25 @@ export const readCachedFailure = (): CachedProbeFailure | null => {
     failureCount: entry.failureCount,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- checked above
     reason: entry.reason as ProbeFailureReason,
+    ...(entry.crashReported === true && { crashReported: true }),
   };
 };
 
 /**
- * Whether a cached failure means the probe isn't run again yet. A `crashed` entry younger than
- * `crashGraceMs` may be a probe still running, in this tab or another, so it doesn't count yet.
+ * The cached failure when it means the probe isn't run again yet, otherwise `null`. A `crashed`
+ * entry younger than `crashGraceMs` may be a probe still running, in this tab or another, so it
+ * doesn't count yet.
  */
-export const hasRecentFailure = (now: number, crashGraceMs: number): boolean => {
+export const readRecentFailure = (now: number, crashGraceMs: number): CachedProbeFailure | null => {
   const failure = readCachedFailure();
   if (failure == null) {
-    return false;
+    return null;
   }
   const age = now - failure.failedAt;
   const maxAge = failure.failureCount >= 2 ? REPEATED_FAILURE_MAX_AGE_MS : FIRST_FAILURE_MAX_AGE_MS;
-  return age >= 0 && age < maxAge && !(failure.reason === "crashed" && age < crashGraceMs);
+  return age >= 0 && age < maxAge && !(failure.reason === "crashed" && age < crashGraceMs)
+    ? failure
+    : null;
 };
 
 /** `false` when the entry couldn't be written (storage full or blocked). */

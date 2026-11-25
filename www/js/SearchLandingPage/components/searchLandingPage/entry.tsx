@@ -2,8 +2,11 @@ import ready from "@rbx/core-scripts/util/ready";
 import { queryClient, renderWithErrorBoundary, TranslationProvider } from "@rbx/core-scripts/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import "@rbx/core-scripts/global";
-import { SearchLandingPageOmniFeed, searchLandingService } from "@rbx/discovery-common";
-import "@rbx/discovery-common/searchLandingPage.scss";
+import {
+  SearchLandingPageOmniFeed,
+  searchLandingService,
+} from "@rbx/discovery-common/search-landing";
+import "@rbx/discovery-common/searchLandingPage.css";
 import { gamePlayButtonNamespaces } from "@rbx/game-play-button";
 import type { Namespace } from "@rbx/www-common/i18n";
 import { TranslationProviderSCC } from "@rbx/www-common/i18n/scc";

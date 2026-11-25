@@ -214,16 +214,21 @@ export const getOdpSettingsPages = (
     [UserSetting.enablePurchases, context.canParentViewChildSpendRestrictions],
   ]);
 
+  // Spend notifications use the remote parent rule (spend restrictions or spending insights),
+  // and also need a remote parent unless sensitive consent upsells are enabled.
+  const canParentViewSpendNotifications =
+    (context.canParentViewChildSpendRestrictions === true ||
+      context.shouldParentSeeSpendingInsights === true) &&
+    (hasRemoteParent || policy?.showRemoteOnlySettingsForAnyLinkedParent === true);
   const spendingSettings: [UserSetting, boolean | undefined][] = [
-    [UserSetting.monthlySpendLimit, spendControls?.monthlyLimitVisible],
     [
-      UserSetting.monthlySpendLimitNotificationType,
-      (hasRemoteParent || policy?.showRemoteOnlySettingsForAnyLinkedParent === true) &&
-        spendControls?.notificationSettingVisible,
+      UserSetting.monthlySpendLimit,
+      context.canParentViewChildSpendRestrictions && spendControls?.monthlyLimitVisible,
     ],
+    [UserSetting.monthlySpendLimitNotificationType, canParentViewSpendNotifications],
   ];
   spendingSettings.forEach(([setting, isSettingVisible]) => {
-    if (!context.canParentViewChildSpendRestrictions || !isSettingVisible) {
+    if (!isSettingVisible) {
       return;
     }
     const name = SettingCategoryPageName.Spending;

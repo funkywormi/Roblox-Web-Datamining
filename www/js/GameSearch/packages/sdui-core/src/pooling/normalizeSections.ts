@@ -1,3 +1,4 @@
+import type { UiComponentTemplate } from "../types";
 import { unwrapOneOf } from "../utils/oneOfHelper";
 import { isRecord } from "../utils/typeGuards";
 import {
@@ -11,12 +12,22 @@ import type { NormalizedPool, PoolId, PoolSectionRegistration, SectionId } from 
 export interface PoolSectionInput {
   identifier: unknown;
   item: unknown;
+  template?: UiComponentTemplate;
 }
 
 export interface NormalizeSectionIssue {
   readonly reason: "invalidRowBudget";
   readonly sectionId: SectionId;
   readonly rowBudget: unknown;
+}
+
+function templateDoesNotAdvanceStartRow(template: UiComponentTemplate | undefined): boolean {
+  const analyticsData = template?.shared.analyticsData;
+  if (!analyticsData) return false;
+  const rawField = analyticsData.doesNotAdvanceStartRow ?? analyticsData.does_not_advance_start_row;
+  if (!isRecord(rawField)) return false;
+  const unwrapped = unwrapOneOf(rawField);
+  return unwrapped?.propType === "literal" && unwrapped.propValue === "true";
 }
 
 function readSectionPayload(item: unknown): Record<string, unknown> | undefined {
@@ -67,11 +78,13 @@ export function normalizeSections(
       DEFAULT_COLLECTION_ITEM_SIZE;
 
     const sectionId = entry.identifier;
+    const doesNotAdvanceStartRow = templateDoesNotAdvanceStartRow(entry.template);
     sections.push({
       sectionId,
       poolId,
       numberOfRows: normalizeNumberOfRows(payload?.maxVisibleRows, poolId, sectionId, onIssue),
       collectionItemSize,
+      ...(doesNotAdvanceStartRow ? { doesNotAdvanceStartRow: true } : {}),
     });
   }
 

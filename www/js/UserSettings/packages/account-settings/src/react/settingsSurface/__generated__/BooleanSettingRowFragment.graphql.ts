@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2ce2597432b73e4cc1077fa22ddadff7>>
+ * @generated SignedSource<<4bb98560ba715299f1a43f6f6499871c>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -12,6 +12,7 @@ import { ReaderFragment } from 'relay-runtime';
 export type RequiredActionType = "AgeCheckPending" | "ContentAgeRestrictionVerification" | "FacialAgeEstimation" | "IdVerification" | "Inherited" | "ParentConsentInherited" | "ParentalConsent" | "ReadableButNotActionable" | "SelfUpdateSetting" | "VpcForFae" | "%future added value";
 import { FragmentRefs } from "relay-runtime";
 export type BooleanSettingRowFragment$data = {
+  readonly auditData: string | null | undefined;
   readonly enabled: boolean;
   readonly id: string;
   readonly off: {
@@ -92,7 +93,13 @@ v1 = [
   }
 ];
 return {
-  "argumentDefinitions": [],
+  "argumentDefinitions": [
+    {
+      "defaultValue": null,
+      "kind": "LocalArgument",
+      "name": "surface"
+    }
+  ],
   "kind": "Fragment",
   "metadata": null,
   "name": "BooleanSettingRowFragment",
@@ -102,6 +109,19 @@ return {
       "args": null,
       "kind": "ScalarField",
       "name": "id",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": [
+        {
+          "kind": "Variable",
+          "name": "surface",
+          "variableName": "surface"
+        }
+      ],
+      "kind": "ScalarField",
+      "name": "auditData",
       "storageKey": null
     },
     {
@@ -217,6 +237,6 @@ return {
 };
 })();
 
-(node as any).hash = "51144420bb23a2fa235f5c901dba74ec";
+(node as any).hash = "e93ffa821421814852957ff9acdb6480";
 
 export default node;

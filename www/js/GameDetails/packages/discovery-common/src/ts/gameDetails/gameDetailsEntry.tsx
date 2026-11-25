@@ -1,4 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query";
+import { document as browserDocument } from "@rbx/core-lib/browser";
 import { ShareLinks } from "@rbx/core-scripts/deep-link";
 import { renderWithErrorBoundary, queryClient } from "@rbx/core-scripts/react";
 import { appDownloadNamespaces } from "@rbx/app-download";
@@ -9,6 +10,7 @@ import { gameDetailsPage } from "../common/constants/configConstants";
 import InviteLinkInvalidModal from "./components/InviteLinkInvalidModal";
 import CarouselContainer from "./containers/CarouselContainer";
 import PlayButton from "./containers/PlayButton";
+import TopAppBannerContainer from "./containers/TopAppBannerContainer";
 import LicensedBadgeContainer from "../gameGuidelines/components/LicensedBadgeContainer";
 import WasmRedirect from "./components/WasmRedirect";
 import AboutTab from "./containers/AboutTab";
@@ -130,6 +132,21 @@ export default (): void => {
     } else {
       renderCarousel();
     }
+  }
+
+  // The navigation's slot above the top nav. Not on a Play on Web link, which opens its own Play on
+  // Web dialog.
+  const topAppBannerSlot = browserDocument?.getElementById("top-app-banner");
+  const { isWasmRedirect = false } = metadataConstants.metadataData() || {};
+  if (topAppBannerSlot && !isWasmRedirect) {
+    renderWithErrorBoundary(
+      <QueryClientProvider client={queryClient}>
+        <TranslationProviderSCC namespaces={appDownloadNamespaces}>
+          <TopAppBannerContainer />
+        </TranslationProviderSCC>
+      </QueryClientProvider>,
+      topAppBannerSlot,
+    );
   }
 
   if (playButtonConstants.gameDetailsPlayButtonContainer()) {

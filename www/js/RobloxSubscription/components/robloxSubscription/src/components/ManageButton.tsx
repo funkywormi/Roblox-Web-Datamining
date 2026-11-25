@@ -33,7 +33,7 @@ const ManageButton: FC<ManageButtonProps> = ({ robloxSubscriptionProduct }) => {
       variant="Standard"
       onClick={onClick}
     >
-      {translate("Action.Manage")}
+      {translate("Action.ViewAccount")}
     </Button>
   );
 };

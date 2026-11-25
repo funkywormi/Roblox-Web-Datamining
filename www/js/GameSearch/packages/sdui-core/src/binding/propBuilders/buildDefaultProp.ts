@@ -106,12 +106,9 @@ export function buildDefaultProp(
             ? undefined
             : options;
       const branchBuilderToUse: PropBuilder = branchBuilder ?? makeSelfBranchBuilder(parser);
-      // Branches may resolve to a `SduiComponentConfig` (nested-component
-      // conditional). Lua flags this on the resolved `PropSignal` via
-      // `isNestedComponentConfig` and the wrapper checks the flag explicitly.
-      // Web instead relies on `isSduiConfig` (renderer/typeGuards.ts) to
-      // structurally detect configs at render time, preferring the
-      // `__sduiKind: "config"` brand set by `buildConfigForComponent`.
+      // Nested-component conditionals are built by `buildNestedComponentProp`,
+      // which sets `isNestedComponentConfig` like Lua. A config reaching the
+      // renderer without that flag is passed to the parent unrendered.
       return generateConditionalPropValue(
         conditionalOptions,
         childRequest,

@@ -2,18 +2,11 @@ import { useCallback } from "react";
 import { TranslateFunction } from "@rbx/core-scripts/react";
 import { useSystemFeedback } from "@rbx/core-ui";
 import { fireEvent } from "@rbx/www-common/event-tracker";
-import bedev2Services from "../services/bedev2Services";
 import { usePageSession } from "../utils/PageSessionContext";
-import {
-  TUserSignalEntity,
-  TUserSignalAssetType,
-  TUserSignalValueType,
-  TUserSignalType,
-} from "../types/userSignalTypes";
 import { PageContext } from "../types/pageContext";
 import { userSignal } from "../constants/configConstants";
 import { FeaturePlacesList } from "../constants/translationConstants";
-import { getProductSurface } from "./userSignalUtils";
+import { sendNotInterestedUserSignal } from "./userSignalUtils";
 
 // send a NotInterested user signal with true for not interested or false for undoing a not interested
 const useSendNotInterestedUserSignalCallback = (
@@ -39,44 +32,15 @@ const useSendNotInterestedUserSignalCallback = (
 
   return useCallback(
     (isNotInterested: boolean) => {
-      const productSurface = getProductSurface(page);
-      if (!productSurface) {
-        onSignalFailure();
-        return;
-      }
-
-      if (!topicId) {
-        onSignalFailure();
-        fireEvent(userSignal.ExplicitFeedbackMissingTopicIdCounterEvent);
-        return;
-      }
-
-      const assetType = isSponsored
-        ? TUserSignalAssetType.SponsoredGame
-        : TUserSignalAssetType.Game;
-
-      const signalEntity: TUserSignalEntity = {
-        id: universeId.toString(),
-        assetType,
-        signalOrigin: {
-          productSurface,
-          topicId,
-          subIds: [topicId],
-        },
-      };
-
-      bedev2Services
-        .postUserSignal(
-          { boolValue: isNotInterested },
-          TUserSignalValueType.Bool,
-          signalEntity,
-          TUserSignalType.NotInterested,
-          pageSession,
-        )
-        .catch(() => {
-          onSignalFailure();
-          fireEvent(userSignal.ExplicitFeedbackUserSignalFailedCounterEvent);
-        });
+      sendNotInterestedUserSignal({
+        universeId: universeId.toString(),
+        topicId,
+        isSponsored,
+        page,
+        pageSession,
+        isNotInterested,
+        onFailure: onSignalFailure,
+      });
     },
     [universeId, page, topicId, isSponsored, pageSession, onSignalFailure],
   );

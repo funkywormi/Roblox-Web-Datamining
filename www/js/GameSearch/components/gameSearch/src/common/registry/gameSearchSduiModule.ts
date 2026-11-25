@@ -1,5 +1,8 @@
 import { ActionType, type SduiRegistryModule } from "@rbx/sdui-core";
-import { openSearchResultsTabResolveHref } from "../actions/openSearchResultsTabHandler";
+import {
+  openSearchResultsTabResolveHref,
+  openSearchResultsTabHandler,
+} from "../actions/openSearchResultsTabHandler";
 import { GAME_SEARCH_CLIENT_COMPONENTS } from "./gameSearchComponents";
 
 export const GameSearchSduiModule = {
@@ -8,6 +11,8 @@ export const GameSearchSduiModule = {
   actionHandlers: {
     [ActionType.OPEN_SEARCH_RESULTS_TAB]: {
       resolveHref: openSearchResultsTabResolveHref,
+      clientNavigation: true,
+      handler: openSearchResultsTabHandler,
     },
   },
 } satisfies SduiRegistryModule;

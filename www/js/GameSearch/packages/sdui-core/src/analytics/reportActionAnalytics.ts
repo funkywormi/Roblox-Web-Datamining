@@ -9,6 +9,7 @@ import { SduiErrorName } from "../errors/SduiErrors";
 import type {
   ActionConfig,
   AnalyticsContext,
+  AnalyticsFieldMap,
   SduiAnalyticsReporter,
   SduiErrorReporter,
   SduiPageContext,
@@ -34,6 +35,9 @@ function normalizeActionParamsForTelemetry(
   if (!actionParams) return {};
   const normalized: Record<string, PrimitiveParam> = {};
   for (const [key, value] of Object.entries(actionParams)) {
+    // Strip bufbuild internal message metadata (`$typeName`, `$unknown`) so it
+    // does not leak into telemetry payloads (Lua `SendItemActionEvent` parity).
+    if (key.startsWith("$")) continue;
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
       normalized[key] = value;
     } else if (value !== undefined && value !== null) {
@@ -53,6 +57,14 @@ function normalizeActionParamsForTelemetry(
     }
   }
   return normalized;
+}
+
+function withoutPoolControlFields(
+  fields: AnalyticsFieldMap | undefined,
+): AnalyticsFieldMap | undefined {
+  if (!fields) return undefined;
+  const { doesNotAdvanceStartRow: _poolControlFlag, ...rest } = fields;
+  return rest;
 }
 
 function getEventContext(pageContext?: SduiPageContext): string {
@@ -113,18 +125,27 @@ export function reportActionAnalytics(
   if (!analyticsReporter) return;
 
   const collectionData = analyticsContext.getCollectionData?.();
-  const ownData = analyticsContext.analyticsData;
-  const ancestorData = analyticsContext.ancestorAnalyticsData;
+  const ownData = withoutPoolControlFields(analyticsContext.analyticsData);
+  const ancestorData = withoutPoolControlFields(analyticsContext.ancestorAnalyticsData);
   // itemPosition/itemComponentType come from setLocalAnalyticsData injected by
-  // SduiRenderer — always on ownData. id may live on an ancestor if the template
-  // bound it higher in the tree, so fall back to ancestorData for it.
+  // SduiRenderer on the list item; nested descendants (e.g. buttons) inherit
+  // them via ancestorData alongside id.
   const idSource = ownData?.id != null ? ownData : ancestorData;
+  const itemPositionSource = ownData?.itemPosition != null ? ownData : ancestorData;
+  const itemComponentTypeSource = ownData?.itemComponentType != null ? ownData : ancestorData;
   const context = getEventContext(pageContext);
+  const normalizedActionParams = normalizeActionParamsForTelemetry(
+    actionConfig.actionParams,
+    pageContext,
+    errorReporter,
+  );
 
-  // Spread actionParams first so canonical metadata keys (Context,
-  // ActionType, collection / item fields) take precedence on collision.
+  // Precedence matches Lua SendItemActionEvent; canonical fields below win.
   const params: Record<string, EventParamValue> = {
-    ...normalizeActionParamsForTelemetry(actionConfig.actionParams, pageContext, errorReporter),
+    ...collectionData,
+    ...ancestorData,
+    ...ownData,
+    ...normalizedActionParams,
     [SharedEventMetadata.Context]: context,
     [ItemActionMetadata.ActionType]: actionTypeName(actionConfig.actionType),
   };
@@ -137,18 +158,44 @@ export function reportActionAnalytics(
     params[ItemActionMetadata.TotalNumberOfItems] = collectionData.totalNumberOfItems;
   }
 
-  if (ownData) {
+  if (ownData || ancestorData) {
+    const itemPosition = Number(itemPositionSource?.itemPosition ?? -1);
+    // Rows follow the section-local cell (Lua `SduiCollectionGrid` itemPosition), not the pool rank.
+    const layoutPosition = analyticsContext.getLayoutCellPosition?.() ?? itemPosition;
     params[ItemActionMetadata.ItemId] = String(idSource?.id ?? "unknown");
-    params[ItemActionMetadata.ItemPosition] = Number(ownData.itemPosition ?? -1);
+    params[ItemActionMetadata.ItemPosition] = itemPosition;
+    params[ItemActionMetadata.PositionInTopic] = itemPosition;
     params[ItemActionMetadata.ItemComponentType] = componentTypeToString(
-      typeof ownData.itemComponentType === "boolean"
-        ? String(ownData.itemComponentType)
-        : (ownData.itemComponentType ?? "unknown"),
+      typeof itemComponentTypeSource?.itemComponentType === "boolean"
+        ? String(itemComponentTypeSource.itemComponentType)
+        : (itemComponentTypeSource?.itemComponentType ?? "unknown"),
     );
+
+    if (collectionData) {
+      // Matches Lua `calculateRowPositionFields` (1-based row/column coordinates; -1 when unavailable).
+      const { itemsPerRow } = collectionData;
+      const startRowNumber =
+        typeof collectionData.startRowNumber === "number"
+          ? collectionData.startRowNumber
+          : undefined;
+      if (layoutPosition > 0 && itemsPerRow > 0) {
+        const rowNumber = Math.ceil(layoutPosition / itemsPerRow);
+        params[ItemActionMetadata.RowNumber] = rowNumber;
+        params[ItemActionMetadata.PositionInRow] = ((layoutPosition - 1) % itemsPerRow) + 1;
+        params[ItemActionMetadata.FeedRowNumber] =
+          startRowNumber !== undefined ? startRowNumber + rowNumber - 1 : -1;
+      } else {
+        params[ItemActionMetadata.RowNumber] = -1;
+        params[ItemActionMetadata.PositionInRow] = -1;
+        params[ItemActionMetadata.FeedRowNumber] = -1;
+      }
+    }
   }
 
   // Prefer actionParams / caller-shared uuid, else generate (lua itemActionEvent parity).
-  params.interactionUuid ??= options?.interactionUuid ?? createInteractionUuid();
+  // Do not inherit a stale interactionUuid from collection/ancestor analytics snapshots.
+  params.interactionUuid =
+    normalizedActionParams.interactionUuid ?? options?.interactionUuid ?? createInteractionUuid();
 
   const eventName = options?.eventNameOverride ?? EventNames.ItemAction;
   const parsedParams = parseEventParams(params);

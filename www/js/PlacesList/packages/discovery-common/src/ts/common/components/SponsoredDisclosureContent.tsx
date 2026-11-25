@@ -1,6 +1,6 @@
 import { TranslateFunction } from "@rbx/core-scripts/react";
-import Intl from "@rbx/core-scripts/intl";
 import { getHelpDeskUrl } from "@rbx/www-common/help-desk";
+import { getRobloxLocale } from "@rbx/www-common/intl";
 import { Loading } from "@rbx/core-ui";
 import { FeatureGameDetails } from "../constants/translationConstants";
 import useGameDetailsForUniverseId from "../../gameDetails/hooks/useGameDetailsForUniverseId";
@@ -12,7 +12,6 @@ enum TSponsoredUserCohort {
   EighteenPlusNonPersonalized = "EighteenPlusNonPersonalized",
 }
 
-const intl = new Intl();
 const getAdsPreferencesUrl = (locale: string): string => {
   return getHelpDeskUrl(locale, "28943243301780");
 };
@@ -66,7 +65,7 @@ const SponsoredDisclosureContent = ({
       {sponsoredDisclosureText}
       {shouldDisplayAdPreferencesLink && (
         <a
-          href={getAdsPreferencesUrl(intl.getRobloxLocale())}
+          href={getAdsPreferencesUrl(getRobloxLocale())}
           className="text-link"
           target="_blank"
           rel="noreferrer"

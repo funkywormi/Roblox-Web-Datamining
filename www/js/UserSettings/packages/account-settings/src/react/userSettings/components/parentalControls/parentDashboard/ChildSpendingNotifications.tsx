@@ -22,8 +22,11 @@ import parentalControlsEventService from "../../../services/eventServices/parent
 const ChildSpendingNotifications = ({
   child,
   onUpdateSetting,
+  displayedSetting,
 }: {
   child: TChildSettingsInfo;
+  // Shown in place of the billing value when set
+  displayedSetting?: SpendNotificationSetting;
 } & TSettingUpdateProps): JSX.Element => {
   const { translate } = useTranslation();
   const { snackbarService } = useSnackbar();
@@ -83,7 +86,7 @@ const ChildSpendingNotifications = ({
       <RadioButtonOptions
         className="section-content"
         options={options}
-        selectedOption={spendControlSettings?.spendNotificationSetting}
+        selectedOption={displayedSetting ?? spendControlSettings?.spendNotificationSetting}
         onValueChange={toggleSpendNotificationHandler}
       />
     </SettingsSection>

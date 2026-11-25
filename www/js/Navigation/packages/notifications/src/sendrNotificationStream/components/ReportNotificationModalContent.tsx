@@ -2,7 +2,6 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { DialogBody, DialogFooter, DialogTitle as FoundationDialogTitle } from "@rbx/foundation-ui";
 import AbuseReportForm from "../abuseReport/AbuseReportForm";
 import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
-import { getFlaggedMuiModalArms } from "../mui/muiModalArms";
 import {
   AbuseReportCustomRenderFn,
   AbuseReportFormAction,
@@ -155,19 +154,6 @@ const ReportNotificationModalContent: FC<ReportNotificationModalProps> = ({ hand
           {translate("DSAIllegal.ReportLink")}
         </a>
       ) : null;
-      const MuiReportNotificationLayout = getFlaggedMuiModalArms()?.ReportNotificationLayout;
-      if (MuiReportNotificationLayout) {
-        return (
-          <MuiReportNotificationLayout
-            title={translate("Title.ReportNotification")}
-            reportedNotification={reportedNotification}
-            body={body}
-            apiError={apiErrorMsg ? translate(apiErrorMsg) : null}
-            actions={actionsButtons}
-            euDsa={euDsaLink}
-          />
-        );
-      }
       return (
         <React.Fragment>
           <DialogBody className="flex flex-col gap-y-small">

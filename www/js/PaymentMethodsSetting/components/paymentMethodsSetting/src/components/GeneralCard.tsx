@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import { fireEvent } from "roblox-event-tracker";
 import { TranslateFunction } from "react-utilities";
 import { TSystemFeedbackService } from "react-style-guide";
-import { getShortenedDateFormat } from "@rbx/payments/utils";
+import { getShortenedDateFormat } from "../utils/dateUtils";
 import { COUNTER_METRICS, getPaymentMethodClassNameMapping } from "../constants/constants";
 import createRemovePaymentMethodModal from "../services/createRemovePaymentMethodModal";
 import createCannotDeletePaymentMethodModal from "../services/createCannotDeletePaymentMethodModal";

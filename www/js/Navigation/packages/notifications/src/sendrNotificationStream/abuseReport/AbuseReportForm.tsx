@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { ProgressCircle } from "@rbx/foundation-ui";
 import { useNotificationLocalization } from "../context/NotificationsLocalization";
 import { getNotificationStreamHost } from "../../notificationStreamData/streamHost";
-import { getFlaggedMuiModalArms, getMuiModalArms } from "../mui/muiModalArms";
 import {
   AbuseReportFormData,
   AbuseReportFormProps,
@@ -172,9 +171,8 @@ const AbuseReportForm: FC<AbuseReportFormProps> = ({
   }, []);
 
   const AbuseReportBody = useMemo(() => {
-    const InputItem = getMuiModalArms()?.AbuseReportInputItem ?? "div";
     return abuseReportsInputsConfiguration.map(config => (
-      <InputItem key={config.name}>
+      <div key={config.name}>
         <AbuseReportInput
           control={control}
           config={config}
@@ -182,11 +180,9 @@ const AbuseReportForm: FC<AbuseReportFormProps> = ({
           errors={errors}
           disabled={isSubmitting}
         />
-      </InputItem>
+      </div>
     ));
   }, [abuseReportsInputsConfiguration, control, errors, isSubmitting, register]);
-
-  const SubmitSpinner = getFlaggedMuiModalArms()?.SubmitSpinner;
 
   const AbuseReportActionButtons = useMemo(() => {
     const actionsList =
@@ -212,31 +208,18 @@ const AbuseReportForm: FC<AbuseReportFormProps> = ({
         onClick={handleSubmit(onReportSubmit)}
       >
         {isSubmitting ? (
-          SubmitSpinner ? (
-            <SubmitSpinner />
-          ) : (
-            <ProgressCircle
-              size="Small"
-              variant="Indeterminate"
-              ariaLabel={translate("Action.Report")}
-            />
-          )
+          <ProgressCircle
+            size="Small"
+            variant="Indeterminate"
+            ariaLabel={translate("Action.Report")}
+          />
         ) : (
           translate("Action.Report")
         )}
       </button>,
     );
     return actionsList;
-  }, [
-    formActions,
-    handleSubmit,
-    onReportSubmit,
-    onSubmit,
-    isSubmitting,
-    translate,
-    isValid,
-    SubmitSpinner,
-  ]);
+  }, [formActions, handleSubmit, onReportSubmit, onSubmit, isSubmitting, translate, isValid]);
 
   return customRender ? customRender(AbuseReportBody, AbuseReportActionButtons) : null;
 };

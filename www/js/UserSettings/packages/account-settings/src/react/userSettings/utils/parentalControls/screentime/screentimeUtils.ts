@@ -1,5 +1,5 @@
 import { Intl } from "Roblox";
-import { TranslateFunction } from "react-utilities";
+import type { TranslateFunction } from "react-utilities";
 import { generateAllowedTimeAmountOptions, generateTimeLimitDisplay } from "@rbx/user-settings";
 import { dateTimes } from "../../../constants/screentimeConstants";
 import ContentMaturityLevel from "../../../../../enums/parentalControls/ContentMaturityLevel";
