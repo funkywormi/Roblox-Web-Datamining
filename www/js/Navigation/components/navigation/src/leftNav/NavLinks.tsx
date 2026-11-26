@@ -31,7 +31,7 @@ import {
   interactable,
   navItemClasses,
 } from "./navItemStyles";
-import theHollowImage from "../images/The Hollow.webp";
+import theGreatBuildImage from "../images/The Great Build.webp";
 
 const noPlusNavEntries: PlusNavEntries = {
   isPlusSubscriber: false,
@@ -253,7 +253,11 @@ export const EventNavItem = () => {
   return (
     <li key={url}>
       <a href={url} className="flex">
-        <img src={assetUrl(theHollowImage)} alt="The Hollow" className="width-full radius-medium" />
+        <img
+          src={assetUrl(theGreatBuildImage)}
+          alt="The Great Build"
+          className="width-full radius-medium"
+        />
       </a>
     </li>
   );

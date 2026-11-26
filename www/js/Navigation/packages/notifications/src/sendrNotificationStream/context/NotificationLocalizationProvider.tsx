@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { withTranslations, WithTranslationsProps } from "react-utilities";
+import { withTranslations, type WithTranslationsProps } from "react-utilities";
 import translationConfig from "../translation.config";
 import { NotificationLocalizationContext } from "./NotificationsLocalization";
 
