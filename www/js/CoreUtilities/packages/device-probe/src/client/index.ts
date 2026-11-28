@@ -181,7 +181,8 @@ const attemptProbe = async (): Promise<DeviceMeasurement | null> => {
     const parsed = result.ok ? measurementFromScores(result.scores) : null;
     if (parsed == null) {
       const reason = result.ok ? "error" : result.reason;
-      if (reason === "hidden") {
+      // The tab's or the deploy's fault, not the device's, so no failure is cached.
+      if (reason === "hidden" || reason === "version") {
         restoreCachedFailure(previousFailure);
       } else {
         writeCachedFailure(reason, failureCount, Date.now());
@@ -191,9 +192,22 @@ const attemptProbe = async (): Promise<DeviceMeasurement | null> => {
     }
     const { measurement, measuredWhileVisible, earlyStop } = parsed;
     const { isolated } = measurement;
+    // Only measured scores are sent: an early stop measured none. The GPU benchmark runs before
+    // the CPU one, after the tab is visible, so a throttled run's GPU score still counts.
+    const reportScores = (): void => {
+      if (earlyStop == null) {
+        report("probeScores", {
+          browser,
+          isolated,
+          singleThreadScore: measuredWhileVisible ? measurement.cpu.singleThreadScore : null,
+          webgpuScore: measurement.gpu.webgpuRenders ? measurement.gpu.webgpuScore : null,
+        });
+      }
+    };
     if (!measuredWhileVisible) {
       restoreCachedFailure(previousFailure);
       report("probeFailed", { reason: "throttled", durationMs, browser, isolated });
+      reportScores();
       return null;
     }
 
@@ -205,6 +219,7 @@ const attemptProbe = async (): Promise<DeviceMeasurement | null> => {
       // An early stop reports the quick checks that failed, not the benchmarks it didn't run.
       failedRules: earlyStop ?? failedRules(measurement, getDeviceProbeConfig().requiredSpec),
     });
+    reportScores();
     return measurement;
   });
 };

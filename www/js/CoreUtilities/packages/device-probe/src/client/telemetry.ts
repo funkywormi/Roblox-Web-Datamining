@@ -1,6 +1,7 @@
 // Probe outcomes, reported through web-telemetry v2 as `WasmDeviceProbe_<Name>` metrics. See the
-// WEB-3600 tech spec's Telemetry section. Labels are low-cardinality: `browser` is the family only,
-// and no scores are sent.
+// WEB-3600 tech spec's Telemetry section. Labels are low-cardinality: `browser` is the family only.
+// The only scores sent are the CPU single-thread and WebGPU scores, each rounded to the nearest
+// 1000, as histograms.
 import {
   type Attributes,
   createFireTelemetryCounter,
@@ -18,10 +19,11 @@ import type { RequiredSpecRule } from "./requiredSpec";
 /**
  * Why the probe couldn't finish: it posted an error, failed to load or couldn't start (`error`),
  * posted nothing in time (`timeout`), an earlier run never settled (`crashed`), the tab was hidden
- * (`hidden`), or it measured while the tab was hidden, so its CPU scores are throttled
- * (`throttled`).
+ * (`hidden`), it measured while the tab was hidden, so its CPU scores are throttled
+ * (`throttled`), or the page posted another score format because it's from another build
+ * (`version`, during a deploy).
  */
-export type DeviceProbeFailureReason = ProbeFailureReason | "hidden" | "throttled";
+export type DeviceProbeFailureReason = ProbeFailureReason | "hidden" | "throttled" | "version";
 
 export type DeviceProbeStartedEvent = {
   /** From `browserCacheKey()`, such as `Chrome/141`. Only the family is sent. */
@@ -47,6 +49,15 @@ export type DeviceProbeCompletedEvent = {
    * device meets the spec.
    */
   failedRules: RequiredSpecRule[];
+};
+
+export type DeviceProbeScoresEvent = {
+  browser: string;
+  isolated: boolean;
+  /** `cpu.singleThreadScore` (iterations per ms); `null` when the CPU scores are throttled. */
+  singleThreadScore: number | null;
+  /** `gpu.webgpu.score` (GFLOPS); `null` when WebGPU didn't render, so it wasn't measured. */
+  webgpuScore: number | null;
 };
 
 /**
@@ -92,6 +103,9 @@ const specNotMetName = (rule: string): string =>
 // `Chrome/141` → `Chrome`: the major version would multiply every series.
 const browserFamily = (browser: string): string => browser.split("/", 1)[0] ?? browser;
 
+/** To the nearest 1000, half up: 499 → 0, 500 → 1000, 1500 → 2000. Scores are never negative. */
+export const roundScore = (score: number): number => Math.round(score / 1000) * 1000;
+
 // `isolated` is left out when it isn't known, rather than given a third value.
 const labels = (browser: string, isolated: boolean | null): Attributes =>
   isolated == null
@@ -117,6 +131,19 @@ export const deviceProbeTelemetry = {
     record("ProbeDurationMs", isolated == null ? {} : { isolated }, durationMs);
     for (const rule of failedRules) {
       count(specNotMetName(rule), common);
+    }
+  },
+  /**
+   * The scores a run measured, rounded to the nearest 1000. Not sent for a run that stopped on a
+   * quick check, or for a cached answer.
+   */
+  probeScores: ({ browser, isolated, singleThreadScore, webgpuScore }: DeviceProbeScoresEvent) => {
+    const common = labels(browser, isolated);
+    if (singleThreadScore != null) {
+      record("SingleThreadScore", common, roundScore(singleThreadScore));
+    }
+    if (webgpuScore != null) {
+      record("WebgpuScore", common, roundScore(webgpuScore));
     }
   },
   /**

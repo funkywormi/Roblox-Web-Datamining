@@ -12,10 +12,14 @@ import realtime from "@rbx/core-scripts/realtime";
 import { getCurrentUser } from "@rbx/www-common/user";
 import { appThemes } from "./constants";
 
-let inFlight: { cancelled: boolean } | null = null;
+let inFlight: { cancelled: boolean } = { cancelled: true };
 
 export const initializeTheme = () => {
-  if (document == null || document.body.classList.contains("forced-theme")) {
+  if (
+    document == null ||
+    document.body.classList.contains("forced-theme") ||
+    document.body.classList.contains("overridden-theme")
+  ) {
     return; // This page should remain on the initial theme
   }
   const user = getCurrentUser();
@@ -32,9 +36,7 @@ export const initializeTheme = () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const { SettingsChanged } = details as Record<string, unknown>;
     if (Array.isArray(SettingsChanged) && SettingsChanged.includes("AccountTheme")) {
-      if (inFlight != null) {
-        inFlight.cancelled = true;
-      }
+      inFlight.cancelled = true;
       const cancellation = { cancelled: false };
       inFlight = cancellation;
       http

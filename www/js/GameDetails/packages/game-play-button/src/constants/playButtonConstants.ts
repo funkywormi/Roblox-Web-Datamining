@@ -108,6 +108,10 @@ const playButtonLayer = "Website.PlayButton";
 // to decide whether /CreateAccount serves the sign-up form or the download page.
 const mobileWebSignupLayer = "Website.LandingPage";
 const mobileWebSignupParameter = "IsDownloadPageHidden";
+// Must match the website's LandingController: /CreateAccount only serves the mobile-web sign-up
+// form to requests carrying a device-checked entry (this, or navigation's header Sign Up).
+const mobileWebSignupEntryParameter = "signupEntry";
+const mobileWebSignupEntryValue = "play";
 
 const ageCheckUpsellFeatureName = "TriggerAgeCheckUpsellIncludingVPC";
 const ageCheckUpsellNamespace = "core_content/CoreContent";
@@ -159,6 +163,8 @@ export default {
   playButtonLayer,
   mobileWebSignupLayer,
   mobileWebSignupParameter,
+  mobileWebSignupEntryParameter,
+  mobileWebSignupEntryValue,
   unlockPlayIntentConstants,
   FeatureExperienceDetails,
   defaultAfReferralProperties,

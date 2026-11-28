@@ -1,4 +1,3 @@
-import $ from "jquery";
 import { parseUrl, formatUrl } from "./util/url/url";
 import { isAuthenticated } from "./meta/user";
 
@@ -201,7 +200,7 @@ const getAbsoluteUrl = (relativeUrl: string): string => {
 
 const generateAbsoluteUrl = (
   relativeUrl: string,
-  requestData: Record<string, string>,
+  requestData: Record<string, string> | null | undefined,
   isRequestCrossDomain: boolean,
 ): string => {
   const splitUrl = splitAtQueryString(relativeUrl);
@@ -215,9 +214,8 @@ const generateAbsoluteUrl = (
 
   if (absoluteUrl.includes("{")) {
     // add in any parameters
-    $.each(requestData, (parameter, value) => {
+    Object.entries(requestData ?? {}).forEach(([parameter, value]) => {
       const regex = new RegExp(`{${parameter.toLowerCase()}(:.*?)?\\??}`);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       absoluteUrl = absoluteUrl.replace(regex, value);
     });
   }

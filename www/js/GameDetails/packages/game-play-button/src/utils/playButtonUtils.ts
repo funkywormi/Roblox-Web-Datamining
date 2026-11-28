@@ -12,7 +12,6 @@ import {
 import { composeQueryString } from "@rbx/core-scripts/util/url";
 import { generateRandomUuid } from "@rbx/core-lib/uuid";
 import { getDeviceMeta, isIos13Ipad } from "@rbx/core-scripts/meta/device";
-import { getSignupUrl } from "@rbx/navigation/auth-links";
 import { fireEvent } from "@rbx/www-common/event-tracker";
 import {
   showAvatarVideoOptInOverlay,
@@ -46,6 +45,8 @@ const {
   ageCheckUpsellFeatureName,
   ageCheckUpsellNamespace,
   counterEvents,
+  mobileWebSignupEntryParameter,
+  mobileWebSignupEntryValue,
 } = playButtonConstants;
 
 type TEventProperties = Record<string, string | number | undefined>;
@@ -254,11 +255,15 @@ const gamePagePathPattern = /^(\/[a-z]{2}(-[a-z]{2})?)?\/games\/[0-9]+(\/|$)/i;
 export const launchSignup = (placeId: string): void => {
   sendPlayGameClickedEvent({}, placeId, {});
   // The game page also renders on /games/start (WASM links), which isn't a game page returnUrl.
-  const gamePagePath = `/games/${placeId}`;
-  const returnLocation = gamePagePathPattern.test(window.location.pathname)
-    ? undefined
-    : { pathname: gamePagePath, search: "", href: getAbsoluteUrl(gamePagePath) };
-  window.location.assign(getSignupUrl(false, returnLocation));
+  const returnUrl = gamePagePathPattern.test(window.location.pathname)
+    ? window.location.href
+    : getAbsoluteUrl(`/games/${placeId}`);
+  // Not through getSignupUrl: its /account/signupredir rewrite keeps only returnUrl.
+  const signupQuery = composeQueryString({
+    returnUrl,
+    [mobileWebSignupEntryParameter]: mobileWebSignupEntryValue,
+  });
+  window.location.assign(`${getAbsoluteUrl("/CreateAccount")}?${signupQuery}`);
 };
 
 // The global type declares this service as required, but it is only installed by the

@@ -1,5 +1,3 @@
-import $ from "jquery";
-
 // Do not import anything here without considering if you need to update the rspack.config.js
 
 const xsrfRequestMethods = ["POST", "PUT", "DELETE", "PATCH"];
@@ -57,15 +55,12 @@ const setToken = (token?: string): void => {
 const getTokenTimestamp = (): Date | null => tokenTimestamp;
 
 const loadTokenFromMetaTag = () => {
-  const metaTag = $("meta[name='csrf-token']");
-  if (metaTag.length > 0) {
-    // TODO: old, migrated code
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    currentToken = metaTag.data("token");
+  const metaTag = document.querySelector<HTMLMetaElement>("meta[name='csrf-token']");
+  if (metaTag) {
+    currentToken = metaTag.dataset.token ?? "";
 
-    const timestampValue: unknown = metaTag.data("timestamp");
+    const timestampValue = metaTag.dataset.timestamp;
     if (timestampValue) {
-      // @ts-expect-error TODO: old, migrated code
       tokenTimestamp = new Date(Date.parse(timestampValue));
     }
   }

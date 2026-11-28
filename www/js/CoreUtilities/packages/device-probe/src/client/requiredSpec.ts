@@ -14,9 +14,11 @@ export type RequiredSpec = {
   /** `navigator.deviceMemory` is bucketed (a 6 GB Android phone most likely reports 4). */
   minDeviceMemoryGiB: number;
   minEffectiveCores: number;
+  /** The probe's `cpu.singleThreadScore`, in iterations per ms. */
   minSingleThreadScore: number;
-  minWebgl2FillPassesPerMs: number;
-  requireWebgl2Renders: boolean;
+  /** The probe's `gpu.webgpu.score`, in GFLOPS. */
+  minWebgpuScore: number;
+  requireWebgpuRenders: boolean;
 };
 
 /**
@@ -31,14 +33,14 @@ export const defaultRequiredSpec: Readonly<RequiredSpec> = {
     "bulkMemory",
     "atomics",
     "webWorkers",
-    "webgl2",
+    "webgpu",
     "can2GBAlloc",
   ],
   minDeviceMemoryGiB: 4,
   minEffectiveCores: 4,
   minSingleThreadScore: 0,
-  minWebgl2FillPassesPerMs: 0,
-  requireWebgl2Renders: true,
+  minWebgpuScore: 0,
+  requireWebgpuRenders: true,
 };
 
 /** The probe's scores that the required spec reads, and all the cache keeps of them. */
@@ -47,22 +49,23 @@ export type DeviceMeasurement = {
   isolated: boolean;
   features: { [Name in keyof DeviceFeatures]: boolean };
   cpu: { effectiveCores: number; singleThreadScore: number };
-  gpu: { webgl2Renders: boolean; fillPassesPerMs: number };
+  gpu: { webgpuRenders: boolean; webgpuScore: number };
   memory: { deviceMemoryGiB: number | null; maxSharedAllocMiB: number };
 };
 
 /**
  * A failed rule: `feature:<name>`, the name of the minimum or requirement, or `softwareRenderer`.
- * Only the probe reports `softwareRenderer`, when it stops before the benchmarks because WebGL
- * would render in software. The scores stored then fail `requireWebgl2Renders` too.
+ * Only the probe reports `softwareRenderer`, when it stops before the benchmarks because WebGPU's
+ * adapter is a fallback adapter, which computes in software. The scores stored then fail
+ * `requireWebgpuRenders` too. It stops on `requireWebgpuRenders` when there's no adapter.
  */
 export type RequiredSpecRule =
   | `feature:${string}`
   | "minDeviceMemoryGiB"
   | "minEffectiveCores"
   | "minSingleThreadScore"
-  | "minWebgl2FillPassesPerMs"
-  | "requireWebgl2Renders"
+  | "minWebgpuScore"
+  | "requireWebgpuRenders"
   | "softwareRenderer";
 
 /** What the browser reports about the device without measuring it. */
@@ -125,11 +128,11 @@ export const failedRules = (
   if (measurement.cpu.singleThreadScore < spec.minSingleThreadScore) {
     failed.push("minSingleThreadScore");
   }
-  if (measurement.gpu.fillPassesPerMs < spec.minWebgl2FillPassesPerMs) {
-    failed.push("minWebgl2FillPassesPerMs");
+  if (measurement.gpu.webgpuScore < spec.minWebgpuScore) {
+    failed.push("minWebgpuScore");
   }
-  if (spec.requireWebgl2Renders && !measurement.gpu.webgl2Renders) {
-    failed.push("requireWebgl2Renders");
+  if (spec.requireWebgpuRenders && !measurement.gpu.webgpuRenders) {
+    failed.push("requireWebgpuRenders");
   }
   return failed;
 };

@@ -14,10 +14,13 @@ export const PageSessionContext = createContext<TPageSessionContext>({
   rotateSessionId: () => "",
 });
 
-export const PageSessionProvider: React.FC = ({ children }) => {
+export const PageSessionProvider: React.FC<{ fallbackSessionId?: string }> = ({
+  children,
+  fallbackSessionId,
+}) => {
   const paramString = browserWindow?.location?.href?.split("?")[1];
   const urlParams = paramString && parseQueryString(paramString);
-  const referredSession =
+  const urlSessionId =
     urlParams &&
     (urlParams.discoverPageSessionInfo ||
       urlParams.homePageSessionInfo ||
@@ -25,7 +28,9 @@ export const PageSessionProvider: React.FC = ({ children }) => {
       urlParams.preAuthLandingPageSessionInfo ||
       urlParams[SessionInfoType.OmniSearchSessionInfo]);
   const [session, setSession] = useState(
-    referredSession && typeof referredSession === "string" ? referredSession : generateRandomUuid(),
+    () =>
+      (urlSessionId && typeof urlSessionId === "string" ? urlSessionId : fallbackSessionId) ??
+      generateRandomUuid(),
   );
   const rotateSessionId = useCallback(() => {
     const newId = generateRandomUuid();

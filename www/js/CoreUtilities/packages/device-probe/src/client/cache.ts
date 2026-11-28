@@ -92,7 +92,7 @@ const featureNames = [
   "crossOriginIsolated",
   "atomics",
   "webWorkers",
-  "webgl2",
+  "webgpu",
   "webSocket",
   "fetch",
   "audioContext",
@@ -169,8 +169,8 @@ const readMeasurement = (entry: Record<string, unknown>): DeviceMeasurement | nu
     !isNumber(cpu.effectiveCores) ||
     !isNumber(cpu.singleThreadScore) ||
     !isRecord(gpu) ||
-    typeof gpu.webgl2Renders !== "boolean" ||
-    !isNumber(gpu.fillPassesPerMs) ||
+    typeof gpu.webgpuRenders !== "boolean" ||
+    !isNumber(gpu.webgpuScore) ||
     !isRecord(memory) ||
     !(memory.deviceMemoryGiB === null || isNumber(memory.deviceMemoryGiB)) ||
     !isNumber(memory.maxSharedAllocMiB)
@@ -181,7 +181,7 @@ const readMeasurement = (entry: Record<string, unknown>): DeviceMeasurement | nu
     isolated,
     features,
     cpu: { effectiveCores: cpu.effectiveCores, singleThreadScore: cpu.singleThreadScore },
-    gpu: { webgl2Renders: gpu.webgl2Renders, fillPassesPerMs: gpu.fillPassesPerMs },
+    gpu: { webgpuRenders: gpu.webgpuRenders, webgpuScore: gpu.webgpuScore },
     memory: {
       deviceMemoryGiB: memory.deviceMemoryGiB,
       maxSharedAllocMiB: memory.maxSharedAllocMiB,
@@ -193,8 +193,8 @@ const fixedRules = new Set<unknown>([
   "minDeviceMemoryGiB",
   "minEffectiveCores",
   "minSingleThreadScore",
-  "minWebgl2FillPassesPerMs",
-  "requireWebgl2Renders",
+  "minWebgpuScore",
+  "requireWebgpuRenders",
   "softwareRenderer",
 ] satisfies Exclude<RequiredSpecRule, `feature:${string}`>[]);
 
@@ -204,8 +204,8 @@ const featureRules = new Set<unknown>(featureNames.map(name => `feature:${name}`
 const isRequiredSpecRule = (value: unknown): value is RequiredSpecRule =>
   fixedRules.has(value) || featureRules.has(value);
 
-// The rules a probe that stopped before its benchmarks posted: `null` when it ran them (and from
-// probes before 1.5.0, which always did), `undefined` when they aren't valid.
+// The rules a probe that stopped before its benchmarks posted: `null` when it ran them,
+// `undefined` when they aren't valid.
 const readEarlyStop = (value: unknown): RequiredSpecRule[] | null | undefined => {
   if (value == null) {
     return null;
@@ -242,28 +242,23 @@ export const measurementFromScores = (
     return null;
   }
   const { measuredWhileVisible } = scores.cpu;
-  const webgl2 = isRecord(scores.gpu) && isRecord(scores.gpu.webgl2) ? scores.gpu.webgl2 : {};
+  const webgpu = isRecord(scores.gpu) && isRecord(scores.gpu.webgpu) ? scores.gpu.webgpu : {};
   const measurement = readMeasurement({
     isolated: scores.features.crossOriginIsolated,
     features: scores.features,
     cpu: scores.cpu,
-    gpu: { webgl2Renders: webgl2.renders, fillPassesPerMs: webgl2.fillPassesPerMs },
+    gpu: { webgpuRenders: webgpu.renders, webgpuScore: webgpu.score },
     memory: scores.memory,
   });
   if (measurement == null || typeof measuredWhileVisible !== "boolean") {
     return null;
   }
-  if (earlyStop != null) {
-    // What it didn't measure is 0 or false, so the scores fail every rule that reads it.
-    return { measurement, measuredWhileVisible, earlyStop };
-  }
-  // When a benchmark throws, a probe before 1.5.0 returns fallback scores instead:
-  // `effectiveCores: 0` (a real run measures at least 1) or a WebGL 2 `renderer` of "error". They
-  // aren't a measurement, so they mustn't be cached as a device that fails the spec. A 1.5.0 probe
-  // rejects instead.
-  return measurement.cpu.effectiveCores < 1 || webgl2.renderer === "error"
+  // An early stop's unmeasured scores are 0 or false, so they fail every rule that reads them.
+  // A probe that ran the benchmarks measures at least 1 core (it rejects when the CPU benchmark
+  // fails), so a 0 isn't a measurement and mustn't be cached as a device that fails the spec.
+  return earlyStop == null && measurement.cpu.effectiveCores < 1
     ? null
-    : { measurement, measuredWhileVisible, earlyStop: null };
+    : { measurement, measuredWhileVisible, earlyStop };
 };
 
 /**
@@ -278,7 +273,7 @@ export const unmeasuredDevice = ({ deviceMemoryGiB }: ReportedDevice): DeviceMea
     featureNames.map(name => [name, false]),
   ) as DeviceMeasurement["features"],
   cpu: { effectiveCores: 0, singleThreadScore: 0 },
-  gpu: { webgl2Renders: false, fillPassesPerMs: 0 },
+  gpu: { webgpuRenders: false, webgpuScore: 0 },
   memory: { deviceMemoryGiB, maxSharedAllocMiB: 0 },
 });
 

@@ -74,9 +74,14 @@ export const runProbeFrame = (timeoutMs: number): Promise<FrameResult> =>
         event.source == null ||
         event.source !== iframe.contentWindow ||
         !isRecord(data) ||
-        data.type !== RESULT_MESSAGE_TYPE ||
-        data.version !== PROBE_VERSION
+        data.type !== RESULT_MESSAGE_TYPE
       ) {
+        return;
+      }
+      // Another score format: the page is from another build than this client, during a deploy.
+      // Its scores can't be read, and it says nothing about the device.
+      if (data.version !== PROBE_VERSION) {
+        settle({ ok: false, reason: "version" });
         return;
       }
       settle(data.ok === true ? { ok: true, scores: data.scores } : { ok: false, reason: "error" });

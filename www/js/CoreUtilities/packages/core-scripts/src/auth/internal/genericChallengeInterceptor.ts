@@ -1,9 +1,11 @@
-import $ from "jquery";
+/// <reference types="jquery" />
 
 let initialized = false;
 
 const initializeGenericChallengeInterceptor = (forceInit?: boolean): void => {
   if (!forceInit && initialized) return;
+  if (!("jQuery" in window)) return;
+  const $ = jQuery;
   // JQuery AJAX client-side error response interceptor for the Generic Challenge
   // Service.
   $.ajaxPrefilter((options: JQueryAjaxSettings) => {

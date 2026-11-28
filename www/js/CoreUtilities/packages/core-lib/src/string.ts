@@ -88,3 +88,27 @@ export const base64ToString = (base64: Base64): string => decoder.decode(base64T
  */
 export const base64UrlToString = (base64: Base64Url): string =>
   decoder.decode(base64UrlToBytes(base64));
+
+const htmlEscapes: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;",
+  "/": "&#x2F;",
+};
+
+/** Escapes a string for interpolation into HTML. Backslashes are left as-is. */
+export const escapeHtml = (str: string): string =>
+  str.replace(/[&<>"'\\/]/g, char => htmlEscapes[char] ?? char);
+
+/**
+ * Turns a name into the slug used in roblox.com URLs (`/groups/{id}/{slug}`), falling back to
+ * `"unnamed"` when nothing usable is left.
+ */
+export const formatSeoName = (name: string): string =>
+  name
+    .replace(/'/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/^(COM\d|LPT\d|AUX|PRT|NUL|CON|BIN)$/i, "") || "unnamed";

@@ -36,6 +36,7 @@ export const SearchGlobalSearch = {
 export const CommonUIMessages = {
   ActionClose: "Action.Close",
   ActionReturnHome: "Action.ReturnHome",
+  LabelLoading: "Label.Loading",
   ResponseUnexpectedError: "Response.UnexpectedError",
 };
 

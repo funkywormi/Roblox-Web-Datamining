@@ -1,7 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { EventContext } from "@rbx/unified-logging";
 import ExperimentationService from "@rbx/experimentation";
+import { cachedMeetsRequiredSpec } from "@rbx/device-probe/client";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { currentBrowser, Browser } from "@rbx/core-scripts/util/current-browser";
 import { fireEvent } from "@rbx/www-common/event-tracker";
@@ -43,13 +44,19 @@ const useMobileWebSignupForPlay = (
   pageContext: TPlayButtonPageContext,
   isVNGRedirectEnabled: boolean | null | undefined,
 ): { isMobileWebSignupEnabled: boolean; logMobileWebSignupExposure: () => void } => {
+  // Play on Web reads the probe's stored answer once at mount (usePlayOnWebVariant), so this
+  // takes only devices that would get its button once signed in. No stored answer yet (null)
+  // doesn't count.
+  const [meetsPlayOnWebSpec] = useState(() => cachedMeetsRequiredSpec() === true);
+
   // The layer enrolls on read, so VNG has to be ruled out first, as website#2241 does.
   // A failed VNG lookup (null) skips the read, like the server's.
   const isCandidate =
     status === PlayabilityStatus.GuestProhibited &&
     pageContext === EventContext.GameDetail &&
     isVNGRedirectEnabled === false &&
-    isAndroidChromePhone();
+    isAndroidChromePhone() &&
+    meetsPlayOnWebSpec;
 
   const { data: isDownloadPageHidden } = useQuery({
     queryKey: [MOBILE_WEB_SIGNUP_QUERY_KEY],

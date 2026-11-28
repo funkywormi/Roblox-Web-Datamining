@@ -48,13 +48,11 @@ const sanitizeRequiredSpec = (spec: Partial<RequiredSpec>): RequiredSpec => {
     minSingleThreadScore: isMinimum(spec.minSingleThreadScore)
       ? spec.minSingleThreadScore
       : defaults.minSingleThreadScore,
-    minWebgl2FillPassesPerMs: isMinimum(spec.minWebgl2FillPassesPerMs)
-      ? spec.minWebgl2FillPassesPerMs
-      : defaults.minWebgl2FillPassesPerMs,
-    requireWebgl2Renders:
-      typeof spec.requireWebgl2Renders === "boolean"
-        ? spec.requireWebgl2Renders
-        : defaults.requireWebgl2Renders,
+    minWebgpuScore: isMinimum(spec.minWebgpuScore) ? spec.minWebgpuScore : defaults.minWebgpuScore,
+    requireWebgpuRenders:
+      typeof spec.requireWebgpuRenders === "boolean"
+        ? spec.requireWebgpuRenders
+        : defaults.requireWebgpuRenders,
   };
 };
 

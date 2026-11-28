@@ -8,6 +8,10 @@ const url = {
     url: `${apiGatewayUrl}/discovery-api/omni-recommendation`,
     withCredentials: true,
   },
+  getHomePage: (): UrlConfig => ({
+    url: `${apiGatewayUrl}/discovery-api/v2/home-page`,
+    withCredentials: true,
+  }),
   getOmniRecommendationsMetadata: {
     url: `${apiGatewayUrl}/discovery-api/omni-recommendation-metadata`,
     withCredentials: true,
